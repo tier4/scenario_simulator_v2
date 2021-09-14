@@ -36,9 +36,15 @@ std::istream & operator>>(std::istream & is, RelativeDistanceType & datum)
 
   BOILERPLATE(longitudinal);
   BOILERPLATE(lateral);
-  BOILERPLATE(cartesianDistance);
+  BOILERPLATE(euclidianDistance);
 
 #undef BOILERPLATE
+
+  // NOTE: cartesianDistance is deprecated (since OpenSCENARIO 1.1)
+  if (buffer == "cartesianDistance") {
+    datum.value = RelativeDistanceType::euclidianDistance;
+    return is;
+  }
 
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(RelativeDistanceType, buffer);
 }
@@ -52,7 +58,7 @@ std::ostream & operator<<(std::ostream & os, const RelativeDistanceType & datum)
 
     BOILERPLATE(longitudinal);
     BOILERPLATE(lateral);
-    BOILERPLATE(cartesianDistance);
+    BOILERPLATE(euclidianDistance);
 
 #undef BOILERPLATE
 

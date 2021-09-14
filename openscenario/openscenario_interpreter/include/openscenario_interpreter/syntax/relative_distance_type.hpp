@@ -52,7 +52,6 @@ struct RelativeDistanceType
   enum value_type {
     longitudinal,
     lateral,
-    cartesianDistance,
     euclidianDistance,
   } value;
 

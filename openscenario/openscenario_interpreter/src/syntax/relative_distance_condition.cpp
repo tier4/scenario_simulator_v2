@@ -70,7 +70,6 @@ auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) ->
                                                                        : distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      Between::reference_points           >(triggering_entity);
         case RelativeDistanceType::lateral:           return freespace ? distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           Between::closest_bounding_box_points>(triggering_entity)
                                                                        : distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           Between::reference_points           >(triggering_entity);
-        case RelativeDistanceType::cartesianDistance: [[fallthrough]];  // NOTE: cartesianDistance is deprecated (OpenSCENARIO 1.1)
         case RelativeDistanceType::euclidianDistance: return freespace ? distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points>(triggering_entity)
                                                                        : distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::reference_points           >(triggering_entity);
       }
@@ -82,7 +81,6 @@ auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) ->
                                                                        : distance<CoordinateSystem::lane, RelativeDistanceType::longitudinal,      Between::reference_points           >(triggering_entity);
         case RelativeDistanceType::lateral:           return freespace ? distance<CoordinateSystem::lane, RelativeDistanceType::lateral,           Between::closest_bounding_box_points>(triggering_entity)
                                                                        : distance<CoordinateSystem::lane, RelativeDistanceType::lateral,           Between::reference_points           >(triggering_entity);
-        case RelativeDistanceType::cartesianDistance: [[fallthrough]];  // NOTE: cartesianDistance is deprecated (OpenSCENARIO 1.1)
         case RelativeDistanceType::euclidianDistance: return freespace ? distance<CoordinateSystem::lane, RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points>(triggering_entity)
                                                                        : distance<CoordinateSystem::lane, RelativeDistanceType::euclidianDistance, Between::reference_points           >(triggering_entity);
       }
