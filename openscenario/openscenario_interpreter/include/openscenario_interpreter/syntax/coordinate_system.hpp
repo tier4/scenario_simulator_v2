@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_TYPE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_TYPE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__COORDINATE_SYSTEM_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__COORDINATE_SYSTEM_HPP_
 
 #include <iostream>
 #include <type_traits>
@@ -22,22 +22,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeDistanceType (OpenSCENARIO 1.1) --------------------------------
+/* ---- CoordinateSystem (OpenSCENARIO 1.1) ------------------------------------
  *
- *  <xsd:simpleType name="RelativeDistanceType">
+ *  <xsd:simpleType name="CoordinateSystem">
  *    <xsd:union>
  *      <xsd:simpleType>
  *        <xsd:restriction base="xsd:string">
- *          <xsd:enumeration value="lateral"/>
- *          <xsd:enumeration value="longitudinal"/>
- *          <xsd:enumeration value="cartesianDistance">
- *            <xsd:annotation>
- *              <xsd:appinfo>
- *                deprecated
- *              </xsd:appinfo>
- *            </xsd:annotation>
- *          </xsd:enumeration>
- *          <xsd:enumeration value="euclidianDistance"/>
+ *          <xsd:enumeration value="entity"/>
+ *          <xsd:enumeration value="lane"/>
+ *          <xsd:enumeration value="road"/>
+ *          <xsd:enumeration value="trajectory"/>
  *        </xsd:restriction>
  *      </xsd:simpleType>
  *      <xsd:simpleType>
@@ -47,27 +41,30 @@ inline namespace syntax
  *  </xsd:simpleType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeDistanceType
+struct CoordinateSystem
 {
   enum value_type {
-    longitudinal,
-    lateral,
-    euclidianDistance,
+    entity,
+    lane,
+    road,
+    trajectory,
   } value;
 
-  explicit RelativeDistanceType() = default;
+  explicit CoordinateSystem() = default;
+
+  constexpr CoordinateSystem(value_type value) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<RelativeDistanceType>::value, "");
+static_assert(std::is_standard_layout<CoordinateSystem>::value, "");
 
-static_assert(std::is_trivial<RelativeDistanceType>::value, "");
+static_assert(std::is_trivial<CoordinateSystem>::value, "");
 
-std::istream & operator>>(std::istream &, RelativeDistanceType &);
+auto operator>>(std::istream &, CoordinateSystem &) -> std::istream &;
 
-std::ostream & operator<<(std::ostream &, const RelativeDistanceType &);
+auto operator<<(std::ostream &, const CoordinateSystem &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_TYPE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__COORDINATE_SYSTEM_HPP_
