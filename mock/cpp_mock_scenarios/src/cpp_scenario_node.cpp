@@ -22,14 +22,23 @@ CppScenarioNode::CppScenarioNode(
   const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
   const rclcpp::NodeOptions & option)
 : Node(node_name, option),
-  api_(this, configure(map_path, lanelet2_map_file, scenario_filename, verbose))
+  api_(this, configure(map_path, lanelet2_map_file, scenario_filename, verbose)),
+  exception_expect_(false)
 {
 }
 
 void CppScenarioNode::update()
 {
   onUpdate();
-  api_.updateFrame();
+  try {
+    api_.updateFrame();
+  } catch (const common::Error & e) {
+    if (exception_expect_) {
+      stop(Result::SUCCESS);
+    } else {
+      stop(Result::FAILURE);
+    }
+  }
 }
 
 void CppScenarioNode::start()

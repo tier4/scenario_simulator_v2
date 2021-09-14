@@ -46,20 +46,9 @@ or
 Error means the test cases was failed with error such as some Autoware node was downed, failed to launch Autoware etc..  
 All errors was thrown as error from API class.
 If you want to see example, please see also [this code](https://github.com/tier4/scenario_simulator_v2/blob/c6d7c4da7556a593dc3d34b0a982bc[…]r/include/openscenario_interpreter/openscenario_interpreter.hpp).  
-XML of the error result should be
-
-```xml
-<error type="AutowareError" message="foo" />
-```
-or
-```xml
-<error type="AutowareError" message="foo" />
-```
-
-Message in xml is a string which comes from what() member function from exception instance.
 
 #### Error Types
-Each error types describe these meanings.
+Each error types describe these meanings.  
 Flow chart of what message type should be use is here.
 
 ```mermaid
@@ -75,7 +64,14 @@ graph TB
     check_base_class_of_exception --> UnknownError
 ```
 
-If you want to know all exception types defined in scenario simulator exception package, please look at [this code](https://github.com/tier4/scenario_simulator_v2/blob/master/common/scenario_simulator_exception/include/scenario_simulator_exception/exception.hpp) and [this document.](ErrorCategories)
+Output format should be like below.
+
+```xml
+<error type="(ERROR_TYPE)" message="(ERROR_MESSAGE)" />
+```
+
+If you want to know all exception types defined in scenario simulator exception package, please look at [this code](https://github.com/tier4/scenario_simulator_v2/blob/master/common/scenario_simulator_exception/include/scenario_simulator_exception/exception.hpp) and [this document.](ErrorCategories.md)  
+(ERROR_MESSAGE) is a error message from exception.  
 
 ## Usage of simple_junit
 
