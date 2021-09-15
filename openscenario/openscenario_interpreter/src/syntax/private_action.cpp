@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/private_action.hpp>
+#include <openscenario_interpreter/utility/overload.hpp>
 
 namespace openscenario_interpreter
 {
@@ -20,20 +21,7 @@ inline namespace syntax
 {
 auto PrivateAction::endsImmediately() const -> bool
 {
-#define BOILERPLATE(TYPE)                \
-  if (is<TYPE>()) {                      \
-    return as<TYPE>().endsImmediately(); \
-  }
-
-  BOILERPLATE(LongitudinalAction)
-  BOILERPLATE(LateralAction)
-  BOILERPLATE(ControllerAction)
-  BOILERPLATE(TeleportAction)
-  BOILERPLATE(RoutingAction)
-
-  throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
-
-#undef BOILERPLATE
+  return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
