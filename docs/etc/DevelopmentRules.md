@@ -1,77 +1,76 @@
-# Development Rules
+# How to contribute
 
-If you have some questions and opinion, please feel free to contact maintainers in [github issue.](https://github.com/tier4/scenario_simulator_v2/issues)
+Thank you for interest in improving scenario_simulator_v2.
+This contributor guide will help you get started.
 
-## Branch Naming
+If you have any questions, please feel free to contact the [maintainers](ContactUs.md).
+
+## Before you get started
+
+To avoid duplicating work, please review current [issues](https://github.com/tier4/scenario_simulator_v2/issues) and [pull requests](https://github.com/tier4/scenario_simulator_v2/pulls).
+
+## Contribution workflow
+
+In short:
+
+1. Fork this repository.
+2. Clone down the repository to your local environment.
+3. Create a new branch from the `master`. See [Branch naming rule](#branch-naming-rules) below.
+4. Commit your changes to the branch and push to your (forked) GitHub repository.
+5. Open a Pull Request (PR). Your changes will be tested automatically. See [Continuous integration](#continuous-integration) below.
+6. Maintainers will review your PR. Once the PR is approved, the code will be merged into the `master` branch. See [Code review](#code-review) below.
+
+## Branch naming rules
+
 ### Feature development
 
-Please use "feature" prefix.  
-Branch name should be like below.
+Please add the `feature/` prefix to your branch name. For example:
 
 ```
-feature/(name of the feature you are developing.)
+feature/(name of the feature you are developing)
 ```
-
-feature branch will be merged into master branch and deleted.
 
 ### Bugfix
 
-Please use "fix" prefix.
-For example,
+Please add the `fix/` prefix to your branch name. For example:
 
 ```
-fix/(name of bug what you are fixing.)
+fix/(name of bug what you are fixing)
 ```
-
-fix branch will be merged into master branch and deleted.
 
 ### Release
-Only maintainers create this branch.  
-Naming rules are below.  
+
+Only maintainers create the `release/` branch.
 
 ```
 release/prepare_(version_tag)
 ```
 
-This branch only update release notes.  
-For example, [link](https://github.com/tier4/scenario_simulator_v2/pull/477)
+The release branches are used only to update the release notes. An example is [here](https://github.com/tier4/scenario_simulator_v2/pull/477).
 
+## Continuous integration
 
-## Merge rule
-### Continuous Integration
+Your changes proposed in the pull request will be tested automatically by the following checks:
 
-If you modify source code, you should be pass all checks below.
+| Checks                                                                                                                                                                                                 | Description                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| [![ScenarioTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml)    | Build all packages and run integration tests.                      |
+| [![BuildTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml)                     | Build each package independently, run linters, and run unit tests. |
+| [![Docker](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)                      | Build a docker image.                                              |
+| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml) | Build the documentation sites.                                     |
+| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)          | Run a spell checker and add warnings to the PR.                    |
 
-|                                                                                                 Budge                                                                                                  |                          Description                           |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| [![ScenarioTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml)    | Build all packages and running integration test.               |
-| [![BuildTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml)                     | Build each package independently and run linter and unit test. |
-| [![Docker](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)                      | Build docker image.                                            |
-| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml) | Build documentation site.                                      |
-| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)          | Run spell checker and leave comment.                           |
+If you contribute to the documentation, your changes should pass the checks below:
 
+| Checks                                                                                                                                                                                                 | Description                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml) | Build the documentation sites.                  |
+| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)          | Run a spell checker and add warnings to the PR. |
 
+## Code review
 
+Any changes to the code or documentation are subject to code review. Maintainers will review your pull request.
 
-Currently, spellcheck is not required, but please check and fix typo if possible.
+**Please do not force-push the commit to your pull request during the code review.** If you want to force-push the commit, please consult with the maintainers in advance.
 
-If you modify only documentation, you should pass checks below.
-
-|                                                                                                 Budge                                                                                                  |                          Description                           |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml) | Build documentation site.                                      |
-| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)          | Run spell checker and leave comment.                           |
-
-### Code review
-More than one [maintainer](/etc/ContactUs) approve your code and check all test cases are passed, your code will be merged into master branch.  
-Your contribution will be recorded in [release note.](/ReleaseNotes)
-
-### How to merge your contribution
-Each branches create merge commit and merge into master branch.
-
-## Push rule
-If you push your source code to scenario_simulator_v2, please follow these guidelines.
-
-1. If you are try to solving urgent problem which only can be solve with force push, please contact to the maintainer and after the maintainer allowed it, then you can execute force push.
-1. Anyone can execute force push to the master branch.
-1. Pushing your source code to the master branch is principle prohibited.
+More than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch. Your contribution will be recorded in the [release note](../ReleaseNotes.md).

@@ -2,15 +2,15 @@
 
 ![ZeroMQ communication](../image/inter_process_communication.png "ZeroMQ inter-process communication")
 
-We use ZeroMQ Inter-Process communication to communicate with your simulator and Traffic simulator.
+We use ZeroMQ Inter-Process communication to communicate with your simulator and traffic simulator.
 
-<font color="#065479E">*Note! Simple Sensor Simulator is just a reference implementation, so we can adapt any kinds of autonomous driving simulators if we can develop ZeroMQ interface to your simulator.*</font>
+<font color="#065479E">_Note! Simple Sensor Simulator is just a reference implementation. We can adapt any kinds of autonomous driving simulators if we can develop ZeroMQ interface to your simulator._</font>
 
 ## What is ZeroMQ
 
 [ZeroMQ](https://zeromq.org/) is an open-source messaging library. It supports TCP/UDP/Inter-Process messaging communication.  
 We use [ZeroMQ](https://zeromq.org/) in order to communicate with the simulator and interpreter.
-We use Request/Reply sockets in order to run the simulators synchronously.  
+We use Request/Reply sockets in order to run the simulators synchronously.
 
 <iframe 
   class="hatenablogcard" 
@@ -20,9 +20,9 @@ We use Request/Reply sockets in order to run the simulators synchronously.
   width="300" height="150" frameborder="0" scrolling="no">
 </iframe>
 
-## Sequence Diagram
+## Sequence diagram
 
-Traffic simulator has a ZeroMQ client and Sensor simulator has a ZeroMQ server.
+The traffic simulator has a ZeroMQ client and the simple sensor simulator has a ZeroMQ server.
 We use [Protocol Buffers](https://developers.google.com/protocol-buffers) (protobuf) in order to serialize data.
 
 ```mermaid
@@ -50,16 +50,16 @@ sequenceDiagram
 
 ## Schema of the message
 
-traffic_simulator::API sends the request to the simulator. The requests are serialized by using protobuf and use various ports in order to communicate with the simulator.
+`traffic_simulator::API` sends the request to the simulator. The requests are serialized by using protobuf and use various ports in order to communicate with the simulator.
 
-### Protobuf Definition
+### Protobuf definition
 
 The schema of protobuf is [here](https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/simulation_interface/proto/simulation_api_schema.proto).
 Protobuf documentation is [here](../proto_doc/protobuf.md). All data are serialized as string and sent via TCP by using ZeroMQ.
 
 ## Required APIs for co-simulation
 
-Traffic simulator and Simple sensor simulator communicate with APIs. If you want to integrate the simulators with your simulator, only you have to do is preparing these APIs below.
+The traffic simulator and the simple sensor simulator communicate with APIs. If you want to integrate the simulators with your simulator, only you have to do is preparing the following APIs:
 
 | API                      | TCP Port | Request                                                                                                                                              | Response                                                                                                                                               |
 | ------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |

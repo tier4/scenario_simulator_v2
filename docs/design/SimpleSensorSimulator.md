@@ -5,7 +5,7 @@
 The simple sensor simulator is a reference implementation of the simulator which follows our scenario testing framework.
 This package includes very very simple lidar simulation and send simulated detection result to the Autoware.
 
-<font color="#065479E">*Note! Simple Sensor Simulator is just a reference implementation, so we can adapt any kinds of autonomous driving simulators if we can develop ZeroMQ interface to your simulator.*</font>
+<font color="#065479E">_Note! Simple Sensor Simulator is just a reference implementation, so we can adapt any kinds of autonomous driving simulators if we can develop ZeroMQ interface to your simulator._</font>
 
 In lidar simulation, we use intel's ray-casting library embree.
 

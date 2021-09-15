@@ -12,18 +12,22 @@ Scenario simulator v2 is a scenario testing framework for Autoware.
 
 ![Scenario Testing Framework](image/what_is_scenario_testing_framework.png "what is scenario testing framework")
 
-It enables Autoware developers to write a scenario at once and run in various kinds of simulator.  
+It enables Autoware developers to write a scenario at once and run in various kinds of simulator.
 
-## What can we do with this framework  
+## What can we do with this framework
+
 Currently, various kinds of simulators and scenario formats are developed all over the world.
 We need an open-source framework for integrating those testing tools with Autoware easily and quickly.
-So, we developed this package.
-<font color="#065479E">__This package is designed to easily accommodate multiple simulators and scenario description formats.__</font>
-This package provides under the Apache License, Version 2.0.
+So, we are developing this package.
+<font color="#065479E">**This package is designed to easily accommodate multiple simulators and scenario description formats.**</font>
+
+This package is licensed under the Apache License, Version 2.0.
 See also [LICENSE](LICENSE).
 
 ## Why this framework is v2?
-This package is re-designed [scenario runner](https://github.com/tier4/scenario_runner.iv.universe) developed by [Tier IV, Inc.](https://tier4.jp/en/), so we named this framework as "scenario_simulator_v2"
 
-## Development rules
-See also [this page.](/etc/DevelopmentRules)
+This package re-designs the [scenario runner](https://github.com/tier4/scenario_runner.iv.universe) developed by [Tier IV, Inc.](https://tier4.jp/en/), so we named this framework as "scenario_simulator_v2"
+
+## How to contribute
+
+Please refer to the [contribution guidelines.](etc/DevelopmentRules.md).
