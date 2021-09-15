@@ -53,19 +53,28 @@ struct GlobalAction : public Element
   {
   }
 
-  bool endsImmediately() const
-  {
-#define BOILERPLATE(TYPE)                \
-  if (is<TYPE>()) {                      \
-    return as<TYPE>().endsImmediately(); \
-  }
-    BOILERPLATE(EntityAction)
-    BOILERPLATE(ParameterAction)
-    BOILERPLATE(InfrastructureAction)
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
-#undef BOILERPLATE
-  }
+  auto endsImmediately() const -> bool;
+
+  auto run() -> void;
 };
+
+DEFINE_LAZY_VISITOR(
+  GlobalAction,
+  // CASE(EnvironmentAction),
+  CASE(EntityAction),          //
+  CASE(ParameterAction),       //
+  CASE(InfrastructureAction),  //
+  // CASE(TrafficAction),
+);
+
+DEFINE_LAZY_VISITOR(
+  const GlobalAction,
+  // CASE(EnvironmentAction),
+  CASE(EntityAction),          //
+  CASE(ParameterAction),       //
+  CASE(InfrastructureAction),  //
+  // CASE(TrafficAction),
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

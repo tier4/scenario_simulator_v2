@@ -40,6 +40,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Action : public Scope, public StoryboardElement<Action>, public Element
 {
+  bool overridden = false;
+
   template <typename Node>
   explicit Action(const Node & node, Scope & scope)
   // clang-format off
@@ -76,9 +78,9 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
 
   using StoryboardElement::evaluate;
 
-  bool overridden = false;
+  auto run() -> void;
 
-  void stop()
+  auto stop() -> void
   {
     if (overridden) {
       current_state = complete_state;
@@ -86,44 +88,23 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
       overridden = true;
     }
   }
-
-  template <typename... Ts>
-  auto run(Ts &&... xs) -> decltype(auto)
-  {
-    return Element::evaluate(std::forward<decltype(xs)>(xs)...);
-  }
 };
 
 auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;
 
-template <typename Result, typename Function, typename... Ts>
-auto apply(Function && function, Action & action, Ts &&... xs) -> Result
-{
-  using functor = std::function<Result(Function &&, Action &, Ts && ...)>;
+DEFINE_LAZY_VISITOR(
+  Action,                   //
+  CASE(GlobalAction),       //
+  CASE(UserDefinedAction),  //
+  CASE(PrivateAction),      //
+);
 
-#define BOILERPLATE(TYPE)                                                    \
-  std::make_pair<std::type_index, functor>(                                  \
-    typeid(TYPE), [](Function && function, Action & action, Ts &&... xs) {   \
-      return function(action.as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
-    })
-
-  static const std::unordered_map<std::type_index, functor> overloads{
-    // clang-format off
-    BOILERPLATE(     GlobalAction),
-    BOILERPLATE(UserDefinedAction),
-    BOILERPLATE(    PrivateAction),
-    // clang-format on
-  };
-
-#undef BOILERPLATE
-
-  try {
-    return overloads.at(action.type())(
-      std::forward<decltype(function)>(function), action, std::forward<decltype(xs)>(xs)...);
-  } catch (const std::out_of_range &) {
-    throw UNSUPPORTED_SETTING_DETECTED(Action, makeTypename(action.type().name()));
-  }
-}
+DEFINE_LAZY_VISITOR(
+  const Action,             //
+  CASE(GlobalAction),       //
+  CASE(UserDefinedAction),  //
+  CASE(PrivateAction),      //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -133,7 +133,7 @@ struct CustomCommandAction : private Scope
     return args;
   }
 
-  auto evaluate()
+  auto run() -> void
   {
     /* ---- NOTE ---------------------------------------------------------------
      *
@@ -154,8 +154,6 @@ struct CustomCommandAction : private Scope
     } else {
       fork_exec(type, content);
     }
-
-    return unspecified;
   }
 
   friend std::ostream & operator<<(std::ostream & os, const CustomCommandAction & action)

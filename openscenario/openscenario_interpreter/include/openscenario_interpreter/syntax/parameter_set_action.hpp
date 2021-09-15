@@ -48,7 +48,7 @@ struct ParameterSetAction : private Scope
 
   static constexpr auto accomplished() noexcept { return true; }
 
-  auto evaluate() const noexcept(false)
+  auto run() const -> void
   {
     // clang-format off
     static const std::unordered_map<
@@ -66,8 +66,6 @@ struct ParameterSetAction : private Scope
     const auto parameter = findElement(parameter_ref);
 
     overloads.at(parameter.type())(parameter, value);
-
-    return parameter;
   }
 };
 }  // namespace syntax

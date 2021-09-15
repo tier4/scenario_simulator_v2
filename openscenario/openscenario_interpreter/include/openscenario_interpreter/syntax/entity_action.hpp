@@ -58,7 +58,7 @@ struct EntityAction : public Element
 
   static auto endsImmediately() noexcept -> bool { return true; }
 
-  inline auto evaluate() const
+  inline auto run() const -> void
   {
     // clang-format off
     static const std::unordered_map<std::type_index, std::function<void(const EntityAction &, const String &)>> overloads
@@ -69,8 +69,6 @@ struct EntityAction : public Element
     // clang-format on
 
     overloads.at(type())(*this, entity_ref);  // TODO(yamacir-kit) CATCH std::out_of_range
-
-    return unspecified;
   }
 };
 }  // namespace syntax

@@ -21,15 +21,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== UserDefinedAction ====================================================
+/* ---- UserDefinedAction ------------------------------------------------------
  *
- * <xsd:complexType name="UserDefinedAction">
- *   <xsd:sequence>
- *     <xsd:element name="CustomCommandAction" type="CustomCommandAction"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="UserDefinedAction">
+ *    <xsd:sequence>
+ *      <xsd:element name="CustomCommandAction" type="CustomCommandAction"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct UserDefinedAction : public Element
 {
   template <typename Node, typename Scope>
@@ -41,7 +41,19 @@ struct UserDefinedAction : public Element
   }
 
   static bool endsImmediately() { return true; }
+
+  auto run() -> void;
 };
+
+DEFINE_LAZY_VISITOR(
+  UserDefinedAction,
+  CASE(CustomCommandAction),  //
+);
+
+DEFINE_LAZY_VISITOR(
+  const UserDefinedAction,
+  CASE(CustomCommandAction),  //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

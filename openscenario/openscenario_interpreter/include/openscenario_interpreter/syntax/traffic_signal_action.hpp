@@ -46,16 +46,22 @@ struct TrafficSignalAction : public ComplexType
   {
   }
 
-  bool endsImmediately() const
-  {
-    if (is<TrafficSignalControllerAction>()) {
-      return as<TrafficSignalControllerAction>().endsImmediately();
-    } else if (is<TrafficSignalStateAction>()) {
-      return as<TrafficSignalStateAction>().endsImmediately();
-    }
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
-  }
+  auto endsImmediately() const -> bool;
+
+  auto run() -> void;
 };
+
+DEFINE_LAZY_VISITOR(
+  TrafficSignalAction,
+  CASE(TrafficSignalStateAction),       //
+  CASE(TrafficSignalControllerAction),  //
+);
+
+DEFINE_LAZY_VISITOR(
+  const TrafficSignalAction,
+  CASE(TrafficSignalStateAction),       //
+  CASE(TrafficSignalControllerAction),  //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
