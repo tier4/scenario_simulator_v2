@@ -94,7 +94,36 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
   }
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Action &);
+auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;
+
+template <typename Result, typename Function, typename... Ts>
+auto apply(Function && function, Action & action, Ts &&... xs) -> Result
+{
+  using functor = std::function<Result(Function &&, Action &, Ts && ...)>;
+
+#define BOILERPLATE(TYPE)                                                    \
+  std::make_pair<std::type_index, functor>(                                  \
+    typeid(TYPE), [](Function && function, Action & action, Ts &&... xs) {   \
+      return function(action.as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
+    })
+
+  static const std::unordered_map<std::type_index, functor> overloads{
+    // clang-format off
+    BOILERPLATE(     GlobalAction),
+    BOILERPLATE(UserDefinedAction),
+    BOILERPLATE(    PrivateAction),
+    // clang-format on
+  };
+
+#undef BOILERPLATE
+
+  try {
+    return overloads.at(action.type())(
+      std::forward<decltype(function)>(function), action, std::forward<decltype(xs)>(xs)...);
+  } catch (const std::out_of_range &) {
+    throw UNSUPPORTED_SETTING_DETECTED(Action, makeTypename(action.type().name()));
+  }
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
