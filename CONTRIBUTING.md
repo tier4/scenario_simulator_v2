@@ -10,4 +10,4 @@ be under the Apache 2 License, as dictated by that
 >    the terms of any separate license agreement you may have executed
 >    with Licensor regarding such Contributions.
 
-Also, please refer to the [contribution guidelines](docs/etc/DevelopmentRules.md).
+Also, please refer to the [contribution guidelines](docs/etc/HowToContribute.md).
