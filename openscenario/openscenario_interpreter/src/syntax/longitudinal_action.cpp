@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/private_action.hpp>
+#include <openscenario_interpreter/syntax/longitudinal_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto PrivateAction::endsImmediately() const -> bool
+auto LongitudinalAction::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
 }

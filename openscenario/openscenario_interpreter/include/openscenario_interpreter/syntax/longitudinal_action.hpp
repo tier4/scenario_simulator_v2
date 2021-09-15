@@ -45,14 +45,36 @@ struct LongitudinalAction : public Element
   {
   }
 
-  bool endsImmediately() const
-  {
-    if (is<SpeedAction>()) {
-      return as<SpeedAction>().endsImmediately();
-    }
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
-  }
+  auto endsImmediately() const -> bool;
 };
+
+template <typename Result = void, typename Function, typename... Ts>
+auto apply(Function && function, const LongitudinalAction & action, Ts &&... xs) -> Result
+{
+  using functor = std::function<Result(Function &&, const LongitudinalAction &, Ts &&...)>;
+
+#define BOILERPLATE(TYPE)                                                                    \
+  std::make_pair<std::type_index, functor>(                                                  \
+    typeid(TYPE), [](Function && function, const LongitudinalAction & action, Ts &&... xs) { \
+      return function(action.as<TYPE>(), std::forward<decltype(xs)>(xs)...);                 \
+    })
+
+  static const std::unordered_map<std::type_index, functor> overloads{
+    // clang-format off
+    BOILERPLATE(               SpeedAction),
+    // BOILERPLATE(LongitudinalDistanceAction),
+    // clang-format on
+  };
+
+#undef BOILERPLATE
+
+  try {
+    return overloads.at(action.type())(
+      std::forward<decltype(function)>(function), action, std::forward<decltype(xs)>(xs)...);
+  } catch (const std::out_of_range &) {
+    throw UNSUPPORTED_SETTING_DETECTED(LongitudinalAction, makeTypename(action.type().name()));
+  }
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
