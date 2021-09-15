@@ -41,3 +41,7 @@ This error occurs when the scenario you gave is correct as OpenSCENARIO, but use
 
 Communicating the need for the feature to the developers may help to raise the priority of the implementation.
 Alternatively, if you can implement the feature yourself, please consider submitting a pull request to our interpreter/simulator.
+
+## SpecificationViolation
+
+Metric module detects specification violation in simulation.  

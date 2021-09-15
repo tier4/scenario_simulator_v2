@@ -17,7 +17,9 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -43,36 +45,36 @@ struct TeleportAction : private Scope
   {
   }
 
-  const std::true_type accomplished{};
+  static auto accomplished() noexcept -> bool { return true; }
 
-  decltype(auto) operator()(const WorldPosition & world_position, const EntityRef & actor) const
-  {
-    return setEntityStatus(actor, static_cast<geometry_msgs::msg::Pose>(world_position));
-  }
+  static auto endsImmediately() noexcept -> bool { return true; };
 
-  decltype(auto) operator()(const LanePosition & lane_position, const EntityRef & actor) const
+  inline auto start() const -> void
   {
-    return setEntityStatus(actor, static_cast<openscenario_msgs::msg::LaneletPose>(lane_position));
-  }
+    auto teleport_action = overload(
+      [](const WorldPosition & position, const auto & actor) {
+        return applyTeleportAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
+      },
+      [](const RelativeWorldPosition & position, const auto & actor) {
+        return applyTeleportAction(
+          actor,
+          position.reference,  // name
+          position,            // geometry_msgs::msg::Point
+          position.orientation);
+      },
+      [](const LanePosition & position, const auto & actor) {
+        return applyTeleportAction(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+      });
 
-  decltype(auto) operator()(
-    const RelativeWorldPosition & relative_world_position, const EntityRef & actor) const
-  {
-    return setEntityStatus(
-      actor,
-      relative_world_position.reference,  // name
-      relative_world_position,            // geometry_msgs::msg::Point
-      relative_world_position.orientation);
-  }
-
-  void start() const
-  {
     for (const auto & actor : actors) {
-      apply(*this, position, actor);
+      if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
+        AddEntityAction(localScope(), position)(actor);  // NOTE: Tier IV extension
+      } else {
+        apply(teleport_action, position, actor);
+      }
     }
   }
-
-  static constexpr auto endsImmediately() noexcept { return true; };
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

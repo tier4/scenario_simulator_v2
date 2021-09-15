@@ -59,10 +59,11 @@ auto Interpreter::isSuccessIntended() const -> bool { return intended_result == 
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
+  const boost::filesystem::path logic_file =
+    script.as<OpenScenario>().category.as<ScenarioDefinition>().road_network.logic_file.filepath;
+
   auto configuration = traffic_simulator::Configuration(
-    boost::filesystem::is_directory(script.as<OpenScenario>().logic_file)
-      ? script.as<OpenScenario>().logic_file
-      : script.as<OpenScenario>().logic_file.parent_path());
+    boost::filesystem::is_directory(logic_file) ? logic_file : logic_file.parent_path());
   {
     configuration.auto_sink = false;
 
@@ -72,10 +73,8 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
     configuration.scenario_path = osc_path;
 
     // XXX DIRTY HACK!!!
-    if (
-      not boost::filesystem::is_directory(script.as<OpenScenario>().logic_file) and
-      script.as<OpenScenario>().logic_file.extension() == ".osm") {
-      configuration.lanelet2_map_file = script.as<OpenScenario>().logic_file.filename().string();
+    if (not boost::filesystem::is_directory(logic_file) and logic_file.extension() == ".osm") {
+      configuration.lanelet2_map_file = logic_file.filename().string();
     }
   }
 

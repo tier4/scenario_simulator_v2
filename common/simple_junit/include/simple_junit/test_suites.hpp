@@ -55,7 +55,7 @@ public:
         const auto & each_cases = std::get<1>(each_suite);
 
         return sum + std::accumulate(
-                       std::cbegin(each_cases), std::cend(each_cases), 0,
+                       std::cbegin(each_cases), std::cend(each_cases), 0.0,
                        [](const auto sum, const auto & each_case) { return sum + each_case.time; });
       });
   }

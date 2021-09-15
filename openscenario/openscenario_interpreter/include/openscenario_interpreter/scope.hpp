@@ -42,9 +42,9 @@ private:
 
   std::vector<EnvironmentFrame *> anonymous_children;
 
-  EnvironmentFrame() = default;
+  explicit EnvironmentFrame() = default;
 
-  EnvironmentFrame(EnvironmentFrame & parent, const std::string & name)
+  explicit EnvironmentFrame(EnvironmentFrame & parent, const std::string & name)
   : scope_name(name), parent(&parent)
   {
     if (name.empty()) {
@@ -54,12 +54,12 @@ private:
     }
   }
 
-  EnvironmentFrame(const EnvironmentFrame &) = delete;
+  explicit EnvironmentFrame(const EnvironmentFrame &) = delete;
 
-  EnvironmentFrame(EnvironmentFrame &&) = delete;
+  explicit EnvironmentFrame(EnvironmentFrame &&) = delete;
 
 public:
-  auto addElement(const std::string & name, Element element) -> void
+  auto insert(const std::string & name, Element element) -> void
   {
     if (name.find(':') != std::string::npos) {
       THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':'");
@@ -210,40 +210,44 @@ class Scope
 {
   const std::shared_ptr<EnvironmentFrame> frame;
 
+  struct GlobalEnvironment
+  {
+    const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
+
+    std::unordered_map<std::string, Element> entities;  // ScenarioObject or EntitySelection
+
+    explicit GlobalEnvironment(const boost::filesystem::path pathname) : pathname(pathname) {}
+  };
+
+  const std::shared_ptr<GlobalEnvironment> global_environment;
+
 public:
   const std::string name;
 
   std::list<EntityRef> actors;
 
-  const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
-
-  boost::filesystem::path logic_file;  // NOTE: Assigned by RoadNetwork's constructor.
-
-  boost::filesystem::path scene_graph_file;  // NOTE: Assigned by RoadNetwork's constructor.
-
-  Scope() = delete;
+  explicit Scope() = delete;
 
   explicit Scope(const boost::filesystem::path & pathname)
-  : frame(new EnvironmentFrame()), pathname(pathname)
+  : frame(new EnvironmentFrame()), global_environment(std::make_shared<GlobalEnvironment>(pathname))
   {
   }
 
 private:
   explicit Scope(
-    const Scope & parent, const std::string & name,
-    const std::shared_ptr<EnvironmentFrame> & frame_)
-  : frame(frame_),
-    name(name),
-    actors(parent.actors),
-    pathname(parent.pathname),
-    logic_file(parent.logic_file),
-    scene_graph_file(parent.scene_graph_file)
+    const Scope & parent, const std::string & name, const std::shared_ptr<EnvironmentFrame> & frame)
+  : frame(frame), global_environment(parent.global_environment), name(name), actors(parent.actors)
   {
   }
 
 public:
-  Scope(const Scope &) = default;  // note: shallow copy
+  Scope(const Scope &) = default;  // NOTE: shallow copy
+
   Scope(Scope &&) noexcept = default;
+
+  auto global() const -> const auto & { return *global_environment; }
+
+  auto global() -> auto & { return *global_environment; }
 
   auto localScope() const noexcept -> const auto & { return *this; }
 
@@ -255,9 +259,9 @@ public:
       *this, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*frame, name)));
   }
 
-  auto addElement(const std::string & name_, const Element & element)
+  auto insert(const std::string & name_, const Element & element)
   {
-    return frame->addElement(name_, element);
+    return frame->insert(name_, element);
   }
 
   auto findElement(const std::string & name_) const { return frame->findElement(name_); }

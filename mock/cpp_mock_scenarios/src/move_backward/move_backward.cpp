@@ -31,9 +31,8 @@ class MoveBackwardScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit MoveBackwardScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "move_backward",
-      ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
-      "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
+      "move_backward", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option)
   {
     start();
   }
