@@ -36,11 +36,14 @@ public:
     const bool verbose, const rclcpp::NodeOptions & option);
   void start();
   void stop(Result result);
+  void expectThrow() { exception_expect_ = true; }
+  void expectNoThrow() { exception_expect_ = false; }
 
 protected:
   traffic_simulator::API api_;
 
 private:
+  bool exception_expect_;
   void update();
   virtual void onUpdate() = 0;
   virtual void onInitialize() = 0;

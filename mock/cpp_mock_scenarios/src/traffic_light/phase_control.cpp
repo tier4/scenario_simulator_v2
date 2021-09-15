@@ -31,9 +31,8 @@ class PhaseControlScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit PhaseControlScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "phase_control",
-      ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
-      "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
+      "phase_control", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option)
   {
     start();
   }

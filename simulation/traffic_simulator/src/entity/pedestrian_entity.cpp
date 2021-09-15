@@ -85,7 +85,11 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
   }
 }
 
-void PedestrianEntity::cancelRequest() { tree_ptr_->setRequest("none"); }
+void PedestrianEntity::cancelRequest()
+{
+  tree_ptr_->setRequest("none");
+  route_planner_ptr_->cancelGoal();
+}
 
 void PedestrianEntity::setTargetSpeed(double target_speed, bool continuous)
 {

@@ -80,7 +80,11 @@ void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
   tree_ptr_->setValueToBlackBoard("to_lanelet_id", to_lanelet_id);
 }
 
-void VehicleEntity::cancelRequest() { tree_ptr_->setRequest("none"); }
+void VehicleEntity::cancelRequest()
+{
+  tree_ptr_->setRequest("none");
+  route_planner_ptr_->cancelGoal();
+}
 
 void VehicleEntity::setTargetSpeed(double target_speed, bool continuous)
 {

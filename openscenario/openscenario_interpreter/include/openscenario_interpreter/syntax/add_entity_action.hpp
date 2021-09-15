@@ -16,8 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ADD_ENTITY_ACTION_HPP_
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
-#include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 
 namespace openscenario_interpreter
 {
@@ -32,17 +33,80 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AddEntityAction
+struct AddEntityAction : private Scope
 {
   const Position position;
 
-  template <typename Node, typename Scope>
-  explicit AddEntityAction(const Node & node, Scope & outer_scope)
-  : position(readElement<Position>("Position", node, outer_scope))
+  explicit AddEntityAction(const Scope & scope, const Position & position)
+  : Scope(scope), position(position)
   {
   }
 
-  auto operator()(const String & /* entity_ref */) const { return unspecified; }
+  template <typename Tree>
+  explicit AddEntityAction(const Tree & tree, Scope & scope)
+  : Scope(scope), position(readElement<Position>("Position", tree, scope))
+  {
+  }
+
+  static auto accomplished() noexcept -> bool { return endsImmediately(); }
+
+  static auto endsImmediately() noexcept -> bool { return true; }
+
+  inline auto operator()(const std::string & entity_ref) const -> void
+  try {
+    const auto entity = global().entities.at(entity_ref);
+
+    // XXX DIRTY HACK!!!
+#define APPLY_ADD_ENTITY_ACTION(...)                                                               \
+  apply<bool>(                                                                                     \
+    overload(                                                                                      \
+      [&](const WorldPosition & position) {                                                        \
+        return applyAddEntityAction(__VA_ARGS__, static_cast<geometry_msgs::msg::Pose>(position)); \
+      },                                                                                           \
+      [&](const RelativeWorldPosition & position) {                                                \
+        return applyAddEntityAction(                                                               \
+          __VA_ARGS__, position.reference, position, position.orientation);                        \
+      },                                                                                           \
+      [&](const LanePosition & position) {                                                         \
+        return applyAddEntityAction(                                                               \
+          __VA_ARGS__, static_cast<openscenario_msgs::msg::LaneletPose>(position));                \
+      }),                                                                                          \
+    position)
+
+    auto add_entity_action = overload(
+
+      [&](const Vehicle & vehicle) {
+        if (APPLY_ADD_ENTITY_ACTION(
+              entity.as<ScenarioObject>().object_controller.isEgo(),  //
+              entity_ref,                                             //
+              static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
+          applyAssignControllerAction(entity_ref, entity.as<ScenarioObject>().object_controller);
+          entity.as<ScenarioObject>().activateSensors();
+          entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
+        }
+      },
+
+      [&](const Pedestrian & pedestrian) {
+        APPLY_ADD_ENTITY_ACTION(
+          false, entity_ref, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
+      },
+
+      [&](const MiscObject & misc_object) {
+        APPLY_ADD_ENTITY_ACTION(
+          false, entity_ref,
+          static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
+      });
+
+    if (not std::exchange(entity.as<ScenarioObject>().is_added, true)) {
+      apply<void>(add_entity_action, entity.as<EntityObject>());
+    } else {
+      throw SemanticError(
+        "Applying action AddEntityAction to an entity ", std::quoted(entity_ref),
+        " that has already been added.");
+    }
+  } catch (const std::out_of_range &) {
+    throw SemanticError("No such name of entity ", std::quoted(entity_ref));
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

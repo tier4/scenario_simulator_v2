@@ -79,7 +79,7 @@ OpenSCENARIO:
                 - name: isEgo
                   value: "false"
       - name: vehicle-1
-        Vehicle:
+        Vehicle: &DefaultVehicle
           name: ""
           vehicleCategory: car
           BoundingBox:
@@ -110,11 +110,14 @@ OpenSCENARIO:
               positionZ: 0.3
           Properties:
             Property: []
-        ObjectController:
+        ObjectController: &DefaultObjectController
           Controller:
             name: ""
             Properties:
               Property: []
+      - name: vehicle-2
+        Vehicle: *DefaultVehicle
+        ObjectController: *DefaultObjectController
       - name: barricade
         MiscObject:
           mass: 1.0
@@ -463,6 +466,56 @@ OpenSCENARIO:
                         SimulationTimeCondition:
                           value: 0
                           rule: greaterThan
+          - name: "test AddEntityAction"
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: "if (10 < t)"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      rule: greaterThan
+                                      value: 10
+                        Action:
+                          - name: ""
+                            GlobalAction:
+                              EntityAction:
+                                entityRef: vehicle-2
+                                AddEntityAction:
+                                  Position:
+                                    LanePosition:
+                                      roadId: ''
+                                      laneId: '34507'
+                                      s: 50
+                                      offset: 0
+                                      Orientation:
+                                        type: relative
+                                        h: 0
+                                        p: 0
+                                        r: 0
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name:
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          rule: greaterThan
+                          value: 0
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1

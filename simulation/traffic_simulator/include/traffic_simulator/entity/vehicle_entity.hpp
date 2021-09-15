@@ -60,7 +60,7 @@ public:
 
   void requestLaneChange(const std::int64_t to_lanelet_id);
 
-  void cancelRequest();
+  void cancelRequest() override;
 
   const boost::optional<openscenario_msgs::msg::VehicleParameters> getVehicleParameters() const
   {

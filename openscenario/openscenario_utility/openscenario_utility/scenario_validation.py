@@ -52,7 +52,7 @@ class ScenarioValidator:
         self.warning_message = ''
         self.schema = xmlschema.XMLSchema(
             resource_string(
-                __name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
+                __name__, "resources/OpenSCENARIO-1.1.xsd").decode("utf-8")
         )
 
     def __call__(self, path: Path):
@@ -106,7 +106,7 @@ def validate_workflow():
 
     schema = xmlschema.XMLSchema(
     resource_string(
-        __name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
+        __name__, "resources/OpenSCENARIO-1.1.xsd").decode("utf-8")
     )
 
     parser = argparse.ArgumentParser(
@@ -130,7 +130,7 @@ def validate_scenario():
 
     schema = xmlschema.XMLSchema(
         resource_string(
-            __name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
+            __name__, "resources/OpenSCENARIO-1.1.xsd").decode("utf-8")
     )
 
     parser = argparse.ArgumentParser(
