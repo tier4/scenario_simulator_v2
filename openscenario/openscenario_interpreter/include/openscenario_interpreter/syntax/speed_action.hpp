@@ -75,10 +75,10 @@ private:
         setTargetSpeed(actor, current_absolute_target_speed, true);
         break;
       }
-      case DynamicsShape::linear: {
+      case DynamicsShape::linear:
         setTargetSpeed(actor, current_absolute_target_speed, true);
         break;
-      }
+
       default:
         throw UNSUPPORTED_SETTING_DETECTED(SpeedAction, speed_action_dynamics.dynamics_shape);
     }
