@@ -1,7 +1,7 @@
 # How to contribute
 
 Thank you for interest in improving scenario_simulator_v2.
-This contributor guide will help you get started.
+This contributor guidelines will help you get started.
 
 If you have any questions, please feel free to contact the [maintainers](ContactUs.md).
 
@@ -23,6 +23,8 @@ In short:
 ## Branch naming rules
 
 ### Feature development
+
+Each new feature development should be worked on in its own branch.
 
 Please add the `feature/` prefix to your branch name. For example:
 
