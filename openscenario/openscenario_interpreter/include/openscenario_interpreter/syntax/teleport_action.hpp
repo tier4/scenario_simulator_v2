@@ -49,7 +49,13 @@ struct TeleportAction : private Scope
 
   static auto endsImmediately() noexcept -> bool { return true; };
 
-  inline auto start() const -> void
+  inline auto evaluate() const -> Element
+  {
+    run();
+    return unspecified;
+  }
+
+  inline auto run() const -> void
   {
     auto teleport_action = overload(
       [](const WorldPosition & position, const auto & actor) {
@@ -75,6 +81,8 @@ struct TeleportAction : private Scope
       }
     }
   }
+
+  static auto start() noexcept -> void {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

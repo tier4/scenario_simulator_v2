@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/private_action.hpp>
+#include <openscenario_interpreter/syntax/lateral_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto PrivateAction::endsImmediately() const -> bool
+auto LateralAction::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
 }
 
-auto PrivateAction::run() -> void
+auto LateralAction::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
 }

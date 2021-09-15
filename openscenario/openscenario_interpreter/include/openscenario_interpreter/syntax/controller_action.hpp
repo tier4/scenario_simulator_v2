@@ -63,11 +63,13 @@ struct ControllerAction
   {
   }
 
-  void start() const { assign_controller_action(); }
+  static auto accomplished() noexcept { return true; }
 
-  const std::true_type accomplished{};
+  static auto endsImmediately() noexcept { return true; };
 
-  static bool endsImmediately() { return true; };
+  inline auto run() const -> void { assign_controller_action(); }
+
+  static auto start() noexcept {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

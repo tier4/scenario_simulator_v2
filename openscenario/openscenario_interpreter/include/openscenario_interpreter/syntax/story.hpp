@@ -53,17 +53,15 @@ struct Story : public Scope, public StoryboardElement<Story>, public Elements
 
   static constexpr auto ready() noexcept { return true; }
 
-  /* -------------------------------------------------------------------------
-   *
-   *  A Story's goal is accomplished when all its Acts are in the completeState.
-   *
-   * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
+    // NOTE: A Story's goal is accomplished when all its Acts are in the completeState.
     return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
       return each.template as<Act>().complete();
     });
   }
+
+  static constexpr auto start() noexcept -> void {}
 
   static constexpr auto stopTriggered() noexcept { return false; }
 

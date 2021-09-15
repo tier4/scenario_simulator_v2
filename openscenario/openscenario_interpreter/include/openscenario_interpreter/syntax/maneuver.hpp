@@ -52,17 +52,13 @@ struct Maneuver : public Scope, public StoryboardElement<Maneuver>, public Eleme
 
   static constexpr auto ready() noexcept { return true; }
 
+  static constexpr auto start() noexcept -> void {}
+
   static constexpr auto stopTriggered() noexcept { return false; }
 
-  /* -------------------------------------------------------------------------
-   *
-   * Maneuver
-   *   A Maneuver's goal is accomplished when all its Events are in the
-   *   completeState.
-   *
-   * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
+    // NOTE: A Maneuver's goal is accomplished when all its Events are in the completeState.
     return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
       return each.template as<Event>().complete();
     });

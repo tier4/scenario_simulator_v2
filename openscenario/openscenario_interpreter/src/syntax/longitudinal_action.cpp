@@ -22,5 +22,10 @@ auto LongitudinalAction::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
 }
+
+auto LongitudinalAction::run() -> void
+{
+  return apply<void>([](auto && action) { return action.run(); }, *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

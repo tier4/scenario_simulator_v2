@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/lane_change_target.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
 #include <string>
@@ -89,6 +91,8 @@ struct LaneChangeAction : private Scope
   }
 
   static bool endsImmediately() { return false; };
+
+  static auto run() -> void {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

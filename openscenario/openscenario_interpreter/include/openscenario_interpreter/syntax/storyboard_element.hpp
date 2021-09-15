@@ -99,8 +99,6 @@ public:
   }
 
 private:
-  static constexpr void start() noexcept {}
-
 #define DEFINE_PERFECT_FORWARD(IDENTIFIER, CONST)                                       \
   template <typename... Ts>                                                             \
   auto IDENTIFIER(Ts &&... xs) CONST->decltype(auto)                                    \
@@ -112,6 +110,7 @@ private:
   DEFINE_PERFECT_FORWARD(accomplished, const);
   DEFINE_PERFECT_FORWARD(ready, );
   DEFINE_PERFECT_FORWARD(run, );
+  DEFINE_PERFECT_FORWARD(start, );
   DEFINE_PERFECT_FORWARD(stop, );
   DEFINE_PERFECT_FORWARD(stopTriggered, );
 
@@ -178,7 +177,7 @@ public:
        *
        * -------------------------------------------------------------------- */
       case StoryboardElementState::startTransition:
-        static_cast<T &>(*this).start();  // NOTE: DON'T USE MACRO DEFINE_PERFECT_FORWARD FOR THIS!
+        start();
         ++current_execution_count;
         return changeStateIf(std::true_type(), running_state);
 

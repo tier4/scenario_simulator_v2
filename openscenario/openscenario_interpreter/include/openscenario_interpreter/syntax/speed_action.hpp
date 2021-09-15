@@ -109,7 +109,7 @@ public:
     return unspecified;
   }
 
-  auto update()
+  auto run() -> void
   {
     for (auto && each : accomplishments) {
       each.second =
@@ -119,7 +119,6 @@ public:
 
   auto accomplished()
   {
-    update();
     return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
   }
 
