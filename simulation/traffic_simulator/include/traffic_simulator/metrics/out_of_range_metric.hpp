@@ -18,7 +18,6 @@
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <limits>
 #include <rclcpp/qos.hpp>
-#include <rclcpp/subscription.hpp>
 #include <string>
 #include <traffic_simulator/metrics/metric_base.hpp>
 
