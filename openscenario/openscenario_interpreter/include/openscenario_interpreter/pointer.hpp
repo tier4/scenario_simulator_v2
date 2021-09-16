@@ -21,7 +21,6 @@
 #include <openscenario_interpreter/type_traits/if_has_member_function_current_state.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_description.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_evaluate.hpp>
-#include <openscenario_interpreter/type_traits/if_has_member_function_start.hpp>
 #include <openscenario_interpreter/type_traits/if_has_stream_output_operator.hpp>
 #include <openscenario_interpreter/utility/pair.hpp>
 #include <typeinfo>
@@ -59,11 +58,6 @@ class Pointer : public std::shared_ptr<T>
     {
       return IfHasMemberFunctionEvaluate<Bound>::invoke(static_cast<Bound &>(*this), else_);
     }
-
-    // void start() override  // corresponds to startTransition
-    // {
-    //   IfHasMemberFunctionStart<Bound>::invoke(*this);
-    // }
 
     auto currentState() const -> const Pointer & override
     {
