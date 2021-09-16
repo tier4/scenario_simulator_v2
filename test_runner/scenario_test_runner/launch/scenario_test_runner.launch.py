@@ -40,7 +40,7 @@ def default_autoware_launch_package_of(architecture_type):
             f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/auto": "scenario_test_runner_launch",
+        "awf/auto": "scenario_simulator_launch",
         "tier4/proposal": "autoware_launch",
     }[architecture_type]
 
