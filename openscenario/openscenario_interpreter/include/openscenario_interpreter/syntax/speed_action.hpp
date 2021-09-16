@@ -63,56 +63,15 @@ struct SpeedAction : private Scope
     }
   }
 
-private:
-  std::function<bool(const EntityRef &)> update_and_check;
-
-  void startImpl(const EntityRef & actor)
-  {
-    auto calc_absolute_target_speed = speed_action_target.getCalculateAbsoluteTargetSpeed();
-
-    double current_absolute_target_speed = calc_absolute_target_speed();
-
-    switch (speed_action_dynamics.dynamics_shape) {
-      case DynamicsShape::step: {
-        auto status = getEntityStatus(actor);
-        status.action_status.twist.linear.x = current_absolute_target_speed;
-        setEntityStatus(actor, status);
-        setTargetSpeed(actor, current_absolute_target_speed, true);
-        break;
-      }
-      case DynamicsShape::linear:
-        setTargetSpeed(actor, current_absolute_target_speed, true);
-        break;
-
-      default:
-        throw UNSUPPORTED_SETTING_DETECTED(SpeedAction, speed_action_dynamics.dynamics_shape);
-    }
-
-    auto is_end = speed_action_target.getIsEnd();
-
-    if (speed_action_target.is<RelativeTargetSpeed>()) {
-      // dynamics_shape is not taken in account
-      update_and_check = [calc_absolute_target_speed,
-                          is_end = std::move(is_end)](const EntityRef & actor) -> bool {
-        setTargetSpeed(actor, calc_absolute_target_speed(), true);
-        return is_end(actor);
-      };
-    } else {
-      update_and_check = std::move(is_end);
-    }
-  }
-
-public:
-  std::function<void(const EntityRef &)> updateTargetSpeed;
-
-  std::function<bool(const EntityRef &)> isAccomplished;
+  std::function<bool(const EntityRef &)> update;
 
   auto start()
   {
     reset();
 
-    updateTargetSpeed = [this](const EntityRef & actor) {
-      auto get_current_absolute_target_speed =
+    update = [this](const EntityRef & actor)  //
+    {
+      const auto get_current_absolute_target_speed =
         speed_action_target.getCalculateAbsoluteTargetSpeed();
 
       switch (speed_action_dynamics.dynamics_shape) {
@@ -134,13 +93,9 @@ public:
       if (speed_action_target.is<RelativeTargetSpeed>()) {
         setTargetSpeed(actor, get_current_absolute_target_speed(), true);
       }
+
+      return speed_action_target.getIsEnd()(actor);
     };
-
-    isAccomplished = speed_action_target.getIsEnd();
-
-    // for (const auto & actor : actors) {
-    //   startImpl(actor);
-    // }
 
     return unspecified;
   }
@@ -148,8 +103,7 @@ public:
   auto run() -> void
   {
     for (auto && each : accomplishments) {
-      updateTargetSpeed(EntityRef(std::get<0>(each)));
-      std::get<1>(each) = std::get<1>(each) or isAccomplished(EntityRef(std::get<0>(each)));
+      std::get<1>(each) = std::get<1>(each) or update(EntityRef(std::get<0>(each)));
     }
   }
 
