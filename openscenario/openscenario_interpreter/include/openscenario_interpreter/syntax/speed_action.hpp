@@ -67,7 +67,9 @@ private:
   void startImpl(const EntityRef & actor)
   {
     auto calc_absolute_target_speed = speed_action_target.getCalculateAbsoluteTargetSpeed();
+
     double current_absolute_target_speed = calc_absolute_target_speed();
+
     switch (speed_action_dynamics.dynamics_shape) {
       case DynamicsShape::step: {
         auto status = getEntityStatus(actor);
@@ -85,6 +87,7 @@ private:
     }
 
     auto is_end = speed_action_target.getIsEnd();
+
     if (speed_action_target.is<RelativeTargetSpeed>()) {
       // dynamics_shape is not taken in account
       update_and_check = [calc_absolute_target_speed,
@@ -101,6 +104,10 @@ public:
   auto start()
   {
     reset();
+
+    // auto make_runner = []() {
+    //   // TODO
+    // };
 
     for (const auto & actor : actors) {
       startImpl(actor);
