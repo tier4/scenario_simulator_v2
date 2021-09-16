@@ -17,6 +17,17 @@
 
 namespace metrics
 {
+void OutOfRangeMetric::setEntityManager(
+  std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr)
+{
+  entity_manager_ptr_ = std::move(entity_manager_ptr);
+  if (jerk_topic) {
+    jerk_callback_ptr_ = entity_manager_ptr_->createSubscription<JerkMessageType>(
+      *jerk_topic, rclcpp::SensorDataQoS(),
+      [this](const JerkMessageType::SharedPtr msg) { linear_jerk_ = msg->data; });
+  }
+}
+
 void OutOfRangeMetric::update()
 {
   const auto status = entity_manager_ptr_->getEntityStatus(target_entity);
@@ -42,16 +53,18 @@ void OutOfRangeMetric::update()
     return;
   }
 
-  const auto jerk_opt = entity_manager_ptr_->getLinearJerk(target_entity);
-
-  if (!jerk_opt) {
-    linear_jerk_ = jerk_opt.get();
-    if (!(min_jerk <= linear_jerk_ && linear_jerk_ <= max_jerk)) {
-      failure(SPECIFICATION_VIOLATION(
-        "current jerk (which is ", linear_jerk_, ") is out of range (which is [", min_jerk, ", ",
-        max_jerk, "])"));
-      return;
+  if (!jerk_callback_ptr_) {
+    const auto jerk_opt = entity_manager_ptr_->getLinearJerk(target_entity);
+    if (!jerk_opt) {
+      linear_jerk_ = jerk_opt.get();
     }
+  }
+
+  if (!(min_jerk <= linear_jerk_ && linear_jerk_ <= max_jerk)) {
+    failure(SPECIFICATION_VIOLATION(
+      "current jerk (which is ", linear_jerk_, ") is out of range (which is [", min_jerk, ", ",
+      max_jerk, "])"));
+    return;
   }
 }
 
