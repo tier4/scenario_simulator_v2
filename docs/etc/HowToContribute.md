@@ -1,24 +1,24 @@
 # How to contribute
 
-Thank you for interest in improving scenario_simulator_v2.
+Thank you for your interest in improving scenario_simulator_v2.
 This contributor guidelines will help you get started.
 
 If you have any questions, please feel free to contact the [maintainers](ContactUs.md).
 
 ## Before you get started
 
-To avoid duplicating work, please review current [issues](https://github.com/tier4/scenario_simulator_v2/issues) and [pull requests](https://github.com/tier4/scenario_simulator_v2/pulls).
+To avoid duplicate work, please review current [issues](https://github.com/tier4/scenario_simulator_v2/issues) and [pull requests](https://github.com/tier4/scenario_simulator_v2/pulls).
 
 ## Contribution workflow
 
-In short:
+Please take the following steps:
 
 1. Fork this repository.
-2. Clone down the repository to your local environment.
-3. Create a new branch from the `master`. See [Branch naming rule](#branch-naming-rules) below.
-4. Commit your changes to the branch and push to your (forked) GitHub repository.
-5. Open a Pull Request (PR). Your changes will be tested automatically. See [Continuous integration](#continuous-integration) below.
-6. Maintainers will review your PR. Once the PR is approved, the code will be merged into the `master` branch. See [Code review](#code-review) below.
+2. Clone down the repository to your local machine.
+3. Create a new branch from the `master`. See [Branch naming rules](#branch-naming-rules) below.
+4. Commit your changes to the branch and push the commit to your GitHub repository that was forked in Step 1.
+5. Open a Pull Request (PR). Our CI workflows will automatically test your changes. See [Continuous integration](#continuous-integration) below.
+6. The maintainers will review your PR. Once the PR is approved, the code will be merged into the `master` branch. See [Code review](#code-review) below.
 
 ## Branch naming rules
 
@@ -52,7 +52,7 @@ The release branches are used only to update the release notes. An example is [h
 
 ## Continuous integration
 
-Your changes proposed in the pull request will be tested automatically by the following checks:
+Your changes proposed in your pull request will be tested automatically by the following checks:
 
 | Checks                                                                                                                                                                                                 | Description                                                        |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
@@ -73,6 +73,6 @@ If you contribute to the documentation, your changes should pass the checks belo
 
 Any changes to the code or documentation are subject to code review. Maintainers will review your pull request.
 
-**Please do not force-push the commit to your pull request during the code review.** If you want to force-push the commit, please consult with the maintainers in advance.
+**Please DO NOT force-push the commit to your pull request during the code review.** If you want to force-push the commit, please contact the maintainers for approval in advance.
 
-More than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch. Your contribution will be recorded in the [release note](../ReleaseNotes.md).
+If more than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch. Your contribution will be recorded in the [release note](../ReleaseNotes.md).
