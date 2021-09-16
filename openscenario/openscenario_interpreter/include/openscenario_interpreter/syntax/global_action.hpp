@@ -56,6 +56,8 @@ struct GlobalAction : public Element
   auto endsImmediately() const -> bool;
 
   auto run() -> void;
+
+  auto start() -> void;
 };
 
 DEFINE_LAZY_VISITOR(

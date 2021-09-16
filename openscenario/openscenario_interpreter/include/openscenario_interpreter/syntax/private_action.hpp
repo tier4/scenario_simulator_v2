@@ -64,77 +64,33 @@ struct PrivateAction : public ComplexType
   auto endsImmediately() const -> bool;
 
   auto run() -> void;
+
+  auto start() -> void;
 };
 
-template <typename Result, typename Function, typename... Ts>
-auto apply(Function && function, const PrivateAction & private_action, Ts &&... xs) -> Result
-{
-  using functor = std::function<Result(Function &&, const PrivateAction &, Ts &&...)>;
+DEFINE_LAZY_VISITOR(
+  PrivateAction,
+  CASE(LongitudinalAction),  //
+  CASE(LateralAction),       //
+  // CASE(VisibilityAction),
+  // CASE(SynchronizeAction),
+  // CASE(ActivateControllerAction),
+  CASE(ControllerAction),  //
+  CASE(TeleportAction),    //
+  CASE(RoutingAction),     //
+);
 
-#define BOILERPLATE(TYPE)                                                                       \
-  std::make_pair<std::type_index, functor>(                                                     \
-    typeid(TYPE), [](Function && function, const PrivateAction & private_action, Ts &&... xs) { \
-      return function(private_action.as<TYPE>(), std::forward<decltype(xs)>(xs)...);            \
-    })
-
-  static const std::unordered_map<std::type_index, functor> overloads{
-    // clang-format off
-    BOILERPLATE(      LongitudinalAction),
-    BOILERPLATE(           LateralAction),
-    // BOILERPLATE(        VisibilityAction),
-    // BOILERPLATE(       SynchronizeAction),
-    // BOILERPLATE(ActivateControllerAction),
-    BOILERPLATE(        ControllerAction),
-    BOILERPLATE(          TeleportAction),
-    BOILERPLATE(           RoutingAction),
-    // clang-format on
-  };
-
-#undef BOILERPLATE
-
-  try {
-    return overloads.at(private_action.type())(
-      std::forward<decltype(function)>(function), private_action,
-      std::forward<decltype(xs)>(xs)...);
-  } catch (const std::out_of_range &) {
-    throw UNSUPPORTED_SETTING_DETECTED(PrivateAction, makeTypename(private_action.type().name()));
-  }
-}
-
-template <typename Result, typename Function, typename... Ts>
-auto apply(Function && function, PrivateAction & private_action, Ts &&... xs) -> Result
-{
-  using functor = std::function<Result(Function &&, PrivateAction &, Ts && ...)>;
-
-#define BOILERPLATE(TYPE)                                                                 \
-  std::make_pair<std::type_index, functor>(                                               \
-    typeid(TYPE), [](Function && function, PrivateAction & private_action, Ts &&... xs) { \
-      return function(private_action.as<TYPE>(), std::forward<decltype(xs)>(xs)...);      \
-    })
-
-  static const std::unordered_map<std::type_index, functor> overloads{
-    // clang-format off
-    BOILERPLATE(      LongitudinalAction),
-    BOILERPLATE(           LateralAction),
-    // BOILERPLATE(        VisibilityAction),
-    // BOILERPLATE(       SynchronizeAction),
-    // BOILERPLATE(ActivateControllerAction),
-    BOILERPLATE(        ControllerAction),
-    BOILERPLATE(          TeleportAction),
-    BOILERPLATE(           RoutingAction),
-    // clang-format on
-  };
-
-#undef BOILERPLATE
-
-  try {
-    return overloads.at(private_action.type())(
-      std::forward<decltype(function)>(function), private_action,
-      std::forward<decltype(xs)>(xs)...);
-  } catch (const std::out_of_range &) {
-    throw UNSUPPORTED_SETTING_DETECTED(PrivateAction, makeTypename(private_action.type().name()));
-  }
-}
+DEFINE_LAZY_VISITOR(
+  const PrivateAction,
+  CASE(LongitudinalAction),  //
+  CASE(LateralAction),       //
+  // CASE(VisibilityAction),
+  // CASE(SynchronizeAction),
+  // CASE(ActivateControllerAction),
+  CASE(ControllerAction),  //
+  CASE(TeleportAction),    //
+  CASE(RoutingAction),     //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

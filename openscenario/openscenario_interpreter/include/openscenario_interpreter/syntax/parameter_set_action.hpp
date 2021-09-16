@@ -67,6 +67,8 @@ struct ParameterSetAction : private Scope
 
     overloads.at(parameter.type())(parameter, value);
   }
+
+  static auto start() noexcept -> void {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

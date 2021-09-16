@@ -27,5 +27,10 @@ auto PrivateAction::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
 }
+
+auto PrivateAction::start() -> void
+{
+  return apply<void>([](auto && action) { return action.start(); }, *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

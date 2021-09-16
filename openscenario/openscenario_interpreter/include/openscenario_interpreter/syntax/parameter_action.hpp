@@ -52,6 +52,8 @@ struct ParameterAction : public Element
   static auto endsImmediately() -> bool { return true; }
 
   auto run() -> void;
+
+  auto start() -> void;
 };
 
 DEFINE_LAZY_VISITOR(

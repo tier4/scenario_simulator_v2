@@ -61,8 +61,6 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
 
   using StoryboardElement::currentState;
 
-  using Element::start;
-
   /* -------------------------------------------------------------------------
    *
    *  An Action's goal is a function of the Action type and cannot be
@@ -79,6 +77,8 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
   using StoryboardElement::evaluate;
 
   auto run() -> void;
+
+  auto start() -> void;
 
   auto stop() -> void
   {

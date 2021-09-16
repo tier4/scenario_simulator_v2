@@ -24,6 +24,11 @@ auto Action::run() -> void
   return apply<void>([](auto && action) { return action.run(); }, *this);
 }
 
+auto Action::start() -> void
+{
+  return apply<void>([](auto && action) { return action.start(); }, *this);
+}
+
 auto operator<<(nlohmann::json & json, const Action & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;

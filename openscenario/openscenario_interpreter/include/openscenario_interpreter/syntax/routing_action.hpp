@@ -51,65 +51,23 @@ struct RoutingAction : public ComplexType
   auto endsImmediately() const -> bool;
 
   auto run() -> void;
+
+  auto start() -> void;
 };
 
-template <typename Result, typename Function, typename... Ts>
-auto apply(Function && function, const RoutingAction & action, Ts &&... xs) -> Result
-{
-  using functor = std::function<Result(Function &&, const RoutingAction &, Ts &&...)>;
+DEFINE_LAZY_VISITOR(
+  RoutingAction,
+  CASE(AssignRouteAction),  //
+  // CASE(FollowTrajectoryAction),
+  CASE(AcquirePositionAction),  //
+);
 
-#define BOILERPLATE(TYPE)                                                               \
-  std::make_pair<std::type_index, functor>(                                             \
-    typeid(TYPE), [](Function && function, const RoutingAction & action, Ts &&... xs) { \
-      return function(action.as<TYPE>(), std::forward<decltype(xs)>(xs)...);            \
-    })
-
-  static const std::unordered_map<std::type_index, functor> overloads{
-    // clang-format off
-    BOILERPLATE(     AssignRouteAction),
-    // BOILERPLATE(FollowTrajectoryAction),
-    BOILERPLATE( AcquirePositionAction),
-    // clang-format on
-  };
-
-#undef BOILERPLATE
-
-  try {
-    return overloads.at(action.type())(
-      std::forward<decltype(function)>(function), action, std::forward<decltype(xs)>(xs)...);
-  } catch (const std::out_of_range &) {
-    throw UNSUPPORTED_SETTING_DETECTED(RoutingAction, makeTypename(action.type().name()));
-  }
-}
-
-template <typename Result, typename Function, typename... Ts>
-auto apply(Function && function, RoutingAction & action, Ts &&... xs) -> Result
-{
-  using functor = std::function<Result(Function &&, RoutingAction &, Ts && ...)>;
-
-#define BOILERPLATE(TYPE)                                                         \
-  std::make_pair<std::type_index, functor>(                                       \
-    typeid(TYPE), [](Function && function, RoutingAction & action, Ts &&... xs) { \
-      return function(action.as<TYPE>(), std::forward<decltype(xs)>(xs)...);      \
-    })
-
-  static const std::unordered_map<std::type_index, functor> overloads{
-    // clang-format off
-    BOILERPLATE(     AssignRouteAction),
-    // BOILERPLATE(FollowTrajectoryAction),
-    BOILERPLATE( AcquirePositionAction),
-    // clang-format on
-  };
-
-#undef BOILERPLATE
-
-  try {
-    return overloads.at(action.type())(
-      std::forward<decltype(function)>(function), action, std::forward<decltype(xs)>(xs)...);
-  } catch (const std::out_of_range &) {
-    throw UNSUPPORTED_SETTING_DETECTED(RoutingAction, makeTypename(action.type().name()));
-  }
-}
+DEFINE_LAZY_VISITOR(
+  const RoutingAction,
+  CASE(AssignRouteAction),  //
+  // CASE(FollowTrajectoryAction),
+  CASE(AcquirePositionAction),  //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -22,5 +22,10 @@ auto UserDefinedAction::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
 }
+
+auto UserDefinedAction::start() -> void
+{
+  return apply<void>([](auto && action) { return action.start(); }, *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -12,25 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/traffic_signal_action.hpp>
+#include <openscenario_interpreter/syntax/entity_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto TrafficSignalAction::endsImmediately() const -> bool
+auto EntityAction::run() const -> void
 {
-  return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
-}
-
-auto TrafficSignalAction::run() -> void
-{
-  return apply<void>([](auto && action) { return action.run(); }, *this);
-}
-
-auto TrafficSignalAction::start() -> void
-{
-  return apply<void>([](auto && action) { return action.start(); }, *this);
+  return apply<void>([this](auto && action) { return action(entity_ref); }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

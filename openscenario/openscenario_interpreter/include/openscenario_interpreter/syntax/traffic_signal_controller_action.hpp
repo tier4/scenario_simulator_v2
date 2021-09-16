@@ -76,6 +76,8 @@ struct TrafficSignalControllerAction : public Scope
         " is not declared in this scope");
     }
   }
+
+  static auto start() noexcept -> void {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -60,10 +60,10 @@ class Pointer : public std::shared_ptr<T>
       return IfHasMemberFunctionEvaluate<Bound>::invoke(static_cast<Bound &>(*this), else_);
     }
 
-    void start() override  // corresponds to startTransition
-    {
-      IfHasMemberFunctionStart<Bound>::invoke(*this);
-    }
+    // void start() override  // corresponds to startTransition
+    // {
+    //   IfHasMemberFunctionStart<Bound>::invoke(*this);
+    // }
 
     auto currentState() const -> const Pointer & override
     {
@@ -140,12 +140,6 @@ public:
   decltype(auto) currentState(Ts &&... xs) const
   {
     return binding().currentState(std::forward<decltype(xs)>(xs)...);
-  }
-
-  template <typename... Ts>
-  decltype(auto) start(Ts &&... xs) const
-  {
-    return binding().start(std::forward<decltype(xs)>(xs)...);
   }
 
   template <typename... Ts>

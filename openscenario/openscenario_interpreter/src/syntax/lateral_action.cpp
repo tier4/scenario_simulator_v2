@@ -27,5 +27,10 @@ auto LateralAction::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
 }
+
+auto LateralAction::start() -> void
+{
+  return apply<void>([](auto && action) { return action.start(); }, *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

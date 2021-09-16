@@ -43,6 +43,8 @@ struct InfrastructureAction : public ComplexType
   auto endsImmediately() const -> bool;
 
   auto run() -> void;
+
+  auto start() -> void;
 };
 
 DEFINE_LAZY_VISITOR(

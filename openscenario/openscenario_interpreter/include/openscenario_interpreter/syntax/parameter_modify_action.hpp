@@ -59,6 +59,8 @@ struct ParameterModifyAction : Scope
   } catch (const std::out_of_range &) {
     throw SemanticError("No such parameter ", std::quoted(parameter_ref));
   }
+
+  static auto start() noexcept -> void {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

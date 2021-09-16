@@ -63,6 +63,8 @@ struct TrafficSignalStateAction
 
   static auto accomplished() noexcept { return true; }
 
+  static auto endsImmediately() noexcept -> bool { return true; }
+
   auto run() const -> void
   {
     const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
@@ -78,7 +80,7 @@ struct TrafficSignalStateAction
     throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
   }
 
-  static bool endsImmediately() { return true; }
+  static auto start() noexcept -> void {}
 
   auto id() const -> std::int64_t { return boost::lexical_cast<std::int64_t>(name); }
 };

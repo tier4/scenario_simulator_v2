@@ -156,6 +156,8 @@ struct CustomCommandAction : private Scope
     }
   }
 
+  static auto start() noexcept -> void {}
+
   friend std::ostream & operator<<(std::ostream & os, const CustomCommandAction & action)
   {
     os << indent << blue << "<CustomCommandAction"
