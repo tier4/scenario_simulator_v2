@@ -76,8 +76,8 @@ struct ScenarioObject
 
       if (object_controller.is<Controller>()) {
         auto controller = object_controller.as<Controller>();
-        auto max_jerk = controller["max_jerk"];
-        auto min_jerk = controller["min_jerk"];
+        auto max_jerk = controller["maxJerk"];
+        auto min_jerk = controller["minJerk"];
 
         if (not max_jerk.name.empty()) {
           configuration.max_jerk = boost::lexical_cast<double>(max_jerk.value);
