@@ -73,7 +73,8 @@ struct ScenarioObject
       configuration.min_acceleration = -parameters.performance.max_deceleration;
       configuration.max_acceleration = +parameters.performance.max_acceleration;
       if (object_controller.isEgo()) {
-        configuration.jerk_topic = "/planning/motion_velocity_optimizer/closest_jerk";
+        configuration.jerk_topic =
+          "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
       }
     }
 

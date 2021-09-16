@@ -66,7 +66,7 @@ struct ObjectController : public ComplexType
     }
   }
 
-  bool isEgo() &
+  bool isEgo() const &
   {
     if (is<Unspecified>()) {
       static auto controller = DefaultController();

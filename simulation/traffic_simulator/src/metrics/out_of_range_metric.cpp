@@ -17,6 +17,17 @@
 
 namespace metrics
 {
+void OutOfRangeMetric::setEntityManager(
+  std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr)
+{
+  entity_manager_ptr_ = std::move(entity_manager_ptr);
+  if (jerk_topic) {
+    jerk_callback_ptr_ = entity_manager_ptr_->createSubscription<JerkMessageType>(
+      *jerk_topic, rclcpp::SensorDataQoS(),
+      [this](const JerkMessageType msg) { linear_jerk_ = msg.data; });
+  }
+}
+
 void OutOfRangeMetric::update()
 {
   const auto status = entity_manager_ptr_->getEntityStatus(target_entity);

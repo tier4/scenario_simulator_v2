@@ -26,6 +26,8 @@
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
+#include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
+#include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
@@ -64,6 +66,8 @@ public:
 class EntityManager
 {
   Configuration configuration;
+
+  std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
 
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
@@ -110,6 +114,10 @@ public:
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const Configuration & configuration)
   : configuration(configuration),
+    node_topics_interface([](auto && node) {
+      using rclcpp::node_interfaces::get_node_topics_interface;
+      return get_node_topics_interface(node);
+    }(node)),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
@@ -319,6 +327,19 @@ public:
 
   auto toMapPose(const openscenario_msgs::msg::LaneletPose &) const
     -> const geometry_msgs::msg::Pose;
+
+  template <typename MessageT, typename... Args>
+  auto createPublisher(Args &&... args)
+  {
+    return rclcpp::create_publisher<MessageT>(node_topics_interface, std::forward<Args>(args)...);
+  }
+
+  template <typename MessageT, typename... Args>
+  auto createSubscription(Args &&... args)
+  {
+    return rclcpp::create_subscription<MessageT>(
+      node_topics_interface, std::forward<Args>(args)...);
+  }
 
   void update(const double current_time, const double step_time);
 
