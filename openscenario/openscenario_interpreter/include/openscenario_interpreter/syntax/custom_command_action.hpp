@@ -65,28 +65,28 @@ struct CustomCommandAction : private Scope
   {
   }
 
-  const std::true_type accomplished{};
+  static auto getNode() -> auto &
+  {
+    static rclcpp::Node node{"custom_command_action", "simulation"};
+
+    return node;
+  }
+
+  static auto getSimulationEventsPublisher() -> auto &
+  {
+    static auto publisher =
+      getNode().create_publisher<autoware_simulation_msgs::msg::SimulationEvents>(
+        "/simulation/events", rclcpp::QoS(1).reliable());
+
+    return *publisher;
+  }
+
+  static auto accomplished() noexcept -> bool { return true; }
 
   static auto applyFaultInjectionAction(const std::vector<std::string> & events, const Scope &)
     -> int
   {
-    static rclcpp::Node node{"custom_command_action/fault_injection_action", "simulation"};
-
-    // static auto publisher = node.create_publisher<autoware_debug_msgs::msg::StringStamped>(
-    //   "/simulation/fault_injection", rclcpp::QoS(1).reliable());
-    //
-    // for (const auto & event : events) {
-    //   autoware_debug_msgs::msg::StringStamped message;
-    //   {
-    //     message.stamp = node.now();
-    //     message.data = event;
-    //   };
-    //
-    //   (*publisher).publish(message);
-    // }
-
-    static auto publisher = node.create_publisher<autoware_simulation_msgs::msg::SimulationEvents>(
-      "/simulation/fault_injection", rclcpp::QoS(1).reliable());
+    const auto now = getNode().now();
 
     auto makeFaultInjectionEvent = [](const auto & name) {
       autoware_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
@@ -99,8 +99,6 @@ struct CustomCommandAction : private Scope
     };
 
     auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
-      const auto now = node.now();
-
       autoware_simulation_msgs::msg::SimulationEvents simulation_events;
       {
         simulation_events.stamp = now;
@@ -113,7 +111,7 @@ struct CustomCommandAction : private Scope
       return simulation_events;
     };
 
-    (*publisher).publish(makeFaultInjectionEvents(events));
+    getSimulationEventsPublisher().publish(makeFaultInjectionEvents(events));
 
     return events.size();
   }

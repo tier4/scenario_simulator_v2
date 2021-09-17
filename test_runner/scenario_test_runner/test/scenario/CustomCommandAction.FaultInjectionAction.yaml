@@ -125,7 +125,7 @@ OpenSCENARIO:
                           - name: 'inject'
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: FaultInjection(cpu_load_average, cpu_temperature, cpu_usage)
+                                type: FaultInjectionAction(cpu_load_average, cpu_temperature, cpu_usage)
             StartTrigger:
               ConditionGroup:
                 - Condition:
