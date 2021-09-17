@@ -47,14 +47,26 @@ struct LateralAction : public ComplexType
   {
   }
 
-  bool endsImmediately() const
-  {
-    if (is<LaneChangeAction>()) {
-      return as<LaneChangeAction>().endsImmediately();
-    }
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
-  }
+  auto endsImmediately() const -> bool;
+
+  auto run() -> void;
+
+  auto start() -> void;
 };
+
+DEFINE_LAZY_VISITOR(
+  LateralAction,
+  CASE(LaneChangeAction),  //
+  // CASE(LaneOffsetAction),
+  // CASE(LateralDistanceAction),
+);
+
+DEFINE_LAZY_VISITOR(
+  const LateralAction,
+  CASE(LaneChangeAction),  //
+  // CASE(LaneOffsetAction),
+  // CASE(LateralDistanceAction),
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

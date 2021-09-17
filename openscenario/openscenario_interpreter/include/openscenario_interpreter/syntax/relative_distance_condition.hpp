@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
@@ -47,7 +48,7 @@ enum class Between {
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeDistanceCondition
+struct RelativeDistanceCondition : private Scope
 {
   const CoordinateSystem coordinate_system;
   // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity".
@@ -72,7 +73,8 @@ struct RelativeDistanceCondition
   explicit RelativeDistanceCondition(
     const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
   // clang-format off
-  : coordinate_system     (readAttribute<CoordinateSystem    >("coordinateSystem",     node, scope, CoordinateSystem::entity)),
+  : Scope(scope),
+    coordinate_system     (readAttribute<CoordinateSystem    >("coordinateSystem",     node, scope, CoordinateSystem::entity)),
     entity_ref            (readAttribute<String              >("entityRef",            node, scope)),
     freespace             (readAttribute<Boolean             >("freespace",            node, scope)),
     relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope)),

@@ -48,17 +48,19 @@ struct ParameterModifyAction : Scope
 
   static constexpr auto accomplished() noexcept { return true; }
 
-  auto evaluate()
+  auto run() -> void
   try {
     const auto target = localScope().findElement(parameter_ref);
     if (rule.is<ParameterAddValueRule>()) {
-      return rule.as<ParameterAddValueRule>()(target);
+      rule.as<ParameterAddValueRule>()(target);
     } else {
-      return rule.as<ParameterMultiplyByValueRule>()(target);
+      rule.as<ParameterMultiplyByValueRule>()(target);
     }
   } catch (const std::out_of_range &) {
     throw SemanticError("No such parameter ", std::quoted(parameter_ref));
   }
+
+  static auto start() noexcept -> void {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -63,24 +63,24 @@ struct TrafficSignalStateAction
 
   static auto accomplished() noexcept { return true; }
 
-  auto start() const
+  static auto endsImmediately() noexcept -> bool { return true; }
+
+  auto run() const -> void
   {
     const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
     if (color_opt.has_value()) {
       setTrafficSignalColor(id(), color_opt.value());
-      return unspecified;
     }
 
     const auto arrow_opt = boost::lexical_cast<boost::optional<Arrow>>(state);
     if (arrow_opt.has_value()) {
       setTrafficSignalArrow(id(), arrow_opt.value());
-      return unspecified;
     }
 
     throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
   }
 
-  static bool endsImmediately() { return true; }
+  static auto start() noexcept -> void {}
 
   auto id() const -> std::int64_t { return boost::lexical_cast<std::int64_t>(name); }
 };

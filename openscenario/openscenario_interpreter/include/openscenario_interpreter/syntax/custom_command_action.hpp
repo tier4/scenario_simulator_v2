@@ -15,6 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
+#include <autoware_debug_msgs/msg/string_stamped.hpp>
+#include <autoware_simulation_msgs/msg/simulation_events.hpp>
 #include <iterator>  // std::distance
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
@@ -63,17 +65,66 @@ struct CustomCommandAction : private Scope
   {
   }
 
-  const std::true_type accomplished{};
+  static auto getNode() -> auto &
+  {
+    static rclcpp::Node node{"custom_command_action", "simulation"};
 
-  static int walkStraightAction(
+    return node;
+  }
+
+  static auto getSimulationEventsPublisher() -> auto &
+  {
+    static auto publisher =
+      getNode().create_publisher<autoware_simulation_msgs::msg::SimulationEvents>(
+        "/simulation/events", rclcpp::QoS(1).reliable());
+
+    return *publisher;
+  }
+
+  static auto accomplished() noexcept -> bool { return true; }
+
+  static auto applyFaultInjectionAction(const std::vector<std::string> & events, const Scope &)
+    -> int
+  {
+    const auto now = getNode().now();
+
+    auto makeFaultInjectionEvent = [](const auto & name) {
+      autoware_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
+      {
+        fault_injection_event.level = autoware_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+        fault_injection_event.name = name;
+      }
+
+      return fault_injection_event;
+    };
+
+    auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
+      autoware_simulation_msgs::msg::SimulationEvents simulation_events;
+      {
+        simulation_events.stamp = now;
+
+        for (const auto & event : events) {
+          simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
+        }
+      }
+
+      return simulation_events;
+    };
+
+    getSimulationEventsPublisher().publish(makeFaultInjectionEvents(events));
+
+    return events.size();
+  }
+
+  static int applyWalkStraightAction(
     const std::vector<std::string> & actors, const Scope & current_scope)
   {
     for (const auto & actor : actors) {
-      applyWalkStraightAction(actor);
+      openscenario_interpreter::applyWalkStraightAction(actor);
     }
 
     for (const auto & actor : current_scope.actors) {
-      applyWalkStraightAction(actor);
+      openscenario_interpreter::applyWalkStraightAction(actor);
     }
 
     return current_scope.actors.size();
@@ -112,7 +163,8 @@ struct CustomCommandAction : private Scope
   const std::unordered_map<
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
     builtins{
-      std::make_pair("WalkStraightAction", walkStraightAction),
+      std::make_pair("FaultInjectionAction", applyFaultInjectionAction),
+      std::make_pair("WalkStraightAction", applyWalkStraightAction),
       std::make_pair("error", error),
       std::make_pair("exitFailure", exitFailure),
       std::make_pair("exitSuccess", exitSuccess),
@@ -133,7 +185,7 @@ struct CustomCommandAction : private Scope
     return args;
   }
 
-  auto evaluate()
+  auto run() -> void
   {
     /* ---- NOTE ---------------------------------------------------------------
      *
@@ -154,9 +206,9 @@ struct CustomCommandAction : private Scope
     } else {
       fork_exec(type, content);
     }
-
-    return unspecified;
   }
+
+  static auto start() noexcept -> void {}
 
   friend std::ostream & operator<<(std::ostream & os, const CustomCommandAction & action)
   {
