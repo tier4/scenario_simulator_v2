@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 
 namespace openscenario_interpreter
 {
@@ -23,7 +24,13 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, Between::reference_points>(
   const EntityRef & triggering_entity) -> double
 {
-  return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
+  if (
+    global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
+    return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
+  } else {
+    return Double::nan();
+  }
 }
 
 template <>
@@ -31,7 +38,13 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, Between::reference_points>(
   const EntityRef & triggering_entity) -> double
 {
-  return std::abs(getRelativePose(triggering_entity, entity_ref).position.y);
+  if (
+    global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
+    return std::abs(getRelativePose(triggering_entity, entity_ref).position.y);
+  } else {
+    return Double::nan();
+  }
 }
 
 template <>
@@ -39,7 +52,13 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance,
   Between::closest_bounding_box_points>(const EntityRef & triggering_entity) -> double
 {
-  return getBoundingBoxDistance(triggering_entity, entity_ref);
+  if (
+    global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
+    return getBoundingBoxDistance(triggering_entity, entity_ref);
+  } else {
+    return Double::nan();
+  }
 }
 
 template <>
@@ -47,9 +66,15 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::reference_points>(
   const EntityRef & triggering_entity) -> double
 {
-  return std::hypot(
-    getRelativePose(triggering_entity, entity_ref).position.x,
-    getRelativePose(triggering_entity, entity_ref).position.y);
+  if (
+    global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
+    return std::hypot(
+      getRelativePose(triggering_entity, entity_ref).position.x,
+      getRelativePose(triggering_entity, entity_ref).position.y);
+  } else {
+    return Double::nan();
+  }
 }
 
 template <>
@@ -57,7 +82,13 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, Between::reference_points>(
   const EntityRef & triggering_entity) -> double
 {
-  return getLongitudinalDistance(triggering_entity, entity_ref);
+  if (
+    global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
+    return getLongitudinalDistance(triggering_entity, entity_ref);
+  } else {
+    return Double::nan();
+  }
 }
 
 auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) -> double

@@ -78,20 +78,20 @@ public:
   }
 
   template <typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
-  decltype(auto) changeStateIf(Boolean && test, const Element & consequent_state)
+  auto changeStateIf(Boolean && test, const Element & consequent_state) -> decltype(auto)
   {
     return changeStateIf(test, consequent_state, current_state);
   }
 
   template <typename Predicate, typename... Ts, REQUIRES(std::is_function<Predicate>)>
-  decltype(auto) changeStateIf(Predicate && predicate, Ts &&... xs)
+  auto changeStateIf(Predicate && predicate, Ts &&... xs) -> decltype(auto)
   {
     return changeStateIf(predicate(), std::forward<decltype(xs)>(xs)...);
   }
 
-  Element override()
+  auto override()
   {
-    if (!complete() && !stopping()) {
+    if (not complete() and not stopping()) {
       return current_state = stop_transition;
     } else {
       return current_state;
@@ -99,11 +99,9 @@ public:
   }
 
 private:
-  static constexpr void start() noexcept {}
-
 #define DEFINE_PERFECT_FORWARD(IDENTIFIER, CONST)                                       \
   template <typename... Ts>                                                             \
-  constexpr decltype(auto) IDENTIFIER(Ts &&... xs) CONST                                \
+  auto IDENTIFIER(Ts &&... xs) CONST->decltype(auto)                                    \
   {                                                                                     \
     return static_cast<CONST T &>(*this).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
   }                                                                                     \
@@ -112,6 +110,7 @@ private:
   DEFINE_PERFECT_FORWARD(accomplished, const);
   DEFINE_PERFECT_FORWARD(ready, );
   DEFINE_PERFECT_FORWARD(run, );
+  DEFINE_PERFECT_FORWARD(start, );
   DEFINE_PERFECT_FORWARD(stop, );
   DEFINE_PERFECT_FORWARD(stopTriggered, );
 
@@ -129,7 +128,7 @@ protected:
   auto unique(const std::string & name) { return cdr(names.emplace(name)); }
 
   template <typename U, typename Node, typename... Ts>
-  decltype(auto) readStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
+  auto readStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
   {
     const auto name = rename(readAttribute<String>("name", node, inner_scope));
 
@@ -178,7 +177,7 @@ public:
        *
        * -------------------------------------------------------------------- */
       case StoryboardElementState::startTransition:
-        static_cast<T &>(*this).start();  // NOTE: DON'T USE MACRO DEFINE_PERFECT_FORWARD FOR THIS!
+        start();
         ++current_execution_count;
         return changeStateIf(std::true_type(), running_state);
 
@@ -292,7 +291,7 @@ public:
        * -------------------------------------------------------------------- */
       default:
       case StoryboardElementState::stopTransition:
-        if (!accomplished()) {
+        if (not accomplished()) {
           stop();
           return current_state;
         } else {

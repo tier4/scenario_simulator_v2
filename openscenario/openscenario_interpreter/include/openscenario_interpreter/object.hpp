@@ -56,6 +56,29 @@ struct Unspecified
 };
 
 std::ostream & operator<<(std::ostream &, const Unspecified &);
+
+#define CASE(TYPE)                                                                   \
+  {                                                                                  \
+    typeid(TYPE), [](Function && function, auto && datum, Ts &&... xs) {             \
+      return function(datum.template as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
+    }                                                                                \
+  }
+
+#define DEFINE_LAZY_VISITOR(TYPE, ...)                                                         \
+  template <typename Result, typename Function, typename... Ts>                                \
+  auto apply(Function && function, TYPE & datum, Ts &&... xs)                                  \
+  {                                                                                            \
+    try {                                                                                      \
+      static const std::unordered_map<                                                         \
+        std::type_index, std::function<Result(Function &&, TYPE &, Ts &&...)>>                 \
+        overloads{__VA_ARGS__};                                                                \
+      return overloads.at(datum.type())(                                                       \
+        std::forward<decltype(function)>(function), datum, std::forward<decltype(xs)>(xs)...); \
+    } catch (const std::out_of_range &) {                                                      \
+      throw UNSUPPORTED_SETTING_DETECTED(TYPE, makeTypename(datum.type().name()));             \
+    }                                                                                          \
+  }                                                                                            \
+  static_assert(true, "")
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__OBJECT_HPP_

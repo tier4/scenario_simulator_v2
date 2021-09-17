@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACQUIRE_POSITION_ACTION_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -49,7 +50,7 @@ struct AcquirePositionAction : private Scope
 
   static constexpr auto endsImmediately() -> bool { return true; };
 
-  auto start() -> Element
+  auto run() -> void
   {
     const auto acquire_position = overload(
       [](const WorldPosition & position, auto && actor) {
@@ -67,9 +68,9 @@ struct AcquirePositionAction : private Scope
     for (const auto & actor : actors) {
       apply(acquire_position, position, actor);
     }
-
-    return unspecified;
   }
+
+  static constexpr auto start() noexcept -> void { static_assert(endsImmediately(), ""); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

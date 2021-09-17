@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__COLLISION_CONDITION_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <utility>
@@ -37,7 +38,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct CollisionCondition
+struct CollisionCondition : private Scope
 {
   const Element another_given_entity;
 
@@ -47,7 +48,8 @@ struct CollisionCondition
   explicit CollisionCondition(
     const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
   // clang-format off
-  : another_given_entity(
+  : Scope(scope),
+    another_given_entity(
       choice(node,
         std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope); }),
         std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
@@ -71,7 +73,9 @@ struct CollisionCondition
 
   auto evaluate() const noexcept
   {
-    if (another_given_entity.is<EntityRef>()) {
+    if (
+      another_given_entity.is<EntityRef>() and
+      global().isAddedEntity(another_given_entity.as<EntityRef>())) {
       return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
         return evaluateCollisionCondition(triggering_entity, another_given_entity.as<EntityRef>());
       }));

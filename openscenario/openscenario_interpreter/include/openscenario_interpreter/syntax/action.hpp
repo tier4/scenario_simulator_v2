@@ -40,6 +40,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Action : public Scope, public StoryboardElement<Action>, public Element
 {
+  bool overridden = false;
+
   template <typename Node>
   explicit Action(const Node & node, Scope & scope)
   // clang-format off
@@ -59,8 +61,6 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
 
   using StoryboardElement::currentState;
 
-  using Element::start;
-
   /* -------------------------------------------------------------------------
    *
    *  An Action's goal is a function of the Action type and cannot be
@@ -76,9 +76,11 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
 
   using StoryboardElement::evaluate;
 
-  bool overridden = false;
+  auto run() -> void;
 
-  void stop()
+  auto start() -> void;
+
+  auto stop() -> void
   {
     if (overridden) {
       current_state = complete_state;
@@ -86,15 +88,23 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
       overridden = true;
     }
   }
-
-  template <typename... Ts>
-  auto run(Ts &&... xs) -> decltype(auto)
-  {
-    return Element::evaluate(std::forward<decltype(xs)>(xs)...);
-  }
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Action &);
+auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;
+
+DEFINE_LAZY_VISITOR(
+  Action,                   //
+  CASE(GlobalAction),       //
+  CASE(UserDefinedAction),  //
+  CASE(PrivateAction),      //
+);
+
+DEFINE_LAZY_VISITOR(
+  const Action,             //
+  CASE(GlobalAction),       //
+  CASE(UserDefinedAction),  //
+  CASE(PrivateAction),      //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

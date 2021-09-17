@@ -12,33 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/event.hpp>
-#include <openscenario_interpreter/utility/demangle.hpp>
+#include <openscenario_interpreter/syntax/infrastructure_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto Action::run() -> void
+auto InfrastructureAction::endsImmediately() const -> bool
+{
+  return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
+}
+
+auto InfrastructureAction::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
 }
 
-auto Action::start() -> void
+auto InfrastructureAction::start() -> void
 {
   return apply<void>([](auto && action) { return action.start(); }, *this);
-}
-
-auto operator<<(nlohmann::json & json, const Action & datum) -> nlohmann::json &
-{
-  json["name"] = datum.name;
-
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
-
-  json["type"] =
-    apply<std::string>([](auto && action) { return makeTypename(action.type()); }, datum);
-
-  return json;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
