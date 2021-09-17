@@ -70,9 +70,9 @@ struct ObjectController : public ComplexType
   {
     if (is<Unspecified>()) {
       static auto controller = DefaultController();
-      return controller["isEgo"];
+      return bool(controller["isEgo"]);
     } else {
-      return as<Controller>()["isEgo"];
+      return bool(as<Controller>()["isEgo"]);
     }
   }
 
@@ -85,7 +85,7 @@ struct ObjectController : public ComplexType
       }
       return controller;
     } else {
-      return as<Controller>();
+      return openscenario_msgs::msg::DriverModel(as<Controller>());
     }
   }
 };
