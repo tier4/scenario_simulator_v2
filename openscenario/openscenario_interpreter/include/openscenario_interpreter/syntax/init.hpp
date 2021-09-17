@@ -42,15 +42,15 @@ struct Init
   }
 
   template <typename... Ts>
-  decltype(auto) evaluate(Ts &&... xs)
+  auto endsImmediately(Ts &&... xs) const
   {
-    return actions.evaluate(std::forward<decltype(xs)>(xs)...);
+    return actions.endsImmediately(std::forward<decltype(xs)>(xs)...);
   }
 
   template <typename... Ts>
-  decltype(auto) endsImmediately(Ts &&... xs)
+  auto evaluate(Ts &&... xs)
   {
-    return actions.endsImmediately(std::forward<decltype(xs)>(xs)...);
+    return actions.evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
 

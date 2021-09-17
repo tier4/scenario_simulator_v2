@@ -60,21 +60,37 @@ struct PrivateAction : public ComplexType
   // clang-format on
   {
   }
-  bool endsImmediately() const
-  {
-#define BOILERPLATE(TYPE)                \
-  if (is<TYPE>()) {                      \
-    return as<TYPE>().endsImmediately(); \
-  }
-    BOILERPLATE(LongitudinalAction)
-    BOILERPLATE(LateralAction)
-    BOILERPLATE(ControllerAction)
-    BOILERPLATE(TeleportAction)
-    BOILERPLATE(RoutingAction)
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
-#undef BOILERPLATE
-  }
+
+  auto endsImmediately() const -> bool;
+
+  auto run() -> void;
+
+  auto start() -> void;
 };
+
+DEFINE_LAZY_VISITOR(
+  PrivateAction,
+  CASE(LongitudinalAction),  //
+  CASE(LateralAction),       //
+  // CASE(VisibilityAction),
+  // CASE(SynchronizeAction),
+  // CASE(ActivateControllerAction),
+  CASE(ControllerAction),  //
+  CASE(TeleportAction),    //
+  CASE(RoutingAction),     //
+);
+
+DEFINE_LAZY_VISITOR(
+  const PrivateAction,
+  CASE(LongitudinalAction),  //
+  CASE(LateralAction),       //
+  // CASE(VisibilityAction),
+  // CASE(SynchronizeAction),
+  // CASE(ActivateControllerAction),
+  CASE(ControllerAction),  //
+  CASE(TeleportAction),    //
+  CASE(RoutingAction),     //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

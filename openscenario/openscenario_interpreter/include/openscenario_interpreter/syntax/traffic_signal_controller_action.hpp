@@ -63,12 +63,13 @@ struct TrafficSignalControllerAction : public Scope
 
   static auto accomplished() noexcept -> bool { return true; }
 
-  auto start()
+  static auto endsImmediately() noexcept -> bool { return true; }
+
+  auto run() -> void
   {
     auto found = localScope().findElement(traffic_signal_controller_ref);
     if (found and found.is<TrafficSignalController>()) {
       found.as<TrafficSignalController>().changePhaseByName(phase);
-      return unspecified;
     } else {
       THROW_SYNTAX_ERROR(
         "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
@@ -76,7 +77,7 @@ struct TrafficSignalControllerAction : public Scope
     }
   }
 
-  static auto endsImmediately() -> bool { return true; }
+  static auto start() noexcept -> void {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

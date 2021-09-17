@@ -45,14 +45,24 @@ struct LongitudinalAction : public Element
   {
   }
 
-  bool endsImmediately() const
-  {
-    if (is<SpeedAction>()) {
-      return as<SpeedAction>().endsImmediately();
-    }
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
-  }
+  auto endsImmediately() const -> bool;
+
+  auto run() -> void;
+
+  auto start() -> void;
 };
+
+DEFINE_LAZY_VISITOR(
+  LongitudinalAction,
+  CASE(SpeedAction),  //
+  // CASE(LongitudinalDistanceAction),
+);
+
+DEFINE_LAZY_VISITOR(
+  const LongitudinalAction,
+  CASE(SpeedAction),  //
+  // CASE(LongitudinalDistanceAction),
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

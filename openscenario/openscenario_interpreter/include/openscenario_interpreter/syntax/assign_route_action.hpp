@@ -55,7 +55,7 @@ struct AssignRouteAction : private Scope
 
   static constexpr auto endsImmediately() noexcept { return true; };
 
-  auto start()
+  auto run()
   {
     for (const auto & actor : actors) {
       applyAssignRouteAction(
@@ -63,6 +63,8 @@ struct AssignRouteAction : private Scope
                  route_or_catalog_reference.as<const Route>()));
     }
   }
+
+  static constexpr auto start() -> void { static_assert(endsImmediately(), ""); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

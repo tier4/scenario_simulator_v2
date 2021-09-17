@@ -12,33 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/event.hpp>
-#include <openscenario_interpreter/utility/demangle.hpp>
+#include <openscenario_interpreter/syntax/speed_action_target.hpp>
+#include <openscenario_interpreter/utility/overload.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto Action::run() -> void
+auto SpeedActionTarget::getCalculateAbsoluteTargetSpeed() const -> std::function<double()>
 {
-  return apply<void>([](auto && action) { return action.run(); }, *this);
+  return apply<std::function<double()>>(
+    [](auto && target_speed) { return target_speed.getCalculateAbsoluteTargetSpeed(); }, *this);
 }
 
-auto Action::start() -> void
+auto SpeedActionTarget::getIsEnd() const -> std::function<bool(const EntityRef &)>
 {
-  return apply<void>([](auto && action) { return action.start(); }, *this);
-}
+  using result = std::function<bool(const EntityRef &)>;
 
-auto operator<<(nlohmann::json & json, const Action & datum) -> nlohmann::json &
-{
-  json["name"] = datum.name;
-
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
-
-  json["type"] =
-    apply<std::string>([](auto && action) { return makeTypename(action.type()); }, datum);
-
-  return json;
+  return apply<result>(
+    [](const auto & target_speed) -> result { return target_speed.getIsEnd(); }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

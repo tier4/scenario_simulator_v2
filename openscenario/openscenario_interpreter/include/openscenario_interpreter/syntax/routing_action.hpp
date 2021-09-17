@@ -48,18 +48,26 @@ struct RoutingAction : public ComplexType
   {
   }
 
-  bool endsImmediately() const
-  {
-#define BOILERPLATE(TYPE)                \
-  if (is<TYPE>()) {                      \
-    return as<TYPE>().endsImmediately(); \
-  }
-    BOILERPLATE(AssignRouteAction)
-    BOILERPLATE(AcquirePositionAction)
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
-#undef BOILERPLATE
-  }
+  auto endsImmediately() const -> bool;
+
+  auto run() -> void;
+
+  auto start() -> void;
 };
+
+DEFINE_LAZY_VISITOR(
+  RoutingAction,
+  CASE(AssignRouteAction),  //
+  // CASE(FollowTrajectoryAction),
+  CASE(AcquirePositionAction),  //
+);
+
+DEFINE_LAZY_VISITOR(
+  const RoutingAction,
+  CASE(AssignRouteAction),  //
+  // CASE(FollowTrajectoryAction),
+  CASE(AcquirePositionAction),  //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
