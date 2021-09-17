@@ -39,7 +39,7 @@ public:
   void activate();
   virtual nlohmann::json toJson() = 0;
   nlohmann::json toBaseJson();
-  void setEntityManager(
+  virtual void setEntityManager(
     std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
   const std::string metrics_type;
   MetricLifecycle getLifecycle() { return lifecycle_; }
