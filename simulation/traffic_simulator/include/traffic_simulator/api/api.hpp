@@ -218,6 +218,7 @@ public:
 private:
   bool updateSensorFrame();
   bool updateEntityStatusInSim();
+  bool updateTrafficLightsInSim();
 
   template <typename Parameters>
   bool spawn(

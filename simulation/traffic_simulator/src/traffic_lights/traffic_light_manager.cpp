@@ -113,6 +113,14 @@ void TrafficLightManager::drawMarkers() const
   marker_pub_->publish(msg);
 }
 
+bool TrafficLightManager::hasAnyLightChanged() {
+  return std::any_of(
+        std::begin(traffic_lights_), std::end(traffic_lights_),
+        [](const auto & id_and_traffic_light) {
+          return (std::get<1>(id_and_traffic_light).colorChanged() || std::get<1>(id_and_traffic_light).arrowChanged());
+        });
+}
+
 void TrafficLightManager::update(const double step_time)
 {
   publishTrafficLightStateArray();
@@ -121,11 +129,7 @@ void TrafficLightManager::update(const double step_time)
     light.second.update(step_time);
   }
 
-  if (std::any_of(
-        std::begin(traffic_lights_), std::end(traffic_lights_),
-        [](const auto & id_and_traffic_light) {
-          return std::get<1>(id_and_traffic_light).colorChanged();
-        })) {
+  if (hasAnyLightChanged()) {
     deleteAllMarkers();
   }
 
