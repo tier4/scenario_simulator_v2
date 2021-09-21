@@ -313,27 +313,20 @@ bool API::updateSensorFrame()
 
 bool API::updateTrafficLightsInSim()
 {
+  simulation_api_schema::UpdateTrafficLightsRequest req;
+  simulation_api_schema::UpdateTrafficLightsResponse res;
   if (entity_manager_ptr_->trafficLightsChanged()) {
-    std::cerr << "xxxxxxxxxxxxxxxxxxx" << std::endl;
     auto ids = entity_manager_ptr_->getTrafficLightIds();
     for (auto id : ids) {
-      try {
-        auto traffic_light_arrow = entity_manager_ptr_->getTrafficLightArrow(id);
-        std::cerr << "Traffic light " << id << ": lamp state arrow: " << traffic_light_arrow << std::endl;
-      } catch (const std::out_of_range &) {
-        // NOTE: ignore it.
-      }
-
-      try {
-        auto traffic_light_color = entity_manager_ptr_->getTrafficLightColor(id);
-        std::cerr << "Traffic light " << id << ": lamp state color: " << traffic_light_color << std::endl;
-      } catch (const std::out_of_range &) {
-        // NOTE: ignore it.
-      }
+      simulation_api_schema::TrafficLightState state;
+      auto traf_light = entity_manager_ptr_->getTrafficLightInstance(id);
+      simulation_interface::toProto(static_cast<const autoware_perception_msgs::msg::TrafficLightState>(traf_light), state);
+      *req.add_states() = state;
     }
-    std::cerr << "---------------" << std::endl;
+    update_traffic_lights_client_.call(req, res);
   }
-  return true;
+  // TODO handle response
+  return res.result().success();
 }
 
 bool API::updateEntityStatusInSim()

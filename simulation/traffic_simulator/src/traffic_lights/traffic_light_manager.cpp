@@ -71,6 +71,11 @@ std::vector<std::int64_t> TrafficLightManager::getIds() const
   return result;
 }
 
+TrafficLight TrafficLightManager::getInstance(const std::int64_t lanelet_id) 
+{
+  return traffic_lights_.at(lanelet_id);
+}
+
 void TrafficLightManager::deleteAllMarkers() const
 {
   visualization_msgs::msg::MarkerArray msg;

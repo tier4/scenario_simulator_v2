@@ -86,7 +86,10 @@ public:
       simulation_interface::ports::attach_lidar_sensor),
     attach_detection_sensor_client_(
       simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::attach_detection_sensor)
+      simulation_interface::ports::attach_detection_sensor),
+    update_traffic_lights_client_(
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
+      simulation_interface::ports::update_traffic_ligths)
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
@@ -277,6 +280,10 @@ private:
     simulation_api_schema::AttachDetectionSensorRequest,
     simulation_api_schema::AttachDetectionSensorResponse>
     attach_detection_sensor_client_;
+  zeromq::Client<
+    simulation_api_schema::UpdateTrafficLightsRequest,
+    simulation_api_schema::UpdateTrafficLightsResponse>
+    update_traffic_lights_client_;
 };
 }  // namespace traffic_simulator
 

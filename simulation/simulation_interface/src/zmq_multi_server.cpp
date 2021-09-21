@@ -77,7 +77,11 @@ MultiServer::MultiServer(
   std::function<void(
     const simulation_api_schema::AttachDetectionSensorRequest &,
     simulation_api_schema::AttachDetectionSensorResponse &)>
-    attach_detection_sensor_func)
+    attach_detection_sensor_func,
+  std::function<void(
+    const simulation_api_schema::UpdateTrafficLightsRequest &,
+    simulation_api_schema::UpdateTrafficLightsResponse &)>
+    update_traffic_lights_func)
 : context_(zmqpp::context()),
   type_(zmqpp::socket_type::reply),
   initialize_sock_(context_, type_),
@@ -99,7 +103,9 @@ MultiServer::MultiServer(
   attach_lidar_sensor_sock_(context_, type_),
   attach_lidar_sensor_func_(attach_lidar_sensor_func),
   attach_detection_sensor_sock_(context_, type_),
-  attach_detection_sensor_func_(attach_detection_sensor_func)
+  attach_detection_sensor_func_(attach_detection_sensor_func),
+  update_traffic_lights_sock_(context_, type_),
+  update_traffic_lights_func_(update_traffic_lights_func)
 {
   initialize_sock_.bind(
     simulation_interface::getEndPoint(protocol, hostname, simulation_interface::ports::initialize));
@@ -121,6 +127,8 @@ MultiServer::MultiServer(
     protocol, hostname, simulation_interface::ports::attach_lidar_sensor));
   attach_detection_sensor_sock_.bind(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::attach_detection_sensor));
+  update_traffic_lights_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::update_traffic_ligths));
   poller_.add(initialize_sock_);
   poller_.add(update_frame_sock_);
   poller_.add(update_sensor_frame_sock_);
@@ -131,6 +139,7 @@ MultiServer::MultiServer(
   poller_.add(update_entity_status_sock_);
   poller_.add(attach_lidar_sensor_sock_);
   poller_.add(attach_detection_sensor_sock_);
+  poller_.add(update_traffic_lights_sock_);
   thread_ = std::thread(&MultiServer::start_poll, this);
 }
 
@@ -226,6 +235,15 @@ void MultiServer::poll()
       toProto<simulation_api_schema::AttachDetectionSensorRequest>(request), response);
     auto msg = toZMQ(response);
     attach_detection_sensor_sock_.send(msg);
+  }
+  if (poller_.has_input(update_traffic_lights_sock_)) {
+    zmqpp::message request;
+    update_traffic_lights_sock_.receive(request);
+    simulation_api_schema::UpdateTrafficLightsResponse response;
+    update_traffic_lights_func_(
+      toProto<simulation_api_schema::UpdateTrafficLightsRequest>(request), response);
+    auto msg = toZMQ(response);
+    update_traffic_lights_sock_.send(msg);
   }
 }
 void MultiServer::start_poll()

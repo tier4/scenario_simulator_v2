@@ -190,3 +190,37 @@ message UpdateSensorFrameRequest {
 message UpdateSensorFrameResponse {
   Result result = 1; // Result of [UpdateSensorFrameRequest](#UpdateSensorFrameRequest)
 }
+
+
+message TrafficLightState {
+  message LampState {
+    enum State {
+      UNKNOWN = 0;
+      RED = 1;
+      GREEN = 2;
+      YELLOW = 3;
+      LEFT = 4;
+      RIGHT = 5;
+      UP = 6;
+      DOWN = 7;
+    }
+    State type = 1;
+    float confidence = 2;
+  }
+  int32 id = 1;
+  repeated LampState lamp_states = 2;
+}
+
+/**
+ * Requests updating traffic lights in simulation.
+ **/
+message UpdateTrafficLightsRequest {
+  repeated TrafficLightState states = 1;
+}
+
+/**
+ * Response of updating traffic lights in simulation.
+ **/
+message UpdateTrafficLightsResponse {
+  Result result = 1; // Result of [DespawnEntityRequest](#DespawnEntityRequest)
+}

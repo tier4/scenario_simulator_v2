@@ -53,6 +53,9 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       &ScenarioSimulator::attachLidarSensor, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
       &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
+      std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1,
       std::placeholders::_2))
 {
 }
@@ -218,6 +221,15 @@ void ScenarioSimulator::updateSensorFrame(
   current_ros_time_ = t;
   sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status_);
   res = simulation_api_schema::UpdateSensorFrameResponse();
+  res.mutable_result()->set_success(true);
+}
+
+void ScenarioSimulator::updateTrafficLights(
+  const simulation_api_schema::UpdateTrafficLightsRequest & req,
+  simulation_api_schema::UpdateTrafficLightsResponse & res)
+{
+  // TODO: handle traffic lights in simple simulator
+  res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
 }
 }  // namespace simple_sensor_simulator
