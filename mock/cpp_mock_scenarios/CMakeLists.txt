@@ -38,7 +38,7 @@ ament_auto_add_executable(traffic_simulation_demo
 target_link_libraries(traffic_simulation_demo cpp_scenario_node)
 
 add_subdirectory(src/collision)
-#add_subdirectory(src/crosswalk)
+add_subdirectory(src/crosswalk)
 #add_subdirectory(src/follow_front_entity)
 #add_subdirectory(src/follow_lane)
 #add_subdirectory(src/lane_change)
@@ -56,9 +56,6 @@ install(
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-
-  include(cmake/add_cpp_mock_scenario_test.cmake)
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "crashing_npc" "5")
 endif()
 
 ament_auto_package(CONFIG_EXTRAS "${PROJECT_NAME}-extras.cmake")
