@@ -1,6 +1,6 @@
 # Metrics
 
-Metrics class allow you to check Autoware way of driving is valid or not.
+Metrics class allows you to check Autoware way of driving is valid or not.
 
 ## How it works
 
@@ -24,16 +24,18 @@ graph RL;
   API --> |Handle Exception| your_application
 ```
 
-You can add metric by using API below,
+You can add a metric by using the API below,
+
 ```C++
 api_.addMetric<T>("name of metric", "arguments for metric you want to check" ...);
 ```
-If the metric detects specification violation, then the metric move to failure lifecycle and throw errors.  
-Thrown exception was handled by your application.
+
+If a metric detects a specification violation, then the metric moves to the Failure lifecycle and throws errors.  
+Thrown exception should be handled by your application.
 
 ## Lifecycle
 
-Each metrics has a lifecycle.
+Each metric has a lifecycle.
 
 ```mermaid
 stateDiagram
@@ -46,50 +48,58 @@ stateDiagram
 ```
 
 ### Inactive
+
 In this state, metrics class does not start calculating metrics.
-If the activateTrigger function in each metrics class returns true, then the metrics moves to Active state.
+If the activateTrigger function in each metrics class returns true, then the metrics move to the Active state.
 
 ### Active
-In this state, metrics class calculate metrics and check the behavior of entity is good or not.
-update function in metrics class was called in every simulation frame in this state.
+
+In this state, metrics class calculates metrics and checks the behavior of an entity is good or not.
+update function in the metrics class is called in every simulation frame in this state.
 
 ### Success
-In this state, metrics class does not calculate metrics any more.
+
+In this state, metrics class does not calculate metrics anymore.
 
 ### Failure
-In this state, metrics class throw specification violation error.
+
+In this state, metrics class throws a specification violation error.
 
 ## What types of metrics can we use?
 
-If you want to use metrics class with C++ API, all you have to do is call API::addMetric function.
+If you want to use the metrics class with C++ APIs, all you have to do is call the `API::addMetric` function.
 
 ```C++
 api_.addMetric<T>("name of metric", "arguments for metric you want to check" ...);
 ```
 
 ### Traveled Distance
-Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1TraveledDistanceMetric/#public-functions)  
-Traveled distance metric calculates total traveled distance for target entity.  
+
+Class documentation is [here](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1TraveledDistanceMetric/#public-functions).  
+Traveled distance metric calculates the total traveled distance for a target entity.
 
 ### Momentary Stop
 
-Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1MomentaryStopMetric/)  
-Momentary stop metric enable us to check the target entity can stop in front of the crosswalk and stop line.  
+Class documentation is [here](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1MomentaryStopMetric/).  
+Momentary stop metric enables us to check the target entity can stop in front of the crosswalk and stop line.
 
 ### Reaction Time
-Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1ReactionTimeMetric/)  
-Reaction time metric enable us to check the target entity follow the front entity speed.  
+
+Class documentation is [here](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1ReactionTimeMetric/).  
+Reaction time metric enables us to check the target entity follows the front entity speed.
 
 ### Out of range
-Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1OutOfRangeMetric/)  
-Out of range metric enables us to check the velocity, acceleration, jerk of target entity is in the valid range or not.  
+
+Class documentation is [here](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1OutOfRangeMetric/).  
+Out of range metric enables us to check the velocity, acceleration, jerk of a target entity are in the valid range or not.
 
 ### Standstill
 
-Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1StandstillMetric/)  
-Standstill metric enables us to check entity is stacked or not.  
-This metric checks the standstill duration of target entity overs the allowed standstill duration.
+Class documentation is [here](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1StandstillMetric/).  
+Standstill metric enables us to check an entity is stacked or not.
+This metric checks the standstill duration of the target entity overs the allowed standstill duration.
 
 ### Collision
-Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1CollisionMetric/) 
-Collision metric checks the target entity is colliding to other entity or not.
+
+Class documentation is [here](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1CollisionMetric/).
+Collision metric checks the target entity is colliding with the other entity or not.
