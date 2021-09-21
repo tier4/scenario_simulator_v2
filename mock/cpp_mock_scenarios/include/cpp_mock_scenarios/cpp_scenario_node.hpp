@@ -16,6 +16,7 @@
 #define CPP_MOCK_SCENARIOS__CPP_SCENARIO_NODE_HPP_
 
 #include <rclcpp/rclcpp.hpp>
+#include <simple_junit/junit5.hpp>
 #include <traffic_simulator/api/api.hpp>
 
 // headers in STL
@@ -35,15 +36,18 @@ public:
     const std::string & lanelet2_map_file, const std::string & scenario_filename,
     const bool verbose, const rclcpp::NodeOptions & option);
   void start();
-  void stop(Result result);
+  void stop(Result result, const std::string & description = "");
   void expectThrow() { exception_expect_ = true; }
   void expectNoThrow() { exception_expect_ = false; }
 
 protected:
   traffic_simulator::API api_;
+  common::junit::JUnit5 junit_;
 
 private:
+  std::string scenario_filename_;
   bool exception_expect_;
+  std::string junit_path_;
   void update();
   virtual void onUpdate() = 0;
   virtual void onInitialize() = 0;
