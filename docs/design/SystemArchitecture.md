@@ -4,7 +4,7 @@
 
 ```
 
-This tool consists of three components: test runner, openscenario_interpreter, and simulator.
+The scenario_simulator_v2 consists of the three components: test runner, openscenario_interpreter, and simulator.
 
 Each component has the following features:
 
@@ -22,9 +22,10 @@ Each component has the following features:
    After that, the test runner activates the openscenario_interpreter and moves the state into "Active".
    When the exception is thrown in the openscenario interpreter, the openscenario interpreter moves into "Inactive" state.
 
-1. simple_sensor_simulator
-   The simple_sensor_simulator communicates with the openscenario_interpreter by using ZeroMQ.
-   You can use any times of simulator by adapting this API.<!-- TODO: clarify the meaning -->
+1. simulator  
+   The simulator component communicates with the openscenario_interpreter by using ZeroMQ.
+   You can use any simulators by adapting the ZeroMQ API.
+   The [simple sensor simulator](SimpleSensorSimulator.md) is a reference implementation of the simulator component.
 
 ## Execution sequence of scenario testing
 
