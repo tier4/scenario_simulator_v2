@@ -21,7 +21,7 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(cpp_scenario_node
+ament_auto_add_library(cpp_scenario_node SHARED
   src/cpp_scenario_node.cpp
 )
 target_link_libraries(cpp_scenario_node

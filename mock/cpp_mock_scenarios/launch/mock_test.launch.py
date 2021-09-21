@@ -74,9 +74,10 @@ def on_stdout_output(event: launch.Event) -> None:
 def generate_launch_description():
     timeout = LaunchConfiguration("timeout", default=10)
     scenario = LaunchConfiguration("scenario", default="")
+    scenario_package = LaunchConfiguration("package", default="cpp_mock_scenarios")
     launch_rviz = LaunchConfiguration("launch_rviz", default=False)
     scenario_node = Node(
-        package="cpp_mock_scenarios",
+        package=scenario_package,
         executable=scenario,
         name=scenario,
         output="screen",
@@ -98,6 +99,11 @@ def generate_launch_description():
         [
             DeclareLaunchArgument(
                 "scenario", default_value=scenario, description="Name of the scenario."
+            ),
+            DeclareLaunchArgument(
+                "package",
+                default_value=scenario_package,
+                description="Name of package your scenario exists",
             ),
             DeclareLaunchArgument(
                 "timeout", default_value=timeout, description="Timeout in seconds."
