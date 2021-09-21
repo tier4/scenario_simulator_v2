@@ -27,14 +27,14 @@ function(add_cpp_mock_scenario_test package_name scenario timeout)
     "package:=${package_name}"
     "scenario:=${scenario}"
     "timeout:=${timeout}"
-    "junit_path:=${CMAKE_BINARY_DIR}/launch_test/${package_name}_${scenario}.xunit.xml"
+    "junit_path:=${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.xunit.xml"
   )
 
   ament_add_test(
     "${package_name}_${scenario}"
     COMMAND ${cmd}
-    OUTPUT_FILE "${CMAKE_BINARY_DIR}/launch_test/${package_name}_${scenario}.output.txt"
-    RESULT_FILE "${CMAKE_BINARY_DIR}/launch_test/${package_name}_${scenario}.xunit.xml"
+    OUTPUT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.output.txt"
+    RESULT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.xunit.xml"
     TIMEOUT "${timeout}"
   )
 endfunction()

@@ -71,7 +71,7 @@ void CppScenarioNode::stop(Result result, const std::string & description)
       break;
     }
   }
-  junit_.testsuite("cpp_mock_scenario").testcase(scenario_filename_).time = api_.getCurrentTime();
+  // junit_.testsuite("cpp_mock_scenario").testcase(scenario_filename_).time = api_.getCurrentTime();
   junit_.write_to(junit_path_.c_str(), "  ");
   update_timer_->cancel();
   rclcpp::shutdown();
