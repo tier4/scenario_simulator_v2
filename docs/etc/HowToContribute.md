@@ -73,6 +73,9 @@ If you contribute to the documentation, your changes should pass the checks belo
 
 Any changes to the code or documentation are subject to code review. Maintainers will review your pull request.
 
-**Please DO NOT force-push the commit to your pull request during the code review.** If you want to force-push the commit, please contact the maintainers for approval in advance.
+As a good practice, reply to the reviewer's comment with a link to your changes (e.g., `Fixed in a0b1c2d`).
+To keep the commit hashes consistent, **please DO NOT force-push the commit to your pull request during the code review.**
+If you want to force-push the commit during the review, please contact the maintainers for approval in advance.
 
-If more than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch. Your contribution will be recorded in the [release note](../ReleaseNotes.md).
+If more than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
+Your contribution will be recorded in the [release note](../ReleaseNotes.md).
