@@ -75,6 +75,7 @@ def generate_launch_description():
     timeout = LaunchConfiguration("timeout", default=10)
     scenario = LaunchConfiguration("scenario", default="")
     scenario_package = LaunchConfiguration("package", default="cpp_mock_scenarios")
+    junit_path = LaunchConfiguration("junit_path", default="/tmp")
     launch_rviz = LaunchConfiguration("launch_rviz", default=False)
     scenario_node = Node(
         package=scenario_package,
@@ -82,6 +83,7 @@ def generate_launch_description():
         name=scenario,
         output="screen",
         arguments=[("__log_level:=info")],
+        parameters=[{"junit_path": junit_path}],
     )
     io_handler = OnProcessIO(
         target_action=scenario_node,
@@ -107,6 +109,11 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "timeout", default_value=timeout, description="Timeout in seconds."
+            ),
+            DeclareLaunchArgument(
+                "junit_path",
+                default_value=junit_path,
+                description="Path of the junit output.",
             ),
             DeclareLaunchArgument(
                 "launch_rviz",
