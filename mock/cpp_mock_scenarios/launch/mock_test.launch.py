@@ -75,7 +75,7 @@ def generate_launch_description():
     timeout = LaunchConfiguration("timeout", default=10)
     scenario = LaunchConfiguration("scenario", default="")
     scenario_package = LaunchConfiguration("package", default="cpp_mock_scenarios")
-    junit_path = LaunchConfiguration("junit_path", default="/tmp")
+    junit_path = LaunchConfiguration("junit_path", default="/tmp/output.xunit.xml")
     launch_rviz = LaunchConfiguration("launch_rviz", default=False)
     scenario_node = Node(
         package=scenario_package,
