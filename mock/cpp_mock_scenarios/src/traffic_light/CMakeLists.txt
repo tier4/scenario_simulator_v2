@@ -7,3 +7,8 @@ install(TARGETS
   phase_control
   DESTINATION lib/cpp_mock_scenarios
 )
+
+if(BUILD_TESTING)
+  include(../../cmake/add_cpp_mock_scenario_test.cmake)
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "phase_control" "15")
+endif()
