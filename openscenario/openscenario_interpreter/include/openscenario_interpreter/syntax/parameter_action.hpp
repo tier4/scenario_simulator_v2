@@ -36,7 +36,6 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-
 struct ParameterAction : public Element
 {
   template <typename Node, typename Scope>
@@ -51,9 +50,23 @@ struct ParameterAction : public Element
   }
 
   static auto endsImmediately() -> bool { return true; }
+
+  auto run() -> void;
+
+  auto start() -> void;
 };
 
-#undef ELEMENT
+DEFINE_LAZY_VISITOR(
+  ParameterAction,
+  CASE(ParameterSetAction),     //
+  CASE(ParameterModifyAction),  //
+);
+
+DEFINE_LAZY_VISITOR(
+  const ParameterAction,
+  CASE(ParameterSetAction),     //
+  CASE(ParameterModifyAction),  //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

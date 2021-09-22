@@ -70,7 +70,7 @@ struct RelativeTargetSpeed
     }
   }
 
-  std::function<bool(const EntityRef & actor)> getIsEnd() const
+  std::function<bool(const EntityRef &)> getIsEnd() const
   {
     if (continuous) {
       return [](const auto &) { return false; };  // ends never

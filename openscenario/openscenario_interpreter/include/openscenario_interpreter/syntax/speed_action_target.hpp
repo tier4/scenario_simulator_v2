@@ -33,42 +33,35 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE) \
-  std::make_pair(     \
-    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
-
-struct SpeedActionTarget : public Element
+struct SpeedActionTarget : public ComplexType
 {
   template <typename Node, typename... Ts>
   explicit SpeedActionTarget(const Node & node, Ts &&... xs)
-  : Element(choice(node, ELEMENT(RelativeTargetSpeed), ELEMENT(AbsoluteTargetSpeed)))
+  // clang-format off
+  : ComplexType(
+      choice(node,
+        std::make_pair("RelativeTargetSpeed", [&](auto && node) { return make<RelativeTargetSpeed>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("AbsoluteTargetSpeed", [&](auto && node) { return make<AbsoluteTargetSpeed>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); })))
+  // clang-format on
   {
   }
 
-  std::function<double()> getCalculateAbsoluteTargetSpeed() const
-  {
-    if (is<AbsoluteTargetSpeed>()) {
-      return as<AbsoluteTargetSpeed>().getCalculateAbsoluteTargetSpeed();
-    } else if (is<RelativeTargetSpeed>()) {
-      return as<RelativeTargetSpeed>().getCalculateAbsoluteTargetSpeed();
-    } else {
-      throw UNSUPPORTED_SETTING_DETECTED(SpeedActionTarget, this->type().name());
-    }
-  }
+  auto getCalculateAbsoluteTargetSpeed() const -> std::function<double()>;
 
-  std::function<bool(const EntityRef & actor)> getIsEnd() const
-  {
-    if (is<AbsoluteTargetSpeed>()) {
-      return as<AbsoluteTargetSpeed>().getIsEnd();
-    } else if (is<RelativeTargetSpeed>()) {
-      return as<RelativeTargetSpeed>().getIsEnd();
-    } else {
-      throw UNSUPPORTED_SETTING_DETECTED(SpeedActionTarget, this->type().name());
-    }
-  }
+  auto getIsEnd() const -> std::function<bool(const EntityRef &)>;
 };
 
-#undef ELEMENT
+DEFINE_LAZY_VISITOR(
+  SpeedActionTarget,
+  CASE(RelativeTargetSpeed),  //
+  CASE(AbsoluteTargetSpeed),  //
+);
+
+DEFINE_LAZY_VISITOR(
+  const SpeedActionTarget,
+  CASE(RelativeTargetSpeed),  //
+  CASE(AbsoluteTargetSpeed),  //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

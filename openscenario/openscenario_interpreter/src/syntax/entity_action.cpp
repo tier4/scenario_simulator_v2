@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,26 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_START_HPP_
-#define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_START_HPP_
-
-#include <openscenario_interpreter/type_traits/void_t.hpp>
+#include <openscenario_interpreter/syntax/entity_action.hpp>
 
 namespace openscenario_interpreter
 {
-inline namespace type_traits
+inline namespace syntax
 {
-template <typename T, typename = void>
-struct HasMemberFunctionStart : public std::false_type
+auto EntityAction::run() const -> void
 {
-};
-
-template <typename T>
-struct HasMemberFunctionStart<T, void_t<decltype(std::declval<T>().start())>>
-: public std::true_type
-{
-};
-}  // namespace type_traits
+  return apply<void>([this](auto && action) { return action(entity_ref); }, *this);
+}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_START_HPP_

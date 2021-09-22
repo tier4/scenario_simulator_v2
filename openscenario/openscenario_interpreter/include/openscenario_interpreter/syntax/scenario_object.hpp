@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 
+#include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
@@ -72,6 +73,24 @@ struct ScenarioObject
       configuration.max_velocity = +parameters.performance.max_speed;
       configuration.min_acceleration = -parameters.performance.max_deceleration;
       configuration.max_acceleration = +parameters.performance.max_acceleration;
+
+      if (object_controller.is<Controller>()) {
+        auto controller = object_controller.as<Controller>();
+        auto max_jerk = controller["maxJerk"];
+        auto min_jerk = controller["minJerk"];
+
+        if (not max_jerk.name.empty()) {
+          configuration.max_jerk = boost::lexical_cast<double>(max_jerk.value);
+        }
+        if (not min_jerk.name.empty()) {
+          configuration.min_jerk = boost::lexical_cast<double>(min_jerk.value);
+        }
+      }
+
+      if (object_controller.isEgo()) {
+        configuration.jerk_topic =
+          "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
+      }
     }
 
     connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);

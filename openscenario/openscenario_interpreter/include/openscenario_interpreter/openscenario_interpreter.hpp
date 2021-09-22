@@ -169,7 +169,7 @@ public:
       return handle(error);
     }
 
-    catch (const std::runtime_error & error)  // NOTE: MUST BE LAST OF CATCH STATEMENTS.
+    catch (const std::exception & error)  // NOTE: MUST BE LAST OF CATCH STATEMENTS.
     {
       isAnErrorIntended() ? set<common::junit::Pass>()
                           : set<common::junit::Error>("InternalError", error.what());

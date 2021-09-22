@@ -217,6 +217,8 @@ class Scope
     std::unordered_map<std::string, Element> entities;  // ScenarioObject or EntitySelection
 
     explicit GlobalEnvironment(const boost::filesystem::path pathname) : pathname(pathname) {}
+
+    auto isAddedEntity(const EntityRef &) const -> bool;
   };
 
   const std::shared_ptr<GlobalEnvironment> global_environment;

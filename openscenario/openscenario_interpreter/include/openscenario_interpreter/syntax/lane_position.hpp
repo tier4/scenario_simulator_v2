@@ -17,6 +17,7 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/orientation.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
 #include <traffic_simulator/helper/helper.hpp>

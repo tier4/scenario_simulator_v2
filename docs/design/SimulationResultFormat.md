@@ -1,8 +1,10 @@
 # Simulation Result Format
+
 ## File format
-Result file should be in junit format.  
-[This package](https://github.com/tier4/scenario_simulator_v2/tree/master/common/simple_junit) helps to output junit.
-Example of result file is here.  
+
+Result files should follow the JUnit format.  
+[This package](https://github.com/tier4/scenario_simulator_v2/tree/master/common/simple_junit) helps you to output JUnit-formatted files.
+An example of the result file is below:
 
 ```xml
 <?xml version="1.0"?>
@@ -17,13 +19,14 @@ Example of result file is here.
 </testsuites>
 ```
 
-This format is a Junit5 format.
+The example follows the JUnit 5 format.
 
 ### Test Case Result
+
 #### Failure
 
-Failure means the test cases was unexpected situation such as collision, stack etc...  
-Message of the result should be
+`Failure` means that the test cases were in an unexpected situation, such as collision, stack, etc.  
+Message of the test result should be:
 
 ```xml
 <failure type="Failure" message="Expected success" />
@@ -43,13 +46,14 @@ or
 
 #### Error
 
-Error means the test cases was failed with error such as some Autoware node was downed, failed to launch Autoware etc..  
-All errors was thrown as error from API class.
-If you want to see example, please see also [this code](https://github.com/tier4/scenario_simulator_v2/blob/c6d7c4da7556a593dc3d34b0a982bc[…]r/include/openscenario_interpreter/openscenario_interpreter.hpp).  
+`Error` means that the test cases were failed with an error, such as some Autoware nodes were downed, failed to launch Autoware, etc.  
+All errors are thrown as errors from the API classes.
+If you want to see examples, please refer to [this code](https://github.com/tier4/scenario_simulator_v2/blob/c6d7c4da7556a593dc3d34b0a982bc[…]r/include/openscenario_interpreter/openscenario_interpreter.hpp).
 
 #### Error Types
-Each error types describe these meanings.  
-Flow chart of what message type should be use is here.
+
+Each error type describes its meaning.  
+The following flow chart describes what message types should be used:
 
 ```mermaid
 graph TB
@@ -64,18 +68,18 @@ graph TB
     check_base_class_of_exception --> UnknownError
 ```
 
-Output format should be like below.
+Output format should be like below:
 
 ```xml
 <error type="(ERROR_TYPE)" message="(ERROR_MESSAGE)" />
 ```
 
-If you want to know all exception types defined in scenario simulator exception package, please look at [this code](https://github.com/tier4/scenario_simulator_v2/blob/master/common/scenario_simulator_exception/include/scenario_simulator_exception/exception.hpp) and [this document.](ErrorCategories.md)  
-(ERROR_MESSAGE) is a error message from exception.  
+If you want to know all exception types defined in the scenario simulator exception package, please refer to [this code](https://github.com/tier4/scenario_simulator_v2/blob/master/common/scenario_simulator_exception/include/scenario_simulator_exception/exception.hpp) and [this document](ErrorCategories.md).  
+(ERROR_MESSAGE) is an error message from an exception.
 
 ## Usage of simple_junit
 
-Sample codes are below.
+Sample codes are below:
 
 ```c++
 #include <simple_junit/junit5.hpp>
@@ -92,7 +96,7 @@ int main()
 }
 ```
 
-If you run this code, result.junit.xml should be like below.
+If you run this code, result.junit.xml should be like below:
 
 ```xml
 <?xml version="1.0"?>
@@ -107,6 +111,6 @@ If you run this code, result.junit.xml should be like below.
 </testsuites>
 ```
 
-common::junit::JUnit5 class provides features to output result in junit format.  
-common::junit::Error class describes the error output.  
-common::junit::Failure class describes the failure output.  
+`common::junit::JUnit5` class provides features to output results in the JUnit format.  
+`common::junit::Error` class describes the error output.  
+`common::junit::Failure` class describes the failure output.

@@ -19,8 +19,6 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/delete_entity_action.hpp>
-#include <typeindex>
-#include <unordered_map>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -58,21 +56,22 @@ struct EntityAction : public Element
 
   static auto endsImmediately() noexcept -> bool { return true; }
 
-  inline auto evaluate() const
-  {
-    // clang-format off
-    static const std::unordered_map<std::type_index, std::function<void(const EntityAction &, const String &)>> overloads
-    {
-      { typeid(   AddEntityAction), [](const EntityAction & entity_action, auto &&... xs) { return entity_action.as<   AddEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
-      { typeid(DeleteEntityAction), [](const EntityAction & entity_action, auto &&... xs) { return entity_action.as<DeleteEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
-    };
-    // clang-format on
+  auto run() const -> void;
 
-    overloads.at(type())(*this, entity_ref);  // TODO(yamacir-kit) CATCH std::out_of_range
-
-    return unspecified;
-  }
+  static auto start() noexcept -> void {}
 };
+
+DEFINE_LAZY_VISITOR(
+  EntityAction,
+  CASE(AddEntityAction),     //
+  CASE(DeleteEntityAction),  //
+);
+
+DEFINE_LAZY_VISITOR(
+  const EntityAction,
+  CASE(AddEntityAction),     //
+  CASE(DeleteEntityAction),  //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

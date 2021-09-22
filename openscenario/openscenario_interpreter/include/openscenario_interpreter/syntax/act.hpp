@@ -57,6 +57,8 @@ struct Act : public Scope, public StoryboardElement<Act>, public Elements
 
   auto ready() { return start_trigger.evaluate().as<Boolean>(); }
 
+  static constexpr auto start() noexcept -> void {}
+
   auto stopTriggered() const { return stop_trigger && stop_trigger.evaluate().as<Boolean>(); }
 
   /* -------------------------------------------------------------------------

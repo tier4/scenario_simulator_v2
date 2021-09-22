@@ -69,7 +69,7 @@ struct Property
   {
   }
 
-  operator bool() const
+  explicit operator bool() const
   {
     if (value.empty()) {
       return Boolean();

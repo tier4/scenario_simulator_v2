@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ABSOLUTE_TARGET_SPEED_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ABSOLUTE_TARGET_SPEED_HPP_
 
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
@@ -46,7 +47,7 @@ struct AbsoluteTargetSpeed
     return [target_speed = value] { return target_speed; };
   }
 
-  auto getIsEnd() const
+  auto getIsEnd() const -> std::function<bool(const EntityRef &)>
   {
     return [target_speed = value](const EntityRef & actor) {  // is_end
       try {

@@ -40,8 +40,26 @@ struct InfrastructureAction : public ComplexType
   {
   }
 
-  bool endsImmediately() const { return as<TrafficSignalAction>().endsImmediately(); }
+  auto endsImmediately() const -> bool;
+
+  auto run() -> void;
+
+  auto start() -> void;
 };
+
+DEFINE_LAZY_VISITOR(
+  InfrastructureAction,                 //
+  CASE(TrafficSignalAction),            //
+  CASE(TrafficSignalStateAction),       // NOTE: SHORTCUT!
+  CASE(TrafficSignalControllerAction),  // NOTE: SHORTCUT!
+);
+
+DEFINE_LAZY_VISITOR(
+  const InfrastructureAction,           //
+  CASE(TrafficSignalAction),            //
+  CASE(TrafficSignalStateAction),       // NOTE: SHORTCUT!
+  CASE(TrafficSignalControllerAction),  // NOTE: SHORTCUT!
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
