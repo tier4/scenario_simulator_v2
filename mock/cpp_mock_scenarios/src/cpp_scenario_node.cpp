@@ -57,7 +57,8 @@ void CppScenarioNode::stop(Result result, const std::string & description)
   junit_.testsuite("cpp_mock_scenario");
   switch (result) {
     case Result::SUCCESS: {
-      junit_.testsuite("cpp_mock_scenario").testcase(scenario_filename_);
+      common::junit::Pass pass_case;
+      junit_.testsuite("cpp_mock_scenario").testcase(scenario_filename_).pass.push_back(pass_case);
       std::cout << "cpp_scenario:success" << std::endl;
       break;
     }
