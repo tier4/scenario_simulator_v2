@@ -12,7 +12,7 @@ It may be remedied by restarting the simulator.
 
 An unexpected anomaly has occurred inside the interpreter/simulator.
 
-This error is caused by a bug in the interpreter/simulator implementation.Due to errors in error handling, there are also cases where a faulty scenario description appears as an error in this category, but there is generally no possible action on the user side.
+This error is caused by a bug in the interpreter/simulator implementation. Due to errors in error handling, there are also cases where a faulty scenario description appears as an error in this category, but there is generally no possible action on the user side.
 
 Please report the error to the developer with the executed scenario and map (if possible).
 
@@ -44,4 +44,4 @@ Alternatively, if you can implement the feature yourself, please consider submit
 
 ## SpecificationViolation
 
-Metric module detects specification violation in simulation.  
+Metric module detects specification violation in simulation.

@@ -2,13 +2,13 @@
 
 ![Simple Demo](../image/simple_demo.png "traffic simulator")
 
-The traffic simulator simulates a traffic flow in urban area.
-Each NPC has a behavior tree and follow user's command.
+The traffic simulator simulates a traffic flow in an urban area.
+Each NPC has a behavior tree and follows the user's commands.
 
 ## C++ API
-The traffic simulator provides an C++ API to control NPC behavior in simulation.
-The sample code is below.  
-You can also see detailed documentation of API class [here](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classtraffic__simulator_1_1API/).  
+
+The traffic simulator provides C++ APIs to control the NPC behavior in simulation.
+You can also see the detailed documentation of the API classes [here](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classtraffic__simulator_1_1API/).
 
 <iframe 
   class="hatenablogcard" 
@@ -18,7 +18,8 @@ You can also see detailed documentation of API class [here](https://tier4.github
   width="300" height="150" frameborder="0" scrolling="no">
 </iframe>
 
-### minimal example
+### Minimal example
+
 ```c++
 #include <traffic_simulator/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>

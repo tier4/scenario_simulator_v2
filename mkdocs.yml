@@ -80,5 +80,5 @@ nav:
   - Package Details: package/About.md
   - Release Notes: ReleaseNotes.md
   - Contact Information: etc/ContactUs.md
-  - Development Rules: etc/DevelopmentRules.md
+  - How to Contribute: etc/HowToContribute.md
   - LICENSE: LICENSE.md

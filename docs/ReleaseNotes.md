@@ -7,6 +7,7 @@
 - Support OpenSCENARIO 1.1 `RelativeDistanceCondition` ([link](https://github.com/tier4/scenario_simulator_v2/pull/519)).
 - Fixed Action to not cause side effects during `startTransition` ([link](https://github.com/tier4/scenario_simulator_v2/pull/522)).
 - Fixed log directory cleaning behavior, cleaning all files and directories under log directory without deleting itself. ([link](https://github.com/tier4/scenario_simulator_v2/pull/527)).
+- Support new `CustomCommandAction` type `FaultInjectionAction` for ArchitectureProposal ([link](https://github.com/tier4/scenario_simulator_v2/pull/491))
 
 ## Version 0.5.0
 - Add arrow markers to visualize goal poses of entities. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
