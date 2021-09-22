@@ -55,8 +55,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
       std::placeholders::_2),
     std::bind(
-      &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1,
-      std::placeholders::_2))
+      &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2))
 {
 }
 
@@ -229,6 +228,7 @@ void ScenarioSimulator::updateTrafficLights(
   simulation_api_schema::UpdateTrafficLightsResponse & res)
 {
   // TODO: handle traffic lights in simple simulator
+  (void)req;
   res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
 }

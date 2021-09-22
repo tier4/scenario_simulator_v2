@@ -71,7 +71,7 @@ std::vector<std::int64_t> TrafficLightManager::getIds() const
   return result;
 }
 
-TrafficLight TrafficLightManager::getInstance(const std::int64_t lanelet_id) 
+TrafficLight TrafficLightManager::getInstance(const std::int64_t lanelet_id)
 {
   return traffic_lights_.at(lanelet_id);
 }
@@ -118,12 +118,14 @@ void TrafficLightManager::drawMarkers() const
   marker_pub_->publish(msg);
 }
 
-bool TrafficLightManager::hasAnyLightChanged() {
+bool TrafficLightManager::hasAnyLightChanged()
+{
   return std::any_of(
-        std::begin(traffic_lights_), std::end(traffic_lights_),
-        [](const auto & id_and_traffic_light) {
-          return (std::get<1>(id_and_traffic_light).colorChanged() || std::get<1>(id_and_traffic_light).arrowChanged());
-        });
+    std::begin(traffic_lights_), std::end(traffic_lights_), [](const auto & id_and_traffic_light) {
+      return (
+        std::get<1>(id_and_traffic_light).colorChanged() ||
+        std::get<1>(id_and_traffic_light).arrowChanged());
+    });
 }
 
 void TrafficLightManager::update(const double step_time)

@@ -320,7 +320,8 @@ bool API::updateTrafficLightsInSim()
     for (auto id : ids) {
       simulation_api_schema::TrafficLightState state;
       auto traf_light = entity_manager_ptr_->getTrafficLightInstance(id);
-      simulation_interface::toProto(static_cast<const autoware_perception_msgs::msg::TrafficLightState>(traf_light), state);
+      simulation_interface::toProto(
+        static_cast<const autoware_perception_msgs::msg::TrafficLightState>(traf_light), state);
       *req.add_states() = state;
     }
     update_traffic_lights_client_.call(req, res);

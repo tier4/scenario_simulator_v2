@@ -25,9 +25,9 @@
 #include <std_msgs.pb.h>
 
 #include <autoware_control_msgs/msg/control_command.hpp>
+#include <autoware_perception_msgs/msg/traffic_light_state.hpp>
 #include <autoware_vehicle_msgs/msg/shift.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
-#include <autoware_perception_msgs/msg/traffic_light_state.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <geometry_msgs/msg/accel.hpp>
