@@ -18,12 +18,7 @@ setup(
     maintainer_email="tatsuya.yamasaki@tier4.jp",
     description="Utility tools for ASAM OpenSCENARIO 1.0.0",
     packages=find_packages(),
-    install_requires=[
-        "PyYAML==5.4",
-        "numpy==1.19.4",
-        "setuptools",
-        "xmlschema==1.3.1",
-    ],
+    install_requires=["PyYAML==5.4", "numpy==1.19.4", "setuptools", "xmlschema==1.3.1"],
     include_package_data=True,
     package_data={"": ["resources/*.xsd"]},
     data_files=[
@@ -36,8 +31,7 @@ setup(
             "validate-xosc = openscenario_utility.validation:main",
             "yaml2xosc     = openscenario_utility.conversion:main",
             "validate-scenario = openscenario_utility.scenario_validation:validate_scenario",
-            "validate-workflow = openscenario_utility.scenario_validation:validate_workflow"
+            "validate-workflow = openscenario_utility.scenario_validation:validate_workflow",
         ]
-
     },
 )

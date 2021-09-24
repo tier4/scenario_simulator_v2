@@ -19,3 +19,10 @@ install(TARGETS
   cancel_request
   DESTINATION lib/cpp_mock_scenarios
 )
+
+if(BUILD_TESTING)
+  include(../../cmake/add_cpp_mock_scenario_test.cmake)
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "acquire_position_in_world_frame" "15.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "assign_route_in_world_frame" "15.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "cancel_request" "15.0")
+endif()

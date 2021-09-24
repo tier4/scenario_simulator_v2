@@ -63,6 +63,7 @@ jobs:
           package-name: ${{ matrix.package }}
           target-ros2-distro: ${{ matrix.rosdistro }}
           vcs-repo-file-url: dependency_${{ matrix.rosdistro }}.repos
+          extra-cmake-args: -DWITH_INTEGRATION_TEST=ON
           colcon-defaults: |
             {
               "build": {
@@ -81,6 +82,6 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
           files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
-          flags: unittests-${{ matrix.package }}
+          flags: colcon_test
           env_vars: ROS_DISTRO
           name: ${{ matrix.package }}
