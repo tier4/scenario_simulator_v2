@@ -38,16 +38,16 @@ ament_auto_add_executable(traffic_simulation_demo
 target_link_libraries(traffic_simulation_demo cpp_scenario_node)
 
 add_subdirectory(src/collision)
-# add_subdirectory(src/crosswalk)
-# add_subdirectory(src/follow_front_entity)
-# add_subdirectory(src/follow_lane)
-# add_subdirectory(src/lane_change)
-# add_subdirectory(src/measurement)
-# add_subdirectory(src/merge)
-# add_subdirectory(src/metrics)
-# add_subdirectory(src/move_backward)
-# add_subdirectory(src/pedestrian)
-# add_subdirectory(src/traffic_light)
+add_subdirectory(src/crosswalk)
+add_subdirectory(src/follow_front_entity)
+add_subdirectory(src/follow_lane)
+add_subdirectory(src/lane_change)
+add_subdirectory(src/measurement)
+add_subdirectory(src/merge)
+add_subdirectory(src/metrics)
+add_subdirectory(src/move_backward)
+add_subdirectory(src/pedestrian)
+add_subdirectory(src/traffic_light)
 
 install(
   DIRECTORY launch rviz
