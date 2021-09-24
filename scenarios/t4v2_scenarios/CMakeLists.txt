@@ -4,4 +4,17 @@ project(t4v2_scenarios)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+
+  include(cmake/add_t4v2_scenario_test.cmake)
+  add_t4v2_scenario_test(
+    "workflow_example"
+    ${PROJECT_NAME}
+    "$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml"
+    "20"
+    "300")
+endif()
+
 ament_package(CONFIG_EXTRAS "${PROJECT_NAME}-extras.cmake")
