@@ -83,16 +83,12 @@ def generate_launch_description():
         name=scenario,
         output="screen",
         arguments=[("__log_level:=info")],
-        parameters=[{"junit_path": junit_path}],
+        parameters=[{"junit_path": junit_path, "timeout": timeout}],
     )
     io_handler = OnProcessIO(
         target_action=scenario_node,
         on_stderr=on_stderr_output,
         on_stdout=on_stdout_output,
-    )
-    timer_action = TimerAction(
-        period=timeout,
-        actions=[LogInfo(msg="Shutting down by timeout"), EmitEvent(event=Shutdown())],
     )
     shutdown_handler = OnProcessExit(
         target_action=scenario_node, on_exit=[EmitEvent(event=Shutdown())]
@@ -136,7 +132,6 @@ def generate_launch_description():
                 name="openscenario_visualization_node",
                 output="screen",
             ),
-            timer_action,
             Node(
                 package="rviz2",
                 executable="rviz2",

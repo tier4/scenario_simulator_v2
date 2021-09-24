@@ -28,6 +28,8 @@ CppScenarioNode::CppScenarioNode(
 {
   declare_parameter<std::string>("junit_path", "/tmp");
   get_parameter<std::string>("junit_path", junit_path_);
+  declare_parameter<double>("timeout", 10.0);
+  get_parameter<double>("timeout", timeout_);
 }
 
 void CppScenarioNode::update()
@@ -35,6 +37,9 @@ void CppScenarioNode::update()
   onUpdate();
   try {
     api_.updateFrame();
+    if (api_.getCurrentTime() >= timeout_) {
+      stop(Result::FAILURE);
+    }
   } catch (const common::scenario_simulator_exception::Error & e) {
     if (exception_expect_) {
       stop(Result::SUCCESS);
