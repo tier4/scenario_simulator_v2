@@ -42,6 +42,7 @@ jobs:
             simple_junit,
             simple_sensor_simulator,
             simulation_interface,
+            t4v2_scenarios,
             traffic_simulator,
           ]
         rosdistro: [foxy, galactic]
