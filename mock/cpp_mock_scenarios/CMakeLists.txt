@@ -58,7 +58,6 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   include(cmake/add_cpp_mock_scenario_test.cmake)
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "traffic_simulation_demo" "70")
 endif()
 
 ament_auto_package(CONFIG_EXTRAS "${PROJECT_NAME}-extras.cmake")
