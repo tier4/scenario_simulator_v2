@@ -10,5 +10,5 @@ install(TARGETS
 
 if(BUILD_TESTING)
   include(../../cmake/add_cpp_mock_scenario_test.cmake)
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "move_backward" "10")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "move_backward" "10.0")
 endif()

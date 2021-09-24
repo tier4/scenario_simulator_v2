@@ -28,8 +28,8 @@ install(TARGETS
 
 if(BUILD_TESTING)
   include(../../cmake/add_cpp_mock_scenario_test.cmake)
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_left" "15")
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_left_with_id" "15")
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_right" "15")
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_right_with_id" "15")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_left" "15.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_left_with_id" "15.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_right" "15.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_right_with_id" "15.0")
 endif()

@@ -16,6 +16,6 @@ install(TARGETS
 
 if(BUILD_TESTING)
   include(../../cmake/add_cpp_mock_scenario_test.cmake)
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "crashing_npc" "5")
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "spawn_with_offset" "15")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "crashing_npc" "5.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "spawn_with_offset" "15.0")
 endif()

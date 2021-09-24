@@ -16,6 +16,6 @@ install(TARGETS
 
 if(BUILD_TESTING)
   include(../../cmake/add_cpp_mock_scenario_test.cmake)
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "accelerate_and_follow" "15")
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "decelerate_and_follow" "15")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "accelerate_and_follow" "15.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "decelerate_and_follow" "15.0")
 endif()

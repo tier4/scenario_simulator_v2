@@ -38,7 +38,7 @@ function(add_cpp_mock_scenario_test package_name scenario timeout)
       COMMAND ${cmd}
       OUTPUT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.output.txt"
       RESULT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.xunit.xml"
-      TIMEOUT "180"
+      TIMEOUT "30"
     )
   endif()
 endfunction()
