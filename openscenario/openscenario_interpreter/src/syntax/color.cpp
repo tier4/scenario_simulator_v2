@@ -21,7 +21,35 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, Color & datum)
+static_assert(std::is_trivially_copy_assignable<Color>::value, "");
+
+static_assert(std::is_trivially_copy_constructible<Color>::value, "");
+
+static_assert(std::is_standard_layout<Color>::value, "");
+
+Color::Color(const traffic_simulator::TrafficLightColor & color)
+: value([](auto && color) {
+    switch (color) {
+      case traffic_simulator::TrafficLightColor::GREEN:
+        return Color::green;
+
+      case traffic_simulator::TrafficLightColor::RED:
+        return Color::red;
+
+      case traffic_simulator::TrafficLightColor::YELLOW:
+        return Color::yellow;
+
+      case traffic_simulator::TrafficLightColor::NONE:
+        // [[fallthrough]];
+
+      default:
+        return Color::none;
+    }
+  }(color))
+{
+}
+
+auto operator>>(std::istream & is, Color & datum) -> std::istream &
 {
   std::string value;
 
@@ -44,7 +72,7 @@ std::istream & operator>>(std::istream & is, Color & datum)
   return is;
 }
 
-std::istream & operator>>(std::istream & is, boost::optional<Color> & datum)
+auto operator>>(std::istream & is, boost::optional<Color> & datum) -> std::istream &
 {
   std::string value;
 
@@ -67,7 +95,7 @@ std::istream & operator>>(std::istream & is, boost::optional<Color> & datum)
   return is;
 }
 
-std::ostream & operator<<(std::ostream & os, const Color & datum)
+auto operator<<(std::ostream & os, const Color & datum) -> std::ostream &
 {
 #define BOILERPLATE(IDENTIFIER) \
   case Color::IDENTIFIER:       \

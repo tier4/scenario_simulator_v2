@@ -36,27 +36,7 @@ struct Color
 
   constexpr Color(value_type value = none) : value(value) {}
 
-  explicit Color(const traffic_simulator::TrafficLightColor & color)
-  : value([](auto && color) {
-      switch (color) {
-        case traffic_simulator::TrafficLightColor::GREEN:
-          return Color::green;
-
-        case traffic_simulator::TrafficLightColor::RED:
-          return Color::red;
-
-        case traffic_simulator::TrafficLightColor::YELLOW:
-          return Color::yellow;
-
-        case traffic_simulator::TrafficLightColor::NONE:
-          // [[fallthrough]];
-
-        default:
-          return Color::none;
-      }
-    }(color))
-  {
-  }
+  explicit Color(const traffic_simulator::TrafficLightColor &);
 
   constexpr operator value_type() const noexcept { return value; }
 
@@ -81,17 +61,11 @@ struct Color
   }
 };
 
-static_assert(std::is_trivially_copy_assignable<Color>::value, "");
+auto operator>>(std::istream &, Color &) -> std::istream &;
 
-static_assert(std::is_trivially_copy_constructible<Color>::value, "");
+auto operator>>(std::istream &, boost::optional<Color> &) -> std::istream &;
 
-static_assert(std::is_standard_layout<Color>::value, "");
-
-std::istream & operator>>(std::istream &, Color &);
-
-std::istream & operator>>(std::istream &, boost::optional<Color> &);
-
-std::ostream & operator<<(std::ostream &, const Color &);
+auto operator<<(std::ostream &, const Color &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
