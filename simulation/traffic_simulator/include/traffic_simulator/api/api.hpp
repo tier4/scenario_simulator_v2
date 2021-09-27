@@ -89,7 +89,7 @@ public:
       simulation_interface::ports::attach_detection_sensor),
     update_traffic_lights_client_(
       simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::update_traffic_ligths)
+      simulation_interface::ports::update_traffic_lights)
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);

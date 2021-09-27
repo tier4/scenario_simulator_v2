@@ -128,7 +128,7 @@ MultiServer::MultiServer(
   attach_detection_sensor_sock_.bind(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::attach_detection_sensor));
   update_traffic_lights_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_traffic_ligths));
+    protocol, hostname, simulation_interface::ports::update_traffic_lights));
   poller_.add(initialize_sock_);
   poller_.add(update_frame_sock_);
   poller_.add(update_sensor_frame_sock_);
