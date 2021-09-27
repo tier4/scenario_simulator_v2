@@ -13,21 +13,21 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/center.hpp>
-#include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Center & datum)
+Center::operator geometry_msgs::msg::Point() const
 {
-  // clang-format off
+  geometry_msgs::msg::Point point;
+  {
+    point.x = x;
+    point.y = y;
+    point.z = z;
+  }
 
-  return os << indent << blue << "<Center " << highlight("x", datum.x)
-                                     << " " << highlight("y", datum.y)
-                                     << " " << highlight("z", datum.z) << blue << "/>" << reset;
-
-  // clang-format on
+  return point;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

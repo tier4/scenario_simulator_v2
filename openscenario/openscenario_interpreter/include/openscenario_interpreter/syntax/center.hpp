@@ -16,9 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CENTER_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
-#include <iostream>
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
 
 namespace openscenario_interpreter
 {
@@ -47,20 +45,8 @@ struct Center
   {
   }
 
-  explicit operator geometry_msgs::msg::Point() const
-  {
-    geometry_msgs::msg::Point point;
-    {
-      point.x = x;
-      point.y = y;
-      point.z = z;
-    }
-
-    return point;
-  }
+  explicit operator geometry_msgs::msg::Point() const;
 };
-
-std::ostream & operator<<(std::ostream &, const Center &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

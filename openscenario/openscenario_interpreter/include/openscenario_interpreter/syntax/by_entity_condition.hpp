@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity_condition.hpp>
-#include <utility>
 
 namespace openscenario_interpreter
 {
