@@ -16,10 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
 
 #include <openscenario_interpreter/syntax/route.hpp>
-#include <type_traits>
-#include <unordered_map>
 #include <utility>
-#include <vector>
 
 namespace openscenario_interpreter
 {
@@ -55,16 +52,9 @@ struct AssignRouteAction : private Scope
 
   static constexpr auto endsImmediately() noexcept { return true; };
 
-  auto run()
-  {
-    for (const auto & actor : actors) {
-      applyAssignRouteAction(
-        actor, static_cast<std::vector<openscenario_msgs::msg::LaneletPose>>(
-                 route_or_catalog_reference.as<const Route>()));
-    }
-  }
+  auto run() -> void;
 
-  static constexpr auto start() -> void { static_assert(endsImmediately(), ""); }
+  static constexpr auto start() -> void {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
