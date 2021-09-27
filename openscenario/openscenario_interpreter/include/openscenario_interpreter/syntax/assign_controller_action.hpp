@@ -24,9 +24,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-#define ELEMENT(TYPE) \
-  std::make_pair(#TYPE, [&](auto && node) { return make<TYPE>(node, outer_scope); })
-
 /* ---- AssignControllerAction -------------------------------------------------
  *
  *  This action assigns a controller to the given entity defined in the
@@ -55,15 +52,8 @@ struct AssignControllerAction : private Scope, public ComplexType
   {
   }
 
-  void operator()() const
-  {
-    for (const auto & actor : actors) {
-      applyAssignControllerAction(actor, (*this).as<Controller>());
-    }
-  }
+  auto operator()() const -> void;
 };
-
-#undef ELEMENT
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
