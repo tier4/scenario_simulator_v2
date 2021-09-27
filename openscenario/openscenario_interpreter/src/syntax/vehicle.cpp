@@ -28,7 +28,6 @@ std::ostream & operator<<(std::ostream & os, const Vehicle & datum)
             << datum.parameter_declarations << "\n"
             << datum.bounding_box           << "\n"
             << datum.performance            << "\n"
-            << datum.axles                  << "\n"
             << (--indent)
             << blue << "</Vehicle>" << reset;
   // clang-format on

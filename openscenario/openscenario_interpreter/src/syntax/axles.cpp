@@ -18,11 +18,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Axles & datum)
+Axles::operator openscenario_msgs::msg::Axles() const
 {
-  os << (indent++) << blue << "<Axles>\n" << reset;
+  openscenario_msgs::msg::Axles axles;
+  {
+    axles.front_axle = static_cast<openscenario_msgs::msg::Axle>(front_axle);
+    axles.rear_axle = static_cast<openscenario_msgs::msg::Axle>(rear_axle);
+  }
 
-  return os << (--indent) << blue << "</Axles>" << reset;
+  return axles;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

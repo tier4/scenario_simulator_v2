@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/axle.hpp>
 #include <openscenario_msgs/msg/axles.hpp>
-#include <vector>
 
 namespace openscenario_interpreter
 {
@@ -53,19 +52,8 @@ struct Axles
   {
   }
 
-  explicit operator openscenario_msgs::msg::Axles() const
-  {
-    openscenario_msgs::msg::Axles axles;
-    {
-      axles.front_axle = static_cast<openscenario_msgs::msg::Axle>(front_axle);
-      axles.rear_axle = static_cast<openscenario_msgs::msg::Axle>(rear_axle);
-    }
-
-    return axles;
-  }
+  explicit operator openscenario_msgs::msg::Axles() const;
 };
-
-std::ostream & operator<<(std::ostream &, const Axles &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

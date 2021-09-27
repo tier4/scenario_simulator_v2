@@ -41,11 +41,13 @@ struct Axle
 
   template <typename Node, typename Scope>
   explicit Axle(const Node & node, Scope & scope)
-  : max_steering(readAttribute<Double>("maxSteering", node, scope)),
+  // clang-format off
+  : max_steering  (readAttribute<Double>("maxSteering",   node, scope)),
     wheel_diameter(readAttribute<Double>("wheelDiameter", node, scope)),
-    track_width(readAttribute<Double>("trackWidth", node, scope)),
-    position_x(readAttribute<Double>("positionX", node, scope)),
-    position_z(readAttribute<Double>("positionZ", node, scope))
+    track_width   (readAttribute<Double>("trackWidth",    node, scope)),
+    position_x    (readAttribute<Double>("positionX",     node, scope)),
+    position_z    (readAttribute<Double>("positionZ",     node, scope))
+  // clang-format on
   {
   }
 
