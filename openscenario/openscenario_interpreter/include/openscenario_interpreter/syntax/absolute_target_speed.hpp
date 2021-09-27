@@ -44,20 +44,10 @@ struct AbsoluteTargetSpeed
 
   auto getCalculateAbsoluteTargetSpeed() const
   {
-    return [target_speed = value] { return target_speed; };
+    return [target_speed = value]() { return target_speed; };
   }
 
-  auto getIsEnd() const -> std::function<bool(const EntityRef &)>
-  {
-    return [target_speed = value](const EntityRef & actor) {  // is_end
-      try {
-        const auto compare = Rule(Rule::equalTo);
-        return compare(getEntityStatus(actor).action_status.twist.linear.x, target_speed);
-      } catch (const SemanticError &) {
-        return false;  // NOTE: The actor is maybe lane-changing now
-      }
-    };
-  }
+  auto getIsEnd() const -> std::function<bool(const EntityRef &)>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

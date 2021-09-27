@@ -21,13 +21,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== AbsoluteTargetLane ===================================================
+/* ---- AbsoluteTargetLane -----------------------------------------------------
  *
- * <xsd:complexType name="AbsoluteTargetLane">
- *   <xsd:attribute name="value" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="AbsoluteTargetLane">
+ *    <xsd:attribute name="value" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct AbsoluteTargetLane
 {
   const String value;
