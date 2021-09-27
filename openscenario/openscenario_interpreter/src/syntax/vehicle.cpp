@@ -26,7 +26,6 @@ std::ostream & operator<<(std::ostream & os, const Vehicle & datum)
                                   << " " << highlight("vehicleCategory", datum.vehicle_category)
             << blue << ">\n" << reset
             << datum.parameter_declarations << "\n"
-            << datum.bounding_box           << "\n"
             << datum.performance            << "\n"
             << (--indent)
             << blue << "</Vehicle>" << reset;

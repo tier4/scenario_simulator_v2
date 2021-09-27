@@ -21,16 +21,15 @@ inline namespace syntax
 {
 static_assert(IsOptionalElement<BoundingBox>::value, "BoundingBox must be an optional element");
 
-std::ostream & operator<<(std::ostream & os, const BoundingBox & datum)
+BoundingBox::operator openscenario_msgs::msg::BoundingBox() const
 {
-  // clang-format off
+  openscenario_msgs::msg::BoundingBox bounding_box;
+  {
+    bounding_box.center = static_cast<geometry_msgs::msg::Point>(center);
+    bounding_box.dimensions = static_cast<geometry_msgs::msg::Vector3>(dimensions);
+  }
 
-  return os << (indent++) << blue << "<BoundingBox>\n" << reset
-            << datum.center << "\n"
-            << datum.dimensions << "\n"
-            << (--indent) << blue << "</BoundingBox>" << reset;
-
-  // clang-format on
+  return bounding_box;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -27,7 +27,6 @@ std::ostream & operator<<(std::ostream & os, const Pedestrian & datum)
                                              << " " << highlight("model", datum.model)
                                              << " " << highlight("pedestrianCategory", datum.pedestrian_category) << blue << ">\n" << reset
             << datum.parameter_declarations << "\n"
-            << datum.bounding_box << "\n"
             << (--indent) << blue << "</Pedestrian>" << reset;
 
   // clang-format on
