@@ -18,21 +18,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-#define BOILERPLATE(TYPENAME)                                                       \
-  std::ostream & operator<<(std::ostream & os, const TYPENAME & datum)              \
-  {                                                                                 \
-    return os << indent << blue << "<" #TYPENAME << " "                             \
-              << highlight("maxSteering", datum.max_steering) << " "                \
-              << highlight("wheelDiameter", datum.wheel_diameter) << " "            \
-              << highlight("trackWidth", datum.track_width) << " "                  \
-              << highlight("positionX", datum.position_x) << " "                    \
-              << highlight("positionZ", datum.position_z) << blue << "/>" << reset; \
-  }                                                                                 \
-  static_assert(true, "")
+Axle::operator openscenario_msgs::msg::Axle() const
+{
+  openscenario_msgs::msg::Axle axle;
+  {
+    axle.max_steering = max_steering;
+    axle.wheel_diameter = wheel_diameter;
+    axle.track_width = track_width;
+    axle.position_x = position_x;
+    axle.position_z = position_z;
+  }
 
-BOILERPLATE(Axle);
-BOILERPLATE(FrontAxle);
-BOILERPLATE(RearAxle);
-BOILERPLATE(AdditionalAxle);
+  return axle;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

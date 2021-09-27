@@ -21,12 +21,6 @@ inline namespace syntax
 std::ostream & operator<<(std::ostream & os, const Axles & datum)
 {
   os << (indent++) << blue << "<Axles>\n" << reset;
-  os << datum.front_axle << "\n";
-  os << datum.rear_axle << "\n";
-
-  for (const auto & each : datum.additional_axles) {
-    os << each << "\n";
-  }
 
   return os << (--indent) << blue << "</Axles>" << reset;
 }

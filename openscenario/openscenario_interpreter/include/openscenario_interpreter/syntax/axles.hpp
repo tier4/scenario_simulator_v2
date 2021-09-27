@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__AXLES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__AXLES_HPP_
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/axle.hpp>
 #include <openscenario_msgs/msg/axles.hpp>
 #include <vector>
