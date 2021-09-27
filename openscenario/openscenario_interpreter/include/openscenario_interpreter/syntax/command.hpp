@@ -15,8 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__COMMAND_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__COMMAND_HPP_
 
-#include <openscenario_interpreter/object.hpp>
-#include <string>
+#include <iostream>
 
 namespace openscenario_interpreter
 {
@@ -35,16 +34,8 @@ struct Command
 
   constexpr operator value_type() const noexcept { return value; }
 
-  auto & operator=(const value_type & rhs)
-  {
-    value = rhs;
-    return *this;
-  }
+  auto operator=(const value_type &) -> Command &;
 };
-
-static_assert(std::is_standard_layout<Command>::value, "");
-
-static_assert(std::is_trivial<Command>::value, "");
 
 std::istream & operator>>(std::istream &, Command &);
 
