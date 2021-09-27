@@ -12,16 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/collision_condition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const CollisionCondition &)
+auto CollisionCondition::description() const -> std::string
 {
-  // TODO (yamacir-kit): Print datum as XML.
-  return os;
+  std::stringstream description;
+
+  description << triggering_entities.description() << " colliding with another given entity "
+              << another_given_entity << "?";
+
+  // TODO (yamacir-kit): If another_given_entity.is<ByType>(), description
+  // will be "Is any of [A, B, C] colliding with another T typed entities?"
+
+  return description.str();
+}
+
+auto CollisionCondition::evaluate() const -> Element
+{
+  if (
+    another_given_entity.is<EntityRef>() and
+    global().isAddedEntity(another_given_entity.as<EntityRef>())) {
+    return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+      return evaluateCollisionCondition(triggering_entity, another_given_entity.as<EntityRef>());
+    }));
+  } else {
+    // TODO ByType
+    return false_v;
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

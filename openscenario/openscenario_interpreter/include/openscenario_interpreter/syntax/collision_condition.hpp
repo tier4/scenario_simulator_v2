@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__COLLISION_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__COLLISION_CONDITION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
@@ -58,35 +57,10 @@ struct CollisionCondition : private Scope
   {
   }
 
-  auto description() const
-  {
-    std::stringstream description;
+  auto description() const -> std::string;
 
-    description << triggering_entities.description() << " colliding with another given entity "
-                << another_given_entity << "?";
-
-    // TODO (yamacir-kit): If another_given_entity.is<ByType>(), description
-    // will be "Is any of [A, B, C] colliding with another T typed entities?"
-
-    return description.str();
-  }
-
-  auto evaluate() const noexcept
-  {
-    if (
-      another_given_entity.is<EntityRef>() and
-      global().isAddedEntity(another_given_entity.as<EntityRef>())) {
-      return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-        return evaluateCollisionCondition(triggering_entity, another_given_entity.as<EntityRef>());
-      }));
-    } else {
-      // TODO ByType
-      return false_v;
-    }
-  }
+  auto evaluate() const -> Element;
 };
-
-std::ostream & operator<<(std::ostream &, const CollisionCondition &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
