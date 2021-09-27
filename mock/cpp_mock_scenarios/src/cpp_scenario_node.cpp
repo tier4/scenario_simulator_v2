@@ -23,8 +23,13 @@ CppScenarioNode::CppScenarioNode(
   const rclcpp::NodeOptions & option)
 : Node(node_name, option),
   api_(this, configure(map_path, lanelet2_map_file, scenario_filename, verbose)),
+  scenario_filename_(scenario_filename),
   exception_expect_(false)
 {
+  declare_parameter<std::string>("junit_path", "/tmp");
+  get_parameter<std::string>("junit_path", junit_path_);
+  declare_parameter<double>("timeout", 10.0);
+  get_parameter<double>("timeout", timeout_);
 }
 
 void CppScenarioNode::update()
@@ -32,7 +37,10 @@ void CppScenarioNode::update()
   onUpdate();
   try {
     api_.updateFrame();
-  } catch (const common::Error & e) {
+    if (api_.getCurrentTime() >= timeout_) {
+      stop(Result::FAILURE);
+    }
+  } catch (const common::scenario_simulator_exception::Error & e) {
     if (exception_expect_) {
       stop(Result::SUCCESS);
     } else {
@@ -49,18 +57,28 @@ void CppScenarioNode::start()
   update_timer_ = this->create_wall_timer(50ms, std::bind(&CppScenarioNode::update, this));
 }
 
-void CppScenarioNode::stop(Result result)
+void CppScenarioNode::stop(Result result, const std::string & description)
 {
+  junit_.testsuite("cpp_mock_scenario");
   switch (result) {
     case Result::SUCCESS: {
+      common::junit::Pass pass_case;
+      junit_.testsuite("cpp_mock_scenario").testcase(scenario_filename_).pass.push_back(pass_case);
       std::cout << "cpp_scenario:success" << std::endl;
       break;
     }
     case Result::FAILURE: {
+      common::junit::Failure failure_case("result", "failure");
+      failure_case.message = description;
+      junit_.testsuite("cpp_mock_scenario")
+        .testcase(scenario_filename_)
+        .failure.push_back(failure_case);
       std::cerr << "cpp_scenario:failure" << std::endl;
       break;
     }
   }
+  // junit_.testsuite("cpp_mock_scenario").testcase(scenario_filename_).time = api_.getCurrentTime();
+  junit_.write_to(junit_path_.c_str(), "  ");
   update_timer_->cancel();
   rclcpp::shutdown();
   std::exit(0);

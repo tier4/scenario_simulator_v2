@@ -37,3 +37,14 @@ install(TARGETS
   collision
   DESTINATION lib/cpp_mock_scenarios
 )
+
+if(BUILD_TESTING)
+  include(../../cmake/add_cpp_mock_scenario_test.cmake)
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "traveled_distance" "15.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "momentary_stop" "20.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "reaction_time" "10.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "out_of_range" "7.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "collision" "5.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "standstill_duration" "15.0")
+endif()
+

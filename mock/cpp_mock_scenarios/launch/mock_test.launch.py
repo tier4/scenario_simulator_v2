@@ -74,22 +74,21 @@ def on_stdout_output(event: launch.Event) -> None:
 def generate_launch_description():
     timeout = LaunchConfiguration("timeout", default=10)
     scenario = LaunchConfiguration("scenario", default="")
+    scenario_package = LaunchConfiguration("package", default="cpp_mock_scenarios")
+    junit_path = LaunchConfiguration("junit_path", default="/tmp/output.xunit.xml")
     launch_rviz = LaunchConfiguration("launch_rviz", default=False)
     scenario_node = Node(
-        package="cpp_mock_scenarios",
+        package=scenario_package,
         executable=scenario,
         name=scenario,
         output="screen",
         arguments=[("__log_level:=info")],
+        parameters=[{"junit_path": junit_path, "timeout": timeout}],
     )
     io_handler = OnProcessIO(
         target_action=scenario_node,
         on_stderr=on_stderr_output,
         on_stdout=on_stdout_output,
-    )
-    timer_action = TimerAction(
-        period=timeout,
-        actions=[LogInfo(msg="Shutting down by timeout"), EmitEvent(event=Shutdown())],
     )
     shutdown_handler = OnProcessExit(
         target_action=scenario_node, on_exit=[EmitEvent(event=Shutdown())]
@@ -100,7 +99,17 @@ def generate_launch_description():
                 "scenario", default_value=scenario, description="Name of the scenario."
             ),
             DeclareLaunchArgument(
+                "package",
+                default_value=scenario_package,
+                description="Name of package your scenario exists",
+            ),
+            DeclareLaunchArgument(
                 "timeout", default_value=timeout, description="Timeout in seconds."
+            ),
+            DeclareLaunchArgument(
+                "junit_path",
+                default_value=junit_path,
+                description="Path of the junit output.",
             ),
             DeclareLaunchArgument(
                 "launch_rviz",
@@ -123,7 +132,6 @@ def generate_launch_description():
                 name="openscenario_visualization_node",
                 output="screen",
             ),
-            timer_action,
             Node(
                 package="rviz2",
                 executable="rviz2",
