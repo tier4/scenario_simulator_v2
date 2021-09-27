@@ -15,13 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ACQUIRE_POSITION_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACQUIRE_POSITION_ACTION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
-#include <openscenario_interpreter/syntax/string.hpp>
-#include <openscenario_interpreter/utility/overload.hpp>
-#include <traffic_simulator/helper/helper.hpp>
-#include <unordered_map>
 
 namespace openscenario_interpreter
 {
@@ -50,27 +45,9 @@ struct AcquirePositionAction : private Scope
 
   static constexpr auto endsImmediately() -> bool { return true; };
 
-  auto run() -> void
-  {
-    const auto acquire_position = overload(
-      [](const WorldPosition & position, auto && actor) {
-        return applyAcquirePositionAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
-      },
-      [](const RelativeWorldPosition & position, auto && actor) {
-        return applyAcquirePositionAction(
-          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
-      },
-      [](const LanePosition & position, auto && actor) {
-        return applyAcquirePositionAction(
-          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
-      });
+  auto run() -> void;
 
-    for (const auto & actor : actors) {
-      apply(acquire_position, position, actor);
-    }
-  }
-
-  static constexpr auto start() noexcept -> void { static_assert(endsImmediately(), ""); }
+  static constexpr auto start() noexcept -> void {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
