@@ -55,44 +55,22 @@ struct Act : public Scope, public StoryboardElement<Act>, public Elements
     });
   }
 
-  auto ready() { return start_trigger.evaluate().as<Boolean>(); }
+  using StoryboardElement::evaluate;
 
   static constexpr auto start() noexcept -> void {}
 
-  auto stopTriggered() const { return stop_trigger && stop_trigger.evaluate().as<Boolean>(); }
+  auto accomplished() const -> bool;
 
-  /* -------------------------------------------------------------------------
-   *
-   *  A ManeuverGroup's goal is accomplished when all its Maneuvers are in the
-   *  completeState.
-   *
-   * ---------------------------------------------------------------------- */
-  auto accomplished() const
-  {
-    return std::all_of(std::begin(*this), std::end(*this), [&](const Element & each) {
-      return each.as<ManeuverGroup>().complete();
-    });
-  }
+  auto stop() -> void;
 
-  void stop()
-  {
-    for (auto && each : *this) {
-      each.as<ManeuverGroup>().override();
-      each.evaluate();
-    }
-  }
+  auto stopTriggered() const -> bool;
 
-  using StoryboardElement::evaluate;
+  auto ready() -> bool;
 
-  void run()
-  {
-    for (auto && each : *this) {
-      each.evaluate();
-    }
-  }
+  auto run() -> void;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Act &);
+auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
