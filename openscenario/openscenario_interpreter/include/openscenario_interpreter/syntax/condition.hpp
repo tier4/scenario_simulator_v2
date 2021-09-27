@@ -63,17 +63,10 @@ struct Condition : public Element
   {
   }
 
-  const auto & evaluate()
-  {
-    if (condition_edge == ConditionEdge::sticky and current_value) {
-      return true_v;
-    } else {
-      return asBoolean(current_value = Element::evaluate().as<Boolean>());
-    }
-  }
+  auto evaluate() -> Element;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Condition &);
+auto operator<<(nlohmann::json &, const Condition &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

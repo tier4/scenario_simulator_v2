@@ -19,7 +19,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Condition & datum)
+auto Condition::evaluate() -> Element
+{
+  if (condition_edge == ConditionEdge::sticky and current_value) {
+    return true_v;
+  } else {
+    return asBoolean(current_value = Element::evaluate().as<Boolean>());
+  }
+}
+
+auto operator<<(nlohmann::json & json, const Condition & datum) -> nlohmann::json &
 {
   json["currentEvaluation"] = datum.description();
 
