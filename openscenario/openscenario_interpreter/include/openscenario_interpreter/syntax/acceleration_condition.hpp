@@ -52,29 +52,9 @@ struct AccelerationCondition
   {
   }
 
-  auto description() const
-  {
-    std::stringstream description;
+  auto description() const -> std::string;
 
-    description << triggering_entities.description() << "'s acceleration = ";
-
-    print_to(description, last_checked_values);
-
-    description << " " << compare << " " << value << "?";
-
-    return description.str();
-  }
-
-  auto evaluate()
-  {
-    last_checked_values.clear();
-
-    return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-      last_checked_values.push_back(
-        getEntityStatus(triggering_entity).action_status.accel.linear.x);
-      return compare(last_checked_values.back(), value);
-    }));
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

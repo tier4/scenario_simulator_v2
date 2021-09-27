@@ -12,22 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/absolute_target_speed.hpp>
+#include <openscenario_interpreter/syntax/acceleration_condition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto AbsoluteTargetSpeed::getIsEnd() const -> std::function<bool(const EntityRef &)>
+auto AccelerationCondition::description() const -> std::string
 {
-  return [target_speed = value](const EntityRef & actor) {  // is_end
-    try {
-      const auto compare = Rule(Rule::equalTo);
-      return compare(getEntityStatus(actor).action_status.twist.linear.x, target_speed);
-    } catch (const SemanticError &) {
-      return false;  // NOTE: The actor is maybe lane-changing now
-    }
-  };
+  std::stringstream description;
+
+  description << triggering_entities.description() << "'s acceleration = ";
+
+  print_to(description, last_checked_values);
+
+  description << " " << compare << " " << value << "?";
+
+  return description.str();
+}
+
+auto AccelerationCondition::evaluate() -> Element
+{
+  last_checked_values.clear();
+
+  return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+    last_checked_values.push_back(getEntityStatus(triggering_entity).action_status.accel.linear.x);
+    return compare(last_checked_values.back(), value);
+  }));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
