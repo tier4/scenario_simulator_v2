@@ -46,19 +46,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Controller : public Scope
 {
-  /* ---- ParameterDeclarations ------------------------------------------------
-   *
-   *  Definition of additional parameters.
-   *
-   * ------------------------------------------------------------------------ */
-  const ParameterDeclarations parameter_declarations;
+  const ParameterDeclarations parameter_declarations;  // Definition of additional parameters.
 
-  /* ---- Properties -----------------------------------------------------------
-   *
-   *  Describing properties for the controller.
-   *
-   * ------------------------------------------------------------------------ */
-  Properties properties;
+  Properties properties;  // Describing properties for the controller.
 
   template <typename Node>
   explicit Controller(const Node & node, Scope & outer_scope)
@@ -70,20 +60,12 @@ struct Controller : public Scope
   }
 
   template <typename... Ts>
-  decltype(auto) operator[](Ts &&... xs)
+  auto operator[](Ts &&... xs) -> decltype(auto)
   {
     return properties.operator[](std::forward<decltype(xs)>(xs)...);
   }
 
-  operator openscenario_msgs::msg::DriverModel()
-  {
-    openscenario_msgs::msg::DriverModel controller;
-    {
-      controller.see_around = not(*this)["isBlind"];
-    }
-
-    return controller;
-  }
+  operator openscenario_msgs::msg::DriverModel();
 };
 
 using DefaultController = Properties;
