@@ -18,7 +18,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const ConditionGroup & datum)
+auto ConditionGroup::evaluate() -> Element
+{
+  // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
+  return asBoolean(
+    current_value = std::accumulate(
+      std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & condition) {
+        const auto rhs = condition.evaluate();
+        return lhs and rhs.as<Boolean>();
+      }));
+}
+
+auto operator<<(nlohmann::json & json, const ConditionGroup & datum) -> nlohmann::json &
 {
   json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));
 
