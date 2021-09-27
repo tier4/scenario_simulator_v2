@@ -19,6 +19,8 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+auto Action::ready() const -> bool { return static_cast<bool>(*this); }
+
 auto Action::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
@@ -27,6 +29,15 @@ auto Action::run() -> void
 auto Action::start() -> void
 {
   return apply<void>([](auto && action) { return action.start(); }, *this);
+}
+
+auto Action::stop() -> void
+{
+  if (overridden) {
+    current_state = complete_state;
+  } else {
+    overridden = true;
+  }
 }
 
 auto operator<<(nlohmann::json & json, const Action & datum) -> nlohmann::json &

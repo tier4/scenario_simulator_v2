@@ -55,10 +55,6 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
   {
   }
 
-  auto ready() const { return static_cast<bool>(*this); }
-
-  static constexpr auto stopTriggered() noexcept { return false; }
-
   using StoryboardElement::currentState;
 
   /* -------------------------------------------------------------------------
@@ -76,18 +72,15 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
 
   using StoryboardElement::evaluate;
 
+  auto ready() const -> bool;
+
   auto run() -> void;
 
   auto start() -> void;
 
-  auto stop() -> void
-  {
-    if (overridden) {
-      current_state = complete_state;
-    } else {
-      overridden = true;
-    }
-  }
+  auto stop() -> void;
+
+  static constexpr auto stopTriggered() noexcept { return false; }
 };
 
 auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;
