@@ -169,6 +169,8 @@ public:
 
   DEFINE_GET_TRAFFIC_LIGHT(Color);
   DEFINE_GET_TRAFFIC_LIGHT(Arrow);
+  DEFINE_GET_TRAFFIC_LIGHT(Ids);
+  DEFINE_GET_TRAFFIC_LIGHT(Instance);
 
 #undef DEFINE_GET_TRAFFIC_LIGHT
 
@@ -214,6 +216,8 @@ public:
   FORWARD_TO_ENTITY(setDriverModel, );
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
+
+  bool trafficLightsChanged();
 
   void setTargetSpeed(const std::string & name, double target_speed, bool continuous);
 

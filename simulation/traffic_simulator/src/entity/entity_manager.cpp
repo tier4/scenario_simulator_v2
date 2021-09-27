@@ -488,6 +488,11 @@ void EntityManager::requestLaneChange(const std::string & name, const Direction 
   }
 }
 
+bool EntityManager::trafficLightsChanged()
+{
+  return traffic_light_manager_ptr_->hasAnyLightChanged();
+}
+
 void EntityManager::setTargetSpeed(const std::string & name, double target_speed, bool continuous)
 {
   if (isEgo(name) && getCurrentTime() > 0) {
