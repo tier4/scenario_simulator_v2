@@ -363,7 +363,7 @@ struct SimpleTestSuites : private std::unordered_map<std::string, SimpleTestSuit
       SimpleTestSuite suite = testsuite.second;
       current_node << suite;
       const auto testcase_names = suite.getTestcaseNames();
-      for (const auto testcase_name : testcase_names) {
+      for (const auto & testcase_name : testcase_names) {
         failures = failures + suite.testcase(testcase_name).failure.size();
         errors = errors + suite.testcase(testcase_name).error.size();
         pass = pass + suite.testcase(testcase_name).pass.size();
