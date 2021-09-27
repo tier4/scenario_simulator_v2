@@ -38,21 +38,10 @@ inline namespace syntax
  * ------------------------------------------------------------------------ */
 struct ControllerAction
 {
-  /* ---- AssignControllerAction -----------------------------------------------
-   *
-   *  Assign a controller to an entity.
-   *
-   * ------------------------------------------------------------------------ */
-  const AssignControllerAction assign_controller_action;
+  const AssignControllerAction assign_controller_action;  // Assign a controller to an entity.
 
-  /* ---- OverrideControllerValueAction ----------------------------------------
-   *
-   *  Values for throttle, brake, clutch, parking brake, steering wheel or gear.
-   *
-   *  NOTE: OverrideControllerValueAction is ignored.
-   *
-   * ------------------------------------------------------------------------ */
   const OverrideControllerValueAction override_controller_value_action;
+  // Values for throttle, brake, clutch, parking brake, steering wheel or gear.
 
   template <typename Node, typename Scope>
   explicit ControllerAction(const Node & node, Scope & outer_scope)
@@ -67,7 +56,7 @@ struct ControllerAction
 
   static auto endsImmediately() noexcept { return true; };
 
-  inline auto run() const -> void { assign_controller_action(); }
+  auto run() const -> void;
 
   static auto start() noexcept {}
 };
