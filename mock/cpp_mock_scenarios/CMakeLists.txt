@@ -21,7 +21,7 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(cpp_scenario_node
+ament_auto_add_library(cpp_scenario_node SHARED
   src/cpp_scenario_node.cpp
 )
 target_link_libraries(cpp_scenario_node
@@ -56,6 +56,9 @@ install(
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+
+  include(cmake/add_cpp_mock_scenario_test.cmake)
+  # add_cpp_mock_scenario_test(${PROJECT_NAME} "traffic_simulation_demo" "70")
 endif()
 
-ament_auto_package()
+ament_auto_package(CONFIG_EXTRAS "${PROJECT_NAME}-extras.cmake")

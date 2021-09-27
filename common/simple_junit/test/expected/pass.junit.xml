@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<testsuites>
-  <testsuite name="example_suite">
-    <testcase name="example_case" />
+<testsuites failures="0" errors="0" tests="0">
+  <testsuite name="example_suite" failures="0" errors="0" tests="0">
+    <testcase name="example_case"/>
   </testsuite>
-  <testsuite name="example_suites" />
+  <testsuite name="example_suites" failures="0" errors="0" tests="0"/>
 </testsuites>
