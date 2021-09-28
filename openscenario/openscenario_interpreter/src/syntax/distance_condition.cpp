@@ -89,7 +89,8 @@ auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> d
 
 template <>
 auto DistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef & entity_ref) const -> double
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(
+  const EntityRef & entity_ref) const -> double
 {
   const auto pose = getRelativePose(entity_ref, static_cast<geometry_msgs::msg::Pose>(position));
   return std::hypot(pose.position.x, pose.position.y);
