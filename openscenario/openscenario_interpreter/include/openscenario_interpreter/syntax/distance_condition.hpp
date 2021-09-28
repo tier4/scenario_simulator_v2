@@ -98,8 +98,18 @@ struct DistanceCondition
 
   auto distance(const EntityRef &) const -> double;
 
+  template <CoordinateSystem::value_type, RelativeDistanceType::value_type, bool>
+  auto distance(const EntityRef &) const -> double
+  {
+    throw SyntaxError(__FILE__, ":", __LINE__);
+  }
+
   auto evaluate() -> Element;
 };
+
+// clang-format off
+template <> auto DistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) const -> double;
+// clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

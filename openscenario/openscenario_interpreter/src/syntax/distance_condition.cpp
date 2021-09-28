@@ -34,7 +34,62 @@ auto DistanceCondition::description() const -> std::string
   return description.str();
 }
 
-auto DistanceCondition::distance(const EntityRef & entity_ref) const -> double
+auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> double
+{
+  // clang-format off
+  switch (coordinate_system) {
+    case CoordinateSystem::entity:
+      switch (relative_distance_type) {
+        case RelativeDistanceType::longitudinal:      return freespace ? distance< CoordinateSystem::entity,     RelativeDistanceType::longitudinal,      true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::entity,     RelativeDistanceType::longitudinal,      false >(triggering_entity);
+        case RelativeDistanceType::lateral:           return freespace ? distance< CoordinateSystem::entity,     RelativeDistanceType::lateral,           true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::entity,     RelativeDistanceType::lateral,           false >(triggering_entity);
+        case RelativeDistanceType::euclidianDistance: return freespace ? distance< CoordinateSystem::entity,     RelativeDistanceType::euclidianDistance, true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::entity,     RelativeDistanceType::euclidianDistance, false >(triggering_entity);
+      }
+      break;
+
+    case CoordinateSystem::lane:
+      switch (relative_distance_type) {
+        case RelativeDistanceType::longitudinal:      return freespace ? distance< CoordinateSystem::lane,       RelativeDistanceType::longitudinal,      true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::lane,       RelativeDistanceType::longitudinal,      false >(triggering_entity);
+        case RelativeDistanceType::lateral:           return freespace ? distance< CoordinateSystem::lane,       RelativeDistanceType::lateral,           true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::lane,       RelativeDistanceType::lateral,           false >(triggering_entity);
+        case RelativeDistanceType::euclidianDistance: return freespace ? distance< CoordinateSystem::lane,       RelativeDistanceType::euclidianDistance, true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::lane,       RelativeDistanceType::euclidianDistance, false >(triggering_entity);
+      }
+      break;
+
+    case CoordinateSystem::road:
+      switch (relative_distance_type) {
+        case RelativeDistanceType::longitudinal:      return freespace ? distance< CoordinateSystem::road,       RelativeDistanceType::longitudinal,      true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::road,       RelativeDistanceType::longitudinal,      false >(triggering_entity);
+        case RelativeDistanceType::lateral:           return freespace ? distance< CoordinateSystem::road,       RelativeDistanceType::lateral,           true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::road,       RelativeDistanceType::lateral,           false >(triggering_entity);
+        case RelativeDistanceType::euclidianDistance: return freespace ? distance< CoordinateSystem::road,       RelativeDistanceType::euclidianDistance, true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::road,       RelativeDistanceType::euclidianDistance, false >(triggering_entity);
+      }
+      break;
+
+    case CoordinateSystem::trajectory:
+      switch (relative_distance_type) {
+        case RelativeDistanceType::longitudinal:      return freespace ? distance< CoordinateSystem::trajectory, RelativeDistanceType::longitudinal,      true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::trajectory, RelativeDistanceType::longitudinal,      false >(triggering_entity);
+        case RelativeDistanceType::lateral:           return freespace ? distance< CoordinateSystem::trajectory, RelativeDistanceType::lateral,           true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::trajectory, RelativeDistanceType::lateral,           false >(triggering_entity);
+        case RelativeDistanceType::euclidianDistance: return freespace ? distance< CoordinateSystem::trajectory, RelativeDistanceType::euclidianDistance, true  >(triggering_entity)
+                                                                       : distance< CoordinateSystem::trajectory, RelativeDistanceType::euclidianDistance, false >(triggering_entity);
+      }
+      break;
+  }
+  // clang-format on
+
+  throw Error(__FILE__, ":", __LINE__);
+}
+
+template <>
+auto DistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef & entity_ref) const -> double
 {
   const auto pose = getRelativePose(entity_ref, static_cast<geometry_msgs::msg::Pose>(position));
   return std::hypot(pose.position.x, pose.position.y);
