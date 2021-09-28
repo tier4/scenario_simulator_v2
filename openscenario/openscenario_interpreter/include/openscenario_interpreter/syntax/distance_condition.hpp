@@ -76,7 +76,7 @@ struct DistanceCondition
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> last_checked_values;  // for description
+  std::vector<Double> results;  // for description
 
   template <typename Node, typename Scope>
   explicit DistanceCondition(
@@ -89,12 +89,14 @@ struct DistanceCondition
     value                 (readAttribute<Double              >("value",                node, scope)),
     position              (readElement  <Position            >("Position",             node, scope)),
     triggering_entities(triggering_entities),
-    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
+    results(triggering_entities.entity_refs.size(), Double::nan())
   // clang-format on
   {
   }
 
   auto description() const -> std::string;
+
+  auto distance(const EntityRef &) const -> double;
 
   auto evaluate() -> Element;
 };

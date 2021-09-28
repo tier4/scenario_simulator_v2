@@ -27,25 +27,26 @@ auto DistanceCondition::description() const -> std::string
 
   description << triggering_entities.description() << "'s distance to given position = ";
 
-  print_to(description, last_checked_values);
+  print_to(description, results);
 
   description << " " << rule << " " << value << "?";
 
   return description.str();
 }
 
+auto DistanceCondition::distance(const EntityRef & entity_ref) const -> double
+{
+  const auto pose = getRelativePose(entity_ref, static_cast<geometry_msgs::msg::Pose>(position));
+  return std::hypot(pose.position.x, pose.position.y);
+}
+
 auto DistanceCondition::evaluate() -> Element
 {
-  auto distance = [&](auto && name) {
-    const auto pose = getRelativePose(name, static_cast<geometry_msgs::msg::Pose>(position));
-    return std::hypot(pose.position.x, pose.position.y);
-  };
-
-  last_checked_values.clear();
+  results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    last_checked_values.push_back(distance(triggering_entity));
-    return rule(last_checked_values.back(), value);
+    results.push_back(distance(triggering_entity));
+    return rule(results.back(), value);
   }));
 }
 }  // namespace syntax
