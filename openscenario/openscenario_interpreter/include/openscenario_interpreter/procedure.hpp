@@ -91,7 +91,7 @@ auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::deca
   static_assert(true, "")
 
 STRIP_OPTIONAL(getBoundingBoxDistance, static_cast<value_type>(0));
-STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::infinity());
+STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_NaN());
 STRIP_OPTIONAL(getStandStillDuration, static_cast<value_type>(0));
 STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
 

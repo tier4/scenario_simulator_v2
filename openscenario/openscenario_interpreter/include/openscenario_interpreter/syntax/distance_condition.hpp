@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTANCE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DISTANCE_CONDITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -54,7 +55,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DistanceCondition
+struct DistanceCondition : private Scope
 {
   // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity". If set, "alongRoute" is ignored.
   const CoordinateSystem coordinate_system;
@@ -78,11 +79,12 @@ struct DistanceCondition
 
   std::vector<Double> results;  // for description
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit DistanceCondition(
     const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
   // clang-format off
-  : coordinate_system     (readAttribute<CoordinateSystem    >("coordinateSystem",     node, scope, CoordinateSystem::entity)),
+  : Scope(scope),
+    coordinate_system     (readAttribute<CoordinateSystem    >("coordinateSystem",     node, scope, CoordinateSystem::entity)),
     freespace             (readAttribute<Boolean             >("freespace",            node, scope)),
     relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope, RelativeDistanceType::euclidianDistance)),
     rule                  (readAttribute<Rule                >("rule",                 node, scope)),
@@ -109,6 +111,7 @@ struct DistanceCondition
 
 // clang-format off
 template <> auto DistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance< CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter

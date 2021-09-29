@@ -17,12 +17,17 @@
 
 namespace openscenario_interpreter
 {
-auto Scope::GlobalEnvironment::isAddedEntity(const EntityRef & entity_ref) const -> bool
+auto Scope::GlobalEnvironment::entityRef(const EntityRef & entity_ref) const -> Element
 {
   try {
-    return entities.at(entity_ref).as<ScenarioObject>().is_added;
+    return entities.at(entity_ref);
   } catch (const std::out_of_range &) {
-    return false;
+    throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");
   }
+}
+
+auto Scope::GlobalEnvironment::isAddedEntity(const EntityRef & entity_ref) const -> bool
+{
+  return entityRef(entity_ref).as<ScenarioObject>().is_added;
 }
 }  // namespace openscenario_interpreter

@@ -15,6 +15,8 @@
 #include <cmath>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/distance_condition.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/utility/overload.hpp>
 #include <sstream>
 
 namespace openscenario_interpreter
@@ -73,7 +75,7 @@ auto DistanceCondition::description() const -> std::string
 auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> double
 {
   APPLY(SWITCH_COORDINATE_SYSTEM, SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_FREESPACE, DISTANCE);
-  throw Error(__FILE__, ":", __LINE__);
+  return std::numeric_limits<double>::quiet_NaN();
 }
 
 template <>
@@ -84,6 +86,39 @@ auto DistanceCondition::distance<
   const auto pose =
     getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
   return std::hypot(pose.position.x, pose.position.y);
+}
+
+template <>
+auto DistanceCondition::distance<CoordinateSystem::lane, RelativeDistanceType::longitudinal, false>(
+  const EntityRef & triggering_entity) const -> double
+{
+  return apply<double>(
+    overload(
+      [&](const WorldPosition & position) {
+        if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
+          return getLongitudinalDistance(
+            triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+        } else {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+      },
+      [&](const RelativeWorldPosition & position) {
+        if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
+          return getLongitudinalDistance(
+            triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+        } else {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+      },
+      [&](const LanePosition & position) {
+        if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
+          return getLongitudinalDistance(
+            triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+        } else {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+      }),
+    position);
 }
 
 auto DistanceCondition::evaluate() -> Element
