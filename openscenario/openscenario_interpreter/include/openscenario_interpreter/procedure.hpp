@@ -43,10 +43,10 @@ try {
 }
 
 template <typename... Ts>
-decltype(auto) getRelativePose(Ts &&... xs)
+auto getRelativePose(Ts &&... xs)
 try {
   return connection.getRelativePose(std::forward<decltype(xs)>(xs)...);
-} catch (const common::scenario_simulator_exception::SimulationError &) {
+} catch (...) {
   geometry_msgs::msg::Pose result{};
   result.position.x = std::numeric_limits<double>::quiet_NaN();
   result.position.y = std::numeric_limits<double>::quiet_NaN();
@@ -57,21 +57,6 @@ try {
   result.orientation.w = 1;
   return result;
 }
-
-// template <typename... Ts>
-// auto getDistanceAlongRoute(Ts&&... xs)
-// {
-//   if (const auto result {
-//   connection->entity->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...) })
-//   {
-//     return *result;
-//   }
-//   else
-//   {
-//     using value_type = typename std::decay<decltype(result)>::type::value_type;
-//     return std::numeric_limits<value_type>::infinity();
-//   }
-// }
 
 auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
   decltype(connection.toLaneletPose(std::declval<decltype(pose)>()).get())>::type;

@@ -220,7 +220,7 @@ class Scope
 
     auto entityRef(const EntityRef &) const -> Element;  // TODO: RETURN ScenarioObject TYPE!
 
-    [[deprecated]] auto isAddedEntity(const EntityRef &) const -> bool;
+    auto isAddedEntity(const EntityRef &) const -> bool;
   };
 
   const std::shared_ptr<GlobalEnvironment> global_environment;

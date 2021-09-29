@@ -83,13 +83,73 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(
   const EntityRef & triggering_entity) const -> double
 {
-  const auto pose =
-    getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-  return std::hypot(pose.position.x, pose.position.y);
+  return apply<double>(
+    overload(
+      [&](const WorldPosition & position) {
+        const auto pose =
+          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+        return std::hypot(pose.position.x, pose.position.y);
+      },
+      [&](const RelativeWorldPosition & position) {
+        const auto pose =
+          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+        return std::hypot(pose.position.x, pose.position.y);
+      },
+      [&](const LanePosition & position) {
+        const auto pose =
+          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+        return std::hypot(pose.position.x, pose.position.y);
+      }),
+    position);
 }
 
 template <>
-auto DistanceCondition::distance<CoordinateSystem::lane, RelativeDistanceType::longitudinal, false>(
+auto DistanceCondition::distance<  //
+  CoordinateSystem::entity, RelativeDistanceType::lateral, false>(
+  const EntityRef & triggering_entity) const -> double
+{
+  return apply<double>(
+    overload(
+      [&](const WorldPosition & position) {
+        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+          .position.y;
+      },
+      [&](const RelativeWorldPosition & position) {
+        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+          .position.y;
+      },
+      [&](const LanePosition & position) {
+        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+          .position.y;
+      }),
+    position);
+}
+
+template <>
+auto DistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::longitudinal, false>(
+  const EntityRef & triggering_entity) const -> double
+{
+  return apply<double>(
+    overload(
+      [&](const WorldPosition & position) {
+        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+          .position.x;
+      },
+      [&](const RelativeWorldPosition & position) {
+        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+          .position.x;
+      },
+      [&](const LanePosition & position) {
+        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+          .position.x;
+      }),
+    position);
+}
+
+template <>
+auto DistanceCondition::distance<  //
+  CoordinateSystem::lane, RelativeDistanceType::longitudinal, false>(
   const EntityRef & triggering_entity) const -> double
 {
   return apply<double>(
