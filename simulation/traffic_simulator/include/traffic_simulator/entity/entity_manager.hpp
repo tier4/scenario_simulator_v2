@@ -92,6 +92,8 @@ class EntityManager
 
   const std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
 
+  using LaneletPose = openscenario_msgs::msg::LaneletPose;
+
 public:
   template <typename Node>
   auto getOrigin(Node & node) const
@@ -263,9 +265,12 @@ public:
   auto getLaneletPose(const std::string & name)
     -> boost::optional<openscenario_msgs::msg::LaneletPose>;
 
-  auto getLongitudinalDistance(
-    const std::string & from, const std::string & to, const double max_distance = 100)
-    -> boost::optional<double>;
+  // clang-format off
+  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &, const double = 100) -> boost::optional<double>;
+  auto getLongitudinalDistance(const LaneletPose &, const std::string &, const double = 100) -> boost::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const LaneletPose &, const double = 100) -> boost::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const std::string &, const double = 100) -> boost::optional<double>;
+  // clang-format on
 
   auto getMapPose(const std::string & entity_name) -> geometry_msgs::msg::Pose;
   auto getMapPose(

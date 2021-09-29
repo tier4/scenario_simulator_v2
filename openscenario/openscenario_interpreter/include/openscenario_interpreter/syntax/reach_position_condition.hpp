@@ -87,6 +87,7 @@ struct ReachPositionCondition
           triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
       });
 
+    // TODO USE DistanceCondition::distance
     const auto distance = overload(
       [&](const WorldPosition & position, auto && triggering_entity) {
         const auto pose =
