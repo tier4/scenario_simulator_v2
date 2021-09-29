@@ -117,6 +117,9 @@ private:
   void updateSensorFrame(
     const simulation_api_schema::UpdateSensorFrameRequest & req,
     simulation_api_schema::UpdateSensorFrameResponse & res);
+  void updateTrafficLights(
+    const simulation_api_schema::UpdateTrafficLightsRequest & req,
+    simulation_api_schema::UpdateTrafficLightsResponse & res);
   std::vector<openscenario_msgs::VehicleParameters> ego_vehicles_;
   std::vector<openscenario_msgs::VehicleParameters> vehicles_;
   std::vector<openscenario_msgs::PedestrianParameters> pedestrians_;

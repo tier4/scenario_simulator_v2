@@ -218,6 +218,8 @@ class Scope
 
     explicit GlobalEnvironment(const boost::filesystem::path pathname) : pathname(pathname) {}
 
+    auto entityRef(const EntityRef &) const -> Element;  // TODO: RETURN ScenarioObject TYPE!
+
     auto isAddedEntity(const EntityRef &) const -> bool;
   };
 

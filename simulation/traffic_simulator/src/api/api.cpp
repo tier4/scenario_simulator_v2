@@ -311,6 +311,25 @@ bool API::updateSensorFrame()
   }
 }
 
+bool API::updateTrafficLightsInSim()
+{
+  simulation_api_schema::UpdateTrafficLightsRequest req;
+  simulation_api_schema::UpdateTrafficLightsResponse res;
+  if (entity_manager_ptr_->trafficLightsChanged()) {
+    auto ids = entity_manager_ptr_->getTrafficLightIds();
+    for (auto id : ids) {
+      simulation_api_schema::TrafficLightState state;
+      auto traffic_light = entity_manager_ptr_->getTrafficLightInstance(id);
+      simulation_interface::toProto(
+        static_cast<const autoware_perception_msgs::msg::TrafficLightState>(traffic_light), state);
+      *req.add_states() = state;
+    }
+    update_traffic_lights_client_.call(req, res);
+  }
+  // TODO handle response
+  return res.result().success();
+}
+
 bool API::updateEntityStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
@@ -388,6 +407,7 @@ bool API::updateFrame()
     if (!updateEntityStatusInSim()) {
       return false;
     }
+    updateTrafficLightsInSim();
     return updateSensorFrame();
   } else {
     entity_manager_ptr_->broadcastEntityTransform();

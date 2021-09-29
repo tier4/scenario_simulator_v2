@@ -566,6 +566,53 @@ TEST(Conversion, LaneletPose)
   EXPECT_LANELET_POSE_EQ(pose, proto);
 }
 
+TEST(Conversion, TrafficLights)
+{
+  simulation_api_schema::TrafficLightState proto;
+  autoware_perception_msgs::msg::TrafficLightState msg;
+  msg.id = 123;
+  autoware_perception_msgs::msg::LampState ls0;
+  autoware_perception_msgs::msg::LampState ls1;
+  autoware_perception_msgs::msg::LampState ls2;
+  autoware_perception_msgs::msg::LampState ls3;
+  autoware_perception_msgs::msg::LampState ls4;
+  autoware_perception_msgs::msg::LampState ls5;
+  autoware_perception_msgs::msg::LampState ls6;
+  autoware_perception_msgs::msg::LampState ls7;
+  ls0.type = ls0.UNKNOWN;
+  ls0.confidence = 12.12;
+
+  ls1.type = ls1.RED;
+  ls2.type = ls2.GREEN;
+  ls3.type = ls3.YELLOW;
+
+  ls4.type = ls4.LEFT;
+  ls5.type = ls5.RIGHT;
+  ls6.type = ls6.UP;
+  ls7.type = ls7.DOWN;
+
+  msg.lamp_states = {ls0, ls1, ls2, ls3, ls4, ls5, ls6, ls7};
+
+  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+  EXPECT_EQ(proto.id(), 123);
+  EXPECT_NE(proto.lamp_states()[0].confidence(), 12.12);
+  EXPECT_EQ(
+    proto.lamp_states()[0].type(), simulation_api_schema::TrafficLightState::LampState::UNKNOWN);
+  EXPECT_EQ(
+    proto.lamp_states()[1].type(), simulation_api_schema::TrafficLightState::LampState::RED);
+  EXPECT_EQ(
+    proto.lamp_states()[2].type(), simulation_api_schema::TrafficLightState::LampState::GREEN);
+  EXPECT_EQ(
+    proto.lamp_states()[3].type(), simulation_api_schema::TrafficLightState::LampState::YELLOW);
+  EXPECT_EQ(
+    proto.lamp_states()[4].type(), simulation_api_schema::TrafficLightState::LampState::LEFT);
+  EXPECT_EQ(
+    proto.lamp_states()[5].type(), simulation_api_schema::TrafficLightState::LampState::RIGHT);
+  EXPECT_EQ(proto.lamp_states()[6].type(), simulation_api_schema::TrafficLightState::LampState::UP);
+  EXPECT_EQ(
+    proto.lamp_states()[7].type(), simulation_api_schema::TrafficLightState::LampState::DOWN);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
