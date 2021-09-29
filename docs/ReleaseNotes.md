@@ -10,6 +10,7 @@
 - Support new `CustomCommandAction` type `FaultInjectionAction` for ArchitectureProposal ([link](https://github.com/tier4/scenario_simulator_v2/pull/491))
 - Enable run cpp_mock_test with colcon test (with -DWITH_INTEGRATION_TEST=ON) ([link](https://github.com/tier4/scenario_simulator_v2/pull/529))
 - Fix problems in getLongitudinal function when the target entity is not in lane coordinate.
+- Support OpenSCENARIO 1.1 `DistanceCondition` ([link](https://github.com/tier4/scenario_simulator_v2/pull/533)).
 
 ## Version 0.5.0
 - Add arrow markers to visualize goal poses of entities. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
