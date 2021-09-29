@@ -223,6 +223,9 @@ auto EntityManager::getLongitudinalDistance(
     const auto from_status = getEntityStatus(from);
     const auto to_status = getEntityStatus(to);
     if (from_status && to_status) {
+      if (!from_status->lanelet_pose_valid || !to_status->lanelet_pose_valid) {
+        return boost::none;
+      }
       const auto distance = hdmap_utils_ptr_->getLongitudinalDistance(
         from_status->lanelet_pose.lanelet_id, from_status->lanelet_pose.s,
         to_status->lanelet_pose.lanelet_id, to_status->lanelet_pose.s);
