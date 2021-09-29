@@ -13,6 +13,7 @@
 
   <depend>ament_index_cpp</depend>
   <depend>autoware_auto_msgs</depend>
+  <depend>autoware_perception_msgs</depend>
   <depend>behaviortree_cpp_v3</depend>
   <depend>concealer</depend>
   <depend>geographic_msgs</depend>
