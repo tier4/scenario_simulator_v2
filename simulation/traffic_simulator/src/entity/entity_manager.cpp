@@ -274,6 +274,22 @@ auto EntityManager::getLongitudinalDistance(
 }
 
 /**
+ * @brief If the target entity's lanelet pose is valid, return true
+ * 
+ * @param name name of the target entity
+ * @return true lane matching is succeed
+ * @return false lane mathing is failed
+ */
+bool EntityManager::laneMatchingSucceed(const std::string & name)
+{
+  const auto status = getEntityStatus(name);
+  if (status && status->lanelet_pose_valid) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * @brief
  *
  * @param from from entity name
