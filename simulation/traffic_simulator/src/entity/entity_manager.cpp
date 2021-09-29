@@ -238,6 +238,9 @@ auto EntityManager::getLongitudinalDistance(
   const LaneletPose & from, const std::string & to, const double max_distance)
   -> boost::optional<double>
 {
+  if (!laneMatchingSucceed(to)) {
+    return boost::none;
+  }
   if (entityStatusSet(to)) {
     if (const auto status = getEntityStatus(to)) {
       return getLongitudinalDistance(from, status->lanelet_pose, max_distance);
@@ -251,6 +254,9 @@ auto EntityManager::getLongitudinalDistance(
   const std::string & from, const LaneletPose & to, const double max_distance)
   -> boost::optional<double>
 {
+  if (!laneMatchingSucceed(from)) {
+    return boost::none;
+  }
   if (entityStatusSet(from)) {
     if (const auto status = getEntityStatus(from)) {
       return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
@@ -264,6 +270,12 @@ auto EntityManager::getLongitudinalDistance(
   const std::string & from, const std::string & to, const double max_distance)
   -> boost::optional<double>
 {
+  if (!laneMatchingSucceed(from)) {
+    return boost::none;
+  }
+  if (!laneMatchingSucceed(to)) {
+    return boost::none;
+  }
   if (entityStatusSet(from)) {
     if (const auto status = getEntityStatus(from)) {
       return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
@@ -271,6 +283,22 @@ auto EntityManager::getLongitudinalDistance(
   }
 
   return boost::none;
+}
+
+/**
+ * @brief If the target entity's lanelet pose is valid, return true
+ * 
+ * @param name name of the target entity
+ * @return true lane matching is succeed
+ * @return false lane mathing is failed
+ */
+bool EntityManager::laneMatchingSucceed(const std::string & name)
+{
+  const auto status = getEntityStatus(name);
+  if (status && status->lanelet_pose_valid) {
+    return true;
+  }
+  return false;
 }
 
 /**

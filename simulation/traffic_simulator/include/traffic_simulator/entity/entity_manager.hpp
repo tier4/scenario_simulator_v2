@@ -238,6 +238,8 @@ public:
 
   bool entityExists(const std::string & name);
 
+  bool laneMatchingSucceed(const std::string & name);
+
   // TODO (yamacir-kit) Rename to 'hasEntityStatus'
   bool entityStatusSet(const std::string & name) const;
 
