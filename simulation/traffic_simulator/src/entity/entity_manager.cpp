@@ -238,6 +238,9 @@ auto EntityManager::getLongitudinalDistance(
   const LaneletPose & from, const std::string & to, const double max_distance)
   -> boost::optional<double>
 {
+  if (!laneMatchingSucceed(to)) {
+    return boost::none;
+  }
   if (entityStatusSet(to)) {
     if (const auto status = getEntityStatus(to)) {
       return getLongitudinalDistance(from, status->lanelet_pose, max_distance);
@@ -251,6 +254,9 @@ auto EntityManager::getLongitudinalDistance(
   const std::string & from, const LaneletPose & to, const double max_distance)
   -> boost::optional<double>
 {
+  if (!laneMatchingSucceed(from)) {
+    return boost::none;
+  }
   if (entityStatusSet(from)) {
     if (const auto status = getEntityStatus(from)) {
       return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
