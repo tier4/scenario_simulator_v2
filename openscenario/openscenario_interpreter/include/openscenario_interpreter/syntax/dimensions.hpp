@@ -17,8 +17,7 @@
 
 #include <geometry_msgs/msg/vector3.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
-#include <ostream>
+#include <openscenario_interpreter/syntax/double.hpp>
 
 namespace openscenario_interpreter
 {
@@ -47,20 +46,8 @@ struct Dimensions
   {
   }
 
-  explicit operator geometry_msgs::msg::Vector3() const
-  {
-    geometry_msgs::msg::Vector3 vector3;
-    {
-      vector3.x = length;
-      vector3.y = width;
-      vector3.z = height;
-    }
-
-    return vector3;
-  }
+  explicit operator geometry_msgs::msg::Vector3() const;
 };
-
-std::ostream & operator<<(std::ostream &, const Dimensions &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
