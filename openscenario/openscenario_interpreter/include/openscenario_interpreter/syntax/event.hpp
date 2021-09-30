@@ -61,47 +61,20 @@ struct Event : private Scope, public StoryboardElement<Event>
     });
   }
 
-  auto ready() { return start_trigger.evaluate().as<Boolean>(); }
+  /*  */ auto accomplished() const -> bool;
 
-  static constexpr auto stopTriggered() noexcept { return false; }
+  /*  */ auto ready() -> bool;
 
-  /* -------------------------------------------------------------------------
-   *
-   *  An Event's goal is accomplished when all its Actions are in the
-   *  completeState.
-   *
-   * ---------------------------------------------------------------------- */
-  auto accomplished() const
-  {
-    return std::all_of(std::begin(actions), std::end(actions), [](auto && each) {
-      return each.template as<Action>().complete();
-    });
-  }
+  /*  */ auto run() -> void;
 
-  void start()
-  {
-    for (auto && each : actions) {
-      each.as<Action>().changeStateIf(true, standby_state);
-    }
-  }
+  /*  */ auto start() -> void;
 
-  void stop()
-  {
-    for (auto && each : actions) {
-      each.as<Action>().override();
-      each.evaluate();
-    }
-  }
+  /*  */ auto stop() -> void;
 
-  void run()
-  {
-    for (auto && action : actions) {
-      action.evaluate();
-    }
-  }
+  static auto stopTriggered() noexcept -> bool;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Event &);
+auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

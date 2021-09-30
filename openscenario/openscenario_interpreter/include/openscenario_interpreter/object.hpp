@@ -34,13 +34,13 @@ template <typename... Ts>
 using IsOptionalElement = std::is_default_constructible<Ts...>;
 
 template <typename T, typename... Ts>
-inline constexpr decltype(auto) make(Ts &&... xs)
+constexpr auto make(Ts &&... xs) -> decltype(auto)
 {
   return Element::bind<T>(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename T>
-inline constexpr decltype(auto) make(T && x)
+constexpr auto make(T && x) -> decltype(auto)
 {
   return Element::bind<typename std::decay<decltype(x)>::type>(std::forward<decltype(x)>(x));
 }
@@ -55,7 +55,7 @@ struct Unspecified
   }
 };
 
-std::ostream & operator<<(std::ostream &, const Unspecified &);
+auto operator<<(std::ostream &, const Unspecified &) -> std::ostream &;
 
 #define CASE(TYPE)                                                                   \
   {                                                                                  \

@@ -18,9 +18,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+auto EntityAction::accomplished() noexcept -> bool { return endsImmediately(); }
+
+auto EntityAction::endsImmediately() noexcept -> bool { return true; }
+
 auto EntityAction::run() const -> void
 {
   return apply<void>([this](auto && action) { return action(entity_ref); }, *this);
 }
+
+auto EntityAction::start() noexcept -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

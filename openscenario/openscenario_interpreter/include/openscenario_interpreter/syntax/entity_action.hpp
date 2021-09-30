@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_ACTION_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/delete_entity_action.hpp>
 #include <utility>
@@ -52,13 +51,13 @@ struct EntityAction : public Element
   {
   }
 
-  static auto accomplished() noexcept -> bool { return endsImmediately(); }
+  static auto accomplished() noexcept -> bool;
 
-  static auto endsImmediately() noexcept -> bool { return true; }
+  static auto endsImmediately() noexcept -> bool;
 
-  auto run() const -> void;
+  /*  */ auto run() const -> void;
 
-  static auto start() noexcept -> void {}
+  static auto start() noexcept -> void;
 };
 
 DEFINE_LAZY_VISITOR(
