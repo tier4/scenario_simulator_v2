@@ -2,6 +2,56 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.1 (2021-09-30)
+------------------
+* Merge pull request `#536 <https://github.com/tier4/scenario_simulator_v2/issues/536>`_ from tier4/fix/get_longitudinal_distance
+* check target entity is assing to the lane or not
+* udpate Release note
+* add bool EntityManager::laneMatchingSucceed(const std::string & name)
+* Merge pull request `#533 <https://github.com/tier4/scenario_simulator_v2/issues/533>`_ from tier4/feature/interpreter/distance-condition
+* Update `getLongitudinalDistance` to support overload for `LaneletPose`
+* Merge pull request `#530 <https://github.com/tier4/scenario_simulator_v2/issues/530>`_ from RobotecAI/traffic_lights
+* Typos fix
+* Clang formatting and conversions test for traffic light
+* ZMQ api for traffic lights
+* Traffic lights wip
+* Merge branch 'master' into fix/clean_directory_behavior
+* Merge branch 'master' into rename_AA_launch_package
+* Merge pull request `#491 <https://github.com/tier4/scenario_simulator_v2/issues/491>`_ from tier4/feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/add-entity-action
+* Merge pull request `#511 <https://github.com/tier4/scenario_simulator_v2/issues/511>`_ from tier4/feature/metrics_get_jerk_from_autoware
+* trivially fix
+* EntityManager has a node as rclcpp::node_interfaces::NodeTopicInterface to erase its type
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge branch 'master' into feature/metrics_get_jerk_from_autoware
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/distance-condition
+* Merge pull request `#521 <https://github.com/tier4/scenario_simulator_v2/issues/521>`_ from tier4/feature/collision_metric
+* update document and fix typo
+* Merge pull request `#520 <https://github.com/tier4/scenario_simulator_v2/issues/520>`_ from tier4/feature/standstill_metric
+* add test case
+* enable specify targets
+* enable throw spec violation
+* modify cmakelist.txt
+* Merge branch 'feature/standstill_metric' of https://github.com/tier4/scenario_simulator_v2 into feature/collision_metric
+* add source
+* add standstill duration scenario
+* add standstill metric
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
+* Merge pull request `#512 <https://github.com/tier4/scenario_simulator_v2/issues/512>`_ from tier4/feature/test_entity
+* apply reformat
+* add acquire position test cases
+* add a subscription to get jerk
+* add test case for set status and update timestamp
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Cleanup member function `EgoEntity::getCurrentAction`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Support new UserDefinedValueCondition `<ENTITY-NAME>.currentState`
+* Support new member function `API::getCurrentAction`
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Jaroszek, Tatsuya Yamasaki, danielm1405, kyabe2718, yamacir-kit
+
 0.5.0 (2021-09-09)
 ------------------
 * Merge pull request `#507 <https://github.com/tier4/scenario_simulator_v2/issues/507>`_ from tier4/feature/add_scenario

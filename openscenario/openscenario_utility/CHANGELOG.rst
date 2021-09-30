@@ -2,6 +2,18 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.1 (2021-09-30)
+------------------
+* Merge pull request `#529 <https://github.com/tier4/scenario_simulator_v2/issues/529>`_ from tier4/feature/cpp_mock_scenario_ament_cmake
+* modify launch file
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge branch 'master' into feature/metrics_get_jerk_from_autoware
+* Merge pull request `#519 <https://github.com/tier4/scenario_simulator_v2/issues/519>`_ from tier4/feature/interpreter/distance-condition
+* Update OpenSCENARIO standard to 1.1 from 1.0
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.5.0 (2021-09-09)
 ------------------
 * Merge branch 'master' into add-goalpose

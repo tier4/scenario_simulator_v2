@@ -2,6 +2,36 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.1 (2021-09-30)
+------------------
+* Merge pull request `#527 <https://github.com/tier4/scenario_simulator_v2/issues/527>`_ from tier4/fix/clean_directory_behavior
+* Merge pull request `#528 <https://github.com/tier4/scenario_simulator_v2/issues/528>`_ from RobotecAI/add_demo_scenario_that_works_with_autoware_auto
+* Merge branch 'master' into fix/clean_directory_behavior
+* add dedicated scenario for AutowareAuto
+* Merge pull request `#525 <https://github.com/tier4/scenario_simulator_v2/issues/525>`_ from RobotecAI/rename_AA_launch_package
+* Merge branch 'master' into rename_AA_launch_package
+* Merge pull request `#491 <https://github.com/tier4/scenario_simulator_v2/issues/491>`_ from tier4/feature/interpreter/fault-injection
+* Update `FaultInjectionAction` topic name to `/simulation/events`
+* change log directory cleanup behavior
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge pull request `#524 <https://github.com/tier4/scenario_simulator_v2/issues/524>`_ from tier4/fix/get-jerk-limit-from-object-controller
+* rename scenario_test_runner_launch to scenario_simulator_launch
+* fix snake_case to lowerCamelCase
+* get jerk limits from ObjectController's property
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge branch 'master' into feature/metrics_get_jerk_from_autoware
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/standstill_metric
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/distance-condition
+* Merge pull request `#506 <https://github.com/tier4/scenario_simulator_v2/issues/506>`_ from tier4/feature/interpreter/add-entity-action
+* Update `AddEntityAction` to treat various Position types
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
+* Add new test scenario `CustomCommandAction.FaultInjectionAction.yaml`
+* Cleanup test scenario `autoware-simple.yaml`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Support new UserDefinedValueCondition `<ENTITY-NAME>.currentState`
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, danielm1405, kyabe2718, yamacir-kit
+
 0.5.0 (2021-09-09)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper

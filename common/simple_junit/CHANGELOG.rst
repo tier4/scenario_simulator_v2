@@ -2,6 +2,34 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.1 (2021-09-30)
+------------------
+* Merge pull request `#529 <https://github.com/tier4/scenario_simulator_v2/issues/529>`_ from tier4/feature/cpp_mock_scenario_ament_cmake
+* use reference
+* use std namespace
+* fix test cases
+* enable count number of failure/error/tests in junit
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge branch 'master' into feature/metrics_get_jerk_from_autoware
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/standstill_metric
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/distance-condition
+* Merge pull request `#518 <https://github.com/tier4/scenario_simulator_v2/issues/518>`_ from tier4/feature/add_testcase_for_simple_junit
+* use 2 space
+* add test cases for testsuites name
+* add test cases for attributes
+* fix trim function
+* change to space
+* Merge pull request `#517 <https://github.com/tier4/scenario_simulator_v2/issues/517>`_ from tier4/doc/result_file_format
+* use tab
+* use space
+* add complex test cas
+* rename test case
+* enable check junit output
+* add some test cases
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.5.0 (2021-09-09)
 ------------------
 * Merge branch 'master' into add-goalpose
