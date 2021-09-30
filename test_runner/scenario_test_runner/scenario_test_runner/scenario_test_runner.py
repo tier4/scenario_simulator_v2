@@ -18,10 +18,12 @@
 
 import argparse
 import time
+import glob
 from pathlib import Path
 from shutil import rmtree
 from sys import exit
 from typing import List
+import os
 
 import rclpy
 from openscenario_utility.conversion import convert
@@ -97,7 +99,13 @@ class ScenarioTestRunner(LifecycleController):
         self.output_directory = substitute_ros_package(output_directory)
 
         if self.output_directory.exists():
-            rmtree(self.output_directory)
+            glob_pattern = str(self.output_directory.resolve()) + "/*"
+            remove_targets = glob.glob(glob_pattern + "/*")
+            for target in remove_targets:
+                if os.path.isdir(target):
+                    rmtree(target)
+                else:
+                    os.remove(target)
         self.output_directory.mkdir(parents=True, exist_ok=True)
 
         self.current_workflow = None

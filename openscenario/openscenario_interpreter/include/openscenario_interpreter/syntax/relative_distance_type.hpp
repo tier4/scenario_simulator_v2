@@ -49,6 +49,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct RelativeDistanceType
 {
+  // NOTE: I understand that "euclidian" is an incorrect spelling, but the XML
+  //       Schema of the OpenSCENARIO 1.1 standard specifies this spelling.
   enum value_type {
     longitudinal,
     lateral,
@@ -56,6 +58,8 @@ struct RelativeDistanceType
   } value;
 
   explicit RelativeDistanceType() = default;
+
+  constexpr RelativeDistanceType(value_type value) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 };

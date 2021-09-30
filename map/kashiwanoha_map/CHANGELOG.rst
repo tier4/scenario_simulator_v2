@@ -2,6 +2,17 @@
 Changelog for package kashiwanoha_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.1 (2021-09-30)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge branch 'master' into feature/metrics_get_jerk_from_autoware
+* Merge pull request `#502 <https://github.com/tier4/scenario_simulator_v2/issues/502>`_ from RobotecAI/removed_cargo_delivery_dependency
+* Reorganize private road ele fix osm file
+* Fix for cpp_mock_scenarios CI tests
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
+* Contributors: Masaya Kataoka, Piotr Jaroszek, kyabe2718, yamacir-kit
+
 0.5.0 (2021-09-09)
 ------------------
 * Merge branch 'master' into add-goalpose

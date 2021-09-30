@@ -15,11 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTANCE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DISTANCE_CONDITION_HPP_
 
-#include <cmath>
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
+#include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+#include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 
@@ -27,111 +28,93 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistanceCondition ------------------------------------------------------
+/* ---- DistanceCondition (OpenSCENARIO 1.1) -----------------------------------
  *
- *  The current distance between an entity and a reference entity is compared to
- *  a given distance (less, greater, equal). Several additional parameters like
- *  free space etc. can be defined.
+ *  The current distance between an entity and a position is compared to a
+ *  given distance (less, greater, equal). Several additional parameters like
+ *  free space etc. can be defined. The property "alongRoute" is deprecated. If
+ *  "coordinateSystem" or "relativeDistanceType" are set, "alongRoute" is
+ *  ignored.
  *
  *  <xsd:complexType name="DistanceCondition">
  *    <xsd:all>
  *      <xsd:element name="Position" type="Position"/>
  *    </xsd:all>
- *    <xsd:attribute name="value" type="Double" use="required"/>
+ *    <xsd:attribute name="alongRoute" type="Boolean">
+ *      <xsd:annotation>
+ *        <xsd:appinfo>
+ *          deprecated
+ *        </xsd:appinfo>
+ *      </xsd:annotation>
+ *    </xsd:attribute>
+ *    <xsd:attribute name="coordinateSystem" type="CoordinateSystem"/>
  *    <xsd:attribute name="freespace" type="Boolean" use="required"/>
- *    <xsd:attribute name="alongRoute" type="Boolean" use="required"/>
+ *    <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType"/>
  *    <xsd:attribute name="rule" type="Rule" use="required"/>
+ *    <xsd:attribute name="value" type="Double" use="required"/>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DistanceCondition
+struct DistanceCondition : private Scope
 {
-  /* ---- value ----------------------------------------------------------------
-   *
-   *  The distance value. Unit: s; Range: [0..inf[.
-   *
-   * ------------------------------------------------------------------------ */
-  const Double value;
+  // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity". If set, "alongRoute" is ignored.
+  const CoordinateSystem coordinate_system;
 
-  /* ---- freespace ------------------------------------------------------------
-   *
-   *  True: distance is measured between the closest bounding box points.
-   *
-   *  False: reference point distance is used.
-   *
-   * ------------------------------------------------------------------------ */
+  // True: distance is measured between closest bounding box points. False: reference point distance is used.
   const Boolean freespace;
 
-  /* ---- alongRoute -----------------------------------------------------------
-   *
-   *  True: routing is taken into account, e.g. turns will increase distance.
-   *
-   *  False: straight line distance is used.
-   *
-   * ------------------------------------------------------------------------ */
-  const Boolean along_route;
+  // Definition of the coordinate system dimension(s) to be used for calculating distances. If set, "alongRoute" is ignored. If not provided, value is interpreted as "euclideanDistance".
+  const RelativeDistanceType relative_distance_type;
 
-  /* ---- rule -----------------------------------------------------------------
-   *
-   *  The operator (less, greater, equal).
-   *
-   * ------------------------------------------------------------------------ */
-  const Rule compare;
+  // The operator (less, greater, equal).
+  const Rule rule;
 
-  /* ---- Position -------------------------------------------------------------
-   *
-   *  The given position the distance is related to.
-   *
-   * ------------------------------------------------------------------------ */
+  // The distance value. Unit: m; Range: [0..inf[.
+  const Double value;
+
+  // The given position the distance is related to.
   const Position position;
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> last_checked_values;  // for description
+  std::vector<Double> results;  // for description
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit DistanceCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
+    const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
   // clang-format off
-  : value      (readAttribute<Double  >("value",      node, outer_scope)),
-    freespace  (readAttribute<Boolean >("freespace",  node, outer_scope)),
-    along_route(readAttribute<Boolean >("alongRoute", node, outer_scope)),
-    compare    (readAttribute<Rule    >("rule",       node, outer_scope)),
-    position   (readElement  <Position>("Position",   node, outer_scope)),
+  : Scope(scope),
+    coordinate_system     (readAttribute<CoordinateSystem    >("coordinateSystem",     node, scope, CoordinateSystem::entity)),
+    freespace             (readAttribute<Boolean             >("freespace",            node, scope)),
+    relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope, RelativeDistanceType::euclidianDistance)),
+    rule                  (readAttribute<Rule                >("rule",                 node, scope)),
+    value                 (readAttribute<Double              >("value",                node, scope)),
+    position              (readElement  <Position            >("Position",             node, scope)),
     triggering_entities(triggering_entities),
-    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
+    results(triggering_entities.entity_refs.size(), Double::nan())
   // clang-format on
   {
   }
 
-  auto description() const
+  auto description() const -> std::string;
+
+  auto distance(const EntityRef &) const -> double;
+
+  template <CoordinateSystem::value_type, RelativeDistanceType::value_type, bool>
+  auto distance(const EntityRef &) const -> double
   {
-    std::stringstream description;
-
-    description << triggering_entities.description() << "'s distance to given position = ";
-
-    print_to(description, last_checked_values);
-
-    description << " " << compare << " " << value << "?";
-
-    return description.str();
+    throw SyntaxError(__FILE__, ":", __LINE__);
   }
 
-  auto evaluate()
-  {
-    auto distance = [&](auto && name) {
-      const auto pose = getRelativePose(name, static_cast<geometry_msgs::msg::Pose>(position));
-      return std::hypot(pose.position.x, pose.position.y);
-    };
-
-    last_checked_values.clear();
-
-    return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-      last_checked_values.push_back(distance(triggering_entity));
-      return compare(last_checked_values.back(), value);
-    }));
-  }
+  auto evaluate() -> Element;
 };
+
+// clang-format off
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;
+// clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

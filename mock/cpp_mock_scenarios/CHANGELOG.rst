@@ -2,6 +2,57 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.1 (2021-09-30)
+------------------
+* Merge pull request `#529 <https://github.com/tier4/scenario_simulator_v2/issues/529>`_ from tier4/feature/cpp_mock_scenario_ament_cmake
+* pass double variable
+* add test cases
+* add timeout parameter
+* change to comment out
+* remove unused function
+* remove cargo_delivery map
+* add scenario_test_runner to the exec_depend
+* add exec depend
+* add WITH_INTEGRATION_TEST command
+* add traffic_simulation_demo
+* update workflow
+* modify flag
+* enable count number of failure/error/tests in junit
+* add some test
+* remove time
+* enable pass ament_copyright
+* add mock test
+* enable output junit
+* modify launch file
+* add cmake function
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge branch 'master' into feature/metrics_get_jerk_from_autoware
+* Merge pull request `#502 <https://github.com/tier4/scenario_simulator_v2/issues/502>`_ from RobotecAI/removed_cargo_delivery_dependency
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/distance-condition
+* Merge pull request `#521 <https://github.com/tier4/scenario_simulator_v2/issues/521>`_ from tier4/feature/collision_metric
+* Reorganize private road ele fix osm file
+* Reverted adding parameters for cpp scenario node.
+* Clang formatting
+* Some missing changes in cpp mock scenarios
+* Removed cargo_delivery dependency
+* Merge pull request `#520 <https://github.com/tier4/scenario_simulator_v2/issues/520>`_ from tier4/feature/standstill_metric
+* add test case
+* Merge branch 'feature/standstill_metric' of https://github.com/tier4/scenario_simulator_v2 into feature/collision_metric
+* add source
+* update scenario
+* add standstill duration scenario
+* enable handle exception while calling updateFrame function
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
+* Merge pull request `#512 <https://github.com/tier4/scenario_simulator_v2/issues/512>`_ from tier4/feature/test_entity
+* change lanelet id
+* modify scenario
+* apply reformat
+* add acquire position test cases
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Jaroszek, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.5.0 (2021-09-09)
 ------------------
 * Merge pull request `#507 <https://github.com/tier4/scenario_simulator_v2/issues/507>`_ from tier4/feature/add_scenario
