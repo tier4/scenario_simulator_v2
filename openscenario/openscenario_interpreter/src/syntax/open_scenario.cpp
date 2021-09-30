@@ -12,16 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iomanip>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const OpenScenario &) { return os; }
+auto OpenScenario::complete() const -> bool { return category.as<ScenarioDefinition>().complete(); }
 
-nlohmann::json & operator<<(nlohmann::json & json, const OpenScenario & datum)
+auto OpenScenario::evaluate() -> Element
+{
+  ++frame;
+  return category.evaluate();
+}
+
+auto OpenScenario::load(const File::Path & filepath) -> const pugi::xml_node &
+{
+  const auto result = script.load_file(filepath.string().c_str());
+
+  if (not result) {
+    throw SyntaxError(result.description(), ": ", filepath);
+  } else {
+    return script;
+  }
+}
+
+auto operator<<(nlohmann::json & json, const OpenScenario & datum) -> nlohmann::json &
 {
   json["version"] = "1.0";
 
