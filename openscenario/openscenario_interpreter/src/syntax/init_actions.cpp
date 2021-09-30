@@ -19,7 +19,31 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const InitActions & init_actions)
+auto InitActions::evaluate() const -> Element
+{
+  for (auto && each : *this) {
+    each.evaluate();
+  }
+
+  return unspecified;
+}
+
+auto InitActions::endsImmediately() const -> bool
+{
+  return std::all_of(begin(), end(), [=](const Element & e) {
+    if (e.is<GlobalAction>()) {
+      return e.as<GlobalAction>().endsImmediately();
+    } else if (e.is<UserDefinedAction>()) {
+      return e.as<UserDefinedAction>().endsImmediately();
+    } else if (e.is<Private>()) {
+      return e.as<Private>().endsImmediately();
+    } else {
+      throw UNSUPPORTED_ELEMENT_SPECIFIED(e.type().name());
+    }
+  });
+}
+
+auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nlohmann::json &
 {
   json["GlobalAction"] = nlohmann::json::array();
 

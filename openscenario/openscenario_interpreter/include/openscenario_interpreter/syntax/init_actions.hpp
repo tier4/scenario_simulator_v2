@@ -59,31 +59,12 @@ struct InitActions : public Elements
     }
   }
 
-  auto evaluate() const
-  {
-    for (auto && each : *this) {
-      each.evaluate();
-    }
-    return unspecified;
-  }
+  auto endsImmediately() const -> bool;
 
-  bool endsImmediately() const
-  {
-    return std::all_of(begin(), end(), [=](const Element & e) {
-      if (e.is<GlobalAction>()) {
-        return e.as<GlobalAction>().endsImmediately();
-      } else if (e.is<UserDefinedAction>()) {
-        return e.as<UserDefinedAction>().endsImmediately();
-      } else if (e.is<Private>()) {
-        return e.as<Private>().endsImmediately();
-      } else {
-        throw UNSUPPORTED_ELEMENT_SPECIFIED(e.type().name());
-      }
-    });
-  }
+  auto evaluate() const -> Element;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const InitActions &);
+auto operator<<(nlohmann::json &, const InitActions &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
