@@ -19,6 +19,7 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
 
 namespace openscenario_interpreter
