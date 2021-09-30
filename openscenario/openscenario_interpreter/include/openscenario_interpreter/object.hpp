@@ -18,6 +18,7 @@
 #include <list>
 #include <openscenario_interpreter/expression.hpp>
 #include <type_traits>
+#include <typeindex>
 #include <utility>
 
 namespace openscenario_interpreter
