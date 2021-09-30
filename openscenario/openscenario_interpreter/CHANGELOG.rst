@@ -2,6 +2,93 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#533 <https://github.com/tier4/scenario_simulator_v2/issues/533>`_ from tier4/feature/interpreter/distance-condition
+* Lipsticks
+* Support `DistanceCondition::distance<entity, *, false>`
+* Support `DistanceCondition::distance<lane, longitudinal, false>`
+* Simplify `DistanceCondition::distance` definition with macro
+* Fix DistanceCondition.relativeDistanceType to be optinal element
+* Update member function `distance` to recognize all parameters
+* Add member function `DistanceCondition::distance`
+* Update syntax `DistanceCondition` members to match OpenSCENARIO 1.1
+* Merge branch 'master' into fix/clean_directory_behavior
+* Merge branch 'master' into rename_AA_launch_package
+* Merge pull request `#491 <https://github.com/tier4/scenario_simulator_v2/issues/491>`_ from tier4/feature/interpreter/fault-injection
+* Update `FaultInjectionAction` topic name to `/simulation/events`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge pull request `#522 <https://github.com/tier4/scenario_simulator_v2/issues/522>`_ from tier4/fix/interpreter/add-entity-action
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge pull request `#524 <https://github.com/tier4/scenario_simulator_v2/issues/524>`_ from tier4/fix/get-jerk-limit-from-object-controller
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/add-entity-action
+* fix snake_case to lowerCamelCase
+* get jerk limits from ObjectController's property
+* Remove deprecated headers
+* Update `RelativeDistanceCondition` to ignore entity that has not yet been added
+* Merge pull request `#511 <https://github.com/tier4/scenario_simulator_v2/issues/511>`_ from tier4/feature/metrics_get_jerk_from_autoware
+* Remove `Pointer::start`
+* EntityManager has a node as rclcpp::node_interfaces::NodeTopicInterface to erase its type
+* Cleanup syntax `SpeedAction`
+* Update `SpeedAction` to not to execute action in `start`
+* Move `SpeedActionTarget`'s member functions into .cpp
+* Update syntax `Action` to call Element's `run` on runningState
+* Add free function `apply` for `Action`
+* Update PrivateActions to support member function `run`
+* Add free function `apply` for syntax `LongitudinalAction`
+* Simplify `PrivateAction::endsImmediately` with `apply`
+* Add free function `apply` for syntax `PrivateAction`
+* Update `CollisionCondition` to ignore entity that has not yet been added
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge branch 'master' into feature/metrics_get_jerk_from_autoware
+* Merge pull request `#519 <https://github.com/tier4/scenario_simulator_v2/issues/519>`_ from tier4/feature/interpreter/distance-condition
+* Lipsticks
+* Support all parameter pattern of `RelativeDistanceCondition`
+* Remove deprecated (since OSC 1.1) enumeration `cartesianDistance`
+* Lipsticks
+* Add `RelativeDistanceCondition::distance` function template specializations
+* Move implementation of member function `distance` into `relative_distance_condition.cpp`
+* Update `RelativeDistanceCondition` to consider all given enumeration
+* Add new syntax `CoordinateSystem`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/standstill_metric
+* Reorder data members of `RelativeDistanceCondition`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/distance-condition
+* Merge pull request `#506 <https://github.com/tier4/scenario_simulator_v2/issues/506>`_ from tier4/feature/interpreter/add-entity-action
+* Lipsticks
+* Update `AddEntityAction` to treat various Position types
+* Lipsticks
+* Move entity spawning operation into syntax `AddEntityAction` from `ScenarioObject`
+* Update syntax `TeleportAction` to spawn entity that have not yet been spawned
+* Add new member function `ScenarioObject::activateSensors`
+* Move ObjectController assignment into functor `spawn_entity`
+* Add new member function `makeOutOfRangeMetric`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
+* Rename function `spawn` to `applyAddEntityAction`
+* Rename member function `Scope::addElement` to `Scope::insert`
+* Update syntax `Entities` to store ScenarioObjects into Scope
+* Rename `despawn` to `applyDeleteEntityAction`
+* fix config to subscribe closest_jerk
+* Remove elements of `RoadNetwork` from struct `GlobalEnvironment`
+* Cleanup member function `Interpreter::makeCurrentConfiguration`
+* Add new struct `Scope::GlobalEnvironment`
+* Cleanup syntax `EntityAction`
+* Cleanup syntax `TeleportAction`
+* Update syntax `TeleportAction` to use function `overload`
+* Add new test scenario `CustomCommandAction.FaultInjectionAction.yaml`
+* Cleanup test scenario `autoware-simple.yaml`
+* Update CustomCommandAction type `FaultInjectionAction` to publish `SimulationEvents`
+* Comment-out dependency to `autoware_simulation_msgs`
+* Add package `autoware_simulation_msgs` to dependency
+* Lipsticks
+* Remove initialize statatement from if (C++17)
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Update `UserDefinedValueCondition` to be more faster
+* Support new UserDefinedValueCondition `<ENTITY-NAME>.currentState`
+* Support new member function `API::getCurrentAction`
+* Add experimental CustomCommandAction type `FaultInjectionAction`
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, danielm1405, kyabe2718, yamacir-kit
+
 0.5.0 (2021-09-09)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper

@@ -2,6 +2,20 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#530 <https://github.com/tier4/scenario_simulator_v2/issues/530>`_ from RobotecAI/traffic_lights
+* Typos fix
+* Clang formatting and conversions test for traffic light
+* ZMQ api for traffic lights
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge branch 'master' into feature/metrics_get_jerk_from_autoware
+* Merge pull request `#516 <https://github.com/tier4/scenario_simulator_v2/issues/516>`_ from tier4/fix/zmq-poll-arg
+* Fix the argument of zmqpp::poller::poll()
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
+* Contributors: Kazuki Miyahara, Masaya Kataoka, Piotr Jaroszek, kyabe2718, yamacir-kit
+
 0.5.0 (2021-09-09)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper
