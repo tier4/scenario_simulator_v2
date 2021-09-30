@@ -39,9 +39,9 @@ struct Boolean
   constexpr operator value_type() const noexcept { return data; }
 };
 
-std::istream & operator>>(std::istream &, Boolean &);
+auto operator>>(std::istream &, Boolean &) -> std::istream &;
 
-std::ostream & operator<<(std::ostream &, const Boolean &);
+auto operator<<(std::ostream &, const Boolean &) -> std::ostream &;
 
 extern const Element true_v;
 

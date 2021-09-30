@@ -37,9 +37,9 @@ struct Command
   auto operator=(const value_type &) -> Command &;
 };
 
-std::istream & operator>>(std::istream &, Command &);
+auto operator>>(std::istream &, Command &) -> std::istream &;
 
-std::ostream & operator<<(std::ostream &, const Command &);
+auto operator<<(std::ostream &, const Command &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -107,13 +107,9 @@ struct ConditionEdge
   operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<ConditionEdge>::value, "");
+auto operator>>(std::istream & is, ConditionEdge &) -> std::istream &;
 
-static_assert(std::is_trivial<ConditionEdge>::value, "");
-
-std::istream & operator>>(std::istream & is, ConditionEdge &);
-
-std::ostream & operator<<(std::ostream & os, const ConditionEdge &);
+auto operator<<(std::ostream & os, const ConditionEdge &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

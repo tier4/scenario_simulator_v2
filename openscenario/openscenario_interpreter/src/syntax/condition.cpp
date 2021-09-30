@@ -19,6 +19,10 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+static_assert(std::is_standard_layout<ConditionEdge>::value, "");
+
+static_assert(std::is_trivial<ConditionEdge>::value, "");
+
 auto Condition::evaluate() -> Element
 {
   if (condition_edge == ConditionEdge::sticky and current_value) {
