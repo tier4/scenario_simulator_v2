@@ -21,20 +21,20 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Directory ============================================================
+/* ---- Directory --------------------------------------------------------------
  *
- * <xsd:complexType name="Directory">
- *   <xsd:attribute name="path" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Directory">
+ *    <xsd:attribute name="path" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Directory
 {
   const String path;
 
-  template <typename Node, typename Scope>
-  explicit Directory(const Node & node, Scope & outer_scope)
-  : path{readAttribute<String>("path", node, outer_scope)}
+  template <typename Node>
+  explicit Directory(const Node & node, Scope & scope)
+  : path{readAttribute<String>("path", node, scope)}
   {
   }
 };

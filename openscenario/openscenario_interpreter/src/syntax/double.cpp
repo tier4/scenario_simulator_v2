@@ -12,17 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iomanip>  // std::fixed
-#include <limits>   // std::numeric_limits
+#include <boost/lexical_cast.hpp>
+#include <iomanip>
+#include <limits>
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <regex>
-#include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, Double & datum)
+static_assert(std::is_standard_layout<Double>::value, "");
+
+static_assert(not std::is_trivial<Double>::value, "");
+
+Double::Double(value_type value) { data = value; }
+
+Double::Double(const std::string & s)
+try {
+  data = boost::lexical_cast<value_type>(s);
+} catch (const boost::bad_lexical_cast &) {
+  throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
+}
+
+auto Double::infinity() noexcept -> Double
+{
+  return static_cast<Double>(std::numeric_limits<value_type>::infinity());
+}
+
+auto Double::nan() noexcept -> Double
+{
+  return static_cast<Double>(std::numeric_limits<value_type>::quiet_NaN());
+}
+
+auto Double::operator=(const value_type & rhs) noexcept -> Double &
+{
+  data = rhs;
+  return *this;
+}
+
+auto Double::operator+=(const value_type & rhs) noexcept -> Double &
+{
+  data += rhs;
+  return *this;
+}
+
+auto Double::operator*=(const value_type & rhs) noexcept -> Double &
+{
+  data *= rhs;
+  return *this;
+}
+
+Double::operator value_type() const noexcept { return data; }
+
+auto operator>>(std::istream & is, Double & datum) -> std::istream &
 {
   std::string token;
 
@@ -32,14 +76,8 @@ std::istream & operator>>(std::istream & is, Double & datum)
 
   std::smatch result;
 
-#ifndef OPENSCENARIO_INTERPRETER_ALLOW_INFINITY
-  constexpr auto upper_bound_value = std::numeric_limits<Double::value_type>::max();
-#else
-  constexpr auto upper_bound_value = std::numeric_limits<Double::value_type>::infinity();
-#endif
-
   if (std::regex_match(token, result, infinity)) {
-    datum.data = (result.str(1) == "-" ? -1 : 1) * upper_bound_value;
+    datum.data = (result.str(1) == "-" ? -1 : 1) * std::numeric_limits<Double::value_type>::max();
   } else {
     datum.data = boost::lexical_cast<Double::value_type>(token);
   }
@@ -47,7 +85,7 @@ std::istream & operator>>(std::istream & is, Double & datum)
   return is;
 }
 
-std::ostream & operator<<(std::ostream & os, const Double & datum)
+auto operator<<(std::ostream & os, const Double & datum) -> std::ostream &
 {
   return os << std::fixed << datum.data;
 }
