@@ -58,49 +58,22 @@ struct ManeuverGroup : public Scope, public StoryboardElement<ManeuverGroup>, pu
     });
   }
 
-  static constexpr auto ready() noexcept { return true; }
-
-  static constexpr auto stopTriggered() noexcept { return false; }
-
-  /* ---------------------------------------------------------------------------
-   *
-   *  A ManeuverGroup's goal is accomplished when all its Maneuvers are in the
-   *  completeState.
-   *
-   * ------------------------------------------------------------------------ */
-  auto accomplished() const
-  {
-    return std::all_of(std::begin(*this), std::end(*this), [&](auto && each) {
-      return each.template as<Maneuver>().complete();
-    });
-  }
-
   using StoryboardElement::evaluate;
 
-  void start()
-  {
-    for (auto && each : *this) {
-      each.as<Maneuver>().changeStateIf(true, standby_state);
-    }
-  }
+  /*  */ auto accomplished() const -> bool;
 
-  void stop()
-  {
-    for (auto && each : *this) {
-      each.as<Maneuver>().override();
-      each.evaluate();
-    }
-  }
+  static auto ready() noexcept -> bool;
 
-  void run()
-  {
-    for (auto && each : *this) {
-      each.evaluate();
-    }
-  }
+  /*  */ auto run() -> void;
+
+  /*  */ auto start() -> void;
+
+  /*  */ auto stop() -> void;
+
+  static auto stopTriggered() noexcept -> bool;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const ManeuverGroup &);
+auto operator<<(nlohmann::json &, const ManeuverGroup &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

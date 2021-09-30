@@ -18,7 +18,41 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const ManeuverGroup & datum)
+auto ManeuverGroup::accomplished() const -> bool
+{
+  // A ManeuverGroup's goal is accomplished when all its Maneuvers are in the completeState.
+  return std::all_of(std::begin(*this), std::end(*this), [&](auto && each) {
+    return each.template as<Maneuver>().complete();
+  });
+}
+
+auto ManeuverGroup::ready() noexcept -> bool { return true; }
+
+auto ManeuverGroup::run() -> void
+{
+  for (auto && each : *this) {
+    each.evaluate();
+  }
+}
+
+auto ManeuverGroup::start() -> void
+{
+  for (auto && each : *this) {
+    each.as<Maneuver>().changeStateIf(true, standby_state);
+  }
+}
+
+auto ManeuverGroup::stop() -> void
+{
+  for (auto && each : *this) {
+    each.as<Maneuver>().override();
+    each.evaluate();
+  }
+}
+
+auto ManeuverGroup::stopTriggered() noexcept -> bool { return false; }
+
+auto operator<<(nlohmann::json & json, const ManeuverGroup & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;
 
