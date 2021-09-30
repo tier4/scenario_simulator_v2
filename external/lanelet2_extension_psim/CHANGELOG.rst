@@ -2,8 +2,8 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.1 (2021-09-30)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
 * Contributors: yamacir-kit

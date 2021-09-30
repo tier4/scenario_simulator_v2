@@ -2,8 +2,8 @@
 Changelog for package kashiwanoha_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.1 (2021-09-30)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
 * Merge branch 'master' into feature/metrics_get_jerk_from_autoware
 * Merge pull request `#502 <https://github.com/tier4/scenario_simulator_v2/issues/502>`_ from RobotecAI/removed_cargo_delivery_dependency

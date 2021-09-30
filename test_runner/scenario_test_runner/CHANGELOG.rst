@@ -2,8 +2,8 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.1 (2021-09-30)
+------------------
 * Merge pull request `#527 <https://github.com/tier4/scenario_simulator_v2/issues/527>`_ from tier4/fix/clean_directory_behavior
 * Merge pull request `#528 <https://github.com/tier4/scenario_simulator_v2/issues/528>`_ from RobotecAI/add_demo_scenario_that_works_with_autoware_auto
 * Merge branch 'master' into fix/clean_directory_behavior
