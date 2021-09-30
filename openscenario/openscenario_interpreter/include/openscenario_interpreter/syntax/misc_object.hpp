@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_msgs/msg/misc_object_parameters.hpp>
 
 namespace openscenario_interpreter
 {
@@ -71,21 +72,7 @@ struct MiscObject : public Scope
   {
   }
 
-  explicit operator openscenario_msgs::msg::MiscObjectParameters() const
-  {
-    openscenario_msgs::msg::MiscObjectParameters misc_object_parameters;
-    {
-      misc_object_parameters.misc_object_category =
-        boost::lexical_cast<String>(misc_object_category);
-
-      misc_object_parameters.name = name;
-
-      misc_object_parameters.bounding_box =
-        static_cast<const openscenario_msgs::msg::BoundingBox>(bounding_box);
-    }
-
-    return misc_object_parameters;
-  }
+  explicit operator openscenario_msgs::msg::MiscObjectParameters() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
