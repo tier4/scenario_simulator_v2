@@ -49,11 +49,11 @@ struct ParameterAction : public Element
   {
   }
 
-  static auto endsImmediately() -> bool { return true; }
+  static auto endsImmediately() -> bool;
 
-  auto run() -> void;
+  /*  */ auto run() -> void;
 
-  auto start() -> void;
+  /*  */ auto start() -> void;
 };
 
 DEFINE_LAZY_VISITOR(

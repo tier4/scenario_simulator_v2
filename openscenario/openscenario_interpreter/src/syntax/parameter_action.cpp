@@ -18,6 +18,8 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+auto ParameterAction::endsImmediately() -> bool { return true; }
+
 auto ParameterAction::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
