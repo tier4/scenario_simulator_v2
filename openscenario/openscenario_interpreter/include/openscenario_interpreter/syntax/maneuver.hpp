@@ -50,39 +50,22 @@ struct Maneuver : public Scope, public StoryboardElement<Maneuver>, public Eleme
     });
   }
 
-  static constexpr auto ready() noexcept { return true; }
-
-  static constexpr auto start() noexcept -> void {}
-
-  static constexpr auto stopTriggered() noexcept { return false; }
-
-  auto accomplished() const
-  {
-    // NOTE: A Maneuver's goal is accomplished when all its Events are in the completeState.
-    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
-      return each.template as<Event>().complete();
-    });
-  }
-
   using StoryboardElement::evaluate;
 
-  void stop()
-  {
-    for (auto && each : *this) {
-      each.as<Event>().override();
-      each.evaluate();
-    }
-  }
+  /*  */ auto accomplished() const -> bool;
 
-  void run()
-  {
-    for (auto && each : *this) {
-      each.evaluate();
-    }
-  }
+  static auto ready() noexcept -> bool;
+
+  /*  */ auto run() -> void;
+
+  static auto start() noexcept -> void;
+
+  /*  */ auto stop() -> void;
+
+  static auto stopTriggered() noexcept -> bool;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Maneuver &);
+auto operator<<(nlohmann::json &, const Maneuver &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
