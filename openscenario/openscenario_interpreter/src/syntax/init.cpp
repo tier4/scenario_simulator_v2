@@ -18,7 +18,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Init & datum)
+auto Init::endsImmediately() const -> bool { return actions.endsImmediately(); }
+
+auto Init::evaluate() -> Element { return actions.evaluate(); }
+
+auto operator<<(nlohmann::json & json, const Init & datum) -> nlohmann::json &
 {
   json["Actions"] << datum.actions;
 

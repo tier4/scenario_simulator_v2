@@ -41,20 +41,12 @@ struct Init
   {
   }
 
-  template <typename... Ts>
-  auto endsImmediately(Ts &&... xs) const
-  {
-    return actions.endsImmediately(std::forward<decltype(xs)>(xs)...);
-  }
+  auto endsImmediately() const -> bool;
 
-  template <typename... Ts>
-  auto evaluate(Ts &&... xs)
-  {
-    return actions.evaluate(std::forward<decltype(xs)>(xs)...);
-  }
+  auto evaluate() -> Element;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Init &);
+auto operator<<(nlohmann::json &, const Init &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
