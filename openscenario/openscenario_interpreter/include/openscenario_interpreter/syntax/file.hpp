@@ -18,7 +18,6 @@
 #include <boost/filesystem.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -33,17 +32,25 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct File
 {
-  const String filepath;
+  using Path = boost::filesystem::path;
 
-  explicit File() : filepath("./") {}
+  const Path filepath;
+
+  explicit File();
+
+  explicit File(const std::string &);
 
   template <typename Node, typename Scope>
-  explicit File(const Node & node, Scope & outer_scope)
-  : filepath(readAttribute<String>("filepath", node, outer_scope))
+  explicit File(const Node & node, Scope & scope)
+  : filepath(readAttribute<String>("filepath", node, scope))
   {
   }
 
-  operator String() const noexcept { return filepath; }
+  auto isDirectory() const -> bool;
+
+  operator Path() const;
+
+  operator String() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

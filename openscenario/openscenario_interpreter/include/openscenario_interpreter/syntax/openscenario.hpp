@@ -66,12 +66,12 @@ struct OpenScenario : public Scope
     return category.evaluate();
   }
 
-  auto load(const boost::filesystem::path & pathname) -> const pugi::xml_node &
+  auto load(const File::Path & filepath) -> const pugi::xml_node &
   {
-    const auto result = script.load_file(pathname.string().c_str());
+    const auto result = script.load_file(filepath.string().c_str());
 
     if (not result) {
-      throw SyntaxError(result.description(), ": ", pathname);
+      throw SyntaxError(result.description(), ": ", filepath);
     } else {
       return script;
     }

@@ -16,8 +16,6 @@
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <algorithm>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>  // boost::filesystem::is_directory
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
@@ -59,11 +57,11 @@ auto Interpreter::isSuccessIntended() const -> bool { return intended_result == 
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
-  const boost::filesystem::path logic_file =
-    script.as<OpenScenario>().category.as<ScenarioDefinition>().road_network.logic_file.filepath;
+  const auto logic_file =
+    script.as<OpenScenario>().category.as<ScenarioDefinition>().road_network.logic_file;
 
   auto configuration = traffic_simulator::Configuration(
-    boost::filesystem::is_directory(logic_file) ? logic_file : logic_file.parent_path());
+    logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
   {
     configuration.auto_sink = false;
 
@@ -73,8 +71,8 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
     configuration.scenario_path = osc_path;
 
     // XXX DIRTY HACK!!!
-    if (not boost::filesystem::is_directory(logic_file) and logic_file.extension() == ".osm") {
-      configuration.lanelet2_map_file = logic_file.filename().string();
+    if (not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm") {
+      configuration.lanelet2_map_file = logic_file.filepath.filename().string();
     }
   }
 
@@ -112,7 +110,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(output_directory);
 
       if (getParameter<bool>("record", true)) {
-        record::start("-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+        record::start("-a", "-o", File::Path(osc_path).replace_extension("").string());
       }
 
       script.rebind<OpenScenario>(osc_path);
