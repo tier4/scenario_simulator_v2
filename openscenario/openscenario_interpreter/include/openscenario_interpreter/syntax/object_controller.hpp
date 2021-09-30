@@ -40,10 +40,7 @@ struct ObjectController : public ComplexType
   // inline static int ego_count= 0;
   static int ego_count;
 
-  explicit ObjectController()  // ObjectController is optional element.
-  : ComplexType(unspecified)
-  {
-  }
+  explicit ObjectController();
 
   template <typename Node, typename... Ts>
   explicit ObjectController(const Node & node, Ts &&... xs)
@@ -59,35 +56,11 @@ struct ObjectController : public ComplexType
     }
   }
 
-  ~ObjectController()
-  {
-    if (isEgo()) {
-      ego_count--;
-    }
-  }
+  ~ObjectController();
 
-  bool isEgo() const &
-  {
-    if (is<Unspecified>()) {
-      static auto controller = DefaultController();
-      return bool(controller["isEgo"]);
-    } else {
-      return bool(as<Controller>()["isEgo"]);
-    }
-  }
+  auto isEgo() const & -> bool;
 
-  operator openscenario_msgs::msg::DriverModel() const
-  {
-    if (is<Unspecified>()) {
-      openscenario_msgs::msg::DriverModel controller;
-      {
-        controller.see_around = !DefaultController()["isBlind"];
-      }
-      return controller;
-    } else {
-      return openscenario_msgs::msg::DriverModel(as<Controller>());
-    }
-  }
+  operator openscenario_msgs::msg::DriverModel() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

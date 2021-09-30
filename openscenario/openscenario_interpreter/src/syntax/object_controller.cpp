@@ -20,5 +20,37 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 int ObjectController::ego_count = 0;
+
+ObjectController::ObjectController() : ComplexType(unspecified) {}
+
+ObjectController::~ObjectController()
+{
+  if (isEgo()) {
+    ego_count--;
+  }
 }
+
+auto ObjectController::isEgo() const & -> bool
+{
+  if (is<Unspecified>()) {
+    static auto controller = DefaultController();
+    return static_cast<bool>(controller["isEgo"]);
+  } else {
+    return static_cast<bool>(as<Controller>()["isEgo"]);
+  }
+}
+
+ObjectController::operator openscenario_msgs::msg::DriverModel() const
+{
+  if (is<Unspecified>()) {
+    openscenario_msgs::msg::DriverModel controller;
+    {
+      controller.see_around = not DefaultController()["isBlind"];
+    }
+    return controller;
+  } else {
+    return openscenario_msgs::msg::DriverModel(as<Controller>());
+  }
+}
+}  // namespace syntax
 }  // namespace openscenario_interpreter

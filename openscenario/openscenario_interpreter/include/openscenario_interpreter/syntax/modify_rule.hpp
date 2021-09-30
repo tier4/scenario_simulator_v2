@@ -26,29 +26,27 @@ inline namespace syntax
 {
 /* ---- ModifyRule -------------------------------------------------------------
  *
- * <xsd:complexType name="ModifyRule">
- *   <xsd:choice>
- *     <xsd:element name="AddValue" type="ParameterAddValueRule"/>
- *     <xsd:element name="MultiplyByValue" type="ParameterMultiplyByValueRule"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="ModifyRule">
+ *    <xsd:choice>
+ *      <xsd:element name="AddValue" type="ParameterAddValueRule"/>
+ *      <xsd:element name="MultiplyByValue" type="ParameterMultiplyByValueRule"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE)                                                            \
-  std::make_pair(#TYPE, [&](auto && node) {                                      \
-    return make<Parameter##TYPE##Rule>(node, std::forward<decltype(xs)>(xs)...); \
-  })
-
 struct ModifyRule : public Element
 {
   template <typename Node, typename... Ts>
   explicit ModifyRule(const Node & node, Ts &&... xs)
-  : Element(choice(node, ELEMENT(AddValue), ELEMENT(MultiplyByValue)))
+  // clang-format off
+  : Element(
+      choice(node,
+        std::make_pair("AddValue",        [&](auto && node) { return make<ParameterAddValueRule       >(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("MultiplyByValue", [&](auto && node) { return make<ParameterMultiplyByValueRule>(node, std::forward<decltype(xs)>(xs)...); })))
+  // clang-format on
   {
   }
 };
-
-#undef ELEMENT
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
