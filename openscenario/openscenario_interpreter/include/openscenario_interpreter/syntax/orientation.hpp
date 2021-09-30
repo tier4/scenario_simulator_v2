@@ -17,6 +17,7 @@
 
 #include <geometry_msgs/msg/vector3.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/reference_context.hpp>
 
 namespace openscenario_interpreter
@@ -50,26 +51,7 @@ struct Orientation
   {
   }
 
-  operator geometry_msgs::msg::Vector3() const
-  {
-    geometry_msgs::msg::Vector3 result{};
-
-    switch (type) {
-      case ReferenceContext::relative:
-        result.x = r;  // roll
-        result.y = p;  // pitch
-        result.z = h;  // yaw (heading)
-        break;
-
-      case ReferenceContext::absolute:
-        // Jumps can never reach here (see ReferenceContext::operator >>).
-
-      default:
-        break;
-    }
-
-    return result;
-  }
+  operator geometry_msgs::msg::Vector3() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
