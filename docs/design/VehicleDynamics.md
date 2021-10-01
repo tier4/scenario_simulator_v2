@@ -13,8 +13,9 @@ Steering and velocity models are implemented 3 types of models.
 
 Uses velocity command. The steering and velocity vary ideally as commanded.
 
-### DELAY_STEER 
-Uses velocity command. The steering and velocity varies following a 1st-order delay model.
+### DELAY_STEER
+
+Uses velocity command. The steering and velocity vary following a first-order delay model.
 
 ### DELAY_STEER_ACC
 Uses acceleration command. The steering and acceleration varies following a 1st-order delay model.
