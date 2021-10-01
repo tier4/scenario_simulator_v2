@@ -18,15 +18,30 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const ParameterDeclaration & datum)
+auto ParameterDeclaration::evaluate() const -> Element
 {
   // clang-format off
+  switch (parameter_type) {
+    case ParameterType::INTEGER:        return make<Integer      >(value);
+    case ParameterType::DOUBLE:         return make<Double       >(value);
+    case ParameterType::STRING:         return make<String       >(value);
+    case ParameterType::UNSIGNED_INT:   return make<UnsignedInt  >(value);
+    case ParameterType::UNSIGNED_SHORT: return make<UnsignedShort>(value);
+    case ParameterType::BOOLEAN:        return make<Boolean      >(value);
+    case ParameterType::DATE_TIME:      return make<String       >(value);
 
-  return os << indent << blue << "<ParameterDeclaration " << highlight("name", datum.name)
-                                                   << " " << highlight("parameterType", datum.parameter_type)
-                                                   << " " << highlight("value", datum.value) << blue << "/>" << reset;
-
+    default:
+      return unspecified;
+  }
   // clang-format on
+}
+
+auto ParameterDeclaration::includes(const std::string & name, const std::vector<char> & chars)
+  -> bool
+{
+  return std::any_of(std::begin(chars), std::end(chars), [&](const auto & each) {
+    return name.find(each) != std::string::npos;
+  });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

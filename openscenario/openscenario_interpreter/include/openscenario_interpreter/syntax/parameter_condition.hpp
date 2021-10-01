@@ -15,13 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_
 
-#include <iomanip>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include <typeindex>
-#include <unordered_map>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -45,9 +41,9 @@ struct ParameterCondition : private Scope
   const Rule compare;
 
   template <typename Node>
-  explicit ParameterCondition(const Node & node, Scope & current_scope)
+  explicit ParameterCondition(const Node & node, Scope & scope)
   // clang-format off
-  : Scope(current_scope),
+  : Scope(scope),
     parameter_ref(readAttribute<String>("parameterRef", node, localScope())),
     value        (readAttribute<String>("value",        node, localScope())),
     compare      (readAttribute<Rule>  ("rule",         node, localScope()))

@@ -41,20 +41,15 @@ struct ParameterDeclaration
 
   const String value;
 
-  auto includes(const std::string & name, const std::vector<char> & chars)
-  {
-    return std::any_of(std::begin(chars), std::end(chars), [&](const auto & each) {
-      return name.find(each) != std::string::npos;
-    });
-  }
-
   ParameterDeclaration() = default;
 
   template <typename Node>
   explicit ParameterDeclaration(const Node & node, Scope & scope)
-  : name(readAttribute<String>("name", node, scope)),
+  // clang-format off
+  : name          (readAttribute<String       >("name",          node, scope)),
     parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
-    value(readAttribute<String>("value", node, scope))
+    value         (readAttribute<String       >("value",         node, scope))
+  // clang-format on
   {
     if (name.substr(0, 3) == "OSC") {
       throw SyntaxError(
@@ -72,37 +67,10 @@ struct ParameterDeclaration
     }
   }
 
-  Element evaluate() const
-  {
-    switch (parameter_type) {
-      case ParameterType::INTEGER:
-        return make<Integer>(value);
+  auto evaluate() const -> Element;
 
-      case ParameterType::DOUBLE:
-        return make<Double>(value);
-
-      case ParameterType::STRING:
-        return make<String>(value);
-
-      case ParameterType::UNSIGNED_INT:
-        return make<UnsignedInt>(value);
-
-      case ParameterType::UNSIGNED_SHORT:
-        return make<UnsignedShort>(value);
-
-      case ParameterType::BOOLEAN:
-        return make<Boolean>(value);
-
-      case ParameterType::DATE_TIME:
-        return make<String>(value);
-
-      default:
-        return unspecified;
-    }
-  }
+  auto includes(const std::string &, const std::vector<char> &) -> bool;
 };
-
-std::ostream & operator<<(std::ostream &, const ParameterDeclaration &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
