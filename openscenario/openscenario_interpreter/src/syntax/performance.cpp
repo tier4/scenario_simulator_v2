@@ -19,15 +19,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Performance & datum)
+Performance::operator openscenario_msgs::msg::Performance() const
 {
-  // clang-format off
+  openscenario_msgs::msg::Performance performance;
+  {
+    performance.max_speed = max_speed;
+    performance.max_acceleration = max_acceleration;
+    performance.max_deceleration = max_deceleration;
+  }
 
-  return os << indent << blue << "<Performance " << highlight("maxSpeed", datum.max_speed)
-                                          << " " << highlight("maxAcceleration", datum.max_acceleration)
-                                          << " " << highlight("maxDeceleration", datum.max_deceleration) << blue << "/>" << reset;
-
-  // clang-format on
+  return performance;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

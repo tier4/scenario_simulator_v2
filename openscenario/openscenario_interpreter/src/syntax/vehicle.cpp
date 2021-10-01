@@ -25,7 +25,6 @@ std::ostream & operator<<(std::ostream & os, const Vehicle & datum)
             << blue << "<Vehicle" << " " << highlight("name", datum.name)
                                   << " " << highlight("vehicleCategory", datum.vehicle_category)
             << blue << ">\n" << reset
-            << datum.performance            << "\n"
             << (--indent)
             << blue << "</Vehicle>" << reset;
   // clang-format on

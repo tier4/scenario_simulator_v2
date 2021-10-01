@@ -48,20 +48,8 @@ struct Performance
   {
   }
 
-  explicit operator openscenario_msgs::msg::Performance() const
-  {
-    openscenario_msgs::msg::Performance performance;
-    {
-      performance.max_speed = max_speed;
-      performance.max_acceleration = max_acceleration;
-      performance.max_deceleration = max_deceleration;
-    }
-
-    return performance;
-  }
+  explicit operator openscenario_msgs::msg::Performance() const;
 };
-
-std::ostream & operator<<(std::ostream &, const Performance &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
