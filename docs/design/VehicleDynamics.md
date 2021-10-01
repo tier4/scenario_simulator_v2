@@ -22,7 +22,7 @@ Uses velocity command. The steering and velocity vary following a first-order de
 Uses acceleration command. The steering and acceleration vary following a first-order delay model.
 
 ## Vehicle Model Parameters
-|         Name         |  Type  |                     Description                      | IDEAL STEER | DELAY STEER | DELAY STEER ACC | Default value |  unit   |
+|         Name         |  Type  |                     Description                      | IDEAL_STEER | DELAY_STEER | DELAY_STEER_ACC | Default value |  unit   |
 | -------------------- | ------ | ---------------------------------------------------- | ----------- | ----------- | --------------- | ------------- | ------- |
 | vel_time_delay       | double | dead time for the velocity input                     | x           | o           | x               | 0.25          | [s]     |
 | acc_time_delay       | double | dead time for the acceleration input                 | x           | x           | o               | 0.1           | [s]     |
