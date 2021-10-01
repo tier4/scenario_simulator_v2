@@ -76,6 +76,7 @@ nav:
       - design/TrafficSimulator.md
       - design/ZeroMQ.md
       - design/Metrics.md
+      - design/VehicleDynamics.md
       - design/SimulationResultFormat.md
   - Package Details: package/About.md
   - Release Notes: ReleaseNotes.md
