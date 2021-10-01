@@ -18,7 +18,36 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Story & datum)
+auto Story::accomplished() const -> bool
+{
+  // NOTE: A Story's goal is accomplished when all its Acts are in the completeState.
+  return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+    return each.template as<Act>().complete();
+  });
+}
+
+auto Story::ready() noexcept -> bool { return true; }
+
+auto Story::run() -> void
+{
+  for (auto && act : *this) {
+    act.evaluate();
+  }
+}
+
+auto Story::start() noexcept -> void {}
+
+auto Story::stop() -> void
+{
+  for (auto && each : *this) {
+    each.as<Act>().override();
+    each.evaluate();
+  }
+}
+
+auto Story::stopTriggered() noexcept -> bool { return false; }
+
+auto operator<<(nlohmann::json & json, const Story & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;
 

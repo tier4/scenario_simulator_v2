@@ -18,8 +18,7 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/act.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
-#include <string>
-#include <vector>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
@@ -39,8 +38,8 @@ inline namespace syntax
 struct Story : public Scope, public StoryboardElement<Story>, public Elements
 {
   template <typename Node>
-  explicit Story(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope)))
+  explicit Story(const Node & node, Scope & scope)
+  : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope)))
   {
     callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
       return make<ParameterDeclarations>(node, localScope());
@@ -51,39 +50,22 @@ struct Story : public Scope, public StoryboardElement<Story>, public Elements
     });
   }
 
-  static constexpr auto ready() noexcept { return true; }
-
-  auto accomplished() const
-  {
-    // NOTE: A Story's goal is accomplished when all its Acts are in the completeState.
-    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
-      return each.template as<Act>().complete();
-    });
-  }
-
-  static constexpr auto start() noexcept -> void {}
-
-  static constexpr auto stopTriggered() noexcept { return false; }
-
-  auto stop()
-  {
-    for (auto && each : *this) {
-      each.as<Act>().override();
-      each.evaluate();
-    }
-  }
-
   using StoryboardElement::evaluate;
 
-  void run()
-  {
-    for (auto && act : *this) {
-      act.evaluate();
-    }
-  }
+  /*  */ auto accomplished() const -> bool;
+
+  static auto ready() noexcept -> bool;
+
+  /*  */ auto run() -> void;
+
+  static auto start() noexcept -> void;
+
+  /*  */ auto stop() -> void;
+
+  static auto stopTriggered() noexcept -> bool;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Story &);
+auto operator<<(nlohmann::json &, const Story &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
