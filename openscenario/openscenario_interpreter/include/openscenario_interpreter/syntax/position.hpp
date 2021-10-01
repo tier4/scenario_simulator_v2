@@ -15,12 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 
-#include <boost/function_types/result_type.hpp>
 #include <openscenario_interpreter/syntax/lane_position.hpp>
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
-#include <stdexcept>
-#include <unordered_map>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -62,52 +59,32 @@ struct Position : public Element
   {
   }
 
-  explicit operator geometry_msgs::msg::Pose() const
-  {
-    if (is<WorldPosition>()) {
-      return static_cast<geometry_msgs::msg::Pose>(as<WorldPosition>());
-    } else if (is<LanePosition>()) {
-      return static_cast<geometry_msgs::msg::Pose>(as<LanePosition>());
-    } else {
-      // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
-    }
-  }
+  explicit operator geometry_msgs::msg::Pose() const;
 };
 
-template <typename Result = void, typename Function, typename... Ts>
-auto apply(Function && function, const Position & position, Ts &&... xs) -> Result
-{
-  using application = std::function<Result(Function &&, const Position &, Ts &&...)>;
+DEFINE_LAZY_VISITOR(
+  Position,
+  CASE(WorldPosition),          //
+  CASE(RelativeWorldPosition),  //
+  // CASE(RelativeObjectPosition),
+  // CASE(RoadPosition),
+  // CASE(RelativeRoadPosition),
+  CASE(LanePosition),
+  // CASE(RelativeLanePosition),
+  // CASE(RoutePosition),
+);
 
-#define BOILERPLATE(TYPE)                                                            \
-  std::make_pair<std::type_index, application>(                                      \
-    typeid(TYPE), [](Function && function, const Position & position, Ts &&... xs) { \
-      return function(position.as<TYPE>(), std::forward<decltype(xs)>(xs)...);       \
-    })
-
-  static const std::unordered_map<std::type_index, application> overloads{
-    // clang-format off
-    BOILERPLATE(         WorldPosition),
-    BOILERPLATE( RelativeWorldPosition),
-    // BOILERPLATE(RelativeObjectPosition),
-    // BOILERPLATE(          RoadPosition),
-    // BOILERPLATE(  RelativeRoadPosition),
-    BOILERPLATE(          LanePosition),
-    // BOILERPLATE(  RelativeLanePosition),
-    // BOILERPLATE(         RoutePosition),
-    // clang-format on
-  };
-
-#undef BOILERPLATE
-
-  try {
-    return overloads.at(position.type())(
-      std::forward<decltype(function)>(function), position, std::forward<decltype(xs)>(xs)...);
-  } catch (const std::out_of_range &) {
-    throw UNSUPPORTED_SETTING_DETECTED(Position, makeTypename(position.type().name()));
-  }
-}
+DEFINE_LAZY_VISITOR(
+  const Position,
+  CASE(WorldPosition),          //
+  CASE(RelativeWorldPosition),  //
+  // CASE(RelativeObjectPosition),
+  // CASE(RoadPosition),
+  // CASE(RelativeRoadPosition),
+  CASE(LanePosition),
+  // CASE(RelativeLanePosition),
+  // CASE(RoutePosition),
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

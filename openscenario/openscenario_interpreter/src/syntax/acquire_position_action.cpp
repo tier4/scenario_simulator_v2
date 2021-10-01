@@ -36,7 +36,7 @@ auto AcquirePositionAction::run() -> void
     });
 
   for (const auto & actor : actors) {
-    apply(acquire_position, position, actor);
+    apply<void>(acquire_position, position, actor);
   }
 }
 }  // namespace syntax

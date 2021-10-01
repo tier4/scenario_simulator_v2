@@ -77,7 +77,7 @@ struct TeleportAction : private Scope
       if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
         AddEntityAction(localScope(), position)(actor);  // NOTE: Tier IV extension
       } else {
-        apply(teleport_action, position, actor);
+        apply<void>(teleport_action, position, actor);
       }
     }
   }
