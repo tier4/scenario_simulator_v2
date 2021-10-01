@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/utility/overload.hpp>
 
 namespace openscenario_interpreter
 {
