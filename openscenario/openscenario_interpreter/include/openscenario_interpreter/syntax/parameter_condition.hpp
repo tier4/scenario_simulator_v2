@@ -18,7 +18,7 @@
 #include <iomanip>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
-#include <string>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
@@ -55,48 +55,9 @@ struct ParameterCondition : private Scope
   {
   }
 
-  auto description() const
-  {
-    std::stringstream description;
+  auto description() const -> String;
 
-    description << "The value of parameter " << std::quoted(parameter_ref) << " = "
-                << localScope().findElement(parameter_ref) << " " << compare << " " << value << "?";
-
-    return description.str();
-  }
-
-  auto evaluate() const
-  {
-    static const std::unordered_map<
-      std::type_index,  //
-      std::function<bool(const Rule, const Element &, const String &)>>
-      overloads{
-        // clang-format off
-        { typeid(Boolean        ), [](auto && compare, auto && lhs, auto && rhs) { return compare(lhs.template as<Boolean        >(), boost::lexical_cast<Boolean        >(rhs)); } },
-        { typeid(Double         ), [](auto && compare, auto && lhs, auto && rhs) { return compare(lhs.template as<Double         >(), boost::lexical_cast<Double         >(rhs)); } },
-        { typeid(Integer        ), [](auto && compare, auto && lhs, auto && rhs) { return compare(lhs.template as<Integer        >(), boost::lexical_cast<Integer        >(rhs)); } },
-        { typeid(String         ), [](auto && compare, auto && lhs, auto && rhs) { return compare(lhs.template as<String         >(),                                      rhs ); } },
-        { typeid(UnsignedInteger), [](auto && compare, auto && lhs, auto && rhs) { return compare(lhs.template as<UnsignedInteger>(), boost::lexical_cast<UnsignedInteger>(rhs)); } },
-        { typeid(UnsignedShort  ), [](auto && compare, auto && lhs, auto && rhs) { return compare(lhs.template as<UnsignedShort  >(), boost::lexical_cast<UnsignedShort  >(rhs)); } },
-        // clang-format on
-      };
-
-    try {
-      const auto & parameter = localScope().findElement(parameter_ref);
-      if (!parameter) {
-        THROW_SYNTAX_ERROR(parameter_ref, " cannot be found from this scope");
-      }
-      try {
-        return asBoolean(overloads.at(parameter.type())(compare, parameter, value));
-      } catch (const std::out_of_range &) {
-        throw SemanticError(
-          "No viable operation ", std::quoted(boost::lexical_cast<String>(compare)),
-          " with parameter ", std::quoted(parameter_ref), " and value ", std::quoted(value));
-      }
-    } catch (const std::out_of_range &) {
-      throw SemanticError("No such parameter ", std::quoted(parameter_ref));
-    }
-  }
+  auto evaluate() const -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

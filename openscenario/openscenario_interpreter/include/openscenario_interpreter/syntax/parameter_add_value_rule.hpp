@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ADD_VALUE_RULE_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 
 namespace openscenario_interpreter
 {
