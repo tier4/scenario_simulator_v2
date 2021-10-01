@@ -19,7 +19,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, Priority & priority)
+static_assert(std::is_standard_layout<Priority>::value, "");
+
+static_assert(std::is_trivial<Priority>::value, "");
+
+auto operator>>(std::istream & is, Priority & priority) -> std::istream &
 {
   std::string buffer;
 
@@ -50,7 +54,7 @@ std::istream & operator>>(std::istream & is, Priority & priority)
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Priority, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const Priority & datum)
+auto operator<<(std::ostream & os, const Priority & datum) -> std::ostream &
 {
 #define BOILERPLATE(NAME) \
   case Priority::NAME:    \

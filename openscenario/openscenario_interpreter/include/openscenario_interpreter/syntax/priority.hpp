@@ -43,28 +43,22 @@ struct Priority
 {
   enum value_type {
 
-    /* ---- NOTE ---------------------------------------------------------------
-     *
-     *  If a starting event has priority Overwrite, all events in running state,
-     *  within the same scope (maneuver) as the starting event, should be issued
-     *  a stop command (stop transition).
-     *
-     * ---------------------------------------------------------------------- */
+    /*
+       If a starting event has priority Overwrite, all events in running state,
+       within the same scope (maneuver) as the starting event, should be issued
+       a stop command (stop transition).
+    */
     overwrite,
 
-    /* ---- NOTE ---------------------------------------------------------------
-     *
-     *  If a starting event has priority Skip, then it will not be run if there
-     *  is any other event in the same scope (maneuver) in the running state.
-     *
-     * ---------------------------------------------------------------------- */
+    /*
+       If a starting event has priority Skip, then it will not be run if there
+       is any other event in the same scope (maneuver) in the running state.
+    */
     skip,
 
-    /* ---- NOTE ---------------------------------------------------------------
-     *
-     *   Execute in parallel to other events.
-     *
-     * ---------------------------------------------------------------------- */
+    /*
+       Execute in parallel to other events.
+    */
     parallel,
   } value;
 
@@ -73,13 +67,9 @@ struct Priority
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<Priority>::value, "");
+auto operator>>(std::istream &, Priority &) -> std::istream &;
 
-static_assert(std::is_trivial<Priority>::value, "");
-
-std::istream & operator>>(std::istream &, Priority &);
-
-std::ostream & operator<<(std::ostream &, const Priority &);
+auto operator<<(std::ostream &, const Priority &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
