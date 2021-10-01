@@ -72,8 +72,6 @@ struct ScenarioDefinition
   }
 };
 
-ASSERT_IS_OPTIONAL_ELEMENT(ParameterDeclarations);
-
 auto operator<<(std::ostream &, const ScenarioDefinition &) -> std::ostream &;
 
 auto operator<<(nlohmann::json &, const ScenarioDefinition &) -> nlohmann::json &;
