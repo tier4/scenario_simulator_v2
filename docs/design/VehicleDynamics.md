@@ -10,7 +10,8 @@ Pose is calculated by bicycle kinematics model.
 Steering and velocity models are implemented 3 types of models.
 
 ### IDEAL_STEER
-Uses velocity command. The steering and velocity varies ideally as commanded.
+
+Uses velocity command. The steering and velocity vary ideally as commanded.
 
 ### DELAY_STEER 
 Uses velocity command. The steering and velocity varies following a 1st-order delay model.
