@@ -37,18 +37,10 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Phase
 {
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  Name of the phase.
-   *
-   * ------------------------------------------------------------------------ */
+  // Name of the phase.
   const String name;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  Duration of the phase. Unit: s; Range: [0..inf[.
-   *
-   * ------------------------------------------------------------------------ */
+  // Duration of the phase. Unit: s; Range: [0..inf[.
   const Double duration;
 
   /* ---- NOTE -----------------------------------------------------------------
@@ -63,22 +55,14 @@ struct Phase
   const std::list<TrafficSignalState> traffic_signal_states;
 
   template <typename Node, typename Scope>
-  explicit Phase(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)),
-    duration(readAttribute<Double>("duration", node, outer_scope, Double::infinity())),
-    traffic_signal_states(
-      readElements<TrafficSignalState, 0>("TrafficSignalState", node, outer_scope))
+  explicit Phase(const Node & node, Scope & scope)
+  : name(readAttribute<String>("name", node, scope)),
+    duration(readAttribute<Double>("duration", node, scope, Double::infinity())),
+    traffic_signal_states(readElements<TrafficSignalState, 0>("TrafficSignalState", node, scope))
   {
   }
 
-  auto evaluate() const
-  {
-    for (const auto & state : traffic_signal_states) {
-      state.evaluate();
-    }
-
-    return unspecified;
-  }
+  auto evaluate() const -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
