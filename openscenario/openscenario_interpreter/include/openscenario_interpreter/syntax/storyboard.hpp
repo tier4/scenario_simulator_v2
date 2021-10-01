@@ -43,8 +43,8 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
   Trigger stop_trigger;
 
   template <typename Node>
-  explicit Storyboard(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope("Storyboard")),
+  explicit Storyboard(const Node & node, Scope & scope)
+  : Scope(scope.makeChildScope("Storyboard")),
     init(readElement<Init>("Init", node, localScope())),
     stop_trigger(readElement<Trigger>("StopTrigger", node, localScope()))
   {
@@ -57,61 +57,22 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
     }
   }
 
-  static constexpr auto ready() noexcept { return true; }
-
-  void start()
-  {
-    init.evaluate();  // NOTE RENAME TO 'start'?
-  }
-
-  auto stopTriggered() -> bool { return stop_trigger.evaluate().as<Boolean>(); }
-
-  void stop()
-  {
-    for (auto && each : *this) {
-      each.as<Story>().override();
-      each.evaluate();
-    }
-  }
-
-  auto accomplished() const
-  {
-    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
-      return each.template as<Story>().complete();
-    });
-  }
-
   bool engaged = false;
 
-  auto run()
-  {
-    if (engaged) {
-      for (auto && story : *this) {
-        story.evaluate();
-      }
-    } else if (std::all_of(  // XXX DIRTY HACK!!!
-                 std::cbegin(global().entities), std::cend(global().entities),
-                 [&](const auto & each) {
-                   return not std::get<1>(each).template as<ScenarioObject>().is_added or
-                          openscenario_interpreter::ready(std::get<0>(each));
-                 })) {
-      for (const auto & each : global().entities) {
-        if (std::get<1>(each).template as<ScenarioObject>().is_added) {
-          engage(std::get<0>(each));
-        }
-      }
-      engaged = true;
-    } else {
-      throw common::AutowareError(
-        "Autoware did not reach an engageable state within the specified time "
-        "(initialize_duration). It is likely that some nodes were corrupted during launch");
-    }
-  }
+  /*  */ auto accomplished() const -> bool;
+
+  static auto ready() noexcept -> bool;
+
+  /*  */ auto run() -> void;
+
+  /*  */ auto start() -> void;
+
+  /*  */ auto stop() -> void;
+
+  /*  */ auto stopTriggered() -> bool;
 };
 
-std::ostream & operator<<(std::ostream &, const Storyboard &);
-
-nlohmann::json & operator<<(nlohmann::json &, const Storyboard &);
+auto operator<<(nlohmann::json &, const Storyboard &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

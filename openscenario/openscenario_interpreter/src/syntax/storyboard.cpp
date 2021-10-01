@@ -18,9 +18,56 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Storyboard &) { return os; }
+auto Storyboard::accomplished() const -> bool
+{
+  return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+    return each.template as<Story>().complete();
+  });
+}
 
-nlohmann::json & operator<<(nlohmann::json & json, const Storyboard & datum)
+auto Storyboard::ready() noexcept -> bool { return true; }
+
+auto Storyboard::run() -> void
+{
+  if (engaged) {
+    for (auto && story : *this) {
+      story.evaluate();
+    }
+  } else if (std::all_of(  // XXX DIRTY HACK!!!
+               std::cbegin(global().entities), std::cend(global().entities),
+               [&](const auto & each) {
+                 return not std::get<1>(each).template as<ScenarioObject>().is_added or
+                        openscenario_interpreter::ready(std::get<0>(each));
+               })) {
+    for (const auto & each : global().entities) {
+      if (std::get<1>(each).template as<ScenarioObject>().is_added) {
+        engage(std::get<0>(each));
+      }
+    }
+    engaged = true;
+  } else {
+    throw common::AutowareError(
+      "Autoware did not reach an engageable state within the specified time "
+      "(initialize_duration). It is likely that some nodes were corrupted during launch");
+  }
+}
+
+auto Storyboard::start() -> void
+{
+  init.evaluate();  // NOTE RENAME TO 'start'?
+}
+
+auto Storyboard::stop() -> void
+{
+  for (auto && each : *this) {
+    each.as<Story>().override();
+    each.evaluate();
+  }
+}
+
+auto Storyboard::stopTriggered() -> bool { return stop_trigger.evaluate().as<Boolean>(); }
+
+auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::json &
 {
   json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
 
