@@ -36,7 +36,7 @@ Uses acceleration command. The steering and acceleration vary following a first-
 | steer_rate_lim       | double | limit of steering angle change rate                  | x           | o           | o                  | 5.0           | [rad/s] |
 | deadzone_delta_steer | double | dead zone for the steering dynamics                  | x           | o           | o                  | 0.0           | [rad]   |
 
-_Note_: The steering/velocity/acceleration dynamics is modeled by a first order system with a deadtime in a _delay_ model. The definition of the _time constant_ is the time it takes for the step response to rise up to 63% of its final value. The _deadtime_ is a delay in the response to a control input.
+_Note_: The steering/velocity/acceleration dynamics is modeled by a first-order system with a deadtime in a _delay_ model. The definition of the _time constant_ is the time it takes for the step response to rise up to 63% of its final value. The _deadtime_ is a delay in the response to a control input.
 
 ## Example Definition
 
