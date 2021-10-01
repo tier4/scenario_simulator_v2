@@ -18,6 +18,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+auto ScenarioDefinition::complete() -> bool { return storyboard.complete(); }
+
+auto ScenarioDefinition::evaluate() -> Element
+{
+  road_network.evaluate();
+  storyboard.evaluate();
+  updateFrame();
+  return storyboard.current_state;
+}
+
 std::ostream & operator<<(std::ostream & os, const ScenarioDefinition & datum)
 {
   nlohmann::json json;

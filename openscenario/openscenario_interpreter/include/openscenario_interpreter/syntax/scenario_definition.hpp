@@ -61,15 +61,9 @@ struct ScenarioDefinition
   {
   }
 
-  auto complete() { return storyboard.complete(); }
+  auto complete() -> bool;
 
-  auto evaluate()
-  {
-    road_network.evaluate();
-    storyboard.evaluate();
-    updateFrame();
-    return storyboard.current_state;
-  }
+  auto evaluate() -> Element;
 };
 
 auto operator<<(std::ostream &, const ScenarioDefinition &) -> std::ostream &;

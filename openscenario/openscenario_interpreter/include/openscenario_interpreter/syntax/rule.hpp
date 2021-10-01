@@ -78,10 +78,6 @@ struct Rule
   }
 };
 
-static_assert(std::is_standard_layout<Rule>::value, "");
-
-static_assert(std::is_trivial<Rule>::value, "");
-
 auto operator>>(std::istream &, Rule &) -> std::istream &;
 
 auto operator<<(std::ostream &, const Rule &) -> std::ostream &;
