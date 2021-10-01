@@ -15,12 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TELEPORT_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TELEPORT_ACTION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
-#include <openscenario_interpreter/syntax/scenario_object.hpp>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -40,49 +36,21 @@ struct TeleportAction : private Scope
   const Position position;
 
   template <typename Node>
-  explicit TeleportAction(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope), position(readElement<Position>("Position", node, localScope()))
+  explicit TeleportAction(const Node & node, Scope & scope)
+  : Scope(scope),  //
+    position(readElement<Position>("Position", node, localScope()))
   {
   }
 
-  static auto accomplished() noexcept -> bool { return true; }
+  static auto accomplished() noexcept -> bool;
 
-  static auto endsImmediately() noexcept -> bool { return true; };
+  static auto endsImmediately() noexcept -> bool;
 
-  inline auto evaluate() const -> Element
-  {
-    run();
-    return unspecified;
-  }
+  /*  */ auto evaluate() const -> Element;
 
-  inline auto run() const -> void
-  {
-    auto teleport_action = overload(
-      [](const WorldPosition & position, const auto & actor) {
-        return applyTeleportAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
-      },
-      [](const RelativeWorldPosition & position, const auto & actor) {
-        return applyTeleportAction(
-          actor,
-          position.reference,  // name
-          position,            // geometry_msgs::msg::Point
-          position.orientation);
-      },
-      [](const LanePosition & position, const auto & actor) {
-        return applyTeleportAction(
-          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
-      });
+  /*  */ auto run() const -> void;
 
-    for (const auto & actor : actors) {
-      if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
-        AddEntityAction(localScope(), position)(actor);  // NOTE: Tier IV extension
-      } else {
-        apply<void>(teleport_action, position, actor);
-      }
-    }
-  }
-
-  static auto start() noexcept -> void {}
+  static auto start() noexcept -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
