@@ -68,4 +68,4 @@ vel_time_constant: 0.61
 vel_time_delay: 0.25
 ```
 
-This example is DELAY_STEER_ACC model, if you want to use another type, please set another variable.
+This example shows DELAY_STEER_ACC model. If you want to use another type, please set another variable.
