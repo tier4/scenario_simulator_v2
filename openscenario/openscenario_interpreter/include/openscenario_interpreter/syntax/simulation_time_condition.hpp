@@ -15,9 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SIMULATION_TIME_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SIMULATION_TIME_CONDITION_HPP_
 
-#include <iomanip>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
@@ -44,19 +43,11 @@ struct SimulationTimeCondition
   {
   }
 
-  Double last_checked_time;
+  Double result;
 
-  auto evaluate() { return asBoolean(compare(last_checked_time = getCurrentTime(), value)); }
+  auto description() const -> String;
 
-  auto description() const
-  {
-    std::stringstream description;
-
-    description << "Is the simulation time (= " << std::fixed << std::setprecision(6)
-                << last_checked_time << ") is " << compare << " " << value << "?";
-
-    return description.str();
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
