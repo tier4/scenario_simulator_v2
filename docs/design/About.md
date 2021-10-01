@@ -34,4 +34,4 @@ If you want to know TierIV Scenario format Version 2.0 , which is a default scen
 
 ## Vehicle Model
 
-If your want to know about vehicle dynamics model in simulation, please check [this documentation](VehicleDynamics.md).
+If you want to know about vehicle dynamics model in simulation, please check [this documentation](VehicleDynamics.md).
