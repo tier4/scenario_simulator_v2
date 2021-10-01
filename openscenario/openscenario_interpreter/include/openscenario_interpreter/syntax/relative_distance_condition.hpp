@@ -15,11 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <utility>
 
@@ -27,11 +27,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-enum class Between {
-  reference_points,             // freespace = false
-  closest_bounding_box_points,  // freespace = true
-};
-
 /* ---- RelativeDistanceCondition (OpenSCENARIO 1.1) ---------------------------
  *
  *  The current relative distance of a triggering entity/entities to a
@@ -50,24 +45,27 @@ enum class Between {
  * -------------------------------------------------------------------------- */
 struct RelativeDistanceCondition : private Scope
 {
-  const CoordinateSystem coordinate_system;
   // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity".
+  const CoordinateSystem coordinate_system;
 
-  const String entity_ref;  // Reference entity.
+  // Reference entity.
+  const String entity_ref;
 
-  const Boolean freespace;
   // True: distance is measured between closest bounding box points. False: reference point distance is used.
+  const Boolean freespace;
 
-  const RelativeDistanceType relative_distance_type;
   // Definition of the coordinate system dimension(s) to be used for calculating distances.
+  const RelativeDistanceType relative_distance_type;
 
-  const Rule rule;  // The operator (less, greater, equal).
+  // The operator (less, greater, equal).
+  const Rule rule;
 
-  const Double value;  // The distance value. Unit: m; Range: [0..inf[.
+  // The distance value. Unit: m; Range: [0..inf[.
+  const Double value;
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> last_checked_values;  // for description
+  std::vector<Double> results;  // for description
 
   template <typename Node, typename Scope>
   explicit RelativeDistanceCondition(
@@ -81,26 +79,14 @@ struct RelativeDistanceCondition : private Scope
     rule                  (readAttribute<Rule                >("rule",                 node, scope)),
     value                 (readAttribute<Double              >("value",                node, scope)),
     triggering_entities(triggering_entities),
-    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
+    results(triggering_entities.entity_refs.size(), Double::nan())
   // clang-format on
   {
   }
 
-  auto description() const
-  {
-    std::stringstream description;
+  auto description() const -> String;
 
-    description << triggering_entities.description() << "'s relative distance to given entity "
-                << entity_ref << " = ";
-
-    print_to(description, last_checked_values);
-
-    description << " " << rule << " " << value << "?";
-
-    return description.str();
-  }
-
-  template <CoordinateSystem::value_type, RelativeDistanceType::value_type, Between>
+  template <CoordinateSystem::value_type, RelativeDistanceType::value_type, Boolean::value_type>
   auto distance(const EntityRef &) -> double
   {
     throw SyntaxError(__FILE__, ":", __LINE__);
@@ -108,23 +94,15 @@ struct RelativeDistanceCondition : private Scope
 
   auto distance(const EntityRef &) -> double;
 
-  auto evaluate()
-  {
-    last_checked_values.clear();
-
-    return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-      last_checked_values.push_back(distance(triggering_entity));
-      return rule(last_checked_values.back(), value);
-    }));
-  }
+  auto evaluate() -> Element;
 };
 
 // clang-format off
-template <> auto RelativeDistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::reference_points           >(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::lateral,           Between::reference_points           >(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::longitudinal,      Between::reference_points           >(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance< CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      Between::reference_points           >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const EntityRef &) -> double;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter
