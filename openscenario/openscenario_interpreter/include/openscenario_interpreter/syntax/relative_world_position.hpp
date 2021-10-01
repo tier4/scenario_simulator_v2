@@ -17,7 +17,10 @@
 
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/orientation.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
 
 namespace openscenario_interpreter
@@ -55,28 +58,11 @@ struct RelativeWorldPosition
   {
   }
 
-  operator geometry_msgs::msg::Point() const
-  {
-    geometry_msgs::msg::Point result;
-    {
-      result.x = dx;
-      result.y = dy;
-      result.z = dz;
-    }
+  operator geometry_msgs::msg::Point() const;
 
-    return result;
-  }
+  explicit operator geometry_msgs::msg::Pose() const;
 
-  explicit operator geometry_msgs::msg::Pose() const
-  {
-    throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, geometry_msgs::msg::Pose);
-  }
-
-  explicit operator openscenario_msgs::msg::LaneletPose() const
-  {
-    throw UNSUPPORTED_CONVERSION_DETECTED(
-      RelativeWorldPosition, openscenario_msgs::msg::LaneletPose);
-  }
+  explicit operator openscenario_msgs::msg::LaneletPose() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
