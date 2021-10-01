@@ -58,15 +58,15 @@ struct TimeHeadwayCondition
 
   template <typename Node, typename Scope>
   explicit TimeHeadwayCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
+    const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
   // clang-format off
-  : entity_ref (readAttribute<String> ("entityRef",  node, outer_scope)),
-    value      (readAttribute<Double> ("value",      node, outer_scope)),
-    freespace  (readAttribute<Boolean>("freespace",  node, outer_scope)),
-    along_route(readAttribute<Boolean>("alongRoute", node, outer_scope)),
-    compare    (readAttribute<Rule>   ("rule",       node, outer_scope)),
+  : entity_ref (readAttribute<String> ("entityRef",  node, scope)),
+    value      (readAttribute<Double> ("value",      node, scope)),
+    freespace  (readAttribute<Boolean>("freespace",  node, scope)),
+    along_route(readAttribute<Boolean>("alongRoute", node, scope)),
+    compare    (readAttribute<Rule>   ("rule",       node, scope)),
     triggering_entities(triggering_entities),
-    results(std::size(triggering_entities.entity_refs), Double::nan())
+    results(triggering_entities.entity_refs.size(), Double::nan())
   // clang-format on
   {
   }
