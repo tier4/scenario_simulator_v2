@@ -26,7 +26,7 @@ auto TrafficSignalControllerAction::run() -> void
 {
   auto found = localScope().findElement(traffic_signal_controller_ref);
   if (found and found.is<TrafficSignalController>()) {
-    found.as<TrafficSignalController>().changePhaseByName(phase);
+    found.as<TrafficSignalController>().changePhaseTo(phase);
   } else {
     THROW_SYNTAX_ERROR(
       "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
