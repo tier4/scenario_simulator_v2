@@ -75,7 +75,7 @@ auto TrafficSignalController::cycleTime() const -> double
 auto TrafficSignalController::evaluate() -> Element
 {
   if (shouldChangePhaseToBegin()) {
-    return changePhaseTo(phases.begin());
+    return changePhaseTo(std::begin(phases));
   } else if (currentPhaseExceeded()) {
     return changePhaseTo(std::next(current_phase));
   } else {
