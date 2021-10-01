@@ -55,8 +55,8 @@ struct Pedestrian : public Scope
   const Properties properties;
 
   template <typename Node>
-  explicit Pedestrian(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
+  explicit Pedestrian(const Node & node, Scope & scope)
+  : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
     mass(readAttribute<Double>("mass", node, localScope())),
     model(readAttribute<String>("model", node, localScope())),
     pedestrian_category(
@@ -68,20 +68,8 @@ struct Pedestrian : public Scope
   {
   }
 
-  explicit operator openscenario_msgs::msg::PedestrianParameters() const
-  {
-    openscenario_msgs::msg::PedestrianParameters parameter;
-    {
-      parameter.name = name;
-      parameter.pedestrian_category = boost::lexical_cast<String>(pedestrian_category);
-      parameter.bounding_box = static_cast<openscenario_msgs::msg::BoundingBox>(bounding_box);
-    }
-
-    return parameter;
-  }
+  explicit operator openscenario_msgs::msg::PedestrianParameters() const;
 };
-
-std::ostream & operator<<(std::ostream &, const Pedestrian &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

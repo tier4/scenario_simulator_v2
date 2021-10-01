@@ -18,17 +18,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Pedestrian & datum)
+Pedestrian::operator openscenario_msgs::msg::PedestrianParameters() const
 {
-  // clang-format off
+  openscenario_msgs::msg::PedestrianParameters parameter;
+  {
+    parameter.name = name;
+    parameter.pedestrian_category = boost::lexical_cast<String>(pedestrian_category);
+    parameter.bounding_box = static_cast<openscenario_msgs::msg::BoundingBox>(bounding_box);
+  }
 
-  return os << (indent++) << blue << "<Pedestrian " << highlight("name", datum.name)
-                                             << " " << highlight("mass", datum.mass)
-                                             << " " << highlight("model", datum.model)
-                                             << " " << highlight("pedestrianCategory", datum.pedestrian_category) << blue << ">\n" << reset
-            << (--indent) << blue << "</Pedestrian>" << reset;
-
-  // clang-format on
+  return parameter;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
