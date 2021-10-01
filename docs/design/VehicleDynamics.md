@@ -1,6 +1,6 @@
 # Vehicle Dynamics
 
-In this section, we describe the vehicle model which was implemented in scenario_smulator_v2
+In this section, we describe the vehicle model which is implemented in scenario_simulator_v2.
 
 
 ## Vehicle Model Types
