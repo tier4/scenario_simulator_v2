@@ -18,10 +18,5 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const ParameterDeclarations &)
-{
-  return os << (indent++) << blue << "<ParameterDeclarations>" << reset << "\n"
-            << (--indent) << blue << "</ParameterDeclarations>";
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

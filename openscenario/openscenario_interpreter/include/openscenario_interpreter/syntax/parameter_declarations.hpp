@@ -37,16 +37,14 @@ struct ParameterDeclarations : public std::vector<ParameterDeclaration>
 {
   ParameterDeclarations() = default;
 
-  template <typename Node, typename Scope>
-  explicit ParameterDeclarations(const Node & node, Scope & outer_scope)
+  template <typename Node>
+  explicit ParameterDeclarations(const Node & node, Scope & scope)
   {
     callWithElements(node, "ParameterDeclaration", 0, unbounded, [&](auto && each) {
-      return emplace_back(each, outer_scope);
+      return emplace_back(each, scope);
     });
   }
 };
-
-std::ostream & operator<<(std::ostream &, const ParameterDeclarations &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

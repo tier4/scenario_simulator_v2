@@ -12,23 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/vehicle.hpp>
+#include <openscenario_interpreter/syntax/parameter_modify_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Vehicle & datum)
+auto ParameterModifyAction::accomplished() noexcept -> bool { return true; }
+
+auto ParameterModifyAction::run() -> void
 {
-  // clang-format off
-  return os << (indent++)
-            << blue << "<Vehicle" << " " << highlight("name", datum.name)
-                                  << " " << highlight("vehicleCategory", datum.vehicle_category)
-            << blue << ">\n" << reset
-            << datum.performance            << "\n"
-            << (--indent)
-            << blue << "</Vehicle>" << reset;
-  // clang-format on
+  try {
+    const auto target = localScope().findElement(parameter_ref);
+    if (rule.is<ParameterAddValueRule>()) {
+      rule.as<ParameterAddValueRule>()(target);
+    } else {
+      rule.as<ParameterMultiplyByValueRule>()(target);
+    }
+  } catch (const std::out_of_range &) {
+    throw SemanticError("No such parameter ", std::quoted(parameter_ref));
+  }
 }
+
+auto ParameterModifyAction::start() noexcept -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
