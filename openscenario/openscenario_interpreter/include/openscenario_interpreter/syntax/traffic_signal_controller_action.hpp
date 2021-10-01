@@ -37,47 +37,31 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignalControllerAction : public Scope
 {
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  ID of the signal controller in a road network.
-   *
-   * ------------------------------------------------------------------------ */
+  // ID of the signal controller in a road network.
   const String traffic_signal_controller_ref;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  Targeted phase of the signal controller. The available phases are defined
-   *  in type RoadNetwork under the property trafficSignalControllers.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     Targeted phase of the signal controller. The available phases are defined
+     in type RoadNetwork under the property trafficSignalControllers.
+  */
   const String phase;
 
   template <typename Node>
-  explicit TrafficSignalControllerAction(const Node & node, const Scope & current_scope)
-  : Scope(current_scope),
+  explicit TrafficSignalControllerAction(const Node & node, const Scope & scope)
+  : Scope(scope),
     traffic_signal_controller_ref(
       readAttribute<String>("trafficSignalControllerRef", node, localScope())),
     phase(readAttribute<String>("phase", node, localScope()))
   {
   }
 
-  static auto accomplished() noexcept -> bool { return true; }
+  static auto accomplished() noexcept -> bool;
 
-  static auto endsImmediately() noexcept -> bool { return true; }
+  static auto endsImmediately() noexcept -> bool;
 
-  auto run() -> void
-  {
-    auto found = localScope().findElement(traffic_signal_controller_ref);
-    if (found and found.is<TrafficSignalController>()) {
-      found.as<TrafficSignalController>().changePhaseByName(phase);
-    } else {
-      THROW_SYNTAX_ERROR(
-        "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
-        " is not declared in this scope");
-    }
-  }
+  /*  */ auto run() -> void;
 
-  static auto start() noexcept -> void {}
+  static auto start() noexcept -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
