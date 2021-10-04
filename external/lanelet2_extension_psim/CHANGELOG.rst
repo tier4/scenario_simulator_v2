@@ -2,6 +2,12 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.1 (2021-09-30)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/add-entity-action
+* Contributors: yamacir-kit
+
 0.5.0 (2021-09-09)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper

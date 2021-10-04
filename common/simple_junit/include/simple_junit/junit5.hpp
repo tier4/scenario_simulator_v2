@@ -298,10 +298,10 @@ struct SimpleTestSuite : private std::unordered_map<xs::string, SimpleTestCase>
 
     current_node.append_attribute("name") = testsuite.name.c_str();
 
-    size_t tests = 0;
-    size_t failures = 0;
-    size_t pass = 0;
-    size_t errors = 0;
+    std::size_t tests = 0;
+    std::size_t failures = 0;
+    std::size_t pass = 0;
+    std::size_t errors = 0;
     for (const auto & testcase : testsuite) {
       current_node << testcase.second;
       pass = pass + testcase.second.pass.size();
@@ -355,15 +355,15 @@ struct SimpleTestSuites : private std::unordered_map<std::string, SimpleTestSuit
     if (not testsuites.name.empty()) {
       current_node.append_attribute("name") = testsuites.name.c_str();
     }
-    size_t tests = 0;
-    size_t failures = 0;
-    size_t pass = 0;
-    size_t errors = 0;
+    std::size_t tests = 0;
+    std::size_t failures = 0;
+    std::size_t pass = 0;
+    std::size_t errors = 0;
     for (const auto & testsuite : testsuites) {
       SimpleTestSuite suite = testsuite.second;
       current_node << suite;
       const auto testcase_names = suite.getTestcaseNames();
-      for (const auto testcase_name : testcase_names) {
+      for (const auto & testcase_name : testcase_names) {
         failures = failures + suite.testcase(testcase_name).failure.size();
         errors = errors + suite.testcase(testcase_name).error.size();
         pass = pass + suite.testcase(testcase_name).pass.size();

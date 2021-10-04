@@ -481,4 +481,16 @@ void toMsg(
   toMsg(proto.header(), vehicle_command.header);
   toMsg(proto.shift(), vehicle_command.shift);
 }
+
+void toProto(
+  const autoware_perception_msgs::msg::TrafficLightState & traffic_light_state,
+  simulation_api_schema::TrafficLightState & proto)
+{
+  proto.set_id(traffic_light_state.id);
+  for (const autoware_perception_msgs::msg::LampState & ls : traffic_light_state.lamp_states) {
+    simulation_api_schema::TrafficLightState::LampState lamp_state;
+    lamp_state.set_type((simulation_api_schema::TrafficLightState_LampState_State)ls.type);
+    *proto.add_lamp_states() = lamp_state;
+  }
+}
 }  // namespace simulation_interface

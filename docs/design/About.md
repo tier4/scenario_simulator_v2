@@ -31,3 +31,7 @@ If you want to know whole system architecture of this framework, please read [th
 ## TierIV Scenario Format Version 2.0
 
 If you want to know TierIV Scenario format Version 2.0 , which is a default scenario format of this framework, please read [this documentation](TierIVScenarioFormatVersion2.md).
+
+## Vehicle Model
+
+If you want to know about vehicle dynamics model in simulation, please check [this documentation](VehicleDynamics.md).
