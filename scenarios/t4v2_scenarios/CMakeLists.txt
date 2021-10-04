@@ -12,9 +12,13 @@ if(BUILD_TESTING)
   add_t4v2_scenario_test(
     "workflow_example"
     ${PROJECT_NAME}
-    "$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml"
+    "$(find-pkg-share ${PROJECT_NAME})/workflow/workflow_example.yaml"
     "20"
     "300")
 endif()
+
+install(
+  DIRECTORY workflow scenario
+  DESTINATION share/${PROJECT_NAME})
 
 ament_package(CONFIG_EXTRAS "${PROJECT_NAME}-extras.cmake")

@@ -1,0 +1,11 @@
+Scenario:
+  - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/all-in-one.yaml }
+  # - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/simple.xosc }
+  - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/ControllerAction.AssignControllerAction.yaml }
+  - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/Property.isBlind.yaml }
+  # - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/collision.yaml }
+  - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/failure.yaml, expect: failure }
+  # - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/minimal.yaml }
+  - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/stand-still.yaml }
+  # - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/success.yaml, expect: success }
+  # - { path: $(find-pkg-share t4v2_scenarios)/test/scenario/distance-condition.yaml }
