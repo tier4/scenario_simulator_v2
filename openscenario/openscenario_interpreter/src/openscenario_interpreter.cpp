@@ -99,27 +99,42 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
        *  node.
        *
        * -------------------------------------------------------------------- */
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       result = common::junit::Failure(
         "Timeout",
         "The simulation time has exceeded the time specified by the scenario_test_runner.");
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
 
-      std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
+      std::this_thread::sleep_for(std::chrono::seconds(3));  // NOTE: Wait for parameters to be set.
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
 
       GET_PARAMETER(intended_result);
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       GET_PARAMETER(local_frame_rate);
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       GET_PARAMETER(local_real_time_factor);
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       GET_PARAMETER(osc_path);
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       GET_PARAMETER(output_directory);
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
 
       if (getParameter<bool>("record", true)) {
+        std::cout << __FILE__ << "," << __LINE__ << std::endl;
         record::start("-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+        std::cout << __FILE__ << "," << __LINE__ << std::endl;
       }
-
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       script.rebind<OpenScenario>(osc_path);
-
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
+      
       connect(shared_from_this(), makeCurrentConfiguration());
 
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
+
       initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
+
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
 
       return Interpreter::Result::SUCCESS;  // => Inactive
     });
