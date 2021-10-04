@@ -125,9 +125,10 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
         std::cout << __FILE__ << "," << __LINE__ << std::endl;
       }
       std::cout << __FILE__ << "," << __LINE__ << std::endl;
+      std::cout << "osc path : " << osc_path << std::endl;
       script.rebind<OpenScenario>(osc_path);
       std::cout << __FILE__ << "," << __LINE__ << std::endl;
-      
+
       connect(shared_from_this(), makeCurrentConfiguration());
 
       std::cout << __FILE__ << "," << __LINE__ << std::endl;
