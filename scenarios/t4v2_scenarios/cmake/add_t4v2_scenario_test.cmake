@@ -30,6 +30,7 @@ function(add_t4v2_scenario_test testsuite_name package_name workflow global_fram
       "workflow:=${workflow}"
       "global_frame_rate:=${global_frame_rate}"
       "output_directory:=${CMAKE_BINARY_DIR}/test_results/${package_name}"
+      "record:=false"
     )
 
     ament_add_test(

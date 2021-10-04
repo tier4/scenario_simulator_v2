@@ -11,8 +11,8 @@ if(BUILD_TESTING)
   include(cmake/add_t4v2_scenario_test.cmake)
   add_t4v2_scenario_test(
     "workflow_example"
-    ${PROJECT_NAME}
-    "$(find-pkg-share ${PROJECT_NAME})/workflow/workflow_example.yaml"
+    "t4v2_scenarios"
+    "$(find-pkg-share t4v2_scenarios)/workflow/workflow_example.yaml"
     "20"
     "300")
 endif()
