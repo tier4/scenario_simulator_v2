@@ -33,7 +33,7 @@ function(add_t4v2_scenario_test testsuite_name package_name workflow global_fram
     )
 
     ament_add_test(
-      "${package_name}_${scenario}"
+      "${package_name}_${testsuite_name}"
       COMMAND ${cmd}
       OUTPUT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/scenario_test_runner/output.txt"
       RESULT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/scenario_test_runner/result.junit.xml"
