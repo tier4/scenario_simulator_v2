@@ -12,7 +12,7 @@ if(BUILD_TESTING)
   add_t4v2_scenario_test(
     "workflow_example"
     "t4v2_scenarios"
-    "$(find-pkg-share t4v2_scenarios)/workflow/workflow_example.yaml"
+    "${CMAKE_SOURCE_DIR}/workflow/workflow_example.yaml"
     "20"
     "300")
 endif()
