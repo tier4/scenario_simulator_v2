@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/controller_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ControllerAction::ControllerAction(const pugi::xml_node & node, Scope & scope)
+: assign_controller_action(
+    readElement<AssignControllerAction>("AssignControllerAction", node, scope)),
+  override_controller_value_action(readElement<OverrideControllerValueAction>(
+    "OverrideControllerValueAction", node, scope))  // NOTE: DUMMY IMPLEMENTATION
+{
+}
+
 auto ControllerAction::accomplished() noexcept -> bool { return true; }
 
 auto ControllerAction::endsImmediately() noexcept -> bool { return true; }

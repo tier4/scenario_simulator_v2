@@ -13,12 +13,27 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/collision_condition.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+CollisionCondition::CollisionCondition(
+  const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
+// clang-format off
+: Scope(scope),
+  another_given_entity(
+    choice(node,
+      std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope); }),
+      std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
+  triggering_entities(triggering_entities)
+// clang-format on
+{
+}
+
 auto CollisionCondition::description() const -> std::string
 {
   std::stringstream description;

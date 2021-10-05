@@ -12,30 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/syntax/assign_controller_action.hpp>
-#include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/syntax/by_entity_condition.hpp>
+#include <openscenario_interpreter/syntax/triggering_entities.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scope & scope)
-// clang-format off
+ByEntityCondition::ByEntityCondition(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
-  ComplexType(
-    choice(node,
-      std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, localScope()); }),
-      std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
-// clang-format on
+  EntityCondition(readElement<EntityCondition>(
+    "EntityCondition", node, localScope(),
+    readElement<TriggeringEntities>("TriggeringEntities", node, localScope())))
 {
-}
-
-auto AssignControllerAction::operator()() const -> void
-{
-  for (const auto & actor : actors) {
-    applyAssignControllerAction(actor, (*this).as<Controller>());
-  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

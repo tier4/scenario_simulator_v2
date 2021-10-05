@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_ACTION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/assign_controller_action.hpp>
 #include <openscenario_interpreter/syntax/override_controller_value_action.hpp>
-#include <type_traits>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -38,19 +38,13 @@ inline namespace syntax
  * ------------------------------------------------------------------------ */
 struct ControllerAction
 {
-  const AssignControllerAction assign_controller_action;  // Assign a controller to an entity.
+  // Assign a controller to an entity.
+  const AssignControllerAction assign_controller_action;
 
-  const OverrideControllerValueAction override_controller_value_action;
   // Values for throttle, brake, clutch, parking brake, steering wheel or gear.
+  const OverrideControllerValueAction override_controller_value_action;
 
-  template <typename Node, typename Scope>
-  explicit ControllerAction(const Node & node, Scope & outer_scope)
-  : assign_controller_action(
-      readElement<AssignControllerAction>("AssignControllerAction", node, outer_scope)),
-    override_controller_value_action(readElement<OverrideControllerValueAction>(
-      "OverrideControllerValueAction", node, outer_scope))  // NOTE: DUMMY IMPLEMENTATION
-  {
-  }
+  explicit ControllerAction(const pugi::xml_node &, Scope &);
 
   static auto accomplished() noexcept -> bool;
 

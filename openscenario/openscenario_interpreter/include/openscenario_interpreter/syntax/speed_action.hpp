@@ -15,12 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
-#include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/speed_action_target.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
+#include <pugixml.hpp>
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -43,14 +42,7 @@ struct SpeedAction : private Scope
 
   const SpeedActionTarget speed_action_target;
 
-  template <typename Node>
-  explicit SpeedAction(const Node & node, Scope & scope)
-  : Scope(scope),
-    speed_action_dynamics(
-      readElement<TransitionDynamics>("SpeedActionDynamics", node, localScope())),
-    speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, localScope()))
-  {
-  }
+  explicit SpeedAction(const pugi::xml_node &, Scope &);
 
   std::unordered_map<String, Boolean> accomplishments;
 

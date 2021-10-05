@@ -13,12 +13,20 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+SpeedAction::SpeedAction(const pugi::xml_node & node, Scope & scope)
+: Scope(scope),
+  speed_action_dynamics(readElement<TransitionDynamics>("SpeedActionDynamics", node, localScope())),
+  speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, localScope()))
+{
+}
+
 auto SpeedAction::accomplished() -> bool
 {
   return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](const auto & each) {
