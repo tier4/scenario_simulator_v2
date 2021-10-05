@@ -129,11 +129,25 @@ public:
     const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
+  /**
+   * @brief Set the Entity Status object
+   * @param name name of the target entity
+   * @param reference_entity_name name of the entity you want to use as reference
+   * @param relative_pose relative pose from the reference entity
+   * @param action_status action status of the target entity
+   */
   void setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
     const geometry_msgs::msg::Pose & relative_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
+  /**
+   * @brief Get the Entity Status object
+   * @param reference_entity_name name of the entity you want to use as reference
+   * @param relative_pose relative pose from the reference entity
+   * @param action_status action status of the target entity
+   * @return const openscenario_msgs::msg::EntityStatus 
+   */
   auto getEntityStatus(
     const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
@@ -153,6 +167,15 @@ public:
     const geometry_msgs::msg::Vector3 & relative_rpy,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
+  /**
+   * @brief Get the Entity Status object
+   * 
+   * @param reference_entity_name name of the entity you want to use as reference
+   * @param relative_position relative position from the reference entity
+   * @param relative_rpy relative RPY orientation from the reference entity
+   * @param action_status action status of the target entity
+   * @return const openscenario_msgs::msg::EntityStatus 
+   */
   auto getEntityStatus(
     const std::string & reference_entity_name, const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
