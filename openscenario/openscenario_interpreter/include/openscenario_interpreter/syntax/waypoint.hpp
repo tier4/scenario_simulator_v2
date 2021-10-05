@@ -46,14 +46,7 @@ struct Waypoint
   {
   }
 
-  explicit operator openscenario_msgs::msg::LaneletPose() const
-  {
-    auto convert = [](auto && position) {
-      return static_cast<openscenario_msgs::msg::LaneletPose>(position);
-    };
-
-    return apply<openscenario_msgs::msg::LaneletPose>(convert, position);
-  }
+  explicit operator openscenario_msgs::msg::LaneletPose() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
