@@ -120,8 +120,7 @@ void API::setEntityStatus(
   const geometry_msgs::msg::Pose & relative_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  entity_manager_ptr_->setEntityStatus(
-    name, getEntityStatus(name, reference_entity_name, relative_pose, action_status));
+  setEntityStatus(name, getEntityStatus(name, reference_entity_name, relative_pose, action_status));
 }
 
 boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
