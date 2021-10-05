@@ -59,24 +59,27 @@ private:
 
   void onInitialize() override
   {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     api_.spawn(
       false, "ego", getVehicleParameters(),
       traffic_simulator::helper::constructLaneletPose(120545, 0),
       traffic_simulator::helper::constructActionStatus(10));
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     api_.setTargetSpeed("ego", 8, true);
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     api_.spawn(
       false, "bob", getPedestrianParameters(),
       traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(1));
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     api_.requestWalkStraight("bob");
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     api_.requestAssignRoute(
       "ego", std::vector<openscenario_msgs::msg::LaneletPose>{
                traffic_simulator::helper::constructLaneletPose(34675, 0.0),
                traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
   }
-
-private:
-  bool lanechange_executed_;
 };
 
 int main(int argc, char * argv[])

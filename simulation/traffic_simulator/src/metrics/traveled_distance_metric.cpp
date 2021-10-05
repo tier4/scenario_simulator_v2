@@ -29,10 +29,8 @@ void TraveledDistanceMetric::update()
 {
   double step_time = entity_manager_ptr_->getStepTime();
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  if (status) {
-    traveled_distance =
-      traveled_distance + std::fabs(status.get().action_status.twist.linear.x) * step_time;
-  }
+  traveled_distance =
+    traveled_distance + std::fabs(status.action_status.twist.linear.x) * step_time;
 }
 
 nlohmann::json TraveledDistanceMetric::toJson()

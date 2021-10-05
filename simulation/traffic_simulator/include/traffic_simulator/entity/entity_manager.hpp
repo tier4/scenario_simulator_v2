@@ -254,7 +254,7 @@ public:
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntityStatus(const std::string & name) const
-    -> const boost::optional<openscenario_msgs::msg::EntityStatus>;
+    -> const openscenario_msgs::msg::EntityStatus;
 
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, openscenario_msgs::msg::EntityType>;

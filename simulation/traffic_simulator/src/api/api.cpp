@@ -30,6 +30,7 @@ bool API::spawn(
   const openscenario_msgs::msg::VehicleParameters & params,
   const openscenario_msgs::msg::EntityStatus & status)
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (
     is_ego and not entity_manager_ptr_->entityExists(name) and
     not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
@@ -136,11 +137,7 @@ geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
 
 openscenario_msgs::msg::EntityStatus API::getEntityStatus(const std::string & name)
 {
-  auto status = entity_manager_ptr_->getEntityStatus(name);
-  if (!status) {
-    THROW_SEMANTIC_ERROR("entity : ", name, " status is empty");
-  }
-  return status.get();
+  return entity_manager_ptr_->getEntityStatus(name);
 }
 
 auto API::getEntityStatus(
@@ -385,23 +382,18 @@ bool API::updateEntityStatusInSim()
   }
   const auto names = entity_manager_ptr_->getEntityNames();
   for (const auto name : names) {
-    auto status = entity_manager_ptr_->getEntityStatus(name);
-    if (status) {
-      openscenario_msgs::EntityStatus proto;
-      status.get().name = name;
-      simulation_interface::toProto(status.get(), proto);
-      *req.add_status() = proto;
-    }
+    auto status = getEntityStatus(name);
+    openscenario_msgs::EntityStatus proto;
+    status.name = name;
+    simulation_interface::toProto(status, proto);
+    *req.add_status() = proto;
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
   update_entity_status_client_.call(req, res);
   for (const auto status : res.status()) {
-    auto entity_status = entity_manager_ptr_->getEntityStatus(status.name());
-    if (!entity_status) {
-      continue;
-    }
+    auto entity_status = getEntityStatus(status.name());
     openscenario_msgs::msg::EntityStatus status_msg;
-    status_msg = entity_status.get();
+    status_msg = entity_status;
     geometry_msgs::msg::Pose pose;
     simulation_interface::toMsg(status.pose(), pose);
     status_msg.pose = pose;
