@@ -79,3 +79,8 @@ jobs:
         with:
           name: test_results
           path: /home/runner/work/scenario_simulator_v2/scenario_simulator_v2/ros_ws/build/test_results
+      - name: show failure test result
+        if: always()
+        run : |
+          cd /home/runner/work/scenario_simulator_v2/scenario_simulator_v2/ros_ws
+          colcon test-result --verbose
