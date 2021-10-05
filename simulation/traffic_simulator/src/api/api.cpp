@@ -69,12 +69,6 @@ openscenario_msgs::msg::EntityStatus API::getEntityStatus(const std::string & na
   return status.get();
 }
 
-void API::setEntityStatus(
-  const std::string & name, const openscenario_msgs::msg::EntityStatus & status)
-{
-  entity_manager_ptr_->setEntityStatus(name, status);
-}
-
 auto API::getEntityStatus(
   const std::string & name, const std::string & reference_entity_name,
   const geometry_msgs::msg::Point & relative_position,
@@ -191,6 +185,14 @@ void API::setEntityStatus(
   const std::string & name, const geometry_msgs::msg::Pose & map_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
+  setEntityStatus(name, getEntityStatus(name, map_pose, action_status));
+}
+
+auto API::getEntityStatus(
+  const std::string & name, const geometry_msgs::msg::Pose & map_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+  -> const openscenario_msgs::msg::EntityStatus
+{
   const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(map_pose);
   openscenario_msgs::msg::EntityStatus status;
   if (lanelet_pose) {
@@ -203,7 +205,7 @@ void API::setEntityStatus(
   status.action_status = action_status;
   status.time = getCurrentTime();
   status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
-  setEntityStatus(name, status);
+  return status;
 }
 
 bool API::initialize(double realtime_factor, double step_time)

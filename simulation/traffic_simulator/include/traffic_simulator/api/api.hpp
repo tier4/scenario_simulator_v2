@@ -119,14 +119,29 @@ public:
 
   geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
-  void setEntityStatus(
-    const std::string & name, const openscenario_msgs::msg::EntityStatus & status);
+  /**
+   * @brief Set the Entity Status object from map pose
+   * @param name name of the target entity
+   * @param map_pose map pose of the entity status you want to set
+   * @param action_status action status of the entity status you want to set
+   */
   void setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
   /**
-   * @brief Set the Entity Status object
+   * @brief Get the Entity Status object from map pose
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param map_pose map pose of the entity status you want to set
+   * @param action_status action status of the entity status you want to set
+   */
+  auto getEntityStatus(
+    const std::string & name, const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status =
+      traffic_simulator::helper::constructActionStatus())
+    -> const openscenario_msgs::msg::EntityStatus;
+  /**
+   * @brief Set the Entity Status object from map pose
    * @param name name of the target entity
    * @param lanelet_pose lanelet pose of the entity status you want to set
    * @param action_status action status of the entity status you want to set
@@ -137,7 +152,7 @@ public:
       traffic_simulator::helper::constructActionStatus());
   /**
    * @brief Get the Entity Status object
-   * @param name name of the target entity
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
    * @param lanelet_pose lanelet pose of the entity status you want to set
    * @param action_status action status of the entity status you want to set
    * @return const openscenario_msgs::msg::EntityStatus 
@@ -149,7 +164,7 @@ public:
     -> const openscenario_msgs::msg::EntityStatus;
   /**
    * @brief Set the Entity Status object
-   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param name name of the target entity
    * @param reference_entity_name name of the entity you want to use as reference
    * @param relative_pose relative pose from the reference entity
    * @param action_status action status of the target entity
@@ -259,6 +274,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
+  FORWARD_TO_ENTITY_MANAGER(setEntityStatus);
   FORWARD_TO_ENTITY_MANAGER(setTargetSpeed);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrowPhase);
