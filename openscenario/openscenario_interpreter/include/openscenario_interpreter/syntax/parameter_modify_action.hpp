@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/modify_rule.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -37,13 +38,7 @@ struct ParameterModifyAction : Scope
 
   const ModifyRule rule;
 
-  template <typename Node>
-  explicit ParameterModifyAction(const Node & node, Scope & scope, const String & parameter_ref)
-  : Scope(scope),
-    parameter_ref(parameter_ref),
-    rule(readElement<ModifyRule>("Rule", node, localScope()))
-  {
-  }
+  explicit ParameterModifyAction(const pugi::xml_node &, Scope &, const String &);
 
   static auto accomplished() noexcept -> bool;
 

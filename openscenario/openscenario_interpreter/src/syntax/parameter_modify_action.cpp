@@ -18,6 +18,14 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ParameterModifyAction::ParameterModifyAction(
+  const pugi::xml_node & node, Scope & scope, const String & parameter_ref)
+: Scope(scope),
+  parameter_ref(parameter_ref),
+  rule(readElement<ModifyRule>("Rule", node, localScope()))
+{
+}
+
 auto ParameterModifyAction::accomplished() noexcept -> bool { return true; }
 
 auto ParameterModifyAction::run() -> void

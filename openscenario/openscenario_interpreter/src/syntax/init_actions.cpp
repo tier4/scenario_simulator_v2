@@ -12,13 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/syntax/action.hpp>
 #include <openscenario_interpreter/syntax/init_actions.hpp>
+#include <openscenario_interpreter/syntax/private.hpp>
+#include <openscenario_interpreter/syntax/user_defined_action.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
+#include <unordered_map>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
+{
+  std::unordered_map<std::string, std::function<void(const pugi::xml_node & node)>> dispatcher{
+    // clang-format off
+    std::make_pair("GlobalAction",      [&](auto && node) { return push_back(make<GlobalAction>     (node, scope)); }),
+    std::make_pair("UserDefinedAction", [&](auto && node) { return push_back(make<UserDefinedAction>(node, scope)); }),
+    std::make_pair("Private",           [&](auto && node) { return push_back(make<Private>          (node, scope)); })
+    // clang-format on
+  };
+
+  for (const auto & each : node.children()) {
+    const auto iter = dispatcher.find(each.name());
+    if (iter != std::end(dispatcher)) {
+      std::get<1> (*iter)(each);
+    }
+  }
+}
+
 auto InitActions::evaluate() const -> Element
 {
   for (auto && each : *this) {

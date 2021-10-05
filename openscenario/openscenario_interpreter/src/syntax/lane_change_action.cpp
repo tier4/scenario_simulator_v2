@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
 
 namespace openscenario_interpreter

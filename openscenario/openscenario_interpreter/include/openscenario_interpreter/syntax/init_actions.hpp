@@ -16,12 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__INIT_ACTIONS_HPP_
 
 #include <nlohmann/json.hpp>
-#include <openscenario_interpreter/syntax/action.hpp>
-#include <openscenario_interpreter/syntax/private.hpp>
-#include <string>
-#include <unordered_map>
-#include <utility>
-#include <vector>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -29,35 +25,18 @@ inline namespace syntax
 {
 /* ---- InitActions ------------------------------------------------------------
  *
- * <xsd:complexType name="InitActions">
- *   <xsd:sequence>
- *     <xsd:element name="GlobalAction" type="GlobalAction" minOccurs="0" maxOccurs="unbounded"/>
- *     <xsd:element name="UserDefinedAction" type="UserDefinedAction" minOccurs="0" maxOccurs="unbounded"/>
- *     <xsd:element name="Private" minOccurs="0" maxOccurs="unbounded" type="Private"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="InitActions">
+ *    <xsd:sequence>
+ *      <xsd:element name="GlobalAction" type="GlobalAction" minOccurs="0" maxOccurs="unbounded"/>
+ *      <xsd:element name="UserDefinedAction" type="UserDefinedAction" minOccurs="0" maxOccurs="unbounded"/>
+ *      <xsd:element name="Private" minOccurs="0" maxOccurs="unbounded" type="Private"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct InitActions : public Elements
 {
-  template <typename Node, typename Scope>
-  explicit InitActions(const Node & node, Scope & scope)
-  {
-    std::unordered_map<std::string, std::function<void(const Node & node)>> dispatcher{
-      // clang-format off
-      std::make_pair("GlobalAction",      [&](auto && node) { return push_back(make<GlobalAction>     (node, scope)); }),
-      std::make_pair("UserDefinedAction", [&](auto && node) { return push_back(make<UserDefinedAction>(node, scope)); }),
-      std::make_pair("Private",           [&](auto && node) { return push_back(make<Private>          (node, scope)); })
-      // clang-format on
-    };
-
-    for (const auto & each : node.children()) {
-      const auto iter = dispatcher.find(each.name());
-      if (iter != std::end(dispatcher)) {
-        std::get<1> (*iter)(each);
-      }
-    }
-  }
+  explicit InitActions(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 
