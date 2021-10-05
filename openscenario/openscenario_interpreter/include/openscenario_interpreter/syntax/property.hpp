@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTY_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
@@ -69,14 +68,7 @@ struct Property
   {
   }
 
-  explicit operator bool() const
-  {
-    if (value.empty()) {
-      return Boolean();
-    } else {
-      return Boolean(value);
-    }
-  }
+  explicit operator bool() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
