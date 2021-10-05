@@ -125,10 +125,21 @@ public:
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
+  /**
+   * @brief Set the Entity Status object
+   * @param name 
+   * @param lanelet_pose 
+   * @param action_status 
+   */
   void setEntityStatus(
     const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
+  auto getEntityStatus(
+    const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status =
+      traffic_simulator::helper::constructActionStatus())
+    -> const openscenario_msgs::msg::EntityStatus;
   /**
    * @brief Set the Entity Status object
    * @param name name of the target entity
@@ -149,7 +160,8 @@ public:
    * @return const openscenario_msgs::msg::EntityStatus 
    */
   auto getEntityStatus(
-    const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose,
+    const std::string & name, const std::string & reference_entity_name,
+    const geometry_msgs::msg::Pose & relative_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus())
     -> const openscenario_msgs::msg::EntityStatus;
@@ -177,7 +189,8 @@ public:
    * @return const openscenario_msgs::msg::EntityStatus 
    */
   auto getEntityStatus(
-    const std::string & reference_entity_name, const geometry_msgs::msg::Point & relative_position,
+    const std::string & name, const std::string & reference_entity_name,
+    const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus())
