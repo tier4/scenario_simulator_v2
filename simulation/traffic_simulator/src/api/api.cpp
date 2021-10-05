@@ -458,7 +458,7 @@ void API::requestLaneChange(
   entity_manager_ptr_->requestLaneChange(name, direction);
 }
 
-openscenario_msgs::msg::EntityStatus getEntityStatus(
+openscenario_msgs::msg::EntityStatus API::getEntityStatus(
   const std::string &, const openscenario_msgs::msg::EntityStatus & status)
 {
   return status;
