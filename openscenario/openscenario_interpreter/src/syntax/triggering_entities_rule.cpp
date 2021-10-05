@@ -19,7 +19,28 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, TriggeringEntitiesRule & rule)
+static_assert(std::is_standard_layout<TriggeringEntitiesRule>::value, "");
+
+static_assert(std::is_trivial<TriggeringEntitiesRule>::value, "");
+
+auto TriggeringEntitiesRule::description() const -> std::string
+{
+  switch (value) {
+    case all:
+      return "Are all of";
+
+    case any:
+      return "Is any of";
+
+    case none:
+      return "Is none of";
+
+    default:
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(TriggeringEntitiesRule, *this);
+  }
+}
+
+auto operator>>(std::istream & is, TriggeringEntitiesRule & rule) -> std::istream &
 {
   std::string buffer;
 
@@ -40,7 +61,7 @@ std::istream & operator>>(std::istream & is, TriggeringEntitiesRule & rule)
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(TriggeringEntitiesRule, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const TriggeringEntitiesRule & datum)
+auto operator<<(std::ostream & os, const TriggeringEntitiesRule & datum) -> std::ostream &
 {
 #define BOILERPLATE(ID)            \
   case TriggeringEntitiesRule::ID: \
