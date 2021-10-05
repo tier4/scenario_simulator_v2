@@ -15,12 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 
-#include <cassert>
 #include <memory>
-#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
-#include <openscenario_interpreter/utility/circular_check.hpp>
 
 namespace openscenario_interpreter
 {
@@ -56,34 +53,10 @@ public:
     resolve_reference(outer_scope);
   }
 
-  auto evaluate()
-  {
-    for (auto && controller : traffic_signal_controllers) {
-      controller->evaluate();
-    }
-
-    return unspecified;
-  }
+  auto evaluate() -> Element;
 
 private:
-  void resolve_reference(Scope & scope)
-  {
-    for (auto & each : traffic_signal_controllers) {
-      if (!each->reference.empty()) {
-        try {
-          auto & reference = scope.findElement(each->reference).as<TrafficSignalController>();
-          if (each->cycleTime() != reference.cycleTime()) {
-            THROW_SEMANTIC_ERROR(
-              "The cycle time of ", each->name, "(", each->cycleTime(), " sec) and ",
-              each->reference, "(", reference.cycleTime(), " sec) is different");
-          }
-          reference.observers.push_back(each);
-        } catch (std::out_of_range &) {
-          THROW_SYNTAX_ERROR(each->reference, "is not declared in the TrafficSignals.");
-        }
-      }
-    }
-  }
+  auto resolve_reference(Scope &) -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
