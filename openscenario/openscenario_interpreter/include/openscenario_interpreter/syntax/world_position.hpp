@@ -15,11 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__WORLD_POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__WORLD_POSITION_HPP_
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
 
 namespace openscenario_interpreter
@@ -53,35 +52,9 @@ struct WorldPosition
   {
   }
 
-  explicit operator geometry_msgs::msg::Pose() const
-  {
-    geometry_msgs::msg::Vector3 vector;
-    {
-      vector.x = r;
-      vector.y = p;
-      vector.z = h;
-    }
+  explicit operator geometry_msgs::msg::Pose() const;
 
-    geometry_msgs::msg::Point point;
-    {
-      point.x = x;
-      point.y = y;
-      point.z = z;
-    }
-
-    geometry_msgs::msg::Pose pose;
-    {
-      pose.position = point;
-      pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(vector);
-    }
-
-    return pose;
-  }
-
-  explicit operator openscenario_msgs::msg::LaneletPose() const
-  {
-    return toLanePosition(static_cast<geometry_msgs::msg::Pose>(*this));
-  }
+  explicit operator openscenario_msgs::msg::LaneletPose() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
