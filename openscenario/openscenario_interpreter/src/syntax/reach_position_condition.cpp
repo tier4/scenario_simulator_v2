@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/reach_position_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <openscenario_interpreter/utility/print.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
 namespace openscenario_interpreter

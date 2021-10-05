@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/syntax/distance_condition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <openscenario_interpreter/utility/print.hpp>
 #include <sstream>
 
 namespace openscenario_interpreter

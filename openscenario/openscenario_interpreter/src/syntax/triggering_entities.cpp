@@ -12,35 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/syntax/speed_condition.hpp>
+#include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto SpeedCondition::description() const -> String
+auto TriggeringEntities::description() const -> String
 {
   std::stringstream description;
 
-  description << triggering_entities.description() << "'s speed = ";
+  description << triggering_entities_rule.description() << " ";
 
-  print_to(description, results);
-
-  description << " " << compare << " " << value << "?";
+  print_to(description, entity_refs);
 
   return description.str();
-}
-
-auto SpeedCondition::evaluate() -> Element
-{
-  results.clear();
-
-  return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(getEntityStatus(triggering_entity).action_status.twist.linear.x);
-    return compare(results.back(), value);
-  }));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
