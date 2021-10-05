@@ -12,22 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/user_defined_action.hpp>
+#include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto UserDefinedAction::endsImmediately() -> bool { return true; }
-
-auto UserDefinedAction::run() -> void
+auto UserDefinedValueCondition::description() const -> String
 {
-  return apply<void>([](auto && action) { return action.run(); }, *this);
+  std::stringstream description;
+
+  description << "Is the " << name << " (= " << result << ") is " << compare << " " << value << "?";
+
+  return description.str();
 }
 
-auto UserDefinedAction::start() -> void
+auto UserDefinedValueCondition::evaluate() -> Element
 {
-  return apply<void>([](auto && action) { return action.start(); }, *this);
+  return asBoolean(compare(result = evaluateValue(), value));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

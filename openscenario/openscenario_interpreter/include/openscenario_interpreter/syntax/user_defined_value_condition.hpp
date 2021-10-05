@@ -16,8 +16,10 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_VALUE_CONDITION_HPP_
 
 #include <openscenario_interpreter/error.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <regex>
 
 namespace openscenario_interpreter
@@ -46,7 +48,7 @@ struct UserDefinedValueCondition
 
   const Rule compare;
 
-  String last_checked_value;
+  String result;
 
   std::function<std::string()> evaluateValue;
 
@@ -70,17 +72,9 @@ struct UserDefinedValueCondition
     }
   }
 
-  auto evaluate() { return asBoolean(compare(last_checked_value = evaluateValue(), value)); }
+  auto description() const -> String;
 
-  auto description() const -> std::string
-  {
-    std::stringstream description;
-
-    description << "Is the " << name << " (= " << last_checked_value << ") is " << compare << " "
-                << value << "?";
-
-    return description.str();
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
