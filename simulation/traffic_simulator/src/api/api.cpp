@@ -54,77 +54,6 @@ bool API::despawn(const std::string & name)
   return true;
 }
 
-bool API::spawn(
-  const bool is_ego, const std::string & name,
-  const openscenario_msgs::msg::VehicleParameters & params)
-{
-  if (
-    is_ego and not entity_manager_ptr_->entityExists(name) and
-    not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
-      name, configuration, clock_.getStepTime(), params)) {
-    return false;
-  }
-  if (
-    not is_ego and
-    not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::VehicleEntity>(name, params)) {
-    return false;
-  }
-  if (configuration.standalone_mode) {
-    return true;
-  }
-  simulation_api_schema::SpawnVehicleEntityRequest req;
-  simulation_api_schema::SpawnVehicleEntityResponse res;
-  simulation_interface::toProto(params, *req.mutable_parameters());
-  req.mutable_parameters()->set_name(name);
-  req.set_is_ego(is_ego);
-  spawn_vehicle_entity_client_.call(req, res);
-  return res.result().success();
-}
-
-bool API::spawn(
-  const bool is_ego, const std::string & name,
-  const openscenario_msgs::msg::PedestrianParameters & params)
-{
-  if (is_ego) {
-    THROW_SEMANTIC_ERROR("pedestrian should not be ego");
-  }
-  if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::PedestrianEntity>(
-        name, params)) {
-    return false;
-  }
-  if (configuration.standalone_mode) {
-    return true;
-  }
-  simulation_api_schema::SpawnPedestrianEntityRequest req;
-  simulation_api_schema::SpawnPedestrianEntityResponse res;
-  simulation_interface::toProto(params, *req.mutable_parameters());
-  req.mutable_parameters()->set_name(name);
-  spawn_pedestrian_entity_client_.call(req, res);
-  return res.result().success();
-}
-
-bool API::spawn(
-  const bool is_ego, const std::string & name,
-  const openscenario_msgs::msg::MiscObjectParameters & params)
-{
-  if (is_ego) {
-    THROW_SEMANTIC_ERROR("misc object should not be ego");
-  }
-  if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::MiscObjectEntity>(
-        name, params)) {
-    return false;
-  }
-  if (configuration.standalone_mode) {
-    return true;
-  }
-  simulation_api_schema::SpawnMiscObjectEntityRequest req;
-  simulation_api_schema::SpawnMiscObjectEntityResponse res;
-  simulation_interface::toProto(params, *req.mutable_parameters());
-  req.mutable_parameters()->set_name(name);
-  spawn_misc_object_entity_client_.call(req, res);
-  return res.result().success();
-}
-
 geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
 {
   auto status = getEntityStatus(name);
@@ -180,9 +109,6 @@ bool API::setEntityStatus(
 
 boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
 {
-  if (!entity_manager_ptr_->entityStatusSet(from) || !entity_manager_ptr_->entityStatusSet(to)) {
-    return boost::none;
-  }
   geometry_msgs::msg::Pose pose = getRelativePose(from, to);
   if (pose.position.x > 0) {
     return boost::none;
@@ -198,25 +124,21 @@ boost::optional<double> API::getTimeHeadway(const std::string & from, const std:
 bool API::reachPosition(
   const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance)
 {
-  return entity_manager_ptr_->entityStatusSet(name) &&
-         entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
+  return entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
 }
 
 bool API::reachPosition(
   const std::string & name, const openscenario_msgs::msg::LaneletPose & target_pose,
   const double tolerance)
 {
-  return entity_manager_ptr_->entityStatusSet(name) &&
-         entity_manager_ptr_->reachPosition(
-           name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
+  return entity_manager_ptr_->reachPosition(
+    name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
 }
 
 bool API::reachPosition(
   const std::string & name, const std::string & target_name, const double tolerance) const
 {
-  return entity_manager_ptr_->entityStatusSet(name) &&
-         entity_manager_ptr_->entityStatusSet(target_name) &&
-         entity_manager_ptr_->reachPosition(name, target_name, tolerance);
+  return entity_manager_ptr_->reachPosition(name, target_name, tolerance);
 }
 
 bool API::setEntityStatus(
@@ -339,13 +261,8 @@ bool API::updateEntityStatusInSim()
       *req.mutable_vehicle_command());
     const auto ego_status_before_update =
       entity_manager_ptr_->getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName());
-    if (ego_status_before_update) {
-      req.set_ego_entity_status_before_update_is_empty(false);
-      simulation_interface::toProto(
-        ego_status_before_update.get(), *req.mutable_ego_entity_status_before_update());
-    } else {
-      req.set_ego_entity_status_before_update_is_empty(true);
-    }
+    simulation_interface::toProto(
+      ego_status_before_update, *req.mutable_ego_entity_status_before_update());
   }
   const auto names = entity_manager_ptr_->getEntityNames();
   for (const auto name : names) {

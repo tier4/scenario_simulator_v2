@@ -107,18 +107,6 @@ public:
 
   void setVerbose(const bool verbose);
 
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::VehicleParameters & params);
-
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::PedestrianParameters & params);
-
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::MiscObjectParameters & params);
-
   template <typename Parameters, typename... Ts>
   auto spawn(const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
   {
@@ -222,14 +210,6 @@ private:
   bool updateSensorFrame();
   bool updateEntityStatusInSim();
   bool updateTrafficLightsInSim();
-
-  template <typename Parameters>
-  bool spawn(
-    const bool is_ego, const Parameters & parameters,
-    const openscenario_msgs::msg::EntityStatus & status)
-  {
-    return spawn(is_ego, parameters.toXml(), status);
-  }
 
   const Configuration configuration;
 

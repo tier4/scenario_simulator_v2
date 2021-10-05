@@ -76,7 +76,8 @@ public:
     const std::string & name,             //
     const Configuration & configuration,  //
     const double step_time,               //
-    const openscenario_msgs::msg::VehicleParameters & parameters);
+    const openscenario_msgs::msg::VehicleParameters & parameters,
+    const openscenario_msgs::msg::EntityStatus & status);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 

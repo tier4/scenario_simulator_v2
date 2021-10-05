@@ -168,8 +168,9 @@ EgoEntity::EgoEntity(
   const std::string & name,             //
   const Configuration & configuration,  //
   const double step_time,               //
-  const openscenario_msgs::msg::VehicleParameters & parameters)
-: VehicleEntity(name, parameters),
+  const openscenario_msgs::msg::VehicleParameters & parameters,
+  const openscenario_msgs::msg::EntityStatus & status)
+: VehicleEntity(name, parameters, status),
   autoware(makeAutoware(configuration)),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))

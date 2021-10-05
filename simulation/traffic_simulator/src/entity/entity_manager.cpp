@@ -36,15 +36,13 @@ void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
   for (auto it = names.begin(); it != names.end(); it++) {
-    if (entityStatusSet(*it)) {
-      auto status = getEntityStatus(*it);
-      if (status) {
-        geometry_msgs::msg::PoseStamped pose;
-        pose.pose = status->pose;
-        pose.header.stamp = clock_ptr_->now();
-        pose.header.frame_id = *it;
-        broadcastTransform(pose);
-      }
+    auto status = getEntityStatus(*it);
+    if (status) {
+      geometry_msgs::msg::PoseStamped pose;
+      pose.pose = status->pose;
+      pose.header.stamp = clock_ptr_->now();
+      pose.header.frame_id = *it;
+      broadcastTransform(pose);
     }
   }
 }
@@ -72,9 +70,6 @@ void EntityManager::broadcastTransform(
 
 bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
 {
-  if (name0 == name1 or not entityStatusSet(name0) or not entityStatusSet(name1)) {
-    return false;
-  }
   auto status0 = getEntityStatus(name0);
   if (!status0) {
     THROW_SEMANTIC_ERROR("entity : ", name0, " status does not exist.");
@@ -96,11 +91,6 @@ bool EntityManager::despawnEntity(const std::string & name)
 bool EntityManager::entityExists(const std::string & name)
 {
   return entities_.find(name) != std::end(entities_);
-}
-
-bool EntityManager::entityStatusSet(const std::string & name) const
-{
-  return entities_.at(name)->statusSet();
 }
 
 auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::string & to)
@@ -241,10 +231,8 @@ auto EntityManager::getLongitudinalDistance(
   if (!laneMatchingSucceed(to)) {
     return boost::none;
   }
-  if (entityStatusSet(to)) {
-    if (const auto status = getEntityStatus(to)) {
-      return getLongitudinalDistance(from, status->lanelet_pose, max_distance);
-    }
+  if (const auto status = getEntityStatus(to)) {
+    return getLongitudinalDistance(from, status->lanelet_pose, max_distance);
   }
 
   return boost::none;
@@ -257,10 +245,8 @@ auto EntityManager::getLongitudinalDistance(
   if (!laneMatchingSucceed(from)) {
     return boost::none;
   }
-  if (entityStatusSet(from)) {
-    if (const auto status = getEntityStatus(from)) {
-      return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
-    }
+  if (const auto status = getEntityStatus(from)) {
+    return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
   }
 
   return boost::none;
@@ -276,10 +262,8 @@ auto EntityManager::getLongitudinalDistance(
   if (!laneMatchingSucceed(to)) {
     return boost::none;
   }
-  if (entityStatusSet(from)) {
-    if (const auto status = getEntityStatus(from)) {
-      return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
-    }
+  if (const auto status = getEntityStatus(from)) {
+    return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
   }
 
   return boost::none;
@@ -443,9 +427,6 @@ bool EntityManager::isEgo(const std::string & name) const
 bool EntityManager::isInLanelet(
   const std::string & name, const std::int64_t lanelet_id, const double tolerance)
 {
-  if (!entityStatusSet(name)) {
-    return false;
-  }
   double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
   auto status = getEntityStatus(name);
   if (!status) {
@@ -594,10 +575,7 @@ openscenario_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
   }
   entities_[name]->setEntityTypeList(type_list);
   entities_[name]->onUpdate(current_time_, step_time_);
-  if (entities_[name]->statusSet()) {
-    return entities_[name]->getStatus();
-  }
-  THROW_SIMULATION_ERROR("status of entity ", name, "is empty");
+  return entities_[name]->getStatus();
 }
 
 void EntityManager::update(const double current_time, const double step_time)
@@ -621,11 +599,9 @@ void EntityManager::update(const double current_time, const double step_time)
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
   for (const auto & entity_name : entity_names) {
-    if (entities_[entity_name]->statusSet()) {
-      auto status = updateNpcLogic(entity_name, type_list);
-      status.bounding_box = getBoundingBox(entity_name);
-      all_status.emplace(entity_name, status);
-    }
+    auto status = updateNpcLogic(entity_name, type_list);
+    status.bounding_box = getBoundingBox(entity_name);
+    all_status.emplace(entity_name, status);
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     it->second->setOtherStatus(all_status);
