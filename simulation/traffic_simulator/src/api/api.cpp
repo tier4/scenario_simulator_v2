@@ -175,7 +175,10 @@ auto API::getEntityStatus(
 {
   const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
   openscenario_msgs::msg::EntityStatus status;
-  status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
+  if (entity_manager_ptr_->entityExists(name)) {
+    status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
+  }
+  status.name = name;
   status.time = clock_.getCurrentSimulationTime();
   status.pose = pose;
   const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
@@ -252,7 +255,9 @@ auto API::getEntityStatus(
   openscenario_msgs::msg::EntityStatus status;
   status.lanelet_pose = lanelet_pose;
   status.lanelet_pose_valid = true;
-  status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
+  if (entity_manager_ptr_->entityExists(name)) {
+    status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
+  }
   status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
   status.name = name;
   status.time = getCurrentTime();
@@ -279,11 +284,13 @@ auto API::getEntityStatus(
   } else {
     status.lanelet_pose_valid = false;
   }
+  if (entity_manager_ptr_->entityExists(name)) {
+    status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
+  }
   status.pose = map_pose;
   status.name = name;
   status.action_status = action_status;
   status.time = getCurrentTime();
-  status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
   return status;
 }
 
