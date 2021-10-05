@@ -17,8 +17,8 @@
 
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
-#include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
+#include <pugixml.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -50,14 +50,7 @@ struct Controller : public Scope
 
   Properties properties;  // Describing properties for the controller.
 
-  template <typename Node>
-  explicit Controller(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
-    parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
-    properties(readElement<Properties>("Properties", node, localScope()))
-  {
-  }
+  explicit Controller(const pugi::xml_node &, Scope &);
 
   template <typename... Ts>
   auto operator[](Ts &&... xs) -> decltype(auto)

@@ -12,12 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/absolute_target_speed.hpp>
+#include <openscenario_interpreter/syntax/rule.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+AbsoluteTargetSpeed::AbsoluteTargetSpeed(const pugi::xml_node & node, Scope & scope)
+: value(readAttribute<Double>("value", node, scope))
+{
+}
+
 auto AbsoluteTargetSpeed::getIsEnd() const -> std::function<bool(const EntityRef &)>
 {
   return [target_speed = value](const EntityRef & actor) {  // is_end

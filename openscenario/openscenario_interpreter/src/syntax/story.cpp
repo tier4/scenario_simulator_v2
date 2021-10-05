@@ -12,12 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/syntax/act.hpp>
+#include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Story::Story(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope)))
+{
+  callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
+    return make<ParameterDeclarations>(node, localScope());
+  });
+
+  callWithElements(node, "Act", 1, unbounded, [&](auto && node) {
+    return push_back(readStoryboardElement<Act>(node, localScope()));
+  });
+}
+
 auto Story::accomplished() const -> bool
 {
   // NOTE: A Story's goal is accomplished when all its Acts are in the completeState.

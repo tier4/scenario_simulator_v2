@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTY_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -32,13 +33,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Property
 {
-  using Name = String;
+  const String name;
 
-  const Name name;
-
-  using Value = String;
-
-  const Value value;
+  const String value;
 
   /* ---------------------------------------------------------------------------
    *
@@ -61,12 +58,7 @@ struct Property
    * ------------------------------------------------------------------------ */
   Property() = default;
 
-  template <typename Node, typename Scope>
-  explicit Property(const Node & node, Scope & outer_scope)
-  : name(readAttribute<Name>("name", node, outer_scope)),
-    value(readAttribute<Value>("value", node, outer_scope))
-  {
-  }
+  explicit Property(const pugi::xml_node &, Scope &);
 
   explicit operator bool() const;
 };

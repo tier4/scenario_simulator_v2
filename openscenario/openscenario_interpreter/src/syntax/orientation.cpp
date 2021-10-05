@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/orientation.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Orientation::Orientation(const pugi::xml_node & node, Scope & scope)
+: type(readAttribute<ReferenceContext>("type", node, scope, ReferenceContext())),
+  h(readAttribute<Double>("h", node, scope, Double())),
+  p(readAttribute<Double>("p", node, scope, Double())),
+  r(readAttribute<Double>("r", node, scope, Double()))
+{
+}
+
 Orientation::operator geometry_msgs::msg::Vector3() const
 {
   geometry_msgs::msg::Vector3 result{};

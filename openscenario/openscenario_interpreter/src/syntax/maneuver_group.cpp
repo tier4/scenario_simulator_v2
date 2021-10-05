@@ -18,6 +18,22 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  StoryboardElement(
+    readAttribute<UnsignedInteger>("maximumExecutionCount", node, localScope(), UnsignedInteger())),
+  actors(readElement<Actors>("Actors", node, localScope()))
+{
+  callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
+    throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
+    return unspecified;
+  });
+
+  callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
+    return push_back(readStoryboardElement<Maneuver>(node, localScope()));
+  });
+}
+
 auto ManeuverGroup::accomplished() const -> bool
 {
   // A ManeuverGroup's goal is accomplished when all its Maneuvers are in the completeState.

@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -40,16 +41,7 @@ struct ParameterCondition : private Scope
 
   const Rule compare;
 
-  template <typename Node>
-  explicit ParameterCondition(const Node & node, Scope & scope)
-  // clang-format off
-  : Scope(scope),
-    parameter_ref(readAttribute<String>("parameterRef", node, localScope())),
-    value        (readAttribute<String>("value",        node, localScope())),
-    compare      (readAttribute<Rule>  ("rule",         node, localScope()))
-  // clang-format on
-  {
-  }
+  explicit ParameterCondition(const XML &, Scope &);
 
   auto description() const -> String;
 

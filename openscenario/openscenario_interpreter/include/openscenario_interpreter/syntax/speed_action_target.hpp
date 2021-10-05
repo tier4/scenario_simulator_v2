@@ -15,9 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_TARGET_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_TARGET_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/absolute_target_speed.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/relative_target_speed.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,16 +37,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct SpeedActionTarget : public ComplexType
 {
-  template <typename Node, typename... Ts>
-  explicit SpeedActionTarget(const Node & node, Ts &&... xs)
-  // clang-format off
-  : ComplexType(
-      choice(node,
-        std::make_pair("RelativeTargetSpeed", [&](auto && node) { return make<RelativeTargetSpeed>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("AbsoluteTargetSpeed", [&](auto && node) { return make<AbsoluteTargetSpeed>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); })))
-  // clang-format on
-  {
-  }
+  explicit SpeedActionTarget(const pugi::xml_node &, Scope &);
 
   auto getCalculateAbsoluteTargetSpeed() const -> std::function<double()>;
 

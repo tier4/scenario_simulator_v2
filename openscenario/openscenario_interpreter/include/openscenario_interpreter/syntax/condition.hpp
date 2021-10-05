@@ -16,10 +16,12 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_
 
 #include <nlohmann/json.hpp>
-#include <openscenario_interpreter/syntax/by_entity_condition.hpp>
-#include <openscenario_interpreter/syntax/by_value_condition.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
-#include <utility>
+#include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
@@ -48,20 +50,7 @@ struct Condition : public Element
 
   bool current_value;
 
-  template <typename Node, typename Scope>
-  explicit Condition(const Node & node, Scope & scope)
-  // clang-format off
-  : Element(
-      choice(node,
-        std::make_pair("ByEntityCondition", [&](auto && node) { return make<ByEntityCondition>(node, scope); }),
-        std::make_pair( "ByValueCondition", [&](auto && node) { return make< ByValueCondition>(node, scope); }))),
-    name(readAttribute<String>("name", node, scope)),
-    delay(readAttribute<Double>("delay", node, scope, Double())),
-    condition_edge(readAttribute<ConditionEdge>("conditionEdge", node, scope)),
-    current_value(false)
-  // clang-format on
-  {
-  }
+  explicit Condition(const XML & node, Scope & scope);
 
   auto evaluate() -> Element;
 };

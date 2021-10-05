@@ -21,6 +21,7 @@
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -82,31 +83,7 @@ public:
 
   explicit TrafficSignalController(const TrafficSignalController &) = delete;
 
-  template <typename Node>
-  explicit TrafficSignalController(const Node & node, Scope & scope)
-  : name(readAttribute<String>("name", node, scope)),
-    delay(readAttribute<Double>("delay", node, scope, Double::nan())),
-    reference(readAttribute<String>("reference", node, scope, "")),
-    phases(readElements<Phase, 0>("Phase", node, scope)),
-    current_phase(std::begin(phases), std::end(phases), std::end(phases)),
-    change_to_begin_time(boost::none),
-    current_phase_started_at(std::numeric_limits<double>::min())
-  {
-    if (delay < 0) {
-      THROW_SYNTAX_ERROR(
-        "TrafficSignalController ", std::quoted(name), ": delay must not be a negative number");
-    }
-
-    if (not std::isnan(delay) and reference.empty()) {
-      THROW_SYNTAX_ERROR(
-        "TrafficSignalController ", std::quoted(name), ": If delay is set, reference is required");
-    }
-
-    if (not reference.empty() and std::isnan(delay)) {
-      THROW_SYNTAX_ERROR(
-        "TrafficSignalController ", std::quoted(name), ": If reference is set, delay is required");
-    }
-  }
+  explicit TrafficSignalController(const pugi::xml_node &, Scope &);
 
   auto changePhaseTo(const String &) -> Element;
 

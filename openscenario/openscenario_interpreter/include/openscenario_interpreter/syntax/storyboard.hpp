@@ -16,10 +16,10 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_HPP_
 
 #include <nlohmann/json.hpp>
-#include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/init.hpp>
-#include <openscenario_interpreter/syntax/story.hpp>
+#include <openscenario_interpreter/syntax/trigger.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,22 +42,9 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
 
   Trigger stop_trigger;
 
-  template <typename Node>
-  explicit Storyboard(const Node & node, Scope & scope)
-  : Scope(scope.makeChildScope("Storyboard")),
-    init(readElement<Init>("Init", node, localScope())),
-    stop_trigger(readElement<Trigger>("StopTrigger", node, localScope()))
-  {
-    callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Story>(node, localScope()));
-    });
-
-    if (not init.endsImmediately()) {
-      throw SemanticError("Init.Actions should end immediately");
-    }
-  }
-
   bool engaged = false;
+
+  explicit Storyboard(const pugi::xml_node &, Scope &);
 
   /*  */ auto accomplished() const -> bool;
 

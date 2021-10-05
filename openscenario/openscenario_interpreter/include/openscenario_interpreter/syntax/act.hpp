@@ -16,8 +16,10 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACT_HPP_
 
 #include <nlohmann/json.hpp>
-#include <openscenario_interpreter/syntax/maneuver_group.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
+#include <openscenario_interpreter/syntax/trigger.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -41,33 +43,21 @@ struct Act : public Scope, public StoryboardElement<Act>, public Elements
 
   Element stop_trigger;
 
-  template <typename Node>
-  explicit Act(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
-    start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
-  {
-    callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<ManeuverGroup>(node, localScope()));
-    });
-
-    callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
-      return stop_trigger.rebind<Trigger>(node, localScope());
-    });
-  }
+  explicit Act(const pugi::xml_node &, Scope &);
 
   using StoryboardElement::evaluate;
 
-  static constexpr auto start() noexcept -> void {}
+  /*  */ auto accomplished() const -> bool;
 
-  auto accomplished() const -> bool;
+  static auto start() noexcept -> void;
 
-  auto stop() -> void;
+  /*  */ auto stop() -> void;
 
-  auto stopTriggered() const -> bool;
+  /*  */ auto stopTriggered() const -> bool;
 
-  auto ready() -> bool;
+  /*  */ auto ready() -> bool;
 
-  auto run() -> void;
+  /*  */ auto run() -> void;
 };
 
 auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;

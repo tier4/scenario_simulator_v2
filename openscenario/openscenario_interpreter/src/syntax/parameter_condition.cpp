@@ -23,6 +23,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ParameterCondition::ParameterCondition(const XML & node, Scope & scope)
+// clang-format off
+: Scope(scope),
+  parameter_ref(readAttribute<String>("parameterRef", node, localScope())),
+  value        (readAttribute<String>("value",        node, localScope())),
+  compare      (readAttribute<Rule>  ("rule",         node, localScope()))
+// clang-format on
+{
+}
+
 auto ParameterCondition::description() const -> String
 {
   std::stringstream description;

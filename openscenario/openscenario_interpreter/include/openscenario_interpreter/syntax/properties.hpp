@@ -47,7 +47,7 @@ struct Properties
    *  of a scenario.
    *
    * ------------------------------------------------------------------------ */
-  std::unordered_map<Property::Name, Property> properties;
+  std::unordered_map<String, Property> properties;
 
   /* ---- files ----------------------------------------------------------------
    *
@@ -68,7 +68,7 @@ struct Properties
     callWithElements(node, "Property", 0, unbounded, [&](auto && node) {
       return properties.emplace(
         std::piecewise_construct,
-        std::forward_as_tuple(readAttribute<Property::Name>("name", node, outer_scope)),
+        std::forward_as_tuple(readAttribute<String>("name", node, outer_scope)),
         std::forward_as_tuple(node, outer_scope));
     });
 

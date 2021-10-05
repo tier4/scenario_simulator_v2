@@ -13,11 +13,25 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/act.hpp>
+#include <openscenario_interpreter/syntax/maneuver_group.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Act::Act(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
+{
+  callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
+    return push_back(readStoryboardElement<ManeuverGroup>(node, localScope()));
+  });
+
+  callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
+    return stop_trigger.rebind<Trigger>(node, localScope());
+  });
+}
+
 auto Act::accomplished() const -> bool
 {
   return std::all_of(std::begin(*this), std::end(*this), [&](const Element & each) {
@@ -33,6 +47,8 @@ auto Act::run() -> void
     each.evaluate();
   }
 }
+
+auto Act::start() noexcept -> void {}
 
 auto Act::stop() -> void
 {

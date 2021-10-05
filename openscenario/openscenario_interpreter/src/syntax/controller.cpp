@@ -13,11 +13,20 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Controller::Controller(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
+  properties(readElement<Properties>("Properties", node, localScope()))
+{
+}
+
 Controller::operator openscenario_msgs::msg::DriverModel()
 {
   openscenario_msgs::msg::DriverModel controller;

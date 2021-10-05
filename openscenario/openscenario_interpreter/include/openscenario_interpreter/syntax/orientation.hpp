@@ -16,9 +16,10 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ORIENTATION_HPP_
 
 #include <geometry_msgs/msg/vector3.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/reference_context.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,14 +43,7 @@ struct Orientation
 
   Orientation() = default;
 
-  template <typename Node, typename Scope>
-  explicit Orientation(const Node & node, Scope & scope)
-  : type(readAttribute<ReferenceContext>("type", node, scope, ReferenceContext())),
-    h(readAttribute<Double>("h", node, scope, Double())),
-    p(readAttribute<Double>("p", node, scope, Double())),
-    r(readAttribute<Double>("r", node, scope, Double()))
-  {
-  }
+  explicit Orientation(const pugi::xml_node &, Scope &);
 
   operator geometry_msgs::msg::Vector3() const;
 };

@@ -19,6 +19,31 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TrafficSignalController::TrafficSignalController(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope)),
+  delay(readAttribute<Double>("delay", node, scope, Double::nan())),
+  reference(readAttribute<String>("reference", node, scope, "")),
+  phases(readElements<Phase, 0>("Phase", node, scope)),
+  current_phase(std::begin(phases), std::end(phases), std::end(phases)),
+  change_to_begin_time(boost::none),
+  current_phase_started_at(std::numeric_limits<double>::min())
+{
+  if (delay < 0) {
+    THROW_SYNTAX_ERROR(
+      "TrafficSignalController ", std::quoted(name), ": delay must not be a negative number");
+  }
+
+  if (not std::isnan(delay) and reference.empty()) {
+    THROW_SYNTAX_ERROR(
+      "TrafficSignalController ", std::quoted(name), ": If delay is set, reference is required");
+  }
+
+  if (not reference.empty() and std::isnan(delay)) {
+    THROW_SYNTAX_ERROR(
+      "TrafficSignalController ", std::quoted(name), ": If reference is set, delay is required");
+  }
+}
+
 auto TrafficSignalController::changePhaseTo(const String & phase_name) -> Element
 {
   auto iter = std::find_if(std::begin(phases), std::end(phases), [&](const auto & phase) {

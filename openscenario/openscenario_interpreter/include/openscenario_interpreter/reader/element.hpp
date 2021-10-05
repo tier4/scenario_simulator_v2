@@ -21,7 +21,7 @@
 #include <openscenario_interpreter/iterator/size.hpp>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/type_traits/must_be_default_constructible.hpp>
-#include <openscenario_interpreter/utility/pugi_extension.hpp>
+#include <pugixml.hpp>
 #include <string>
 #include <unordered_map>
 #include <utility>

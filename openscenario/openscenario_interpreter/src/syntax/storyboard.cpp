@@ -12,12 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/syntax/story.hpp>
 #include <openscenario_interpreter/syntax/storyboard.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope("Storyboard")),
+  init(readElement<Init>("Init", node, localScope())),
+  stop_trigger(readElement<Trigger>("StopTrigger", node, localScope()))
+{
+  callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
+    return push_back(readStoryboardElement<Story>(node, localScope()));
+  });
+
+  if (not init.endsImmediately()) {
+    throw SemanticError("Init.Actions should end immediately");
+  }
+}
+
 auto Storyboard::accomplished() const -> bool
 {
   return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {

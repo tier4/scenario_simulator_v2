@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/property.hpp>
 
@@ -19,13 +20,12 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Property::operator bool() const
+Property::Property(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope)),  //
+  value(readAttribute<String>("value", node, scope))
 {
-  if (value.empty()) {
-    return Boolean();
-  } else {
-    return Boolean(value);
-  }
 }
+
+Property::operator bool() const { return value.empty() ? Boolean() : Boolean(value); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
