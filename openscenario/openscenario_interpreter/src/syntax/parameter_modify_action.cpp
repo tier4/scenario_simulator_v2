@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/parameter_add_value_rule.hpp>
 #include <openscenario_interpreter/syntax/parameter_modify_action.hpp>
+#include <openscenario_interpreter/syntax/parameter_multiply_by_value_rule.hpp>
 
 namespace openscenario_interpreter
 {

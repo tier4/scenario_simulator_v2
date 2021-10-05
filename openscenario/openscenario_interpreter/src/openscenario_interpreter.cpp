@@ -111,7 +111,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(output_directory);
 
       if (getParameter<bool>("record", true)) {
-        record::start("-a", "-o", File::Path(osc_path).replace_extension("").string());
+        record::start("-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
       }
 
       script.rebind<OpenScenario>(osc_path);

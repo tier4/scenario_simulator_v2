@@ -16,7 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGER_HPP_
 
 #include <nlohmann/json.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/condition_group.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,12 +37,7 @@ struct Trigger : public std::list<ConditionGroup>
 {
   bool current_value;
 
-  template <typename Node, typename Scope>
-  explicit Trigger(const Node & node, Scope & scope) : current_value()
-  {
-    callWithElements(
-      node, "ConditionGroup", 0, unbounded, [&](auto && node) { emplace_back(node, scope); });
-  }
+  explicit Trigger(const pugi::xml_node &, Scope &);
 
   auto evaluate() -> Element;
 };

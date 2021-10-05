@@ -12,27 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/filesystem/operations.hpp>  // boost::filesystem::is_directory
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/file.hpp>
+#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/modify_rule.hpp>
+#include <openscenario_interpreter/syntax/parameter_add_value_rule.hpp>
+#include <openscenario_interpreter/syntax/parameter_multiply_by_value_rule.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-File::File() : filepath("./") {}
-
-File::File(const std::string & filepath) : filepath(filepath) {}
-
-File::File(const pugi::xml_node & node, Scope & scope)
-: filepath(readAttribute<String>("filepath", node, scope))
+ModifyRule::ModifyRule(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: Element(
+    choice(node,
+      std::make_pair("AddValue",        [&](const auto & node) { return make<ParameterAddValueRule       >(node, scope); }),
+      std::make_pair("MultiplyByValue", [&](const auto & node) { return make<ParameterMultiplyByValueRule>(node, scope); })))
+// clang-format on
 {
 }
-
-auto File::isDirectory() const -> bool { return boost::filesystem::is_directory(filepath); }
-
-File::operator boost::filesystem::path() const { return filepath; }
-
-File::operator String() const { return filepath.string(); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

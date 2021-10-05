@@ -14,12 +14,19 @@
 
 #include <iomanip>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/simulation_time_condition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+SimulationTimeCondition::SimulationTimeCondition(const pugi::xml_node & node, Scope & scope)
+: value(readAttribute<Double>("value", node, scope)),
+  compare(readAttribute<Rule>("rule", node, scope))
+{
+}
+
 auto SimulationTimeCondition::description() const -> String
 {
   std::stringstream description;

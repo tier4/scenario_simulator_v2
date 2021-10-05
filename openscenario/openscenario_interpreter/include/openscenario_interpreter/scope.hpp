@@ -15,9 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
+#include <boost/filesystem.hpp>
 #include <memory>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
-#include <openscenario_interpreter/syntax/file.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -73,11 +73,11 @@ class Scope
 
   struct GlobalEnvironment
   {
-    const File::Path pathname;  // for substitution syntax '$(dirname)'
+    const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
     std::unordered_map<std::string, Element> entities;  // ScenarioObject or EntitySelection
 
-    explicit GlobalEnvironment(const File::Path &);
+    explicit GlobalEnvironment(const boost::filesystem::path &);
 
     auto entityRef(const EntityRef &) const -> Element;  // TODO: RETURN ScenarioObject TYPE!
 
@@ -93,7 +93,7 @@ public:
 
   explicit Scope() = delete;
 
-  explicit Scope(const File::Path &);
+  explicit Scope(const boost::filesystem::path &);
 
 private:
   explicit Scope(const Scope &, const std::string &, const std::shared_ptr<EnvironmentFrame> &);

@@ -15,10 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 
+#include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -44,21 +47,13 @@ struct OpenScenario : public Scope
 
   std::size_t frame;
 
-  template <typename... Ts>
-  explicit OpenScenario(Ts &&... xs)
-  : Scope(std::forward<decltype(xs)>(xs)...),
-    file_header(readElement<FileHeader>(
-      "FileHeader", load(global().pathname).child("OpenSCENARIO"), localScope())),
-    category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, localScope())),
-    frame(0)
-  {
-  }
+  explicit OpenScenario(const boost::filesystem::path &);
 
   auto complete() const -> bool;
 
   auto evaluate() -> Element;
 
-  auto load(const File::Path &) -> const pugi::xml_node &;
+  auto load(const boost::filesystem::path &) -> const pugi::xml_node &;
 };
 
 auto operator<<(nlohmann::json &, const OpenScenario &) -> nlohmann::json &;

@@ -176,7 +176,7 @@ auto EnvironmentFrame::lookupUnqualifiedScope(const std::string & name) const
   }
 }
 
-Scope::Scope(const File::Path & pathname)
+Scope::Scope(const boost::filesystem::path & pathname)
 : frame(new EnvironmentFrame()), global_environment(std::make_shared<GlobalEnvironment>(pathname))
 {
 }
@@ -209,7 +209,10 @@ auto Scope::insert(const std::string & name_, const Element & element) -> void
   return frame->insert(name_, element);
 }
 
-Scope::GlobalEnvironment::GlobalEnvironment(const File::Path & pathname) : pathname(pathname) {}
+Scope::GlobalEnvironment::GlobalEnvironment(const boost::filesystem::path & pathname)
+: pathname(pathname)
+{
+}
 
 auto Scope::GlobalEnvironment::entityRef(const EntityRef & entity_ref) const -> Element
 {

@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/parameter_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ParameterAction::ParameterAction(const pugi::xml_node & parent, Scope & scope)
+// clang-format off
+: Element(
+    choice(parent,
+      std::make_pair(   "SetAction", [&](auto && node) { return make<   ParameterSetAction>(node, scope, readAttribute<String>("parameterRef", parent, scope)); }),
+      std::make_pair("ModifyAction", [&](auto && node) { return make<ParameterModifyAction>(node, scope, readAttribute<String>("parameterRef", parent, scope)); })))
+// clang-format on
+{
+}
+
 auto ParameterAction::endsImmediately() -> bool { return true; }
 
 auto ParameterAction::run() -> void

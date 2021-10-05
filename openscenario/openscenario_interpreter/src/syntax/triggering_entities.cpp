@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -19,6 +21,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TriggeringEntities::TriggeringEntities(const pugi::xml_node & node, Scope & scope)
+: triggering_entities_rule(
+    readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)),
+  entity_refs(readElements<EntityRef, 1>("EntityRef", node, scope))
+{
+}
+
 auto TriggeringEntities::description() const -> String
 {
   std::stringstream description;

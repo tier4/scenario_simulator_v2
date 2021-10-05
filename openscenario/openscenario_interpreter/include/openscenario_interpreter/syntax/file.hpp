@@ -16,8 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HPP_
 
 #include <boost/filesystem.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -32,23 +33,17 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct File
 {
-  using Path = boost::filesystem::path;
-
-  const Path filepath;
+  const boost::filesystem::path filepath;
 
   explicit File();
 
   explicit File(const std::string &);
 
-  template <typename Node, typename Scope>
-  explicit File(const Node & node, Scope & scope)
-  : filepath(readAttribute<String>("filepath", node, scope))
-  {
-  }
+  explicit File(const pugi::xml_node &, Scope &);
 
   auto isDirectory() const -> bool;
 
-  operator Path() const;
+  operator boost::filesystem::path() const;
 
   operator String() const;
 };

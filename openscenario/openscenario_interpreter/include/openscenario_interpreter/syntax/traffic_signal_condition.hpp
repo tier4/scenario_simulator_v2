@@ -15,11 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONDITION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/arrow.hpp>
 #include <openscenario_interpreter/syntax/color.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -44,12 +44,7 @@ struct TrafficSignalCondition
 
   const String state;
 
-  template <typename Node>
-  explicit TrafficSignalCondition(const Node & node, Scope & scope)
-  : name(readAttribute<String>("name", node, scope)),
-    state(readAttribute<String>("state", node, scope))
-  {
-  }
+  explicit TrafficSignalCondition(const pugi::xml_node &, Scope &);
 
   Arrow current_arrow;  // for description
 

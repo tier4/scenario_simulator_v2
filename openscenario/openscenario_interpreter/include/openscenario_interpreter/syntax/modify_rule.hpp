@@ -15,10 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__MODIFY_RULE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__MODIFY_RULE_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/parameter_add_value_rule.hpp>
-#include <openscenario_interpreter/syntax/parameter_multiply_by_value_rule.hpp>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -34,18 +32,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ModifyRule : public Element
+struct ModifyRule : public ComplexType
 {
-  template <typename Node, typename... Ts>
-  explicit ModifyRule(const Node & node, Ts &&... xs)
-  // clang-format off
-  : Element(
-      choice(node,
-        std::make_pair("AddValue",        [&](auto && node) { return make<ParameterAddValueRule       >(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("MultiplyByValue", [&](auto && node) { return make<ParameterMultiplyByValueRule>(node, std::forward<decltype(xs)>(xs)...); })))
-  // clang-format on
-  {
-  }
+  explicit ModifyRule(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

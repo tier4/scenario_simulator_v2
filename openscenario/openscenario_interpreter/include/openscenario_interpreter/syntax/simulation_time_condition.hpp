@@ -15,8 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SIMULATION_TIME_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SIMULATION_TIME_CONDITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -36,12 +38,7 @@ struct SimulationTimeCondition
 
   const Rule compare;
 
-  template <typename Node, typename Scope>
-  explicit SimulationTimeCondition(const Node & node, Scope & scope)
-  : value(readAttribute<Double>("value", node, scope)),
-    compare(readAttribute<Rule>("rule", node, scope))
-  {
-  }
+  explicit SimulationTimeCondition(const pugi::xml_node &, Scope &);
 
   Double result;
 
