@@ -12,12 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/axle.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Axle::Axle(const pugi::xml_node & node, Scope & scope)
+: max_steering(readAttribute<Double>("maxSteering", node, scope)),
+  wheel_diameter(readAttribute<Double>("wheelDiameter", node, scope)),
+  track_width(readAttribute<Double>("trackWidth", node, scope)),
+  position_x(readAttribute<Double>("positionX", node, scope)),
+  position_z(readAttribute<Double>("positionZ", node, scope))
+{
+}
+
 Axle::operator openscenario_msgs::msg::Axle() const
 {
   openscenario_msgs::msg::Axle axle;

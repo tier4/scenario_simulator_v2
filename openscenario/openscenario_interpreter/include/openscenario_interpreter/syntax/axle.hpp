@@ -15,8 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__AXLE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__AXLE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_msgs/msg/axle.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -39,17 +41,7 @@ struct Axle
 
   Axle() = default;
 
-  template <typename Node, typename Scope>
-  explicit Axle(const Node & node, Scope & scope)
-  // clang-format off
-  : max_steering  (readAttribute<Double>("maxSteering",   node, scope)),
-    wheel_diameter(readAttribute<Double>("wheelDiameter", node, scope)),
-    track_width   (readAttribute<Double>("trackWidth",    node, scope)),
-    position_x    (readAttribute<Double>("positionX",     node, scope)),
-    position_z    (readAttribute<Double>("positionZ",     node, scope))
-  // clang-format on
-  {
-  }
+  explicit Axle(const pugi::xml_node &, Scope &);
 
   explicit operator openscenario_msgs::msg::Axle() const;
 };

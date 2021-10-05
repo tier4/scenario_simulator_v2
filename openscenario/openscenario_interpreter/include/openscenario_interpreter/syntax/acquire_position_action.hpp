@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,11 +36,7 @@ struct AcquirePositionAction : private Scope
 {
   const Position position;
 
-  template <typename Node>
-  explicit AcquirePositionAction(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope), position(readElement<Position>("Position", node, localScope()))
-  {
-  }
+  explicit AcquirePositionAction(const pugi::xml_node &, Scope &);
 
   static constexpr auto accomplished() -> bool { return true; }
 

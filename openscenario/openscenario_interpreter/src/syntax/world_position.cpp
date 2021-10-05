@@ -15,12 +15,23 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+WorldPosition::WorldPosition(const pugi::xml_node & node, Scope & scope)
+: x(readAttribute<Double>("x", node, scope)),
+  y(readAttribute<Double>("y", node, scope)),
+  z(readAttribute<Double>("z", node, scope, Double())),
+  h(readAttribute<Double>("h", node, scope, Double())),  // yaw
+  p(readAttribute<Double>("p", node, scope, Double())),
+  r(readAttribute<Double>("r", node, scope, Double()))
+{
+}
+
 WorldPosition::operator geometry_msgs::msg::Pose() const
 {
   geometry_msgs::msg::Vector3 vector;

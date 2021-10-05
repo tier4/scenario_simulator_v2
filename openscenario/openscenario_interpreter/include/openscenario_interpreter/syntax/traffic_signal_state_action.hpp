@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -53,12 +54,7 @@ struct TrafficSignalStateAction
    * ------------------------------------------------------------------------ */
   const String state;
 
-  template <typename Node>
-  explicit TrafficSignalStateAction(const Node & node, Scope & current_scope)
-  : name(readAttribute<String>("name", node, current_scope)),
-    state(readAttribute<String>("state", node, current_scope))
-  {
-  }
+  explicit TrafficSignalStateAction(const pugi::xml_node &, Scope &);
 
   static auto accomplished() noexcept -> bool;
 

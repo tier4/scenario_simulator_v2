@@ -20,6 +20,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+AcquirePositionAction::AcquirePositionAction(const pugi::xml_node & node, Scope & scope)
+: Scope(scope), position(readElement<Position>("Position", node, localScope()))
+{
+}
+
 auto AcquirePositionAction::run() -> void
 {
   const auto acquire_position = overload(

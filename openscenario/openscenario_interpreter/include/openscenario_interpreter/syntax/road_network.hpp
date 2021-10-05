@@ -15,8 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ROAD_NETWORK_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ROAD_NETWORK_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
 #include <openscenario_interpreter/syntax/traffic_signals.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -44,13 +46,7 @@ struct RoadNetwork
   // Name references and description of dynamic behavior for traffic signals defined in the road network file.
   TrafficSignals traffic_signals;
 
-  template <typename Node, typename Scope>
-  explicit RoadNetwork(const Node & node, Scope & outer_scope)
-  : logic_file(readElement<File>("LogicFile", node, outer_scope)),
-    scene_graph_file(readElement<File>("SceneGraphFile", node, outer_scope)),
-    traffic_signals(readElement<TrafficSignals>("TrafficSignals", node, outer_scope))
-  {
-  }
+  explicit RoadNetwork(const pugi::xml_node &, Scope &);
 
   auto evaluate() -> Element;
 };

@@ -16,9 +16,10 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__MANEUVER_HPP_
 
 #include <nlohmann/json.hpp>
-#include <openscenario_interpreter/syntax/event.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -39,16 +40,7 @@ struct Maneuver : public Scope, public StoryboardElement<Maneuver>, public Eleme
 {
   const ParameterDeclarations parameter_declarations;
 
-  template <typename Node>
-  explicit Maneuver(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
-    parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope()))
-  {
-    callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Event>(node, localScope()));
-    });
-  }
+  explicit Maneuver(const pugi::xml_node &, Scope &);
 
   using StoryboardElement::evaluate;
 

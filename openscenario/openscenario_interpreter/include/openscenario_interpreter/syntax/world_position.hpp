@@ -17,9 +17,10 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -41,16 +42,7 @@ struct WorldPosition
 {
   const Double x, y, z, h, p, r;
 
-  template <typename Node, typename Scope>
-  explicit WorldPosition(const Node & node, Scope & scope)
-  : x(readAttribute<Double>("x", node, scope)),
-    y(readAttribute<Double>("y", node, scope)),
-    z(readAttribute<Double>("z", node, scope, Double())),
-    h(readAttribute<Double>("h", node, scope, Double())),  // yaw
-    p(readAttribute<Double>("p", node, scope, Double())),
-    r(readAttribute<Double>("r", node, scope, Double()))
-  {
-  }
+  explicit WorldPosition(const pugi::xml_node &, Scope &);
 
   explicit operator geometry_msgs::msg::Pose() const;
 

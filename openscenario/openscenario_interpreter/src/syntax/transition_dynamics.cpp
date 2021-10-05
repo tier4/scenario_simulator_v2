@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/road_network.hpp>
+#include <openscenario_interpreter/syntax/transition_dynamics.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-RoadNetwork::RoadNetwork(const pugi::xml_node & node, Scope & scope)
-: logic_file(readElement<File>("LogicFile", node, scope)),
-  scene_graph_file(readElement<File>("SceneGraphFile", node, scope)),
-  traffic_signals(readElement<TrafficSignals>("TrafficSignals", node, scope))
+TransitionDynamics::TransitionDynamics(const pugi::xml_node & node, Scope & scope)
+: dynamics_shape(readAttribute<DynamicsShape>("dynamicsShape", node, scope)),
+  value(readAttribute<Double>("value", node, scope)),
+  dynamics_dimension(readAttribute<DynamicsDimension>("dynamicsDimension", node, scope))
 {
 }
-
-auto RoadNetwork::evaluate() -> Element { return traffic_signals.evaluate(); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/event.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope()))
+{
+  callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
+    return push_back(readStoryboardElement<Event>(node, localScope()));
+  });
+}
+
 auto Maneuver::accomplished() const -> bool
 {
   // NOTE: A Maneuver's goal is accomplished when all its Events are in the completeState.
