@@ -13,12 +13,23 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
+: Scope(scope),
+  target_lane_offset(readAttribute<Double>("targetLaneOffset", node, localScope(), Double())),
+  lane_change_action_dynamics(
+    readElement<TransitionDynamics>("LaneChangeActionDynamics", node, localScope())),
+  lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, localScope()))
+{
+}
+
 auto LaneChangeAction::accomplished() -> bool
 {
   if (lane_change_target.is<AbsoluteTargetLane>()) {

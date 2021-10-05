@@ -16,7 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CENTER_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -37,13 +38,7 @@ struct Center
 
   Center() = default;
 
-  template <typename Node, typename Scope>
-  explicit Center(const Node & node, Scope & scope)
-  : x(readAttribute<Double>("x", node, scope)),
-    y(readAttribute<Double>("y", node, scope)),
-    z(readAttribute<Double>("z", node, scope))
-  {
-  }
+  explicit Center(const pugi::xml_node &, Scope &);
 
   explicit operator geometry_msgs::msg::Point() const;
 };

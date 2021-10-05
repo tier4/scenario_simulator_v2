@@ -15,12 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/boolean.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/lane_change_target.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
+#include <pugixml.hpp>
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -46,16 +47,7 @@ struct LaneChangeAction : private Scope
 
   const LaneChangeTarget lane_change_target;
 
-  template <typename Node>
-  explicit LaneChangeAction(const Node & node, Scope & scope)
-  // clang-format off
-  : Scope(scope),
-    target_lane_offset         (readAttribute<Double            >("targetLaneOffset",         node, localScope(), Double())),
-    lane_change_action_dynamics(readElement  <TransitionDynamics>("LaneChangeActionDynamics", node, localScope())),
-    lane_change_target         (readElement  <LaneChangeTarget  >("LaneChangeTarget",         node, localScope()))
-  // clang-format on
-  {
-  }
+  explicit LaneChangeAction(const pugi::xml_node &, Scope &);
 
   std::unordered_map<String, Boolean> accomplishments;
 

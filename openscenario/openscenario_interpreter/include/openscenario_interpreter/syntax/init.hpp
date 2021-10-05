@@ -16,7 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__INIT_HPP_
 
 #include <nlohmann/json.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/init_actions.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,11 +37,7 @@ struct Init
 {
   const InitActions actions;
 
-  template <typename Node, typename Scope>
-  explicit Init(const Node & node, Scope & scope)
-  : actions(readElement<InitActions>("Actions", node, scope))
-  {
-  }
+  explicit Init(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 

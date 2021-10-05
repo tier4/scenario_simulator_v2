@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/waypoint.hpp>
+#include <pugixml.hpp>
 #include <vector>
 
 namespace openscenario_interpreter
@@ -43,17 +44,7 @@ struct Route : public Scope
 
   std::list<Waypoint> waypoints;
 
-  template <typename Node>
-  explicit Route(const Node & node, Scope & scope)
-  : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-    closed(readAttribute<Boolean>("closed", node, localScope(), Boolean())),
-    parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope()))
-  {
-    callWithElements(node, "Waypoint", 2, unbounded, [&](auto && node) {
-      return waypoints.emplace_back(node, localScope());
-    });
-  }
+  explicit Route(const pugi::xml_node &, Scope &);
 
   explicit operator std::vector<openscenario_msgs::msg::LaneletPose>() const;
 };

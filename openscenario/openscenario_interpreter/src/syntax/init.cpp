@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/init.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Init::Init(const pugi::xml_node & node, Scope & scope)
+: actions(readElement<InitActions>("Actions", node, scope))
+{
+}
+
 auto Init::endsImmediately() const -> bool { return actions.endsImmediately(); }
 
 auto Init::evaluate() -> Element { return actions.evaluate(); }

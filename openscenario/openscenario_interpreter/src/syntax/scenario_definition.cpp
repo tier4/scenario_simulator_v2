@@ -18,6 +18,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ScenarioDefinition::ScenarioDefinition(const pugi::xml_node & node, Scope & scope)
+: parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, scope)),
+  catalog_locations(readElement<CatalogLocations>("CatalogLocations", node, scope)),
+  road_network(readElement<RoadNetwork>("RoadNetwork", node, scope)),
+  entities(readElement<Entities>("Entities", node, scope)),
+  storyboard(readElement<Storyboard>("Storyboard", node, scope))
+{
+}
+
 auto ScenarioDefinition::complete() -> bool { return storyboard.complete(); }
 
 auto ScenarioDefinition::evaluate() -> Element
@@ -28,14 +37,14 @@ auto ScenarioDefinition::evaluate() -> Element
   return storyboard.current_state;
 }
 
-std::ostream & operator<<(std::ostream & os, const ScenarioDefinition & datum)
+auto operator<<(std::ostream & os, const ScenarioDefinition & datum) -> std::ostream &
 {
   nlohmann::json json;
 
   return os << (json << datum).dump(2);
 }
 
-nlohmann::json & operator<<(nlohmann::json & json, const ScenarioDefinition & datum)
+auto operator<<(nlohmann::json & json, const ScenarioDefinition & datum) -> nlohmann::json &
 {
   json["Storyboard"] << datum.storyboard;
 

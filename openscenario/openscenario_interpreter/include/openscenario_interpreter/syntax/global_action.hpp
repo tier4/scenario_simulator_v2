@@ -18,7 +18,7 @@
 #include <openscenario_interpreter/syntax/entity_action.hpp>
 #include <openscenario_interpreter/syntax/infrastructure_action.hpp>
 #include <openscenario_interpreter/syntax/parameter_action.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -37,21 +37,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct GlobalAction : public Element
+struct GlobalAction : public ComplexType
 {
-  template <typename Node, typename... Ts>
-  explicit GlobalAction(const Node & node, Ts &&... xs)
-  // clang-format off
-  : Element(
-      choice(node,
-        std::make_pair(   "EnvironmentAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(        "EntityAction", [&](auto && node) { return make<        EntityAction>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(     "ParameterAction", [&](auto && node) { return make<     ParameterAction>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("InfrastructureAction", [&](auto && node) { return make<InfrastructureAction>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(       "TrafficAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
-  // clang-format on
-  {
-  }
+  explicit GlobalAction(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 

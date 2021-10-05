@@ -20,6 +20,7 @@
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/road_network.hpp>
 #include <openscenario_interpreter/syntax/storyboard.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -50,16 +51,7 @@ struct ScenarioDefinition
 
   Storyboard storyboard;
 
-  template <typename Node>
-  explicit ScenarioDefinition(const Node & node, Scope & outer_scope)
-  : parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, outer_scope)),
-    catalog_locations(readElement<CatalogLocations>("CatalogLocations", node, outer_scope)),
-    road_network(readElement<RoadNetwork>("RoadNetwork", node, outer_scope)),
-    entities(readElement<Entities>("Entities", node, outer_scope)),
-    storyboard(readElement<Storyboard>("Storyboard", node, outer_scope))
-  {
-  }
+  explicit ScenarioDefinition(const pugi::xml_node &, Scope &);
 
   auto complete() -> bool;
 

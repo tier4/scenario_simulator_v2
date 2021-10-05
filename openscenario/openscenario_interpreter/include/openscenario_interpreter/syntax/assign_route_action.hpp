@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
 
-#include <openscenario_interpreter/syntax/route.hpp>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -36,25 +36,15 @@ struct AssignRouteAction : private Scope
 {
   Element route_or_catalog_reference;
 
-  template <typename Node>
-  explicit AssignRouteAction(const Node & node, Scope & outer_scope)
-  // clang-format off
-  : Scope(outer_scope),
-    route_or_catalog_reference(
-      choice(node,
-        std::make_pair("Route",            [&](auto && node) { return make<Route>(node, localScope()); }),
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
-  // clang-format on
-  {
-  }
+  explicit AssignRouteAction(const pugi::xml_node &, Scope &);
 
-  static constexpr auto accomplished() noexcept { return true; }
+  static auto accomplished() noexcept -> bool;
 
-  static constexpr auto endsImmediately() noexcept { return true; };
+  static auto endsImmediately() noexcept -> bool;
 
-  auto run() -> void;
+  /*  */ auto run() -> void;
 
-  static constexpr auto start() -> void {}
+  static auto start() -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

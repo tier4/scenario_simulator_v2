@@ -15,9 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STAND_STILL_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STAND_STILL_CONDITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,15 +42,7 @@ struct StandStillCondition
 
   std::vector<Double> results;  // for description
 
-  template <typename Node, typename Scope>
-  explicit StandStillCondition(
-    const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-  : duration(readAttribute<Double>("duration", node, scope)),
-    compare(Rule::greaterThan),
-    triggering_entities(triggering_entities),
-    results(triggering_entities.entity_refs.size(), Double::nan())
-  {
-  }
+  explicit StandStillCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
 

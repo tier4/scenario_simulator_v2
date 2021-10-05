@@ -12,12 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Vehicle::Vehicle(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, localScope())),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
+  performance(readElement<Performance>("Performance", node, localScope())),
+  axles(readElement<Axles>("Axles", node, localScope())),
+  properties(readElement<Properties>("Properties", node, localScope()))
+{
+}
+
 Vehicle::operator openscenario_msgs::msg::VehicleParameters() const
 {
   openscenario_msgs::msg::VehicleParameters parameter;

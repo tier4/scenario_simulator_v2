@@ -14,12 +14,28 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/assign_route_action.hpp>
+#include <openscenario_interpreter/syntax/route.hpp>
 #include <vector>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+AssignRouteAction::AssignRouteAction(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: Scope(scope),
+  route_or_catalog_reference(
+    choice(node,
+      std::make_pair("Route",            [&](auto && node) { return make<Route>(node, localScope()); }),
+      std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+// clang-format on
+{
+}
+
+auto AssignRouteAction::accomplished() noexcept -> bool { return true; }
+
+auto AssignRouteAction::endsImmediately() noexcept -> bool { return true; }
+
 auto AssignRouteAction::run() -> void
 {
   for (const auto & actor : actors) {
@@ -28,5 +44,7 @@ auto AssignRouteAction::run() -> void
                route_or_catalog_reference.as<const Route>()));
   }
 }
+
+auto AssignRouteAction::start() -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

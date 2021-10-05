@@ -12,12 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/center.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Center::Center(const pugi::xml_node & node, Scope & scope)
+: x(readAttribute<Double>("x", node, scope)),
+  y(readAttribute<Double>("y", node, scope)),
+  z(readAttribute<Double>("z", node, scope))
+{
+}
+
 Center::operator geometry_msgs::msg::Point() const
 {
   geometry_msgs::msg::Point point;
