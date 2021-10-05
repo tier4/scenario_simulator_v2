@@ -42,10 +42,14 @@ private:
 
   void onInitialize() override
   {
-    api_.spawn(false, "ego", getVehicleParameters(), traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
+    api_.spawn(
+      false, "ego", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("ego", 0, true);
-    api_.spawn(false, "npc1", getVehicleParameters(), traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
+    api_.spawn(
+      false, "npc1", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("npc1", 0, true);
     std::vector<std::string> targets = {"npc1"};

@@ -52,7 +52,9 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(false, "ego", getVehicleParameters(), traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
+    api_.spawn(
+      false, "ego", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(7));
     api_.setTargetSpeed("ego", 7, true);
     const geometry_msgs::msg::Pose goal_pose =

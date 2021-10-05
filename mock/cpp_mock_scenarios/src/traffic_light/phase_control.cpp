@@ -62,7 +62,9 @@ private:
 
   void onInitialize() override
   {
-    api_.spawn(false, "ego", getVehicleParameters(), traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
+    api_.spawn(
+      false, "ego", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(3));
     api_.setTargetSpeed("ego", 3, true);
     std::vector<std::pair<double, traffic_simulator::TrafficLightColor>> phase;
