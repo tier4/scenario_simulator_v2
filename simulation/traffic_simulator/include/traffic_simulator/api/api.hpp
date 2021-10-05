@@ -127,14 +127,21 @@ public:
       traffic_simulator::helper::constructActionStatus());
   /**
    * @brief Set the Entity Status object
-   * @param name 
-   * @param lanelet_pose 
-   * @param action_status 
+   * @param name name of the target entity
+   * @param lanelet_pose lanelet pose of the entity status you want to set
+   * @param action_status action status of the entity status you want to set
    */
   void setEntityStatus(
     const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
+  /**
+   * @brief Get the Entity Status object
+   * @param name name of the target entity
+   * @param lanelet_pose lanelet pose of the entity status you want to set
+   * @param action_status action status of the entity status you want to set
+   * @return const openscenario_msgs::msg::EntityStatus 
+   */
   auto getEntityStatus(
     const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
@@ -142,7 +149,7 @@ public:
     -> const openscenario_msgs::msg::EntityStatus;
   /**
    * @brief Set the Entity Status object
-   * @param name name of the target entity
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
    * @param reference_entity_name name of the entity you want to use as reference
    * @param relative_pose relative pose from the reference entity
    * @param action_status action status of the target entity
@@ -154,6 +161,7 @@ public:
       traffic_simulator::helper::constructActionStatus());
   /**
    * @brief Get the Entity Status object
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
    * @param reference_entity_name name of the entity you want to use as reference
    * @param relative_pose relative pose from the reference entity
    * @param action_status action status of the target entity
@@ -181,7 +189,7 @@ public:
       traffic_simulator::helper::constructActionStatus());
   /**
    * @brief Get the Entity Status object
-   * 
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
    * @param reference_entity_name name of the entity you want to use as reference
    * @param relative_position relative position from the reference entity
    * @param relative_rpy relative RPY orientation from the reference entity
