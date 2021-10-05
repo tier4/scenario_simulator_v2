@@ -25,12 +25,11 @@
 
 namespace traffic_simulator
 {
-bool API::spawn(
+bool API::spawnEntity(
   const bool is_ego, const std::string & name,
   const openscenario_msgs::msg::VehicleParameters & params,
   const openscenario_msgs::msg::EntityStatus & status)
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (
     is_ego and not entity_manager_ptr_->entityExists(name) and
     not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
@@ -54,7 +53,7 @@ bool API::spawn(
   return res.result().success();
 }
 
-bool API::spawn(
+bool API::spawnEntity(
   const bool is_ego, const std::string & name,
   const openscenario_msgs::msg::PedestrianParameters & params,
   const openscenario_msgs::msg::EntityStatus & status)
@@ -77,7 +76,7 @@ bool API::spawn(
   return res.result().success();
 }
 
-bool API::spawn(
+bool API::spawnEntity(
   const bool is_ego, const std::string & name,
   const openscenario_msgs::msg::MiscObjectParameters & params,
   const openscenario_msgs::msg::EntityStatus & status)

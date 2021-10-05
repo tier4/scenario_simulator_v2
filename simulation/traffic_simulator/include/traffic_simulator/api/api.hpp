@@ -107,25 +107,10 @@ public:
 
   void setVerbose(const bool verbose);
 
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::VehicleParameters & params,
-    const openscenario_msgs::msg::EntityStatus & stats);
-
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::PedestrianParameters & params,
-    const openscenario_msgs::msg::EntityStatus & stats);
-
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::MiscObjectParameters & params,
-    const openscenario_msgs::msg::EntityStatus & stats);
-
   template <typename Parameters, typename... Ts>
   bool spawn(const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
   {
-    return spawn(is_ego, name, params, getEntityStatus(name, std::forward<decltype(xs)>(xs)...));
+    return spawnEntity(is_ego, name, params, getEntityStatus(name, std::forward<decltype(xs)>(xs)...));
   }
 
   bool despawn(const std::string & name);
@@ -306,6 +291,21 @@ public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
 private:
+  bool spawnEntity(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::VehicleParameters & params,
+    const openscenario_msgs::msg::EntityStatus & stats);
+
+  bool spawnEntity(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::PedestrianParameters & params,
+    const openscenario_msgs::msg::EntityStatus & stats);
+
+  bool spawnEntity(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::MiscObjectParameters & params,
+    const openscenario_msgs::msg::EntityStatus & stats);
+
   bool updateSensorFrame();
   bool updateEntityStatusInSim();
   bool updateTrafficLightsInSim();
