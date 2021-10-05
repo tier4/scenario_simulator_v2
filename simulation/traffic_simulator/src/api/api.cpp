@@ -69,28 +69,38 @@ openscenario_msgs::msg::EntityStatus API::getEntityStatus(const std::string & na
   return status.get();
 }
 
-bool API::setEntityStatus(
+void API::setEntityStatus(
   const std::string & name, const openscenario_msgs::msg::EntityStatus & status)
 {
-  return entity_manager_ptr_->setEntityStatus(name, status);
+  entity_manager_ptr_->setEntityStatus(name, status);
 }
 
-bool API::setEntityStatus(
+auto API::getEntityStatus(
+  const std::string & reference_entity_name, const geometry_msgs::msg::Point & relative_position,
+  const geometry_msgs::msg::Vector3 & relative_rpy,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+  -> const openscenario_msgs::msg::EntityStatus
+{
+  geometry_msgs::msg::Pose relative_pose;
+  relative_pose.position = relative_position;
+  relative_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(relative_rpy);
+  return getEntityStatus(reference_entity_name, relative_pose, action_status);
+}
+
+void API::setEntityStatus(
   const std::string & name, const std::string & reference_entity_name,
   const geometry_msgs::msg::Point & relative_position,
   const geometry_msgs::msg::Vector3 & relative_rpy,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  geometry_msgs::msg::Pose relative_pose;
-  relative_pose.position = relative_position;
-  relative_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(relative_rpy);
-  return setEntityStatus(name, reference_entity_name, relative_pose, action_status);
+  setEntityStatus(
+    name, getEntityStatus(reference_entity_name, relative_position, relative_rpy, action_status));
 }
 
-bool API::setEntityStatus(
-  const std::string & name, const std::string & reference_entity_name,
-  const geometry_msgs::msg::Pose & relative_pose,
+auto API::getEntityStatus(
+  const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
+  -> const openscenario_msgs::msg::EntityStatus
 {
   const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
   openscenario_msgs::msg::EntityStatus status;
@@ -104,7 +114,16 @@ bool API::setEntityStatus(
   } else {
     status.lanelet_pose_valid = false;
   }
-  return entity_manager_ptr_->setEntityStatus(name, status);
+  return status;
+}
+
+void API::setEntityStatus(
+  const std::string & name, const std::string & reference_entity_name,
+  const geometry_msgs::msg::Pose & relative_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  entity_manager_ptr_->setEntityStatus(
+    name, getEntityStatus(reference_entity_name, relative_pose, action_status));
 }
 
 boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
@@ -141,7 +160,7 @@ bool API::reachPosition(
   return entity_manager_ptr_->reachPosition(name, target_name, tolerance);
 }
 
-bool API::setEntityStatus(
+void API::setEntityStatus(
   const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
@@ -153,10 +172,10 @@ bool API::setEntityStatus(
   status.name = name;
   status.time = getCurrentTime();
   status.action_status = action_status;
-  return setEntityStatus(name, status);
+  setEntityStatus(name, status);
 }
 
-bool API::setEntityStatus(
+void API::setEntityStatus(
   const std::string & name, const geometry_msgs::msg::Pose & map_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
@@ -172,7 +191,7 @@ bool API::setEntityStatus(
   status.action_status = action_status;
   status.time = getCurrentTime();
   status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
-  return setEntityStatus(name, status);
+  setEntityStatus(name, status);
 }
 
 bool API::initialize(double realtime_factor, double step_time)

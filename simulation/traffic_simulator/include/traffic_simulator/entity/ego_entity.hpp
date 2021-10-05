@@ -118,7 +118,7 @@ public:
 
   void requestLaneChange(const std::int64_t) override;
 
-  auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool override;
+  void setStatus(const openscenario_msgs::msg::EntityStatus & status);
 
   void setTargetSpeed(double, bool) override;
 };

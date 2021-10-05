@@ -415,10 +415,8 @@ void EgoEntity::requestLaneChange(const std::int64_t)
     "everything but their destination");
 }
 
-bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
+void EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus &)
 {
-  const bool success = VehicleEntity::setStatus(status);  // NOTE: setStatus always succeeds.
-
   const auto current_pose = getStatus().pose;
 
   if (autoware->initialized()) {
@@ -435,8 +433,6 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   if (!initial_pose_) {
     initial_pose_ = current_pose;
   }
-
-  return success;
 }
 
 void EgoEntity::setTargetSpeed(double value, bool)

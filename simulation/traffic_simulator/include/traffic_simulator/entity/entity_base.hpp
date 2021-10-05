@@ -108,7 +108,7 @@ public:
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status);
 
-  virtual auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool;
+  virtual void setStatus(const openscenario_msgs::msg::EntityStatus & status);
 
   virtual void setTargetSpeed(double target_speed, bool continuous) = 0;
 

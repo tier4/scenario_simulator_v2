@@ -541,7 +541,7 @@ void EntityManager::setTargetSpeed(const std::string & name, double target_speed
   return entities_.at(name)->setTargetSpeed(target_speed, continuous);
 }
 
-bool EntityManager::setEntityStatus(
+void EntityManager::setEntityStatus(
   const std::string & name, openscenario_msgs::msg::EntityStatus status)
 {
   status.name = name;  // XXX UGLY CODE
@@ -549,7 +549,7 @@ bool EntityManager::setEntityStatus(
     THROW_SEMANTIC_ERROR(
       "You cannot set entity status to the ego vehicle name:", name, " after starting scenario.");
   }
-  return entities_.at(name)->setStatus(status);
+  entities_.at(name)->setStatus(status);
 }
 
 void EntityManager::setVerbose(const bool verbose)

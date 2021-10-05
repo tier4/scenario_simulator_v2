@@ -315,7 +315,7 @@ public:
 
   void requestLaneChange(const std::string & name, const Direction & direction);
 
-  bool setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
+  void setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
 
   void setVerbose(const bool verbose);
 

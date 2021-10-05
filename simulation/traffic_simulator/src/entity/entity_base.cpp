@@ -77,11 +77,10 @@ void EntityBase::setOtherStatus(
 
 const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const { return this->status_; }
 
-bool EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)
+void EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
   status_ = status;
   status_.name = name;
-  return true;
 }
 
 void EntityBase::stopAtEndOfRoad()
