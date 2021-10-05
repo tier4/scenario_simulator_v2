@@ -12,7 +12,7 @@ on:
       - master
 
 jobs:
-  job1:
+  generate:
     name: Generate Documentation
     runs-on: ubuntu-18.04
     steps:
@@ -35,7 +35,6 @@ jobs:
           cp -rf . ~/doxybook2
           cd ~/doxybook2
           unzip doxybook2-linux-amd64-v1.2.3.zip
-
       # generating traffic_simulator package documentation
       - name: Generate doxygen for traffic_simulator package
         run: |
@@ -47,7 +46,6 @@ jobs:
           cd docs/package/traffic_simulator
           mkdir -p ./markdown/Classes
           doxybook2 --input ./build/ --output ./markdown -c config.json
-
       # generating simple_sensor_simulator package documentation
       - name: Generate doxygen for simple_sensor_simulator package
         run: |
@@ -59,7 +57,6 @@ jobs:
           cd docs/package/simple_sensor_simulator
           mkdir -p ./markdown/Classes
           doxybook2 --input ./build/ --output ./markdown -c config.json
-
       # generating simulation_interface package documentation
       - name: Generate doxygen for simulation_interface package
         run: |
@@ -71,7 +68,6 @@ jobs:
           cd docs/package/simulation_interface
           mkdir -p ./markdown/Classes
           doxybook2 --input ./build/ --output ./markdown -c config.json
-
       # generating openscenario_interpreter package documentation
       - name: Generate doxygen for openscenario_interpreter package
         run: |
@@ -83,7 +79,6 @@ jobs:
           cd docs/package/openscenario_interpreter
           mkdir -p ./markdown/Classes
           doxybook2 --input ./build/ --output ./markdown -c config.json
-
       # generating openscenario_visualization package documentation
       - name: Generate doxygen for openscenario_visualization package
         run: |
@@ -95,7 +90,6 @@ jobs:
           cd docs/package/openscenario_visualization
           mkdir -p ./markdown/Classes
           doxybook2 --input ./build/ --output ./markdown -c config.json
-
       - name: Generate documentation
         run: mkdocs build
       - name: "Upload Artifact"
@@ -108,6 +102,7 @@ jobs:
         if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          personal_token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
           publish_dir: site
           keep_files: false
+          external_repository: tier4/scenario_simulator_v2-docs
