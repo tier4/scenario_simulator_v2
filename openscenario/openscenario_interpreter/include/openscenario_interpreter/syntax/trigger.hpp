@@ -17,7 +17,6 @@
 
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/condition_group.hpp>
-#include <vector>
 
 namespace openscenario_interpreter
 {
@@ -43,28 +42,10 @@ struct Trigger : public std::list<ConditionGroup>
       node, "ConditionGroup", 0, unbounded, [&](auto && node) { emplace_back(node, scope); });
   }
 
-  auto evaluate()
-  {
-    /* -------------------------------------------------------------------------
-     *
-     *  A trigger is then defined as an association of condition groups. A
-     *  trigger evaluates to true if at least one of the associated condition
-     *  groups evaluates to true, otherwise it evaluates to false (OR
-     *  operation).
-     *
-     * ---------------------------------------------------------------------- */
-    // NOTE: Don't use std::any_of; Intentionally does not short-circuit evaluation.
-    return asBoolean(
-      current_value = std::accumulate(
-        std::begin(*this), std::end(*this), false,
-        [&](auto && lhs, ConditionGroup & condition_group) {
-          const auto rhs = condition_group.evaluate();
-          return lhs or rhs.as<Boolean>();
-        }));
-  }
+  auto evaluate() -> Element;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Trigger &);
+auto operator<<(nlohmann::json &, const Trigger &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

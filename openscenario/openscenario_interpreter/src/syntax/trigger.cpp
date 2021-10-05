@@ -18,7 +18,27 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Trigger & datum)
+auto Trigger::evaluate() -> Element
+{
+  /* -------------------------------------------------------------------------
+   *
+   *  A trigger is then defined as an association of condition groups. A
+   *  trigger evaluates to true if at least one of the associated condition
+   *  groups evaluates to true, otherwise it evaluates to false (OR
+   *  operation).
+   *
+   * ---------------------------------------------------------------------- */
+  // NOTE: Don't use std::any_of; Intentionally does not short-circuit evaluation.
+  return asBoolean(
+    current_value = std::accumulate(
+      std::begin(*this), std::end(*this), false,
+      [&](auto && lhs, ConditionGroup & condition_group) {
+        const auto rhs = condition_group.evaluate();
+        return lhs or rhs.as<Boolean>();
+      }));
+}
+
+auto operator<<(nlohmann::json & json, const Trigger & datum) -> nlohmann::json &
 {
   json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));
 
