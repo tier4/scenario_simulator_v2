@@ -113,6 +113,21 @@ public:
     return spawn(is_ego, name, params, getEntityStatus(name, std::forward<decltype(xs)>(xs)...));
   }
 
+  bool spawn(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::VehicleParameters & params,
+    const openscenario_msgs::msg::EntityStatus & stats);
+
+  bool spawn(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::PedestrianParameters & params,
+    const openscenario_msgs::msg::EntityStatus & stats);
+
+  bool spawn(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::MiscObjectParameters & params,
+    const openscenario_msgs::msg::EntityStatus & stats);
+
   bool despawn(const std::string & name);
 
   openscenario_msgs::msg::EntityStatus getEntityStatus(const std::string & name);
@@ -294,6 +309,9 @@ private:
   bool updateSensorFrame();
   bool updateEntityStatusInSim();
   bool updateTrafficLightsInSim();
+
+  openscenario_msgs::msg::EntityStatus getEntityStatus(
+    const std::string & name, const openscenario_msgs::msg::EntityStatus & status);
 
   const Configuration configuration;
 

@@ -25,6 +25,80 @@
 
 namespace traffic_simulator
 {
+bool API::spawn(
+  const bool is_ego, const std::string & name,
+  const openscenario_msgs::msg::VehicleParameters & params,
+  const openscenario_msgs::msg::EntityStatus & status)
+{
+  if (
+    is_ego and not entity_manager_ptr_->entityExists(name) and
+    not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
+      name, configuration, clock_.getStepTime(), params, status)) {
+    return false;
+  }
+  if (
+    not is_ego and not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::VehicleEntity>(
+                     name, params, status)) {
+    return false;
+  }
+  if (configuration.standalone_mode) {
+    return true;
+  }
+  simulation_api_schema::SpawnVehicleEntityRequest req;
+  simulation_api_schema::SpawnVehicleEntityResponse res;
+  simulation_interface::toProto(params, *req.mutable_parameters());
+  req.mutable_parameters()->set_name(name);
+  req.set_is_ego(is_ego);
+  spawn_vehicle_entity_client_.call(req, res);
+  return res.result().success();
+}
+
+bool API::spawn(
+  const bool is_ego, const std::string & name,
+  const openscenario_msgs::msg::PedestrianParameters & params,
+  const openscenario_msgs::msg::EntityStatus & status)
+{
+  if (is_ego) {
+    THROW_SEMANTIC_ERROR("pedestrian should not be ego");
+  }
+  if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::PedestrianEntity>(
+        name, params, status)) {
+    return false;
+  }
+  if (configuration.standalone_mode) {
+    return true;
+  }
+  simulation_api_schema::SpawnPedestrianEntityRequest req;
+  simulation_api_schema::SpawnPedestrianEntityResponse res;
+  simulation_interface::toProto(params, *req.mutable_parameters());
+  req.mutable_parameters()->set_name(name);
+  spawn_pedestrian_entity_client_.call(req, res);
+  return res.result().success();
+}
+
+bool API::spawn(
+  const bool is_ego, const std::string & name,
+  const openscenario_msgs::msg::MiscObjectParameters & params,
+  const openscenario_msgs::msg::EntityStatus & status)
+{
+  if (is_ego) {
+    THROW_SEMANTIC_ERROR("misc object should not be ego");
+  }
+  if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::MiscObjectEntity>(
+        name, params, status)) {
+    return false;
+  }
+  if (configuration.standalone_mode) {
+    return true;
+  }
+  simulation_api_schema::SpawnMiscObjectEntityRequest req;
+  simulation_api_schema::SpawnMiscObjectEntityResponse res;
+  simulation_interface::toProto(params, *req.mutable_parameters());
+  req.mutable_parameters()->set_name(name);
+  spawn_misc_object_entity_client_.call(req, res);
+  return res.result().success();
+}
+
 metrics::MetricLifecycle API::getMetricLifecycle(const std::string & name)
 {
   return metrics_manager_.getLifecycle(name);
@@ -382,6 +456,12 @@ void API::requestLaneChange(
   const std::string & name, const traffic_simulator::entity::Direction & direction)
 {
   entity_manager_ptr_->requestLaneChange(name, direction);
+}
+
+openscenario_msgs::msg::EntityStatus getEntityStatus(
+  const std::string &, const openscenario_msgs::msg::EntityStatus & status)
+{
+  return status;
 }
 
 }  // namespace traffic_simulator
