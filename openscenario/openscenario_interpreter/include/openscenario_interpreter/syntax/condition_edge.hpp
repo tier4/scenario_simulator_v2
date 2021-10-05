@@ -46,7 +46,6 @@ inline namespace syntax
 struct ConditionEdge
 {
   enum value_type {
-
     /* ---- NOTE ---------------------------------------------------------------
      *
      *  A condition defined with a 'none' edge shall return true at discrete

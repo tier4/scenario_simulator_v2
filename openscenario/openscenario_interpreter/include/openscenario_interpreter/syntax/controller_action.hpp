@@ -52,13 +52,13 @@ struct ControllerAction
   {
   }
 
-  static auto accomplished() noexcept { return true; }
+  static auto accomplished() noexcept -> bool;
 
-  static auto endsImmediately() noexcept { return true; };
+  static auto endsImmediately() noexcept -> bool;
 
-  auto run() const -> void;
+  /*  */ auto run() const -> void;
 
-  static auto start() noexcept {}
+  static auto start() noexcept -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

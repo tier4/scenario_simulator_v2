@@ -19,7 +19,34 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Private & datum)
+auto Private::endsImmediately() const -> bool
+{
+  return std::all_of(
+    private_actions.begin(), private_actions.end(),
+    [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
+}
+
+auto Private::evaluate() -> Element
+{
+  for (auto && private_action : private_actions) {
+    // NOTE: standbyState -> startTransition (if ready)
+    // private_action.ready();
+
+    // NOTE: startTransition -> runningState (unconditionally)
+    private_action.start();
+
+    // NOTE: runningState -> endTransition (if accomplished)
+    do {
+      private_action.run();
+    } while (not private_action.accomplished());
+
+    // NOTE: endTransition -> completeState (Init.Actions only once executed)
+  }
+
+  return unspecified;
+}
+
+auto operator<<(nlohmann::json & json, const Private & datum) -> nlohmann::json &
 {
   json["entityRef"] = datum.entity_ref;
 

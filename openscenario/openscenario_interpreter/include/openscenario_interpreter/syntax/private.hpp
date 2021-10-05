@@ -50,35 +50,12 @@ struct Private : public Scope
     });
   }
 
-  auto evaluate()
-  {
-    for (auto && private_action : private_actions) {
-      // NOTE: standbyState -> startTransition (if ready)
-      // private_action.ready();
+  auto endsImmediately() const -> bool;
 
-      // NOTE: startTransition -> runningState (unconditionally)
-      private_action.start();
-
-      // NOTE: runningState -> endTransition (if accomplished)
-      do {
-        private_action.run();
-      } while (not private_action.accomplished());
-
-      // NOTE: endTransition -> completeState (Init.Actions only once executed)
-    }
-
-    return unspecified;
-  }
-
-  bool endsImmediately() const
-  {
-    return std::all_of(
-      private_actions.begin(), private_actions.end(),
-      [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
-  }
+  auto evaluate() -> Element;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Private &);
+auto operator<<(nlohmann::json &, const Private &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

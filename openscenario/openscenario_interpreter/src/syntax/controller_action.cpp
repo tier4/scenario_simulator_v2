@@ -18,6 +18,12 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+auto ControllerAction::accomplished() noexcept -> bool { return true; }
+
+auto ControllerAction::endsImmediately() noexcept -> bool { return true; }
+
 auto ControllerAction::run() const -> void { assign_controller_action(); }
+
+auto ControllerAction::start() noexcept -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
