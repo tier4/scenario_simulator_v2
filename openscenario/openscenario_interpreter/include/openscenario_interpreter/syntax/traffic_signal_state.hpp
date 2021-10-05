@@ -15,10 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>  // for setTrafficSignal(Color|Arrow)
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/arrow.hpp>
-#include <openscenario_interpreter/syntax/color.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
@@ -63,30 +60,9 @@ struct TrafficSignalState
   {
   }
 
-  auto id() const { return boost::lexical_cast<LaneletId>(traffic_signal_id); }
+  auto evaluate() const -> Element;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  `state: none` is valid for both Arrow / Color. That is, `state: none`
-   *  changes both the arrow signal and the color signal to unlit at once.
-   *
-   * ------------------------------------------------------------------------ */
-  auto evaluate() const
-  {
-    const auto color = boost::lexical_cast<boost::optional<Color>>(state);
-    if (color.has_value()) {
-      setTrafficSignalColor(id(), color.value());
-      return unspecified;
-    }
-
-    const auto arrow = boost::lexical_cast<boost::optional<Arrow>>(state);
-    if (arrow.has_value()) {
-      setTrafficSignalArrow(id(), arrow.value());
-      return unspecified;
-    }
-
-    throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
-  }
+  auto id() const -> LaneletId;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

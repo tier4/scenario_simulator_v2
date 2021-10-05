@@ -180,13 +180,9 @@ struct StoryboardElementState
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<StoryboardElementState>::value, "");
+auto operator>>(std::istream &, StoryboardElementState &) -> std::istream &;
 
-static_assert(std::is_trivial<StoryboardElementState>::value, "");
-
-std::istream & operator>>(std::istream &, StoryboardElementState &);
-
-std::ostream & operator<<(std::ostream &, const StoryboardElementState &);
+auto operator<<(std::ostream &, const StoryboardElementState &) -> std::ostream &;
 
 // clang-format off
 extern const Element start_transition;

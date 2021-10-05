@@ -15,37 +15,39 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/arrow.hpp>
 #include <openscenario_interpreter/syntax/color.hpp>
-#include <openscenario_interpreter/syntax/traffic_signal_condition.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto TrafficSignalCondition::description() const -> String
+auto TrafficSignalState::evaluate() const -> Element
 {
-  std::stringstream description;
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  `state: none` is valid for both Arrow / Color. That is, `state: none`
+   *  changes both the arrow signal and the color signal to unlit at once.
+   *
+   * ------------------------------------------------------------------------ */
 
-  description << "Is TrafficSignal " << std::quoted(name) << " (Arrow = " << current_arrow
-              << ", Color = " << current_color << ") in state " << std::quoted(state) << "?";
+  const auto color = boost::lexical_cast<boost::optional<Color>>(state);
+  if (color.has_value()) {
+    setTrafficSignalColor(id(), color.value());
+    return unspecified;
+  }
 
-  return description.str();
+  const auto arrow = boost::lexical_cast<boost::optional<Arrow>>(state);
+  if (arrow.has_value()) {
+    setTrafficSignalArrow(id(), arrow.value());
+    return unspecified;
+  }
+
+  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
 }
 
-auto TrafficSignalCondition::evaluate() -> Element
+auto TrafficSignalState::id() const -> LaneletId
 {
-  using LaneletId = TrafficSignalState::LaneletId;
-
-  current_arrow = static_cast<Arrow>(getTrafficSignalArrow(boost::lexical_cast<LaneletId>(name)));
-  current_color = static_cast<Color>(getTrafficSignalColor(boost::lexical_cast<LaneletId>(name)));
-
-  if (state == "none") {
-    return asBoolean(current_arrow == Arrow::none and current_color == Color::none);
-  } else {
-    return asBoolean(
-      boost::lexical_cast<String>(current_arrow) == state or
-      boost::lexical_cast<String>(current_color) == state);
-  }
+  return boost::lexical_cast<LaneletId>(traffic_signal_id);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

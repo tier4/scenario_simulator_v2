@@ -58,9 +58,9 @@ struct StoryboardElementType
   constexpr operator value_type() const noexcept { return value; }
 };
 
-std::istream & operator>>(std::istream &, StoryboardElementType &);
+auto operator>>(std::istream &, StoryboardElementType &) -> std::istream &;
 
-std::ostream & operator<<(std::ostream &, const StoryboardElementType &);
+auto operator<<(std::ostream &, const StoryboardElementType &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
