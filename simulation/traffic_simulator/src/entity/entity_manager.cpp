@@ -390,7 +390,7 @@ bool EntityManager::isInLanelet(
 {
   double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
   auto status = getEntityStatus(name);
-  if (status.lanelet_pose_valid) {
+  if (!status.lanelet_pose_valid) {
     return false;
   }
   if (status.lanelet_pose.lanelet_id == lanelet_id) {
