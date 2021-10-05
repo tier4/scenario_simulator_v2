@@ -76,7 +76,7 @@ public:
 
   /*   */ auto getStatus() const -> const openscenario_msgs::msg::EntityStatus;
 
-  /*   */ auto getStandStillDuration() const -> boost::optional<double>;
+  /*   */ auto getStandStillDuration() const -> double;
 
   /*   */ auto getVisibility() { return visibility_; }
 
@@ -170,7 +170,7 @@ protected:
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list_;
 
   boost::optional<double> linear_jerk_;
-  boost::optional<double> stand_still_duration_;
+  double stand_still_duration_;
 
   visualization_msgs::msg::MarkerArray current_marker_;
   openscenario_msgs::msg::EntityType entity_type_;

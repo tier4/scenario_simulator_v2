@@ -42,10 +42,10 @@ void MomentaryStopMetric::update()
     if (!standstill_duration) {
       THROW_SIMULATION_ERROR("failed to calculate standstill duration.");
     }
-    standstill_duration_ = standstill_duration.get();
+    standstill_duration_ = standstill_duration;
     if (
       entity_manager_ptr_->isStopping(target_entity) &&
-      standstill_duration.get() >= stop_duration) {
+      standstill_duration >= stop_duration) {
       success();
     }
     if (distance.get() <= stop_sequence_end_distance) {

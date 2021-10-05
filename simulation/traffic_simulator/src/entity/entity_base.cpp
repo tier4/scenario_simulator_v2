@@ -34,7 +34,7 @@ EntityBase::EntityBase(
 
 void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
 
-boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
+double EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
 const autoware_vehicle_msgs::msg::VehicleCommand EntityBase::getVehicleCommand()
 {
@@ -43,11 +43,8 @@ const autoware_vehicle_msgs::msg::VehicleCommand EntityBase::getVehicleCommand()
 
 void EntityBase::updateStandStillDuration(const double step_time)
 {
-  if (!stand_still_duration_) {
-    stand_still_duration_ = 0;
-  }
   if (std::fabs(status_.action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
-    stand_still_duration_ = step_time + stand_still_duration_.get();
+    stand_still_duration_ = step_time + stand_still_duration_;
   } else {
     stand_still_duration_ = 0;
   }
