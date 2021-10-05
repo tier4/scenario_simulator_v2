@@ -39,17 +39,13 @@ public:
 private:
   void onUpdate() override
   {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     // LCOV_EXCL_START
     if (!api_.metricExists("ego_momentary_stop")) {
-      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     if (
       api_.metricExists("ego_momentary_stop") &&
       api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::FAILURE) {
-      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
@@ -62,7 +58,6 @@ private:
 
   void onInitialize() override
   {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     api_.spawn(
       false, "ego", getVehicleParameters(),
       traffic_simulator::helper::constructLaneletPose(34606, 20.0),
@@ -71,7 +66,6 @@ private:
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop", "ego", -10, 10, 120635,
       metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE, 30, 1, 0.05);
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
   }
 };
 
