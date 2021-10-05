@@ -70,3 +70,12 @@ jobs:
           files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
           flags: colcon_test
           env_vars: ROS_DISTRO
+      - name: collect test result
+        if: always()
+        run: |
+          cd /home/runner/work/scenario_simulator_v2/scenario_simulator_v2/ros_ws/build
+          find -name test_results | xargs -i cp -r -p {} .
+      - uses: actions/upload-artifact@v2
+        with:
+          name: test_results
+          path: /home/runner/work/scenario_simulator_v2/scenario_simulator_v2/ros_ws/build/test_results
