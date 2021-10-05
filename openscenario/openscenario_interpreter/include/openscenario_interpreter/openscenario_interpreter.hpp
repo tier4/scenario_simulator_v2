@@ -131,6 +131,7 @@ public:
 
     catch (const SpecialAction<EXIT_SUCCESS> & action)  // from CustomCommandAction::exitSuccess
     {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       const auto what = "Expected " + intended_result;
       isSuccessIntended() ? set<common::junit::Pass>()
                           : set<common::junit::Failure>("UnintendedSuccess", what);
@@ -139,6 +140,7 @@ public:
 
     catch (const SpecialAction<EXIT_FAILURE> & action)  // from CustomCommandAction::exitFailure
     {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       const auto what = "Expected " + intended_result;
       isFailureIntended() ? set<common::junit::Pass>()
                           : set<common::junit::Failure>("Failure", what);
@@ -146,24 +148,28 @@ public:
     }
 
     catch (const AutowareError & error) {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       isAnErrorIntended() ? set<common::junit::Pass>()
                           : set<common::junit::Error>("AutowareError", error.what());
       return handle(error);
     }
 
     catch (const SemanticError & error) {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       isAnErrorIntended() ? set<common::junit::Pass>()
                           : set<common::junit::Error>("SemanticError", error.what());
       return handle(error);
     }
 
     catch (const SimulationError & error) {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       isAnErrorIntended() ? set<common::junit::Pass>()
                           : set<common::junit::Error>("SimulationError", error.what());
       return handle(error);
     }
 
     catch (const SyntaxError & error) {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       isAnErrorIntended() ? set<common::junit::Pass>()
                           : set<common::junit::Error>("SyntaxError", error.what());
       return handle(error);
@@ -171,6 +177,7 @@ public:
 
     catch (const std::exception & error)  // NOTE: MUST BE LAST OF CATCH STATEMENTS.
     {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       isAnErrorIntended() ? set<common::junit::Pass>()
                           : set<common::junit::Error>("InternalError", error.what());
       return handle(error);
@@ -178,6 +185,7 @@ public:
 
     catch (...)  // FINAL BARRIER
     {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       set<common::junit::Error>("UnknownError", "An unknown exception has occurred");
       return handle();
     }
