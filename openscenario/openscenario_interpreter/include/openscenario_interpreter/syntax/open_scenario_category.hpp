@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
 
-#include <openscenario_interpreter/syntax/catalog_definition.hpp>
-#include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -34,15 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct OpenScenarioCategory : public Group
 {
-  template <typename Tree, typename... Ts>
-  explicit OpenScenarioCategory(const Tree & tree, Ts &&... xs)
-  // clang-format off
-  : Group(
-      tree.child("Catalog") ? make< CatalogDefinition>(tree, std::forward<decltype(xs)>(xs)...)
-                            : make<ScenarioDefinition>(tree, std::forward<decltype(xs)>(xs)...))
-  // clang-format on
-  {
-  }
+  explicit OpenScenarioCategory(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

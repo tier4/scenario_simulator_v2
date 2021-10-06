@@ -19,9 +19,36 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Integer & datum) { return os << datum.data; }
+static_assert(std::is_standard_layout<Integer>::value, "");
 
-std::istream & operator>>(std::istream & is, Integer & datum)
+static_assert(not std::is_trivial<Integer>::value, "");
+
+Integer::Integer(value_type value) { data = value; }
+
+Integer::Integer(const std::string & s)
+{
+  try {
+    data = boost::lexical_cast<value_type>(s);
+  } catch (const boost::bad_lexical_cast &) {
+    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
+  }
+}
+
+auto Integer::operator+=(const double & rhs) -> Integer &
+{
+  data += rhs;
+  return *this;
+}
+
+auto Integer::operator*=(const double & rhs) -> Integer &
+{
+  data *= rhs;
+  return *this;
+}
+
+Integer::operator value_type() const noexcept { return data; }
+
+auto operator>>(std::istream & is, Integer & datum) -> std::istream &
 {
   std::string token;
 
@@ -30,6 +57,11 @@ std::istream & operator>>(std::istream & is, Integer & datum)
   datum.data = boost::lexical_cast<Integer::value_type>(token);
 
   return is;
+}
+
+auto operator<<(std::ostream & os, const Integer & datum) -> std::ostream &
+{
+  return os << datum.data;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

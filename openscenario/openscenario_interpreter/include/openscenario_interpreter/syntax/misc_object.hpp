@@ -22,6 +22,8 @@
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_msgs/msg/misc_object_parameters.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -57,35 +59,9 @@ struct MiscObject : public Scope
 
   Properties properties;  // Property definitions for the miscellaneous object.
 
-  template <typename Tree>
-  explicit MiscObject(const Tree & tree, Scope & scope)
-  : Scope(scope.makeChildScope(readAttribute<String>("name", tree, scope))),
-    // clang-format off
-    mass                  (readAttribute<Double               >("mass",                  tree, localScope())),
-    misc_object_category  (readAttribute<MiscObjectCategory   >("miscObjectCategory",    tree, localScope())),
-    // model3d               (readAttribute<String               >("model3d",               tree, localScope())),
-    parameter_declarations(readElement  <ParameterDeclarations>("ParameterDeclarations", tree, localScope())),
-    bounding_box          (readElement  <BoundingBox          >("BoundingBox",           tree, localScope())),
-    properties            (readElement  <Properties           >("Properties",            tree, localScope()))
-  // clang-format on
-  {
-  }
+  explicit MiscObject(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::MiscObjectParameters() const
-  {
-    openscenario_msgs::msg::MiscObjectParameters misc_object_parameters;
-    {
-      misc_object_parameters.misc_object_category =
-        boost::lexical_cast<String>(misc_object_category);
-
-      misc_object_parameters.name = name;
-
-      misc_object_parameters.bounding_box =
-        static_cast<const openscenario_msgs::msg::BoundingBox>(bounding_box);
-    }
-
-    return misc_object_parameters;
-  }
+  explicit operator openscenario_msgs::msg::MiscObjectParameters() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

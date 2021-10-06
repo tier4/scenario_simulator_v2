@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/lateral_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+LateralAction::LateralAction(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: ComplexType(
+    choice(node,
+      std::make_pair(     "LaneChangeAction", [&](auto && node) { return make<LaneChangeAction>(node, scope); }),
+      std::make_pair(     "LaneOffsetAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair("LateralDistanceAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+// clang-format on
+{
+}
+
 auto LateralAction::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);

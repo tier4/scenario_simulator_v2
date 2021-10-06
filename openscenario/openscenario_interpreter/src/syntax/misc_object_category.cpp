@@ -20,6 +20,10 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+static_assert(std::is_standard_layout<MiscObjectCategory>::value, "");
+
+static_assert(std::is_trivial<MiscObjectCategory>::value, "");
+
 auto operator>>(std::istream & is, MiscObjectCategory & datum) -> std::istream &
 {
   std::string buffer;

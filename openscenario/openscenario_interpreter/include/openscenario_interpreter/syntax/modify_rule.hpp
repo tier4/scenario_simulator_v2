@@ -15,10 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__MODIFY_RULE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__MODIFY_RULE_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/parameter_add_value_rule.hpp>
-#include <openscenario_interpreter/syntax/parameter_multiply_by_value_rule.hpp>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -26,29 +24,18 @@ inline namespace syntax
 {
 /* ---- ModifyRule -------------------------------------------------------------
  *
- * <xsd:complexType name="ModifyRule">
- *   <xsd:choice>
- *     <xsd:element name="AddValue" type="ParameterAddValueRule"/>
- *     <xsd:element name="MultiplyByValue" type="ParameterMultiplyByValueRule"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="ModifyRule">
+ *    <xsd:choice>
+ *      <xsd:element name="AddValue" type="ParameterAddValueRule"/>
+ *      <xsd:element name="MultiplyByValue" type="ParameterMultiplyByValueRule"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE)                                                            \
-  std::make_pair(#TYPE, [&](auto && node) {                                      \
-    return make<Parameter##TYPE##Rule>(node, std::forward<decltype(xs)>(xs)...); \
-  })
-
-struct ModifyRule : public Element
+struct ModifyRule : public ComplexType
 {
-  template <typename Node, typename... Ts>
-  explicit ModifyRule(const Node & node, Ts &&... xs)
-  : Element(choice(node, ELEMENT(AddValue), ELEMENT(MultiplyByValue)))
-  {
-  }
+  explicit ModifyRule(const pugi::xml_node &, Scope &);
 };
-
-#undef ELEMENT
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

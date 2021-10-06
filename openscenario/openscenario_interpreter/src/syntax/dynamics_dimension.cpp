@@ -19,7 +19,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, DynamicsDimension & datum)
+static_assert(std::is_standard_layout<DynamicsDimension>::value, "");
+
+static_assert(std::is_trivial<DynamicsDimension>::value, "");
+
+auto operator>>(std::istream & is, DynamicsDimension & datum) -> std::istream &
 {
   std::string buffer;
 
@@ -49,7 +53,7 @@ std::istream & operator>>(std::istream & is, DynamicsDimension & datum)
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(DynamicsDimension, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const DynamicsDimension & datum)
+auto operator<<(std::ostream & os, const DynamicsDimension & datum) -> std::ostream &
 {
 #define BOILERPLATE(NAME)       \
   case DynamicsDimension::NAME: \

@@ -15,11 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ABSOLUTE_TARGET_SPEED_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ABSOLUTE_TARGET_SPEED_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
-#include <openscenario_interpreter/syntax/rule.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -36,28 +35,14 @@ struct AbsoluteTargetSpeed
 {
   const Double value;
 
-  template <typename Node>
-  explicit AbsoluteTargetSpeed(const Node & node, Scope & scope)
-  : value(readAttribute<Double>("value", node, scope))
-  {
-  }
+  explicit AbsoluteTargetSpeed(const pugi::xml_node &, Scope &);
 
   auto getCalculateAbsoluteTargetSpeed() const
   {
-    return [target_speed = value] { return target_speed; };
+    return [target_speed = value]() { return target_speed; };
   }
 
-  auto getIsEnd() const -> std::function<bool(const EntityRef &)>
-  {
-    return [target_speed = value](const EntityRef & actor) {  // is_end
-      try {
-        const auto compare = Rule(Rule::equalTo);
-        return compare(getEntityStatus(actor).action_status.twist.linear.x, target_speed);
-      } catch (const SemanticError &) {
-        return false;  // NOTE: The actor is maybe lane-changing now
-      }
-    };
-  }
+  auto getIsEnd() const -> std::function<bool(const EntityRef &)>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

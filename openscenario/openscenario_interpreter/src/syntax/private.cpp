@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 
@@ -19,7 +21,44 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Private & datum)
+Private::Private(const pugi::xml_node & node, Scope & scope)
+: Scope(scope), entity_ref(readAttribute<String>("entityRef", node, localScope()))
+{
+  actors.emplace_back(entity_ref);
+
+  callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
+    return private_actions.emplace_back(node, localScope());
+  });
+}
+
+auto Private::endsImmediately() const -> bool
+{
+  return std::all_of(
+    private_actions.begin(), private_actions.end(),
+    [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
+}
+
+auto Private::evaluate() -> Element
+{
+  for (auto && private_action : private_actions) {
+    // NOTE: standbyState -> startTransition (if ready)
+    // private_action.ready();
+
+    // NOTE: startTransition -> runningState (unconditionally)
+    private_action.start();
+
+    // NOTE: runningState -> endTransition (if accomplished)
+    do {
+      private_action.run();
+    } while (not private_action.accomplished());
+
+    // NOTE: endTransition -> completeState (Init.Actions only once executed)
+  }
+
+  return unspecified;
+}
+
+auto operator<<(nlohmann::json & json, const Private & datum) -> nlohmann::json &
 {
   json["entityRef"] = datum.entity_ref;
 

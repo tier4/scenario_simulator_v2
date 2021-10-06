@@ -28,39 +28,18 @@ struct UnsignedInteger : public std_msgs::msg::UInt64
 {
   using value_type = decltype(std_msgs::msg::UInt64::data);
 
-  explicit UnsignedInteger(value_type value = {}) { data = value; }
+  explicit UnsignedInteger(value_type value = {});
 
-  explicit UnsignedInteger(const std::string & s)
-  try {
-    data = boost::lexical_cast<value_type>(s);
-  } catch (const boost::bad_lexical_cast &) {
-    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
-  }
+  explicit UnsignedInteger(const std::string &);
 
-  constexpr operator value_type() const noexcept { return data; }
+  auto operator++() noexcept -> UnsignedInteger &;
 
-  decltype(auto) operator++() noexcept
-  {
-    ++data;
-    return *this;
-  }
+  auto operator+=(const value_type &) -> UnsignedInteger &;
 
-  auto & operator+=(const double & rhs)
-  {
-    data += rhs;
-    return *this;
-  }
+  auto operator*=(const value_type &) -> UnsignedInteger &;
 
-  auto & operator*=(const double & rhs)
-  {
-    data *= rhs;
-    return *this;
-  }
+  operator value_type() const noexcept;
 };
-
-static_assert(std::is_standard_layout<UnsignedInteger>::value, "");
-
-static_assert(not std::is_trivial<UnsignedInteger>::value, "");
 
 std::istream & operator>>(std::istream &, UnsignedInteger &);
 

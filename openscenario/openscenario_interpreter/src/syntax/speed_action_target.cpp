@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/speed_action_target.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 
@@ -19,6 +20,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+SpeedActionTarget::SpeedActionTarget(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: ComplexType(
+    choice(node,
+      std::make_pair("RelativeTargetSpeed", [&](const auto & node) { return make<RelativeTargetSpeed>(node, scope); }),
+      std::make_pair("AbsoluteTargetSpeed", [&](const auto & node) { return make<AbsoluteTargetSpeed>(node, scope); })))
+// clang-format on
+{
+}
+
 auto SpeedActionTarget::getCalculateAbsoluteTargetSpeed() const -> std::function<double()>
 {
   return apply<std::function<double()>>(

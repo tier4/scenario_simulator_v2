@@ -17,8 +17,12 @@
 
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/orientation.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -45,38 +49,13 @@ struct RelativeWorldPosition
 
   const Double dx, dy, dz;
 
-  template <typename Node, typename Scope>
-  explicit RelativeWorldPosition(const Node & node, Scope & scope)
-  : orientation(readElement<Orientation>("Orientation", node, scope)),
-    reference(readAttribute<EntityRef>("entityRef", node, scope)),
-    dx(readAttribute<Double>("dx", node, scope)),
-    dy(readAttribute<Double>("dy", node, scope)),
-    dz(readAttribute<Double>("dz", node, scope, Double()))
-  {
-  }
+  explicit RelativeWorldPosition(const pugi::xml_node &, Scope &);
 
-  operator geometry_msgs::msg::Point() const
-  {
-    geometry_msgs::msg::Point result;
-    {
-      result.x = dx;
-      result.y = dy;
-      result.z = dz;
-    }
+  operator geometry_msgs::msg::Point() const;
 
-    return result;
-  }
+  explicit operator geometry_msgs::msg::Pose() const;
 
-  explicit operator geometry_msgs::msg::Pose() const
-  {
-    throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, geometry_msgs::msg::Pose);
-  }
-
-  explicit operator openscenario_msgs::msg::LaneletPose() const
-  {
-    throw UNSUPPORTED_CONVERSION_DETECTED(
-      RelativeWorldPosition, openscenario_msgs::msg::LaneletPose);
-  }
+  explicit operator openscenario_msgs::msg::LaneletPose() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

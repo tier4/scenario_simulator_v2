@@ -15,10 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ACCELERATION_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACCELERATION_CONDITION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
-#include <openscenario_interpreter/utility/print.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,39 +43,11 @@ struct AccelerationCondition
 
   std::vector<double> last_checked_values;  // for description
 
-  template <typename Node, typename Scope>
-  explicit AccelerationCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
-  : value(readAttribute<Double>("value", node, outer_scope)),
-    compare(readAttribute<Rule>("rule", node, outer_scope)),
-    triggering_entities(triggering_entities),
-    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
-  {
-  }
+  explicit AccelerationCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
-  auto description() const
-  {
-    std::stringstream description;
+  auto description() const -> std::string;
 
-    description << triggering_entities.description() << "'s acceleration = ";
-
-    print_to(description, last_checked_values);
-
-    description << " " << compare << " " << value << "?";
-
-    return description.str();
-  }
-
-  auto evaluate()
-  {
-    last_checked_values.clear();
-
-    return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-      last_checked_values.push_back(
-        getEntityStatus(triggering_entity).action_status.accel.linear.x);
-      return compare(last_checked_values.back(), value);
-    }));
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

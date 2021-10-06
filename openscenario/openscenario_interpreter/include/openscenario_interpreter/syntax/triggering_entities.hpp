@@ -15,12 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGERING_ENTITIES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGERING_ENTITIES_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities_rule.hpp>
-#include <openscenario_interpreter/utility/print.hpp>
-#include <utility>
-#include <vector>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,37 +41,16 @@ struct TriggeringEntities
 
   const std::list<EntityRef> entity_refs;
 
-  template <typename Node, typename Scope>
-  explicit TriggeringEntities(const Node & node, Scope & scope)
-  : triggering_entities_rule(
-      readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)),
-    entity_refs(readElements<EntityRef, 1>("EntityRef", node, scope))
-  {
-  }
+  explicit TriggeringEntities(const pugi::xml_node &, Scope &);
 
   template <typename Predicate>
-  constexpr decltype(auto) apply(Predicate && predicate) const
+  auto apply(Predicate && predicate) const -> decltype(auto)
   {
     return triggering_entities_rule.apply(
       std::begin(entity_refs), std::end(entity_refs), std::forward<decltype(predicate)>(predicate));
   }
 
-  template <typename... Ts>
-  [[deprecated]] constexpr decltype(auto) operator()(Ts &&... xs) const
-  {
-    return apply(std::forward<decltype(xs)>(xs)...);
-  }
-
-  auto description() const
-  {
-    std::stringstream description;
-
-    description << triggering_entities_rule.description() << " ";
-
-    print_to(description, entity_refs);
-
-    return description.str();
-  }
+  auto description() const -> String;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -15,11 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_SPEED_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_SPEED_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/boolean.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
-#include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/speed_target_value_type.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -45,47 +47,11 @@ struct RelativeTargetSpeed
 
   const Boolean continuous;
 
-  template <typename Node, typename Scope>
-  explicit RelativeTargetSpeed(const Node & node, Scope & scope)
-  : entity_ref(readAttribute<String>("entityRef", node, scope)),
-    value(readAttribute<Double>("value", node, scope)),
-    speed_target_value_type(readAttribute<SpeedTargetValueType>(
-      "speedTargetValueType", node, scope, SpeedTargetValueType())),
-    continuous(readAttribute<Boolean>("continuous", node, scope, Boolean()))
-  {
-  }
+  explicit RelativeTargetSpeed(const pugi::xml_node &, Scope &);
 
-  std::function<double()> getCalculateAbsoluteTargetSpeed() const
-  {
-    if (speed_target_value_type == SpeedTargetValueType::factor) {
-      return [factor = value, entity_ref = entity_ref]() -> double {
-        return factor * getEntityStatus(entity_ref).action_status.twist.linear.x;
-      };
-    } else if (speed_target_value_type == SpeedTargetValueType::delta) {
-      return [delta = value, entity_ref = entity_ref]() -> double {
-        return delta + getEntityStatus(entity_ref).action_status.twist.linear.x;
-      };
-    } else {
-      throw UNSUPPORTED_SETTING_DETECTED(RelativeTargetSpeed, speed_target_value_type);
-    }
-  }
+  auto getCalculateAbsoluteTargetSpeed() const -> std::function<double()>;
 
-  std::function<bool(const EntityRef &)> getIsEnd() const
-  {
-    if (continuous) {
-      return [](const auto &) { return false; };  // ends never
-    } else {
-      return [calc_absolute_target_speed = getCalculateAbsoluteTargetSpeed()](const auto & actor) {
-        try {
-          const auto compare = Rule(Rule::equalTo);
-          return compare(
-            getEntityStatus(actor).action_status.twist.linear.x, calc_absolute_target_speed());
-        } catch (const SemanticError &) {
-          return false;  // NOTE: The actor is maybe lane-changing now
-        }
-      };
-    }
-  }
+  auto getIsEnd() const -> std::function<bool(const EntityRef &)>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

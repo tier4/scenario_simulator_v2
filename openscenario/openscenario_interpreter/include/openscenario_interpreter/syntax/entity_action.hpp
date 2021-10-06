@@ -15,11 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/delete_entity_action.hpp>
-#include <utility>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,25 +40,15 @@ struct EntityAction : public Element
 {
   const String entity_ref;
 
-  template <typename Node, typename Scope>
-  explicit EntityAction(const Node & node, Scope & outer_scope)
-  // clang-format off
-  : Element(
-      choice(node,
-        std::make_pair(   "AddEntityAction", [&](auto && node) { return make<   AddEntityAction>(node, outer_scope); }),
-        std::make_pair("DeleteEntityAction", [&](auto && node) { return make<DeleteEntityAction>(node, outer_scope); }))),
-    entity_ref(readAttribute<String>("entityRef", node, outer_scope))
-  // clang-format on
-  {
-  }
+  explicit EntityAction(const pugi::xml_node &, Scope &);
 
-  static auto accomplished() noexcept -> bool { return endsImmediately(); }
+  static auto accomplished() noexcept -> bool;
 
-  static auto endsImmediately() noexcept -> bool { return true; }
+  static auto endsImmediately() noexcept -> bool;
 
-  auto run() const -> void;
+  /*  */ auto run() const -> void;
 
-  static auto start() noexcept -> void {}
+  static auto start() noexcept -> void;
 };
 
 DEFINE_LAZY_VISITOR(

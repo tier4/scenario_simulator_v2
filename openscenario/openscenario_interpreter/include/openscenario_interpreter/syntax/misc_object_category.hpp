@@ -85,10 +85,6 @@ struct MiscObjectCategory
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<MiscObjectCategory>::value, "");
-
-static_assert(std::is_trivial<MiscObjectCategory>::value, "");
-
 auto operator>>(std::istream &, MiscObjectCategory &) -> std::istream &;
 
 auto operator<<(std::ostream &, const MiscObjectCategory &) -> std::ostream &;

@@ -15,18 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_CONTROLLER_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_CONTROLLER_ACTION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/syntax/controller.hpp>
-#include <type_traits>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-#define ELEMENT(TYPE) \
-  std::make_pair(#TYPE, [&](auto && node) { return make<TYPE>(node, outer_scope); })
-
 /* ---- AssignControllerAction -------------------------------------------------
  *
  *  This action assigns a controller to the given entity defined in the
@@ -43,27 +38,10 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct AssignControllerAction : private Scope, public ComplexType
 {
-  template <typename Node>
-  explicit AssignControllerAction(const Node & node, Scope & outer_scope)
-  // clang-format off
-  : Scope(outer_scope),
-    ComplexType(
-      choice(node,
-        std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, localScope()); }),
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
-  // clang-format on
-  {
-  }
+  explicit AssignControllerAction(const pugi::xml_node &, Scope &);
 
-  void operator()() const
-  {
-    for (const auto & actor : actors) {
-      applyAssignControllerAction(actor, (*this).as<Controller>());
-    }
-  }
+  auto operator()() const -> void;
 };
-
-#undef ELEMENT
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

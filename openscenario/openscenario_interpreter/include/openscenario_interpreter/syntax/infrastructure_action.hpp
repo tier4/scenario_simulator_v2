@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__INFRASTRUCTURE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__INFRASTRUCTURE_ACTION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_action.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -33,12 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct InfrastructureAction : public ComplexType
 {
-  template <typename... Ts>
-  explicit InfrastructureAction(Ts &&... xs)
-  : ComplexType(
-      readElement<TrafficSignalAction>("TrafficSignalAction", std::forward<decltype(xs)>(xs)...))
-  {
-  }
+  explicit InfrastructureAction(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 

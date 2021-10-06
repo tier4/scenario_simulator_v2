@@ -12,13 +12,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/maneuver_group.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const ManeuverGroup & datum)
+ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  StoryboardElement(
+    readAttribute<UnsignedInteger>("maximumExecutionCount", node, localScope(), UnsignedInteger())),
+  actors(readElement<Actors>("Actors", node, localScope()))
+{
+  callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
+    throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
+    return unspecified;
+  });
+
+  callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
+    return push_back(readStoryboardElement<Maneuver>(node, localScope()));
+  });
+}
+
+auto ManeuverGroup::accomplished() const -> bool
+{
+  // A ManeuverGroup's goal is accomplished when all its Maneuvers are in the completeState.
+  return std::all_of(std::begin(*this), std::end(*this), [&](auto && each) {
+    return each.template as<Maneuver>().complete();
+  });
+}
+
+auto ManeuverGroup::ready() noexcept -> bool { return true; }
+
+auto ManeuverGroup::run() -> void
+{
+  for (auto && each : *this) {
+    each.evaluate();
+  }
+}
+
+auto ManeuverGroup::start() -> void
+{
+  for (auto && each : *this) {
+    each.as<Maneuver>().changeStateIf(true, standby_state);
+  }
+}
+
+auto ManeuverGroup::stop() -> void
+{
+  for (auto && each : *this) {
+    each.as<Maneuver>().override();
+    each.evaluate();
+  }
+}
+
+auto ManeuverGroup::stopTriggered() noexcept -> bool { return false; }
+
+auto operator<<(nlohmann::json & json, const ManeuverGroup & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;
 

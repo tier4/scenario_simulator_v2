@@ -19,24 +19,24 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ObjectType ===========================================================
+/* ---- ObjectType -------------------------------------------------------------
  *
- * <xsd:simpleType name="ObjectType">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="pedestrian"/>
- *         <xsd:enumeration value="vehicle"/>
- *         <xsd:enumeration value="miscellaneous"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="ObjectType">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="pedestrian"/>
+ *          <xsd:enumeration value="vehicle"/>
+ *          <xsd:enumeration value="miscellaneous"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ObjectType
 {
 };

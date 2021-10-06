@@ -18,8 +18,10 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/road_network.hpp>
 #include <openscenario_interpreter/syntax/storyboard.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -50,29 +52,12 @@ struct ScenarioDefinition
 
   Storyboard storyboard;
 
-  template <typename Node>
-  explicit ScenarioDefinition(const Node & node, Scope & outer_scope)
-  : parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, outer_scope)),
-    catalog_locations(readElement<CatalogLocations>("CatalogLocations", node, outer_scope)),
-    road_network(readElement<RoadNetwork>("RoadNetwork", node, outer_scope)),
-    entities(readElement<Entities>("Entities", node, outer_scope)),
-    storyboard(readElement<Storyboard>("Storyboard", node, outer_scope))
-  {
-  }
+  explicit ScenarioDefinition(const pugi::xml_node &, Scope &);
 
-  auto complete() { return storyboard.complete(); }
+  auto complete() -> bool;
 
-  auto evaluate()
-  {
-    road_network.evaluate();
-    storyboard.evaluate();
-    updateFrame();
-    return storyboard.current_state;
-  }
+  auto evaluate() -> Element;
 };
-
-ASSERT_IS_OPTIONAL_ELEMENT(ParameterDeclarations);
 
 auto operator<<(std::ostream &, const ScenarioDefinition &) -> std::ostream &;
 

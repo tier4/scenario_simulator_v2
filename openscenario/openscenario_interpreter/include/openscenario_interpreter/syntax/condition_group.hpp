@@ -16,9 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_GROUP_HPP_
 
 #include <nlohmann/json.hpp>
-#include <numeric>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/condition.hpp>
-#include <vector>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -41,26 +41,12 @@ struct ConditionGroup : public std::list<Condition>
 {
   bool current_value;
 
-  template <typename Node, typename Scope>
-  explicit ConditionGroup(const Node & node, Scope & scope) : current_value(false)
-  {
-    callWithElements(
-      node, "Condition", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
-  }
+  explicit ConditionGroup(const pugi::xml_node &, Scope &);
 
-  auto evaluate()
-  {
-    // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
-    return asBoolean(
-      current_value = std::accumulate(
-        std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & condition) {
-          const auto rhs = condition.evaluate();
-          return lhs and rhs.as<Boolean>();
-        }));
-  }
+  auto evaluate() -> Element;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const ConditionGroup &);
+auto operator<<(nlohmann::json &, const ConditionGroup &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

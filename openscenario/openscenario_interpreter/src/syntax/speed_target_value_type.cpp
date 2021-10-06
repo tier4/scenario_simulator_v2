@@ -21,7 +21,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, SpeedTargetValueType & datum)
+static_assert(std::is_standard_layout<SpeedTargetValueType>::value, "");
+
+static_assert(std::is_trivial<SpeedTargetValueType>::value, "");
+
+auto operator>>(std::istream & is, SpeedTargetValueType & datum) -> std::istream &
 {
   std::string buffer;
 
@@ -42,7 +46,7 @@ std::istream & operator>>(std::istream & is, SpeedTargetValueType & datum)
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(SpeedTargetValueType, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const SpeedTargetValueType & datum)
+auto operator<<(std::ostream & os, const SpeedTargetValueType & datum) -> std::ostream &
 {
 #define BOILERPLATE(NAME)          \
   case SpeedTargetValueType::NAME: \

@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TrafficSignalAction::TrafficSignalAction(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: ComplexType(
+    choice(node,
+      std::make_pair("TrafficSignalControllerAction", [&](const auto & node) { return make<TrafficSignalControllerAction>(node, scope); }),
+      std::make_pair("TrafficSignalStateAction",      [&](const auto & node) { return make<TrafficSignalStateAction     >(node, scope); })))
+// clang-format on
+{
+}
+
 auto TrafficSignalAction::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);

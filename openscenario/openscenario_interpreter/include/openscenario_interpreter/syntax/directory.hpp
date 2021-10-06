@@ -16,27 +16,25 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DIRECTORY_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Directory ============================================================
+/* ---- Directory --------------------------------------------------------------
  *
- * <xsd:complexType name="Directory">
- *   <xsd:attribute name="path" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Directory">
+ *    <xsd:attribute name="path" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Directory
 {
   const String path;
 
-  template <typename Node, typename Scope>
-  explicit Directory(const Node & node, Scope & outer_scope)
-  : path{readAttribute<String>("path", node, outer_scope)}
-  {
-  }
+  explicit Directory(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

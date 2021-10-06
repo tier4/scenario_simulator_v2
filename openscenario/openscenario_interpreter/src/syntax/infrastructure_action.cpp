@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/infrastructure_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+InfrastructureAction::InfrastructureAction(const pugi::xml_node & node, Scope & scope)
+: ComplexType(readElement<TrafficSignalAction>("TrafficSignalAction", node, scope))
+{
+}
+
 auto InfrastructureAction::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);

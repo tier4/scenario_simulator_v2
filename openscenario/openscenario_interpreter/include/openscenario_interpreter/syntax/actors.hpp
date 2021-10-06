@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ACTORS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACTORS_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/boolean.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -37,15 +38,7 @@ struct Actors
   // Indicates whether the triggering entities are considered actors.
   const Boolean select_triggering_entities;
 
-  template <typename Node, typename Scope>
-  explicit Actors(const Node & node, Scope & scope)
-  : select_triggering_entities(
-      readAttribute<Boolean>("selectTriggeringEntities", node, scope, Boolean()))
-  {
-    callWithElements(node, "EntityRef", 0, unbounded, [&](auto && node) {
-      scope.actors.emplace_back(node, scope);
-    });
-  }
+  explicit Actors(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
