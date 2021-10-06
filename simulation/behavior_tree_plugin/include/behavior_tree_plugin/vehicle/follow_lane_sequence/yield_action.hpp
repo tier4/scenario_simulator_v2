@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_
+#ifndef BEHAVIOR_TREE_PLUGIN__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_
+#define BEHAVIOR_TREE_PLUGIN__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_
 
 #include <string>
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
@@ -52,4 +52,4 @@ private:
 }  // namespace vehicle
 }  // namespace entity_behavior
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_
+#endif  // BEHAVIOR_TREE_PLUGIN__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_

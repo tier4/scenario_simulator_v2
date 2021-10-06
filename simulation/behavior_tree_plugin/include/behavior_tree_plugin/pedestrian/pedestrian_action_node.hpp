@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_
+#ifndef BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_
+#define BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
 
@@ -46,4 +46,4 @@ public:
 };
 }  // namespace entity_behavior
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_
+#endif  // BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_
