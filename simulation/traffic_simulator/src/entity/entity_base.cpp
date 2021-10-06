@@ -28,7 +28,12 @@ namespace entity
 EntityBase::EntityBase(
   const std::string & type, const std::string & name,
   const openscenario_msgs::msg::EntityStatus & status)
-: type(type), name(name), status_(status), verbose_(true), visibility_(true)
+: type(type),
+  name(name),
+  status_(status),
+  verbose_(true),
+  visibility_(true),
+  stand_still_duration_(0)
 {
 }
 
