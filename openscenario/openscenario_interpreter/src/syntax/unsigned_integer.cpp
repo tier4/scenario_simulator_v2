@@ -18,9 +18,47 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, UnsignedInteger & datum) { return is >> datum.data; }
+static_assert(std::is_standard_layout<UnsignedInteger>::value, "");
 
-std::ostream & operator<<(std::ostream & os, const UnsignedInteger & datum)
+static_assert(not std::is_trivial<UnsignedInteger>::value, "");
+
+UnsignedInteger::UnsignedInteger(value_type value) { data = value; }
+
+UnsignedInteger::UnsignedInteger(const std::string & s)
+{
+  try {
+    data = boost::lexical_cast<value_type>(s);
+  } catch (const boost::bad_lexical_cast &) {
+    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
+  }
+}
+
+auto UnsignedInteger::operator++() noexcept -> UnsignedInteger &
+{
+  ++data;
+  return *this;
+}
+
+auto UnsignedInteger::operator+=(const value_type & rhs) -> UnsignedInteger &
+{
+  data += rhs;
+  return *this;
+}
+
+auto UnsignedInteger::operator*=(const value_type & rhs) -> UnsignedInteger &
+{
+  data *= rhs;
+  return *this;
+}
+
+UnsignedInteger::operator value_type() const noexcept { return data; }
+
+auto operator>>(std::istream & is, UnsignedInteger & datum) -> std::istream &
+{
+  return is >> datum.data;
+}
+
+auto operator<<(std::ostream & os, const UnsignedInteger & datum) -> std::ostream &
 {
   return os << datum.data;
 }

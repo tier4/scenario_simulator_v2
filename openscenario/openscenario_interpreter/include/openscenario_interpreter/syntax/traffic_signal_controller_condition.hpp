@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_CONDITION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -37,11 +37,11 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignalControllerCondition
 {
-  const String
-    phase;  // Name of the phase of the signal controller to be reached for the condition to become true. The available phases are defined in type RoadNetwork under the property trafficSignalControllers.
+  // Name of the phase of the signal controller to be reached for the condition to become true. The available phases are defined in type RoadNetwork under the property trafficSignalControllers.
+  const String phase;
 
-  const String
-    traffic_signal_controller_ref;  //  ID of the referenced signal controller in a road network.
+  // ID of the referenced signal controller in a road network.
+  const String traffic_signal_controller_ref;
 
   String current_phase_name;
 
@@ -49,41 +49,11 @@ struct TrafficSignalControllerCondition
 
   Scope scope;
 
-  template <typename Tree>
-  explicit TrafficSignalControllerCondition(const Tree & tree, const Scope & scope)
-  : phase(readAttribute<String>("phase", tree, scope)),
-    traffic_signal_controller_ref(readAttribute<String>("trafficSignalControllerRef", tree, scope)),
-    scope(scope)
-  {
-  }
+  explicit TrafficSignalControllerCondition(const pugi::xml_node &, const Scope &);
 
-  auto evaluate()
-  {
-    const auto & found = scope.findElement(traffic_signal_controller_ref);
-    if (found && found.is<TrafficSignalController>()) {
-      const auto & controller = found.as<TrafficSignalController>();
-      current_phase_name = controller.currentPhaseName();
-      current_phase_since = controller.currentPhaseSince();
-      return asBoolean(current_phase_name == phase);
-    } else {
-      THROW_SYNTAX_ERROR(
-        "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
-        " is not declared in this scope");
-    }
-  }
+  auto description() const -> String;
 
-  auto description() const
-  {
-    std::stringstream description;
-
-    description << "Is controller " << std::quoted(traffic_signal_controller_ref)  //
-                << " (Phase = "                                                    //
-                << current_phase_name                                              //
-                << ", since " << current_phase_since                               //
-                << " sec) in phase " << std::quoted(phase) << "?";
-
-    return description.str();
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

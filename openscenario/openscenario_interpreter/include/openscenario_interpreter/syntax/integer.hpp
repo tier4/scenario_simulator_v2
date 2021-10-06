@@ -30,37 +30,20 @@ struct Integer : public std_msgs::msg::Int64
 
   explicit Integer() = default;
 
-  explicit Integer(value_type value) { data = value; }
+  explicit Integer(value_type);
 
-  explicit Integer(const std::string & s)
-  try {
-    data = boost::lexical_cast<value_type>(s);
-  } catch (const boost::bad_lexical_cast &) {
-    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
-  }
+  explicit Integer(const std::string &);
 
-  constexpr operator value_type() const noexcept { return data; }
+  auto operator+=(const double &) -> Integer &;
 
-  auto & operator+=(const double & rhs)
-  {
-    data += rhs;
-    return *this;
-  }
+  auto operator*=(const double &) -> Integer &;
 
-  auto & operator*=(const double & rhs)
-  {
-    data *= rhs;
-    return *this;
-  }
+  operator value_type() const noexcept;
 };
 
-static_assert(std::is_standard_layout<Integer>::value, "");
+auto operator>>(std::istream &, Integer &) -> std::istream &;
 
-static_assert(not std::is_trivial<Integer>::value, "");
-
-std::istream & operator>>(std::istream &, Integer &);
-
-std::ostream & operator<<(std::ostream &, const Integer &);
+auto operator<<(std::ostream &, const Integer &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

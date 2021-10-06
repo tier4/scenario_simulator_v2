@@ -15,9 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__AXLE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__AXLE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_msgs/msg/axle.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,56 +41,25 @@ struct Axle
 
   Axle() = default;
 
-  template <typename Node, typename Scope>
-  explicit Axle(const Node & node, Scope & scope)
-  : max_steering(readAttribute<Double>("maxSteering", node, scope)),
-    wheel_diameter(readAttribute<Double>("wheelDiameter", node, scope)),
-    track_width(readAttribute<Double>("trackWidth", node, scope)),
-    position_x(readAttribute<Double>("positionX", node, scope)),
-    position_z(readAttribute<Double>("positionZ", node, scope))
-  {
-  }
+  explicit Axle(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::Axle() const
-  {
-    openscenario_msgs::msg::Axle axle;
-    {
-      axle.max_steering = max_steering;
-      axle.wheel_diameter = wheel_diameter;
-      axle.track_width = track_width;
-      axle.position_x = position_x;
-      axle.position_z = position_z;
-    }
-
-    return axle;
-  }
+  explicit operator openscenario_msgs::msg::Axle() const;
 };
 
-std::ostream & operator<<(std::ostream &, const Axle &);
-
-// NOTE: DON'T REWRITE THIS STRUCT LIKE `using FrontAxle = Axle` (for Clang)
 struct FrontAxle : public Axle
 {
   using Axle::Axle;
 };
 
-std::ostream & operator<<(std::ostream &, const FrontAxle &);
-
-// NOTE: DON'T REWRITE THIS STRUCT LIKE `using RearAxle = Axle` (for Clang)
 struct RearAxle : public Axle
 {
   using Axle::Axle;
 };
 
-std::ostream & operator<<(std::ostream &, const RearAxle &);
-
-// NOTE: DON'T REWRITE THIS STRUCT LIKE `using AdditionalAxle = Axle` (for Clang)
 struct AdditionalAxle : public Axle
 {
   using Axle::Axle;
 };
-
-std::ostream & operator<<(std::ostream &, const AdditionalAxle &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

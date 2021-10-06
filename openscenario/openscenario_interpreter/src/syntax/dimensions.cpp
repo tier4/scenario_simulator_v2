@@ -12,24 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/dimensions.hpp>
-#include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-static_assert(IsOptionalElement<Dimensions>::value, "Dimensions must be an optional element");
-
-std::ostream & operator<<(std::ostream & os, const Dimensions & datum)
+Dimensions::Dimensions(const pugi::xml_node & node, Scope & scope)
+: width(readAttribute<Double>("width", node, scope)),
+  length(readAttribute<Double>("length", node, scope)),
+  height(readAttribute<Double>("height", node, scope))
 {
-  // clang-format off
+}
 
-  return os << indent << blue << "<Dimensions " << highlight("width", datum.width)
-                                         << " " << highlight("length", datum.length)
-                                         << " " << highlight("height", datum.height) << blue << "/>" << reset;
+Dimensions::operator geometry_msgs::msg::Vector3() const
+{
+  geometry_msgs::msg::Vector3 vector3;
+  {
+    vector3.x = length;
+    vector3.y = width;
+    vector3.z = height;
+  }
 
-  // clang-format on
+  return vector3;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

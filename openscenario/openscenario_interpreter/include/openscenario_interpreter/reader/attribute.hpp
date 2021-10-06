@@ -15,11 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 
+#define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
+
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <functional>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <openscenario_interpreter/utility/highlighter.hpp>
-#include <openscenario_interpreter/utility/pugi_extension.hpp>
+#include <pugixml.hpp>
 #include <regex>
 #include <string>
 #include <unordered_map>
@@ -28,6 +30,8 @@ namespace openscenario_interpreter
 {
 inline namespace reader
 {
+using XML = pugi::xml_node;
+
 /* ---- Dynamic Configuration --------------------------------------------------
  *
  *  See https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
@@ -72,7 +76,7 @@ auto substitute(std::string attribute, Scope & scope)
 }
 
 template <typename T, typename Node, typename Scope>
-T readAttribute(const std::string & name, const Node & node, const Scope & scope)
+auto readAttribute(const std::string & name, const Node & node, const Scope & scope) -> T
 {
   if (const auto & attribute{node.attribute(name.c_str())}) {
     std::string value{substitute(attribute.value(), scope)};

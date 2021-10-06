@@ -12,22 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/performance.hpp>
-#include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Performance & datum)
+Performance::Performance(const pugi::xml_node & node, Scope & scope)
+: max_speed(readAttribute<Double>("maxSpeed", node, scope)),
+  max_acceleration(readAttribute<Double>("maxAcceleration", node, scope)),
+  max_deceleration(readAttribute<Double>("maxDeceleration", node, scope))
 {
-  // clang-format off
+}
 
-  return os << indent << blue << "<Performance " << highlight("maxSpeed", datum.max_speed)
-                                          << " " << highlight("maxAcceleration", datum.max_acceleration)
-                                          << " " << highlight("maxDeceleration", datum.max_deceleration) << blue << "/>" << reset;
+Performance::operator openscenario_msgs::msg::Performance() const
+{
+  openscenario_msgs::msg::Performance performance;
+  {
+    performance.max_speed = max_speed;
+    performance.max_acceleration = max_acceleration;
+    performance.max_deceleration = max_deceleration;
+  }
 
-  // clang-format on
+  return performance;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

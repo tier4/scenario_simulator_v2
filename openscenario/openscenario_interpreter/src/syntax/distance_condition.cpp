@@ -14,15 +14,34 @@
 
 #include <cmath>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/distance_condition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <openscenario_interpreter/utility/print.hpp>
 #include <sstream>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+DistanceCondition::DistanceCondition(
+  const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
+: Scope(scope),
+  coordinate_system(
+    readAttribute<CoordinateSystem>("coordinateSystem", node, scope, CoordinateSystem::entity)),
+  freespace(readAttribute<Boolean>("freespace", node, scope)),
+  relative_distance_type(readAttribute<RelativeDistanceType>(
+    "relativeDistanceType", node, scope, RelativeDistanceType::euclidianDistance)),
+  rule(readAttribute<Rule>("rule", node, scope)),
+  value(readAttribute<Double>("value", node, scope)),
+  position(readElement<Position>("Position", node, scope)),
+  triggering_entities(triggering_entities),
+  results(triggering_entities.entity_refs.size(), Double::nan())
+{
+}
+
 auto DistanceCondition::description() const -> std::string
 {
   std::stringstream description;

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/by_entity_condition.hpp>
+#include <openscenario_interpreter/syntax/by_value_condition.hpp>
 #include <openscenario_interpreter/syntax/condition.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 
@@ -19,7 +23,34 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Condition & datum)
+static_assert(std::is_standard_layout<ConditionEdge>::value, "");
+
+static_assert(std::is_trivial<ConditionEdge>::value, "");
+
+Condition::Condition(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: Element(
+    choice(node,
+      std::make_pair("ByEntityCondition", [&](auto && node) { return make<ByEntityCondition>(node, scope); }),
+      std::make_pair( "ByValueCondition", [&](auto && node) { return make< ByValueCondition>(node, scope); }))),
+  name(readAttribute<String>("name", node, scope)),
+  delay(readAttribute<Double>("delay", node, scope, Double())),
+  condition_edge(readAttribute<ConditionEdge>("conditionEdge", node, scope)),
+  current_value(false)
+// clang-format on
+{
+}
+
+auto Condition::evaluate() -> Element
+{
+  if (condition_edge == ConditionEdge::sticky and current_value) {
+    return true_v;
+  } else {
+    return asBoolean(current_value = Element::evaluate().as<Boolean>());
+  }
+}
+
+auto operator<<(nlohmann::json & json, const Condition & datum) -> nlohmann::json &
 {
   json["currentEvaluation"] = datum.description();
 

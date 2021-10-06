@@ -12,23 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/axles.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Axles & datum)
+Axles::Axles(const pugi::xml_node & node, Scope & scope)
+: front_axle(readElement<FrontAxle>("FrontAxle", node, scope)),
+  rear_axle(readElement<RearAxle>("RearAxle", node, scope)),
+  additional_axles(readElements<AdditionalAxle, 0>("AdditionalAxle", node, scope))
 {
-  os << (indent++) << blue << "<Axles>\n" << reset;
-  os << datum.front_axle << "\n";
-  os << datum.rear_axle << "\n";
+}
 
-  for (const auto & each : datum.additional_axles) {
-    os << each << "\n";
+Axles::operator openscenario_msgs::msg::Axles() const
+{
+  openscenario_msgs::msg::Axles axles;
+  {
+    axles.front_axle = static_cast<openscenario_msgs::msg::Axle>(front_axle);
+    axles.rear_axle = static_cast<openscenario_msgs::msg::Axle>(rear_axle);
   }
 
-  return os << (--indent) << blue << "</Axles>" << reset;
+  return axles;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -18,6 +18,7 @@
 #include <boost/mpl/and.hpp>
 #include <cstddef>
 #include <limits>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
@@ -25,6 +26,8 @@
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
+
+#define REQUIRES(...) typename = typename std::enable_if<__VA_ARGS__::value>::type
 
 namespace openscenario_interpreter
 {

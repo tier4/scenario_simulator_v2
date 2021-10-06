@@ -19,7 +19,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, RouteStrategy & datum)
+static_assert(std::is_standard_layout<RouteStrategy>::value, "");
+
+static_assert(std::is_trivial<RouteStrategy>::value, "");
+
+auto operator>>(std::istream & is, RouteStrategy & datum) -> std::istream &
 {
   std::string buffer;
 
@@ -51,7 +55,7 @@ std::istream & operator>>(std::istream & is, RouteStrategy & datum)
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(RouteStrategy, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const RouteStrategy & datum)
+auto operator<<(std::ostream & os, const RouteStrategy & datum) -> std::ostream &
 {
 #define BOILERPLATE(NAME)   \
   case RouteStrategy::NAME: \

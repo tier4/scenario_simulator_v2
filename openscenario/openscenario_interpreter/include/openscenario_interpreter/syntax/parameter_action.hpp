@@ -15,11 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_modify_action.hpp>
 #include <openscenario_interpreter/syntax/parameter_set_action.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -38,22 +37,13 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ParameterAction : public Element
 {
-  template <typename Node, typename Scope>
-  explicit ParameterAction(const Node & parent, Scope & outer_scope)
-  // clang-format off
-  : Element(
-      choice(parent,
-        std::make_pair(   "SetAction", [&](auto && node) { return make<   ParameterSetAction>(node, outer_scope, readAttribute<String>("parameterRef", parent, outer_scope)); }),
-        std::make_pair("ModifyAction", [&](auto && node) { return make<ParameterModifyAction>(node, outer_scope, readAttribute<String>("parameterRef", parent, outer_scope)); })))
-  // clang-format on
-  {
-  }
+  explicit ParameterAction(const pugi::xml_node &, Scope &);
 
-  static auto endsImmediately() -> bool { return true; }
+  static auto endsImmediately() -> bool;
 
-  auto run() -> void;
+  /*  */ auto run() -> void;
 
-  auto start() -> void;
+  /*  */ auto start() -> void;
 };
 
 DEFINE_LAZY_VISITOR(

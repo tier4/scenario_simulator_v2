@@ -12,13 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/event.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Maneuver & datum)
+Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope()))
+{
+  callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
+    return push_back(readStoryboardElement<Event>(node, localScope()));
+  });
+}
+
+auto Maneuver::accomplished() const -> bool
+{
+  // NOTE: A Maneuver's goal is accomplished when all its Events are in the completeState.
+  return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+    return each.template as<Event>().complete();
+  });
+}
+
+auto Maneuver::ready() noexcept -> bool { return true; }
+
+auto Maneuver::run() -> void
+{
+  for (auto && each : *this) {
+    each.evaluate();
+  }
+}
+
+auto Maneuver::start() noexcept -> void {}
+
+auto Maneuver::stop() -> void
+{
+  for (auto && each : *this) {
+    each.as<Event>().override();
+    each.evaluate();
+  }
+}
+
+auto Maneuver::stopTriggered() noexcept -> bool { return false; }
+
+auto operator<<(nlohmann::json & json, const Maneuver & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;
 

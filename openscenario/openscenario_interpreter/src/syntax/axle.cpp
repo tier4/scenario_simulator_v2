@@ -12,27 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/axle.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-#define BOILERPLATE(TYPENAME)                                                       \
-  std::ostream & operator<<(std::ostream & os, const TYPENAME & datum)              \
-  {                                                                                 \
-    return os << indent << blue << "<" #TYPENAME << " "                             \
-              << highlight("maxSteering", datum.max_steering) << " "                \
-              << highlight("wheelDiameter", datum.wheel_diameter) << " "            \
-              << highlight("trackWidth", datum.track_width) << " "                  \
-              << highlight("positionX", datum.position_x) << " "                    \
-              << highlight("positionZ", datum.position_z) << blue << "/>" << reset; \
-  }                                                                                 \
-  static_assert(true, "")
+Axle::Axle(const pugi::xml_node & node, Scope & scope)
+: max_steering(readAttribute<Double>("maxSteering", node, scope)),
+  wheel_diameter(readAttribute<Double>("wheelDiameter", node, scope)),
+  track_width(readAttribute<Double>("trackWidth", node, scope)),
+  position_x(readAttribute<Double>("positionX", node, scope)),
+  position_z(readAttribute<Double>("positionZ", node, scope))
+{
+}
 
-BOILERPLATE(Axle);
-BOILERPLATE(FrontAxle);
-BOILERPLATE(RearAxle);
-BOILERPLATE(AdditionalAxle);
+Axle::operator openscenario_msgs::msg::Axle() const
+{
+  openscenario_msgs::msg::Axle axle;
+  {
+    axle.max_steering = max_steering;
+    axle.wheel_diameter = wheel_diameter;
+    axle.track_width = track_width;
+    axle.position_x = position_x;
+    axle.position_z = position_z;
+  }
+
+  return axle;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

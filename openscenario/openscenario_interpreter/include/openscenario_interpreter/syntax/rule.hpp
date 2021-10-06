@@ -17,7 +17,6 @@
 
 #include <functional>
 #include <openscenario_interpreter/functional/equal_to.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <string>
 #include <utility>
 
@@ -77,10 +76,6 @@ struct Rule
     }
   }
 };
-
-static_assert(std::is_standard_layout<Rule>::value, "");
-
-static_assert(std::is_trivial<Rule>::value, "");
 
 auto operator>>(std::istream &, Rule &) -> std::istream &;
 

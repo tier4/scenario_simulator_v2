@@ -12,16 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iomanip>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/open_scenario_category.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const OpenScenario &) { return os; }
+OpenScenario::OpenScenario(const boost::filesystem::path & pathname)
+: Scope(pathname),
+  file_header(readElement<FileHeader>(
+    "FileHeader", load(global().pathname).child("OpenSCENARIO"), localScope())),
+  category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, localScope())),
+  frame(0)
+{
+}
 
-nlohmann::json & operator<<(nlohmann::json & json, const OpenScenario & datum)
+auto OpenScenario::complete() const -> bool { return category.as<ScenarioDefinition>().complete(); }
+
+auto OpenScenario::evaluate() -> Element
+{
+  ++frame;
+  return category.evaluate();
+}
+
+auto OpenScenario::load(const boost::filesystem::path & filepath) -> const pugi::xml_node &
+{
+  const auto result = script.load_file(filepath.string().c_str());
+
+  if (not result) {
+    throw SyntaxError(result.description(), ": ", filepath);
+  } else {
+    return script;
+  }
+}
+
+auto operator<<(nlohmann::json & json, const OpenScenario & datum) -> nlohmann::json &
 {
   json["version"] = "1.0";
 

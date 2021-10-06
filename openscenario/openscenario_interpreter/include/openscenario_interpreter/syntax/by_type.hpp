@@ -21,13 +21,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ByType ===============================================================
+/* ---- ByType -----------------------------------------------------------------
  *
- * <xsd:complexType name="ByType">
- *   <xsd:attribute name="objectType" type="ObjectType" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="ByType">
+ *    <xsd:attribute name="objectType" type="ObjectType" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ByType
 {
 };

@@ -53,32 +53,13 @@ struct EntityObject : public Group
   }
 };
 
-template <typename Result = void, typename Function, typename... Ts>
-auto apply(Function && function, const EntityObject & entity_object, Ts &&... xs) -> Result
-{
-  using functor = std::function<Result(Function &&, const EntityObject &, Ts &&...)>;
-
-#define BOILERPLATE(TYPE)                                                                     \
-  std::make_pair<std::type_index, functor>(                                                   \
-    typeid(TYPE), [](Function && function, const EntityObject & entity_object, Ts &&... xs) { \
-      return function(entity_object.as<TYPE>(), std::forward<decltype(xs)>(xs)...);           \
-    })
-
-  static const std::unordered_map<std::type_index, functor> overloads{
-    BOILERPLATE(Vehicle),
-    BOILERPLATE(Pedestrian),
-    BOILERPLATE(MiscObject),
-  };
-
-#undef BOILERPLATE
-
-  try {
-    return overloads.at(entity_object.type())(
-      std::forward<decltype(function)>(function), entity_object, std::forward<decltype(xs)>(xs)...);
-  } catch (const std::out_of_range &) {
-    throw UNSUPPORTED_SETTING_DETECTED(EntityObject, makeTypename(entity_object.type().name()));
-  }
-}
+DEFINE_LAZY_VISITOR(
+  EntityObject,
+  // CASE(CatalogReference),
+  CASE(Vehicle),     //
+  CASE(Pedestrian),  //
+  CASE(MiscObject),  //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

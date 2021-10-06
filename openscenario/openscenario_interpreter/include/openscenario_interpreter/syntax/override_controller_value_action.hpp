@@ -15,6 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OVERRIDE_CONTROLLER_VALUE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OVERRIDE_CONTROLLER_VALUE_ACTION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -79,10 +82,7 @@ struct OverrideControllerValueAction
    * ------------------------------------------------------------------------ */
   // TODO(yamacir-kit): const OverrideGearAction overrideGear;
 
-  template <typename Node, typename Scope>
-  explicit OverrideControllerValueAction(const Node &, Scope &)
-  {
-  }
+  explicit OverrideControllerValueAction(const pugi::xml_node &, Scope &) {}
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -15,9 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,41 +44,13 @@ struct SpeedCondition
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> last_checked_values;  // for description
+  std::vector<Double> results;  // for description
 
-  template <typename AST, typename Scope>
-  explicit SpeedCondition(
-    const AST & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
-  : value(readAttribute<Double>("value", node, outer_scope)),
-    compare(readAttribute<Rule>("rule", node, outer_scope)),
-    triggering_entities(triggering_entities),
-    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
-  {
-  }
+  explicit SpeedCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
-  auto description() const
-  {
-    std::stringstream description;
+  auto description() const -> String;
 
-    description << triggering_entities.description() << "'s speed = ";
-
-    print_to(description, last_checked_values);
-
-    description << " " << compare << " " << value << "?";
-
-    return description.str();
-  }
-
-  auto evaluate()
-  {
-    last_checked_values.clear();
-
-    return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-      last_checked_values.push_back(
-        getEntityStatus(triggering_entity).action_status.twist.linear.x);
-      return compare(last_checked_values.back(), value);
-    }));
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

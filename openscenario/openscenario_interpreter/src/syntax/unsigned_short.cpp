@@ -12,15 +12,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/lexical_cast.hpp>
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/unsigned_short.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, UnsignedShort & datum) { return is >> datum.data; }
+static_assert(std::is_standard_layout<UnsignedShort>::value, "");
 
-std::ostream & operator<<(std::ostream & os, const UnsignedShort & datum)
+static_assert(not std::is_trivial<UnsignedShort>::value, "");
+
+UnsignedShort::UnsignedShort(value_type value) { data = value; }
+
+UnsignedShort::UnsignedShort(const std::string & s)
+{
+  try {
+    data = boost::lexical_cast<value_type>(s);
+  } catch (const boost::bad_lexical_cast &) {
+    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
+  }
+}
+
+auto UnsignedShort::operator++() noexcept -> UnsignedShort &
+{
+  ++data;
+  return *this;
+}
+
+auto UnsignedShort::operator+=(const value_type & rhs) -> UnsignedShort &
+{
+  data += rhs;
+  return *this;
+}
+
+auto UnsignedShort::operator*=(const value_type & rhs) -> UnsignedShort &
+{
+  data *= rhs;
+  return *this;
+}
+
+UnsignedShort::operator value_type() const noexcept { return data; }
+
+auto operator>>(std::istream & is, UnsignedShort & datum) -> std::istream &
+{
+  return is >> datum.data;
+}
+
+auto operator<<(std::ostream & os, const UnsignedShort & datum) -> std::ostream &
 {
   return os << datum.data;
 }

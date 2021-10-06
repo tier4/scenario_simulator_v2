@@ -12,12 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/user_defined_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+UserDefinedAction::UserDefinedAction(const pugi::xml_node & node, Scope & scope)
+{
+  callWithElements(node, "CustomCommandAction", 1, 1, [&](auto && node) {
+    return rebind<CustomCommandAction>(node, scope);
+  });
+}
+
+auto UserDefinedAction::endsImmediately() -> bool { return true; }
+
 auto UserDefinedAction::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);

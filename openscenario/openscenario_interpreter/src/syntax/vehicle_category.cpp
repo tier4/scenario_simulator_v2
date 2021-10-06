@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, VehicleCategory & category)
+auto operator>>(std::istream & is, VehicleCategory & category) -> std::istream &
 {
   std::string buffer;
 
@@ -59,7 +59,7 @@ std::istream & operator>>(std::istream & is, VehicleCategory & category)
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(VehicleCategory, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const VehicleCategory & datum)
+auto operator<<(std::ostream & os, const VehicleCategory & datum) -> std::ostream &
 {
 #define BOILERPLATE(NAME)     \
   case VehicleCategory::NAME: \

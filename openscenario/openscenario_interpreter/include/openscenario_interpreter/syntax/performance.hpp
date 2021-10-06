@@ -15,9 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PERFORMANCE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PERFORMANCE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_msgs/msg/performance.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,28 +41,10 @@ struct Performance
 
   Performance() = default;
 
-  template <typename Node, typename Scope>
-  explicit Performance(const Node & node, Scope & scope)
-  : max_speed(readAttribute<Double>("maxSpeed", node, scope)),
-    max_acceleration(readAttribute<Double>("maxAcceleration", node, scope)),
-    max_deceleration(readAttribute<Double>("maxDeceleration", node, scope))
-  {
-  }
+  explicit Performance(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::Performance() const
-  {
-    openscenario_msgs::msg::Performance performance;
-    {
-      performance.max_speed = max_speed;
-      performance.max_acceleration = max_acceleration;
-      performance.max_deceleration = max_deceleration;
-    }
-
-    return performance;
-  }
+  explicit operator openscenario_msgs::msg::Performance() const;
 };
-
-std::ostream & operator<<(std::ostream &, const Performance &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

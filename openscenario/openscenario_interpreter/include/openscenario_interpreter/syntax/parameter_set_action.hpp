@@ -15,11 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_SET_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_SET_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
-#include <typeindex>
-#include <unordered_map>
-#include <utility>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -38,37 +36,13 @@ struct ParameterSetAction : private Scope
 
   const String value;
 
-  template <typename Node>
-  explicit ParameterSetAction(const Node & node, Scope & outer_scope, const String & parameter_ref)
-  : Scope(outer_scope),
-    parameter_ref(parameter_ref),
-    value(readAttribute<String>("value", node, localScope()))
-  {
-  }
+  explicit ParameterSetAction(const pugi::xml_node &, Scope &, const String &);
 
-  static constexpr auto accomplished() noexcept { return true; }
+  static auto accomplished() noexcept -> bool;
 
-  auto run() const -> void
-  {
-    // clang-format off
-    static const std::unordered_map<
-      std::type_index, std::function<void(const Element &, const String &)>> overloads
-    {
-      { typeid(Boolean),         [](const Element & parameter, auto && value) { parameter.as<Boolean        >() = boost::lexical_cast<Boolean        >(value); } },
-      { typeid(Double),          [](const Element & parameter, auto && value) { parameter.as<Double         >() = boost::lexical_cast<Double         >(value); } },
-      { typeid(Integer),         [](const Element & parameter, auto && value) { parameter.as<Integer        >() = boost::lexical_cast<Integer        >(value); } },
-      { typeid(String),          [](const Element & parameter, auto && value) { parameter.as<String         >() =                                      value ; } },
-      { typeid(UnsignedInteger), [](const Element & parameter, auto && value) { parameter.as<UnsignedInteger>() = boost::lexical_cast<UnsignedInteger>(value); } },
-      { typeid(UnsignedShort),   [](const Element & parameter, auto && value) { parameter.as<UnsignedShort  >() = boost::lexical_cast<UnsignedShort  >(value); } },
-    };
-    // clang-format on
+  /*  */ auto run() const -> void;
 
-    const auto parameter = findElement(parameter_ref);
-
-    overloads.at(parameter.type())(parameter, value);
-  }
-
-  static auto start() noexcept -> void {}
+  static auto start() noexcept -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

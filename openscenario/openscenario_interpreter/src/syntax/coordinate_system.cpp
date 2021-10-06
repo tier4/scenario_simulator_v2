@@ -19,6 +19,10 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+static_assert(std::is_standard_layout<CoordinateSystem>::value, "");
+
+static_assert(std::is_trivial<CoordinateSystem>::value, "");
+
 auto operator>>(std::istream & is, CoordinateSystem & datum) -> std::istream &
 {
   std::string buffer;

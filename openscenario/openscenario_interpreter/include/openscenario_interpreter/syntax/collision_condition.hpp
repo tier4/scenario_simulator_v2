@@ -15,11 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__COLLISION_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__COLLISION_CONDITION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -44,49 +42,12 @@ struct CollisionCondition : private Scope
 
   const TriggeringEntities triggering_entities;
 
-  template <typename Node, typename Scope>
-  explicit CollisionCondition(
-    const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-  // clang-format off
-  : Scope(scope),
-    another_given_entity(
-      choice(node,
-        std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope); }),
-        std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
-    triggering_entities(triggering_entities)
-  // clang-format on
-  {
-  }
+  explicit CollisionCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
-  auto description() const
-  {
-    std::stringstream description;
+  auto description() const -> std::string;
 
-    description << triggering_entities.description() << " colliding with another given entity "
-                << another_given_entity << "?";
-
-    // TODO (yamacir-kit): If another_given_entity.is<ByType>(), description
-    // will be "Is any of [A, B, C] colliding with another T typed entities?"
-
-    return description.str();
-  }
-
-  auto evaluate() const noexcept
-  {
-    if (
-      another_given_entity.is<EntityRef>() and
-      global().isAddedEntity(another_given_entity.as<EntityRef>())) {
-      return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-        return evaluateCollisionCondition(triggering_entity, another_given_entity.as<EntityRef>());
-      }));
-    } else {
-      // TODO ByType
-      return false_v;
-    }
-  }
+  auto evaluate() const -> Element;
 };
-
-std::ostream & operator<<(std::ostream &, const CollisionCondition &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

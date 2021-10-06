@@ -15,14 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/boolean.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/lane_change_target.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
-#include <string>
+#include <pugixml.hpp>
 #include <unordered_map>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -47,52 +47,17 @@ struct LaneChangeAction : private Scope
 
   const LaneChangeTarget lane_change_target;
 
-  template <typename Node>
-  explicit LaneChangeAction(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope),
-    target_lane_offset(readAttribute<Double>("targetLaneOffset", node, localScope(), Double())),
-    lane_change_action_dynamics(
-      readElement<TransitionDynamics>("LaneChangeActionDynamics", node, localScope())),
-    lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, localScope()))
-  {
-  }
+  explicit LaneChangeAction(const pugi::xml_node &, Scope &);
 
   std::unordered_map<String, Boolean> accomplishments;
 
-  void start()
-  {
-    accomplishments.clear();
+  /*  */ auto accomplished() -> bool;
 
-    if (lane_change_target.is<AbsoluteTargetLane>()) {
-      for (const auto & actor : actors) {
-        accomplishments.emplace(actor, false);
-        applyLaneChangeAction(actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
-      }
-    } else {
-      // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(lane_change_target.type().name());
-    }
-  }
+  static auto endsImmediately() noexcept -> bool;
 
-  auto accomplished()
-  {
-    if (lane_change_target.is<AbsoluteTargetLane>()) {
-      for (auto && each : accomplishments) {
-        if (!cdr(each)) {
-          cdr(each) =
-            isInLanelet(car(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value), 0.1);
-        }
-      }
-      return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
-    } else {
-      // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(lane_change_target.type().name());
-    }
-  }
+  static auto run() noexcept -> void;
 
-  static bool endsImmediately() { return false; };
-
-  static auto run() -> void {}
+  /*  */ auto start() -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

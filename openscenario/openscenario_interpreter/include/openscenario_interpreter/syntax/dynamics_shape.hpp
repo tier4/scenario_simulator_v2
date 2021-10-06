@@ -43,7 +43,6 @@ inline namespace syntax
 struct DynamicsShape
 {
   enum value_type {
-
     /* ---- NOTE ---------------------------------------------------------------
      *
      *  Value changes in a linear function:
@@ -92,9 +91,9 @@ static_assert(std::is_standard_layout<DynamicsShape>::value, "");
 
 static_assert(std::is_trivial<DynamicsShape>::value, "");
 
-std::istream & operator>>(std::istream &, DynamicsShape &);
+auto operator>>(std::istream &, DynamicsShape &) -> std::istream &;
 
-std::ostream & operator<<(std::ostream &, const DynamicsShape &);
+auto operator<<(std::ostream &, const DynamicsShape &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -12,15 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/entity_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+EntityAction::EntityAction(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: Element(
+    choice(node,
+      std::make_pair(   "AddEntityAction", [&](auto && node) { return make<   AddEntityAction>(node, scope); }),
+      std::make_pair("DeleteEntityAction", [&](auto && node) { return make<DeleteEntityAction>(node, scope); }))),
+  entity_ref(readAttribute<String>("entityRef", node, scope))
+// clang-format on
+{
+}
+
+auto EntityAction::accomplished() noexcept -> bool { return endsImmediately(); }
+
+auto EntityAction::endsImmediately() noexcept -> bool { return true; }
+
 auto EntityAction::run() const -> void
 {
   return apply<void>([this](auto && action) { return action(entity_ref); }, *this);
 }
+
+auto EntityAction::start() noexcept -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

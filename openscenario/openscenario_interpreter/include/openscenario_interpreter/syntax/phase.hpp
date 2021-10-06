@@ -15,10 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PHASE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PHASE_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -37,18 +38,10 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Phase
 {
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  Name of the phase.
-   *
-   * ------------------------------------------------------------------------ */
+  // Name of the phase.
   const String name;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  Duration of the phase. Unit: s; Range: [0..inf[.
-   *
-   * ------------------------------------------------------------------------ */
+  // Duration of the phase. Unit: s; Range: [0..inf[.
   const Double duration;
 
   /* ---- NOTE -----------------------------------------------------------------
@@ -62,23 +55,9 @@ struct Phase
    * ------------------------------------------------------------------------ */
   const std::list<TrafficSignalState> traffic_signal_states;
 
-  template <typename Node, typename Scope>
-  explicit Phase(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)),
-    duration(readAttribute<Double>("duration", node, outer_scope, Double::infinity())),
-    traffic_signal_states(
-      readElements<TrafficSignalState, 0>("TrafficSignalState", node, outer_scope))
-  {
-  }
+  explicit Phase(const pugi::xml_node &, Scope &);
 
-  auto evaluate() const
-  {
-    for (const auto & state : traffic_signal_states) {
-      state.evaluate();
-    }
-
-    return unspecified;
-  }
+  auto evaluate() const -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

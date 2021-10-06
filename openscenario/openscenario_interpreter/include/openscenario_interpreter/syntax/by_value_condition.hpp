@@ -15,13 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__BY_VALUE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__BY_VALUE_CONDITION_HPP_
 
-#include <openscenario_interpreter/syntax/parameter_condition.hpp>
-#include <openscenario_interpreter/syntax/simulation_time_condition.hpp>
-#include <openscenario_interpreter/syntax/storyboard_element_state_condition.hpp>
-#include <openscenario_interpreter/syntax/traffic_signal_condition.hpp>
-#include <openscenario_interpreter/syntax/traffic_signal_controller_condition.hpp>
-#include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -44,21 +39,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ByValueCondition : public ComplexType
 {
-  template <typename Node, typename... Ts>
-  explicit ByValueCondition(const Node & node, Ts &&... xs)
-  // clang-format off
-  : ComplexType(
-      choice(node,
-        std::make_pair(              "ParameterCondition", [&](auto && node) { return make<              ParameterCondition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(              "TimeOfDayCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(         "SimulationTimeCondition", [&](auto && node) { return make<         SimulationTimeCondition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair( "StoryboardElementStateCondition", [&](auto && node) { return make< StoryboardElementStateCondition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(       "UserDefinedValueCondition", [&](auto && node) { return make<       UserDefinedValueCondition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(          "TrafficSignalCondition", [&](auto && node) { return make<          TrafficSignalCondition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("TrafficSignalControllerCondition", [&](auto && node) { return make<TrafficSignalControllerCondition>(node, std::forward<decltype(xs)>(xs)...); })))
-  // clang-format on
-  {
-  }
+  explicit ByValueCondition(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

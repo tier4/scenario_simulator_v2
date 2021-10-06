@@ -19,7 +19,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, ParameterType & datum)
+static_assert(std::is_standard_layout<ParameterType>::value, "");
+
+static_assert(std::is_trivial<ParameterType>::value, "");
+
+auto operator>>(std::istream & is, ParameterType & datum) -> std::istream &
 {
   std::string buffer;
 
@@ -45,7 +49,7 @@ std::istream & operator>>(std::istream & is, ParameterType & datum)
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(ParameterType, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const ParameterType & datum)
+auto operator<<(std::ostream & os, const ParameterType & datum) -> std::ostream &
 {
 #define BOILERPLATE(NAME, ID) \
   case ParameterType::ID:     \

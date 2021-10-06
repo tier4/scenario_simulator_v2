@@ -57,10 +57,6 @@ struct CoordinateSystem
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<CoordinateSystem>::value, "");
-
-static_assert(std::is_trivial<CoordinateSystem>::value, "");
-
 auto operator>>(std::istream &, CoordinateSystem &) -> std::istream &;
 
 auto operator<<(std::ostream &, const CoordinateSystem &) -> std::ostream &;

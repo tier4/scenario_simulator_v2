@@ -15,20 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
-#include <autoware_debug_msgs/msg/string_stamped.hpp>
 #include <autoware_simulation_msgs/msg/simulation_events.hpp>
-#include <iterator>  // std::distance
-#include <openscenario_interpreter/error.hpp>
-#include <openscenario_interpreter/posix/fork_exec.hpp>
-#include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/scope.hpp>
-#include <stdexcept>  // std::runtime_error
+#include <pugixml.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <string>
-#include <type_traits>  // std::true_type
-#include <unordered_map>
-#include <utility>  // std::make_pair
 #include <vector>
 
 namespace openscenario_interpreter
@@ -57,171 +48,33 @@ struct CustomCommandAction : private Scope
 
   const String content;
 
-  template <typename Node>
-  explicit CustomCommandAction(const Node & node, const Scope & outer_scope)
-  : Scope(outer_scope),
-    type(readAttribute<String>("type", node, localScope())),
-    content(readContent<String>(node, localScope()))
-  {
-  }
+  explicit CustomCommandAction(const pugi::xml_node &, const Scope &);
 
-  static auto getNode() -> auto &
-  {
-    static rclcpp::Node node{"custom_command_action", "simulation"};
+  static auto accomplished() noexcept -> bool;
 
-    return node;
-  }
+  static auto applyFaultInjectionAction(const std::vector<std::string> &, const Scope &) -> int;
 
-  static auto getSimulationEventsPublisher() -> auto &
-  {
-    static auto publisher =
-      getNode().create_publisher<autoware_simulation_msgs::msg::SimulationEvents>(
-        "/simulation/events", rclcpp::QoS(1).reliable());
+  static auto applyWalkStraightAction(const std::vector<std::string> &, const Scope &) -> int;
 
-    return *publisher;
-  }
+  static auto debugError(const std::vector<std::string> &, const Scope &) -> int;
 
-  static auto accomplished() noexcept -> bool { return true; }
+  static auto debugSegmentationFault(const std::vector<std::string> &, const Scope &) -> int;
 
-  static auto applyFaultInjectionAction(const std::vector<std::string> & events, const Scope &)
-    -> int
-  {
-    const auto now = getNode().now();
+  static auto exitFailure(const std::vector<std::string> &, const Scope &) -> int;
 
-    auto makeFaultInjectionEvent = [](const auto & name) {
-      autoware_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
-      {
-        fault_injection_event.level = autoware_simulation_msgs::msg::FaultInjectionEvent::ERROR;
-        fault_injection_event.name = name;
-      }
+  static auto exitSuccess(const std::vector<std::string> &, const Scope &) -> int;
 
-      return fault_injection_event;
-    };
+  static auto node() -> rclcpp::Node &;
 
-    auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
-      autoware_simulation_msgs::msg::SimulationEvents simulation_events;
-      {
-        simulation_events.stamp = now;
+  /*  */ auto run() -> void;
 
-        for (const auto & event : events) {
-          simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
-        }
-      }
+  static auto publisher() -> rclcpp::Publisher<autoware_simulation_msgs::msg::SimulationEvents> &;
 
-      return simulation_events;
-    };
+  static auto split(const std::string &) -> std::vector<std::string>;
 
-    getSimulationEventsPublisher().publish(makeFaultInjectionEvents(events));
+  static auto start() noexcept -> void;
 
-    return events.size();
-  }
-
-  static int applyWalkStraightAction(
-    const std::vector<std::string> & actors, const Scope & current_scope)
-  {
-    for (const auto & actor : actors) {
-      openscenario_interpreter::applyWalkStraightAction(actor);
-    }
-
-    for (const auto & actor : current_scope.actors) {
-      openscenario_interpreter::applyWalkStraightAction(actor);
-    }
-
-    return current_scope.actors.size();
-  }
-
-  static int exitSuccess(const std::vector<std::string> &, const Scope &)
-  {
-    throw SpecialAction<EXIT_SUCCESS>();
-  }
-
-  static int exitFailure(const std::vector<std::string> &, const Scope &)
-  {
-    throw SpecialAction<EXIT_FAILURE>();
-  }
-
-  static int error(const std::vector<std::string> &, const Scope &)
-  {
-    throw Error(__FILE__, ":", __LINE__);
-  }
-
-  static int segv(const std::vector<std::string> &, const Scope &)
-  {
-    return *reinterpret_cast<std::add_pointer<int>::type>(0);
-  }
-
-  static int test(const std::vector<std::string> & args, const Scope &)
-  {
-    std::cout << "test" << std::endl;
-    for (auto iter = std::cbegin(args); iter != std::cend(args); ++iter) {
-      std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter << "\n";
-    }
-
-    return args.size();
-  }
-
-  const std::unordered_map<
-    std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
-    builtins{
-      std::make_pair("FaultInjectionAction", applyFaultInjectionAction),
-      std::make_pair("WalkStraightAction", applyWalkStraightAction),
-      std::make_pair("error", error),
-      std::make_pair("exitFailure", exitFailure),
-      std::make_pair("exitSuccess", exitSuccess),
-      std::make_pair("sigsegv", segv),  // Deprecated
-      std::make_pair("test", test),
-    };
-
-  static auto split(const std::string & s)
-  {
-    static const std::regex pattern{R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"};
-
-    std::vector<std::string> args{};
-
-    for (std::sregex_iterator iter{std::begin(s), std::end(s), pattern}, end; iter != end; ++iter) {
-      args.emplace_back((*iter)[1]);
-    }
-
-    return args;
-  }
-
-  auto run() -> void
-  {
-    /* ---- NOTE ---------------------------------------------------------------
-     *
-     *  <CustomCommandAction type="function(foo, &quot;hello, world!&quot;, 3.14)"/>
-     *
-     *  result[0] = function(foo, "hello, world!", 3.14)
-     *  result[1] = function
-     *  result[2] = (foo, "hello, world!", 3.14)
-     *  result[3] = foo, "hello, world!", 3.14
-     *
-     * ---------------------------------------------------------------------- */
-    static const std::regex pattern{R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)"};
-
-    std::smatch result{};
-
-    if (std::regex_match(type, result, pattern) && builtins.find(result[1]) != std::end(builtins)) {
-      builtins.at(result[1])(split(result[3]), localScope());
-    } else {
-      fork_exec(type, content);
-    }
-  }
-
-  static auto start() noexcept -> void {}
-
-  friend std::ostream & operator<<(std::ostream & os, const CustomCommandAction & action)
-  {
-    os << indent << blue << "<CustomCommandAction"
-       << " " << highlight("type", action.type);
-
-    if (action.content.empty()) {
-      return os << blue << "/>" << reset;
-    } else {
-      return os << blue << ">" << reset << action.content << blue << "</CustomCommandAction>"
-                << reset;
-    }
-  }
+  static auto test(const std::vector<std::string> &, const Scope &) -> int;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

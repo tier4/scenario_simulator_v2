@@ -32,7 +32,7 @@ inline namespace syntax
 struct EntityRef : public String
 {
   template <typename... Ts>
-  explicit constexpr EntityRef(Ts &&... xs) : String(std::forward<decltype(xs)>(xs)...)
+  EntityRef(Ts &&... xs) : String(std::forward<decltype(xs)>(xs)...)
   {
   }
 

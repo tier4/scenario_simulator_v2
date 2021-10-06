@@ -12,12 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/private_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+PrivateAction::PrivateAction(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: ComplexType(
+    choice(node,
+      std::make_pair(      "LongitudinalAction", [&](const auto & node) { return make<LongitudinalAction>(node, scope); }),
+      std::make_pair(           "LateralAction", [&](const auto & node) { return make<     LateralAction>(node, scope); }),
+      std::make_pair(        "VisibilityAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(       "SynchronizeAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair("ActivateControllerAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(        "ControllerAction", [&](const auto & node) { return make<  ControllerAction>(node, scope); }),
+      std::make_pair(          "TeleportAction", [&](const auto & node) { return make<    TeleportAction>(node, scope); }),
+      std::make_pair(           "RoutingAction", [&](const auto & node) { return make<     RoutingAction>(node, scope); })))
+// clang-format on
+{
+}
+
 auto PrivateAction::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
