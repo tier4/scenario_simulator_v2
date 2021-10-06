@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_CONDITION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -49,13 +49,7 @@ struct TrafficSignalControllerCondition
 
   Scope scope;
 
-  template <typename Tree>
-  explicit TrafficSignalControllerCondition(const Tree & tree, const Scope & scope)
-  : phase(readAttribute<String>("phase", tree, scope)),
-    traffic_signal_controller_ref(readAttribute<String>("trafficSignalControllerRef", tree, scope)),
-    scope(scope)
-  {
-  }
+  explicit TrafficSignalControllerCondition(const pugi::xml_node &, const Scope &);
 
   auto description() const -> String;
 

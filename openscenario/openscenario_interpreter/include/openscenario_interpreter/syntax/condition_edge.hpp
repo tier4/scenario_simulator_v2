@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_EDGE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_EDGE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <iostream>
 
 namespace openscenario_interpreter
 {

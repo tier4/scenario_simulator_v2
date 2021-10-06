@@ -17,7 +17,6 @@
 
 #include <functional>
 #include <openscenario_interpreter/functional/equal_to.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <string>
 #include <utility>
 

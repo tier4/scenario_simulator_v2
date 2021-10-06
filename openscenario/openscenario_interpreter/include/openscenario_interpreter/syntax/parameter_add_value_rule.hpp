@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ADD_VALUE_RULE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ADD_VALUE_RULE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -33,11 +34,7 @@ struct ParameterAddValueRule
 {
   const Double value;
 
-  template <typename... Ts>
-  explicit ParameterAddValueRule(Ts &&... xs)
-  : value(readAttribute<Double>("value", std::forward<decltype(xs)>(xs)...))
-  {
-  }
+  explicit ParameterAddValueRule(const pugi::xml_node &, Scope &);
 
   auto operator()(const Element & target) const -> Element;
 };

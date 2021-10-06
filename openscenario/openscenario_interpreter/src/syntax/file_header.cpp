@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/parameter_declarations.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/file_header.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-ParameterDeclarations::ParameterDeclarations(const pugi::xml_node & node, Scope & scope)
+FileHeader::FileHeader(const pugi::xml_node & tree, Scope & scope)
+: revMajor(readAttribute<UnsignedShort>("revMajor", tree, scope)),
+  revMinor(readAttribute<UnsignedShort>("revMinor", tree, scope)),
+  date(readAttribute<String>("date", tree, scope)),
+  description(readAttribute<String>("description", tree, scope)),
+  author(readAttribute<String>("author", tree, scope))
 {
-  callWithElements(node, "ParameterDeclaration", 0, unbounded, [&](auto && each) {
-    return emplace_back(each, scope);
-  });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/parameter_declarations.hpp>
+#include <openscenario_interpreter/syntax/catalog_definition.hpp>
+#include <openscenario_interpreter/syntax/open_scenario_category.hpp>
+#include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-ParameterDeclarations::ParameterDeclarations(const pugi::xml_node & node, Scope & scope)
+OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & scope)
+: Group(
+    tree.child("Catalog") ? make<CatalogDefinition>(tree, scope)
+                          : make<ScenarioDefinition>(tree, scope))
 {
-  callWithElements(node, "ParameterDeclaration", 0, unbounded, [&](auto && each) {
-    return emplace_back(each, scope);
-  });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

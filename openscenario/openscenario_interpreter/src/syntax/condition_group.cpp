@@ -18,6 +18,12 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ConditionGroup::ConditionGroup(const pugi::xml_node & node, Scope & scope) : current_value(false)
+{
+  callWithElements(
+    node, "Condition", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
+}
+
 auto ConditionGroup::evaluate() -> Element
 {
   // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.

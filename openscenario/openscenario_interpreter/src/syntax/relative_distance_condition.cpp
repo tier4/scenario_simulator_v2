@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
@@ -21,6 +22,21 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+RelativeDistanceCondition::RelativeDistanceCondition(
+  const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
+: Scope(scope),
+  coordinate_system(
+    readAttribute<CoordinateSystem>("coordinateSystem", node, scope, CoordinateSystem::entity)),
+  entity_ref(readAttribute<String>("entityRef", node, scope)),
+  freespace(readAttribute<Boolean>("freespace", node, scope)),
+  relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope)),
+  rule(readAttribute<Rule>("rule", node, scope)),
+  value(readAttribute<Double>("value", node, scope)),
+  triggering_entities(triggering_entities),
+  results(triggering_entities.entity_refs.size(), Double::nan())
+{
+}
+
 auto RelativeDistanceCondition::description() const -> String
 {
   std::stringstream description;

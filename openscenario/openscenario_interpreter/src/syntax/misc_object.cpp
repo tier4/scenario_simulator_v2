@@ -12,12 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+MiscObject::MiscObject(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  mass(readAttribute<Double>("mass", node, localScope())),
+  misc_object_category(readAttribute<MiscObjectCategory>("miscObjectCategory", node, localScope())),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
+  properties(readElement<Properties>("Properties", node, localScope()))
+{
+}
+
 MiscObject::operator openscenario_msgs::msg::MiscObjectParameters() const
 {
   openscenario_msgs::msg::MiscObjectParameters misc_object_parameters;

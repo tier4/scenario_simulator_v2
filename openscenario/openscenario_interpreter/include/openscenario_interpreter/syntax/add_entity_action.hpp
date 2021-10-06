@@ -15,9 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ADD_ENTITY_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ADD_ENTITY_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -38,11 +38,7 @@ struct AddEntityAction : private Scope
 
   explicit AddEntityAction(const Scope &, const Position &);
 
-  template <typename Tree>
-  explicit AddEntityAction(const Tree & tree, Scope & scope)
-  : Scope(scope), position(readElement<Position>("Position", tree, scope))
-  {
-  }
+  explicit AddEntityAction(const pugi::xml_node &, Scope &);
 
   static auto accomplished() noexcept -> bool { return endsImmediately(); }
 

@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -41,7 +41,7 @@ struct ParameterCondition : private Scope
 
   const Rule compare;
 
-  explicit ParameterCondition(const XML &, Scope &);
+  explicit ParameterCondition(const pugi::xml_node &, Scope &);
 
   auto description() const -> String;
 

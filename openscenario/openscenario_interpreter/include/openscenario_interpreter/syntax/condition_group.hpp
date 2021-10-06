@@ -16,7 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_GROUP_HPP_
 
 #include <nlohmann/json.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/condition.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -39,12 +41,7 @@ struct ConditionGroup : public std::list<Condition>
 {
   bool current_value;
 
-  template <typename Node, typename Scope>
-  explicit ConditionGroup(const Node & node, Scope & scope) : current_value(false)
-  {
-    callWithElements(
-      node, "Condition", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
-  }
+  explicit ConditionGroup(const pugi::xml_node &, Scope &);
 
   auto evaluate() -> Element;
 };

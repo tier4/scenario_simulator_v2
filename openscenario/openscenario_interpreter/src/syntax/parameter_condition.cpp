@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <iomanip>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/parameter_condition.hpp>
 #include <sstream>
 #include <stdexcept>
@@ -23,13 +24,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-ParameterCondition::ParameterCondition(const XML & node, Scope & scope)
-// clang-format off
+ParameterCondition::ParameterCondition(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
   parameter_ref(readAttribute<String>("parameterRef", node, localScope())),
-  value        (readAttribute<String>("value",        node, localScope())),
-  compare      (readAttribute<Rule>  ("rule",         node, localScope()))
-// clang-format on
+  value(readAttribute<String>("value", node, localScope())),
+  compare(readAttribute<Rule>("rule", node, localScope()))
 {
 }
 

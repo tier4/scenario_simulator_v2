@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -21,6 +22,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+AddEntityAction::AddEntityAction(const pugi::xml_node & node, Scope & scope)
+: Scope(scope), position(readElement<Position>("Position", node, scope))
+{
+}
+
 AddEntityAction::AddEntityAction(const Scope & scope, const Position & position)
 : Scope(scope), position(position)
 {

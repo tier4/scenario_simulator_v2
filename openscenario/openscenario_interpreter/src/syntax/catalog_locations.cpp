@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/assign_controller_action.hpp>
-#include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/syntax/catalog_locations.hpp>
+#include <tuple>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scope & scope)
-// clang-format off
-: Scope(scope),
-  ComplexType(
-    choice(node,
-      std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, localScope()); }),
-      std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
-// clang-format on
-{
-}
+#define ELEMENT(TYPE)                                                   \
+  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {     \
+    return emplace(                                                     \
+      std::piecewise_construct, std::forward_as_tuple(#TYPE "Catalog"), \
+      std::forward_as_tuple(node, scope));                              \
+  })
 
-auto AssignControllerAction::operator()() const -> void
+CatalogLocations::CatalogLocations(const pugi::xml_node & node, Scope & scope)
 {
-  for (const auto & actor : actors) {
-    applyAssignControllerAction(actor, (*this).as<Controller>());
-  }
+  ELEMENT(Vehicle);
+  ELEMENT(Controller);
+  ELEMENT(Pedestrian);
+  ELEMENT(MiscObject);
+  ELEMENT(Environment);
+  ELEMENT(Maneuver);
+  ELEMENT(Trajectory);
+  ELEMENT(Route);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -21,7 +21,7 @@
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -67,22 +67,7 @@ struct RelativeDistanceCondition : private Scope
 
   std::vector<Double> results;  // for description
 
-  template <typename Node, typename Scope>
-  explicit RelativeDistanceCondition(
-    const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-  // clang-format off
-  : Scope(scope),
-    coordinate_system     (readAttribute<CoordinateSystem    >("coordinateSystem",     node, scope, CoordinateSystem::entity)),
-    entity_ref            (readAttribute<String              >("entityRef",            node, scope)),
-    freespace             (readAttribute<Boolean             >("freespace",            node, scope)),
-    relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope)),
-    rule                  (readAttribute<Rule                >("rule",                 node, scope)),
-    value                 (readAttribute<Double              >("value",                node, scope)),
-    triggering_entities(triggering_entities),
-    results(triggering_entities.entity_refs.size(), Double::nan())
-  // clang-format on
-  {
-  }
+  explicit RelativeDistanceCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
 

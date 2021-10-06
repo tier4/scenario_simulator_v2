@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller_condition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TrafficSignalControllerCondition::TrafficSignalControllerCondition(
+  const pugi::xml_node & tree, const Scope & scope)
+: phase(readAttribute<String>("phase", tree, scope)),
+  traffic_signal_controller_ref(readAttribute<String>("trafficSignalControllerRef", tree, scope)),
+  scope(scope)
+{
+}
+
 auto TrafficSignalControllerCondition::description() const -> String
 {
   std::stringstream description;
