@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Update syntaxes of `openscenario_interpreter` to be compiled separately ([link](https://github.com/tier4/scenario_simulator_v2/pull/532)).
 
 ## Version 0.5.1
 - Support OpenSCENARIO 1.1 `AddEntityAction` ([link](https://github.com/tier4/scenario_simulator_v2/pull/506)).
