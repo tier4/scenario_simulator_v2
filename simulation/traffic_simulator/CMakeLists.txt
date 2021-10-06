@@ -21,23 +21,6 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
-  src/behavior/action_node.cpp
-  src/behavior/pedestrian/behavior_tree.cpp
-  src/behavior/pedestrian/follow_lane_action.cpp
-  src/behavior/pedestrian/pedestrian_action_node.cpp
-  src/behavior/pedestrian/walk_straight_action.cpp
-  src/behavior/route_planner.cpp
-  src/behavior/target_speed_planner.cpp
-  src/behavior/vehicle/behavior_tree.cpp
-  src/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/follow_lane_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/move_backward_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/stop_at_traffic_light_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/yield_action.cpp
-  src/behavior/vehicle/lane_change_action.cpp
-  src/behavior/vehicle/vehicle_action_node.cpp
   src/color_utils/color_utils.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
