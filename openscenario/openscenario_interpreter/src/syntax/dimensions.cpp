@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/dimensions.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-static_assert(IsOptionalElement<Dimensions>::value, "");
+Dimensions::Dimensions(const pugi::xml_node & node, Scope & scope)
+: width(readAttribute<Double>("width", node, scope)),
+  length(readAttribute<Double>("length", node, scope)),
+  height(readAttribute<Double>("height", node, scope))
+{
+}
 
 Dimensions::operator geometry_msgs::msg::Vector3() const
 {

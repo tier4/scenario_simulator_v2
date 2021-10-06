@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/lane_position.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
@@ -20,6 +22,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+LanePosition::LanePosition(const pugi::xml_node & node, Scope & scope)
+: road_id(readAttribute<String>("roadId", node, scope, "none")),
+  lane_id(readAttribute<String>("laneId", node, scope)),
+  offset(readAttribute<Double>("offset", node, scope, Double())),
+  s(readAttribute<Double>("s", node, scope)),
+  orientation(readElement<Orientation>("Orientation", node, scope))
+{
+}
+
 LanePosition::operator openscenario_msgs::msg::LaneletPose() const
 {
   const geometry_msgs::msg::Vector3 rpy = orientation;

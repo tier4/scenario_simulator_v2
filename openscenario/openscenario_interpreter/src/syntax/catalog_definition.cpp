@@ -12,25 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/waypoint.hpp>
+#include <openscenario_interpreter/syntax/catalog_definition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Waypoint::Waypoint(const pugi::xml_node & node, Scope & scope)
-: route_strategy(readAttribute<RouteStrategy>("routeStrategy", node, scope)),
-  position(readElement<Position>("Position", node, scope))
-{
-}
-
-Waypoint::operator openscenario_msgs::msg::LaneletPose() const
-{
-  return apply<openscenario_msgs::msg::LaneletPose>(
-    [](auto && position) { return static_cast<openscenario_msgs::msg::LaneletPose>(position); },
-    position);
-}
+CatalogDefinition::CatalogDefinition(const pugi::xml_node &, Scope &) {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

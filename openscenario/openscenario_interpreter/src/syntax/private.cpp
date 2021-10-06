@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 
@@ -19,6 +21,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Private::Private(const pugi::xml_node & node, Scope & scope)
+: Scope(scope), entity_ref(readAttribute<String>("entityRef", node, localScope()))
+{
+  actors.emplace_back(entity_ref);
+
+  callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
+    return private_actions.emplace_back(node, localScope());
+  });
+}
+
 auto Private::endsImmediately() const -> bool
 {
   return std::all_of(

@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DIRECTORY_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -32,11 +34,7 @@ struct Directory
 {
   const String path;
 
-  template <typename Node>
-  explicit Directory(const Node & node, Scope & scope)
-  : path{readAttribute<String>("path", node, scope)}
-  {
-  }
+  explicit Directory(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

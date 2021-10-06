@@ -15,11 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_SET_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_SET_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
-#include <typeindex>
-#include <unordered_map>
-#include <utility>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -38,13 +36,7 @@ struct ParameterSetAction : private Scope
 
   const String value;
 
-  template <typename Node>
-  explicit ParameterSetAction(const Node & node, Scope & scope, const String & parameter_ref)
-  : Scope(scope),
-    parameter_ref(parameter_ref),
-    value(readAttribute<String>("value", node, localScope()))
-  {
-  }
+  explicit ParameterSetAction(const pugi::xml_node &, Scope &, const String &);
 
   static auto accomplished() noexcept -> bool;
 

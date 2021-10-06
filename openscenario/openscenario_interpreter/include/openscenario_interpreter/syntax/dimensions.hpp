@@ -16,8 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DIMENSIONS_HPP_
 
 #include <geometry_msgs/msg/vector3.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -38,13 +39,7 @@ struct Dimensions
 
   Dimensions() = default;
 
-  template <typename Node, typename Scope>
-  explicit Dimensions(const Node & node, Scope & scope)
-  : width(readAttribute<Double>("width", node, scope)),
-    length(readAttribute<Double>("length", node, scope)),
-    height(readAttribute<Double>("height", node, scope))
-  {
-  }
+  explicit Dimensions(const pugi::xml_node &, Scope &);
 
   explicit operator geometry_msgs::msg::Vector3() const;
 };

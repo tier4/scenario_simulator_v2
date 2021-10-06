@@ -16,8 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_HPP_
 
 #include <nlohmann/json.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/private_action.hpp>
-#include <vector>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -39,16 +40,7 @@ struct Private : public Scope
 
   std::list<PrivateAction> private_actions;
 
-  template <typename Node>
-  explicit Private(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope), entity_ref(readAttribute<String>("entityRef", node, localScope()))
-  {
-    actors.emplace_back(entity_ref);
-
-    callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
-      return private_actions.emplace_back(node, localScope());
-    });
-  }
+  explicit Private(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 

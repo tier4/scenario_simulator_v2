@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/waypoint.hpp>
+#include <openscenario_interpreter/syntax/properties.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Waypoint::Waypoint(const pugi::xml_node & node, Scope & scope)
-: route_strategy(readAttribute<RouteStrategy>("routeStrategy", node, scope)),
-  position(readElement<Position>("Position", node, scope))
+Properties::Properties(const pugi::xml_node & node, Scope & scope)
 {
-}
+  callWithElements(node, "Property", 0, unbounded, [&](auto && node) {
+    return properties.emplace(
+      std::piecewise_construct,  //
+      std::forward_as_tuple(readAttribute<String>("name", node, scope)),
+      std::forward_as_tuple(node, scope));
+  });
 
-Waypoint::operator openscenario_msgs::msg::LaneletPose() const
-{
-  return apply<openscenario_msgs::msg::LaneletPose>(
-    [](auto && position) { return static_cast<openscenario_msgs::msg::LaneletPose>(position); },
-    position);
+  callWithElements(node, "File", 0, unbounded, [&](auto && node) {
+    return files.emplace_back(std::forward<decltype(node)>(node), scope);
+  });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

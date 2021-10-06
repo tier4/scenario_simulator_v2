@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/parameter_set_action.hpp>
+#include <typeindex>
+#include <unordered_map>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ParameterSetAction::ParameterSetAction(
+  const pugi::xml_node & node, Scope & scope, const String & parameter_ref)
+: Scope(scope),
+  parameter_ref(parameter_ref),
+  value(readAttribute<String>("value", node, localScope()))
+{
+}
+
 auto ParameterSetAction::accomplished() noexcept -> bool { return true; }
 
 auto ParameterSetAction::run() const -> void

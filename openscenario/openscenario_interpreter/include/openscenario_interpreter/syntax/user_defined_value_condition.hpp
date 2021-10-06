@@ -15,12 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_VALUE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_VALUE_CONDITION_HPP_
 
-#include <openscenario_interpreter/error.hpp>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include <regex>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,37 +38,20 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct UserDefinedValueCondition
+class UserDefinedValueCondition
 {
+  String result;
+
+  std::function<std::string()> evaluateValue;
+
+public:
   const String name;
 
   const String value;
 
   const Rule compare;
 
-  String result;
-
-  std::function<std::string()> evaluateValue;
-
-  template <typename Node>
-  explicit UserDefinedValueCondition(const Node & node, Scope & scope)
-  : name(readAttribute<String>("name", node, scope)),
-    value(readAttribute<String>("value", node, scope)),
-    compare(readAttribute<Rule>("rule", node, scope))
-  {
-    static const std::regex pattern{R"(([^\.]+)\.(.+))"};
-
-    std::smatch result;
-
-    if (std::regex_match(name, result, pattern)) {
-      const std::unordered_map<std::string, std::function<std::string()>> dispatch{
-        std::make_pair("currentState", [result]() { return evaluateCurrentState(result.str(1)); }),
-      };
-      evaluateValue = dispatch.at(result.str(2));  // XXX catch
-    } else {
-      throw SyntaxError(__FILE__, ":", __LINE__);
-    }
-  }
+  explicit UserDefinedValueCondition(const pugi::xml_node &, Scope &);
 
   auto description() const -> String;
 
