@@ -14,6 +14,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <traffic_simulator/metrics/out_of_range_metric.hpp>
 

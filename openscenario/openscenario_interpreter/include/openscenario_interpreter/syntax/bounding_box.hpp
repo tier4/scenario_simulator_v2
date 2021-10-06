@@ -15,10 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__BOUNDING_BOX_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__BOUNDING_BOX_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/center.hpp>
 #include <openscenario_interpreter/syntax/dimensions.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,12 +43,7 @@ struct BoundingBox
 
   BoundingBox() = default;
 
-  template <typename Node, typename Scope>
-  explicit BoundingBox(const Node & node, Scope & scope)
-  : center(readElement<Center>("Center", node, scope)),
-    dimensions(readElement<Dimensions>("Dimensions", node, scope))
-  {
-  }
+  explicit BoundingBox(const pugi::xml_node &, Scope &);
 
   explicit operator openscenario_msgs::msg::BoundingBox() const;
 };

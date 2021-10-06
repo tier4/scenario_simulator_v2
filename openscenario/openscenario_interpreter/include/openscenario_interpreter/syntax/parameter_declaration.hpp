@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_DECLARATION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_DECLARATION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
-#include <string>
-#include <vector>
+#include <openscenario_interpreter/syntax/parameter_type.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -43,33 +43,9 @@ struct ParameterDeclaration
 
   ParameterDeclaration() = default;
 
-  template <typename Node>
-  explicit ParameterDeclaration(const Node & node, Scope & scope)
-  // clang-format off
-  : name          (readAttribute<String       >("name",          node, scope)),
-    parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
-    value         (readAttribute<String       >("value",         node, scope))
-  // clang-format on
-  {
-    if (name.substr(0, 3) == "OSC") {
-      throw SyntaxError(
-        "Parameter names starting with \"OSC\" are reserved for special use in future versions "
-        "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix.");
-    } else if (includes(name, {' ', '$', '\'', '"'})) {
-      throw SyntaxError(
-        "In parameter names, usage of symbols is restricted. Symbols that must not be used are:\n"
-        "  - \" \" (blank space)\n"
-        "  - $\n"
-        "  - \'\n"
-        "  - \"\n");
-    } else {
-      scope.insert(name, evaluate());
-    }
-  }
+  explicit ParameterDeclaration(const pugi::xml_node &, Scope &);
 
   auto evaluate() const -> Element;
-
-  auto includes(const std::string &, const std::vector<char> &) -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

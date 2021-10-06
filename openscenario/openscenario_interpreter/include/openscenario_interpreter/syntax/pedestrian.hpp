@@ -15,11 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PEDESTRIAN_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PEDESTRIAN_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/pedestrian_category.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -54,19 +56,7 @@ struct Pedestrian : public Scope
 
   const Properties properties;
 
-  template <typename Node>
-  explicit Pedestrian(const Node & node, Scope & scope)
-  : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-    mass(readAttribute<Double>("mass", node, localScope())),
-    model(readAttribute<String>("model", node, localScope())),
-    pedestrian_category(
-      readAttribute<PedestrianCategory>("pedestrianCategory", node, localScope())),
-    parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
-    bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
-    properties(readElement<Properties>("Properties", node, localScope()))
-  {
-  }
+  explicit Pedestrian(const pugi::xml_node &, Scope &);
 
   explicit operator openscenario_msgs::msg::PedestrianParameters() const;
 };

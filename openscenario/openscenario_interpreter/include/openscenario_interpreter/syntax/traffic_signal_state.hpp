@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -53,12 +54,7 @@ struct TrafficSignalState
    * ------------------------------------------------------------------------ */
   const String state;
 
-  template <typename Node, typename Scope>
-  explicit TrafficSignalState(const Node & node, Scope & scope)
-  : traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
-    state(readAttribute<String>("state", node, scope))
-  {
-  }
+  explicit TrafficSignalState(const pugi::xml_node &, Scope &);
 
   auto evaluate() const -> Element;
 

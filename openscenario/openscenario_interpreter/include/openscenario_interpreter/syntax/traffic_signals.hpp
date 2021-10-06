@@ -18,6 +18,7 @@
 #include <memory>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -32,31 +33,18 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignals
+class TrafficSignals
 {
-private:
   std::list<std::shared_ptr<TrafficSignalController>> traffic_signal_controllers;
+
+  auto resolve_reference(Scope &) -> void;
 
 public:
   TrafficSignals() = default;
 
-  template <typename Node>
-  explicit TrafficSignals(const Node & node, Scope & outer_scope)
-  {
-    for (auto & element : readElementsAsElement<TrafficSignalController, 0>(
-           "TrafficSignalController", node, outer_scope)) {
-      const auto controller = std::dynamic_pointer_cast<TrafficSignalController>(element);
-      outer_scope.insert(controller->name, element);
-      traffic_signal_controllers.push_back(std::move(controller));
-    }
-
-    resolve_reference(outer_scope);
-  }
+  explicit TrafficSignals(const pugi::xml_node &, Scope &);
 
   auto evaluate() -> Element;
-
-private:
-  auto resolve_reference(Scope &) -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

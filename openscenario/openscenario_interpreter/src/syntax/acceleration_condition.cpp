@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/acceleration_condition.hpp>
+#include <openscenario_interpreter/utility/print.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+AccelerationCondition::AccelerationCondition(
+  const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
+: value(readAttribute<Double>("value", node, scope)),
+  compare(readAttribute<Rule>("rule", node, scope)),
+  triggering_entities(triggering_entities),
+  last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
+{
+}
+
 auto AccelerationCondition::description() const -> std::string
 {
   std::stringstream description;

@@ -12,12 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Pedestrian::Pedestrian(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  mass(readAttribute<Double>("mass", node, localScope())),
+  model(readAttribute<String>("model", node, localScope())),
+  pedestrian_category(readAttribute<PedestrianCategory>("pedestrianCategory", node, localScope())),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
+  properties(readElement<Properties>("Properties", node, localScope()))
+{
+}
+
 Pedestrian::operator openscenario_msgs::msg::PedestrianParameters() const
 {
   openscenario_msgs::msg::PedestrianParameters parameter;

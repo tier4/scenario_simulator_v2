@@ -15,10 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PHASE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PHASE_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -54,13 +55,7 @@ struct Phase
    * ------------------------------------------------------------------------ */
   const std::list<TrafficSignalState> traffic_signal_states;
 
-  template <typename Node, typename Scope>
-  explicit Phase(const Node & node, Scope & scope)
-  : name(readAttribute<String>("name", node, scope)),
-    duration(readAttribute<Double>("duration", node, scope, Double::infinity())),
-    traffic_signal_states(readElements<TrafficSignalState, 0>("TrafficSignalState", node, scope))
-  {
-  }
+  explicit Phase(const pugi::xml_node &, Scope &);
 
   auto evaluate() const -> Element;
 };

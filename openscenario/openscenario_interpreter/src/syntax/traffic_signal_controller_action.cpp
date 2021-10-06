@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TrafficSignalControllerAction::TrafficSignalControllerAction(
+  const pugi::xml_node & node, const Scope & scope)
+: Scope(scope),
+  traffic_signal_controller_ref(
+    readAttribute<String>("trafficSignalControllerRef", node, localScope())),
+  phase(readAttribute<String>("phase", node, localScope()))
+{
+}
+
 auto TrafficSignalControllerAction::accomplished() noexcept -> bool { return true; }
 
 auto TrafficSignalControllerAction::endsImmediately() noexcept -> bool { return true; }

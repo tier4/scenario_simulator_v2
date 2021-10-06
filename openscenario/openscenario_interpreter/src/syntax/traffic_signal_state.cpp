@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/arrow.hpp>
 #include <openscenario_interpreter/syntax/color.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
@@ -21,6 +22,12 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scope)
+: traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
+  state(readAttribute<String>("state", node, scope))
+{
+}
+
 auto TrafficSignalState::evaluate() const -> Element
 {
   /* ---- NOTE -----------------------------------------------------------------

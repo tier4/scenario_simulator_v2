@@ -15,10 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_ACTION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -46,14 +45,7 @@ struct TrafficSignalControllerAction : public Scope
   */
   const String phase;
 
-  template <typename Node>
-  explicit TrafficSignalControllerAction(const Node & node, const Scope & scope)
-  : Scope(scope),
-    traffic_signal_controller_ref(
-      readAttribute<String>("trafficSignalControllerRef", node, localScope())),
-    phase(readAttribute<String>("phase", node, localScope()))
-  {
-  }
+  explicit TrafficSignalControllerAction(const pugi::xml_node &, const Scope &);
 
   static auto accomplished() noexcept -> bool;
 

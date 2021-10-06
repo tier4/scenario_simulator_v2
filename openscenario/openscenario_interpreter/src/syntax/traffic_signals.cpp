@@ -14,12 +14,25 @@
 
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/traffic_signals.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TrafficSignals::TrafficSignals(const pugi::xml_node & node, Scope & scope)
+{
+  for (auto & element :
+       readElementsAsElement<TrafficSignalController, 0>("TrafficSignalController", node, scope)) {
+    const auto controller = std::dynamic_pointer_cast<TrafficSignalController>(element);
+    scope.insert(controller->name, element);
+    traffic_signal_controllers.push_back(std::move(controller));
+  }
+
+  resolve_reference(scope);
+}
+
 auto TrafficSignals::evaluate() -> Element
 {
   for (auto && controller : traffic_signal_controllers) {

@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Phase::Phase(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope)),
+  duration(readAttribute<Double>("duration", node, scope, Double::infinity())),
+  traffic_signal_states(readElements<TrafficSignalState, 0>("TrafficSignalState", node, scope))
+{
+}
+
 auto Phase::evaluate() const -> Element
 {
   for (const auto & state : traffic_signal_states) {

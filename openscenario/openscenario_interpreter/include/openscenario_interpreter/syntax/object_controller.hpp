@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 
-#include <openscenario_interpreter/syntax/controller.hpp>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,19 +43,7 @@ struct ObjectController : public ComplexType
 
   explicit ObjectController();
 
-  template <typename Node, typename... Ts>
-  explicit ObjectController(const Node & node, Ts &&... xs)
-  // clang-format off
-  : ComplexType(
-      choice(node,
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, std::forward<decltype(xs)>(xs)...); })))
-  // clang-format on
-  {
-    if (isEgo()) {
-      ego_count++;
-    }
-  }
+  explicit ObjectController(const pugi::xml_node &, Scope &);
 
   ~ObjectController();
 

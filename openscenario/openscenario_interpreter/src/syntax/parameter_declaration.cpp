@@ -12,12 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
+#include <string>
+#include <vector>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope)),
+  parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
+  value(readAttribute<String>("value", node, scope))
+{
+  auto includes = [](const std::string & name, const std::vector<char> & chars) {
+    return std::any_of(std::begin(chars), std::end(chars), [&](const auto & each) {
+      return name.find(each) != std::string::npos;
+    });
+  };
+
+  if (name.substr(0, 3) == "OSC") {
+    throw SyntaxError(
+      "Parameter names starting with \"OSC\" are reserved for special use in future versions "
+      "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix.");
+  } else if (includes(name, {' ', '$', '\'', '"'})) {
+    throw SyntaxError(
+      "In parameter names, usage of symbols is restricted. Symbols that must not be used are:\n"
+      "  - \" \" (blank space)\n"
+      "  - $\n"
+      "  - \'\n"
+      "  - \"\n");
+  } else {
+    scope.insert(name, evaluate());
+  }
+}
+
 auto ParameterDeclaration::evaluate() const -> Element
 {
   // clang-format off
@@ -34,14 +64,6 @@ auto ParameterDeclaration::evaluate() const -> Element
       return unspecified;
   }
   // clang-format on
-}
-
-auto ParameterDeclaration::includes(const std::string & name, const std::vector<char> & chars)
-  -> bool
-{
-  return std::any_of(std::begin(chars), std::end(chars), [&](const auto & each) {
-    return name.find(each) != std::string::npos;
-  });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
