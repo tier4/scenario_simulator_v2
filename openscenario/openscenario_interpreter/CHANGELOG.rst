@@ -2,6 +2,111 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.2 (2021-10-06)
+------------------
+* Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_none_status
+* Merge pull request `#532 <https://github.com/tier4/scenario_simulator_v2/issues/532>`_ from tier4/refactor/interpreter/speedup-build
+* Move some classes constructors into .cpp (11)
+* Move some classes constructors into .cpp (10)
+* Move some classes constructors into .cpp (9)
+* Move some classes constructors into .cpp (8)
+* Move some classes constructors into .cpp (7)
+* Move some classes constructors into .cpp (6)
+* Move some classes constructors into .cpp (5)
+* remove boost::none from getStandstillDuration function
+* Move some classes constructors into .cpp (4)
+* Move some classes constructors into .cpp (3)
+* Move some classes constructors into .cpp (2)
+* Move some classes constructors into .cpp
+* Move class `Scope` member implementation into .cpp
+* Move class `WorldPosition` member implementation into .cpp
+* Move class `Waypoint` member implementation into .cpp
+* Move class `Vehicle` member implementation into .cpp
+* Move class `UserDefinedValueCondition` member implementation into .cpp
+* Move class `UnsignedShort` member implementation into .cpp
+* Move class `UnsignedInteger` member implementation into .cpp
+* Move class `TriggeringEntitiesRule` member implementation into .cpp
+* Move class `TriggeringEntities` member implementation into .cpp
+* Move class `Trigger` member implementation into .cpp
+* Move class `TrafficSignals` member implementation into .cpp
+* Move class `TrafficSignalStateAction` member implementation into .cpp
+* Move class `TrafficSignalState` member implementation into .cpp
+* Move class `Property` member implementation into .cpp
+* Move class `Private` member implementation into .cpp
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Move class `StoryboardElementStateCondition` member implementation into .cpp
+* Move class `Storyboard` member implementation into .cpp
+* Move class `Story` member implementation into .cpp
+* Move class `StandStillCondition` member implementation into .cpp
+* Move class `SpeedCondition` member implementation into .cpp
+* Move class `SpeedAction` member implementation into .cpp
+* Move class `SimulationTimeCondition` member implementation into .cpp
+* Move class `ScenarioObject` member implementation into .cpp
+* Move class `ScenarioDefinition` member implementation into .cpp
+* Move class `Route` member implementation into .cpp
+* Move class `RoadNetwork` member implementation into .cpp
+* Move class `RelativeWorldPosition` member implementation into .cpp
+* Move class `RelativeTargetSpeed` member implementation into .cpp
+* Move class `RelativeDistanceCondition` member implementation into .cpp
+* Move class `ReachPositionCondition` member implementation into .cpp
+* Move class `TeleportAction` member implementation into .cpp
+* Move class `TimeHeadwayCondition` member implementation into .cpp
+* Move class `TrafficSignalCondition` member implementation into .cpp
+* Move class `TrafficSignalController` member implementation into .cpp
+* Move class `TrafficSignalControllerAction` member implementation into .cpp
+* Move class `TrafficSignalControllerCondition` member implementation into .cpp
+* Move class `Position` member implementation into .cpp
+* Move class `Phase` member implementation into .cpp
+* Move class `Performance` member implementation into .cpp
+* Move class `Pedestrian` member implementation into .cpp
+* Move class `ParameterSetAction` member implementation into .cpp
+* Move class `ParameterMultiplyByValueRule` member implementation into .cpp
+* Move class `ParameterModifyAction` member implementation into .cpp
+* Move class `ParameterCondition` member implementation into .cpp
+* Move class `ParameterCondition` member implementation into .cpp
+* Move class `ParameterAddValueRule` member implementation into .cpp
+* Move class `Orientation` member implementation into .cpp
+* Move class `OpenScenario` member implementation into .cpp
+* Move class `ObjectController` member implementation into .cpp
+* Move class `MiscObject` member implementation into .cpp
+* Move class `ManeuverGroup` member implementation into .cpp
+* Move class `Maneuver` member implementation into .cpp
+* Move class `LanePosition` member implementation into .cpp
+* Move class `LaneChangeAction` member implementation into .cpp
+* Move class `Integer` member implementation into .cpp
+* Move class `InitActions` member implementation into .cpp
+* Move class `Init` member implementation into .cpp
+* Move class `File` member implementation into .cpp
+* Move class `Event` member implementation into .cpp
+* Move class `Double` member implementation into .cpp
+* Move class `Dimensions` member implementation into .cpp
+* Move class `DeleteEntityAction` member implementation into .cpp
+* Move class `CustomCommandAction` member implementation into .cpp
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Move class `ControllerAction` member implementation into .cpp
+* Move class `Controller` member implementation into .cpp
+* Move class `ConditionGroup` member implementation into .cpp
+* Move class `Condition` member implementation into .cpp
+* Move class `Command` member implementation into .cpp
+* Move class `Color` member implementation into .cpp
+* Move class `CollisionCondition` member implementation into .cpp
+* Move class `Center` member implementation into .cpp
+* Move class `BoundingBox` member implementation into .cpp
+* Move class `Boolean` member implementation into .cpp
+* Move class `Axles` member implementation into .cpp
+* Move class `Axle` member implementation into .cpp
+* Move class `AssignRouteAction` member implementation into .cpp
+* Move class `AssignControllerAction` member implementation into .cpp
+* Move class `Arrow` member implementation into .cpp
+* Move class `AddEntityAction` member implementation into .cpp
+* Move class `Action` member implementation into .cpp
+* Move class `Act` member implementation into .cpp
+* Move class `AcquirePositionAction` member implementation into .cpp
+* Move class `AccelerationCondition` member implementation into .cpp
+* Move class `AbsoluteTargetSpeed` member implementation into .cpp
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.1 (2021-09-30)
 ------------------
 * Merge pull request `#533 <https://github.com/tier4/scenario_simulator_v2/issues/533>`_ from tier4/feature/interpreter/distance-condition

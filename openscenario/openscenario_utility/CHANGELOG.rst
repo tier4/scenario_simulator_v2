@@ -2,6 +2,12 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.2 (2021-10-06)
+------------------
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Contributors: yamacir-kit
+
 0.5.1 (2021-09-30)
 ------------------
 * Merge pull request `#529 <https://github.com/tier4/scenario_simulator_v2/issues/529>`_ from tier4/feature/cpp_mock_scenario_ament_cmake

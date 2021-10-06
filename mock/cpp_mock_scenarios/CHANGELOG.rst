@@ -2,6 +2,21 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.2 (2021-10-06)
+------------------
+* Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status
+* remove debug line
+* remove boost::none check
+* add spawnEntity function
+* rename scenario class
+* remove boost none in each metrics
+* apply reformat
+* remove spawn function without status
+* remove unused depend
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.1 (2021-09-30)
 ------------------
 * Merge pull request `#529 <https://github.com/tier4/scenario_simulator_v2/issues/529>`_ from tier4/feature/cpp_mock_scenario_ament_cmake

@@ -2,6 +2,33 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.2 (2021-10-06)
+------------------
+* Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status
+* initialize standstill duration for each entity
+* apply reformat
+* remove boost::none check
+* add spawnEntity function
+* remove boost::none from getStandstillDuration function
+* remove boost none in each metrics
+* enable check entity exists
+* move rviz file and configure depends
+* add API::
+* add spawn function
+* remove spawn function without status
+* remove unused depend
+* use template
+* use API::setEntityStatus function
+* enable pass compile
+* add doxygen comments
+* add name argument
+* add comment
+* remove unused bool return value
+* remove boost::none status in traffic_simulator
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.1 (2021-09-30)
 ------------------
 * Merge pull request `#536 <https://github.com/tier4/scenario_simulator_v2/issues/536>`_ from tier4/fix/get_longitudinal_distance
