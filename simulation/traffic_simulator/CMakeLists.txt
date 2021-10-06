@@ -21,6 +21,7 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
+  src/behavior/black_board.cpp
   src/color_utils/color_utils.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
