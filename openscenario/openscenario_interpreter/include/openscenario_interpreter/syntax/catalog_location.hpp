@@ -16,7 +16,10 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATION_HPP_
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
+
+#include <boost/filesystem.hpp>
 
 namespace openscenario_interpreter
 {
@@ -24,22 +27,30 @@ inline namespace syntax
 {
 /* ---- CatalogLocation --------------------------------------------------------
  *
- *  <xsd:complexType name="VehicleCatalogLocation">
+ *  <xsd:complexType name="CatalogLocations">
  *    <xsd:all>
- *      <xsd:element name="Directory" type="Directory"/>
+ *      <xsd:element name="VehicleCatalog" type="VehicleCatalogLocation" minOccurs="0"/>
+ *      <xsd:element name="ControllerCatalog" type="ControllerCatalogLocation" minOccurs="0"/>
+ *      <xsd:element name="PedestrianCatalog" type="PedestrianCatalogLocation" minOccurs="0"/>
+ *      <xsd:element name="MiscObjectCatalog" type="MiscObjectCatalogLocation" minOccurs="0"/>
+ *      <xsd:element name="EnvironmentCatalog" type="EnvironmentCatalogLocation" minOccurs="0"/>
+ *      <xsd:element name="ManeuverCatalog" type="ManeuverCatalogLocation" minOccurs="0"/>
+ *      <xsd:element name="TrajectoryCatalog" type="TrajectoryCatalogLocation" minOccurs="0"/>
+ *      <xsd:element name="RouteCatalog" type="RouteCatalogLocation" minOccurs="0"/>
  *    </xsd:all>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct CatalogLocation
 {
-  const Directory directory;
-
   template <typename Node, typename Scope>
   explicit CatalogLocation(const Node & node, Scope & outer_scope)
   : directory(readElement<Directory>("Directory", node, outer_scope))
   {
   }
+
+  const Directory directory;
+  std::unordered_map<std::string, std::string> catalog_files;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

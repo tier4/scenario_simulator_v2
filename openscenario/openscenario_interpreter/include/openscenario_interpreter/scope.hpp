@@ -19,6 +19,7 @@
 #include <boost/filesystem.hpp>
 #include <limits>
 #include <memory>
+#include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <unordered_map>
@@ -216,7 +217,9 @@ class Scope
 
     std::unordered_map<std::string, Element> entities;  // ScenarioObject or EntitySelection
 
-    explicit GlobalEnvironment(const boost::filesystem::path pathname) : pathname(pathname) {}
+    CatalogLocations catalog_locations;
+
+    explicit GlobalEnvironment(boost::filesystem::path pathname) : pathname(std::move(pathname)) {}
 
     auto entityRef(const EntityRef &) const -> Element;  // TODO: RETURN ScenarioObject TYPE!
 

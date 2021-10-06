@@ -40,12 +40,6 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE)                                                   \
-  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {     \
-    return emplace(                                                     \
-      std::piecewise_construct, std::forward_as_tuple(#TYPE "Catalog"), \
-      std::forward_as_tuple(node, outer_scope));                        \
-  })
 
 struct CatalogLocations : public std::unordered_map<String, CatalogLocation>
 {
@@ -54,6 +48,12 @@ struct CatalogLocations : public std::unordered_map<String, CatalogLocation>
   template <typename Node, typename Scope>
   explicit CatalogLocations(const Node & node, Scope & outer_scope)
   {
+#define ELEMENT(TYPE)                                                   \
+  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {     \
+    emplace(                                                            \
+      std::piecewise_construct, std::forward_as_tuple(#TYPE "Catalog"), \
+      std::forward_as_tuple(node, outer_scope));                        \
+  })
     ELEMENT(Vehicle);
     ELEMENT(Controller);
     ELEMENT(Pedestrian);
@@ -62,10 +62,12 @@ struct CatalogLocations : public std::unordered_map<String, CatalogLocation>
     ELEMENT(Maneuver);
     ELEMENT(Trajectory);
     ELEMENT(Route);
+#undef ELEMENT
+
+    outer_scope.global().catalog_locations = *this;
   }
 };
 
-#undef ELEMENT
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
