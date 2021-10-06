@@ -62,6 +62,11 @@ jobs:
           # If possible, pin the repository in the workflow to a specific commit to avoid
           # changes in colcon-mixin-repository from breaking your tests.
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml
+      - name: show failure test result
+        if: always()
+        run : |
+          cd /home/runner/work/scenario_simulator_v2/scenario_simulator_v2/ros_ws
+          colcon test-result --verbose
       - name: publish codecov result
         uses: codecov/codecov-action@v1.2.1
         if: always()
@@ -80,8 +85,3 @@ jobs:
         with:
           name: test_results
           path: /home/runner/work/scenario_simulator_v2/scenario_simulator_v2/ros_ws/build/test_results
-      - name: show failure test result
-        if: always()
-        run : |
-          cd /home/runner/work/scenario_simulator_v2/scenario_simulator_v2/ros_ws
-          colcon test-result --verbose
