@@ -107,22 +107,11 @@ public:
 
   void setVerbose(const bool verbose);
 
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::VehicleParameters & params);
-
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::PedestrianParameters & params);
-
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::MiscObjectParameters & params);
-
   template <typename Parameters, typename... Ts>
-  auto spawn(const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
+  bool spawn(const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
   {
-    return spawn(is_ego, name, params) && setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
+    return spawnEntity(
+      is_ego, name, params, getEntityStatus(name, std::forward<decltype(xs)>(xs)...));
   }
 
   bool despawn(const std::string & name);
@@ -131,27 +120,111 @@ public:
 
   geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
-  bool setEntityStatus(
+  void setEntityStatus(
     const std::string & name, const openscenario_msgs::msg::EntityStatus & status);
-  bool setEntityStatus(
+
+  /**
+   * @brief Set the Entity Status object from map pose
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param map_pose map pose of the entity status you want to set
+   * @param action_status action status of the entity status you want to set
+   */
+  void setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
-  bool setEntityStatus(
+  /**
+   * @brief Get the Entity Status object from map pose
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param map_pose map pose of the entity status you want to set
+   * @param action_status action status of the entity status you want to set
+   */
+  auto getEntityStatus(
+    const std::string & name, const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status =
+      traffic_simulator::helper::constructActionStatus())
+    -> const openscenario_msgs::msg::EntityStatus;
+  /**
+   * @brief Set the Entity Status object
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param lanelet_pose lanelet pose of the entity status you want to set
+   * @param action_status action status of the entity status you want to set
+   * @return const openscenario_msgs::msg::EntityStatus 
+   */
+  void setEntityStatus(
     const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
-  bool setEntityStatus(
+  /**
+   * @brief Get the Entity Status object
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param lanelet_pose lanelet pose of the entity status you want to set
+   * @param action_status action status of the entity status you want to set
+   * @return const openscenario_msgs::msg::EntityStatus 
+   */
+  auto getEntityStatus(
+    const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status =
+      traffic_simulator::helper::constructActionStatus())
+    -> const openscenario_msgs::msg::EntityStatus;
+  /**
+   * @brief Set the Entity Status object
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param reference_entity_name name of the entity you want to use as reference
+   * @param relative_pose relative pose from the reference entity
+   * @param action_status action status of the target entity
+   * @return const openscenario_msgs::msg::EntityStatus 
+   */
+  void setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
     const geometry_msgs::msg::Pose & relative_pose,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
-  bool setEntityStatus(
+  /**
+   * @brief Get the Entity Status object
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param reference_entity_name name of the entity you want to use as reference
+   * @param relative_pose relative pose from the reference entity
+   * @param action_status action status of the target entity
+   * @return const openscenario_msgs::msg::EntityStatus 
+   */
+  auto getEntityStatus(
+    const std::string & name, const std::string & reference_entity_name,
+    const geometry_msgs::msg::Pose & relative_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status =
+      traffic_simulator::helper::constructActionStatus())
+    -> const openscenario_msgs::msg::EntityStatus;
+  /**
+   * @brief Set the Entity Status object
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param reference_entity_name name of the entity you want to use as reference
+   * @param relative_position relative position from the reference entity
+   * @param relative_rpy relative RPY orientation from the reference entity
+   * @param action_status action status of the target entity
+   * @return const openscenario_msgs::msg::EntityStatus 
+   */
+  void setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
     const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
     const openscenario_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
+  /**
+   * @brief Get the Entity Status object
+   * @param name name of the target entity, this argument used for calculating boundingbox etc...
+   * @param reference_entity_name name of the entity you want to use as reference
+   * @param relative_position relative position from the reference entity
+   * @param relative_rpy relative RPY orientation from the reference entity
+   * @param action_status action status of the target entity
+   * @return const openscenario_msgs::msg::EntityStatus 
+   */
+  auto getEntityStatus(
+    const std::string & name, const std::string & reference_entity_name,
+    const geometry_msgs::msg::Point & relative_position,
+    const geometry_msgs::msg::Vector3 & relative_rpy,
+    const openscenario_msgs::msg::ActionStatus & action_status =
+      traffic_simulator::helper::constructActionStatus())
+    -> const openscenario_msgs::msg::EntityStatus;
 
   boost::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
@@ -219,17 +292,27 @@ public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
 private:
+  bool spawnEntity(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::VehicleParameters & params,
+    const openscenario_msgs::msg::EntityStatus & stats);
+
+  bool spawnEntity(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::PedestrianParameters & params,
+    const openscenario_msgs::msg::EntityStatus & stats);
+
+  bool spawnEntity(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::MiscObjectParameters & params,
+    const openscenario_msgs::msg::EntityStatus & stats);
+
   bool updateSensorFrame();
   bool updateEntityStatusInSim();
   bool updateTrafficLightsInSim();
 
-  template <typename Parameters>
-  bool spawn(
-    const bool is_ego, const Parameters & parameters,
-    const openscenario_msgs::msg::EntityStatus & status)
-  {
-    return spawn(is_ego, parameters.toXml(), status);
-  }
+  openscenario_msgs::msg::EntityStatus getEntityStatus(
+    const std::string & name, const openscenario_msgs::msg::EntityStatus & status);
 
   const Configuration configuration;
 

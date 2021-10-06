@@ -55,15 +55,15 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(false, "ego", getVehicleParameters());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
+    api_.spawn(
+      false, "ego", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("ego", 5, true);
     api_.requestLaneChange("ego", 34513);
-    api_.spawn(false, "npc", getVehicleParameters());
-    api_.setEntityStatus(
-      "npc", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
+    api_.spawn(
+      false, "npc", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
   }
 };

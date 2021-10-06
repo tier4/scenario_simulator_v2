@@ -68,19 +68,19 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(false, "ego", getVehicleParameters());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34513, 5, 0, 0, 0, 0),
+    api_.spawn(
+      false, "ego", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34513, 5, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 3, true);
-    api_.spawn(false, "front", getVehicleParameters());
-    api_.setEntityStatus(
-      "front", traffic_simulator::helper::constructLaneletPose(34513, 10, 0, 0, 0, 0),
+    api_.spawn(
+      false, "front", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34513, 10, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("front", 3, true);
-    api_.spawn(false, "behind", getVehicleParameters());
-    api_.setEntityStatus(
-      "behind", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
+    api_.spawn(
+      false, "behind", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("behind", 3, true);
   }

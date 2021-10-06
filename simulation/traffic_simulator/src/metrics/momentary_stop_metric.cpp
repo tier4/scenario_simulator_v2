@@ -20,10 +20,6 @@ namespace metrics
 void MomentaryStopMetric::update()
 {
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  if (!status) {
-    THROW_SIMULATION_ERROR("failed to get target entity status.");
-    return;
-  }
   boost::optional<double> distance;
   switch (stop_target_lanelet_type) {
     case StopTargetLaneletType::STOP_LINE:
@@ -40,16 +36,11 @@ void MomentaryStopMetric::update()
     THROW_SIMULATION_ERROR("failed to calculate distance to stop line.");
   }
   distance_to_stopline_ = distance.get();
-  linear_acceleration_ = status->action_status.accel.linear.x;
+  linear_acceleration_ = status.action_status.accel.linear.x;
   if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
     auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
-    if (!standstill_duration) {
-      THROW_SIMULATION_ERROR("failed to calculate standstill duration.");
-    }
-    standstill_duration_ = standstill_duration.get();
-    if (
-      entity_manager_ptr_->isStopping(target_entity) &&
-      standstill_duration.get() >= stop_duration) {
+    standstill_duration_ = standstill_duration;
+    if (entity_manager_ptr_->isStopping(target_entity) && standstill_duration >= stop_duration) {
       success();
     }
     if (distance.get() <= stop_sequence_end_distance) {
@@ -64,9 +55,6 @@ void MomentaryStopMetric::update()
 bool MomentaryStopMetric::activateTrigger()
 {
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  if (!status) {
-    return false;
-  }
   boost::optional<double> distance;
   switch (stop_target_lanelet_type) {
     case StopTargetLaneletType::STOP_LINE:

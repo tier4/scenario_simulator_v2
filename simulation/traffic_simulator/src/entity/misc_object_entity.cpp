@@ -19,22 +19,19 @@ namespace traffic_simulator
 namespace entity
 {
 MiscObjectEntity::MiscObjectEntity(
-  const std::string & name, const openscenario_msgs::msg::MiscObjectParameters & params)
-: EntityBase(params.misc_object_category, name), params_(params)
+  const std::string & name, const openscenario_msgs::msg::MiscObjectParameters & params,
+  const openscenario_msgs::msg::EntityStatus & status)
+: EntityBase(params.misc_object_category, name, status), params_(params)
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::MISC_OBJECT;
 }
 
 void MiscObjectEntity::onUpdate(double, double)
 {
-  if (status_) {
-    status_->action_status.accel = geometry_msgs::msg::Accel();
-    status_->action_status.twist = geometry_msgs::msg::Twist();
-    status_->action_status.current_action = "static";
-    status_before_update_ = status_;
-  } else {
-    status_before_update_ = status_;
-  }
+  status_.action_status.accel = geometry_msgs::msg::Accel();
+  status_.action_status.twist = geometry_msgs::msg::Twist();
+  status_.action_status.current_action = "static";
+  status_before_update_ = status_;
 }
 
 auto MiscObjectEntity::getBoundingBox() const -> const openscenario_msgs::msg::BoundingBox
@@ -44,10 +41,7 @@ auto MiscObjectEntity::getBoundingBox() const -> const openscenario_msgs::msg::B
 
 auto MiscObjectEntity::getCurrentAction() const -> const std::string
 {
-  if (status_) {
-    return status_->action_status.current_action;
-  }
-  return "";
+  return status_.action_status.current_action;
 }
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -46,7 +46,9 @@ public:
 
   const std::string name;
 
-  EntityBase(const std::string & type, const std::string & name);
+  EntityBase(
+    const std::string & type, const std::string & name,
+    const openscenario_msgs::msg::EntityStatus & status);
 
   virtual ~EntityBase() = default;
 
@@ -57,8 +59,7 @@ public:
 
   virtual auto getCurrentAction() const -> const std::string = 0;
 
-  /*   */ auto getEntityStatusBeforeUpdate() const
-    -> const boost::optional<openscenario_msgs::msg::EntityStatus>
+  /*   */ auto getEntityStatusBeforeUpdate() const -> const openscenario_msgs::msg::EntityStatus
   {
     return status_before_update_;
   }
@@ -75,7 +76,7 @@ public:
 
   /*   */ auto getStatus() const -> const openscenario_msgs::msg::EntityStatus;
 
-  /*   */ auto getStandStillDuration() const -> boost::optional<double>;
+  /*   */ auto getStandStillDuration() const -> double;
 
   /*   */ auto getVisibility() { return visibility_; }
 
@@ -107,7 +108,7 @@ public:
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status);
 
-  virtual auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool;
+  virtual void setStatus(const openscenario_msgs::msg::EntityStatus & status);
 
   virtual void setTargetSpeed(double target_speed, bool continuous) = 0;
 
@@ -123,7 +124,7 @@ public:
 
   virtual void onUpdate(double current_time, double step_time);
 
-  virtual auto ready() const -> bool { return static_cast<bool>(status_); }
+  virtual auto ready() const -> bool { return true; }
 
   virtual void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) = 0;
 
@@ -141,8 +142,6 @@ public:
     THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
   }
 
-  /*   */ auto statusSet() const noexcept { return static_cast<bool>(status_); }
-
   /*   */ void stopAtEndOfRoad();
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
@@ -156,8 +155,8 @@ public:
 
 protected:
   boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
-  boost::optional<openscenario_msgs::msg::EntityStatus> status_;
-  boost::optional<openscenario_msgs::msg::EntityStatus> status_before_update_;
+  openscenario_msgs::msg::EntityStatus status_;
+  openscenario_msgs::msg::EntityStatus status_before_update_;
 
   std::queue<openscenario_msgs::msg::LaneletPose> waypoints_;
 
@@ -171,7 +170,7 @@ protected:
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list_;
 
   boost::optional<double> linear_jerk_;
-  boost::optional<double> stand_still_duration_;
+  double stand_still_duration_;
 
   visualization_msgs::msg::MarkerArray current_marker_;
   openscenario_msgs::msg::EntityType entity_type_;

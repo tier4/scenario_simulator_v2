@@ -240,9 +240,6 @@ public:
 
   bool laneMatchingSucceed(const std::string & name);
 
-  // TODO (yamacir-kit) Rename to 'hasEntityStatus'
-  bool entityStatusSet(const std::string & name) const;
-
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> boost::optional<double>;
 
@@ -257,7 +254,7 @@ public:
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntityStatus(const std::string & name) const
-    -> const boost::optional<openscenario_msgs::msg::EntityStatus>;
+    -> const openscenario_msgs::msg::EntityStatus;
 
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, openscenario_msgs::msg::EntityType>;
@@ -318,7 +315,7 @@ public:
 
   void requestLaneChange(const std::string & name, const Direction & direction);
 
-  bool setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
+  void setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
 
   void setVerbose(const bool verbose);
 

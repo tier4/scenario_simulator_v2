@@ -26,8 +26,9 @@ namespace traffic_simulator
 namespace entity
 {
 VehicleEntity::VehicleEntity(
-  const std::string & name, const openscenario_msgs::msg::VehicleParameters & params)
-: EntityBase(params.vehicle_category, name),
+  const std::string & name, const openscenario_msgs::msg::VehicleParameters & params,
+  const openscenario_msgs::msg::EntityStatus & status)
+: EntityBase(params.vehicle_category, name, status),
   parameters(params),
   tree_ptr_(std::make_shared<entity_behavior::vehicle::BehaviorTree>())
 {
@@ -38,8 +39,8 @@ VehicleEntity::VehicleEntity(
 void VehicleEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
-  if (status_ and status_->lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
+  if (status_.lanelet_pose_valid) {
+    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints);
   }
 }
 
@@ -59,8 +60,8 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
 
 void VehicleEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
-  if (status_ and status_->lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
+  if (status_.lanelet_pose_valid) {
+    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, lanelet_pose);
   }
 }
 
@@ -94,20 +95,17 @@ void VehicleEntity::setTargetSpeed(double target_speed, bool continuous)
 void VehicleEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
-  if (!status_) {
-    return;
-  }
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
   } else {
     tree_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
     tree_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
-    tree_ptr_->setValueToBlackBoard("entity_status", status_.get());
-    target_speed_planner_.update(status_->action_status.twist.linear.x);
+    tree_ptr_->setValueToBlackBoard("entity_status", status_);
+    target_speed_planner_.update(status_.action_status.twist.linear.x);
     tree_ptr_->setValueToBlackBoard("target_speed", target_speed_planner_.getTargetSpeed());
-    if (status_->lanelet_pose_valid) {
+    if (status_.lanelet_pose_valid) {
       tree_ptr_->setValueToBlackBoard(
-        "route_lanelets", route_planner_ptr_->getRouteLanelets(status_->lanelet_pose));
+        "route_lanelets", route_planner_ptr_->getRouteLanelets(status_.lanelet_pose));
     } else {
       std::vector<std::int64_t> empty = {};
       tree_ptr_->setValueToBlackBoard("route_lanelets", empty);
@@ -123,13 +121,9 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    if (!status_) {
-      linear_jerk_ = 0;
-    } else {
-      linear_jerk_ =
-        (status_updated.action_status.accel.linear.x - status_->action_status.accel.linear.x) /
-        step_time;
-    }
+    linear_jerk_ =
+      (status_updated.action_status.accel.linear.x - status_.action_status.accel.linear.x) /
+      step_time;
     setStatus(status_updated);
     updateStandStillDuration(step_time);
   }
