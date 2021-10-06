@@ -15,11 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TIME_HEADWAY_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TIME_HEADWAY_CONDITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -56,20 +58,7 @@ struct TimeHeadwayCondition
 
   std::vector<Double> results;  // for description
 
-  template <typename Node, typename Scope>
-  explicit TimeHeadwayCondition(
-    const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-  // clang-format off
-  : entity_ref (readAttribute<String> ("entityRef",  node, scope)),
-    value      (readAttribute<Double> ("value",      node, scope)),
-    freespace  (readAttribute<Boolean>("freespace",  node, scope)),
-    along_route(readAttribute<Boolean>("alongRoute", node, scope)),
-    compare    (readAttribute<Rule>   ("rule",       node, scope)),
-    triggering_entities(triggering_entities),
-    results(triggering_entities.entity_refs.size(), Double::nan())
-  // clang-format on
-  {
-  }
+  explicit TimeHeadwayCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
 

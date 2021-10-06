@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,12 +36,7 @@ struct TeleportAction : private Scope
 {
   const Position position;
 
-  template <typename Node>
-  explicit TeleportAction(const Node & node, Scope & scope)
-  : Scope(scope),  //
-    position(readElement<Position>("Position", node, localScope()))
-  {
-  }
+  explicit TeleportAction(const pugi::xml_node &, Scope &);
 
   static auto accomplished() noexcept -> bool;
 

@@ -22,6 +22,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TeleportAction::TeleportAction(const pugi::xml_node & node, Scope & scope)
+: Scope(scope), position(readElement<Position>("Position", node, localScope()))
+{
+}
+
 auto TeleportAction::accomplished() noexcept -> bool { return true; }
 
 auto TeleportAction::endsImmediately() noexcept -> bool { return true; }

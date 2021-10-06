@@ -15,10 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__REACH_POSITION_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__REACH_POSITION_CONDITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -46,16 +48,7 @@ struct ReachPositionCondition
 
   std::vector<Double> results;  // for description
 
-  template <typename Node, typename Scope>
-  explicit ReachPositionCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
-  : tolerance(readAttribute<Double>("tolerance", node, outer_scope)),
-    position(readElement<Position>("Position", node, outer_scope)),
-    compare(Rule::lessThan),
-    triggering_entities(triggering_entities),
-    results(triggering_entities.entity_refs.size(), Double::nan())
-  {
-  }
+  explicit ReachPositionCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
 

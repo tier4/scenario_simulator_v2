@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,28 +13,18 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/axles.hpp>
+#include <openscenario_interpreter/syntax/actors.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Axles::Axles(const pugi::xml_node & node, Scope & scope)
-: front_axle(readElement<FrontAxle>("FrontAxle", node, scope)),
-  rear_axle(readElement<RearAxle>("RearAxle", node, scope)),
-  additional_axles(readElements<AdditionalAxle, 0>("AdditionalAxle", node, scope))
+Actors::Actors(const pugi::xml_node & node, Scope & scope)
+: select_triggering_entities(
+    readAttribute<Boolean>("selectTriggeringEntities", node, scope, Boolean()))
 {
-}
-
-Axles::operator openscenario_msgs::msg::Axles() const
-{
-  openscenario_msgs::msg::Axles axles;
-  {
-    axles.front_axle = static_cast<openscenario_msgs::msg::Axle>(front_axle);
-    axles.rear_axle = static_cast<openscenario_msgs::msg::Axle>(rear_axle);
-  }
-
-  return axles;
+  callWithElements(
+    node, "EntityRef", 0, unbounded, [&](auto && node) { scope.actors.emplace_back(node, scope); });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -16,6 +16,8 @@
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <unordered_map>
 
@@ -23,6 +25,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+CustomCommandAction::CustomCommandAction(const pugi::xml_node & node, const Scope & scope)
+: Scope(scope),
+  type(readAttribute<String>("type", node, localScope())),
+  content(readContent<String>(node, localScope()))
+{
+}
+
 auto CustomCommandAction::accomplished() noexcept -> bool { return true; }
 
 auto CustomCommandAction::applyFaultInjectionAction(

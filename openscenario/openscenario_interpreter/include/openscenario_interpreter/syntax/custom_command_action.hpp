@@ -16,9 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
 #include <autoware_simulation_msgs/msg/simulation_events.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <vector>
@@ -49,13 +48,7 @@ struct CustomCommandAction : private Scope
 
   const String content;
 
-  template <typename Node>
-  explicit CustomCommandAction(const Node & node, const Scope & outer_scope)
-  : Scope(outer_scope),
-    type(readAttribute<String>("type", node, localScope())),
-    content(readContent<String>(node, localScope()))
-  {
-  }
+  explicit CustomCommandAction(const pugi::xml_node &, const Scope &);
 
   static auto accomplished() noexcept -> bool;
 

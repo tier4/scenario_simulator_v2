@@ -22,6 +22,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ReachPositionCondition::ReachPositionCondition(
+  const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
+: tolerance(readAttribute<Double>("tolerance", node, scope)),
+  position(readElement<Position>("Position", node, scope)),
+  compare(Rule::lessThan),
+  triggering_entities(triggering_entities),
+  results(triggering_entities.entity_refs.size(), Double::nan())
+{
+}
+
 auto ReachPositionCondition::description() const -> String
 {
   std::stringstream description;

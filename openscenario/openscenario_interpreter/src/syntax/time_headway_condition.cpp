@@ -20,6 +20,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TimeHeadwayCondition::TimeHeadwayCondition(
+  const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
+: entity_ref(readAttribute<String>("entityRef", node, scope)),
+  value(readAttribute<Double>("value", node, scope)),
+  freespace(readAttribute<Boolean>("freespace", node, scope)),
+  along_route(readAttribute<Boolean>("alongRoute", node, scope)),
+  compare(readAttribute<Rule>("rule", node, scope)),
+  triggering_entities(triggering_entities),
+  results(triggering_entities.entity_refs.size(), Double::nan())
+{
+}
+
 auto TimeHeadwayCondition::description() const -> String
 {
   std::stringstream description;

@@ -15,7 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_ACTION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -30,15 +32,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct UserDefinedAction : public Element
+struct UserDefinedAction : public ComplexType
 {
-  template <typename Node, typename Scope>
-  explicit UserDefinedAction(const Node & node, Scope & scope)
-  {
-    callWithElements(node, "CustomCommandAction", 1, 1, [&](auto && node) {
-      return rebind<CustomCommandAction>(node, scope);
-    });
-  }
+  explicit UserDefinedAction(const pugi::xml_node &, Scope &);
 
   static auto endsImmediately() -> bool;
 

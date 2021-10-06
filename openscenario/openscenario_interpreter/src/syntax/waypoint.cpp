@@ -18,6 +18,12 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Waypoint::Waypoint(const pugi::xml_node & node, Scope & scope)
+: route_strategy(readAttribute<RouteStrategy>("routeStrategy", node, scope)),
+  position(readElement<Position>("Position", node, scope))
+{
+}
+
 Waypoint::operator openscenario_msgs::msg::LaneletPose() const
 {
   return apply<openscenario_msgs::msg::LaneletPose>(

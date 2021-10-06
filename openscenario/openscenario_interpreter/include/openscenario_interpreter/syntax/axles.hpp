@@ -15,9 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__AXLES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__AXLES_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/axle.hpp>
 #include <openscenario_msgs/msg/axles.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -44,13 +45,7 @@ struct Axles
 
   Axles() = default;
 
-  template <typename Node, typename Scope>
-  explicit Axles(const Node & node, Scope & scope)
-  : front_axle(readElement<FrontAxle>("FrontAxle", node, scope)),
-    rear_axle(readElement<RearAxle>("RearAxle", node, scope)),
-    additional_axles(readElements<AdditionalAxle, 0>("AdditionalAxle", node, scope))
-  {
-  }
+  explicit Axles(const pugi::xml_node & node, Scope & scope);
 
   explicit operator openscenario_msgs::msg::Axles() const;
 };

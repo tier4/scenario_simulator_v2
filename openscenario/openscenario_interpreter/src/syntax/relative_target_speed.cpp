@@ -13,12 +13,23 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/relative_target_speed.hpp>
+#include <openscenario_interpreter/syntax/rule.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+RelativeTargetSpeed::RelativeTargetSpeed(const pugi::xml_node & node, Scope & scope)
+: entity_ref(readAttribute<String>("entityRef", node, scope)),
+  value(readAttribute<Double>("value", node, scope)),
+  speed_target_value_type(readAttribute<SpeedTargetValueType>(
+    "speedTargetValueType", node, scope, SpeedTargetValueType())),
+  continuous(readAttribute<Boolean>("continuous", node, scope, Boolean()))
+{
+}
+
 auto RelativeTargetSpeed::getCalculateAbsoluteTargetSpeed() const -> std::function<double()>
 {
   if (speed_target_value_type == SpeedTargetValueType::factor) {
