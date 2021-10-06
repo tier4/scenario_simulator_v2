@@ -110,7 +110,8 @@ public:
   template <typename Parameters, typename... Ts>
   bool spawn(const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
   {
-    return spawnEntity(is_ego, name, params, getEntityStatus(name, std::forward<decltype(xs)>(xs)...));
+    return spawnEntity(
+      is_ego, name, params, getEntityStatus(name, std::forward<decltype(xs)>(xs)...));
   }
 
   bool despawn(const std::string & name);

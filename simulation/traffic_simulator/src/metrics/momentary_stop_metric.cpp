@@ -40,9 +40,7 @@ void MomentaryStopMetric::update()
   if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
     auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
     standstill_duration_ = standstill_duration;
-    if (
-      entity_manager_ptr_->isStopping(target_entity) &&
-      standstill_duration >= stop_duration) {
+    if (entity_manager_ptr_->isStopping(target_entity) && standstill_duration >= stop_duration) {
       success();
     }
     if (distance.get() <= stop_sequence_end_distance) {
