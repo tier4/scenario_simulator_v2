@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 
@@ -19,6 +20,22 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Position::Position(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: Element(
+    choice(node,
+      std::make_pair(         "WorldPosition", [&](auto && node) { return make<        WorldPosition>(node, scope); }),
+      std::make_pair( "RelativeWorldPosition", [&](auto && node) { return make<RelativeWorldPosition>(node, scope); }),
+      std::make_pair("RelativeObjectPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(          "RoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(  "RelativeRoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(          "LanePosition", [&](auto && node) { return make<         LanePosition>(node, scope); }),
+      std::make_pair(  "RelativeLanePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(         "RoutePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+// clang-format on
+{
+}
+
 Position::operator geometry_msgs::msg::Pose() const
 {
   return apply<geometry_msgs::msg::Pose>(

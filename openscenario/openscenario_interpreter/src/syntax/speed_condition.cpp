@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -20,6 +21,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+SpeedCondition::SpeedCondition(
+  const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
+: value(readAttribute<Double>("value", node, scope)),
+  compare(readAttribute<Rule>("rule", node, scope)),
+  triggering_entities(triggering_entities),
+  results(triggering_entities.entity_refs.size(), Double::nan())
+{
+}
+
 auto SpeedCondition::description() const -> String
 {
   std::stringstream description;

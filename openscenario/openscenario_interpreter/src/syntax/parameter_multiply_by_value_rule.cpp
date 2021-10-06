@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/parameter_multiply_by_value_rule.hpp>
 #include <typeindex>
 #include <unordered_map>
@@ -21,6 +22,12 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ParameterMultiplyByValueRule::ParameterMultiplyByValueRule(
+  const pugi::xml_node & node, Scope & scope)
+: value(readAttribute<Double>("value", node, scope))
+{
+}
+
 auto ParameterMultiplyByValueRule::operator()(const Element & target) const -> Element
 {
   static const std::unordered_map<

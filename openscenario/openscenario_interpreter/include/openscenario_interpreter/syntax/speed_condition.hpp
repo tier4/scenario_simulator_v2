@@ -15,8 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -43,15 +46,7 @@ struct SpeedCondition
 
   std::vector<Double> results;  // for description
 
-  template <typename AST, typename Scope>
-  explicit SpeedCondition(
-    const AST & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
-  : value(readAttribute<Double>("value", node, outer_scope)),
-    compare(readAttribute<Rule>("rule", node, outer_scope)),
-    triggering_entities(triggering_entities),
-    results(triggering_entities.entity_refs.size(), Double::nan())
-  {
-  }
+  explicit SpeedCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
 

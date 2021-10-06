@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state_condition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+StoryboardElementStateCondition::StoryboardElementStateCondition(
+  const pugi::xml_node & node, const Scope & scope)
+: Scope(scope),
+  storyboard_element_ref(readAttribute<String>("storyboardElementRef", node, localScope())),
+  storyboard_element_type(
+    readAttribute<StoryboardElementType>("storyboardElementType", node, localScope())),
+  state(readAttribute<StoryboardElementState>("state", node, localScope())),
+  result(StoryboardElementState::standbyState)
+{
+}
+
 auto StoryboardElementStateCondition::description() const -> String
 {
   std::stringstream description;

@@ -12,12 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Event::Event(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  StoryboardElement(
+    readAttribute<UnsignedInt>("maximumExecutionCount", node, localScope(), UnsignedInt(1))),
+  priority(readAttribute<Priority>("priority", node, localScope())),
+  start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
+{
+  callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
+    return actions.push_back(readStoryboardElement<Action>(node, localScope()));
+  });
+}
+
 auto Event::accomplished() const -> bool
 {
   // An Event's goal is accomplished when all its Actions are in the completeState.

@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_type.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,17 +43,7 @@ struct StoryboardElementStateCondition : private Scope
 
   StoryboardElementState result;
 
-  template <typename Node>
-  explicit StoryboardElementStateCondition(const Node & node, const Scope & scope)
-  // clang-format off
-  : Scope(scope),
-    storyboard_element_ref (readAttribute<String                >("storyboardElementRef",  node, localScope())),
-    storyboard_element_type(readAttribute<StoryboardElementType >("storyboardElementType", node, localScope())),
-    state                  (readAttribute<StoryboardElementState>("state",                 node, localScope())),
-    result(StoryboardElementState::standbyState)
-  // clang-format on
-  {
-  }
+  explicit StoryboardElementStateCondition(const pugi::xml_node &, const Scope &);
 
   auto description() const -> String;
 

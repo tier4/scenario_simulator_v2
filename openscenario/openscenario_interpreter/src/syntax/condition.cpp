@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/by_entity_condition.hpp>
 #include <openscenario_interpreter/syntax/by_value_condition.hpp>
 #include <openscenario_interpreter/syntax/condition.hpp>
@@ -25,7 +27,7 @@ static_assert(std::is_standard_layout<ConditionEdge>::value, "");
 
 static_assert(std::is_trivial<ConditionEdge>::value, "");
 
-Condition::Condition(const XML & node, Scope & scope)
+Condition::Condition(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : Element(
     choice(node,

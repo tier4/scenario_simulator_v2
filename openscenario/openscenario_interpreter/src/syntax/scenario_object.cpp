@@ -14,6 +14,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <traffic_simulator/metrics/out_of_range_metric.hpp>
@@ -22,6 +23,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ScenarioObject::ScenarioObject(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  EntityObject(node, localScope()),
+  object_controller(readElement<ObjectController>("ObjectController", node, localScope()))
+{
+}
+
 auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> bool
 {
   const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);

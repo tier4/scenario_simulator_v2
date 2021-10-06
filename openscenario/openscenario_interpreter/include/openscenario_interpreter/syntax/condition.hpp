@@ -16,12 +16,11 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_
 
 #include <nlohmann/json.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -50,7 +49,7 @@ struct Condition : public Element
 
   bool current_value;
 
-  explicit Condition(const XML & node, Scope & scope);
+  explicit Condition(const pugi::xml_node & node, Scope & scope);
 
   auto evaluate() -> Element;
 };

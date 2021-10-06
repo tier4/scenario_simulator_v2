@@ -15,10 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/lane_position.hpp>
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,22 +43,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Position : public Element
 {
-  template <typename XML, typename... Ts>
-  explicit Position(const XML & node, Ts &&... xs)
-  // clang-format off
-  : Element(
-      choice(node,
-        std::make_pair(         "WorldPosition", [&](auto && node) { return make<        WorldPosition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair( "RelativeWorldPosition", [&](auto && node) { return make<RelativeWorldPosition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("RelativeObjectPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(          "RoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(  "RelativeRoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(          "LanePosition", [&](auto && node) { return make<         LanePosition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(  "RelativeLanePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(         "RoutePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
-  // clang-format on
-  {
-  }
+  explicit Position(const pugi::xml_node &, Scope &);
 
   explicit operator geometry_msgs::msg::Pose() const;
 };
