@@ -2,8 +2,8 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.2 (2021-10-06)
+------------------
 * Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status
 * remove boost::none status in traffic_simulator
 * Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
