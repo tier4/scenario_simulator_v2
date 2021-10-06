@@ -12,13 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Event & datum)
+Event::Event(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  StoryboardElement(
+    readAttribute<UnsignedInt>("maximumExecutionCount", node, localScope(), UnsignedInt(1))),
+  priority(readAttribute<Priority>("priority", node, localScope())),
+  start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
+{
+  callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
+    return actions.push_back(readStoryboardElement<Action>(node, localScope()));
+  });
+}
+
+auto Event::accomplished() const -> bool
+{
+  // An Event's goal is accomplished when all its Actions are in the completeState.
+  return std::all_of(std::begin(actions), std::end(actions), [](auto && each) {
+    return each.template as<Action>().complete();
+  });
+}
+
+auto Event::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
+
+auto Event::run() -> void
+{
+  for (auto && action : actions) {
+    action.evaluate();
+  }
+}
+
+auto Event::start() -> void
+{
+  for (auto && each : actions) {
+    each.as<Action>().changeStateIf(true, standby_state);
+  }
+}
+
+auto Event::stop() -> void
+{
+  for (auto && each : actions) {
+    each.as<Action>().override();
+    each.evaluate();
+  }
+}
+
+auto Event::stopTriggered() noexcept -> bool { return false; }
+
+auto operator<<(nlohmann::json & json, const Event & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;
 

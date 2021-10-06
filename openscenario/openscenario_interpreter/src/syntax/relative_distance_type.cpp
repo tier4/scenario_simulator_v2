@@ -16,12 +16,17 @@
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <string>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, RelativeDistanceType & datum)
+static_assert(std::is_standard_layout<RelativeDistanceType>::value, "");
+
+static_assert(std::is_trivial<RelativeDistanceType>::value, "");
+
+auto operator>>(std::istream & is, RelativeDistanceType & datum) -> std::istream &
 {
   std::string buffer;
 
@@ -49,7 +54,7 @@ std::istream & operator>>(std::istream & is, RelativeDistanceType & datum)
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(RelativeDistanceType, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const RelativeDistanceType & datum)
+auto operator<<(std::ostream & os, const RelativeDistanceType & datum) -> std::ostream &
 {
   switch (datum) {
 #define BOILERPLATE(ID)          \

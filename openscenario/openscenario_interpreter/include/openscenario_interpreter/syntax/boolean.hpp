@@ -15,11 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__BOOLEAN_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__BOOLEAN_HPP_
 
-#include <iomanip>
 #include <iostream>
-#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/object.hpp>
-#include <string>
 
 namespace openscenario_interpreter
 {
@@ -35,36 +32,22 @@ struct Boolean
 
   explicit constexpr Boolean(value_type value) noexcept : data(value) {}
 
-  explicit Boolean(const std::string & target)
-  {
-    std::stringstream interpreter;
+  explicit Boolean(const std::string &);
 
-    if (!(interpreter << target && interpreter >> std::boolalpha >> data)) {
-      throw INVALID_NUMERIC_LITERAL_SPECIFIED(target);
-    }
-  }
-
-  auto & operator=(const value_type & rhs) noexcept
-  {
-    data = rhs;
-    return *this;
-  }
+  auto operator=(const value_type & rhs) noexcept -> Boolean &;
 
   constexpr operator value_type() const noexcept { return data; }
 };
 
-static_assert(std::is_standard_layout<Boolean>::value, "");
+auto operator>>(std::istream &, Boolean &) -> std::istream &;
 
-static_assert(std::is_trivial<Boolean>::value, "");
-
-std::istream & operator>>(std::istream &, Boolean &);
-
-std::ostream & operator<<(std::ostream &, const Boolean &);
+auto operator<<(std::ostream &, const Boolean &) -> std::ostream &;
 
 extern const Element true_v;
+
 extern const Element false_v;
 
-const Element & asBoolean(bool);
+auto asBoolean(bool) -> const Element &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -16,8 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_HPP_
 
 #include <nlohmann/json.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/private_action.hpp>
-#include <vector>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -39,46 +40,14 @@ struct Private : public Scope
 
   std::list<PrivateAction> private_actions;
 
-  template <typename Node>
-  explicit Private(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope), entity_ref(readAttribute<String>("entityRef", node, localScope()))
-  {
-    actors.emplace_back(entity_ref);
+  explicit Private(const pugi::xml_node &, Scope &);
 
-    callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
-      return private_actions.emplace_back(node, localScope());
-    });
-  }
+  auto endsImmediately() const -> bool;
 
-  auto evaluate()
-  {
-    for (auto && private_action : private_actions) {
-      // NOTE: standbyState -> startTransition (if ready)
-      // private_action.ready();
-
-      // NOTE: startTransition -> runningState (unconditionally)
-      private_action.start();
-
-      // NOTE: runningState -> endTransition (if accomplished)
-      do {
-        private_action.run();
-      } while (not private_action.accomplished());
-
-      // NOTE: endTransition -> completeState (Init.Actions only once executed)
-    }
-
-    return unspecified;
-  }
-
-  bool endsImmediately() const
-  {
-    return std::all_of(
-      private_actions.begin(), private_actions.end(),
-      [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
-  }
+  auto evaluate() -> Element;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Private &);
+auto operator<<(nlohmann::json &, const Private &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

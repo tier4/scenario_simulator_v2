@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATION_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,11 +36,7 @@ struct CatalogLocation
 {
   const Directory directory;
 
-  template <typename Node, typename Scope>
-  explicit CatalogLocation(const Node & node, Scope & outer_scope)
-  : directory(readElement<Directory>("Directory", node, outer_scope))
-  {
-  }
+  explicit CatalogLocation(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

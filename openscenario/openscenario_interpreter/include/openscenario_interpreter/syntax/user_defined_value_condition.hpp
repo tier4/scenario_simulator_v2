@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_VALUE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_VALUE_CONDITION_HPP_
 
-#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
-#include <regex>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -38,49 +38,24 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct UserDefinedValueCondition
+class UserDefinedValueCondition
 {
+  String result;
+
+  std::function<std::string()> evaluateValue;
+
+public:
   const String name;
 
   const String value;
 
   const Rule compare;
 
-  String last_checked_value;
+  explicit UserDefinedValueCondition(const pugi::xml_node &, Scope &);
 
-  std::function<std::string()> evaluateValue;
+  auto description() const -> String;
 
-  template <typename Node>
-  explicit UserDefinedValueCondition(const Node & node, Scope & scope)
-  : name(readAttribute<String>("name", node, scope)),
-    value(readAttribute<String>("value", node, scope)),
-    compare(readAttribute<Rule>("rule", node, scope))
-  {
-    static const std::regex pattern{R"(([^\.]+)\.(.+))"};
-
-    std::smatch result;
-
-    if (std::regex_match(name, result, pattern)) {
-      const std::unordered_map<std::string, std::function<std::string()>> dispatch{
-        std::make_pair("currentState", [result]() { return evaluateCurrentState(result.str(1)); }),
-      };
-      evaluateValue = dispatch.at(result.str(2));  // XXX catch
-    } else {
-      throw SyntaxError(__FILE__, ":", __LINE__);
-    }
-  }
-
-  auto evaluate() { return asBoolean(compare(last_checked_value = evaluateValue(), value)); }
-
-  auto description() const -> std::string
-  {
-    std::stringstream description;
-
-    description << "Is the " << name << " (= " << last_checked_value << ") is " << compare << " "
-                << value << "?";
-
-    return description.str();
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -12,12 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/global_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+GlobalAction::GlobalAction(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: ComplexType(
+    choice(node,
+      std::make_pair(   "EnvironmentAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(        "EntityAction", [&](auto && node) { return make<        EntityAction>(std::forward<decltype(node)>(node), scope); }),
+      std::make_pair(     "ParameterAction", [&](auto && node) { return make<     ParameterAction>(std::forward<decltype(node)>(node), scope); }),
+      std::make_pair("InfrastructureAction", [&](auto && node) { return make<InfrastructureAction>(std::forward<decltype(node)>(node), scope); }),
+      std::make_pair(       "TrafficAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+// clang-format on
+{
+}
+
 auto GlobalAction::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);

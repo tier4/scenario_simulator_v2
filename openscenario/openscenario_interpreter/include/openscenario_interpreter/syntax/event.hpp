@@ -16,10 +16,12 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
 
 #include <nlohmann/json.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/action.hpp>
 #include <openscenario_interpreter/syntax/priority.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <openscenario_interpreter/syntax/trigger.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -48,60 +50,22 @@ struct Event : private Scope, public StoryboardElement<Event>
 
   Trigger start_trigger;
 
-  template <typename XML>
-  explicit Event(const XML & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
-    StoryboardElement(
-      readAttribute<UnsignedInt>("maximumExecutionCount", node, localScope(), UnsignedInt(1))),
-    priority(readAttribute<Priority>("priority", node, localScope())),
-    start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
-  {
-    callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
-      return actions.push_back(readStoryboardElement<Action>(node, localScope()));
-    });
-  }
+  explicit Event(const pugi::xml_node &, Scope &);
 
-  auto ready() { return start_trigger.evaluate().as<Boolean>(); }
+  /*  */ auto accomplished() const -> bool;
 
-  static constexpr auto stopTriggered() noexcept { return false; }
+  /*  */ auto ready() -> bool;
 
-  /* -------------------------------------------------------------------------
-   *
-   *  An Event's goal is accomplished when all its Actions are in the
-   *  completeState.
-   *
-   * ---------------------------------------------------------------------- */
-  auto accomplished() const
-  {
-    return std::all_of(std::begin(actions), std::end(actions), [](auto && each) {
-      return each.template as<Action>().complete();
-    });
-  }
+  /*  */ auto run() -> void;
 
-  void start()
-  {
-    for (auto && each : actions) {
-      each.as<Action>().changeStateIf(true, standby_state);
-    }
-  }
+  /*  */ auto start() -> void;
 
-  void stop()
-  {
-    for (auto && each : actions) {
-      each.as<Action>().override();
-      each.evaluate();
-    }
-  }
+  /*  */ auto stop() -> void;
 
-  void run()
-  {
-    for (auto && action : actions) {
-      action.evaluate();
-    }
-  }
+  static auto stopTriggered() noexcept -> bool;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const Event &);
+auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -52,9 +52,9 @@ struct PedestrianCategory
   constexpr operator value_type() const noexcept { return value; }
 };
 
-std::istream & operator>>(std::istream &, PedestrianCategory &);
+auto operator>>(std::istream &, PedestrianCategory &) -> std::istream &;
 
-std::ostream & operator<<(std::ostream &, const PedestrianCategory &);
+auto operator<<(std::ostream &, const PedestrianCategory &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

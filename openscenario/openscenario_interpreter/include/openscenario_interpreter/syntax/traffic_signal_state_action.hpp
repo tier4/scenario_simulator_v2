@@ -15,9 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -54,35 +54,17 @@ struct TrafficSignalStateAction
    * ------------------------------------------------------------------------ */
   const String state;
 
-  template <typename Node>
-  explicit TrafficSignalStateAction(const Node & node, Scope & current_scope)
-  : name(readAttribute<String>("name", node, current_scope)),
-    state(readAttribute<String>("state", node, current_scope))
-  {
-  }
+  explicit TrafficSignalStateAction(const pugi::xml_node &, Scope &);
 
-  static auto accomplished() noexcept { return true; }
+  static auto accomplished() noexcept -> bool;
 
-  static auto endsImmediately() noexcept -> bool { return true; }
+  static auto endsImmediately() noexcept -> bool;
 
-  auto run() const -> void
-  {
-    const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
-    if (color_opt.has_value()) {
-      setTrafficSignalColor(id(), color_opt.value());
-    }
+  /*  */ auto run() const -> void;
 
-    const auto arrow_opt = boost::lexical_cast<boost::optional<Arrow>>(state);
-    if (arrow_opt.has_value()) {
-      setTrafficSignalArrow(id(), arrow_opt.value());
-    }
+  static auto start() noexcept -> void;
 
-    throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
-  }
-
-  static auto start() noexcept -> void {}
-
-  auto id() const -> std::int64_t { return boost::lexical_cast<std::int64_t>(name); }
+  /*  */ auto id() const -> std::int64_t;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

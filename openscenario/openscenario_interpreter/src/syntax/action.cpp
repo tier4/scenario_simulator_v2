@@ -12,13 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/event.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/action.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+Action::Action(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  Element(
+    choice(node,
+      std::make_pair(     "GlobalAction", [this](auto && node) { return make<     GlobalAction>(node, localScope()); }),
+      std::make_pair("UserDefinedAction", [this](auto && node) { return make<UserDefinedAction>(node, localScope()); }),
+      std::make_pair(    "PrivateAction", [this](auto && node) { return make<    PrivateAction>(node, localScope()); })))
+// clang-format on
+{
+}
+
+auto Action::ready() const -> bool { return static_cast<bool>(*this); }
+
 auto Action::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
@@ -28,6 +43,17 @@ auto Action::start() -> void
 {
   return apply<void>([](auto && action) { return action.start(); }, *this);
 }
+
+auto Action::stop() -> void
+{
+  if (overridden) {
+    current_state = complete_state;
+  } else {
+    overridden = true;
+  }
+}
+
+auto Action::stopTriggered() noexcept -> bool { return false; }
 
 auto operator<<(nlohmann::json & json, const Action & datum) -> nlohmann::json &
 {

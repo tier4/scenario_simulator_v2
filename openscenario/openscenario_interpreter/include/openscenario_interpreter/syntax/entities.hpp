@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITIES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITIES_HPP_
 
-#include <openscenario_interpreter/syntax/entity_selection.hpp>
-#include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -34,21 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Entities
 {
-  template <typename Node>
-  explicit Entities(const Node & node, Scope & scope)
-  {
-    callWithElements(node, "ScenarioObject", 0, unbounded, [&](auto && node) {
-      auto name = readAttribute<std::string>("name", node, scope);
-      auto element = make<ScenarioObject>(node, scope);
-      scope.global().entities.emplace(name, element);
-      // scope.insert(name, element);
-    });
-
-    callWithElements(node, "EntitySelection", 0, unbounded, [&](auto && node) {
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
-      return unspecified;
-    });
-  }
+  explicit Entities(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

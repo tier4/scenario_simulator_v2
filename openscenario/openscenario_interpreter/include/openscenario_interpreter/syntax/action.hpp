@@ -20,7 +20,7 @@
 #include <openscenario_interpreter/syntax/private_action.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <openscenario_interpreter/syntax/user_defined_action.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,22 +42,7 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
 {
   bool overridden = false;
 
-  template <typename Node>
-  explicit Action(const Node & node, Scope & scope)
-  // clang-format off
-  : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-    Element(
-      choice(node,
-        std::make_pair(     "GlobalAction", [this](auto && node) { return make<     GlobalAction>(node, localScope()); }),
-        std::make_pair("UserDefinedAction", [this](auto && node) { return make<UserDefinedAction>(node, localScope()); }),
-        std::make_pair(    "PrivateAction", [this](auto && node) { return make<    PrivateAction>(node, localScope()); })))
-  // clang-format on
-  {
-  }
-
-  auto ready() const { return static_cast<bool>(*this); }
-
-  static constexpr auto stopTriggered() noexcept { return false; }
+  explicit Action(const pugi::xml_node &, Scope &);
 
   using StoryboardElement::currentState;
 
@@ -76,18 +61,15 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
 
   using StoryboardElement::evaluate;
 
-  auto run() -> void;
+  /*  */ auto ready() const -> bool;
 
-  auto start() -> void;
+  /*  */ auto run() -> void;
 
-  auto stop() -> void
-  {
-    if (overridden) {
-      current_state = complete_state;
-    } else {
-      overridden = true;
-    }
-  }
+  /*  */ auto start() -> void;
+
+  /*  */ auto stop() -> void;
+
+  static auto stopTriggered() noexcept -> bool;
 };
 
 auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;

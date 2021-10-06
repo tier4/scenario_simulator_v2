@@ -15,11 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__REACH_POSITION_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__REACH_POSITION_CONDITION_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+#include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
-#include <openscenario_interpreter/utility/overload.hpp>
-#include <traffic_simulator/helper/helper.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -45,73 +46,13 @@ struct ReachPositionCondition
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> last_checked_values;  // for description
+  std::vector<Double> results;  // for description
 
-  template <typename Node, typename Scope>
-  explicit ReachPositionCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
-  : tolerance(readAttribute<Double>("tolerance", node, outer_scope)),
-    position(readElement<Position>("Position", node, outer_scope)),
-    compare(Rule::lessThan),
-    triggering_entities(triggering_entities),
-    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
-  {
-  }
+  explicit ReachPositionCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
-  auto description() const
-  {
-    std::stringstream description;
+  auto description() const -> String;
 
-    description << triggering_entities.description() << "'s distance to given position = ";
-
-    print_to(description, last_checked_values);
-
-    description << " " << compare << " " << tolerance << "?";
-
-    return description.str();
-  }
-
-  auto evaluate()
-  {
-    const auto reach_position = overload(
-      [](const WorldPosition & position, auto && triggering_entity, auto && tolerance) {
-        return evaluateReachPositionCondition(
-          triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), tolerance);
-      },
-      [](const RelativeWorldPosition & position, auto && triggering_entity, auto && tolerance) {
-        return evaluateReachPositionCondition(
-          triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
-      },
-      [](const LanePosition & position, auto && triggering_entity, auto && tolerance) {
-        return evaluateReachPositionCondition(
-          triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
-      });
-
-    // TODO USE DistanceCondition::distance
-    const auto distance = overload(
-      [&](const WorldPosition & position, auto && triggering_entity) {
-        const auto pose =
-          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-        return std::hypot(pose.position.x, pose.position.y);
-      },
-      [&](const RelativeWorldPosition & position, auto && triggering_entity) {
-        const auto pose =
-          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-        return std::hypot(pose.position.x, pose.position.y);
-      },
-      [&](const LanePosition & position, auto && triggering_entity) {
-        const auto pose =
-          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-        return std::hypot(pose.position.x, pose.position.y);
-      });
-
-    last_checked_values.clear();
-
-    return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-      last_checked_values.push_back(apply<Double>(distance, position, triggering_entity));
-      return apply<bool>(reach_position, position, triggering_entity, tolerance);
-    }));
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

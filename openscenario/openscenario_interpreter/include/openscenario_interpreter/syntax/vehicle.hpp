@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/axles.hpp>
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
@@ -22,7 +23,7 @@
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/vehicle_category.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -57,41 +58,16 @@ struct Vehicle : public Scope  // for ParameterDeclarations
 
   Properties properties;  // Additional properties as name value pairs.
 
-  template <typename Node>
-  explicit Vehicle(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
-    vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, localScope())),
-    parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
-    bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
-    performance(readElement<Performance>("Performance", node, localScope())),
-    axles(readElement<Axles>("Axles", node, localScope())),
-    properties(readElement<Properties>("Properties", node, localScope()))
-  {
-  }
+  explicit Vehicle(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::VehicleParameters() const
-  {
-    openscenario_msgs::msg::VehicleParameters parameter;
-    {
-      parameter.name = name;
-      parameter.vehicle_category = boost::lexical_cast<String>(vehicle_category);
-      parameter.bounding_box = static_cast<openscenario_msgs::msg::BoundingBox>(bounding_box);
-      parameter.performance = static_cast<openscenario_msgs::msg::Performance>(performance);
-      parameter.axles = static_cast<openscenario_msgs::msg::Axles>(axles);
-    }
-
-    return parameter;
-  }
+  explicit operator openscenario_msgs::msg::VehicleParameters() const;
 
   template <typename... Ts>
-  decltype(auto) operator[](Ts &&... xs)
+  auto operator[](Ts &&... xs) -> decltype(auto)
   {
     return properties.operator[](std::forward<decltype(xs)>(xs)...);
   }
 };
-
-std::ostream & operator<<(std::ostream &, const Vehicle &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

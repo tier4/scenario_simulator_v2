@@ -13,27 +13,52 @@
 // limitations under the License.
 
 #include <boost/io/ios_state.hpp>
+#include <iomanip>
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
+#include <sstream>
+#include <string>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Boolean & datum)
+static_assert(std::is_standard_layout<Boolean>::value, "");
+
+static_assert(std::is_trivial<Boolean>::value, "");
+
+Boolean::Boolean(const std::string & target)
+{
+  std::stringstream interpreter;
+
+  if (!(interpreter << target && interpreter >> std::boolalpha >> data)) {
+    throw INVALID_NUMERIC_LITERAL_SPECIFIED(target);
+  }
+}
+
+auto Boolean::operator=(const value_type & rhs) noexcept -> Boolean &
+{
+  data = rhs;
+  return *this;
+}
+
+auto operator<<(std::ostream & os, const Boolean & datum) -> std::ostream &
 {
   boost::io::ios_flags_saver saver{os};
   return os << std::boolalpha << datum.data;
 }
 
-std::istream & operator>>(std::istream & is, Boolean & datum)
+auto operator>>(std::istream & is, Boolean & datum) -> std::istream &
 {
   boost::io::ios_flags_saver saver{is};
   return is >> std::boolalpha >> datum.data;
 }
 
 const Element true_v = make<Boolean>(true);
+
 const Element false_v = make<Boolean>(false);
 
-const Element & asBoolean(bool value) { return value ? true_v : false_v; }
+auto asBoolean(bool value) -> const Element & { return value ? true_v : false_v; }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

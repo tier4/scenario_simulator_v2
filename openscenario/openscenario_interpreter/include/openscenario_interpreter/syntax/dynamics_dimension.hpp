@@ -42,9 +42,14 @@ inline namespace syntax
 struct DynamicsDimension
 {
   enum value_type {
-    rate,      // A predefined constant rate is used to acquire the target value.
-    time,      // A predefined time (duration) is used to acquire the target value.
-    distance,  // A predefined distance used to acquire the target value.
+    // A predefined constant rate is used to acquire the target value.
+    rate,
+
+    // A predefined time (duration) is used to acquire the target value.
+    time,
+
+    // A predefined distance used to acquire the target value.
+    distance,
   } value;
 
   explicit DynamicsDimension() = default;
@@ -52,13 +57,9 @@ struct DynamicsDimension
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<DynamicsDimension>::value, "");
+auto operator>>(std::istream &, DynamicsDimension &) -> std::istream &;
 
-static_assert(std::is_trivial<DynamicsDimension>::value, "");
-
-std::istream & operator>>(std::istream &, DynamicsDimension &);
-
-std::ostream & operator<<(std::ostream &, const DynamicsDimension &);
+auto operator<<(std::ostream &, const DynamicsDimension &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -42,14 +42,18 @@ inline namespace syntax
 struct SpeedTargetValueType
 {
   enum value_type {
-    // The relative value is interpreted as a difference to a referenced value.
-    // Unit: m/s. As an example, a speed value of 10 equals a speed that's 10m/s
-    // faster than the reference speed.
+    /*
+       The relative value is interpreted as a difference to a referenced value.
+       Unit: m/s. As an example, a speed value of 10 equals a speed that's 10m/s
+       faster than the reference speed.
+    */
     delta,
 
-    // The relative value is interpreted as a factor to a referenced value. No
-    // unit. As an example, a speed value of 1.1 equals a speed that's 10%
-    // faster than the reference speed.
+    /*
+       The relative value is interpreted as a factor to a referenced value. No
+       unit. As an example, a speed value of 1.1 equals a speed that's 10%
+       faster than the reference speed.
+    */
     factor,
   } value;
 
@@ -58,13 +62,9 @@ struct SpeedTargetValueType
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<SpeedTargetValueType>::value, "");
+auto operator>>(std::istream &, SpeedTargetValueType &) -> std::istream &;
 
-static_assert(std::is_trivial<SpeedTargetValueType>::value, "");
-
-std::istream & operator>>(std::istream &, SpeedTargetValueType &);
-
-std::ostream & operator<<(std::ostream &, const SpeedTargetValueType &);
+auto operator<<(std::ostream &, const SpeedTargetValueType &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

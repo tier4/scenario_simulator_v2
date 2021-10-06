@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_EDGE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_EDGE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <iostream>
 
 namespace openscenario_interpreter
 {
@@ -46,7 +46,6 @@ inline namespace syntax
 struct ConditionEdge
 {
   enum value_type {
-
     /* ---- NOTE ---------------------------------------------------------------
      *
      *  A condition defined with a 'none' edge shall return true at discrete
@@ -107,13 +106,9 @@ struct ConditionEdge
   operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<ConditionEdge>::value, "");
+auto operator>>(std::istream & is, ConditionEdge &) -> std::istream &;
 
-static_assert(std::is_trivial<ConditionEdge>::value, "");
-
-std::istream & operator>>(std::istream & is, ConditionEdge &);
-
-std::ostream & operator<<(std::ostream & os, const ConditionEdge &);
+auto operator<<(std::ostream & os, const ConditionEdge &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

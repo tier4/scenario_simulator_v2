@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const ParameterDeclarations &)
+ParameterDeclarations::ParameterDeclarations(const pugi::xml_node & node, Scope & scope)
 {
-  return os << (indent++) << blue << "<ParameterDeclarations>" << reset << "\n"
-            << (--indent) << blue << "</ParameterDeclarations>";
+  callWithElements(node, "ParameterDeclaration", 0, unbounded, [&](auto && each) {
+    return emplace_back(each, scope);
+  });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

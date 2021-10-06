@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <algorithm>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>  // boost::filesystem::is_directory
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
+#include <openscenario_interpreter/syntax/object_controller.hpp>
+#include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#include <openscenario_interpreter/utility/overload.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
@@ -59,11 +59,11 @@ auto Interpreter::isSuccessIntended() const -> bool { return intended_result == 
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
-  const boost::filesystem::path logic_file =
-    script.as<OpenScenario>().category.as<ScenarioDefinition>().road_network.logic_file.filepath;
+  const auto logic_file =
+    script.as<OpenScenario>().category.as<ScenarioDefinition>().road_network.logic_file;
 
   auto configuration = traffic_simulator::Configuration(
-    boost::filesystem::is_directory(logic_file) ? logic_file : logic_file.parent_path());
+    logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
   {
     configuration.auto_sink = false;
 
@@ -73,8 +73,8 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
     configuration.scenario_path = osc_path;
 
     // XXX DIRTY HACK!!!
-    if (not boost::filesystem::is_directory(logic_file) and logic_file.extension() == ".osm") {
-      configuration.lanelet2_map_file = logic_file.filename().string();
+    if (not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm") {
+      configuration.lanelet2_map_file = logic_file.filepath.filename().string();
     }
   }
 

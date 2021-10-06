@@ -53,7 +53,7 @@ struct TriggeringEntitiesRule
   constexpr operator value_type() const noexcept { return value; }
 
   template <typename... Ts>
-  constexpr decltype(auto) apply(Ts &&... xs) const
+  constexpr auto apply(Ts &&... xs) const -> decltype(auto)
   {
     switch (value) {
       case all:
@@ -70,31 +70,12 @@ struct TriggeringEntitiesRule
     }
   }
 
-  auto description() const -> std::string
-  {
-    switch (value) {
-      case all:
-        return "Are all of";
-
-      case any:
-        return "Is any of";
-
-      case none:
-        return "Is none of";
-
-      default:
-        throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(TriggeringEntitiesRule, *this);
-    }
-  }
+  auto description() const -> std::string;
 };
 
-static_assert(std::is_standard_layout<TriggeringEntitiesRule>::value, "");
+auto operator>>(std::istream &, TriggeringEntitiesRule &) -> std::istream &;
 
-static_assert(std::is_trivial<TriggeringEntitiesRule>::value, "");
-
-std::istream & operator>>(std::istream &, TriggeringEntitiesRule &);
-
-std::ostream & operator<<(std::ostream &, const TriggeringEntitiesRule &);
+auto operator<<(std::ostream &, const TriggeringEntitiesRule &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
