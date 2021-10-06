@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <scenario_simulator_exception/exception.hpp>
-#include <string>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+#include <string>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <utility>
 #include <vector>

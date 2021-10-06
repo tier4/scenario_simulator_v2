@@ -17,10 +17,10 @@
 
 #include <behaviortree_cpp_v3/action_node.h>
 
+#include <behavior_tree_plugin/action_node.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
 #include <string>
-#include <behavior_tree_plugin/action_node.hpp>
 
 namespace entity_behavior
 {

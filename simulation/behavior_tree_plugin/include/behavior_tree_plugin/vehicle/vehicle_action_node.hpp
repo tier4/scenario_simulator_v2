@@ -17,13 +17,13 @@
 
 #include <behaviortree_cpp_v3/action_node.h>
 
+#include <behavior_tree_plugin/action_node.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <openscenario_msgs/msg/obstacle.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
-#include <behavior_tree_plugin/action_node.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <vector>

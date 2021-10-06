@@ -14,9 +14,9 @@
 
 #include <algorithm>
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <behavior_tree_plugin/pedestrian/behavior_tree.hpp>
 #include <iostream>
 #include <string>
-#include <behavior_tree_plugin/pedestrian/behavior_tree.hpp>
 #include <utility>
 
 namespace entity_behavior

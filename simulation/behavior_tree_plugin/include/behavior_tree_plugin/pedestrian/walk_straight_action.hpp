@@ -29,10 +29,10 @@
 #include <behaviortree_cpp_v3/behavior_tree.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
 
+#include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/entity_status.hpp>
 #include <string>
-#include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 

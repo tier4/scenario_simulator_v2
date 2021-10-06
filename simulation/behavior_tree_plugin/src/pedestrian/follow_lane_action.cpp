@@ -14,11 +14,11 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
 #include <boost/algorithm/clamp.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
 #include <vector>
 
 namespace entity_behavior

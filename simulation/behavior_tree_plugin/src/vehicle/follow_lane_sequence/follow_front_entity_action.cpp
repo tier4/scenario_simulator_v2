@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
+#include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
 #include <boost/algorithm/clamp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
-#include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <vector>
 

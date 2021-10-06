@@ -18,14 +18,14 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
+#include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
+#include <behavior_tree_plugin/pedestrian/walk_straight_action.hpp>
 #include <functional>
 #include <geometry_msgs/msg/point.hpp>
 #include <map>
 #include <memory>
 #include <openscenario_msgs/msg/entity_status.hpp>
 #include <string>
-#include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
-#include <behavior_tree_plugin/pedestrian/walk_straight_action.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 

@@ -18,11 +18,11 @@
 #include <behaviortree_cpp_v3/behavior_tree.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
 
+#include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
 #include <boost/optional.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/entity_status.hpp>
 #include <string>
-#include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <vector>
 

@@ -23,8 +23,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string>
 #include <behavior_tree_plugin/pedestrian/walk_straight_action.hpp>
+#include <string>
 
 namespace entity_behavior
 {

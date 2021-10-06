@@ -14,9 +14,6 @@
 
 #include <algorithm>
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <iostream>
-#include <openscenario_msgs/msg/driver_model.hpp>
-#include <string>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
@@ -26,6 +23,9 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
+#include <iostream>
+#include <openscenario_msgs/msg/driver_model.hpp>
+#include <string>
 #include <utility>
 
 namespace entity_behavior

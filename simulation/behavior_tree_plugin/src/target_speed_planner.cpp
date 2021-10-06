@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iostream>
 #include <behavior_tree_plugin/target_speed_planner.hpp>
+#include <iostream>
 
 namespace traffic_simulator
 {

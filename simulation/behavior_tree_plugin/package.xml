@@ -12,6 +12,7 @@
   <depend>rclcpp</depend>
   <depend>pluginlib</depend>
   <depend>traffic_simulator</depend>
+  <depend>behavior_tree_cpp_v3</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>

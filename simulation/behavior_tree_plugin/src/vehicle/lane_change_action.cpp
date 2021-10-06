@@ -13,11 +13,11 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
+#include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
-#include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <vector>
 

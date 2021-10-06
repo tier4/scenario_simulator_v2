@@ -15,8 +15,8 @@
 #ifndef BEHAVIOR_TREE_PLUGIN__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_CROSSING_ENTITY_ACTION_HPP_
 #define BEHAVIOR_TREE_PLUGIN__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_CROSSING_ENTITY_ACTION_HPP_
 
-#include <string>
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
+#include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <vector>
 
