@@ -1,29 +1,40 @@
-name: BuildTest
+name: BuildIsolateTest
 
 on:
   workflow_dispatch:
   schedule:
     - cron: 0 0 * * *
-  pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "README.md"
-      - "workflows/Docker.yaml"
-      - "workflows/Documentation.yaml"
-      - "workflows/NotifyFailure.yaml"
-      - "workflows/Release.yaml"
-      - "workflows/SpellCheck.yaml"
+  push:
+    branches:
+      - master
 
 jobs:
-  build:
-    name: build
+  build_isolate:
+    name: build_isolate
     runs-on: ubuntu-20.04
     timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: 8
       matrix:
+        package:
+          [
+            concealer,
+            cpp_mock_scenarios,
+            kashiwanoha_map,
+            lanelet2_extension_psim,
+            openscenario_interpreter,
+            openscenario_msgs,
+            openscenario_utility,
+            openscenario_visualization,
+            scenario_simulator_exception,
+            scenario_simulator_v2,
+            scenario_test_runner,
+            simple_junit,
+            simple_sensor_simulator,
+            simulation_interface,
+            traffic_simulator,
+          ]
         rosdistro: [foxy, galactic]
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
@@ -36,17 +47,10 @@ jobs:
         uses: ros-tooling/setup-ros@v0.2
         with:
           required-ros-distributions: ${{ matrix.rosdistro }}
-      - name: Search packages in this repository
-        id: list_packages
-        run: |
-          echo ::set-output name=package_list::$(colcon list --names-only | sed -e ':loop; N; $!b loop; s/\n/ /g')
-      - name: Show target packages
-        run: |
-          echo "Target packages: ${{ steps.list_packages.outputs.package_list }}"
-      - name: Run build test
+      - name: Run build test for ${{ matrix.package }} package
         uses: ros-tooling/action-ros-ci@v0.2
         with:
-          package-name: ${{ steps.list_packages.outputs.package_list }}
+          package-name: ${{ matrix.package }}
           target-ros2-distro: ${{ matrix.rosdistro }}
           vcs-repo-file-url: dependency_${{ matrix.rosdistro }}.repos
           extra-cmake-args: -DWITH_INTEGRATION_TEST=ON
@@ -70,3 +74,4 @@ jobs:
           files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
           flags: colcon_test
           env_vars: ROS_DISTRO
+          name: ${{ matrix.package }}
