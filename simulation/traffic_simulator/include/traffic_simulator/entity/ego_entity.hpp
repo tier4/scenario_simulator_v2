@@ -89,7 +89,7 @@ public:
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
 
-  void engage() override;
+  auto engage() -> void override;
 
   auto getCurrentAction() const -> const std::string override;
 
@@ -118,7 +118,7 @@ public:
 
   void requestLaneChange(const std::int64_t) override;
 
-  void setStatus(const openscenario_msgs::msg::EntityStatus & status);
+  void setStatus(const openscenario_msgs::msg::EntityStatus &) override;
 
   void setTargetSpeed(double, bool) override;
 };
