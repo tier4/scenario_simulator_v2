@@ -2,6 +2,9 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.3 (2021-10-07)
+------------------
+
 0.5.2 (2021-10-06)
 ------------------
 * Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
