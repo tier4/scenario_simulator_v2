@@ -413,21 +413,21 @@ public:
    *  Topic: /awapi/vehicle/put/velocity
    *
    * ------------------------------------------------------------------------ */
-  // using VehicleVelocity = autoware_api_msgs::msg::VelocityLimit;
-  //
-  // DEFINE_PUBLISHER(VehicleVelocity);
-  //
-  // template <typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
-  // decltype(auto) setVehicleVelocity(const T value)
-  // {
-  //   VehicleVelocity vehicle_velocity;
-  //   {
-  //     vehicle_velocity.stamp = get_clock()->now();
-  //     vehicle_velocity.max_velocity = value;
-  //   }
-  //
-  //   return setVehicleVelocity(vehicle_velocity);
-  // }
+  using VehicleVelocity = autoware_api_msgs::msg::VelocityLimit;
+
+  DEFINE_PUBLISHER(VehicleVelocity);
+
+  template <typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
+  auto setVehicleVelocity(const T value) -> decltype(auto)
+  {
+    VehicleVelocity vehicle_velocity;
+    {
+      vehicle_velocity.stamp = get_clock()->now();
+      vehicle_velocity.max_velocity = value;
+    }
+
+    return setVehicleVelocity(vehicle_velocity);
+  }
 
   /* ---- AutowareStatus -------------------------------------------------------
    *

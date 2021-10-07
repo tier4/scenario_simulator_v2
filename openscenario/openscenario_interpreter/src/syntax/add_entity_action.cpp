@@ -54,7 +54,6 @@ try {
     position)
 
   auto add_entity_action = overload(
-
     [&](const Vehicle & vehicle) {
       if (APPLY_ADD_ENTITY_ACTION(
             entity.as<ScenarioObject>().object_controller.isEgo(),  //
@@ -65,12 +64,10 @@ try {
         entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
       }
     },
-
     [&](const Pedestrian & pedestrian) {
       APPLY_ADD_ENTITY_ACTION(
         false, entity_ref, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
     },
-
     [&](const MiscObject & misc_object) {
       APPLY_ADD_ENTITY_ACTION(
         false, entity_ref, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
