@@ -15,14 +15,15 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 
+#include <pluginlib/class_loader.h>
+
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/behavior/target_speed_planner.hpp>
-#include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
-#include <traffic_simulator/behavior/vehicle/lane_change_action.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 
 // headers in pugixml
@@ -70,21 +71,21 @@ public:
 
   void setDriverModel(const openscenario_msgs::msg::DriverModel & model) override
   {
-    tree_ptr_->setValueToBlackBoard("driver_model", model);
+    behavior_plugin_ptr_->setValueToBlackBoard("driver_model", model);
   }
 
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
   {
     EntityBase::setHdMapUtils(ptr);
     route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
-    tree_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
+    behavior_plugin_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
   }
 
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override
   {
     EntityBase::setTrafficLightManager(ptr);
-    tree_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
+    behavior_plugin_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
   }
 
   void setTargetSpeed(double target_speed, bool continuous) override;
@@ -99,12 +100,12 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
-  const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
+  const std::string getCurrentAction() const { return behavior_plugin_ptr_->getCurrentAction(); }
 
   const openscenario_msgs::msg::WaypointsArray getWaypoints() override
   {
     try {
-      return tree_ptr_->getWaypoints();
+      return behavior_plugin_ptr_->getWaypoints();
     } catch (const std::runtime_error & e) {
       if (status_.lanelet_pose_valid == false) {
         THROW_SIMULATION_ERROR(
@@ -122,7 +123,7 @@ public:
 
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
   {
-    return tree_ptr_->getObstacle();
+    return behavior_plugin_ptr_->getObstacle();
   }
 
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
@@ -134,7 +135,7 @@ public:
   }
 
 private:
-  std::shared_ptr<entity_behavior::vehicle::BehaviorTree> tree_ptr_;
+  std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
   traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
 };

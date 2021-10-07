@@ -30,9 +30,9 @@ public:
     data_[key] = boost::any_cast<T>(value);
   }
   template <typename T>
-  const T get(const std::string & key) const
+  void get(const std::string & key, const T & value) const
   {
-    return boost::any_cast<T>(getValue(key));
+    value = boost::any_cast<T>(getValue(key));
   }
 
 private:
