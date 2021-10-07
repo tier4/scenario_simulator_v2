@@ -59,7 +59,7 @@ public:
 
   virtual auto getCurrentAction() const -> const std::string = 0;
 
-  /*   */ auto getEntityStatusBeforeUpdate() const -> const openscenario_msgs::msg::EntityStatus
+  /*   */ auto getEntityStatusBeforeUpdate() const -> const openscenario_msgs::msg::EntityStatus &
   {
     return status_before_update_;
   }
