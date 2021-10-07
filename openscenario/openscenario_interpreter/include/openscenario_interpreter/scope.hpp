@@ -55,11 +55,13 @@ private:
     }
   }
 
+public:
   explicit EnvironmentFrame(const EnvironmentFrame &) = delete;
 
   explicit EnvironmentFrame(EnvironmentFrame &&) = delete;
 
-public:
+  bool isTopLevel() const { return parent == nullptr; }
+
   auto insert(const std::string & name, Element element) -> void
   {
     if (name.find(':') != std::string::npos) {
@@ -266,11 +268,14 @@ public:
       *this, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*frame, name)));
   }
 
+  bool isTopLevel() const { return frame->isTopLevel(); }
+
   auto insert(const std::string & name_, const Element & element)
   {
     return frame->insert(name_, element);
   }
 
+  // TODO: rename to entityRef
   auto findElement(const std::string & name_) const { return frame->findElement(name_); }
 };
 }  // namespace openscenario_interpreter

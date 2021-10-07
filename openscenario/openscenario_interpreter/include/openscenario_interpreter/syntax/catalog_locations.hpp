@@ -41,7 +41,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct CatalogLocations : public std::unordered_map<String, CatalogLocation>
+struct CatalogLocations : public std::unordered_map<std::string, CatalogLocation>
 {
   explicit CatalogLocations() = default;
 

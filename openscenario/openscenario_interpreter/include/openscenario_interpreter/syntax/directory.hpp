@@ -15,7 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DIRECTORY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DIRECTORY_HPP_
 
-#include <openscenario_interpreter/scope.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 
 namespace openscenario_interpreter
 {
@@ -30,12 +32,18 @@ inline namespace syntax
  * ======================================================================== */
 struct Directory
 {
-  const String path;
+  const boost::filesystem::path path;
 
   template <typename Node, typename Scope>
   explicit Directory(const Node & node, Scope & outer_scope)
-  : path{readAttribute<String>("path", node, outer_scope)}
+  : path{readAttribute<std::string>("path", node, outer_scope)}
   {
+  }
+
+  static auto ls(const Directory & dir)
+  {
+    using dir_it = boost::filesystem::directory_iterator;
+    return std::vector<boost::filesystem::path>(dir_it(dir.path), dir_it());
   }
 };
 }  // namespace syntax

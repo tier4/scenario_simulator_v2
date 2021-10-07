@@ -11,7 +11,12 @@ OpenSCENARIO:
         parameterType: unsignedInt
         value: &count-default 0
   CatalogLocations:
-    CatalogLocation: []
+    VehicleCatalog:
+      Directory:
+        path: src/simulator/scenario_simulator/test_runner/scenario_test_runner/test/scenario/catalog/vehicle
+    ControllerCatalog:
+      Directory:
+        path: src/simulator/scenario_simulator/test_runner/scenario_test_runner/test/scenario/catalog/controller
   RoadNetwork:
     LogicFile:
       filepath: $(find-pkg-share kashiwanoha_map)/map
