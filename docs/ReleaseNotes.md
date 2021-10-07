@@ -2,6 +2,9 @@
 
 ## Difference between the latest release and master
 
+## Version 0.5.3
+- Fix setStatus function in EgoEntity class. ([link](https://github.com/tier4/scenario_simulator_v2/pull/549))
+
 ## Version 0.5.2
 - Remove entity status which is empty. ([link](https://github.com/tier4/scenario_simulator_v2/pull/543)).
 - Update syntaxes of `openscenario_interpreter` to be compiled separately ([link](https://github.com/tier4/scenario_simulator_v2/pull/532)).
