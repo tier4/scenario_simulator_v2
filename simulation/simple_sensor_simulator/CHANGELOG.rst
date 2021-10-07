@@ -2,6 +2,9 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.2 (2021-10-06)
 ------------------
 * Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build

@@ -2,6 +2,15 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#549 <https://github.com/tier4/scenario_simulator_v2/issues/549>`_ from tier4/fix/traffic_simulator/autoware
+* Fix `EgoEntity::setStatus` to call `VehicleEntity::setStatus`
+* Lipsticks
+* Merge pull request `#548 <https://github.com/tier4/scenario_simulator_v2/issues/548>`_ from prybicki/patch-6
+* Fix SIGABRT due to accessing uninitialized optional
+* Contributors: Peter Rybicki, Tatsuya Yamasaki, yamacir-kit
+
 0.5.2 (2021-10-06)
 ------------------
 * Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status
