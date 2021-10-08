@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
@@ -27,6 +28,11 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
     readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
   properties(readElement<Properties>("Properties", node, localScope()))
 {
+}
+
+auto Controller::assign(const EntityRef & entity_ref) -> void
+{
+  applyAssignControllerAction(entity_ref, *this);
 }
 
 auto Controller::operator[](const String & name) -> const Property & { return properties[name]; }

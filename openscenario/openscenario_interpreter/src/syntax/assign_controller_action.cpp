@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/assign_controller_action.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
@@ -35,7 +34,7 @@ AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scop
 auto AssignControllerAction::operator()() const -> void
 {
   for (const auto & actor : actors) {
-    applyAssignControllerAction(actor, as<Controller>());
+    as<Controller>().assign(actor);
   }
 }
 }  // namespace syntax
