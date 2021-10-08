@@ -189,6 +189,8 @@ public:
   /*   */ auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
 
   /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
+
+  virtual auto setUpperBoundSpeed(double) -> double;
 };
 }  // namespace concealer
 

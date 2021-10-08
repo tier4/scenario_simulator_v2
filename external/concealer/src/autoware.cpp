@@ -112,4 +112,9 @@ auto Autoware::set(const geometry_msgs::msg::Twist & twist) -> const geometry_ms
 {
   return current_twist = twist;
 }
+
+auto Autoware::setUpperBoundSpeed(double value) -> double  //
+{
+  return current_twist.linear.x;
+}
 }  // namespace concealer

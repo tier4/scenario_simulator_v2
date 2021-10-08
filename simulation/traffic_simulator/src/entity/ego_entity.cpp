@@ -467,5 +467,10 @@ void EgoEntity::setTargetSpeed(double value, bool)
         getParameter<std::string>("vehicle_model_type", "IDEAL_STEER"), "specified");
   }
 }
+
+auto EgoEntity::setUpperBoundSpeed(double value) -> void  //
+{
+  autoware->setUpperBoundSpeed(value);
+}
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -18,7 +18,7 @@ namespace concealer
 {
 AutowareArchitectureProposal::~AutowareArchitectureProposal() { shutdownAutoware(); }
 
-void AutowareArchitectureProposal::initialize(const geometry_msgs::msg::Pose & initial_pose)
+auto AutowareArchitectureProposal::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
@@ -29,7 +29,8 @@ void AutowareArchitectureProposal::initialize(const geometry_msgs::msg::Pose & i
   }
 }
 
-void AutowareArchitectureProposal::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+auto AutowareArchitectureProposal::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+  -> void
 {
   assert(!route.empty());
 
@@ -44,13 +45,13 @@ void AutowareArchitectureProposal::plan(const std::vector<geometry_msgs::msg::Po
   });
 }
 
-void AutowareArchitectureProposal::engage()
+auto AutowareArchitectureProposal::engage() -> void
 {
   task_queue.delay(
     [this]() { waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); }); });
 }
 
-void AutowareArchitectureProposal::update()
+auto AutowareArchitectureProposal::update() -> void
 {
   setCurrentControlMode();
   setCurrentShift(current_twist);
@@ -62,27 +63,27 @@ void AutowareArchitectureProposal::update()
   setTransform(current_pose);
 }
 
-double AutowareArchitectureProposal::getAcceleration() const
+auto AutowareArchitectureProposal::getAcceleration() const -> double
 {
   return getVehicleCommand().control.acceleration;
 }
 
-double AutowareArchitectureProposal::getVelocity() const
+auto AutowareArchitectureProposal::getVelocity() const -> double
 {
   return getVehicleCommand().control.velocity;
 }
 
-double AutowareArchitectureProposal::getSteeringAngle() const
+auto AutowareArchitectureProposal::getSteeringAngle() const -> double
 {
   return getVehicleCommand().control.steering_angle;
 }
 
-double AutowareArchitectureProposal::getGearSign() const
+auto AutowareArchitectureProposal::getGearSign() const -> double
 {
   return getVehicleCommand().shift.data == autoware_vehicle_msgs::msg::Shift::REVERSE ? -1.0 : 1.0;
 }
 
-openscenario_msgs::msg::WaypointsArray AutowareArchitectureProposal::getWaypoints() const
+auto AutowareArchitectureProposal::getWaypoints() const -> openscenario_msgs::msg::WaypointsArray
 {
   openscenario_msgs::msg::WaypointsArray waypoints;
 
@@ -93,31 +94,49 @@ openscenario_msgs::msg::WaypointsArray AutowareArchitectureProposal::getWaypoint
   return waypoints;
 }
 
-double AutowareArchitectureProposal::restrictTargetSpeed(double value) const
+auto AutowareArchitectureProposal::restrictTargetSpeed(double value) const -> double
 {
   // no restrictions here
   return value;
 }
 
-std::string AutowareArchitectureProposal::getAutowareStateMessage() const
+auto AutowareArchitectureProposal::getAutowareStateMessage() const -> std::string
 {
   return getAutowareStatus().autoware_state;
 }
 
-void AutowareArchitectureProposal::sendSIGINT() { ::kill(process_id, SIGINT); }
+auto AutowareArchitectureProposal::sendSIGINT() -> void  //
+{
+  ::kill(process_id, SIGINT);
+}
 
-bool AutowareArchitectureProposal::isReady() noexcept
+auto AutowareArchitectureProposal::isReady() noexcept -> bool
 {
   return is_ready or (is_ready = isWaitingForRoute());
 }
 
-bool AutowareArchitectureProposal::isNotReady() noexcept { return not isReady(); }
+auto AutowareArchitectureProposal::isNotReady() noexcept -> bool  //
+{
+  return not isReady();
+}
 
-void AutowareArchitectureProposal::checkAutowareState()
+auto AutowareArchitectureProposal::checkAutowareState() -> void
 {
   if (isReady() and isEmergency()) {
     // throw common::AutowareError("Autoware is in emergency state now");
   }
 }
 
+auto AutowareArchitectureProposal::setUpperBoundSpeed(double value) -> double
+{
+  VehicleVelocity vehicle_velocity;
+  {
+    vehicle_velocity.stamp = get_clock()->now();
+    vehicle_velocity.max_velocity = value;
+  }
+
+  setVehicleVelocity(vehicle_velocity);
+
+  return value;
+}
 }  // namespace concealer

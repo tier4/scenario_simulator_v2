@@ -203,19 +203,20 @@ public:
   FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
-  FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
+  FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(getVehicleCommand, const);
+  FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(ready, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
   FORWARD_TO_ENTITY(setDriverModel, );
+  FORWARD_TO_ENTITY(setUpperBoundSpeed, );
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
 

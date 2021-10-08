@@ -121,6 +121,8 @@ public:
   void setStatus(const openscenario_msgs::msg::EntityStatus &) override;
 
   void setTargetSpeed(double, bool) override;
+
+  auto setUpperBoundSpeed(double) -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

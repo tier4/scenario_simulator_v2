@@ -417,18 +417,6 @@ public:
 
   DEFINE_PUBLISHER(VehicleVelocity);
 
-  template <typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
-  auto setVehicleVelocity(const T value) -> decltype(auto)
-  {
-    VehicleVelocity vehicle_velocity;
-    {
-      vehicle_velocity.stamp = get_clock()->now();
-      vehicle_velocity.max_velocity = value;
-    }
-
-    return setVehicleVelocity(vehicle_velocity);
-  }
-
   /* ---- AutowareStatus -------------------------------------------------------
    *
    *  Topic: /awapi/autoware/get/status
@@ -515,27 +503,29 @@ public:
 
   virtual ~AutowareArchitectureProposal();
 
-  void initialize(const geometry_msgs::msg::Pose &) override;
+  auto engage() -> void override;
 
-  void plan(const std::vector<geometry_msgs::msg::PoseStamped> &) override;
+  auto getAcceleration() const -> double override;
 
-  void engage() override;
+  auto getAutowareStateMessage() const -> std::string override;
 
-  void update() override;
+  auto getGearSign() const -> double override;
 
-  double getAcceleration() const override;
+  auto getSteeringAngle() const -> double override;
 
-  double getVelocity() const override;
+  auto getVelocity() const -> double override;
 
-  double getSteeringAngle() const override;
+  auto getWaypoints() const -> openscenario_msgs::msg::WaypointsArray override;
 
-  double getGearSign() const override;
+  auto initialize(const geometry_msgs::msg::Pose &) -> void override;
 
-  openscenario_msgs::msg::WaypointsArray getWaypoints() const override;
+  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
 
-  double restrictTargetSpeed(double) const override;
+  auto restrictTargetSpeed(double) const -> double override;
 
-  std::string getAutowareStateMessage() const override;
+  auto setUpperBoundSpeed(double) -> double override;
+
+  auto update() -> void override;
 };
 }  // namespace concealer
 
