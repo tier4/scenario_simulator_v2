@@ -50,6 +50,7 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
       if (not max_jerk.name.empty()) {
         configuration.max_jerk = boost::lexical_cast<double>(max_jerk.value);
       }
+
       if (not min_jerk.name.empty()) {
         configuration.min_jerk = boost::lexical_cast<double>(min_jerk.value);
       }

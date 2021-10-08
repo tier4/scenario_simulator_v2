@@ -32,7 +32,17 @@ AddEntityAction::AddEntityAction(const Scope & scope, const Position & position)
 {
 }
 
-auto AddEntityAction::operator()(const std::string & entity_ref) const -> void
+auto AddEntityAction::accomplished() noexcept -> bool  //
+{
+  return endsImmediately();
+}
+
+auto AddEntityAction::endsImmediately() noexcept -> bool  //
+{
+  return true;
+}
+
+auto AddEntityAction::operator()(const EntityRef & entity_ref) const -> void
 try {
   const auto entity = global().entities.at(entity_ref);
 

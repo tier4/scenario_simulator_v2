@@ -32,10 +32,17 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 
 auto Controller::assign(const EntityRef & entity_ref) -> void
 {
-  applyAssignControllerAction(entity_ref, *this);
+  if (properties["isEgo"]) {
+    // TODO activateSensors / activateMetrics
+  } else {
+    applyAssignControllerAction(entity_ref, *this);  // For non-Ego vehicles.
+  }
 }
 
-auto Controller::operator[](const String & name) -> const Property & { return properties[name]; }
+auto Controller::operator[](const String & name) -> const Property &  //
+{
+  return properties[name];
+}
 
 Controller::operator openscenario_msgs::msg::DriverModel()
 {

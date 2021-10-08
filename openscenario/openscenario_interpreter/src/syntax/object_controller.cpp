@@ -22,6 +22,11 @@ inline namespace syntax
 {
 int ObjectController::ego_count = 0;
 
+ObjectController::ObjectController()  //
+: ComplexType(unspecified)
+{
+}
+
 ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
@@ -47,7 +52,7 @@ auto ObjectController::isEgo() const & -> bool
   if (is<Controller>()) {
     return static_cast<bool>(as<Controller>()["isEgo"]);
   } else {
-    return false;  // TODO CatalogReference
+    return false;
   }
 }
 
@@ -56,7 +61,11 @@ ObjectController::operator openscenario_msgs::msg::DriverModel() const
   if (is<Controller>()) {
     return static_cast<openscenario_msgs::msg::DriverModel>(as<Controller>());
   } else {
-    throw SyntaxError("CatalogReference is not yet supported.");
+    openscenario_msgs::msg::DriverModel controller;
+    {
+      controller.see_around = not Properties()["isBlind"];
+    }
+    return controller;
   }
 }
 }  // namespace syntax

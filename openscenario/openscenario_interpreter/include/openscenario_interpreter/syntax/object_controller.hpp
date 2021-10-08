@@ -41,11 +41,13 @@ struct ObjectController : public ComplexType
   // inline static int ego_count= 0;
   static int ego_count;
 
+  explicit ObjectController();
+
   explicit ObjectController(const pugi::xml_node &, Scope &);
 
   ~ObjectController();
 
-  auto isEgo() const & -> bool;
+  [[deprecated]] auto isEgo() const & -> bool;
 
   operator openscenario_msgs::msg::DriverModel() const;
 };
