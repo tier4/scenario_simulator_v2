@@ -77,12 +77,14 @@ auto ScenarioObject::activateSensors() -> bool
              attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
                name, "/perception/object_recognition/objects", 0.1));
     } else if (architecture_type == "awf/auto") {
+      /*
+         Autoware.Auto does not currently support object prediction however it
+         is work-in-progress for Cargo ODD msgs are already implemented and
+         autoware_auto_msgs::msg::PredictedObjects will probably be used here
+         topic name is yet unknown.
+      */
       return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
         traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
-      // Autoware.Auto does not currently support object prediction
-      // however it is work-in-progress for Cargo ODD
-      // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
-      // topic name is yet unknown
     } else {
       throw SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type), " specified");

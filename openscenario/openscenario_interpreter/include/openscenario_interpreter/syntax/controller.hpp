@@ -56,8 +56,6 @@ struct Controller : public Scope
 
   operator openscenario_msgs::msg::DriverModel();
 };
-
-using DefaultController = Properties;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

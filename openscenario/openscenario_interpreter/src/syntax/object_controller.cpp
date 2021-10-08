@@ -35,8 +35,6 @@ ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-ObjectController::ObjectController() : ComplexType(unspecified) {}
-
 ObjectController::~ObjectController()
 {
   if (isEgo()) {
@@ -46,24 +44,19 @@ ObjectController::~ObjectController()
 
 auto ObjectController::isEgo() const & -> bool
 {
-  if (is<Unspecified>()) {
-    static auto controller = DefaultController();
-    return static_cast<bool>(controller["isEgo"]);
-  } else {
+  if (is<Controller>()) {
     return static_cast<bool>(as<Controller>()["isEgo"]);
+  } else {
+    return false;  // TODO CatalogReference
   }
 }
 
 ObjectController::operator openscenario_msgs::msg::DriverModel() const
 {
-  if (is<Unspecified>()) {
-    openscenario_msgs::msg::DriverModel controller;
-    {
-      controller.see_around = not DefaultController()["isBlind"];
-    }
-    return controller;
+  if (is<Controller>()) {
+    return static_cast<openscenario_msgs::msg::DriverModel>(as<Controller>());
   } else {
-    return openscenario_msgs::msg::DriverModel(as<Controller>());
+    throw SyntaxError("CatalogReference is not yet supported.");
   }
 }
 }  // namespace syntax
