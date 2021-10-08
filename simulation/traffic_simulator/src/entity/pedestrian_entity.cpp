@@ -38,7 +38,7 @@ PedestrianEntity::PedestrianEntity(
    */
   std::string plugin_name = "behavior_plugin/behavior_tree_plugin";
   behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
-  behavior_plugin_ptr_->setValueToBlackBoard("pedestrian_parameters", parameters);
+  behavior_plugin_ptr_->setPedestrianParameters(parameters);
 }
 
 void PedestrianEntity::requestAssignRoute(
@@ -104,18 +104,17 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
   } else {
-    behavior_plugin_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
-    behavior_plugin_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
-    behavior_plugin_ptr_->setValueToBlackBoard("entity_status", status_);
+    behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
+    behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
+    behavior_plugin_ptr_->setEntityStatus(status_);
     target_speed_planner_.update(status_.action_status.twist.linear.x);
-    behavior_plugin_ptr_->setValueToBlackBoard(
-      "target_speed", target_speed_planner_.getTargetSpeed());
+    behavior_plugin_ptr_->setTargetSpeed(target_speed_planner_.getTargetSpeed());
     if (status_.lanelet_pose_valid) {
       auto route = route_planner_ptr_->getRouteLanelets(status_.lanelet_pose);
-      behavior_plugin_ptr_->setValueToBlackBoard("route_lanelets", route);
+      behavior_plugin_ptr_->setRouteLanelets(route);
     } else {
       std::vector<std::int64_t> empty = {};
-      behavior_plugin_ptr_->setValueToBlackBoard("route_lanelets", empty);
+      behavior_plugin_ptr_->setRouteLanelets(empty);
     }
     behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();

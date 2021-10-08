@@ -39,7 +39,7 @@ VehicleEntity::VehicleEntity(
    */
   std::string plugin_name = "behavior_plugin/behavior_tree_plugin";
   behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
-  behavior_plugin_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
+  behavior_plugin_ptr_->setVehicleParameters(parameters);
 }
 
 void VehicleEntity::requestAssignRoute(
@@ -84,7 +84,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 {
   behavior_plugin_ptr_->setRequest("lane_change");
-  behavior_plugin_ptr_->setValueToBlackBoard("to_lanelet_id", to_lanelet_id);
+  behavior_plugin_ptr_->setToLaneletId(to_lanelet_id);
 }
 
 void VehicleEntity::cancelRequest()
@@ -104,18 +104,17 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
   } else {
-    behavior_plugin_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
-    behavior_plugin_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
-    behavior_plugin_ptr_->setValueToBlackBoard("entity_status", status_);
+    behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
+    behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
+    behavior_plugin_ptr_->setEntityStatus(status_);
     target_speed_planner_.update(status_.action_status.twist.linear.x);
-    behavior_plugin_ptr_->setValueToBlackBoard(
-      "target_speed", target_speed_planner_.getTargetSpeed());
+    behavior_plugin_ptr_->setTargetSpeed(target_speed_planner_.getTargetSpeed());
     if (status_.lanelet_pose_valid) {
-      behavior_plugin_ptr_->setValueToBlackBoard(
-        "route_lanelets", route_planner_ptr_->getRouteLanelets(status_.lanelet_pose));
+      behavior_plugin_ptr_->setRouteLanelets(
+        route_planner_ptr_->getRouteLanelets(status_.lanelet_pose));
     } else {
       std::vector<std::int64_t> empty = {};
-      behavior_plugin_ptr_->setValueToBlackBoard("route_lanelets", empty);
+      behavior_plugin_ptr_->setRouteLanelets(empty);
     }
     behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();

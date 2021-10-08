@@ -60,14 +60,14 @@ public:
   {
     EntityBase::setHdMapUtils(ptr);
     route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
-    behavior_plugin_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
+    behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
   }
 
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override
   {
     EntityBase::setTrafficLightManager(ptr);
-    behavior_plugin_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
+    behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
   }
 
   void setTargetSpeed(double target_speed, bool continuous) override;
