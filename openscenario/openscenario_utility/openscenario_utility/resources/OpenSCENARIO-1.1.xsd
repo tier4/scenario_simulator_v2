@@ -7,8 +7,8 @@ __(c)__ by ASAM e.V., 2021
 
 Description of dynamic content in driving simulations
 
-Any use is limited to the scope described in the ASAM license terms. 
-This file is distributable in accordance with the ASAM license terms. 
+Any use is limited to the scope described in the ASAM license terms.
+This file is distributable in accordance with the ASAM license terms.
 See www.asam.net/license.html for further details.
 -->
 	<xsd:element name="OpenSCENARIO" type="OpenScenario"/>
@@ -67,6 +67,7 @@ See www.asam.net/license.html for further details.
 					<xsd:enumeration value="none"/>
 					<xsd:enumeration value="rising"/>
 					<xsd:enumeration value="risingOrFalling"/>
+					<xsd:enumeration value="sticky"/>
 				</xsd:restriction>
 			</xsd:simpleType>
 			<xsd:simpleType>
