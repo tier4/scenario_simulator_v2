@@ -35,25 +35,21 @@ ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
       std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, scope); })))
 // clang-format on
 {
-  if (isEgo()) {
+  if (isUserDefinedController()) {
     ego_count++;
   }
 }
 
 ObjectController::~ObjectController()
 {
-  if (isEgo()) {
+  if (isUserDefinedController()) {
     ego_count--;
   }
 }
 
-auto ObjectController::isEgo() const & -> bool
+auto ObjectController::isUserDefinedController() const & -> bool
 {
-  if (is<Controller>()) {
-    return static_cast<bool>(as<Controller>()["isEgo"]);
-  } else {
-    return false;
-  }
+  return is<Controller>() and as<Controller>().isUserDefinedController();
 }
 
 ObjectController::operator openscenario_msgs::msg::DriverModel() const

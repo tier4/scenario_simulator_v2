@@ -32,11 +32,16 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 
 auto Controller::assign(const EntityRef & entity_ref) -> void
 {
-  if (properties["isEgo"]) {
+  if (isUserDefinedController()) {
     // TODO activateSensors / activateMetrics
   } else {
     applyAssignControllerAction(entity_ref, *this);  // For non-Ego vehicles.
   }
+}
+
+auto Controller::isUserDefinedController() & -> bool
+{
+  return static_cast<bool>(properties["isEgo"]);
 }
 
 auto Controller::operator[](const String & name) -> const Property &  //

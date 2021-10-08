@@ -32,10 +32,10 @@ ScenarioObject::ScenarioObject(const pugi::xml_node & node, Scope & scope)
 
 auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> bool
 {
-  const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
-
   metrics::OutOfRangeMetric::Config configuration;
   {
+    const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
+
     configuration.target_entity = name;
     configuration.min_velocity = -parameters.performance.max_speed;
     configuration.max_velocity = +parameters.performance.max_speed;
@@ -56,7 +56,7 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
       }
     }
 
-    if (object_controller.isEgo()) {
+    if (object_controller.isUserDefinedController()) {
       configuration.jerk_topic =
         "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
     }
@@ -69,7 +69,7 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
 
 auto ScenarioObject::activateSensors() -> bool
 {
-  if (object_controller.isEgo()) {
+  if (object_controller.isUserDefinedController()) {
     const auto architecture_type = getParameter<std::string>("architecture_type", "");
     if (architecture_type == "tier4/proposal") {
       return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(

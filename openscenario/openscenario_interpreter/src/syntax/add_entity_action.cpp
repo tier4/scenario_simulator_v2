@@ -66,8 +66,8 @@ try {
   auto add_entity_action = overload(
     [&](const Vehicle & vehicle) {
       if (APPLY_ADD_ENTITY_ACTION(
-            entity.as<ScenarioObject>().object_controller.isEgo(),  //
-            entity_ref,                                             //
+            entity.as<ScenarioObject>().object_controller.isUserDefinedController(),  //
+            entity_ref,                                                               //
             static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
         applyAssignControllerAction(entity_ref, entity.as<ScenarioObject>().object_controller);
         entity.as<ScenarioObject>().activateSensors();

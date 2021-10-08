@@ -47,7 +47,7 @@ struct ObjectController : public ComplexType
 
   ~ObjectController();
 
-  [[deprecated]] auto isEgo() const & -> bool;
+  auto isUserDefinedController() const & -> bool;
 
   operator openscenario_msgs::msg::DriverModel() const;
 };

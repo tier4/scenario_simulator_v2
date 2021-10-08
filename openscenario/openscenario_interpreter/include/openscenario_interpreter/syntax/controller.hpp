@@ -55,6 +55,8 @@ struct Controller : public Scope
 
   auto assign(const EntityRef &) -> void;
 
+  auto isUserDefinedController() & -> bool;
+
   auto operator[](const String &) -> const Property &;
 
   operator openscenario_msgs::msg::DriverModel();
