@@ -46,14 +46,14 @@ public:
     return value;                        \
   }
   DEFINE_GETTER(getWaypoints, "waypoints", openscenario_msgs::msg::WaypointsArray)
-  // DEFINE_GETTER(getObstacle, "obstacle", boost::optional<openscenario_msgs::msg::Obstacle>)
+  DEFINE_GETTER(getObstacle, "obstacle", boost::optional<openscenario_msgs::msg::Obstacle>)
+  DEFINE_GETTER(getUpdatedStatus, "updated_status", openscenario_msgs::msg::EntityStatus)
 #undef DEFINE_GETTER
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() const
-  {
-    boost::optional<openscenario_msgs::msg::Obstacle> value;
-    black_board_.get("obstacle", value);
-    return value;
-  }
+
+#define DEFINE_SETTER(SETTER, KEY, TYPE) \
+  void SETTER(const TYPE & value) { black_board_.set(KEY, value); }
+  DEFINE_SETTER(setRequest, "request", std::string)
+#undef DEFINE_SETTER
 };  // namespace entity_behavior
 }  // namespace entity_behavior
 
