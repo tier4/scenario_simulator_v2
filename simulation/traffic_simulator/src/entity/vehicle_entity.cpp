@@ -30,10 +30,16 @@ VehicleEntity::VehicleEntity(
   const openscenario_msgs::msg::EntityStatus & status)
 : EntityBase(params.vehicle_category, name, status),
   parameters(params),
-  tree_ptr_(std::make_shared<entity_behavior::vehicle::BehaviorTree>())
+  loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
+    "behavior_plugin", "behavior_plugin_base"))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
+  /**
+   * @todo pass plugin name via constructor
+   */
+  std::string plugin_name = "behavior_plugin/behavior_tree_plugin";
+  behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
+  behavior_plugin_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
 void VehicleEntity::requestAssignRoute(
@@ -77,13 +83,13 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 
 void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 {
-  tree_ptr_->setRequest("lane_change");
-  tree_ptr_->setValueToBlackBoard("to_lanelet_id", to_lanelet_id);
+  behavior_plugin_ptr_->setRequest("lane_change");
+  behavior_plugin_ptr_->setValueToBlackBoard("to_lanelet_id", to_lanelet_id);
 }
 
 void VehicleEntity::cancelRequest()
 {
-  tree_ptr_->setRequest("none");
+  behavior_plugin_ptr_->setRequest("none");
   route_planner_ptr_->cancelGoal();
 }
 
@@ -98,20 +104,21 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
   } else {
-    tree_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
-    tree_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
-    tree_ptr_->setValueToBlackBoard("entity_status", status_);
+    behavior_plugin_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
+    behavior_plugin_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
+    behavior_plugin_ptr_->setValueToBlackBoard("entity_status", status_);
     target_speed_planner_.update(status_.action_status.twist.linear.x);
-    tree_ptr_->setValueToBlackBoard("target_speed", target_speed_planner_.getTargetSpeed());
+    behavior_plugin_ptr_->setValueToBlackBoard(
+      "target_speed", target_speed_planner_.getTargetSpeed());
     if (status_.lanelet_pose_valid) {
-      tree_ptr_->setValueToBlackBoard(
+      behavior_plugin_ptr_->setValueToBlackBoard(
         "route_lanelets", route_planner_ptr_->getRouteLanelets(status_.lanelet_pose));
     } else {
       std::vector<std::int64_t> empty = {};
-      tree_ptr_->setValueToBlackBoard("route_lanelets", empty);
+      behavior_plugin_ptr_->setValueToBlackBoard("route_lanelets", empty);
     }
-    tree_ptr_->tick(current_time, step_time);
-    auto status_updated = tree_ptr_->getUpdatedStatus();
+    behavior_plugin_ptr_->update(current_time, step_time);
+    auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (status_updated.lanelet_pose_valid) {
       auto following_lanelets =
         hdmap_utils_ptr_->getFollowingLanelets(status_updated.lanelet_pose.lanelet_id);

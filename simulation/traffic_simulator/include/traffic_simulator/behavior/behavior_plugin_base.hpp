@@ -15,7 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__BEHAVIOR_PLUGIN_BASE_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__BEHAVIOR_PLUGIN_BASE_HPP_
 
+#include <boost/optional.hpp>
 #include <openscenario_msgs/msg/entity_status.hpp>
+#include <openscenario_msgs/msg/obstacle.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
 #include <traffic_simulator/behavior/black_board.hpp>
 
@@ -29,18 +32,29 @@ private:
 
 public:
   virtual void update(double current_time, double step_time) = 0;
+  const std::string getCurrentAction() const { return current_action_; }
   template <typename T>
   void setValueToBlackBoard(const std::string & key, const T & value)
   {
     black_board_.set(key, value);
   }
-  template <typename T>
-  void getValueFromBlackBoard(std::string key, const T & value)
-  {
-    black_board_.get(key, value);
+#define DEFINE_GETTER(GETTER, KEY, TYPE) \
+  TYPE GETTER() const                    \
+  {                                      \
+    TYPE value;                          \
+    black_board_.get(KEY, value);        \
+    return value;                        \
   }
-  const std::string getCurrentAction() const { return current_action_; }
-};
+  DEFINE_GETTER(getWaypoints, "waypoints", openscenario_msgs::msg::WaypointsArray)
+  // DEFINE_GETTER(getObstacle, "obstacle", boost::optional<openscenario_msgs::msg::Obstacle>)
+#undef DEFINE_GETTER
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() const
+  {
+    boost::optional<openscenario_msgs::msg::Obstacle> value;
+    black_board_.get("obstacle", value);
+    return value;
+  }
+};  // namespace entity_behavior
 }  // namespace entity_behavior
 
 #endif  // TRAFFIC_SIMULATOR__BEHAVIOR__BEHAVIOR_PLUGIN_BASE_HPP_

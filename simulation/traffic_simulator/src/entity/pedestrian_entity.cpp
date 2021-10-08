@@ -27,17 +27,24 @@ namespace entity
 PedestrianEntity::PedestrianEntity(
   const std::string & name, const openscenario_msgs::msg::PedestrianParameters & params,
   const openscenario_msgs::msg::EntityStatus & status)
-: EntityBase(params.pedestrian_category, name, status), parameters(params)
+: EntityBase(params.pedestrian_category, name, status),
+  parameters(params),
+  loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
+    "behavior_plugin", "behavior_plugin_base"))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
-  tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("pedestrian_parameters", parameters);
+  /**
+   * @todo pass plugin name via constructor
+   */
+  std::string plugin_name = "behavior_plugin/behavior_tree_plugin";
+  behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
+  behavior_plugin_ptr_->setValueToBlackBoard("pedestrian_parameters", parameters);
 }
 
 void PedestrianEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
-  tree_ptr_->setRequest("follow_lane");
+  behavior_plugin_ptr_->setRequest("follow_lane");
   if (status_.lanelet_pose_valid) {
     return;
   }
@@ -58,12 +65,12 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   requestAssignRoute(route);
 }
 
-void PedestrianEntity::requestWalkStraight() { tree_ptr_->setRequest("walk_straight"); }
+void PedestrianEntity::requestWalkStraight() { behavior_plugin_ptr_->setRequest("walk_straight"); }
 
 void PedestrianEntity::requestAcquirePosition(
   const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
-  tree_ptr_->setRequest("follow_lane");
+  behavior_plugin_ptr_->setRequest("follow_lane");
   if (status_.lanelet_pose_valid) {
     return;
   }
@@ -82,7 +89,7 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 
 void PedestrianEntity::cancelRequest()
 {
-  tree_ptr_->setRequest("none");
+  behavior_plugin_ptr_->setRequest("none");
   route_planner_ptr_->cancelGoal();
 }
 
@@ -97,20 +104,21 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
   } else {
-    tree_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
-    tree_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
-    tree_ptr_->setValueToBlackBoard("entity_status", status_);
+    behavior_plugin_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
+    behavior_plugin_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
+    behavior_plugin_ptr_->setValueToBlackBoard("entity_status", status_);
     target_speed_planner_.update(status_.action_status.twist.linear.x);
-    tree_ptr_->setValueToBlackBoard("target_speed", target_speed_planner_.getTargetSpeed());
+    behavior_plugin_ptr_->setValueToBlackBoard(
+      "target_speed", target_speed_planner_.getTargetSpeed());
     if (status_.lanelet_pose_valid) {
       auto route = route_planner_ptr_->getRouteLanelets(status_.lanelet_pose);
-      tree_ptr_->setValueToBlackBoard("route_lanelets", route);
+      behavior_plugin_ptr_->setValueToBlackBoard("route_lanelets", route);
     } else {
       std::vector<std::int64_t> empty = {};
-      tree_ptr_->setValueToBlackBoard("route_lanelets", empty);
+      behavior_plugin_ptr_->setValueToBlackBoard("route_lanelets", empty);
     }
-    tree_ptr_->tick(current_time, step_time);
-    auto status_updated = tree_ptr_->getUpdatedStatus();
+    behavior_plugin_ptr_->update(current_time, step_time);
+    auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (status_updated.lanelet_pose_valid) {
       auto following_lanelets =
         hdmap_utils_ptr_->getFollowingLanelets(status_updated.lanelet_pose.lanelet_id);

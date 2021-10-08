@@ -15,22 +15,19 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 
-#include <pluginlib/class_loader.h>
-
+#include <boost/optional.hpp>
+#include <memory>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <pluginlib/class_loader.hpp>
+#include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-
-// headers in pugixml
-#include <boost/optional.hpp>
-#include <memory>
-#include <pugixml.hpp>
-#include <string>
 #include <vector>
 
 namespace traffic_simulator
@@ -136,6 +133,7 @@ public:
 
 private:
   std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
+  pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
   traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
 };

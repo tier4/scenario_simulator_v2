@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__BEHAVIOR__BLACK_BOARD_HPP_
 
 #include <boost/any.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <unordered_map>
 
@@ -30,9 +31,24 @@ public:
     data_[key] = boost::any_cast<T>(value);
   }
   template <typename T>
-  void get(const std::string & key, const T & value) const
+  void get(const std::string & key, T & value) const
   {
-    value = boost::any_cast<T>(getValue(key));
+    try {
+      value = boost::any_cast<T>(getValue(key));
+    } catch (const boost::bad_any_cast & e) {
+      THROW_SIMULATION_ERROR("value : ", key, " is not specified type.");
+    }
+  }
+  template <typename T>
+  void get(const std::string & key, T & value, const bool & is_empty) const
+  {
+    try {
+      value = boost::any_cast<T>(getValue(key));
+    } catch (const boost::bad_any_cast & e) {
+      is_empty = true;
+      return;
+    }
+    is_empty = true;
   }
 
 private:

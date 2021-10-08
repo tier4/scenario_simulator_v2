@@ -15,15 +15,13 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 
-#include <pluginlib/class_loader.h>
-
 #include <boost/optional.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+#include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
 #include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
-#include <traffic_simulator/behavior/pedestrian/behavior_tree.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
@@ -112,6 +110,7 @@ public:
 
 private:
   std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
+  pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
   traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };

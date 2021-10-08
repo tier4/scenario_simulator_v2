@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <behavior_tree_plugin/route_planner.hpp>
 #include <memory>
 #include <queue>
+#include <traffic_simulator/behavior/route_planner.hpp>
 #include <vector>
 
 namespace traffic_simulator
