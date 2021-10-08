@@ -46,9 +46,10 @@ public:
   void onDisable();
 private Q_SLOTS:
   void selectTopic(int);
-  void updatedisplay();
+  void update_display();
 Q_SIGNALS:
   void display_trigger();
+
 protected:
   Ui::ContextPanel * ui_;
   rclcpp::Node::SharedPtr node_;

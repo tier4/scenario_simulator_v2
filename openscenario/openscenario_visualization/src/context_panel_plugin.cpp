@@ -13,10 +13,10 @@
 // limitations under the License.
 
 #include <class_loader/class_loader.hpp>
+#include <nlohmann/json.hpp>
 #include <openscenario_visualization/context_panel_plugin.hpp>
 
 #include "ui_context_panel_plugin.h"
-#include <nlohmann/json.hpp>
 // for convenience
 using json = nlohmann::json;
 
@@ -30,15 +30,12 @@ ContextPanel::ContextPanel(QWidget * parent) : Panel(parent), ui_(new Ui::Contex
   ui_->TopicSelect->addItem("/simulation/context");
   topic_query_thread_ = std::thread(&ContextPanel::updateTopicCandidates, this);
   connect(ui_->TopicSelect, SIGNAL(highlighted(int)), this, SLOT(selectTopic(int)));
-  connect(this, SIGNAL(display_trigger()), this, SLOT(updatedisplay()));
+  connect(this, SIGNAL(display_trigger()), this, SLOT(update_display()));
   startSubscription();
   spin_thread_ = std::thread(&ContextPanel::spin, this);
 }
 
-ContextPanel::~ContextPanel()
-{
-  runnning_ = false;
-}
+ContextPanel::~ContextPanel() { runnning_ = false; }
 
 void ContextPanel::onInitialize() { parentWidget()->setVisible(true); }
 
@@ -59,15 +56,18 @@ void ContextPanel::contextCallback(const openscenario_interpreter_msgs::msg::Con
   context_ = msg->data;
   json j = json::parse(context_);
   std::vector<std::vector<std::string>> condition_group;
-  auto  condition_group_json = j["OpenSCENARIO"]["Storyboard"]["Story"][0]["Act"][0] ["ManeuverGroup"][0]["Maneuver"][0]["Event"][0]["StartTrigger"]["ConditionGroup"];
+  auto condition_group_json = j["OpenSCENARIO"]["Storyboard"]["Story"][0]["Act"][0]["ManeuverGroup"]
+                               [0]["Maneuver"][0]["Event"][0]["StartTrigger"]["ConditionGroup"];
   std::vector<std::string> item_vec;
-  for (json::iterator it = condition_group_json.begin(); it != condition_group_json.end(); ++it) {
+  for (json::iterator it1 = condition_group_json.begin(); it1 != condition_group_json.end();
+       ++it1) {
     item_vec.clear();
-    for (json::iterator itit = (*it)["Condition"].begin(); itit != (*it)["Condition"].end(); ++itit){
-      item_vec.push_back((*itit)["currentEvaluation"].dump());
-      item_vec.push_back((*itit)["currentValue"].dump());
-      item_vec.push_back((*itit)["name"].dump());
-      item_vec.push_back((*itit)["type"].dump());
+    for (json::iterator it2 = (*it1)["Condition"].begin(); it2 != (*it1)["Condition"].end();
+         ++it2) {
+      item_vec.push_back((*it2)["currentEvaluation"].dump());
+      item_vec.push_back((*it2)["currentValue"].dump());
+      item_vec.push_back((*it2)["name"].dump());
+      item_vec.push_back((*it2)["type"].dump());
     }
     condition_group.push_back(item_vec);
   }
@@ -105,48 +105,51 @@ void ContextPanel::updateTopicCandidates()
   }
 }
 
-void ContextPanel::updatedisplay()
+void ContextPanel::update_display()
 {
-    if(not condition_group_vec.empty()){
-
-      std::vector<std::vector<std::vector<std::string>>::iterator> true_it, false_it;
-      for (std::vector<std::vector<std::string>>::iterator it = condition_group_vec.begin(); it != condition_group_vec.end(); ++it){
-        if ( (*it)[1].size() == 6){
-          true_it.push_back(it);
-        }else{
-          false_it.push_back(it);
-        }
-      }
-
-      if (true_it.size() == 0){
-        ui_->success_condition_name->clear();
-        ui_->success_condition_status->clear();
-      }else if(false_it.size() == 0){
-        ui_->failure_condition_name->clear();
-        ui_->failure_condition_status->clear();
-      }
-
-      for (std::vector<std::vector<std::vector<std::string>>::iterator>::iterator i =false_it.begin(); i != false_it.end(); i++){
-        if (i == false_it.begin()){
-          ui_->failure_condition_name->setText(QString::fromUtf8((*(*i))[3].c_str()));
-          ui_->failure_condition_status->setText(QString::fromUtf8((*(*i))[1].c_str()));
-        }else{
-          ui_->failure_condition_name->append(QString::fromUtf8((*(*i))[3].c_str()));
-          ui_->failure_condition_status->append(QString::fromUtf8((*(*i))[1].c_str()));
-        }
-        ui_->failure_condition_status->setTextColor(QColor("red"));
-      }
-      for (std::vector<std::vector<std::vector<std::string>>::iterator>::iterator i =true_it.begin(); i != true_it.end(); i++){
-        if (i == true_it.begin()){
-          ui_->success_condition_name->setText(QString::fromUtf8((*(*i))[3].c_str()));
-          ui_->success_condition_status->setText(QString::fromUtf8((*(*i))[1].c_str()));
-        }else{
-          ui_->success_condition_name->append(QString::fromUtf8((*(*i))[3].c_str()));
-          ui_->success_condition_status->append(QString::fromUtf8((*(*i))[1].c_str()));
-        }
-        ui_->success_condition_status->setTextColor(QColor("blue"));
+  if (not condition_group_vec.empty()) {
+    std::vector<std::vector<std::vector<std::string>>::iterator> true_it, false_it;
+    for (std::vector<std::vector<std::string>>::iterator it = condition_group_vec.begin();
+         it != condition_group_vec.end(); ++it) {
+      if ((*it)[1].size() == 6) {
+        true_it.push_back(it);
+      } else {
+        false_it.push_back(it);
       }
     }
+
+    if (true_it.size() == 0) {
+      ui_->success_condition_name->clear();
+      ui_->success_condition_status->clear();
+    } else if (false_it.size() == 0) {
+      ui_->failure_condition_name->clear();
+      ui_->failure_condition_status->clear();
+    }
+
+    for (std::vector<std::vector<std::vector<std::string>>::iterator>::iterator i =
+           false_it.begin();
+         i != false_it.end(); i++) {
+      if (i == false_it.begin()) {
+        ui_->failure_condition_name->setText(QString::fromUtf8((*(*i))[3].c_str()));
+        ui_->failure_condition_status->setText(QString::fromUtf8((*(*i))[1].c_str()));
+      } else {
+        ui_->failure_condition_name->append(QString::fromUtf8((*(*i))[3].c_str()));
+        ui_->failure_condition_status->append(QString::fromUtf8((*(*i))[1].c_str()));
+      }
+      ui_->failure_condition_status->setTextColor(QColor("red"));
+    }
+    for (std::vector<std::vector<std::vector<std::string>>::iterator>::iterator i = true_it.begin();
+         i != true_it.end(); i++) {
+      if (i == true_it.begin()) {
+        ui_->success_condition_name->setText(QString::fromUtf8((*(*i))[3].c_str()));
+        ui_->success_condition_status->setText(QString::fromUtf8((*(*i))[1].c_str()));
+      } else {
+        ui_->success_condition_name->append(QString::fromUtf8((*(*i))[3].c_str()));
+        ui_->success_condition_status->append(QString::fromUtf8((*(*i))[1].c_str()));
+      }
+      ui_->success_condition_status->setTextColor(QColor("blue"));
+    }
+  }
 }
 
 void ContextPanel::spin()
@@ -169,7 +172,7 @@ void ContextPanel::selectTopic(int)
   topic_candidates_mutex_.lock();
   selected_ = true;
   topic_candidates_mutex_.unlock();
-  updatedisplay();
+  update_display();
 }
 }  // namespace openscenario_visualization
 

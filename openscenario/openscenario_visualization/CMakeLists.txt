@@ -68,7 +68,7 @@ ament_target_dependencies(openscenario_visualization_node
   visualization_msgs
   openscenario_msgs
   quaternion_operation
-  )
+)
 
 ###############
 # Qt settings #
@@ -115,10 +115,7 @@ install(TARGETS openscenario_visualization_rviz_plugin
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-install(TARGETS
-  openscenario_visualization_node
-  DESTINATION lib/openscenario_visualization
-  )
+install(TARGETS openscenario_visualization_node DESTINATION lib/openscenario_visualization)
 
 install(TARGETS
   openscenario_visualization_component

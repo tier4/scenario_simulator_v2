@@ -1,7 +1,5 @@
 <library path="openscenario_visualization_rviz_plugin">
-  <!-- Dial Panel -->
   <class name="openscenario_visualization/ContextPanel" type="openscenario_visualization::ContextPanel" base_class_type="rviz_common::Panel">
-  <!-- <class name="openscenario_visualization/DialPanel" type="openscenario_visualization::DialPanel" base_class_type="rviz_common::Panel">   -->
     <description>
       Context Panel plugin.
     </description>
