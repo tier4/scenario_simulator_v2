@@ -59,9 +59,10 @@ OpenSCENARIO:
             name: ''
             Properties:
               Property:
-                - { name: isEgo, value: 'true' }
-                - { name: minJerk, value: -1.5 }
-                - { name: maxJerk, value:  1.5 }
+                - { name: isEgo,    value: 'true' }
+                - { name: maxJerk,  value:  1.5   }
+                - { name: minJerk,  value: -1.5   }
+                - { name: maxSpeed, value:  1     }
   Storyboard:
     Init:
       Actions:

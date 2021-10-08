@@ -52,11 +52,7 @@ struct Controller : public Scope
 
   explicit Controller(const pugi::xml_node &, Scope &);
 
-  template <typename... Ts>
-  auto operator[](Ts &&... xs) -> decltype(auto)
-  {
-    return properties.operator[](std::forward<decltype(xs)>(xs)...);
-  }
+  auto operator[](const String &) -> const Property &;
 
   operator openscenario_msgs::msg::DriverModel();
 };

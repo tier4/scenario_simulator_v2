@@ -29,11 +29,13 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 {
 }
 
+auto Controller::operator[](const String & name) -> const Property & { return properties[name]; }
+
 Controller::operator openscenario_msgs::msg::DriverModel()
 {
   openscenario_msgs::msg::DriverModel controller;
   {
-    controller.see_around = not(*this)["isBlind"];
+    controller.see_around = not properties["isBlind"];
   }
 
   return controller;

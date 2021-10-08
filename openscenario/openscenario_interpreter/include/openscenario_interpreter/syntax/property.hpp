@@ -37,25 +37,21 @@ struct Property
 
   const String value;
 
-  /* ---------------------------------------------------------------------------
-   *
-   *  NOTE: by yamacir-kit
-   *
-   *  The default construct is used to give the value of an unspecified
-   *  property.
-   *
-   *  Generally, this default constructor is called when an unspecified property
-   *  name is specified in operator [] of std::unordered_map that holds the
-   *  Property class.
-   *
-   *  The default constructed property has an empty "value".
-   *  The implicit cast operator of the Property class constructs the target
-   *  type by default constructor if the string "value" is empty.
-   *
-   *  Keep in mind that the C++ bool type has a value 'false' when it is
-   *  initialized by default construction.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     The default construct is used to give the value of an unspecified
+     property.
+
+     Generally, this default constructor is called when an unspecified property
+     name is specified in operator [] of std::unordered_map that holds the
+     Property class.
+
+     The default constructed property has an empty "value".
+     The implicit cast operator of the Property class constructs the target
+     type by default constructor if the string "value" is empty.
+
+     Keep in mind that the C++ bool type has a value 'false' when it is
+     initialized by default construction.
+  */
   Property() = default;
 
   explicit Property(const pugi::xml_node &, Scope &);

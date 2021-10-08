@@ -35,7 +35,7 @@ AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scop
 auto AssignControllerAction::operator()() const -> void
 {
   for (const auto & actor : actors) {
-    applyAssignControllerAction(actor, (*this).as<Controller>());
+    applyAssignControllerAction(actor, as<Controller>());
   }
 }
 }  // namespace syntax
