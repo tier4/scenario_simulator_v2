@@ -34,8 +34,8 @@ namespace vehicle
 {
 BehaviorTree::BehaviorTree()
 {
-  std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
-                     "/resource/vehicle_entity_behavior.xml";
+  std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
+                     "/config/vehicle_entity_behavior.xml";
   factory_.registerNodeType<follow_lane_sequence::FollowLaneAction>("FollowLane");
   factory_.registerNodeType<follow_lane_sequence::FollowFrontEntityAction>("FollowFrontEntity");
   factory_.registerNodeType<follow_lane_sequence::StopAtCrossingEntityAction>(
