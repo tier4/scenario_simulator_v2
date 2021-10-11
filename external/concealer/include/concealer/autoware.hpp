@@ -79,6 +79,8 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
+  double current_upper_bound_speed = 0;
+
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
   virtual void sendSIGINT() = 0;
@@ -190,7 +192,7 @@ public:
 
   /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
 
-  virtual auto setUpperBoundSpeed(double) -> double;
+  /*   */ auto setUpperBoundSpeed(double) -> double;
 };
 }  // namespace concealer
 

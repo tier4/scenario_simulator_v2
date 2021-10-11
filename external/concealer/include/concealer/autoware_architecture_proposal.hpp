@@ -417,6 +417,18 @@ public:
 
   DEFINE_PUBLISHER(VehicleVelocity);
 
+  template <typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
+  auto setVehicleVelocity(const T & value) -> decltype(auto)
+  {
+    VehicleVelocity vehicle_velocity;
+    {
+      vehicle_velocity.stamp = get_clock()->now();
+      vehicle_velocity.max_velocity = value;
+    }
+
+    return setVehicleVelocity(vehicle_velocity);
+  }
+
   /* ---- AutowareStatus -------------------------------------------------------
    *
    *  Topic: /awapi/autoware/get/status
@@ -490,7 +502,7 @@ public:
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
     INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
-    // INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+    INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
     // INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {})
@@ -522,8 +534,6 @@ public:
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
 
   auto restrictTargetSpeed(double) const -> double override;
-
-  auto setUpperBoundSpeed(double) -> double override;
 
   auto update() -> void override;
 };

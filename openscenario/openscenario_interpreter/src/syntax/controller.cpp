@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
@@ -38,7 +39,7 @@ auto Controller::assign(const EntityRef & entity_ref) -> void
     const auto max_speed = properties["maxSpeed"];
 
     if (not max_speed.value.empty()) {
-      setUpperBoundSpeed(entity_ref, boost::lexical_cast<double>(max_speed.value));
+      setUpperBoundSpeed(entity_ref, Double(max_speed.value));
     }
   } else {
     applyAssignControllerAction(entity_ref, *this);  // For non-Ego vehicles.

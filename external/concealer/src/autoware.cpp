@@ -115,6 +115,6 @@ auto Autoware::set(const geometry_msgs::msg::Twist & twist) -> const geometry_ms
 
 auto Autoware::setUpperBoundSpeed(double value) -> double  //
 {
-  return current_twist.linear.x;
+  return current_upper_bound_speed = std::max(0.0, value);
 }
 }  // namespace concealer

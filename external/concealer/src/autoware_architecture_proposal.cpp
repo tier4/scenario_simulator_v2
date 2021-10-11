@@ -61,6 +61,7 @@ auto AutowareArchitectureProposal::update() -> void
   setLocalizationPose(current_pose);
   setLocalizationTwist(current_twist);
   setTransform(current_pose);
+  setVehicleVelocity(current_upper_bound_speed);
 }
 
 auto AutowareArchitectureProposal::getAcceleration() const -> double
@@ -125,18 +126,5 @@ auto AutowareArchitectureProposal::checkAutowareState() -> void
   if (isReady() and isEmergency()) {
     // throw common::AutowareError("Autoware is in emergency state now");
   }
-}
-
-auto AutowareArchitectureProposal::setUpperBoundSpeed(double value) -> double
-{
-  VehicleVelocity vehicle_velocity;
-  {
-    vehicle_velocity.stamp = get_clock()->now();
-    vehicle_velocity.max_velocity = value;
-  }
-
-  setVehicleVelocity(vehicle_velocity);
-
-  return value;
 }
 }  // namespace concealer
