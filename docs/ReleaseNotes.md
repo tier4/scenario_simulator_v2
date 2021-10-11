@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Add context panel to display conditions' status. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
+- Add Tier IV extension `conditionEdge="sticky"` to `OpenSCENARIO-1.1.xsd` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/553)).
 - Add new Controller's Property `maxSpeed` to set explicitly upper bound speed to Autoware ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/554)).
 
 ## Version 0.5.3

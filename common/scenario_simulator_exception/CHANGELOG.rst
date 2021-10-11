@@ -2,6 +2,9 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.3 (2021-10-07)
+------------------
+
 0.5.2 (2021-10-06)
 ------------------
 * Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
