@@ -27,12 +27,23 @@ ControllerAction::ControllerAction(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto ControllerAction::accomplished() noexcept -> bool { return true; }
+auto ControllerAction::accomplished() noexcept -> bool  //
+{
+  return true;
+}
 
-auto ControllerAction::endsImmediately() noexcept -> bool { return true; }
+auto ControllerAction::endsImmediately() noexcept -> bool  //
+{
+  return true;
+}
 
-auto ControllerAction::run() const -> void { assign_controller_action(); }
+auto ControllerAction::run() const -> void  //
+{
+  assign_controller_action();
+}
 
-auto ControllerAction::start() noexcept -> void {}
+auto ControllerAction::start() noexcept -> void  //
+{
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
