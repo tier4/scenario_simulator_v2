@@ -8,12 +8,18 @@
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-
+  <buildtool_depend>pkg-config</buildtool_depend>
+  
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>visualization_msgs</depend>
   <depend>openscenario_msgs</depend>
   <depend>traffic_simulator</depend>
+  <depend version_gte="1.11.2">pluginlib</depend>  
+  <depend>openscenario_interpreter_msgs</depend>
+  <depend>rviz2</depend>
+  <depend>qtbase5-dev</depend>
+  <depend>class_loader</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>
@@ -24,5 +30,6 @@
 
   <export>
     <build_type>ament_cmake</build_type>
+    <rviz plugin="${prefix}/plugin.xml"/>
   </export>
 </package>
