@@ -47,6 +47,13 @@ ObjectController::~ObjectController()
   }
 }
 
+auto ObjectController::assign(const EntityRef & entity_ref) -> void
+{
+  if (is<Controller>()) {
+    return as<Controller>().assign(entity_ref);
+  }
+}
+
 auto ObjectController::isUserDefinedController() const & -> bool
 {
   return is<Controller>() and as<Controller>().isUserDefinedController();

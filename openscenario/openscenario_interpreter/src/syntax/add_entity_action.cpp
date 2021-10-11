@@ -69,7 +69,7 @@ try {
             entity.as<ScenarioObject>().object_controller.isUserDefinedController(),  //
             entity_ref,                                                               //
             static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
-        applyAssignControllerAction(entity_ref, entity.as<ScenarioObject>().object_controller);
+        entity.as<ScenarioObject>().object_controller.assign(entity_ref);
         entity.as<ScenarioObject>().activateSensors();
         entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
       }
