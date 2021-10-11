@@ -74,9 +74,11 @@ void BehaviorTreePlugin::callback(
     current_action_ = node.name();
   }
   if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
+    /*
     if (request_ == current_action_) {
       setRequest("none");
     }
+    */
   }
 }
 }  // namespace entity_behavior
