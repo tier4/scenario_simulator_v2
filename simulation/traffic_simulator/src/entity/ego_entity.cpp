@@ -415,8 +415,10 @@ void EgoEntity::requestLaneChange(const std::int64_t)
     "everything but their destination");
 }
 
-void EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus &)
+void EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
+  VehicleEntity::setStatus(status);
+
   const auto current_pose = getStatus().pose;
 
   if (autoware->initialized()) {
@@ -430,7 +432,7 @@ void EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus &)
     autoware->set(current_twist);
   }
 
-  if (!initial_pose_) {
+  if (not initial_pose_) {
     initial_pose_ = current_pose;
   }
 }

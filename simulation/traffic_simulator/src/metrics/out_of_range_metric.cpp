@@ -50,7 +50,7 @@ void OutOfRangeMetric::update()
 
   if (!jerk_callback_ptr_) {
     const auto jerk_opt = entity_manager_ptr_->getLinearJerk(target_entity);
-    if (!jerk_opt) {
+    if (jerk_opt) {
       linear_jerk_ = jerk_opt.get();
     }
   }
