@@ -11,7 +11,7 @@ Only you have to do is type this command in your terminal.
 
 ```bash
 source ~/scenario_simulator_ws/install/local_setup.bash
-ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
+ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60.0
 ```
 
 You can see ego vehicle running in kashiwanoha.
