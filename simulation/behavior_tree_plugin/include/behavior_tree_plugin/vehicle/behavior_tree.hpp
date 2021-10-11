@@ -35,33 +35,10 @@ namespace entity_behavior
 {
 namespace vehicle
 {
-class BehaviorTree : public BehaviorPluginBase
+class BehaviorTree : public BehaviorTreePlugin
 {
 public:
   BehaviorTree();
-  void tick(double current_time, double step_time);
-  const std::string getCurrentAction() const { return current_action_; }
-
-  template <typename T>
-  void setValueToBlackBoard(const std::string & key, T && value)
-  {
-    tree_.rootBlackboard()->set(key, std::forward<decltype(value)>(value));
-  }
-
-private:
-  BT::NodeStatus tickOnce(double current_time, double step_time);
-  std::string request_;
-  BT::BehaviorTreeFactory factory_;
-  BT::Tree tree_;
-  std::shared_ptr<BT::StdCoutLogger> logger_cout_ptr_;
-  void callback(
-    BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
-    BT::NodeStatus status);
-  void setupLogger();
-  BT::TimestampType type_;
-  BT::TimePoint first_timestamp_;
-  std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
-  std::string current_action_;
 };
 }  // namespace vehicle
 }  // namespace entity_behavior

@@ -39,9 +39,6 @@ class BehaviorTree : public BehaviorTreePlugin
 {
 public:
   BehaviorTree();
-
-private:
-  BT::NodeStatus tickOnce(double current_time, double step_time);
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior
