@@ -35,7 +35,7 @@ namespace entity_behavior
 class BehaviorTreePlugin : public BehaviorPluginBase
 {
 public:
-  BehaviorTreePlugin();
+  void configure();
   void update(double current_time, double step_time) override;
   const std::string getCurrentAction() const { return current_action_; }
   template <typename T>
@@ -49,7 +49,7 @@ public:
     tree_.rootBlackboard()->get(key, value);
   }
 
-private:
+protected:
   BT::NodeStatus tickOnce(double current_time, double step_time);
   std::string request_;
   BT::BehaviorTreeFactory factory_;

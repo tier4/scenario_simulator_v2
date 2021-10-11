@@ -16,7 +16,7 @@
 
 namespace entity_behavior
 {
-BehaviorTreePlugin::BehaviorTreePlugin()
+void BehaviorTreePlugin::configure()
 {
   current_action_ = "root";
   setupLogger();

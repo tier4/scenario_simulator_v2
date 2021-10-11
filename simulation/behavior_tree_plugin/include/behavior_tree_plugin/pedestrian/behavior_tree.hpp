@@ -18,6 +18,7 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
+#include <behavior_tree_plugin/behavior_tree_plugin.hpp>
 #include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
 #include <behavior_tree_plugin/pedestrian/walk_straight_action.hpp>
 #include <functional>
@@ -34,37 +35,13 @@ namespace entity_behavior
 {
 namespace pedestrian
 {
-class BehaviorTree : public BehaviorPluginBase
+class BehaviorTree : public BehaviorTreePlugin
 {
 public:
   BehaviorTree();
-  void tick(double current_time, double step_time);
-  const std::string getCurrentAction() const { return current_action_; }
-  template <typename T>
-  void setValueToBlackBoard(std::string key, T value)
-  {
-    tree_.rootBlackboard()->set(key, value);
-  }
-  template <typename T>
-  void getValueToBlackBoard(std::string key, T & value)
-  {
-    tree_.rootBlackboard()->get(key, value);
-  }
 
 private:
   BT::NodeStatus tickOnce(double current_time, double step_time);
-  std::string request_;
-  BT::BehaviorTreeFactory factory_;
-  BT::Tree tree_;
-  std::shared_ptr<BT::StdCoutLogger> logger_cout_ptr_;
-  void callback(
-    BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
-    BT::NodeStatus status);
-  void setupLogger();
-  BT::TimestampType type_;
-  BT::TimePoint first_timestamp_;
-  std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
-  std::string current_action_;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior
