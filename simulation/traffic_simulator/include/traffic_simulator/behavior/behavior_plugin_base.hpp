@@ -40,6 +40,9 @@ private:
 public:
   virtual void update(double current_time, double step_time) = 0;
   const std::string getCurrentAction() const { return current_action_; }
+
+  typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityType> EntityTypeDict;
+  typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> EntityStatusDict;
 #define DEFINE_GETTER(GETTER, KEY, TYPE) \
   TYPE GETTER() const                    \
   {                                      \
@@ -47,32 +50,53 @@ public:
     black_board_.get(KEY, value);        \
     return value;                        \
   }
-  DEFINE_GETTER(getWaypoints, "waypoints", openscenario_msgs::msg::WaypointsArray)
-  DEFINE_GETTER(getObstacle, "obstacle", boost::optional<openscenario_msgs::msg::Obstacle>)
-  DEFINE_GETTER(getUpdatedStatus, "updated_status", openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER(getOtherEntityStatus, "other_entity_status", EntityStatusDict)
+  DEFINE_GETTER(getToLaneletId, "to_lanelet_id", std::int64_t)
+  DEFINE_GETTER(getEntityStatus, "entity_status", openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER(getTargetSpeed, "target_speed", boost::optional<double>)
+  DEFINE_GETTER(getRouteLanelets, "route_lanelets", std::vector<std::int64_t>)
 #undef DEFINE_GETTER
 
 #define DEFINE_SETTER(SETTER, KEY, TYPE) \
   void SETTER(const TYPE & value) { black_board_.set(KEY, value); }
-  DEFINE_SETTER(setRequest, "request", std::string)
-  DEFINE_SETTER(setHdMapUtils, "hdmap_utils", std::shared_ptr<hdmap_utils::HdMapUtils>)
-  typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityType> EntityTypeDict;
-  DEFINE_SETTER(setEntityTypeList, "entity_type_list", EntityTypeDict)
-  DEFINE_SETTER(
-    setTrafficLightManager, "traffic_light_manager",
-    std::shared_ptr<traffic_simulator::TrafficLightManager>)
-  DEFINE_SETTER(
-    setPedestrianParameters, "pedestrian_parameters", openscenario_msgs::msg::PedestrianParameters)
-  DEFINE_SETTER(setDriverModel, "driver_model", openscenario_msgs::msg::DriverModel)
-  DEFINE_SETTER(
-    setVehicleParameters, "vehicle_parameters", openscenario_msgs::msg::VehicleParameters)
-  typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> EntityStatusDict;
   DEFINE_SETTER(setOtherEntityStatus, "other_entity_status", EntityStatusDict)
   DEFINE_SETTER(setToLaneletId, "to_lanelet_id", std::int64_t)
   DEFINE_SETTER(setEntityStatus, "entity_status", openscenario_msgs::msg::EntityStatus)
   DEFINE_SETTER(setTargetSpeed, "target_speed", boost::optional<double>)
   DEFINE_SETTER(setRouteLanelets, "route_lanelets", std::vector<std::int64_t>)
 #undef DEFINE_SETTER
+
+#define DEFINE_GETTER_SETTER(GETTER, SETTER, KEY, TYPE)             \
+  TYPE GETTER() const                                               \
+  {                                                                 \
+    TYPE value;                                                     \
+    black_board_.get(KEY, value);                                   \
+    return value;                                                   \
+  }                                                                 \
+  void SETTER(const TYPE & value) { black_board_.set(KEY, value); } \
+  const std::string GETTER##Key() const { return KEY; }
+  DEFINE_GETTER_SETTER(
+    getWaypoints, setWaypoints, "waypoints", openscenario_msgs::msg::WaypointsArray)
+  DEFINE_GETTER_SETTER(
+    getObstacle, setObstacle, "obstacle", boost::optional<openscenario_msgs::msg::Obstacle>)
+  DEFINE_GETTER_SETTER(
+    getUpdatedStatus, setUpdatedStatus, "updated_status", openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(getRequest, setRequest, "request", std::string)
+  DEFINE_GETTER_SETTER(
+    getHdMapUtils, setHdMapUtils, "hdmap_utils", std::shared_ptr<hdmap_utils::HdMapUtils>)
+  DEFINE_GETTER_SETTER(getEntityTypeList, setEntityTypeList, "entity_type_list", EntityTypeDict)
+  DEFINE_GETTER_SETTER(
+    getTrafficLightManager, setTrafficLightManager, "traffic_light_manager",
+    std::shared_ptr<traffic_simulator::TrafficLightManager>)
+  DEFINE_GETTER_SETTER(
+    getPedestrianParameters, setPedestrianParameters, "pedestrian_parameters",
+    openscenario_msgs::msg::PedestrianParameters)
+  DEFINE_GETTER_SETTER(
+    getDriverModel, setDriverModel, "driver_model", openscenario_msgs::msg::DriverModel)
+  DEFINE_GETTER_SETTER(
+    getVehicleParameters, setVehicleParameters, "vehicle_parameters",
+    openscenario_msgs::msg::VehicleParameters)
+#undef DEFINE_GETTER_SETTER
 };
 }  // namespace entity_behavior
 
