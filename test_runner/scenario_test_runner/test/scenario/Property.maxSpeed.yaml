@@ -54,9 +54,7 @@ OpenSCENARIO:
             Properties:
               Property:
                 - { name: isEgo,    value: 'true' }
-                # - { name: maxJerk,  value:  1.5   }
-                # - { name: minJerk,  value: -1.5   }
-                # - { name: maxSpeed, value:  1     }
+                - { name: maxSpeed, value: 1      }
   Storyboard:
     Init:
       Actions:
@@ -97,14 +95,13 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 2.778
-              - ControllerAction:
-                  AssignControllerAction:
-                    Controller:
-                      name: ''
-                      Properties:
-                        Property:
-                          - { name: isEgo, value: "true" }
-                          - { name: maxSpeed, value: 1 }
+              # - ControllerAction:
+              #     AssignControllerAction:
+              #       Controller:
+              #         name: ''
+              #         Properties:
+              #           Property:
+              #             - { name: maxSpeed, value: 1 }
     Story:
       - name: ''
         Act:
@@ -140,7 +137,6 @@ OpenSCENARIO:
                                     name: ''
                                     Properties:
                                       Property:
-                                        - { name: isEgo, value: "true" }
                                         - { name: maxSpeed, value: 10 }
             StartTrigger:
               ConditionGroup:

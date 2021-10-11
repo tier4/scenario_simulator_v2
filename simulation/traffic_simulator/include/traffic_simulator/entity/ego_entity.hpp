@@ -118,6 +118,8 @@ public:
 
   void requestLaneChange(const std::int64_t) override;
 
+  auto setDriverModel(const openscenario_msgs::msg::DriverModel &) -> void override;
+
   void setStatus(const openscenario_msgs::msg::EntityStatus &) override;
 
   void setTargetSpeed(double, bool) override;

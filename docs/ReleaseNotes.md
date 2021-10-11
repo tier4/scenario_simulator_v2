@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Add new Controller's Property `maxSpeed` to set explicitly upper bound speed to Autoware ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/554)).
 
 ## Version 0.5.3
 - Fix setStatus function in EgoEntity class. ([link](https://github.com/tier4/scenario_simulator_v2/pull/549))

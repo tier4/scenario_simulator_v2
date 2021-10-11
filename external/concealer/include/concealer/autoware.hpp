@@ -32,6 +32,7 @@
 #include <exception>
 #include <future>
 #include <geometry_msgs/msg/twist_stamped.hpp>
+#include <limits>
 #include <mutex>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <thread>
@@ -79,7 +80,7 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
-  double current_upper_bound_speed = 0;
+  double current_upper_bound_speed = std::numeric_limits<double>::max();
 
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
