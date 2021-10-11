@@ -43,28 +43,6 @@ public:
 
   typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityType> EntityTypeDict;
   typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> EntityStatusDict;
-#define DEFINE_GETTER(GETTER, KEY, TYPE) \
-  TYPE GETTER() const                    \
-  {                                      \
-    TYPE value;                          \
-    black_board_.get(KEY, value);        \
-    return value;                        \
-  }
-  DEFINE_GETTER(getOtherEntityStatus, "other_entity_status", EntityStatusDict)
-  DEFINE_GETTER(getToLaneletId, "to_lanelet_id", std::int64_t)
-  DEFINE_GETTER(getEntityStatus, "entity_status", openscenario_msgs::msg::EntityStatus)
-  DEFINE_GETTER(getTargetSpeed, "target_speed", boost::optional<double>)
-  DEFINE_GETTER(getRouteLanelets, "route_lanelets", std::vector<std::int64_t>)
-#undef DEFINE_GETTER
-
-#define DEFINE_SETTER(SETTER, KEY, TYPE) \
-  void SETTER(const TYPE & value) { black_board_.set(KEY, value); }
-  DEFINE_SETTER(setOtherEntityStatus, "other_entity_status", EntityStatusDict)
-  DEFINE_SETTER(setToLaneletId, "to_lanelet_id", std::int64_t)
-  DEFINE_SETTER(setEntityStatus, "entity_status", openscenario_msgs::msg::EntityStatus)
-  DEFINE_SETTER(setTargetSpeed, "target_speed", boost::optional<double>)
-  DEFINE_SETTER(setRouteLanelets, "route_lanelets", std::vector<std::int64_t>)
-#undef DEFINE_SETTER
 
 #define DEFINE_GETTER_SETTER(GETTER, SETTER, KEY, TYPE)             \
   TYPE GETTER() const                                               \
@@ -96,6 +74,14 @@ public:
   DEFINE_GETTER_SETTER(
     getVehicleParameters, setVehicleParameters, "vehicle_parameters",
     openscenario_msgs::msg::VehicleParameters)
+  DEFINE_GETTER_SETTER(
+    getOtherEntityStatus, setOtherEntityStatus, "other_entity_status", EntityStatusDict)
+  DEFINE_GETTER_SETTER(getToLaneletId, setToLaneletId, "to_lanelet_id", std::int64_t)
+  DEFINE_GETTER_SETTER(
+    getEntityStatus, setEntityStatus, "entity_status", openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(getTargetSpeed, setTargetSpeed, "target_speed", boost::optional<double>)
+  DEFINE_GETTER_SETTER(
+    getRouteLanelets, setRouteLanelets, "route_lanelets", std::vector<std::int64_t>)
 #undef DEFINE_GETTER_SETTER
 };
 }  // namespace entity_behavior

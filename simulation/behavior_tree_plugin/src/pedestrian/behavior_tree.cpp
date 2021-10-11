@@ -36,12 +36,6 @@ BehaviorTree::BehaviorTree()
   setRequest("none");
 }
 
-void BehaviorTree::setRequest(std::string request)
-{
-  request_ = request;
-  setValueToBlackBoard("request", request);
-}
-
 void BehaviorTree::setupLogger()
 {
   first_timestamp_ = std::chrono::high_resolution_clock::now();

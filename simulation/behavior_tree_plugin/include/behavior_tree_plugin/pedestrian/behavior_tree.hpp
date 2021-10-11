@@ -26,6 +26,7 @@
 #include <memory>
 #include <openscenario_msgs/msg/entity_status.hpp>
 #include <string>
+#include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 
@@ -33,7 +34,7 @@ namespace entity_behavior
 {
 namespace pedestrian
 {
-class BehaviorTree
+class BehaviorTree : public BehaviorPluginBase
 {
 public:
   BehaviorTree();
@@ -44,13 +45,6 @@ public:
   {
     tree_.rootBlackboard()->set(key, value);
   }
-  openscenario_msgs::msg::EntityStatus getUpdatedStatus()
-  {
-    openscenario_msgs::msg::EntityStatus status;
-    tree_.rootBlackboard()->get("updated_status", status);
-    return status;
-  }
-  void setRequest(std::string request);
 
 private:
   BT::NodeStatus tickOnce(double current_time, double step_time);

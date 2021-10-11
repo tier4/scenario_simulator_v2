@@ -26,6 +26,7 @@
 #include <openscenario_msgs/msg/obstacle.hpp>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
+#include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 
@@ -33,7 +34,7 @@ namespace entity_behavior
 {
 namespace vehicle
 {
-class BehaviorTree
+class BehaviorTree : public BehaviorPluginBase
 {
 public:
   BehaviorTree();
@@ -45,28 +46,6 @@ public:
   {
     tree_.rootBlackboard()->set(key, std::forward<decltype(value)>(value));
   }
-
-  openscenario_msgs::msg::EntityStatus getUpdatedStatus()
-  {
-    openscenario_msgs::msg::EntityStatus status;
-    tree_.rootBlackboard()->get("updated_status", status);
-    return status;
-  }
-
-  openscenario_msgs::msg::WaypointsArray getWaypoints()
-  {
-    openscenario_msgs::msg::WaypointsArray waypoints;
-    tree_.rootBlackboard()->get("waypoints", waypoints);
-    return waypoints;
-  }
-
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle()
-  {
-    boost::optional<openscenario_msgs::msg::Obstacle> obstacle;
-    tree_.rootBlackboard()->get("obstacle", obstacle);
-    return obstacle;
-  }
-  void setRequest(std::string request);
 
 private:
   BT::NodeStatus tickOnce(double current_time, double step_time);
