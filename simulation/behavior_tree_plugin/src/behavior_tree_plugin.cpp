@@ -53,8 +53,8 @@ void BehaviorTreePlugin::update(double current_time, double step_time)
 
 BT::NodeStatus BehaviorTreePlugin::tickOnce(double current_time, double step_time)
 {
-  setValueToBlackBoard("current_time", current_time);
-  setValueToBlackBoard("step_time", step_time);
+  setCurrentTime(current_time);
+  setStepTime(step_time);
   return tree_.rootNode()->executeTick();
 }
 
@@ -74,11 +74,9 @@ void BehaviorTreePlugin::callback(
     current_action_ = node.name();
   }
   if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
-    /*
     if (request_ == current_action_) {
       setRequest("none");
     }
-    */
   }
 }
 }  // namespace entity_behavior

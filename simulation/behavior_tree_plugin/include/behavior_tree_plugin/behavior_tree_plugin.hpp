@@ -36,11 +36,6 @@ public:
   void configure();
   void update(double current_time, double step_time) override;
   const std::string getCurrentAction() const { return current_action_; }
-  template <typename T>
-  void setValueToBlackBoard(std::string key, T value)
-  {
-    tree_.rootBlackboard()->set(key, value);
-  }
 
 #define DEFINE_GETTER_SETTER(GETTER, SETTER, TYPE)                                    \
   TYPE GETTER() override { return tree_.rootBlackboard()->get<TYPE>(GETTER##Key()); } \
@@ -64,6 +59,8 @@ public:
   DEFINE_GETTER_SETTER(getEntityStatus, setEntityStatus, openscenario_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(getTargetSpeed, setTargetSpeed, boost::optional<double>)
   DEFINE_GETTER_SETTER(getRouteLanelets, setRouteLanelets, std::vector<std::int64_t>)
+  DEFINE_GETTER_SETTER(getCurrentTime, setCurrentTime, double)
+  DEFINE_GETTER_SETTER(getStepTime, setStepTime, double)
 #undef DEFINE_GETTER_SETTER
 
 protected:

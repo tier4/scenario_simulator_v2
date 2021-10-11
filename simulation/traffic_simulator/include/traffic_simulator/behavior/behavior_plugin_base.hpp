@@ -82,6 +82,8 @@ public:
   DEFINE_GETTER_SETTER(getTargetSpeed, setTargetSpeed, "target_speed", boost::optional<double>)
   DEFINE_GETTER_SETTER(
     getRouteLanelets, setRouteLanelets, "route_lanelets", std::vector<std::int64_t>)
+  DEFINE_GETTER_SETTER(getCurrentTime, setCurrentTime, "current_time", double)
+  DEFINE_GETTER_SETTER(getStepTime, setStepTime, "step_time", double)
 #undef DEFINE_GETTER_SETTER
 };
 }  // namespace entity_behavior
