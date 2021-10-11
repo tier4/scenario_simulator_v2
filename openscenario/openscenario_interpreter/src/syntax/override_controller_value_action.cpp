@@ -18,7 +18,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-OverrideControllerValueAction::OverrideControllerValueAction(const pugi::xml_node &, Scope &)
+OverrideControllerValueAction::OverrideControllerValueAction(const pugi::xml_node &, Scope &)  //
 {
 }
 }  // namespace syntax

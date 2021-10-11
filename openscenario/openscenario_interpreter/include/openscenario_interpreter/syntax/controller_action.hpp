@@ -37,7 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * ------------------------------------------------------------------------ */
-struct ControllerAction
+struct ControllerAction : private Scope
 {
   // Assign a controller to an entity.
   const AssignControllerAction assign_controller_action;
