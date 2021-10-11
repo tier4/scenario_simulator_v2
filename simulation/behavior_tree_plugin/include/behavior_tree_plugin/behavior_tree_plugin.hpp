@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__BEHAVIOR_TREE_HPP_
-#define BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__BEHAVIOR_TREE_HPP_
+#ifndef BEHAVIOR_TREE_PLUGIN__BEHAVIOR_TREE_PLUGIN_HPP_
+#define BEHAVIOR_TREE_PLUGIN__BEHAVIOR_TREE_PLUGIN_HPP_
 
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
@@ -32,13 +32,11 @@
 
 namespace entity_behavior
 {
-namespace pedestrian
-{
-class BehaviorTree : public BehaviorPluginBase
+class BehaviorTreePlugin : public BehaviorPluginBase
 {
 public:
-  BehaviorTree();
-  void tick(double current_time, double step_time);
+  BehaviorTreePlugin();
+  void update(double current_time, double step_time) override;
   const std::string getCurrentAction() const { return current_action_; }
   template <typename T>
   void setValueToBlackBoard(std::string key, T value)
@@ -66,7 +64,6 @@ private:
   std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
   std::string current_action_;
 };
-}  // namespace pedestrian
 }  // namespace entity_behavior
 
-#endif  // BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__BEHAVIOR_TREE_HPP_
+#endif  // BEHAVIOR_TREE_PLUGIN__BEHAVIOR_TREE_PLUGIN_HPP_

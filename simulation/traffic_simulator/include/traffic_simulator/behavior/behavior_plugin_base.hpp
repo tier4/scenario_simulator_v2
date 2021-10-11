@@ -44,14 +44,14 @@ public:
   typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityType> EntityTypeDict;
   typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> EntityStatusDict;
 
-#define DEFINE_GETTER_SETTER(GETTER, SETTER, KEY, TYPE)             \
-  TYPE GETTER() const                                               \
-  {                                                                 \
-    TYPE value;                                                     \
-    black_board_.get(KEY, value);                                   \
-    return value;                                                   \
-  }                                                                 \
-  void SETTER(const TYPE & value) { black_board_.set(KEY, value); } \
+#define DEFINE_GETTER_SETTER(GETTER, SETTER, KEY, TYPE)                     \
+  virtual TYPE GETTER() const                                               \
+  {                                                                         \
+    TYPE value;                                                             \
+    black_board_.get(KEY, value);                                           \
+    return value;                                                           \
+  }                                                                         \
+  virtual void SETTER(const TYPE & value) { black_board_.set(KEY, value); } \
   const std::string GETTER##Key() const { return KEY; }
   DEFINE_GETTER_SETTER(
     getWaypoints, setWaypoints, "waypoints", openscenario_msgs::msg::WaypointsArray)
