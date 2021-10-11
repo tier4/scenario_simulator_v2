@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/assign_controller_action.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
@@ -21,21 +20,25 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+AssignControllerAction::AssignControllerAction()  //
+: ComplexType(unspecified)
+{
+}
+
 AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
-: Scope(scope),
-  ComplexType(
+: ComplexType(
     choice(node,
-      std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, localScope()); }),
-      std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+      std::make_pair("Controller",       [&](const auto & node) { return make<Controller>(node, scope); }),
+      std::make_pair("CatalogReference", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
 // clang-format on
 {
 }
 
-auto AssignControllerAction::operator()() const -> void
+auto AssignControllerAction::operator()(const EntityRef & entity_ref) const -> void
 {
-  for (const auto & actor : actors) {
-    applyAssignControllerAction(actor, (*this).as<Controller>());
+  if (is<Controller>()) {
+    as<Controller>().assign(entity_ref);
   }
 }
 }  // namespace syntax

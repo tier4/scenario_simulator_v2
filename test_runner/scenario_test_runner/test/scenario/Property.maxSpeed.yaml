@@ -1,9 +1,3 @@
-ScenarioModifiers:
-  ScenarioModifier:
-    - name: DUMMY
-      start: 0
-      step: 2
-      stop: 5
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
@@ -60,8 +54,7 @@ OpenSCENARIO:
             Properties:
               Property:
                 - { name: isEgo,    value: 'true' }
-                - { name: maxJerk,  value:  1.5   }
-                - { name: minJerk,  value: -1.5   }
+                - { name: maxSpeed, value: 1      }
   Storyboard:
     Init:
       Actions:
@@ -102,7 +95,59 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 2.778
+              # - ControllerAction:
+              #     AssignControllerAction:
+              #       Controller:
+              #         name: ''
+              #         Properties:
+              #           Property:
+              #             - { name: maxSpeed, value: 1 }
     Story:
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      rule: greaterThan
+                                      value: 20
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              ControllerAction:
+                                AssignControllerAction:
+                                  Controller:
+                                    name: ''
+                                    Properties:
+                                      Property:
+                                        - { name: maxSpeed, value: 10 }
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
       - name: ''
         Act:
           - name: _EndCondition

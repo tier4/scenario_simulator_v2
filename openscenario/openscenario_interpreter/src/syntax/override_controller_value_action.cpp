@@ -12,27 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/properties.hpp>
+#include <openscenario_interpreter/syntax/override_controller_value_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Properties::Properties(const pugi::xml_node & node, Scope & scope)
+OverrideControllerValueAction::OverrideControllerValueAction(const pugi::xml_node &, Scope &)  //
 {
-  callWithElements(node, "Property", 0, unbounded, [&](auto && node) {
-    return properties.emplace(
-      std::piecewise_construct,  //
-      std::forward_as_tuple(readAttribute<String>("name", node, scope)),
-      std::forward_as_tuple(node, scope));
-  });
-
-  callWithElements(node, "File", 0, unbounded, [&](auto && node) {
-    return files.emplace_back(std::forward<decltype(node)>(node), scope);
-  });
 }
-
-auto Properties::operator[](const String & name) -> const Property & { return properties[name]; }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

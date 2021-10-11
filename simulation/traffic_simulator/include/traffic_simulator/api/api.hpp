@@ -149,7 +149,7 @@ public:
    * @param name name of the target entity, this argument used for calculating boundingbox etc...
    * @param lanelet_pose lanelet pose of the entity status you want to set
    * @param action_status action status of the entity status you want to set
-   * @return const openscenario_msgs::msg::EntityStatus 
+   * @return const openscenario_msgs::msg::EntityStatus
    */
   void setEntityStatus(
     const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
@@ -160,7 +160,7 @@ public:
    * @param name name of the target entity, this argument used for calculating boundingbox etc...
    * @param lanelet_pose lanelet pose of the entity status you want to set
    * @param action_status action status of the entity status you want to set
-   * @return const openscenario_msgs::msg::EntityStatus 
+   * @return const openscenario_msgs::msg::EntityStatus
    */
   auto getEntityStatus(
     const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
@@ -173,7 +173,7 @@ public:
    * @param reference_entity_name name of the entity you want to use as reference
    * @param relative_pose relative pose from the reference entity
    * @param action_status action status of the target entity
-   * @return const openscenario_msgs::msg::EntityStatus 
+   * @return const openscenario_msgs::msg::EntityStatus
    */
   void setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
@@ -186,7 +186,7 @@ public:
    * @param reference_entity_name name of the entity you want to use as reference
    * @param relative_pose relative pose from the reference entity
    * @param action_status action status of the target entity
-   * @return const openscenario_msgs::msg::EntityStatus 
+   * @return const openscenario_msgs::msg::EntityStatus
    */
   auto getEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
@@ -201,7 +201,7 @@ public:
    * @param relative_position relative position from the reference entity
    * @param relative_rpy relative RPY orientation from the reference entity
    * @param action_status action status of the target entity
-   * @return const openscenario_msgs::msg::EntityStatus 
+   * @return const openscenario_msgs::msg::EntityStatus
    */
   void setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
@@ -216,7 +216,7 @@ public:
    * @param relative_position relative position from the reference entity
    * @param relative_rpy relative RPY orientation from the reference entity
    * @param action_status action status of the target entity
-   * @return const openscenario_msgs::msg::EntityStatus 
+   * @return const openscenario_msgs::msg::EntityStatus
    */
   auto getEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
@@ -286,6 +286,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrowPhase);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColor);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
+  FORWARD_TO_ENTITY_MANAGER(setUpperBoundSpeed);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 

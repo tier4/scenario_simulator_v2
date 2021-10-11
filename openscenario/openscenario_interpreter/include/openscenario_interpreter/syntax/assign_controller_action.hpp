@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_CONTROLLER_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -36,11 +37,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AssignControllerAction : private Scope, public ComplexType
+struct AssignControllerAction : public ComplexType
 {
+  explicit AssignControllerAction();
+
   explicit AssignControllerAction(const pugi::xml_node &, Scope &);
 
-  auto operator()() const -> void;
+  auto operator()(const EntityRef &) const -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

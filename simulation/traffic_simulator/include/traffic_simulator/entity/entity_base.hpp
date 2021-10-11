@@ -118,6 +118,8 @@ public:
     traffic_light_manager_ = ptr;
   }
 
+  virtual auto setUpperBoundSpeed(double) -> void {}
+
   /*   */ void setVerbose(bool verbose) { verbose_ = verbose; }
 
   /*   */ auto setVisibility(const bool visibility) { return visibility_ = visibility; }

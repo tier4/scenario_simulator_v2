@@ -22,6 +22,11 @@ inline namespace syntax
 {
 int ObjectController::ego_count = 0;
 
+ObjectController::ObjectController()  //
+: ComplexType(unspecified)
+{
+}
+
 ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
@@ -30,40 +35,40 @@ ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
       std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, scope); })))
 // clang-format on
 {
-  if (isEgo()) {
+  if (isUserDefinedController()) {
     ego_count++;
   }
 }
 
-ObjectController::ObjectController() : ComplexType(unspecified) {}
-
 ObjectController::~ObjectController()
 {
-  if (isEgo()) {
+  if (isUserDefinedController()) {
     ego_count--;
   }
 }
 
-auto ObjectController::isEgo() const & -> bool
+auto ObjectController::assign(const EntityRef & entity_ref) -> void
 {
-  if (is<Unspecified>()) {
-    static auto controller = DefaultController();
-    return static_cast<bool>(controller["isEgo"]);
-  } else {
-    return static_cast<bool>(as<Controller>()["isEgo"]);
+  if (is<Controller>()) {
+    return as<Controller>().assign(entity_ref);
   }
+}
+
+auto ObjectController::isUserDefinedController() const & -> bool
+{
+  return is<Controller>() and as<Controller>().isUserDefinedController();
 }
 
 ObjectController::operator openscenario_msgs::msg::DriverModel() const
 {
-  if (is<Unspecified>()) {
+  if (is<Controller>()) {
+    return static_cast<openscenario_msgs::msg::DriverModel>(as<Controller>());
+  } else {
     openscenario_msgs::msg::DriverModel controller;
     {
-      controller.see_around = not DefaultController()["isBlind"];
+      controller.see_around = not Properties()["isBlind"];
     }
     return controller;
-  } else {
-    return openscenario_msgs::msg::DriverModel(as<Controller>());
   }
 }
 }  // namespace syntax
