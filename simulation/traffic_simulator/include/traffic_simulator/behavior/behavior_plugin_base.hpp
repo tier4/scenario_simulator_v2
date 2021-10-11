@@ -45,7 +45,7 @@ public:
   typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> EntityStatusDict;
 
 #define DEFINE_GETTER_SETTER(GETTER, SETTER, KEY, TYPE)                     \
-  virtual TYPE GETTER() const                                               \
+  virtual TYPE GETTER()                                                     \
   {                                                                         \
     TYPE value;                                                             \
     black_board_.get(KEY, value);                                           \

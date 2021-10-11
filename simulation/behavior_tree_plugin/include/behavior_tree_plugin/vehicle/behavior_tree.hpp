@@ -18,6 +18,7 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
+#include <behavior_tree_plugin/behavior_tree_plugin.hpp>
 #include <functional>
 #include <geometry_msgs/msg/point.hpp>
 #include <map>
