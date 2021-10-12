@@ -168,9 +168,8 @@ EgoEntity::EgoEntity(
   const std::string & name,             //
   const Configuration & configuration,  //
   const double step_time,               //
-  const openscenario_msgs::msg::VehicleParameters & parameters,
-  const openscenario_msgs::msg::EntityStatus & status)
-: VehicleEntity(name, parameters, status),
+  const openscenario_msgs::msg::VehicleParameters & parameters)
+: VehicleEntity(name, parameters),
   autoware(makeAutoware(configuration)),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
@@ -419,9 +418,9 @@ auto EgoEntity::setDriverModel(const openscenario_msgs::msg::DriverModel &) -> v
 {
 }
 
-void EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
+bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
-  VehicleEntity::setStatus(status);
+  const bool success = VehicleEntity::setStatus(status);  // NOTE: setStatus always succeeds.
 
   const auto current_pose = getStatus().pose;
 
@@ -439,6 +438,8 @@ void EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   if (not initial_pose_) {
     initial_pose_ = current_pose;
   }
+
+  return success;
 }
 
 void EgoEntity::setTargetSpeed(double value, bool)

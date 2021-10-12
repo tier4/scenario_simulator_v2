@@ -31,8 +31,13 @@ void OutOfRangeMetric::setEntityManager(
 void OutOfRangeMetric::update()
 {
   const auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  linear_velocity_ = status.action_status.twist.linear.x;
-  linear_acceleration_ = status.action_status.accel.linear.x;
+  if (!status) {
+    THROW_SIMULATION_ERROR("failed to get status of target_entity (", target_entity, ")");
+    return;
+  }
+
+  linear_velocity_ = status->action_status.twist.linear.x;
+  linear_acceleration_ = status->action_status.accel.linear.x;
 
   if (!(min_velocity <= linear_velocity_ && linear_velocity_ <= max_velocity)) {
     failure(SPECIFICATION_VIOLATION(
