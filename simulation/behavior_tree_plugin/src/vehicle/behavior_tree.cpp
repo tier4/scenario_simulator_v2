@@ -32,6 +32,7 @@ namespace entity_behavior
 {
 void VehicleBehaviorTree::configure()
 {
+  /*
   std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
                      "/config/vehicle_entity_behavior.xml";
   factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::FollowLaneAction>(
@@ -55,8 +56,12 @@ void VehicleBehaviorTree::configure()
   current_action_ = "root";
   setupLogger();
   setRequest("none");
+*/
 }
 
+void VehicleBehaviorTree::update(double, double) {}
+
+/*
 void VehicleBehaviorTree::setupLogger()
 {
   first_timestamp_ = std::chrono::high_resolution_clock::now();
@@ -113,6 +118,7 @@ void VehicleBehaviorTree::callback(
     }
   }
 }
+*/
 }  // namespace entity_behavior
 
 #include "pluginlib/class_list_macros.hpp"

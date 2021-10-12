@@ -23,6 +23,7 @@ namespace entity_behavior
 {
 void PedestrianBehaviorTree::configure()
 {
+  /*
   std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
                      "/config/pedestrian_entity_behavior.xml";
   factory_.registerNodeType<entity_behavior::pedestrian::FollowLaneAction>("FollowLane");
@@ -31,8 +32,12 @@ void PedestrianBehaviorTree::configure()
   current_action_ = "root";
   setupLogger();
   setRequest("none");
+  */
 }
 
+void PedestrianBehaviorTree::update(double, double) {}
+
+/*
 void PedestrianBehaviorTree::setupLogger()
 {
   first_timestamp_ = std::chrono::high_resolution_clock::now();
@@ -89,6 +94,7 @@ void PedestrianBehaviorTree::callback(
     }
   }
 }
+*/
 }  // namespace entity_behavior
 
 #include "pluginlib/class_list_macros.hpp"
