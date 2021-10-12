@@ -37,7 +37,7 @@ VehicleEntity::VehicleEntity(
   /**
    * @todo pass plugin name via constructor
    */
-  std::string plugin_name = "behavior_plugin/behavior_tree_plugin";
+  std::string plugin_name = "behavior_tree_plugin/vehicle/BehaviorTree";
   behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
   behavior_plugin_ptr_->setVehicleParameters(parameters);
 }

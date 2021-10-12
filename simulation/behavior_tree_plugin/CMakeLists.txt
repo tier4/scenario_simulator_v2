@@ -27,6 +27,8 @@ ament_auto_add_library(behavior_tree_plugin SHARED
   src/vehicle/lane_change_action.cpp
   src/vehicle/vehicle_action_node.cpp)
 
+pluginlib_export_plugin_description_file(behavior_tree_plugin plugins.xml)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()

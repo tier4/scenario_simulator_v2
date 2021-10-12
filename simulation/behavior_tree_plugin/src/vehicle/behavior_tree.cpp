@@ -50,3 +50,7 @@ BehaviorTree::BehaviorTree()
 }
 }  // namespace vehicle
 }  // namespace entity_behavior
+
+#include "pluginlib/class_list_macros.hpp"
+
+PLUGINLIB_EXPORT_CLASS(entity_behavior::vehicle::BehaviorTree, entity_behavior::BehaviorPluginBase)

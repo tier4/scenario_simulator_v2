@@ -1,0 +1,17 @@
+
+<library path="behavior_tree_plugin">
+  <class name="behavior_tree_plugin/pedestrian/BehaviorTree"
+         type="entity_behavior::pedestrian::BehaviorTree"
+         base_class_type="entity_behavior::BehaviorPluginBase">
+    <description>
+      A dynamixel hardware plugin for the ros2_control.
+    </description>
+  </class>
+  <class name="behavior_tree_plugin/vehicle/BehaviorTree"
+         type="entity_behavior::vehicle::BehaviorTree"
+         base_class_type="entity_behavior::BehaviorPluginBase">
+    <description>
+      A dynamixel hardware plugin for the ros2_control.
+    </description>
+  </class>
+</library>
