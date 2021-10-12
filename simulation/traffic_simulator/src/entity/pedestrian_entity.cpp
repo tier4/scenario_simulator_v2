@@ -30,9 +30,10 @@ PedestrianEntity::PedestrianEntity(
 : EntityBase(params.pedestrian_category, name, status),
   parameters(params),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
-    "behavior_plugin", "behavior_plugin_base"))
+    "traffic_simulator", "entity_behavior::BehaviorPluginBase"))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
+  const auto paths = loader_.getPluginXmlPaths();
   /**
    * @todo pass plugin name via constructor
    */

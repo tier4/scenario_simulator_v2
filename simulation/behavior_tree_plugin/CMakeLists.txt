@@ -27,7 +27,7 @@ ament_auto_add_library(behavior_tree_plugin SHARED
   src/vehicle/lane_change_action.cpp
   src/vehicle/vehicle_action_node.cpp)
 
-pluginlib_export_plugin_description_file(behavior_tree_plugin plugins.xml)
+pluginlib_export_plugin_description_file(traffic_simulator plugins.xml)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -38,4 +38,4 @@ install(
   DIRECTORY config
   DESTINATION share/${PROJECT_NAME})
 
-ament_package()
+ament_auto_package()
