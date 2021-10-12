@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
 #include <simple_junit/junit5.hpp>
