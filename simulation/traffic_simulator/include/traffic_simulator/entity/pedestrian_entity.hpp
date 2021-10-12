@@ -34,8 +34,7 @@ class PedestrianEntity : public EntityBase
 {
 public:
   PedestrianEntity(
-    const std::string & name, const openscenario_msgs::msg::PedestrianParameters & parameters,
-    const openscenario_msgs::msg::EntityStatus & status);
+    const std::string & name, const openscenario_msgs::msg::PedestrianParameters & parameters);
 
   const openscenario_msgs::msg::PedestrianParameters parameters;
 
@@ -85,8 +84,8 @@ public:
 
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
-    if (status_.lanelet_pose_valid) {
-      return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
+    if (status_ and status_->lanelet_pose_valid) {
+      return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
     } else {
       return {};
     }

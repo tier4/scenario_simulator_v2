@@ -40,8 +40,7 @@ class VehicleEntity : public EntityBase
 {
 public:
   VehicleEntity(
-    const std::string & name, const openscenario_msgs::msg::VehicleParameters & parameters,
-    const openscenario_msgs::msg::EntityStatus & status);
+    const std::string & name, const openscenario_msgs::msg::VehicleParameters & parameters);
 
   ~VehicleEntity() override = default;
 
@@ -106,7 +105,10 @@ public:
     try {
       return tree_ptr_->getWaypoints();
     } catch (const std::runtime_error & e) {
-      if (status_.lanelet_pose_valid == false) {
+      if (!status_) {
+        THROW_SIMULATION_ERROR("Entity : ", name, " status is empty.");
+      }
+      if (status_ && status_->lanelet_pose_valid == false) {
         THROW_SIMULATION_ERROR(
           "Failed to calculate waypoints in NPC logics, please check Entity : ", name,
           " is in a lane coordinate.");
@@ -127,10 +129,13 @@ public:
 
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
-    if (status_.lanelet_pose_valid) {
+    if (!status_) {
       return {};
     }
-    return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
+    if (!status_->lanelet_pose_valid) {
+      return {};
+    }
+    return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
   }
 
 private:

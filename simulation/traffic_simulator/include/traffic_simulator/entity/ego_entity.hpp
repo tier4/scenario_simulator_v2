@@ -76,8 +76,7 @@ public:
     const std::string & name,             //
     const Configuration & configuration,  //
     const double step_time,               //
-    const openscenario_msgs::msg::VehicleParameters & parameters,
-    const openscenario_msgs::msg::EntityStatus & status);
+    const openscenario_msgs::msg::VehicleParameters & parameters);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 
@@ -120,7 +119,7 @@ public:
 
   auto setDriverModel(const openscenario_msgs::msg::DriverModel &) -> void override;
 
-  void setStatus(const openscenario_msgs::msg::EntityStatus &) override;
+  auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool override;
 
   void setTargetSpeed(double, bool) override;
 
