@@ -15,7 +15,6 @@
 #ifndef BEHAVIOR_TREE_PLUGIN__VEHICLE__BEHAVIOR_TREE_HPP_
 #define BEHAVIOR_TREE_PLUGIN__VEHICLE__BEHAVIOR_TREE_HPP_
 
-/*
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
@@ -30,8 +29,6 @@
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
-*/
-#include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 
 namespace entity_behavior
 {
@@ -42,7 +39,6 @@ public:
   void configure() override;
 
 private:
-  /*
   BT::NodeStatus tickOnce(double current_time, double step_time);
   std::shared_ptr<BT::StdCoutLogger> logger_cout_ptr_;
   void callback(
@@ -56,7 +52,6 @@ private:
   std::string request_;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
-*/
 };
 }  // namespace entity_behavior
 

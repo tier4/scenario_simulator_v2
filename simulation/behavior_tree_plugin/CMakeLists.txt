@@ -13,21 +13,21 @@ find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(pluginlib REQUIRED)
 
 add_library(behavior_tree_plugin SHARED
-  #src/action_node.cpp
+  src/action_node.cpp
   src/pedestrian/behavior_tree.cpp
-  #src/pedestrian/follow_lane_action.cpp
-  #src/pedestrian/pedestrian_action_node.cpp
-  #src/pedestrian/walk_straight_action.cpp
-  #src/vehicle/behavior_tree.cpp
-  #src/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
-  #src/vehicle/follow_lane_sequence/follow_lane_action.cpp
-  #src/vehicle/follow_lane_sequence/move_backward_action.cpp
-  #src/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.cpp
-  #src/vehicle/follow_lane_sequence/stop_at_stop_line_action.cpp
-  #src/vehicle/follow_lane_sequence/stop_at_traffic_light_action.cpp
-  #src/vehicle/follow_lane_sequence/yield_action.cpp
-  #src/vehicle/lane_change_action.cpp
-  #src/vehicle/vehicle_action_node.cpp)
+  src/pedestrian/follow_lane_action.cpp
+  src/pedestrian/pedestrian_action_node.cpp
+  src/pedestrian/walk_straight_action.cpp
+  src/vehicle/behavior_tree.cpp
+  src/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
+  src/vehicle/follow_lane_sequence/follow_lane_action.cpp
+  src/vehicle/follow_lane_sequence/move_backward_action.cpp
+  src/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.cpp
+  src/vehicle/follow_lane_sequence/stop_at_stop_line_action.cpp
+  src/vehicle/follow_lane_sequence/stop_at_traffic_light_action.cpp
+  src/vehicle/follow_lane_sequence/yield_action.cpp
+  src/vehicle/lane_change_action.cpp
+  src/vehicle/vehicle_action_node.cpp
 )
 
 target_include_directories(
