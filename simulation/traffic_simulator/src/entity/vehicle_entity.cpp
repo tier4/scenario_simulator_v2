@@ -34,11 +34,18 @@ VehicleEntity::VehicleEntity(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase"))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
+  const auto paths = loader_.getPluginXmlPaths();
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  for(const auto & path : paths) {
+    std::cout << "xml path = " << path << std::endl;
+  }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   /**
    * @todo pass plugin name via constructor
    */
   std::string plugin_name = "behavior_tree_plugin/vehicle/BehaviorTree";
   behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   behavior_plugin_ptr_->setVehicleParameters(parameters);
 }
 
