@@ -45,6 +45,8 @@ PedestrianEntity::PedestrianEntity(
   std::string plugin_name = "behavior_tree_plugin/PedestrianBehaviorTree";
   behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
   std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  behavior_plugin_ptr_->configure();
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
 }
 

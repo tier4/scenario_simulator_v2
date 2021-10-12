@@ -30,7 +30,7 @@
 
 namespace entity_behavior
 {
-VehicleBehaviorTree::VehicleBehaviorTree()
+void VehicleBehaviorTree::configure()
 {
   std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
                      "/config/vehicle_entity_behavior.xml";

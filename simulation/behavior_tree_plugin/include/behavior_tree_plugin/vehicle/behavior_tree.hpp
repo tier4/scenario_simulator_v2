@@ -35,8 +35,8 @@ namespace entity_behavior
 class VehicleBehaviorTree : public BehaviorPluginBase
 {
 public:
-  VehicleBehaviorTree();
   void update(double current_time, double step_time) override;
+  virtual void configure() override;
 
 private:
   BT::NodeStatus tickOnce(double current_time, double step_time);

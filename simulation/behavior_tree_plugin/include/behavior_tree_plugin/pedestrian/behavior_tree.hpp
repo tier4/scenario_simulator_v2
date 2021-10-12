@@ -35,7 +35,7 @@ namespace entity_behavior
 class PedestrianBehaviorTree : public BehaviorPluginBase
 {
 public:
-  PedestrianBehaviorTree();
+  void configure() override;
   void update(double current_time, double step_time) override;
 
 private:
