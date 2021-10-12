@@ -11,7 +11,6 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(behavior_tree_plugin SHARED
   src/action_node.cpp
-  src/behavior_tree_plugin.cpp
   src/pedestrian/behavior_tree.cpp
   src/pedestrian/follow_lane_action.cpp
   src/pedestrian/pedestrian_action_node.cpp

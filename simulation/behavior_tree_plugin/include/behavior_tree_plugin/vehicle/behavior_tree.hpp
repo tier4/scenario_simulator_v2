@@ -18,7 +18,6 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
-#include <behavior_tree_plugin/behavior_tree_plugin.hpp>
 #include <functional>
 #include <geometry_msgs/msg/point.hpp>
 #include <map>
@@ -35,10 +34,26 @@ namespace entity_behavior
 {
 namespace vehicle
 {
-class BehaviorTree : public BehaviorTreePlugin
+class BehaviorTree : public BehaviorPluginBase
 {
 public:
   BehaviorTree();
+  void update(double current_time, double step_time) override;
+
+private:
+  BT::NodeStatus tickOnce(double current_time, double step_time);
+  std::shared_ptr<BT::StdCoutLogger> logger_cout_ptr_;
+  void callback(
+    BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
+    BT::NodeStatus status);
+  void setupLogger();
+  BT::TimestampType type_;
+  BT::TimePoint first_timestamp_;
+  std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
+  std::string current_action_;
+  std::string request_;
+  BT::BehaviorTreeFactory factory_;
+  BT::Tree tree_;
 };
 }  // namespace vehicle
 }  // namespace entity_behavior
