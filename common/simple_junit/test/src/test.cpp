@@ -50,6 +50,17 @@ std::string trim(const std::string & string)
   return result;
 }
 
+void cleanup(const std::string & filename)
+{
+  const boost::filesystem::path path(filename);
+  boost::system::error_code error;
+  const bool result = boost::filesystem::exists(path, error);
+  if (!result || error) {
+    throw std::runtime_error("file : " + filename + " does not found.");
+  }
+  boost::filesystem::remove(path);
+}
+
 #define EXPECT_TEXT_FILE_EQ(FILE0, FILE1)             \
   const std::string str0 = trim(readFromFile(FILE0)); \
   const std::string str1 = trim(readFromFile(FILE1)); \
@@ -64,6 +75,7 @@ TEST(SIMPLE_JUNIT, PASS)
   EXPECT_TEXT_FILE_EQ(
     "result_pass.junit.xml",
     ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/pass.junit.xml");
+  cleanup("result_pass.junit.xml");
 }
 
 TEST(SIMPLE_JUNIT, FAILURE)
@@ -76,6 +88,7 @@ TEST(SIMPLE_JUNIT, FAILURE)
   EXPECT_TEXT_FILE_EQ(
     "result_failure.junit.xml",
     ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/failure.junit.xml");
+  cleanup("result_failure.junit.xml");
 }
 
 TEST(SIMPLE_JUNIT, ERROR)
@@ -88,6 +101,7 @@ TEST(SIMPLE_JUNIT, ERROR)
   EXPECT_TEXT_FILE_EQ(
     "result_error.junit.xml",
     ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/error.junit.xml");
+  cleanup("result_error.junit.xml");
 }
 
 TEST(SIMPLE_JUNIT, COMPLEX)
@@ -102,6 +116,7 @@ TEST(SIMPLE_JUNIT, COMPLEX)
   EXPECT_TEXT_FILE_EQ(
     "result_complex.junit.xml",
     ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/complex.junit.xml");
+  cleanup("result_complex.junit.xml");
 }
 
 TEST(SIMPLE_JUNIT, ATTRIBUTES)
@@ -118,6 +133,7 @@ TEST(SIMPLE_JUNIT, ATTRIBUTES)
   EXPECT_TEXT_FILE_EQ(
     "result_attribute.junit.xml", ament_index_cpp::get_package_share_directory("simple_junit") +
                                     "/expected/attributes.junit.xml");
+  cleanup("result_attribute.junit.xml");
 }
 
 TEST(SIMPLE_JUNIT, TESTSUITES_NAME)
@@ -130,6 +146,7 @@ TEST(SIMPLE_JUNIT, TESTSUITES_NAME)
     "result_testsuites_name.junit.xml",
     ament_index_cpp::get_package_share_directory("simple_junit") +
       "/expected/testsuites_name.junit.xml");
+  cleanup("result_testsuites_name.junit.xml");
 }
 
 int main(int argc, char ** argv)
