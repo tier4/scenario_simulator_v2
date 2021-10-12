@@ -21,9 +21,7 @@
 
 namespace entity_behavior
 {
-namespace pedestrian
-{
-BehaviorTree::BehaviorTree()
+PedestrianBehaviorTree::PedestrianBehaviorTree()
 {
   std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
                      "/config/pedestrian_entity_behavior.xml";
@@ -35,7 +33,7 @@ BehaviorTree::BehaviorTree()
   setRequest("none");
 }
 
-void BehaviorTree::setupLogger()
+void PedestrianBehaviorTree::setupLogger()
 {
   first_timestamp_ = std::chrono::high_resolution_clock::now();
   auto subscribeCallback = [this](
@@ -55,7 +53,7 @@ void BehaviorTree::setupLogger()
   BT::applyRecursiveVisitor(tree_.rootNode(), visitor);
 }
 
-void BehaviorTree::update(double current_time, double step_time)
+void PedestrianBehaviorTree::update(double current_time, double step_time)
 {
   tickOnce(current_time, step_time);
   while (getCurrentAction() == "root") {
@@ -63,14 +61,14 @@ void BehaviorTree::update(double current_time, double step_time)
   }
 }
 
-BT::NodeStatus BehaviorTree::tickOnce(double current_time, double step_time)
+BT::NodeStatus PedestrianBehaviorTree::tickOnce(double current_time, double step_time)
 {
   setCurrentTime(current_time);
   setStepTime(step_time);
   return tree_.rootNode()->executeTick();
 }
 
-void BehaviorTree::callback(
+void PedestrianBehaviorTree::callback(
   BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
   BT::NodeStatus status)
 {
@@ -91,10 +89,8 @@ void BehaviorTree::callback(
     }
   }
 }
-}  // namespace pedestrian
 }  // namespace entity_behavior
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(
-  entity_behavior::pedestrian::BehaviorTree, entity_behavior::BehaviorPluginBase)
+PLUGINLIB_EXPORT_CLASS(entity_behavior::PedestrianBehaviorTree, entity_behavior::BehaviorPluginBase)

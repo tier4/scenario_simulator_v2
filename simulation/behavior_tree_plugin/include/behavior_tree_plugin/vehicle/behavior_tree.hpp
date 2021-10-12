@@ -32,12 +32,10 @@
 
 namespace entity_behavior
 {
-namespace vehicle
-{
-class BehaviorTree : public BehaviorPluginBase
+class VehicleBehaviorTree : public BehaviorPluginBase
 {
 public:
-  BehaviorTree();
+  VehicleBehaviorTree();
   void update(double current_time, double step_time) override;
 
 private:
@@ -55,7 +53,6 @@ private:
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
 };
-}  // namespace vehicle
 }  // namespace entity_behavior
 
 #endif  // BEHAVIOR_TREE_PLUGIN__VEHICLE__BEHAVIOR_TREE_HPP_

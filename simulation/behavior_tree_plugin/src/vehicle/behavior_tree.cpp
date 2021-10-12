@@ -30,28 +30,34 @@
 
 namespace entity_behavior
 {
-namespace vehicle
-{
-BehaviorTree::BehaviorTree()
+VehicleBehaviorTree::VehicleBehaviorTree()
 {
   std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
                      "/config/vehicle_entity_behavior.xml";
-  factory_.registerNodeType<follow_lane_sequence::FollowLaneAction>("FollowLane");
-  factory_.registerNodeType<follow_lane_sequence::FollowFrontEntityAction>("FollowFrontEntity");
-  factory_.registerNodeType<follow_lane_sequence::StopAtCrossingEntityAction>(
-    "StopAtCrossingEntity");
-  factory_.registerNodeType<follow_lane_sequence::StopAtStopLineAction>("StopAtStopLine");
-  factory_.registerNodeType<follow_lane_sequence::StopAtTrafficLightAction>("StopAtTrafficLight");
-  factory_.registerNodeType<follow_lane_sequence::YieldAction>("Yield");
-  factory_.registerNodeType<follow_lane_sequence::MoveBackwardAction>("MoveBackward");
-  factory_.registerNodeType<LaneChangeAction>("LaneChange");
+  factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::FollowLaneAction>(
+    "FollowLane");
+  factory_
+    .registerNodeType<entity_behavior::vehicle::follow_lane_sequence::FollowFrontEntityAction>(
+      "FollowFrontEntity");
+  factory_
+    .registerNodeType<entity_behavior::vehicle::follow_lane_sequence::StopAtCrossingEntityAction>(
+      "StopAtCrossingEntity");
+  factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::StopAtStopLineAction>(
+    "StopAtStopLine");
+  factory_
+    .registerNodeType<entity_behavior::vehicle::follow_lane_sequence::StopAtTrafficLightAction>(
+      "StopAtTrafficLight");
+  factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::YieldAction>("Yield");
+  factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::MoveBackwardAction>(
+    "MoveBackward");
+  factory_.registerNodeType<entity_behavior::vehicle::LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
   setupLogger();
   setRequest("none");
 }
 
-void BehaviorTree::setupLogger()
+void VehicleBehaviorTree::setupLogger()
 {
   first_timestamp_ = std::chrono::high_resolution_clock::now();
   auto subscribeCallback = [this](
@@ -71,7 +77,7 @@ void BehaviorTree::setupLogger()
   BT::applyRecursiveVisitor(tree_.rootNode(), visitor);
 }
 
-void BehaviorTree::update(double current_time, double step_time)
+void VehicleBehaviorTree::update(double current_time, double step_time)
 {
   tickOnce(current_time, step_time);
   while (getCurrentAction() == "root") {
@@ -79,14 +85,14 @@ void BehaviorTree::update(double current_time, double step_time)
   }
 }
 
-BT::NodeStatus BehaviorTree::tickOnce(double current_time, double step_time)
+BT::NodeStatus VehicleBehaviorTree::tickOnce(double current_time, double step_time)
 {
   setCurrentTime(current_time);
   setStepTime(step_time);
   return tree_.rootNode()->executeTick();
 }
 
-void BehaviorTree::callback(
+void VehicleBehaviorTree::callback(
   BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
   BT::NodeStatus status)
 {
@@ -107,9 +113,8 @@ void BehaviorTree::callback(
     }
   }
 }
-}  // namespace vehicle
 }  // namespace entity_behavior
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(entity_behavior::vehicle::BehaviorTree, entity_behavior::BehaviorPluginBase)
+PLUGINLIB_EXPORT_CLASS(entity_behavior::VehicleBehaviorTree, entity_behavior::BehaviorPluginBase)

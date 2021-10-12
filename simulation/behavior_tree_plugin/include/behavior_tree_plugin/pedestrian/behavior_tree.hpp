@@ -32,12 +32,10 @@
 
 namespace entity_behavior
 {
-namespace pedestrian
-{
-class BehaviorTree : public BehaviorPluginBase
+class PedestrianBehaviorTree : public BehaviorPluginBase
 {
 public:
-  BehaviorTree();
+  PedestrianBehaviorTree();
   void update(double current_time, double step_time) override;
 
 private:
@@ -55,7 +53,6 @@ private:
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
 };
-}  // namespace pedestrian
 }  // namespace entity_behavior
 
 #endif  // BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__BEHAVIOR_TREE_HPP_
