@@ -40,8 +40,6 @@ public:
   VehicleEntity(
     const std::string & name, const openscenario_msgs::msg::VehicleParameters & parameters);
 
-  // ~VehicleEntity() override;
-
   const openscenario_msgs::msg::VehicleParameters parameters;
 
   auto getEntityTypename() const -> const std::string & override

@@ -39,8 +39,6 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_->setVehicleParameters(parameters);
 }
 
-// VehicleEntity::~VehicleEntity() { loader_.unloadLibraryForClass(plugin_name); }
-
 void VehicleEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {

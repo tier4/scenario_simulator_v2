@@ -38,8 +38,6 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
 }
 
-// PedestrianEntity::~PedestrianEntity() { loader_.unloadLibraryForClass(plugin_name); }
-
 void PedestrianEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
