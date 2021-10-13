@@ -24,19 +24,20 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ControllerAction -------------------------------------------------------
+/* ---- ControllerAction (OSC 1.1) ---------------------------------------------
  *
  *  Action that assigns a new controller or overrides an existing one.
  *
  *  <xsd:complexType name="ControllerAction">
  *    <xsd:all>
- *      <xsd:element name="AssignControllerAction" type="AssignControllerAction"/>
- *      <xsd:element name="OverrideControllerValueAction" type="OverrideControllerValueAction"/>
+ *      <xsd:element name="AssignControllerAction" type="AssignControllerAction" minOccurs="0"/>
+ *      <xsd:element name="OverrideControllerValueAction" type="OverrideControllerValueAction" minOccurs="0"/>
+ *      <xsd:element name="ActivateControllerAction" type="ActivateControllerAction" minOccurs="0"/>
  *    </xsd:all>
  *  </xsd:complexType>
  *
  * ------------------------------------------------------------------------ */
-struct ControllerAction
+struct ControllerAction : private Scope
 {
   // Assign a controller to an entity.
   const AssignControllerAction assign_controller_action;

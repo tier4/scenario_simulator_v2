@@ -77,6 +77,7 @@ auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::deca
 
 STRIP_OPTIONAL(getBoundingBoxDistance, static_cast<value_type>(0));
 STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_NaN());
+STRIP_OPTIONAL(getStandStillDuration, static_cast<value_type>(0));
 STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
 
 #undef STRIP_OPTIONAL
@@ -93,12 +94,12 @@ FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
 FORWARD_TO_SIMULATION_API(engage);
 FORWARD_TO_SIMULATION_API(getCurrentTime);
-FORWARD_TO_SIMULATION_API(getStandStillDuration);
 FORWARD_TO_SIMULATION_API(initialize);
 FORWARD_TO_SIMULATION_API(isInLanelet);
 FORWARD_TO_SIMULATION_API(ready);
 FORWARD_TO_SIMULATION_API(setEntityStatus);
 FORWARD_TO_SIMULATION_API(setTargetSpeed);
+FORWARD_TO_SIMULATION_API(setUpperBoundSpeed);
 FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef FORWARD_TO_SIMULATION_API

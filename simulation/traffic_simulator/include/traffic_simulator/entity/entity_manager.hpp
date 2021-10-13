@@ -203,19 +203,20 @@ public:
   FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
-  FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
+  FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(getVehicleCommand, const);
+  FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(ready, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
   FORWARD_TO_ENTITY(setDriverModel, );
+  FORWARD_TO_ENTITY(setUpperBoundSpeed, );
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
 
@@ -240,6 +241,9 @@ public:
 
   bool laneMatchingSucceed(const std::string & name);
 
+  // TODO (yamacir-kit) Rename to 'hasEntityStatus'
+  bool entityStatusSet(const std::string & name) const;
+
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> boost::optional<double>;
 
@@ -254,7 +258,7 @@ public:
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntityStatus(const std::string & name) const
-    -> const openscenario_msgs::msg::EntityStatus;
+    -> const boost::optional<openscenario_msgs::msg::EntityStatus>;
 
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, openscenario_msgs::msg::EntityType>;
@@ -315,7 +319,7 @@ public:
 
   void requestLaneChange(const std::string & name, const Direction & direction);
 
-  void setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
+  bool setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
 
   void setVerbose(const bool verbose);
 

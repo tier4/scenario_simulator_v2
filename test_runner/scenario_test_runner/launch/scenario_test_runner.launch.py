@@ -183,7 +183,7 @@ def launch_setup(context, *args, **kwargs):
             arguments=[
                 "-d",
                 str(
-                    Path(get_package_share_directory("traffic_simulator"))
+                    Path(get_package_share_directory("scenario_test_runner"))
                     / "config/scenario_simulator_v2.rviz"
                 ),
             ],

@@ -2,6 +2,16 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.4 (2021-10-13)
+------------------
+* Merge pull request `#557 <https://github.com/tier4/scenario_simulator_v2/issues/557>`_ from tier4/revert/pr_544
+* Revert "Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status"
+* Merge pull request `#554 <https://github.com/tier4/scenario_simulator_v2/issues/554>`_ from tier4/feature/autoware/upper-bound-velocity
+* Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
+* Fix Autoware's default upper bound speed to double max from zero
+* Add new member function `setUpperBoundSpeed`
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.3 (2021-10-07)
 ------------------
 * Merge pull request `#549 <https://github.com/tier4/scenario_simulator_v2/issues/549>`_ from tier4/fix/traffic_simulator/autoware

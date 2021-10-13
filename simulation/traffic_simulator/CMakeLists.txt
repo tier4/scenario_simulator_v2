@@ -73,7 +73,7 @@ target_link_libraries(traffic_simulator
   ${PROTOBUF_LIBRARY})
 
 install(
-  DIRECTORY config test/catalog test/map
+  DIRECTORY test/catalog test/map
   DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)

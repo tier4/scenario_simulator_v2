@@ -26,9 +26,8 @@ namespace traffic_simulator
 namespace entity
 {
 VehicleEntity::VehicleEntity(
-  const std::string & name, const openscenario_msgs::msg::VehicleParameters & params,
-  const openscenario_msgs::msg::EntityStatus & status)
-: EntityBase(params.vehicle_category, name, status),
+  const std::string & name, const openscenario_msgs::msg::VehicleParameters & params)
+: EntityBase(params.vehicle_category, name),
   parameters(params),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase"))
@@ -54,8 +53,8 @@ VehicleEntity::VehicleEntity(
 void VehicleEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
-  if (status_.lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints);
+  if (status_ and status_->lanelet_pose_valid) {
+    route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
   }
 }
 
@@ -75,8 +74,8 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
 
 void VehicleEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
-  if (status_.lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, lanelet_pose);
+  if (status_ and status_->lanelet_pose_valid) {
+    route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
   }
 }
 
@@ -110,17 +109,20 @@ void VehicleEntity::setTargetSpeed(double target_speed, bool continuous)
 void VehicleEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
+  if (!status_) {
+    return;
+  }
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
   } else {
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
-    behavior_plugin_ptr_->setEntityStatus(status_);
-    target_speed_planner_.update(status_.action_status.twist.linear.x);
+    behavior_plugin_ptr_->setEntityStatus(status_.get());
+    target_speed_planner_.update(status_->action_status.twist.linear.x);
     behavior_plugin_ptr_->setTargetSpeed(target_speed_planner_.getTargetSpeed());
-    if (status_.lanelet_pose_valid) {
+    if (status_->lanelet_pose_valid) {
       behavior_plugin_ptr_->setRouteLanelets(
-        route_planner_ptr_->getRouteLanelets(status_.lanelet_pose));
+        route_planner_ptr_->getRouteLanelets(status_->lanelet_pose));
     } else {
       std::vector<std::int64_t> empty = {};
       behavior_plugin_ptr_->setRouteLanelets(empty);
@@ -136,9 +138,13 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    linear_jerk_ =
-      (status_updated.action_status.accel.linear.x - status_.action_status.accel.linear.x) /
-      step_time;
+    if (!status_) {
+      linear_jerk_ = 0;
+    } else {
+      linear_jerk_ =
+        (status_updated.action_status.accel.linear.x - status_->action_status.accel.linear.x) /
+        step_time;
+    }
     setStatus(status_updated);
     updateStandStillDuration(step_time);
   }

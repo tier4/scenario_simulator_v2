@@ -20,19 +20,33 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 ControllerAction::ControllerAction(const pugi::xml_node & node, Scope & scope)
-: assign_controller_action(
+: Scope(scope),
+  assign_controller_action(
     readElement<AssignControllerAction>("AssignControllerAction", node, scope)),
   override_controller_value_action(readElement<OverrideControllerValueAction>(
     "OverrideControllerValueAction", node, scope))  // NOTE: DUMMY IMPLEMENTATION
 {
 }
 
-auto ControllerAction::accomplished() noexcept -> bool { return true; }
+auto ControllerAction::accomplished() noexcept -> bool  //
+{
+  return true;
+}
 
-auto ControllerAction::endsImmediately() noexcept -> bool { return true; }
+auto ControllerAction::endsImmediately() noexcept -> bool  //
+{
+  return true;
+}
 
-auto ControllerAction::run() const -> void { assign_controller_action(); }
+auto ControllerAction::run() const -> void  //
+{
+  for (const auto & actor : actors) {
+    assign_controller_action(actor);
+  }
+}
 
-auto ControllerAction::start() noexcept -> void {}
+auto ControllerAction::start() noexcept -> void  //
+{
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

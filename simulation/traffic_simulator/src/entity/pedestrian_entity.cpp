@@ -25,9 +25,8 @@ namespace traffic_simulator
 namespace entity
 {
 PedestrianEntity::PedestrianEntity(
-  const std::string & name, const openscenario_msgs::msg::PedestrianParameters & params,
-  const openscenario_msgs::msg::EntityStatus & status)
-: EntityBase(params.pedestrian_category, name, status),
+  const std::string & name, const openscenario_msgs::msg::PedestrianParameters & params)
+: EntityBase(params.pedestrian_category, name),
   parameters(params),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase"))
@@ -54,10 +53,13 @@ void PedestrianEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
   behavior_plugin_ptr_->setRequest("follow_lane");
-  if (status_.lanelet_pose_valid) {
+  if (!status_) {
     return;
   }
-  route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints);
+  if (!status_->lanelet_pose_valid) {
+    return;
+  }
+  route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
 }
 
 void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
@@ -80,10 +82,13 @@ void PedestrianEntity::requestAcquirePosition(
   const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
   behavior_plugin_ptr_->setRequest("follow_lane");
-  if (status_.lanelet_pose_valid) {
+  if (!status_) {
     return;
   }
-  route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, lanelet_pose);
+  if (!status_->lanelet_pose_valid) {
+    return;
+  }
+  route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
 }
 
 void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
@@ -110,16 +115,19 @@ void PedestrianEntity::setTargetSpeed(double target_speed, bool continuous)
 void PedestrianEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
+  if (!status_) {
+    return;
+  }
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
   } else {
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
-    behavior_plugin_ptr_->setEntityStatus(status_);
-    target_speed_planner_.update(status_.action_status.twist.linear.x);
+    behavior_plugin_ptr_->setEntityStatus(status_.get());
+    target_speed_planner_.update(status_->action_status.twist.linear.x);
     behavior_plugin_ptr_->setTargetSpeed(target_speed_planner_.getTargetSpeed());
-    if (status_.lanelet_pose_valid) {
-      auto route = route_planner_ptr_->getRouteLanelets(status_.lanelet_pose);
+    if (status_->lanelet_pose_valid) {
+      auto route = route_planner_ptr_->getRouteLanelets(status_->lanelet_pose);
       behavior_plugin_ptr_->setRouteLanelets(route);
     } else {
       std::vector<std::int64_t> empty = {};
@@ -136,9 +144,13 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    linear_jerk_ =
-      (status_updated.action_status.accel.linear.x - status_.action_status.accel.linear.x) /
-      step_time;
+    if (!status_) {
+      linear_jerk_ = 0;
+    } else {
+      linear_jerk_ =
+        (status_updated.action_status.accel.linear.x - status_->action_status.accel.linear.x) /
+        step_time;
+    }
     setStatus(status_updated);
     updateStandStillDuration(step_time);
   }

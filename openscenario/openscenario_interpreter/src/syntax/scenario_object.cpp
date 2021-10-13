@@ -32,10 +32,10 @@ ScenarioObject::ScenarioObject(const pugi::xml_node & node, Scope & scope)
 
 auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> bool
 {
-  const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
-
   metrics::OutOfRangeMetric::Config configuration;
   {
+    const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
+
     configuration.target_entity = name;
     configuration.min_velocity = -parameters.performance.max_speed;
     configuration.max_velocity = +parameters.performance.max_speed;
@@ -50,12 +50,13 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
       if (not max_jerk.name.empty()) {
         configuration.max_jerk = boost::lexical_cast<double>(max_jerk.value);
       }
+
       if (not min_jerk.name.empty()) {
         configuration.min_jerk = boost::lexical_cast<double>(min_jerk.value);
       }
     }
 
-    if (object_controller.isEgo()) {
+    if (object_controller.isUserDefinedController()) {
       configuration.jerk_topic =
         "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
     }
@@ -68,7 +69,7 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
 
 auto ScenarioObject::activateSensors() -> bool
 {
-  if (object_controller.isEgo()) {
+  if (object_controller.isUserDefinedController()) {
     const auto architecture_type = getParameter<std::string>("architecture_type", "");
     if (architecture_type == "tier4/proposal") {
       return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
@@ -77,12 +78,14 @@ auto ScenarioObject::activateSensors() -> bool
              attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
                name, "/perception/object_recognition/objects", 0.1));
     } else if (architecture_type == "awf/auto") {
+      /*
+         Autoware.Auto does not currently support object prediction however it
+         is work-in-progress for Cargo ODD msgs are already implemented and
+         autoware_auto_msgs::msg::PredictedObjects will probably be used here
+         topic name is yet unknown.
+      */
       return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
         traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
-      // Autoware.Auto does not currently support object prediction
-      // however it is work-in-progress for Cargo ODD
-      // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
-      // topic name is yet unknown
     } else {
       throw SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type), " specified");

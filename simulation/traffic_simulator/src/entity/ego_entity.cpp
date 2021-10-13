@@ -168,9 +168,8 @@ EgoEntity::EgoEntity(
   const std::string & name,             //
   const Configuration & configuration,  //
   const double step_time,               //
-  const openscenario_msgs::msg::VehicleParameters & parameters,
-  const openscenario_msgs::msg::EntityStatus & status)
-: VehicleEntity(name, parameters, status),
+  const openscenario_msgs::msg::VehicleParameters & parameters)
+: VehicleEntity(name, parameters),
   autoware(makeAutoware(configuration)),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
@@ -415,9 +414,13 @@ void EgoEntity::requestLaneChange(const std::int64_t)
     "everything but their destination");
 }
 
-void EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
+auto EgoEntity::setDriverModel(const openscenario_msgs::msg::DriverModel &) -> void  //
 {
-  VehicleEntity::setStatus(status);
+}
+
+bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
+{
+  const bool success = VehicleEntity::setStatus(status);  // NOTE: setStatus always succeeds.
 
   const auto current_pose = getStatus().pose;
 
@@ -435,6 +438,8 @@ void EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   if (not initial_pose_) {
     initial_pose_ = current_pose;
   }
+
+  return success;
 }
 
 void EgoEntity::setTargetSpeed(double value, bool)
@@ -466,6 +471,11 @@ void EgoEntity::setTargetSpeed(double value, bool)
         "Unsupported simulation model ",
         getParameter<std::string>("vehicle_model_type", "IDEAL_STEER"), "specified");
   }
+}
+
+auto EgoEntity::setUpperBoundSpeed(double value) -> void  //
+{
+  autoware->setUpperBoundSpeed(value);
 }
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
@@ -29,11 +31,32 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 {
 }
 
+auto Controller::assign(const EntityRef & entity_ref) -> void
+{
+  const auto max_speed = properties["maxSpeed"];
+
+  if (not max_speed.value.empty()) {
+    setUpperBoundSpeed(entity_ref, Double(max_speed.value));
+  }
+
+  applyAssignControllerAction(entity_ref, *this);
+}
+
+auto Controller::isUserDefinedController() & -> bool
+{
+  return static_cast<bool>(properties["isEgo"]);
+}
+
+auto Controller::operator[](const String & name) -> const Property &  //
+{
+  return properties[name];
+}
+
 Controller::operator openscenario_msgs::msg::DriverModel()
 {
   openscenario_msgs::msg::DriverModel controller;
   {
-    controller.see_around = not(*this)["isBlind"];
+    controller.see_around = not properties["isBlind"];
   }
 
   return controller;

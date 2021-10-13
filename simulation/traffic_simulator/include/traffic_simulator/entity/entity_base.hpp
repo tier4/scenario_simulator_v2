@@ -46,9 +46,7 @@ public:
 
   const std::string name;
 
-  EntityBase(
-    const std::string & type, const std::string & name,
-    const openscenario_msgs::msg::EntityStatus & status);
+  EntityBase(const std::string & type, const std::string & name);
 
   virtual ~EntityBase() = default;
 
@@ -59,7 +57,8 @@ public:
 
   virtual auto getCurrentAction() const -> const std::string = 0;
 
-  /*   */ auto getEntityStatusBeforeUpdate() const -> const openscenario_msgs::msg::EntityStatus &
+  /*   */ auto getEntityStatusBeforeUpdate() const
+    -> const boost::optional<openscenario_msgs::msg::EntityStatus>
   {
     return status_before_update_;
   }
@@ -76,7 +75,7 @@ public:
 
   /*   */ auto getStatus() const -> const openscenario_msgs::msg::EntityStatus;
 
-  /*   */ auto getStandStillDuration() const -> double;
+  /*   */ auto getStandStillDuration() const -> boost::optional<double>;
 
   /*   */ auto getVisibility() { return visibility_; }
 
@@ -108,7 +107,7 @@ public:
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status);
 
-  virtual void setStatus(const openscenario_msgs::msg::EntityStatus & status);
+  virtual auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool;
 
   virtual void setTargetSpeed(double target_speed, bool continuous) = 0;
 
@@ -118,13 +117,15 @@ public:
     traffic_light_manager_ = ptr;
   }
 
+  virtual auto setUpperBoundSpeed(double) -> void {}
+
   /*   */ void setVerbose(bool verbose) { verbose_ = verbose; }
 
   /*   */ auto setVisibility(const bool visibility) { return visibility_ = visibility; }
 
   virtual void onUpdate(double current_time, double step_time);
 
-  virtual auto ready() const -> bool { return true; }
+  virtual auto ready() const -> bool { return static_cast<bool>(status_); }
 
   virtual void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) = 0;
 
@@ -142,6 +143,8 @@ public:
     THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
   }
 
+  /*   */ auto statusSet() const noexcept { return static_cast<bool>(status_); }
+
   /*   */ void stopAtEndOfRoad();
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
@@ -155,8 +158,8 @@ public:
 
 protected:
   boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
-  openscenario_msgs::msg::EntityStatus status_;
-  openscenario_msgs::msg::EntityStatus status_before_update_;
+  boost::optional<openscenario_msgs::msg::EntityStatus> status_;
+  boost::optional<openscenario_msgs::msg::EntityStatus> status_before_update_;
 
   std::queue<openscenario_msgs::msg::LaneletPose> waypoints_;
 
@@ -170,7 +173,7 @@ protected:
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list_;
 
   boost::optional<double> linear_jerk_;
-  double stand_still_duration_;
+  boost::optional<double> stand_still_duration_;
 
   visualization_msgs::msg::MarkerArray current_marker_;
   openscenario_msgs::msg::EntityType entity_type_;

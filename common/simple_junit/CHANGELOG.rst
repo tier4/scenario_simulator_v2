@@ -2,6 +2,14 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.4 (2021-10-13)
+------------------
+* add #include <boost/filesystem.hpp> line
+* add cleanup function
+* Revert "Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status"
+* Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
+* Contributors: MasayaKataoka, yamacir-kit
+
 0.5.3 (2021-10-07)
 ------------------
 
