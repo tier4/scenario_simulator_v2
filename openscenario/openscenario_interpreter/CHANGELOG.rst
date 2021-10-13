@@ -2,6 +2,13 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#561 <https://github.com/tier4/scenario_simulator_v2/issues/561>`_ from tier4/fix/interpreter/reach-position-condition
+* Cleanup
+* Update `ReachPositionCondition` to not to use `API::reachPosition`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 0.5.4 (2021-10-13)
 ------------------
 * Merge pull request `#557 <https://github.com/tier4/scenario_simulator_v2/issues/557>`_ from tier4/revert/pr_544

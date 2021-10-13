@@ -2,6 +2,9 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.4 (2021-10-13)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
