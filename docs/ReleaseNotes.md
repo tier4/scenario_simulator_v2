@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Fix syntax `ReachPositionCondition` to not to use `API::reachPosition` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/561)).
 
 ## Version 0.5.4
 - Revert [PR #544](https://github.com/tier4/scenario_simulator_v2/pull/544) ([link](https://github.com/tier4/scenario_simulator_v2/pull/557))
