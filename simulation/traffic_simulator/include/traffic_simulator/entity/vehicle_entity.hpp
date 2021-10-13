@@ -40,7 +40,7 @@ public:
   VehicleEntity(
     const std::string & name, const openscenario_msgs::msg::VehicleParameters & parameters);
 
-  ~VehicleEntity() override;
+  // ~VehicleEntity() override;
 
   const openscenario_msgs::msg::VehicleParameters parameters;
 
@@ -135,10 +135,11 @@ public:
     }
     return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
   }
+  const std::string plugin_name;
 
 private:
-  std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
+  std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
   traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
 };

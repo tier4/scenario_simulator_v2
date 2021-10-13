@@ -28,27 +28,17 @@ PedestrianEntity::PedestrianEntity(
   const std::string & name, const openscenario_msgs::msg::PedestrianParameters & params)
 : EntityBase(params.pedestrian_category, name),
   parameters(params),
+  plugin_name("behavior_tree_plugin/PedestrianBehaviorTree"),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
-    "traffic_simulator", "entity_behavior::BehaviorPluginBase"))
+    "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
+  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
-  /**
-   * @todo pass plugin name via constructor
-   */
-  std::string plugin_name = "behavior_tree_plugin/PedestrianBehaviorTree";
-  behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
   behavior_plugin_ptr_->configure();
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
 }
 
-PedestrianEntity::~PedestrianEntity()
-{
-  /**
-   * @todo pass plugin name via constructor
-   */
-  std::string plugin_name = "behavior_tree_plugin/PedestrianBehaviorTree";
-  loader_.unloadLibraryForClass(plugin_name);
-}
+// PedestrianEntity::~PedestrianEntity() { loader_.unloadLibraryForClass(plugin_name); }
 
 void PedestrianEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)

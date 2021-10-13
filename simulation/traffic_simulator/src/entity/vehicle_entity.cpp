@@ -29,27 +29,17 @@ VehicleEntity::VehicleEntity(
   const std::string & name, const openscenario_msgs::msg::VehicleParameters & params)
 : EntityBase(params.vehicle_category, name),
   parameters(params),
+  plugin_name("behavior_tree_plugin/VehicleBehaviorTree"),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
-    "traffic_simulator", "entity_behavior::BehaviorPluginBase"))
+    "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
+  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
-  /**
-   * @todo pass plugin name via constructor
-   */
-  std::string plugin_name = "behavior_tree_plugin/VehicleBehaviorTree";
-  behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
   behavior_plugin_ptr_->configure();
   behavior_plugin_ptr_->setVehicleParameters(parameters);
 }
 
-VehicleEntity::~VehicleEntity()
-{
-  /**
-   * @todo pass plugin name via constructor
-   */
-  std::string plugin_name = "behavior_tree_plugin/VehicleBehaviorTree";
-  loader_.unloadLibraryForClass(plugin_name);
-}
+// VehicleEntity::~VehicleEntity() { loader_.unloadLibraryForClass(plugin_name); }
 
 void VehicleEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)

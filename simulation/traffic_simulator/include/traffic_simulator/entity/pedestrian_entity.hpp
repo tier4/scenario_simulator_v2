@@ -36,7 +36,7 @@ class PedestrianEntity : public EntityBase
 public:
   PedestrianEntity(
     const std::string & name, const openscenario_msgs::msg::PedestrianParameters & parameters);
-  ~PedestrianEntity() override;
+  // ~PedestrianEntity() override;
 
   const openscenario_msgs::msg::PedestrianParameters parameters;
 
@@ -108,9 +108,11 @@ public:
     return openscenario_msgs::msg::WaypointsArray();
   };
 
+  const std::string plugin_name;
+
 private:
-  std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
+  std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };
