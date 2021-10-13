@@ -49,28 +49,11 @@ auto ReachPositionCondition::description() const -> String
 
 auto ReachPositionCondition::evaluate() -> Element
 {
-  // const auto reach_position = overload(
-  //   [](const WorldPosition & position, auto && triggering_entity, auto && tolerance) {
-  //     return evaluateReachPositionCondition(
-  //       triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), tolerance);
-  //   },
-  //   [](const RelativeWorldPosition & position, auto && triggering_entity, auto && tolerance) {
-  //     return evaluateReachPositionCondition(
-  //       triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
-  //   },
-  //   [](const LanePosition & position, auto && triggering_entity, auto && tolerance) {
-  //     return evaluateReachPositionCondition(
-  //       triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
-  //   });
-
   // TODO USE DistanceCondition::distance
   const auto distance = overload(
     [&](const WorldPosition & position, auto && triggering_entity) {
       const auto pose =
         getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-      PRINT(pose.position.x);
-      PRINT(pose.position.y);
-      PRINT(std::hypot(pose.position.x, pose.position.y));
       return std::hypot(pose.position.x, pose.position.y);
     },
     [&](const RelativeWorldPosition & position, auto && triggering_entity) {
@@ -88,7 +71,6 @@ auto ReachPositionCondition::evaluate() -> Element
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     results.push_back(apply<Double>(distance, position, triggering_entity));
-    PRINT(results.back());
     return compare(results.back(), tolerance);
   }));
 }
