@@ -2,6 +2,12 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.5 (2021-10-13)
+------------------
+* Merge pull request `#562 <https://github.com/tier4/scenario_simulator_v2/issues/562>`_ from tier4/fix/depends_in_rviz
+* fix rviz path and package dependency
+* Contributors: Masaya Kataoka, MasayaKataoka
+
 0.5.4 (2021-10-13)
 ------------------
 * Merge pull request `#557 <https://github.com/tier4/scenario_simulator_v2/issues/557>`_ from tier4/revert/pr_544

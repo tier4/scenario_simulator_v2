@@ -2,6 +2,9 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.5 (2021-10-13)
+------------------
+
 0.5.4 (2021-10-13)
 ------------------
 * add #include <boost/filesystem.hpp> line

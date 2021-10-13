@@ -2,6 +2,9 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.5 (2021-10-13)
+------------------
+
 0.5.4 (2021-10-13)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
