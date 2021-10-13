@@ -2,6 +2,20 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#557 <https://github.com/tier4/scenario_simulator_v2/issues/557>`_ from tier4/revert/pr_544
+* Revert "Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status"
+* Merge pull request `#554 <https://github.com/tier4/scenario_simulator_v2/issues/554>`_ from tier4/feature/autoware/upper-bound-velocity
+* Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
+* Fix Autoware's default upper bound speed to double max from zero
+* Update syntax `ObjectController` to support `assign` member function
+* Update syntax `AssignControllerAction` to be optional
+* Update syntax `OverrideControllerValueAction` to be optional
+* Fix `setVehicleVelocity` to work in `Autoware::update`
+* Update Property/Properties operator []
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.3 (2021-10-07)
 ------------------
 

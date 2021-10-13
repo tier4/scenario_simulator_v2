@@ -2,6 +2,11 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
+* Contributors: yamacir-kit
+
 0.5.3 (2021-10-07)
 ------------------
 
