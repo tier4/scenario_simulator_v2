@@ -32,7 +32,6 @@ namespace entity_behavior
 {
 void VehicleBehaviorTree::configure()
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
                      "/config/vehicle_entity_behavior.xml";
   factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::FollowLaneAction>(
@@ -56,7 +55,6 @@ void VehicleBehaviorTree::configure()
   current_action_ = "root";
   setupLogger();
   setRequest("none");
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
 }
 
 void VehicleBehaviorTree::setupLogger()
@@ -81,26 +79,17 @@ void VehicleBehaviorTree::setupLogger()
 
 void VehicleBehaviorTree::update(double current_time, double step_time)
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   tickOnce(current_time, step_time);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   while (getCurrentAction() == "root") {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     tickOnce(current_time, step_time);
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
   }
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
 }
 
 BT::NodeStatus VehicleBehaviorTree::tickOnce(double current_time, double step_time)
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   setCurrentTime(current_time);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   setStepTime(step_time);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto ret = tree_.rootNode()->executeTick();
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   return ret;
 }
 
