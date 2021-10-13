@@ -37,6 +37,8 @@ public:
   PedestrianEntity(
     const std::string & name, const openscenario_msgs::msg::PedestrianParameters & parameters);
 
+  void onDespawn() override;
+
   const openscenario_msgs::msg::PedestrianParameters parameters;
 
   auto getEntityTypename() const -> const std::string & override

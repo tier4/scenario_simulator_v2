@@ -52,6 +52,7 @@ public:
 
 public:
   virtual void engage() {}
+  virtual void onDespawn() {}
 
   virtual auto getBoundingBox() const -> const openscenario_msgs::msg::BoundingBox = 0;
 

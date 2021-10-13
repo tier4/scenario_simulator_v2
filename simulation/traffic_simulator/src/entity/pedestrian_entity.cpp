@@ -32,7 +32,6 @@ PedestrianEntity::PedestrianEntity(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase"))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
-  const auto paths = loader_.getPluginXmlPaths();
   /**
    * @todo pass plugin name via constructor
    */
@@ -40,6 +39,15 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_ = loader_.createSharedInstance(plugin_name);
   behavior_plugin_ptr_->configure();
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
+}
+
+void PedestrianEntity::onDespawn()
+{
+  /**
+   * @todo pass plugin name via constructor
+   */
+  std::string plugin_name = "behavior_tree_plugin/PedestrianBehaviorTree";
+  loader_.unloadLibraryForClass(plugin_name);
 }
 
 void PedestrianEntity::requestAssignRoute(
