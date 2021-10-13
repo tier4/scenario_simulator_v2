@@ -2,6 +2,16 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.4 (2021-10-13)
+------------------
+* Merge pull request `#554 <https://github.com/tier4/scenario_simulator_v2/issues/554>`_ from tier4/feature/autoware/upper-bound-velocity
+* Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
+* Fix Autoware's default upper bound speed to double max from zero
+* Fix `setVehicleVelocity` to work in `Autoware::update`
+* Add new member function `setUpperBoundSpeed`
+* Lipsticks
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 0.5.3 (2021-10-07)
 ------------------
 

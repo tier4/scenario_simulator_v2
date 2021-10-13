@@ -2,6 +2,14 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.4 (2021-10-13)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
+* Merge pull request `#555 <https://github.com/tier4/scenario_simulator_v2/issues/555>`_ from Utaro-M/matsuura/feature/context_panel
+* fix format
+* add context panel
+* Contributors: Masaya Kataoka, Yutaro Matsuura, yamacir-kit
+
 0.5.3 (2021-10-07)
 ------------------
 
