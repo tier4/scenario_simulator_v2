@@ -2,8 +2,8 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.4 (2021-10-13)
+------------------
 * add #include <boost/filesystem.hpp> line
 * add cleanup function
 * Revert "Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status"
