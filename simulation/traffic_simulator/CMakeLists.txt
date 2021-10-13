@@ -15,6 +15,7 @@ endif()
 
 find_package(ament_cmake_auto REQUIRED)
 find_package(openscenario_msgs REQUIRED)
+find_package(Boost COMPONENTS filesystem)
 include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
@@ -70,6 +71,7 @@ target_link_libraries(traffic_simulator
   sodium
   zmqpp
   zmq
+  Boost::filesystem
   ${PROTOBUF_LIBRARY})
 
 install(
