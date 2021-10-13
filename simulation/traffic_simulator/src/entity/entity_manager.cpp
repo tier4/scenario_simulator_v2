@@ -90,13 +90,7 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
 
 bool EntityManager::despawnEntity(const std::string & name)
 {
-  if(entityExists(name))
-  {
-    entities_.at(name)->onDespawn();
-    entities_.erase(name);
-    return true;
-  }
-  return false;
+  return entityExists(name) && entities_.erase(name);
 }
 
 bool EntityManager::entityExists(const std::string & name)

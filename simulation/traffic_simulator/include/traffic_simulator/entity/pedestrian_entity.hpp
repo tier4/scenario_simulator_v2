@@ -36,8 +36,7 @@ class PedestrianEntity : public EntityBase
 public:
   PedestrianEntity(
     const std::string & name, const openscenario_msgs::msg::PedestrianParameters & parameters);
-
-  void onDespawn() override;
+  ~PedestrianEntity() override;
 
   const openscenario_msgs::msg::PedestrianParameters parameters;
 

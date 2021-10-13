@@ -40,7 +40,7 @@ public:
   VehicleEntity(
     const std::string & name, const openscenario_msgs::msg::VehicleParameters & parameters);
 
-  void onDespawn() override;
+  ~VehicleEntity() override;
 
   const openscenario_msgs::msg::VehicleParameters parameters;
 

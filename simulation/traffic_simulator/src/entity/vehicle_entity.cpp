@@ -42,7 +42,7 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_->setVehicleParameters(parameters);
 }
 
-void VehicleEntity::onDespawn()
+VehicleEntity::~VehicleEntity()
 {
   /**
    * @todo pass plugin name via constructor

@@ -41,7 +41,7 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
 }
 
-void PedestrianEntity::onDespawn()
+PedestrianEntity::~PedestrianEntity()
 {
   /**
    * @todo pass plugin name via constructor
