@@ -24,17 +24,21 @@ inline namespace syntax
 UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   value(readAttribute<String>("value", node, scope)),
-  compare(readAttribute<Rule>("rule", node, scope))
+  rule(readAttribute<Rule>("rule", node, scope))
 {
-  static const std::regex pattern{R"(([^\.]+)\.(.+))"};
-
   std::smatch result;
 
-  if (std::regex_match(name, result, pattern)) {
+  if (std::regex_match(name, result, std::regex(R"(([^\.]+)\.(.+))"))) {
     const std::unordered_map<std::string, std::function<std::string()>> dispatch{
       std::make_pair("currentState", [result]() { return evaluateCurrentState(result.str(1)); }),
     };
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
+  } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
+    evaluateValue = [result]() {
+      PRINT(result.str(0));
+      PRINT(result.str(1));
+      return result.str(1);
+    };
   } else {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
@@ -44,14 +48,14 @@ auto UserDefinedValueCondition::description() const -> String
 {
   std::stringstream description;
 
-  description << "Is the " << name << " (= " << result << ") is " << compare << " " << value << "?";
+  description << "Is the " << name << " (= " << result << ") is " << rule << " " << value << "?";
 
   return description.str();
 }
 
 auto UserDefinedValueCondition::evaluate() -> Element
 {
-  return asBoolean(compare(result = evaluateValue(), value));
+  return asBoolean(rule(result = evaluateValue(), value));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

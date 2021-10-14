@@ -49,7 +49,7 @@ public:
 
   const String value;
 
-  const Rule compare;
+  const Rule rule;
 
   explicit UserDefinedValueCondition(const pugi::xml_node &, Scope &);
 
