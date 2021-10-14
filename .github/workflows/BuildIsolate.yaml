@@ -19,6 +19,7 @@ jobs:
       matrix:
         package:
           [
+            behavior_tree_plugin,
             concealer,
             cpp_mock_scenarios,
             kashiwanoha_map,
