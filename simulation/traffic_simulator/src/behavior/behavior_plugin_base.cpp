@@ -12,27 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
-#define BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
+#include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 
-#include <boost/optional.hpp>
-
-namespace traffic_simulator
+namespace entity_behavior
 {
-namespace behavior
-{
-class TargetSpeedPlanner
-{
-public:
-  void setTargetSpeed(double target_speed, bool continuous);
-  void update(double current_speed);
-  boost::optional<double> getTargetSpeed() const;
-
-private:
-  boost::optional<double> target_speed_;
-  bool continuous_;
-};
-}  // namespace behavior
-}  // namespace traffic_simulator
-
-#endif  // BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
+}

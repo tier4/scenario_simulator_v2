@@ -12,27 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
-#define BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
+#include <traffic_simulator/behavior/black_board.hpp>
 
-#include <boost/optional.hpp>
-
-namespace traffic_simulator
+namespace entity_behavior
 {
-namespace behavior
+boost::any BlackBoard::getValue(const std::string & key) const
 {
-class TargetSpeedPlanner
-{
-public:
-  void setTargetSpeed(double target_speed, bool continuous);
-  void update(double current_speed);
-  boost::optional<double> getTargetSpeed() const;
-
-private:
-  boost::optional<double> target_speed_;
-  bool continuous_;
-};
-}  // namespace behavior
-}  // namespace traffic_simulator
-
-#endif  // BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
+  if (data_.find(key) == data_.end()) {
+    throw std::runtime_error("key : " + key + " does not exist.");
+  }
+  return data_.at(key);
+}
+}  // namespace entity_behavior
