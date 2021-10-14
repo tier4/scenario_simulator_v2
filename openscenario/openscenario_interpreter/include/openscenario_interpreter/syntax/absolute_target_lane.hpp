@@ -15,28 +15,25 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ABSOLUTE_TARGET_LANE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ABSOLUTE_TARGET_LANE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== AbsoluteTargetLane ===================================================
+/* ---- AbsoluteTargetLane -----------------------------------------------------
  *
- * <xsd:complexType name="AbsoluteTargetLane">
- *   <xsd:attribute name="value" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="AbsoluteTargetLane">
+ *    <xsd:attribute name="value" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct AbsoluteTargetLane
 {
   const String value;
 
-  template <typename Node, typename Scope>
-  explicit AbsoluteTargetLane(const Node & node, Scope & scope)
-  : value{readAttribute<String>("value", node, scope)}
-  {
-  }
+  explicit AbsoluteTargetLane(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

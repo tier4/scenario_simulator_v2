@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_TARGET_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_TARGET_HPP_
 
-#include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -34,16 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct LaneChangeTarget : public ComplexType
 {
-  template <typename Node, typename... Ts>
-  explicit LaneChangeTarget(const Node & node, Ts &&... xs)
-  // clang-format off
-  : ComplexType(
-      choice(node,
-        std::make_pair("RelativeTargetLane", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair("AbsoluteTargetLane", [&](auto && node) { return make<AbsoluteTargetLane>(node, std::forward<decltype(xs)>(xs)...); })))
-  // clang-format on
-  {
-  }
+  explicit LaneChangeTarget(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

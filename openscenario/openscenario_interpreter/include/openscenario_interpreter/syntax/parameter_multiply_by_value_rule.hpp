@@ -15,10 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_MULTIPLY_BY_VALUE_RULE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_MULTIPLY_BY_VALUE_RULE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <typeindex>
-#include <unordered_map>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,53 +34,9 @@ struct ParameterMultiplyByValueRule
 {
   const Double value;
 
-  template <typename... Ts>
-  explicit ParameterMultiplyByValueRule(Ts &&... xs)
-  : value(readAttribute<Double>("value", std::forward<decltype(xs)>(xs)...))
-  {
-  }
+  explicit ParameterMultiplyByValueRule(const pugi::xml_node &, Scope &);
 
-  auto operator()(const Element & target) const
-  {
-    static const std::unordered_map<
-      std::type_index, std::function<Element(const Element &, const Double &)> >
-      overloads{
-        {typeid(Integer),
-         [](auto && target, auto && value) {
-           target.template as<Integer>() *= value;
-           return target;
-         }},
-
-        {typeid(Double),
-         [](auto && target, auto && value) {
-           target.template as<Double>() *= value;
-           return target;
-         }},
-
-        {typeid(UnsignedInteger),
-         [](auto && target, auto && value) {
-           target.template as<UnsignedInteger>() *= value;
-           return target;
-         }},
-
-        {typeid(UnsignedShort),
-         [](auto && target, auto && value) {
-           target.template as<UnsignedShort>() *= value;
-           return target;
-         }},
-      };
-
-    const auto iter = overloads.find(target.type());
-
-    if (iter != std::end(overloads)) {
-      return std::get<1>(*iter)(target, value);
-    } else {
-      throw SyntaxError(
-        "The parameter specified by attribute 'parameterRef' of type 'ParameterAction' must be "
-        "numeric type (double, integer, unsignedInteger or unsignedShort), but ",
-        target, " (type ", target.type().name(), ") specified");
-    }
-  }
+  auto operator()(const Element &) const -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

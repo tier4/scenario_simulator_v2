@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 
+#include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
@@ -44,41 +45,22 @@ struct EntityObject : public Group
   // clang-format off
   : Group(
       choice(node,
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>   (node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>(node, std::forward<decltype(xs)>(xs)...); })))
+        std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference::make(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>         (node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>      (node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>      (node, std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {
   }
 };
 
-template <typename Result = void, typename Function, typename... Ts>
-auto apply(Function && function, const EntityObject & entity_object, Ts &&... xs) -> Result
-{
-  using functor = std::function<Result(Function &&, const EntityObject &, Ts &&...)>;
-
-#define BOILERPLATE(TYPE)                                                                     \
-  std::make_pair<std::type_index, functor>(                                                   \
-    typeid(TYPE), [](Function && function, const EntityObject & entity_object, Ts &&... xs) { \
-      return function(entity_object.as<TYPE>(), std::forward<decltype(xs)>(xs)...);           \
-    })
-
-  static const std::unordered_map<std::type_index, functor> overloads{
-    BOILERPLATE(Vehicle),
-    BOILERPLATE(Pedestrian),
-    BOILERPLATE(MiscObject),
-  };
-
-#undef BOILERPLATE
-
-  try {
-    return overloads.at(entity_object.type())(
-      std::forward<decltype(function)>(function), entity_object, std::forward<decltype(xs)>(xs)...);
-  } catch (const std::out_of_range &) {
-    throw UNSUPPORTED_SETTING_DETECTED(EntityObject, makeTypename(entity_object.type().name()));
-  }
-}
+DEFINE_LAZY_VISITOR(
+  EntityObject,
+  // CASE(CatalogReference),  //
+  CASE(Vehicle),     //
+  CASE(Pedestrian),  //
+  CASE(MiscObject),  //
+);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -12,25 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Pedestrian & datum)
+Pedestrian::Pedestrian(const pugi::xml_node & node, Scope & scope)
+: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+  mass(readAttribute<Double>("mass", node, localScope())),
+  model(readAttribute<String>("model", node, localScope())),
+  pedestrian_category(readAttribute<PedestrianCategory>("pedestrianCategory", node, localScope())),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
+  properties(readElement<Properties>("Properties", node, localScope()))
 {
-  // clang-format off
+}
 
-  return os << (indent++) << blue << "<Pedestrian " << highlight("name", datum.name)
-                                             << " " << highlight("mass", datum.mass)
-                                             << " " << highlight("model", datum.model)
-                                             << " " << highlight("pedestrianCategory", datum.pedestrian_category) << blue << ">\n" << reset
-            << datum.parameter_declarations << "\n"
-            << datum.bounding_box << "\n"
-            << (--indent) << blue << "</Pedestrian>" << reset;
+Pedestrian::operator openscenario_msgs::msg::PedestrianParameters() const
+{
+  openscenario_msgs::msg::PedestrianParameters parameter;
+  {
+    parameter.name = name;
+    parameter.pedestrian_category = boost::lexical_cast<String>(pedestrian_category);
+    parameter.bounding_box = static_cast<openscenario_msgs::msg::BoundingBox>(bounding_box);
+  }
 
-  // clang-format on
+  return parameter;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

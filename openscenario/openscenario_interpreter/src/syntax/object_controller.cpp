@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iomanip>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 
 namespace openscenario_interpreter
@@ -20,5 +21,55 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 int ObjectController::ego_count = 0;
+
+ObjectController::ObjectController()  //
+: ComplexType(unspecified)
+{
 }
+
+ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: ComplexType(
+    choice(node,
+      std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, scope); })))
+// clang-format on
+{
+  if (isUserDefinedController()) {
+    ego_count++;
+  }
+}
+
+ObjectController::~ObjectController()
+{
+  if (isUserDefinedController()) {
+    ego_count--;
+  }
+}
+
+auto ObjectController::assign(const EntityRef & entity_ref) -> void
+{
+  if (is<Controller>()) {
+    return as<Controller>().assign(entity_ref);
+  }
+}
+
+auto ObjectController::isUserDefinedController() const & -> bool
+{
+  return is<Controller>() and as<Controller>().isUserDefinedController();
+}
+
+ObjectController::operator openscenario_msgs::msg::DriverModel() const
+{
+  if (is<Controller>()) {
+    return static_cast<openscenario_msgs::msg::DriverModel>(as<Controller>());
+  } else {
+    openscenario_msgs::msg::DriverModel controller;
+    {
+      controller.see_around = not Properties()["isBlind"];
+    }
+    return controller;
+  }
+}
+}  // namespace syntax
 }  // namespace openscenario_interpreter

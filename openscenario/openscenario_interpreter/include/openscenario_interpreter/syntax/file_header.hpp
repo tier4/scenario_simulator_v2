@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HEADER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HEADER_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -45,15 +45,7 @@ struct FileHeader
 
   const String author;
 
-  template <typename Tree>
-  explicit FileHeader(const Tree & tree, Scope & outer_scope)
-  : revMajor(readAttribute<UnsignedShort>("revMajor", tree, outer_scope)),
-    revMinor(readAttribute<UnsignedShort>("revMinor", tree, outer_scope)),
-    date(readAttribute<String>("date", tree, outer_scope)),
-    description(readAttribute<String>("description", tree, outer_scope)),
-    author(readAttribute<String>("author", tree, outer_scope))
-  {
-  }
+  explicit FileHeader(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

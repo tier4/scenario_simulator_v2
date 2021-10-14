@@ -15,9 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTY_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/boolean.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -33,50 +33,30 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Property
 {
-  using Name = String;
+  const String name;
 
-  const Name name;
+  const String value;
 
-  using Value = String;
+  /*
+     The default construct is used to give the value of an unspecified
+     property.
 
-  const Value value;
+     Generally, this default constructor is called when an unspecified property
+     name is specified in operator [] of std::unordered_map that holds the
+     Property class.
 
-  /* ---------------------------------------------------------------------------
-   *
-   *  NOTE: by yamacir-kit
-   *
-   *  The default construct is used to give the value of an unspecified
-   *  property.
-   *
-   *  Generally, this default constructor is called when an unspecified property
-   *  name is specified in operator [] of std::unordered_map that holds the
-   *  Property class.
-   *
-   *  The default constructed property has an empty "value".
-   *  The implicit cast operator of the Property class constructs the target
-   *  type by default constructor if the string "value" is empty.
-   *
-   *  Keep in mind that the C++ bool type has a value 'false' when it is
-   *  initialized by default construction.
-   *
-   * ------------------------------------------------------------------------ */
+     The default constructed property has an empty "value".
+     The implicit cast operator of the Property class constructs the target
+     type by default constructor if the string "value" is empty.
+
+     Keep in mind that the C++ bool type has a value 'false' when it is
+     initialized by default construction.
+  */
   Property() = default;
 
-  template <typename Node, typename Scope>
-  explicit Property(const Node & node, Scope & outer_scope)
-  : name(readAttribute<Name>("name", node, outer_scope)),
-    value(readAttribute<Value>("value", node, outer_scope))
-  {
-  }
+  explicit Property(const pugi::xml_node &, Scope &);
 
-  explicit operator bool() const
-  {
-    if (value.empty()) {
-      return Boolean();
-    } else {
-      return Boolean(value);
-    }
-  }
+  explicit operator bool() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

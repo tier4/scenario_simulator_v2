@@ -17,7 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity_condition.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,14 +35,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ByEntityCondition : private Scope, public EntityCondition
 {
-  template <typename Node, typename Scope>
-  explicit ByEntityCondition(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope),
-    EntityCondition(readElement<EntityCondition>(
-      "EntityCondition", node, localScope(),
-      readElement<TriggeringEntities>("TriggeringEntities", node, localScope())))
-  {
-  }
+  explicit ByEntityCondition(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

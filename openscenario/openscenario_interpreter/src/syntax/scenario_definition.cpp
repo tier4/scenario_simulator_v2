@@ -12,20 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const ScenarioDefinition & datum)
+ScenarioDefinition::ScenarioDefinition(const pugi::xml_node & node, Scope & scope)
+: parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, scope)),
+  catalog_locations(readElement<CatalogLocations>("CatalogLocations", node, scope)),
+  road_network(readElement<RoadNetwork>("RoadNetwork", node, scope)),
+  entities(readElement<Entities>("Entities", node, scope)),
+  storyboard(readElement<Storyboard>("Storyboard", node, scope))
+{
+}
+
+auto ScenarioDefinition::complete() -> bool { return storyboard.complete(); }
+
+auto ScenarioDefinition::evaluate() -> Element
+{
+  road_network.evaluate();
+  storyboard.evaluate();
+  updateFrame();
+  return storyboard.current_state;
+}
+
+auto operator<<(std::ostream & os, const ScenarioDefinition & datum) -> std::ostream &
 {
   nlohmann::json json;
 
   return os << (json << datum).dump(2);
 }
 
-nlohmann::json & operator<<(nlohmann::json & json, const ScenarioDefinition & datum)
+auto operator<<(nlohmann::json & json, const ScenarioDefinition & datum) -> nlohmann::json &
 {
   json["Storyboard"] << datum.storyboard;
 

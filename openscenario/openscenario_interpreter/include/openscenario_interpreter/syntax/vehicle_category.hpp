@@ -68,9 +68,9 @@ struct VehicleCategory
   constexpr operator value_type() const noexcept { return value; }
 };
 
-std::istream & operator>>(std::istream &, VehicleCategory &);
+auto operator>>(std::istream &, VehicleCategory &) -> std::istream &;
 
-std::ostream & operator<<(std::ostream &, const VehicleCategory &);
+auto operator<<(std::ostream &, const VehicleCategory &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

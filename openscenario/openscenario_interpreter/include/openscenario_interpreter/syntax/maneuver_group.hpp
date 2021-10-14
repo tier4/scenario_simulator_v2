@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/actors.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -41,66 +42,24 @@ struct ManeuverGroup : public Scope, public StoryboardElement<ManeuverGroup>, pu
 {
   const Actors actors;
 
-  template <typename Node>
-  explicit ManeuverGroup(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
-    StoryboardElement(readAttribute<UnsignedInteger>(
-      "maximumExecutionCount", node, localScope(), UnsignedInteger())),
-    actors(readElement<Actors>("Actors", node, localScope()))
-  {
-    callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
-      return unspecified;
-    });
-
-    callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Maneuver>(node, localScope()));
-    });
-  }
-
-  static constexpr auto ready() noexcept { return true; }
-
-  static constexpr auto stopTriggered() noexcept { return false; }
-
-  /* ---------------------------------------------------------------------------
-   *
-   *  A ManeuverGroup's goal is accomplished when all its Maneuvers are in the
-   *  completeState.
-   *
-   * ------------------------------------------------------------------------ */
-  auto accomplished() const
-  {
-    return std::all_of(std::begin(*this), std::end(*this), [&](auto && each) {
-      return each.template as<Maneuver>().complete();
-    });
-  }
+  explicit ManeuverGroup(const pugi::xml_node &, Scope &);
 
   using StoryboardElement::evaluate;
 
-  void start()
-  {
-    for (auto && each : *this) {
-      each.as<Maneuver>().changeStateIf(true, standby_state);
-    }
-  }
+  /*  */ auto accomplished() const -> bool;
 
-  void stop()
-  {
-    for (auto && each : *this) {
-      each.as<Maneuver>().override();
-      each.evaluate();
-    }
-  }
+  static auto ready() noexcept -> bool;
 
-  void run()
-  {
-    for (auto && each : *this) {
-      each.evaluate();
-    }
-  }
+  /*  */ auto run() -> void;
+
+  /*  */ auto start() -> void;
+
+  /*  */ auto stop() -> void;
+
+  static auto stopTriggered() noexcept -> bool;
 };
 
-nlohmann::json & operator<<(nlohmann::json &, const ManeuverGroup &);
+auto operator<<(nlohmann::json &, const ManeuverGroup &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

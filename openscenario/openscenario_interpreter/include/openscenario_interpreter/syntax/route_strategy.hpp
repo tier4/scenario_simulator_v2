@@ -54,13 +54,9 @@ struct RouteStrategy
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<RouteStrategy>::value, "");
+auto operator>>(std::istream &, RouteStrategy &) -> std::istream &;
 
-static_assert(std::is_trivial<RouteStrategy>::value, "");
-
-std::istream & operator>>(std::istream &, RouteStrategy &);
-
-std::ostream & operator<<(std::ostream &, const RouteStrategy &);
+auto operator<<(std::ostream &, const RouteStrategy &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

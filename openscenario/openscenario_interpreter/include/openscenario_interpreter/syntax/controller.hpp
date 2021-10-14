@@ -15,10 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_HPP_
 
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
-#include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
+#include <pugixml.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -46,47 +47,20 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Controller : public Scope
 {
-  /* ---- ParameterDeclarations ------------------------------------------------
-   *
-   *  Definition of additional parameters.
-   *
-   * ------------------------------------------------------------------------ */
-  const ParameterDeclarations parameter_declarations;
+  const ParameterDeclarations parameter_declarations;  // Definition of additional parameters.
 
-  /* ---- Properties -----------------------------------------------------------
-   *
-   *  Describing properties for the controller.
-   *
-   * ------------------------------------------------------------------------ */
-  Properties properties;
+  Properties properties;  // Describing properties for the controller.
 
-  template <typename Node>
-  explicit Controller(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
-    parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
-    properties(readElement<Properties>("Properties", node, localScope()))
-  {
-  }
+  explicit Controller(const pugi::xml_node &, Scope &);
 
-  template <typename... Ts>
-  decltype(auto) operator[](Ts &&... xs)
-  {
-    return properties.operator[](std::forward<decltype(xs)>(xs)...);
-  }
+  auto assign(const EntityRef &) -> void;
 
-  operator openscenario_msgs::msg::DriverModel()
-  {
-    openscenario_msgs::msg::DriverModel controller;
-    {
-      controller.see_around = not(*this)["isBlind"];
-    }
+  auto isUserDefinedController() & -> bool;
 
-    return controller;
-  }
+  auto operator[](const String &) -> const Property &;
+
+  operator openscenario_msgs::msg::DriverModel();
 };
-
-using DefaultController = Properties;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

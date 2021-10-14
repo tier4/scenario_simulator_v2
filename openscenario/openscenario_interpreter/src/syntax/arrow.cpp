@@ -20,7 +20,35 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, Arrow & datum)
+static_assert(std::is_standard_layout<Arrow>::value, "");
+
+static_assert(std::is_trivially_copy_assignable<Arrow>::value, "");
+
+static_assert(std::is_trivially_copy_constructible<Arrow>::value, "");
+
+Arrow::Arrow(const traffic_simulator::TrafficLightArrow & arrow)
+: value([](auto && arrow) {
+    switch (arrow) {
+      case traffic_simulator::TrafficLightArrow::LEFT:
+        return Arrow::left;
+
+      case traffic_simulator::TrafficLightArrow::RIGHT:
+        return Arrow::right;
+
+      case traffic_simulator::TrafficLightArrow::STRAIGHT:
+        return Arrow::straight;
+
+      case traffic_simulator::TrafficLightArrow::NONE:
+        // [[fallthrough]];
+
+      default:
+        return Arrow::none;
+    }
+  }(arrow))
+{
+}
+
+auto operator>>(std::istream & is, Arrow & datum) -> std::istream &
 {
   std::string value;
 
@@ -43,7 +71,7 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
   return is;
 }
 
-std::istream & operator>>(std::istream & is, boost::optional<Arrow> & datum)
+auto operator>>(std::istream & is, boost::optional<Arrow> & datum) -> std::istream &
 {
   std::string value;
 
@@ -66,7 +94,7 @@ std::istream & operator>>(std::istream & is, boost::optional<Arrow> & datum)
   return is;
 }
 
-std::ostream & operator<<(std::ostream & os, const Arrow & datum)
+auto operator<<(std::ostream & os, const Arrow & datum) -> std::ostream &
 {
 #define BOILERPLATE(IDENTIFIER) \
   case Arrow::IDENTIFIER:       \

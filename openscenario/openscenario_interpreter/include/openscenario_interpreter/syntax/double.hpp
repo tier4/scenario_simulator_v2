@@ -15,9 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DOUBLE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DOUBLE_HPP_
 
-#include <boost/lexical_cast.hpp>
-#include <limits>
-#include <openscenario_interpreter/error.hpp>
 #include <std_msgs/msg/float64.hpp>
 #include <string>
 
@@ -31,53 +28,26 @@ struct Double : public std_msgs::msg::Float64
 
   explicit Double() = default;
 
-  Double(value_type value) { data = value; }
+  Double(value_type);
 
-  explicit Double(const std::string & s)
-  try {
-    data = boost::lexical_cast<value_type>(s);
-  } catch (const boost::bad_lexical_cast &) {
-    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
-  }
+  explicit Double(const std::string &);
 
-  constexpr operator value_type() const noexcept { return data; }
+  static auto infinity() noexcept -> Double;
 
-  static auto infinity() noexcept
-  {
-    return static_cast<Double>(std::numeric_limits<value_type>::infinity());
-  }
+  static auto nan() noexcept -> Double;
 
-  static auto nan() noexcept
-  {
-    return static_cast<Double>(std::numeric_limits<value_type>::quiet_NaN());
-  }
+  auto operator=(const value_type & rhs) noexcept -> Double &;
 
-  auto operator=(const value_type & rhs) noexcept -> decltype(auto)
-  {
-    data = rhs;
-    return *this;
-  }
+  auto operator+=(const value_type & rhs) noexcept -> Double &;
 
-  auto operator+=(const double & rhs) noexcept -> decltype(auto)
-  {
-    data += rhs;
-    return *this;
-  }
+  auto operator*=(const value_type & rhs) noexcept -> Double &;
 
-  auto operator*=(const double & rhs) noexcept -> decltype(auto)
-  {
-    data *= rhs;
-    return *this;
-  }
+  operator value_type() const noexcept;
 };
 
-static_assert(std::is_standard_layout<Double>::value, "");
+auto operator>>(std::istream &, Double &) -> std::istream &;
 
-static_assert(not std::is_trivial<Double>::value, "");
-
-std::istream & operator>>(std::istream &, Double &);
-
-std::ostream & operator<<(std::ostream &, const Double &);
+auto operator<<(std::ostream &, const Double &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

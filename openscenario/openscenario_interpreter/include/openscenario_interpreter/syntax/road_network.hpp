@@ -15,9 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ROAD_NETWORK_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ROAD_NETWORK_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
 #include <openscenario_interpreter/syntax/traffic_signals.hpp>
-#include <openscenario_interpreter/utility/assertion_auxiliary.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -34,47 +35,20 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-ASSERT_IS_OPTIONAL_ELEMENT(File);
-ASSERT_IS_OPTIONAL_ELEMENT(TrafficSignals);
-
 struct RoadNetwork
 {
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  File path of the road network file (e.g. an ASAM OpenDRIVE file).
-   *
-   * ------------------------------------------------------------------------ */
+  // File path of the road network file (e.g. an ASAM OpenDRIVE file).
   const File logic_file;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  File path of a 3D model representing the virtual environment. This may be
-   *  used for visual representation (rendering).
-   *
-   * ------------------------------------------------------------------------ */
+  // File path of a 3D model representing the virtual environment. This may be used for visual representation (rendering).
   const File scene_graph_file;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  Name references and description of dynamic behavior for traffic signals
-   *  defined in the road network file.
-   *
-   * ------------------------------------------------------------------------ */
+  // Name references and description of dynamic behavior for traffic signals defined in the road network file.
   TrafficSignals traffic_signals;
 
-  template <typename Node, typename Scope>
-  explicit RoadNetwork(const Node & node, Scope & outer_scope)
-  : logic_file(readElement<File>("LogicFile", node, outer_scope)),
-    scene_graph_file(readElement<File>("SceneGraphFile", node, outer_scope)),
-    traffic_signals(readElement<TrafficSignals>("TrafficSignals", node, outer_scope))
-  {
-  }
+  explicit RoadNetwork(const pugi::xml_node &, Scope &);
 
-  template <typename... Ts>
-  auto evaluate(Ts &&... xs) -> decltype(auto)
-  {
-    return traffic_signals.evaluate(std::forward<decltype(xs)>(xs)...);
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -103,4 +103,18 @@ void Autoware::resetTimerCallback()
   updater = create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });
 }
 
+auto Autoware::set(const geometry_msgs::msg::Pose & pose) -> const geometry_msgs::msg::Pose &
+{
+  return current_pose = pose;
+}
+
+auto Autoware::set(const geometry_msgs::msg::Twist & twist) -> const geometry_msgs::msg::Twist &
+{
+  return current_twist = twist;
+}
+
+auto Autoware::setUpperBoundSpeed(double value) -> double  //
+{
+  return current_upper_bound_speed = std::max(0.0, value);
+}
 }  // namespace concealer

@@ -32,6 +32,7 @@
 #include <exception>
 #include <future>
 #include <geometry_msgs/msg/twist_stamped.hpp>
+#include <limits>
 #include <mutex>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <thread>
@@ -78,6 +79,8 @@ protected:
   geometry_msgs::msg::Pose current_pose;
 
   geometry_msgs::msg::Twist current_twist;
+
+  double current_upper_bound_speed = std::numeric_limits<double>::max();
 
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
@@ -137,14 +140,14 @@ public:
    *  engagement equivalent, this operation can be nop (No operation).
    *
    * -------------------------------------------------------------------------- */
-  virtual void engage() = 0;
+  virtual auto engage() -> void = 0;
 
   /* ---- NOTE -------------------------------------------------------------------
    *
    *  Send initial_pose to Autoware.
    *
    * -------------------------------------------------------------------------- */
-  virtual void initialize(const geometry_msgs::msg::Pose &) = 0;
+  virtual auto initialize(const geometry_msgs::msg::Pose &) -> void = 0;
 
   /* ---- NOTE -------------------------------------------------------------------
    *
@@ -156,42 +159,41 @@ public:
    *  route.size() - 1.
    *
    * -------------------------------------------------------------------------- */
-  virtual void plan(const std::vector<geometry_msgs::msg::PoseStamped> &) = 0;
+  virtual auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void = 0;
 
-  virtual void update() = 0;
+  virtual auto update() -> void = 0;
 
-  virtual double getAcceleration() const = 0;
+  virtual auto getAcceleration() const -> double = 0;
 
-  virtual double getVelocity() const = 0;
-
-  virtual double getSteeringAngle() const = 0;
+  virtual auto getAutowareStateMessage() const -> std::string = 0;
 
   // returns -1.0 when gear is reverse and 1.0 otherwise
-  virtual double getGearSign() const = 0;
+  virtual auto getGearSign() const -> double = 0;
 
-  virtual openscenario_msgs::msg::WaypointsArray getWaypoints() const = 0;
+  virtual auto getSteeringAngle() const -> double = 0;
+
+  virtual auto getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand = 0;
+
+  virtual auto getVelocity() const -> double = 0;
+
+  virtual auto getWaypoints() const -> openscenario_msgs::msg::WaypointsArray = 0;
+
+  /*   */ auto initialized() const noexcept { return initialize_was_called; }
+
+  /*   */ auto lock() const { return std::unique_lock<std::mutex>(mutex); }
+
+  /*   */ auto ready() const noexcept(false) -> bool;
 
   // different autowares accept different initial target speed
-  virtual double restrictTargetSpeed(double value) const = 0;
+  virtual auto restrictTargetSpeed(double) const -> double = 0;
 
-  virtual std::string getAutowareStateMessage() const = 0;
+  /*   */ auto rethrow() const noexcept(false) -> void;
 
-  virtual autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const = 0;
+  /*   */ auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
 
-  void rethrow() const noexcept(false);
+  /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
 
-  bool ready() const noexcept(false);
-
-  auto initialized() const noexcept { return initialize_was_called; }
-
-  auto lock() const { return std::unique_lock<std::mutex>(mutex); }
-
-  auto set(const geometry_msgs::msg::Pose & pose) -> const auto & { return current_pose = pose; }
-
-  auto set(const geometry_msgs::msg::Twist & twist) -> const auto &
-  {
-    return current_twist = twist;
-  }
+  /*   */ auto setUpperBoundSpeed(double) -> double;
 };
 }  // namespace concealer
 

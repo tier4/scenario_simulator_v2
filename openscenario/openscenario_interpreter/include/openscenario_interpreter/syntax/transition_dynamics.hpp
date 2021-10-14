@@ -15,8 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRANSITION_DYNAMICS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRANSITION_DYNAMICS_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/dynamics_dimension.hpp>
 #include <openscenario_interpreter/syntax/dynamics_shape.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -39,13 +42,7 @@ struct TransitionDynamics
 
   const DynamicsDimension dynamics_dimension;
 
-  template <typename Node, typename Scope>
-  explicit TransitionDynamics(const Node & node, Scope & scope)
-  : dynamics_shape(readAttribute<DynamicsShape>("dynamicsShape", node, scope)),
-    value(readAttribute<Double>("value", node, scope)),
-    dynamics_dimension(readAttribute<DynamicsDimension>("dynamicsDimension", node, scope))
-  {
-  }
+  explicit TransitionDynamics(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

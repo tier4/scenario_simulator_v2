@@ -15,15 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_CONDITION_HPP_
 
-#include <openscenario_interpreter/syntax/acceleration_condition.hpp>
-#include <openscenario_interpreter/syntax/collision_condition.hpp>
-#include <openscenario_interpreter/syntax/distance_condition.hpp>
-#include <openscenario_interpreter/syntax/reach_position_condition.hpp>
-#include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
-#include <openscenario_interpreter/syntax/speed_condition.hpp>
-#include <openscenario_interpreter/syntax/stand_still_condition.hpp>
-#include <openscenario_interpreter/syntax/time_headway_condition.hpp>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -50,30 +44,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct EntityCondition : public Element
+struct EntityCondition : public ComplexType
 {
-  template <typename Node, typename... Ts>
-  explicit EntityCondition(const Node & node, Ts &&... xs)
-  // clang-format off
-  : Element(
-      choice(node,
-        std::make_pair(       "EndOfRoadCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(       "CollisionCondition", [&](auto && node) { return make<       CollisionCondition>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(         "OffroadCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(     "TimeHeadwayCondition", [&](auto && node) { return make<     TimeHeadwayCondition>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair( "TimeToCollisionCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(    "AccelerationCondition", [&](auto && node) { return make<    AccelerationCondition>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(      "StandStillCondition", [&](auto && node) { return make<      StandStillCondition>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(           "SpeedCondition", [&](auto && node) { return make<           SpeedCondition>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(   "RelativeSpeedCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair("TraveledDistanceCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair(   "ReachPositionCondition", [&](auto && node) { return make<   ReachPositionCondition>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(        "DistanceCondition", [&](auto && node) { return make<        DistanceCondition>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("RelativeDistanceCondition", [&](auto && node) { return make<RelativeDistanceCondition>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); })
-        ))
-  // clang-format on
-  {
-  }
+  explicit EntityCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

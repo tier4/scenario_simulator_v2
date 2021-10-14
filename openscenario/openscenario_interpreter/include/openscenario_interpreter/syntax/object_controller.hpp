@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 
-#include <openscenario_interpreter/syntax/controller.hpp>
-#include <utility>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,54 +41,17 @@ struct ObjectController : public ComplexType
   // inline static int ego_count= 0;
   static int ego_count;
 
-  explicit ObjectController()  // ObjectController is optional element.
-  : ComplexType(unspecified)
-  {
-  }
+  explicit ObjectController();
 
-  template <typename Node, typename... Ts>
-  explicit ObjectController(const Node & node, Ts &&... xs)
-  // clang-format off
-  : ComplexType(
-      choice(node,
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, std::forward<decltype(xs)>(xs)...); })))
-  // clang-format on
-  {
-    if (isEgo()) {
-      ego_count++;
-    }
-  }
+  explicit ObjectController(const pugi::xml_node &, Scope &);
 
-  ~ObjectController()
-  {
-    if (isEgo()) {
-      ego_count--;
-    }
-  }
+  ~ObjectController();
 
-  bool isEgo() const &
-  {
-    if (is<Unspecified>()) {
-      static auto controller = DefaultController();
-      return bool(controller["isEgo"]);
-    } else {
-      return bool(as<Controller>()["isEgo"]);
-    }
-  }
+  auto assign(const EntityRef &) -> void;
 
-  operator openscenario_msgs::msg::DriverModel() const
-  {
-    if (is<Unspecified>()) {
-      openscenario_msgs::msg::DriverModel controller;
-      {
-        controller.see_around = !DefaultController()["isBlind"];
-      }
-      return controller;
-    } else {
-      return openscenario_msgs::msg::DriverModel(as<Controller>());
-    }
-  }
+  auto isUserDefinedController() const & -> bool;
+
+  operator openscenario_msgs::msg::DriverModel() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

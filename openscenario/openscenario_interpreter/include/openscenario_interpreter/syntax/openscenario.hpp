@@ -15,14 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 
-#include <cstddef>
+#include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
-#include <string>
-#include <utility>
-#include <vector>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -48,39 +47,16 @@ struct OpenScenario : public Scope
 
   std::size_t frame;
 
-  template <typename... Ts>
-  explicit OpenScenario(Ts &&... xs)
-  : Scope(std::forward<decltype(xs)>(xs)...),
-    file_header(readElement<FileHeader>(
-      "FileHeader", load(global().pathname).child("OpenSCENARIO"), localScope())),
-    category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, localScope())),
-    frame(0)
-  {
-  }
+  explicit OpenScenario(const boost::filesystem::path &);
 
-  auto complete() const { return category.as<ScenarioDefinition>().complete(); }
+  auto complete() const -> bool;
 
-  auto evaluate()
-  {
-    ++frame;
-    return category.evaluate();
-  }
+  auto evaluate() -> Element;
 
-  auto load(const boost::filesystem::path & pathname) -> const pugi::xml_node &
-  {
-    const auto result = script.load_file(pathname.string().c_str());
-
-    if (not result) {
-      throw SyntaxError(result.description(), ": ", pathname);
-    } else {
-      return script;
-    }
-  }
+  auto load(const boost::filesystem::path &) -> const pugi::xml_node &;
 };
 
-std::ostream & operator<<(std::ostream &, const OpenScenario &);
-
-nlohmann::json & operator<<(nlohmann::json &, const OpenScenario &);
+auto operator<<(nlohmann::json &, const OpenScenario &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

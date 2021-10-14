@@ -16,29 +16,27 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DIRECTORY_HPP_
 
 #include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
+struct Scope;
 inline namespace syntax
 {
-/* ==== Directory ============================================================
+/* ---- Directory --------------------------------------------------------------
  *
- * <xsd:complexType name="Directory">
- *   <xsd:attribute name="path" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Directory">
+ *    <xsd:attribute name="path" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Directory
 {
   const boost::filesystem::path path;
 
-  template <typename Node, typename Scope>
-  explicit Directory(const Node & node, Scope & outer_scope)
-  : path{readAttribute<std::string>("path", node, outer_scope)}
-  {
-  }
+  explicit Directory(const pugi::xml_node &, Scope &);
 
   static auto ls(const Directory & dir)
   {

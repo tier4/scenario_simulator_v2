@@ -34,8 +34,8 @@ inline namespace syntax
 Catalog::Catalog(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<std::string>("name", node, scope))
 {
-  if (scope.isTopLevel()) {
-    bool already_found = false;
+  // if (scope.isTopLevel()) {
+  bool already_found = false;
 
 #define FIND_CATEGORY_ELEMENT(TYPE)                                                   \
   do {                                                                                \
@@ -51,16 +51,16 @@ Catalog::Catalog(const pugi::xml_node & node, Scope & scope)
     }                                                                                 \
   } while (0)
 
-    FIND_CATEGORY_ELEMENT(Vehicle);
-    FIND_CATEGORY_ELEMENT(Controller);
-    FIND_CATEGORY_ELEMENT(Pedestrian);
-    FIND_CATEGORY_ELEMENT(MiscObject);
-    // FIND_CATEGORY_ELEMENT(Environment);
-    FIND_CATEGORY_ELEMENT(Maneuver);
-    // FIND_CATEGORY_ELEMENT(Trajectory);
-    FIND_CATEGORY_ELEMENT(Route);
+  FIND_CATEGORY_ELEMENT(Vehicle);
+  FIND_CATEGORY_ELEMENT(Controller);
+  FIND_CATEGORY_ELEMENT(Pedestrian);
+  FIND_CATEGORY_ELEMENT(MiscObject);
+  // FIND_CATEGORY_ELEMENT(Environment);
+  FIND_CATEGORY_ELEMENT(Maneuver);
+  // FIND_CATEGORY_ELEMENT(Trajectory);
+  FIND_CATEGORY_ELEMENT(Route);
 #undef FIND_CATEGORY_ELEMENT
-  }
+  // }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

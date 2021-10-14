@@ -15,10 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_DECLARATIONS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_DECLARATIONS_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
-#include <vector>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -37,16 +36,8 @@ struct ParameterDeclarations : public std::vector<ParameterDeclaration>
 {
   ParameterDeclarations() = default;
 
-  template <typename Node, typename Scope>
-  explicit ParameterDeclarations(const Node & node, Scope & outer_scope)
-  {
-    callWithElements(node, "ParameterDeclaration", 0, unbounded, [&](auto && each) {
-      return emplace_back(each, outer_scope);
-    });
-  }
+  explicit ParameterDeclarations(const pugi::xml_node &, Scope &);
 };
-
-std::ostream & operator<<(std::ostream &, const ParameterDeclarations &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

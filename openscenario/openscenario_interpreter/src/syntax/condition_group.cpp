@@ -12,13 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/condition_group.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const ConditionGroup & datum)
+ConditionGroup::ConditionGroup(const pugi::xml_node & node, Scope & scope) : current_value(false)
+{
+  callWithElements(
+    node, "Condition", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
+}
+
+auto ConditionGroup::evaluate() -> Element
+{
+  // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
+  return asBoolean(
+    current_value = std::accumulate(
+      std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & condition) {
+        const auto rhs = condition.evaluate();
+        return lhs and rhs.as<Boolean>();
+      }));
+}
+
+auto operator<<(nlohmann::json & json, const ConditionGroup & datum) -> nlohmann::json &
 {
   json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));
 

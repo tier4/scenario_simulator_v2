@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_type.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,42 +41,13 @@ struct StoryboardElementStateCondition : private Scope
 
   const StoryboardElementState state;
 
-  StoryboardElementState last_checked_value;
+  StoryboardElementState result;
 
-  template <typename Node>
-  explicit StoryboardElementStateCondition(const Node & node, const Scope & outer_scope)
-  // clang-format off
-  : Scope(outer_scope),
-    storyboard_element_ref (readAttribute<String                >("storyboardElementRef",  node, localScope())),
-    storyboard_element_type(readAttribute<StoryboardElementType >("storyboardElementType", node, localScope())),
-    state                  (readAttribute<StoryboardElementState>("state",                 node, localScope())),
-    last_checked_value(StoryboardElementState::standbyState)
-  // clang-format on
-  {
-  }
+  explicit StoryboardElementStateCondition(const pugi::xml_node &, const Scope &);
 
-  auto description() const
-  {
-    std::stringstream description;
+  auto description() const -> String;
 
-    description << "The state of StoryboardElement " << std::quoted(storyboard_element_ref)
-                << " (= " << last_checked_value << ") is given state " << state << "?";
-
-    return description.str();
-  }
-
-  auto evaluate()
-  {
-    try {
-      last_checked_value = localScope()
-                             .findElement(storyboard_element_ref)
-                             .currentState()
-                             .as<StoryboardElementState>();
-      return asBoolean(last_checked_value == state);
-    } catch (const std::out_of_range &) {
-      return false_v;
-    }
-  }
+  auto evaluate() -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

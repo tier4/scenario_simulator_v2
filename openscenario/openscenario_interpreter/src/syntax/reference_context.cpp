@@ -19,7 +19,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, ReferenceContext & context)
+static_assert(std::is_standard_layout<ReferenceContext>::value, "");
+
+static_assert(std::is_trivial<ReferenceContext>::value, "");
+
+auto operator>>(std::istream & is, ReferenceContext & context) -> std::istream &
 {
   std::string buffer{};
 
@@ -49,7 +53,7 @@ std::istream & operator>>(std::istream & is, ReferenceContext & context)
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(ReferenceContext, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const ReferenceContext & datum)
+auto operator<<(std::ostream & os, const ReferenceContext & datum) -> std::ostream &
 {
 #define BOILERPLATE(ID)      \
   case ReferenceContext::ID: \

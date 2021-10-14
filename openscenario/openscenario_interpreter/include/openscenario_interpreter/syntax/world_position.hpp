@@ -15,11 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__WORLD_POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__WORLD_POSITION_HPP_
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -41,46 +42,11 @@ struct WorldPosition
 {
   const Double x, y, z, h, p, r;
 
-  template <typename Node, typename Scope>
-  explicit WorldPosition(const Node & node, Scope & scope)
-  : x(readAttribute<Double>("x", node, scope)),
-    y(readAttribute<Double>("y", node, scope)),
-    z(readAttribute<Double>("z", node, scope, Double())),
-    h(readAttribute<Double>("h", node, scope, Double())),  // yaw
-    p(readAttribute<Double>("p", node, scope, Double())),
-    r(readAttribute<Double>("r", node, scope, Double()))
-  {
-  }
+  explicit WorldPosition(const pugi::xml_node &, Scope &);
 
-  explicit operator geometry_msgs::msg::Pose() const
-  {
-    geometry_msgs::msg::Vector3 vector;
-    {
-      vector.x = r;
-      vector.y = p;
-      vector.z = h;
-    }
+  explicit operator geometry_msgs::msg::Pose() const;
 
-    geometry_msgs::msg::Point point;
-    {
-      point.x = x;
-      point.y = y;
-      point.z = z;
-    }
-
-    geometry_msgs::msg::Pose pose;
-    {
-      pose.position = point;
-      pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(vector);
-    }
-
-    return pose;
-  }
-
-  explicit operator openscenario_msgs::msg::LaneletPose() const
-  {
-    return toLanePosition(static_cast<geometry_msgs::msg::Pose>(*this));
-  }
+  explicit operator openscenario_msgs::msg::LaneletPose() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

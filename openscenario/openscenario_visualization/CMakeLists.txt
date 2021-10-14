@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+  add_compile_options(-Wall -Wpedantic -Werror) # -Wextra
 endif()
 
 # find dependencies
@@ -24,7 +24,20 @@ find_package(visualization_msgs REQUIRED)
 find_package(traffic_simulator REQUIRED)
 find_package(openscenario_msgs REQUIRED)
 find_package(quaternion_operation REQUIRED)
+find_package(openscenario_interpreter_msgs REQUIRED)
+find_package(rviz2 REQUIRED)
+find_package(rviz_common REQUIRED)
+find_package(rviz_default_plugins REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(class_loader REQUIRED)
+find_package(pluginlib REQUIRED)
+
+ament_export_dependencies(class_loader REQUIRED)
+ament_export_dependencies(pluginlib REQUIRED)
+ament_export_dependencies(rclcpp REQUIRED)
+ament_export_dependencies(std_msgs REQUIRED)
+ament_export_dependencies(rviz2 REQUIRED)
+ament_export_dependencies(Eigen3 REQUIRED)
 
 include_directories(
   include
@@ -57,10 +70,53 @@ ament_target_dependencies(openscenario_visualization_node
   quaternion_operation
 )
 
-install(TARGETS
-  openscenario_visualization_node
-  DESTINATION lib/openscenario_visualization
+###############
+# Qt settings #
+###############
+find_package(Qt5 ${rviz_QT_VERSION} REQUIRED Core Widgets)
+macro(qt_wrap_ui)
+  qt5_wrap_ui(${ARGN})
+endmacro()
+include_directories(${Qt5Core_INCLUDE_DIRS})
+include_directories(${Qt5Widgets_INCLUDE_DIRS})
+add_definitions(-DQT_NO_KEYWORDS)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+pluginlib_export_plugin_description_file(rviz_common plugins.xml)
+
+include_directories(
+  include
 )
+
+qt5_wrap_ui(UIC_FILES
+  src/ui/context_panel_plugin.ui
+)
+
+add_library(openscenario_visualization_rviz_plugin SHARED
+  include/openscenario_visualization/context_panel_plugin.hpp
+  src/context_panel_plugin.cpp
+  ${UIC_FILES})
+ament_target_dependencies(openscenario_visualization_rviz_plugin
+  rviz2
+  Qt5
+  pluginlib
+  rclcpp
+  openscenario_interpreter_msgs
+)
+target_include_directories(openscenario_visualization_rviz_plugin PRIVATE "${OGRE_PREFIX_DIR}/include")
+
+install(DIRECTORY icons DESTINATION share/openscenario_visualization)
+install(DIRECTORY include/ DESTINATION include)
+
+install(TARGETS openscenario_visualization_rviz_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+
+install(TARGETS openscenario_visualization_node DESTINATION lib/openscenario_visualization)
+
 install(TARGETS
   openscenario_visualization_component
   ARCHIVE DESTINATION lib

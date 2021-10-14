@@ -16,9 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATIONS_HPP_
 
 #include <openscenario_interpreter/syntax/catalog_location.hpp>
-#include <tuple>
+#include <pugixml.hpp>
 #include <unordered_map>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -44,30 +43,8 @@ inline namespace syntax
 struct CatalogLocations : public std::unordered_map<std::string, CatalogLocation>
 {
   explicit CatalogLocations() = default;
-
-  template <typename Node, typename Scope>
-  explicit CatalogLocations(const Node & node, Scope & outer_scope)
-  {
-#define ELEMENT(TYPE)                                                   \
-  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {     \
-    emplace(                                                            \
-      std::piecewise_construct, std::forward_as_tuple(#TYPE "Catalog"), \
-      std::forward_as_tuple(node, outer_scope));                        \
-  })
-    ELEMENT(Vehicle);
-    ELEMENT(Controller);
-    ELEMENT(Pedestrian);
-    ELEMENT(MiscObject);
-    ELEMENT(Environment);
-    ELEMENT(Maneuver);
-    ELEMENT(Trajectory);
-    ELEMENT(Route);
-#undef ELEMENT
-
-    outer_scope.global().catalog_locations = *this;
-  }
+  explicit CatalogLocations(const pugi::xml_node & node, Scope & scope);
 };
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

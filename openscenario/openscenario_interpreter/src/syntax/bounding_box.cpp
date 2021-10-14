@@ -12,25 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
-#include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-static_assert(IsOptionalElement<BoundingBox>::value, "BoundingBox must be an optional element");
-
-std::ostream & operator<<(std::ostream & os, const BoundingBox & datum)
+BoundingBox::BoundingBox(const pugi::xml_node & node, Scope & scope)
+: center(readElement<Center>("Center", node, scope)),
+  dimensions(readElement<Dimensions>("Dimensions", node, scope))
 {
-  // clang-format off
+}
 
-  return os << (indent++) << blue << "<BoundingBox>\n" << reset
-            << datum.center << "\n"
-            << datum.dimensions << "\n"
-            << (--indent) << blue << "</BoundingBox>" << reset;
+BoundingBox::operator openscenario_msgs::msg::BoundingBox() const
+{
+  openscenario_msgs::msg::BoundingBox bounding_box;
+  {
+    bounding_box.center = static_cast<geometry_msgs::msg::Point>(center);
+    bounding_box.dimensions = static_cast<geometry_msgs::msg::Vector3>(dimensions);
+  }
 
-  // clang-format on
+  return bounding_box;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

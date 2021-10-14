@@ -1,6 +1,17 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Revert [PR #544](https://github.com/tier4/scenario_simulator_v2/pull/544) ([link](https://github.com/tier4/scenario_simulator_v2/pull/557))
+- Add context panel to display conditions' status. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
+- Add Tier IV extension `conditionEdge="sticky"` to `OpenSCENARIO-1.1.xsd` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/553)).
+- Add new Controller's Property `maxSpeed` to set explicitly upper bound speed to Autoware ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/554)).
+
+## Version 0.5.3
+- Fix setStatus function in EgoEntity class. ([link](https://github.com/tier4/scenario_simulator_v2/pull/549))
+
+## Version 0.5.2
+- Remove entity status which is empty. ([link](https://github.com/tier4/scenario_simulator_v2/pull/544)).
+- Update syntaxes of `openscenario_interpreter` to be compiled separately ([link](https://github.com/tier4/scenario_simulator_v2/pull/532)).
 
 ## Version 0.5.1
 - Support OpenSCENARIO 1.1 `AddEntityAction` ([link](https://github.com/tier4/scenario_simulator_v2/pull/506)).

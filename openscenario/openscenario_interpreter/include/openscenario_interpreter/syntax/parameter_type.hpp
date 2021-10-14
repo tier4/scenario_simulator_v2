@@ -66,13 +66,9 @@ struct ParameterType
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<ParameterType>::value, "");
+auto operator>>(std::istream &, ParameterType &) -> std::istream &;
 
-static_assert(std::is_trivial<ParameterType>::value, "");
-
-std::istream & operator>>(std::istream &, ParameterType &);
-
-std::ostream & operator<<(std::ostream &, const ParameterType &);
+auto operator<<(std::ostream &, const ParameterType &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

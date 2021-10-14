@@ -22,16 +22,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== SelectedEntities =====================================================
+/* ---- SelectedEntities -------------------------------------------------------
  *
- * <xsd:complexType name="SelectedEntities">
- *   <xsd:choice>
- *     <xsd:element name="EntityRef" minOccurs="0" maxOccurs="unbounded" type="EntityRef"/>
- *     <xsd:element name="ByType" minOccurs="0" maxOccurs="unbounded" type="ByType"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="SelectedEntities">
+ *    <xsd:choice>
+ *      <xsd:element name="EntityRef" minOccurs="0" maxOccurs="unbounded" type="EntityRef"/>
+ *      <xsd:element name="ByType" minOccurs="0" maxOccurs="unbounded" type="ByType"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct SelectedEntities
 {
 };

@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/longitudinal_action.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+LongitudinalAction::LongitudinalAction(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: Element(
+    choice(node,
+      std::make_pair(               "SpeedAction", [&](const auto & node) { return make<SpeedAction>(node, scope); }),
+      std::make_pair("LongitudinalDistanceAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+// clang-format on
+{
+}
+
 auto LongitudinalAction::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);

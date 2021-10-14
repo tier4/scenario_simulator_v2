@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__LATERAL_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LATERAL_ACTION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
-#include <utility>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,17 +36,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct LateralAction : public ComplexType
 {
-  template <typename Node, typename Scope>
-  explicit LateralAction(const Node & node, Scope & scope)
-  // clang-format off
-  : ComplexType(
-      choice(node,
-        std::make_pair(     "LaneChangeAction", [&](auto && node) { return make<LaneChangeAction>(node, scope); }),
-        std::make_pair(     "LaneOffsetAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair("LateralDistanceAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
-  // clang-format on
-  {
-  }
+  explicit LateralAction(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 

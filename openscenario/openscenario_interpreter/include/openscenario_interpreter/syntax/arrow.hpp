@@ -36,27 +36,7 @@ struct Arrow
 
   constexpr Arrow(value_type value = none) : value(value) {}
 
-  explicit Arrow(const traffic_simulator::TrafficLightArrow & arrow)
-  : value([](auto && arrow) {
-      switch (arrow) {
-        case traffic_simulator::TrafficLightArrow::LEFT:
-          return Arrow::left;
-
-        case traffic_simulator::TrafficLightArrow::RIGHT:
-          return Arrow::right;
-
-        case traffic_simulator::TrafficLightArrow::STRAIGHT:
-          return Arrow::straight;
-
-        case traffic_simulator::TrafficLightArrow::NONE:
-          // [[fallthrough]];
-
-        default:
-          return Arrow::none;
-      }
-    }(arrow))
-  {
-  }
+  explicit Arrow(const traffic_simulator::TrafficLightArrow &);
 
   constexpr operator value_type() const noexcept { return value; }
 
@@ -81,17 +61,11 @@ struct Arrow
   }
 };
 
-static_assert(std::is_standard_layout<Arrow>::value, "");
+auto operator>>(std::istream &, Arrow &) -> std::istream &;
 
-static_assert(std::is_trivially_copy_assignable<Arrow>::value, "");
+auto operator>>(std::istream &, boost::optional<Arrow> &) -> std::istream &;
 
-static_assert(std::is_trivially_copy_constructible<Arrow>::value, "");
-
-std::istream & operator>>(std::istream &, Arrow &);
-
-std::istream & operator>>(std::istream &, boost::optional<Arrow> &);
-
-std::ostream & operator<<(std::ostream &, const Arrow &);
+auto operator<<(std::ostream &, const Arrow &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

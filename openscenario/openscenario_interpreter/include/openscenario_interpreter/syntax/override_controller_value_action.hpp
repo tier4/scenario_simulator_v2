@@ -15,6 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OVERRIDE_CONTROLLER_VALUE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OVERRIDE_CONTROLLER_VALUE_ACTION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
+#include <pugixml.hpp>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -37,52 +40,27 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct OverrideControllerValueAction
 {
-  /* ---- OverrideThrottleAction -----------------------------------------------
-   *
-   *  New value for throttle pedal position or unset value.
-   *
-   * ------------------------------------------------------------------------ */
-  // TODO(yamacir-kit): const OverrideThrottleAction overrideThrottle;
+  // New value for throttle pedal position or unset value.
+  // const OverrideThrottleAction overrideThrottle;
 
-  /* ---- OverrideBrakeAction --------------------------------------------------
-   *
-   *  New value for brake position or unset value.
-   *
-   * ------------------------------------------------------------------------ */
-  // TODO(yamacir-kit): const OverrideBrakeAction overrideBrake;
+  // New value for brake position or unset value.
+  // const OverrideBrakeAction overrideBrake;
 
-  /* ---- OverrideClutchAction -------------------------------------------------
-   *
-   *  New value for clutch position or unset value.
-   *
-   * ------------------------------------------------------------------------ */
-  // TODO(yamacir-kit): const OverrideClutchAction overrideClutch;
+  // New value for clutch position or unset value.
+  // const OverrideClutchAction overrideClutch;
 
-  /* ---- OverrideParkingBrakeAction -------------------------------------------
-   *
-   *  New value for parking brake position or unset value.
-   *
-   * ------------------------------------------------------------------------ */
-  // TODO(yamacir-kit): const OverrideParkingBrakeAction overrideParkingBrake;
+  // New value for parking brake position or unset value.
+  // const OverrideParkingBrakeAction overrideParkingBrake;
 
-  /* ---- OverrideSteeringWheelAction ------------------------------------------
-   *
-   *  New value for steering wheel position or unset value.
-   *
-   * ------------------------------------------------------------------------ */
-  // TODO(yamacir-kit): const OverrideSteeringWheelAction overrideSteeringWheel;
+  // New value for steering wheel position or unset value.
+  // const OverrideSteeringWheelAction overrideSteeringWheel;
 
-  /* ---- OverrideGearAction ---------------------------------------------------
-   *
-   *  New value for gear position or unset value.
-   *
-   * ------------------------------------------------------------------------ */
-  // TODO(yamacir-kit): const OverrideGearAction overrideGear;
+  // New value for gear position or unset value.
+  // const OverrideGearAction overrideGear;
 
-  template <typename Node, typename Scope>
-  explicit OverrideControllerValueAction(const Node &, Scope &)
-  {
-  }
+  explicit OverrideControllerValueAction() = default;
+
+  explicit OverrideControllerValueAction(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

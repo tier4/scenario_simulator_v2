@@ -15,7 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
 
@@ -38,13 +39,7 @@ inline namespace syntax
 
 struct CatalogReference
 {
-  template <typename Node, typename Scope>
-  explicit CatalogReference(const Node & node, Scope & outer_scope)
-  {
-  }
-
-  const std::string catalogName;
-  const std::string entryName;
+  static Element make(const pugi::xml_node & node, Scope & scope);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

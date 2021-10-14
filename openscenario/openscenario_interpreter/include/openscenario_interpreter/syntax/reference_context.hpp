@@ -51,13 +51,9 @@ struct ReferenceContext
   constexpr operator value_type() const noexcept { return value; }
 };
 
-static_assert(std::is_standard_layout<ReferenceContext>::value, "");
+auto operator>>(std::istream &, ReferenceContext &) -> std::istream &;
 
-static_assert(std::is_trivial<ReferenceContext>::value, "");
-
-std::istream & operator>>(std::istream &, ReferenceContext &);
-
-std::ostream & operator<<(std::ostream &, const ReferenceContext &);
+auto operator<<(std::ostream &, const ReferenceContext &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

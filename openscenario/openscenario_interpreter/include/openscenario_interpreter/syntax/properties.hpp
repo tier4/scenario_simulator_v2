@@ -15,11 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTIES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTIES_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
 #include <openscenario_interpreter/syntax/property.hpp>
+#include <pugixml.hpp>
 #include <unordered_map>
-#include <utility>
-#include <vector>
 
 namespace openscenario_interpreter
 {
@@ -40,48 +40,27 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Properties
 {
-  /* ---- properties -----------------------------------------------------------
-   *
-   *  A name-value pair. The semantic of the name/values are subject of a
-   *  contract between the provider of a simulation environment and the author
-   *  of a scenario.
-   *
-   * ------------------------------------------------------------------------ */
-  std::unordered_map<Property::Name, Property> properties;
+  /*
+     A name-value pair. The semantic of the name/values are subject of a
+     contract between the provider of a simulation environment and the author
+     of a scenario.
+  */
+  std::unordered_map<String, Property> properties;
 
-  /* ---- files ----------------------------------------------------------------
-   *
-   *  A list of arbitrary files attached to an object that owns the properties.
-   *  The semantic and the file formats are subject of a contract between the
-   *  provider of a simulation environment and the author of a scenario.
-   *
-   *  Note: currently ignored.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     A list of arbitrary files attached to an object that owns the properties.
+     The semantic and the file formats are subject of a contract between the
+     provider of a simulation environment and the author of a scenario.
+
+     NOTE: currently ignored.
+  */
   std::list<File> files;
 
   Properties() = default;
 
-  template <typename Node, typename Scope>
-  explicit Properties(const Node & node, Scope & outer_scope)
-  {
-    callWithElements(node, "Property", 0, unbounded, [&](auto && node) {
-      return properties.emplace(
-        std::piecewise_construct,
-        std::forward_as_tuple(readAttribute<Property::Name>("name", node, outer_scope)),
-        std::forward_as_tuple(node, outer_scope));
-    });
+  explicit Properties(const pugi::xml_node &, Scope &);
 
-    callWithElements(node, "File", 0, unbounded, [&](auto && node) {
-      return files.emplace_back(std::forward<decltype(node)>(node), outer_scope);
-    });
-  }
-
-  template <typename... Ts>
-  decltype(auto) operator[](Ts &&... xs)
-  {
-    return properties.operator[](std::forward<decltype(xs)>(xs)...);
-  }
+  auto operator[](const String &) -> const Property &;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

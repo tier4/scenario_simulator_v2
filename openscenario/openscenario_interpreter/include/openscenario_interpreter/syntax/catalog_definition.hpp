@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_DEFINITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_DEFINITION_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -33,11 +33,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct CatalogDefinition : Catalog
 {
-  template <typename Node, typename... Ts>
-  explicit CatalogDefinition(const Node & node, Ts &&... args)
-  : Catalog(readElement<Catalog>("Catalog", node, std::forward<Ts>(args)...))
-  {
-  }
+  explicit CatalogDefinition(const pugi::xml_node & node, Scope & scope);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
