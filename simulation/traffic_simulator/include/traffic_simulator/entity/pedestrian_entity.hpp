@@ -18,9 +18,10 @@
 #include <boost/optional.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+#include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
 #include <string>
-#include <traffic_simulator/behavior/pedestrian/behavior_tree.hpp>
+#include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
@@ -58,14 +59,14 @@ public:
   {
     EntityBase::setHdMapUtils(ptr);
     route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
-    tree_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
+    behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
   }
 
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override
   {
     EntityBase::setTrafficLightManager(ptr);
-    tree_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
+    behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
   }
 
   void setTargetSpeed(double target_speed, bool continuous) override;
@@ -80,7 +81,10 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
-  const std::string getCurrentAction() const override { return tree_ptr_->getCurrentAction(); }
+  const std::string getCurrentAction() const override
+  {
+    return behavior_plugin_ptr_->getCurrentAction();
+  }
 
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
@@ -103,8 +107,11 @@ public:
     return openscenario_msgs::msg::WaypointsArray();
   };
 
+  const std::string plugin_name;
+
 private:
-  std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;
+  pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
+  std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };

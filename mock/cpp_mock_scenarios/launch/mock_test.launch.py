@@ -72,7 +72,7 @@ def on_stdout_output(event: launch.Event) -> None:
 
 
 def generate_launch_description():
-    timeout = LaunchConfiguration("timeout", default=10)
+    timeout = LaunchConfiguration("timeout", default=10.0)
     scenario = LaunchConfiguration("scenario", default="")
     scenario_package = LaunchConfiguration("package", default="cpp_mock_scenarios")
     junit_path = LaunchConfiguration("junit_path", default="/tmp/output.xunit.xml")

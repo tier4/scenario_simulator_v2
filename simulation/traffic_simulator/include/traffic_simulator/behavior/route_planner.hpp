@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__ROUTE_PLANNER_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__ROUTE_PLANNER_HPP_
+#ifndef BEHAVIOR_TREE_PLUGIN__ROUTE_PLANNER_HPP_
+#define BEHAVIOR_TREE_PLUGIN__ROUTE_PLANNER_HPP_
 
 #include <memory>
 #include <queue>
@@ -48,4 +48,4 @@ private:
 };
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__ROUTE_PLANNER_HPP_
+#endif  // BEHAVIOR_TREE_PLUGIN__ROUTE_PLANNER_HPP_

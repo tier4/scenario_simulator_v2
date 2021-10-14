@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__TARGET_SPEED_PLANNER_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__TARGET_SPEED_PLANNER_HPP_
+#ifndef BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
+#define BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
 
 #include <boost/optional.hpp>
 
@@ -35,4 +35,4 @@ private:
 }  // namespace behavior
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__TARGET_SPEED_PLANNER_HPP_
+#endif  // BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
