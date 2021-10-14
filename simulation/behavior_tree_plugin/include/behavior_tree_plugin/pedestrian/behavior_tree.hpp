@@ -76,7 +76,6 @@ private:
   BT::TimePoint first_timestamp_;
   std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
   std::string current_action_;
-  std::string request_;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
 };
