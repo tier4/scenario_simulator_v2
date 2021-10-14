@@ -21,6 +21,7 @@
 #include "../catalogs.hpp"
 #include "../expect_eq_macros.hpp"
 
+/*
 TEST(VEHICLE_ENTITYT, GET_VEHICLE_COMMAND)
 {
   traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
@@ -50,6 +51,7 @@ TEST(VEHICLE_ENTITYT, UPDATE_ENTITY_TIMESTAMP)
   EXPECT_NO_THROW(entity.updateEntityStatusTimestamp(3));
   EXPECT_DOUBLE_EQ(entity.getStatus().time, 3.0);
 }
+*/
 
 int main(int argc, char ** argv)
 {
