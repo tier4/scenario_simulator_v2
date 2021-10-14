@@ -104,12 +104,11 @@ void VehicleBehaviorTree::callback(
     "[%.3f]: %s%s %s -> %s", since_epoch, node.name().c_str(),
     &whitespaces[std::min(ws_count, node.name().size())], toStr(prev_status, true).c_str(),
     toStr(status, true).c_str());
-  std::cout << std::endl;
   if (status != BT::NodeStatus::SUCCESS) {
     current_action_ = node.name();
   }
   if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
-    if (request_ == current_action_) {
+    if (getRequest() == current_action_) {
       setRequest("none");
     }
   }
