@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>1058</width>
     <height>600</height>
    </rect>
   </property>
@@ -14,9 +14,6 @@
    <string>Widget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
-   <item>
-    <widget class="QComboBox" name="TopicSelect"/>
-   </item>
    <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
@@ -27,94 +24,284 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>780</width>
+        <width>1038</width>
         <height>549</height>
        </rect>
       </property>
       <widget class="QLabel" name="condition">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>120</y>
+         <x>10</x>
+         <y>20</y>
          <width>101</width>
          <height>17</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>Condition</string>
+        <string>Conditions</string>
        </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>150</y>
-         <width>126</width>
-         <height>136</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="spacing">
-         <number>100</number>
-        </property>
-        <item>
-         <widget class="QLabel" name="success_condition">
-          <property name="text">
-           <string>Success Condition</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="failure_condition">
-          <property name="text">
-           <string>Failure Condition</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </widget>
       <widget class="QTextEdit" name="success_condition_name">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>170</y>
-         <width>341</width>
-         <height>70</height>
+         <x>10</x>
+         <y>90</y>
+         <width>200</width>
+         <height>120</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
        </property>
       </widget>
       <widget class="QTextEdit" name="failure_condition_name">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>290</y>
-         <width>341</width>
-         <height>70</height>
+         <x>10</x>
+         <y>270</y>
+         <width>200</width>
+         <height>120</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
        </property>
       </widget>
       <widget class="QTextEdit" name="success_condition_status">
        <property name="geometry">
         <rect>
-         <x>400</x>
-         <y>170</y>
-         <width>211</width>
-         <height>70</height>
+         <x>220</x>
+         <y>90</y>
+         <width>70</width>
+         <height>120</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
        </property>
       </widget>
       <widget class="QTextEdit" name="failure_condition_status">
        <property name="geometry">
         <rect>
-         <x>400</x>
-         <y>290</y>
-         <width>211</width>
-         <height>70</height>
+         <x>220</x>
+         <y>270</y>
+         <width>70</width>
+         <height>120</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="failure_condition">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>230</y>
+         <width>140</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Failure Condition</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="success_condition">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>140</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Success Condition</string>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="success_condition_evaluation">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>90</y>
+         <width>600</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="failure_condition_evaluation">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>270</y>
+         <width>600</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustIgnored</enum>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
+       </property>
+      </widget>
+      <widget class="Line" name="success_line">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>90</y>
+         <width>20</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+      <widget class="Line" name="success_line_2">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>270</y>
+         <width>20</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+      <widget class="QLabel" name="success_type">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>67</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>type</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="success_evalutation">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>70</y>
+         <width>181</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>evaluation</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="success_value">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>70</y>
+         <width>101</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>value</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="failure_type">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>250</y>
+         <width>67</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>type</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="failure_value">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>250</y>
+         <width>101</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>value</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="failure_evaluation">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>250</y>
+         <width>181</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>evaluation</string>
        </property>
       </widget>
      </widget>
     </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="TopicSelect"/>
    </item>
   </layout>
  </widget>
