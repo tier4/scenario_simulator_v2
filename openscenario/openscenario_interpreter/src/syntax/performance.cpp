@@ -26,9 +26,9 @@ Performance::Performance(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-Performance::operator openscenario_msgs::msg::Performance() const
+Performance::operator traffic_simulator_msgs::msg::Performance() const
 {
-  openscenario_msgs::msg::Performance performance;
+  traffic_simulator_msgs::msg::Performance performance;
   {
     performance.max_speed = max_speed;
     performance.max_acceleration = max_acceleration;

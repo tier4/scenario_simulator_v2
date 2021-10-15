@@ -15,14 +15,14 @@
 #ifndef CPP_MOCK_SCENARIOS__CATALOGS_HPP_
 #define CPP_MOCK_SCENARIOS__CATALOGS_HPP_
 
-#include <openscenario_msgs/msg/misc_object_parameters.hpp>
-#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <string>
+#include <traffic_simulator_msgs/msg/misc_object_parameters.hpp>
+#include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 
-auto getVehicleParameters() -> openscenario_msgs::msg::VehicleParameters
+auto getVehicleParameters() -> traffic_simulator_msgs::msg::VehicleParameters
 {
-  openscenario_msgs::msg::VehicleParameters parameters;
+  traffic_simulator_msgs::msg::VehicleParameters parameters;
   parameters.name = "vehicle.volkswagen.t";
   parameters.vehicle_category = "car";
   parameters.performance.max_speed = 69.444;
@@ -47,9 +47,9 @@ auto getVehicleParameters() -> openscenario_msgs::msg::VehicleParameters
   return parameters;
 }
 
-auto getPedestrianParameters() -> openscenario_msgs::msg::PedestrianParameters
+auto getPedestrianParameters() -> traffic_simulator_msgs::msg::PedestrianParameters
 {
-  openscenario_msgs::msg::PedestrianParameters parameters;
+  traffic_simulator_msgs::msg::PedestrianParameters parameters;
   parameters.name = "pedestrian";
   parameters.pedestrian_category = "pedestrian";
   parameters.bounding_box.center.x = 0.0;
@@ -61,9 +61,9 @@ auto getPedestrianParameters() -> openscenario_msgs::msg::PedestrianParameters
   return parameters;
 }
 
-auto getMiscObjectParameters() -> openscenario_msgs::msg::MiscObjectParameters
+auto getMiscObjectParameters() -> traffic_simulator_msgs::msg::MiscObjectParameters
 {
-  openscenario_msgs::msg::MiscObjectParameters misc_object_param;
+  traffic_simulator_msgs::msg::MiscObjectParameters misc_object_param;
   misc_object_param.bounding_box.dimensions.x = 1.0;
   misc_object_param.bounding_box.dimensions.y = 1.0;
   misc_object_param.bounding_box.dimensions.z = 1.0;

@@ -28,9 +28,9 @@ Axle::Axle(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-Axle::operator openscenario_msgs::msg::Axle() const
+Axle::operator traffic_simulator_msgs::msg::Axle() const
 {
-  openscenario_msgs::msg::Axle axle;
+  traffic_simulator_msgs::msg::Axle axle;
   {
     axle.max_steering = max_steering;
     axle.wheel_diameter = wheel_diameter;

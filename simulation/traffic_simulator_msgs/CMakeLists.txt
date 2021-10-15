@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(openscenario_msgs)
+project(traffic_simulator_msgs)
 
 find_package(rosidl_default_generators REQUIRED)
 find_package(std_msgs REQUIRED)

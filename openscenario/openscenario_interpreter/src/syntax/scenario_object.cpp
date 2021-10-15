@@ -34,7 +34,7 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
 {
   metrics::OutOfRangeMetric::Config configuration;
   {
-    const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
+    const auto parameters = static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle);
 
     configuration.target_entity = name;
     configuration.min_velocity = -parameters.performance.max_speed;

@@ -23,14 +23,14 @@ include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
 set(PROTO_FILES
-  "proto/builtin_interfaces.proto"
-  "proto/std_msgs.proto"
-  "proto/rosgraph_msgs.proto"
-  "proto/geometry_msgs.proto"
-  "proto/openscenario_msgs.proto"
   "proto/autoware_control_msgs.proto"
   "proto/autoware_vehicle_msgs.proto"
+  "proto/builtin_interfaces.proto"
+  "proto/geometry_msgs.proto"
+  "proto/rosgraph_msgs.proto"
   "proto/simulation_api_schema.proto"
+  "proto/std_msgs.proto"
+  "proto/traffic_simulator_msgs.proto"
 )
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 include_directories(
