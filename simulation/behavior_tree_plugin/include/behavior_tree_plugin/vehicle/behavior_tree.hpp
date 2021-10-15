@@ -45,23 +45,23 @@ public:
   }
 
   // clang-format off
-  DEFINE_GETTER_SETTER(Waypoints, openscenario_msgs::msg::WaypointsArray)
-  DEFINE_GETTER_SETTER(Obstacle, boost::optional<openscenario_msgs::msg::Obstacle>)
-  DEFINE_GETTER_SETTER(UpdatedStatus, openscenario_msgs::msg::EntityStatus)
-  DEFINE_GETTER_SETTER(Request, std::string)
-  DEFINE_GETTER_SETTER(HdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)
-  DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
-  DEFINE_GETTER_SETTER(TrafficLightManager,std::shared_ptr<traffic_simulator::TrafficLightManager>)
-  DEFINE_GETTER_SETTER(PedestrianParameters, openscenario_msgs::msg::PedestrianParameters)
-  DEFINE_GETTER_SETTER(DriverModel, openscenario_msgs::msg::DriverModel)
-  DEFINE_GETTER_SETTER(VehicleParameters, openscenario_msgs::msg::VehicleParameters)
-  DEFINE_GETTER_SETTER(OtherEntityStatus, EntityStatusDict)
-  DEFINE_GETTER_SETTER(ToLaneletId, std::int64_t)
-  DEFINE_GETTER_SETTER(EntityStatus, openscenario_msgs::msg::EntityStatus)
-  DEFINE_GETTER_SETTER(TargetSpeed, boost::optional<double>)
-  DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(CurrentTime, double)
+  DEFINE_GETTER_SETTER(DriverModel, openscenario_msgs::msg::DriverModel)
+  DEFINE_GETTER_SETTER(EntityStatus, openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
+  DEFINE_GETTER_SETTER(HdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)
+  DEFINE_GETTER_SETTER(Obstacle, boost::optional<openscenario_msgs::msg::Obstacle>)
+  DEFINE_GETTER_SETTER(OtherEntityStatus, EntityStatusDict)
+  DEFINE_GETTER_SETTER(PedestrianParameters, openscenario_msgs::msg::PedestrianParameters)
+  DEFINE_GETTER_SETTER(Request, std::string)
+  DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(StepTime, double)
+  DEFINE_GETTER_SETTER(TargetSpeed, boost::optional<double>)
+  DEFINE_GETTER_SETTER(ToLaneletId, std::int64_t)
+  DEFINE_GETTER_SETTER(TrafficLightManager,std::shared_ptr<traffic_simulator::TrafficLightManager>)
+  DEFINE_GETTER_SETTER(UpdatedStatus, openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(VehicleParameters, openscenario_msgs::msg::VehicleParameters)
+  DEFINE_GETTER_SETTER(Waypoints, openscenario_msgs::msg::WaypointsArray)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 private:

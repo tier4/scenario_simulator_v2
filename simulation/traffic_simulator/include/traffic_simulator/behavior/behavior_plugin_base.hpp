@@ -49,23 +49,23 @@ public:
   const std::string get##NAME##Key() const { return KEY; };
 
   // clang-format off
-  DEFINE_GETTER_SETTER(Waypoints, "waypoints", openscenario_msgs::msg::WaypointsArray)
-  DEFINE_GETTER_SETTER(Obstacle, "obstacle", boost::optional<openscenario_msgs::msg::Obstacle>)
-  DEFINE_GETTER_SETTER(UpdatedStatus, "updated_status", openscenario_msgs::msg::EntityStatus)
-  DEFINE_GETTER_SETTER(Request, "request", std::string)
-  DEFINE_GETTER_SETTER(HdMapUtils, "hdmap_utils", std::shared_ptr<hdmap_utils::HdMapUtils>)
-  DEFINE_GETTER_SETTER(EntityTypeList, "entity_type_list", EntityTypeDict)
-  DEFINE_GETTER_SETTER(TrafficLightManager, "traffic_light_manager",std::shared_ptr<traffic_simulator::TrafficLightManager>)
-  DEFINE_GETTER_SETTER(PedestrianParameters, "pedestrian_parameters", openscenario_msgs::msg::PedestrianParameters)
-  DEFINE_GETTER_SETTER(DriverModel, "driver_model", openscenario_msgs::msg::DriverModel)
-  DEFINE_GETTER_SETTER(VehicleParameters, "vehicle_parameters", openscenario_msgs::msg::VehicleParameters)
-  DEFINE_GETTER_SETTER(OtherEntityStatus, "other_entity_status", EntityStatusDict)
-  DEFINE_GETTER_SETTER(ToLaneletId, "to_lanelet_id", std::int64_t)
-  DEFINE_GETTER_SETTER(EntityStatus, "entity_status", openscenario_msgs::msg::EntityStatus)
-  DEFINE_GETTER_SETTER(TargetSpeed, "target_speed", boost::optional<double>)
-  DEFINE_GETTER_SETTER(RouteLanelets, "route_lanelets", std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(CurrentTime, "current_time", double)
+  DEFINE_GETTER_SETTER(DriverModel, "driver_model", openscenario_msgs::msg::DriverModel)
+  DEFINE_GETTER_SETTER(EntityStatus, "entity_status", openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(EntityTypeList, "entity_type_list", EntityTypeDict)
+  DEFINE_GETTER_SETTER(HdMapUtils, "hdmap_utils", std::shared_ptr<hdmap_utils::HdMapUtils>)
+  DEFINE_GETTER_SETTER(Obstacle, "obstacle", boost::optional<openscenario_msgs::msg::Obstacle>)
+  DEFINE_GETTER_SETTER(OtherEntityStatus, "other_entity_status", EntityStatusDict)
+  DEFINE_GETTER_SETTER(PedestrianParameters, "pedestrian_parameters", openscenario_msgs::msg::PedestrianParameters)
+  DEFINE_GETTER_SETTER(Request, "request", std::string)
+  DEFINE_GETTER_SETTER(RouteLanelets, "route_lanelets", std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(StepTime, "step_time", double)
+  DEFINE_GETTER_SETTER(TargetSpeed, "target_speed", boost::optional<double>)
+  DEFINE_GETTER_SETTER(ToLaneletId, "to_lanelet_id", std::int64_t)
+  DEFINE_GETTER_SETTER(TrafficLightManager, "traffic_light_manager",std::shared_ptr<traffic_simulator::TrafficLightManager>)
+  DEFINE_GETTER_SETTER(UpdatedStatus, "updated_status", openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(VehicleParameters, "vehicle_parameters", openscenario_msgs::msg::VehicleParameters)
+  DEFINE_GETTER_SETTER(Waypoints, "waypoints", openscenario_msgs::msg::WaypointsArray)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };
