@@ -60,7 +60,7 @@ void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
   setRequest("none");
 }
 
-const std::string VehicleBehaviorTree::getCurrentAction() const
+const std::string & VehicleBehaviorTree::getCurrentAction() const
 {
   return logging_event_ptr_->getCurrentAction();
 }

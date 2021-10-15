@@ -35,7 +35,7 @@ class BehaviorPluginBase
 public:
   virtual void configure(const rclcpp::Logger & logger) = 0;
   virtual void update(double current_time, double step_time) = 0;
-  virtual const std::string getCurrentAction() const = 0;
+  virtual const std::string & getCurrentAction() const = 0;
 
   typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityType> EntityTypeDict;
   typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> EntityStatusDict;

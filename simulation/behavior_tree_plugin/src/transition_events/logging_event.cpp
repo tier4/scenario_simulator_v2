@@ -34,5 +34,5 @@ void LoggingEvent::callback(
   TransitionEvent::updateCurrentAction(status, node);
 }
 
-const std::string LoggingEvent::getCurrentAction() const { return current_action_; }
+const std::string & LoggingEvent::getCurrentAction() const { return current_action_; }
 }  // namespace behavior_tree_plugin

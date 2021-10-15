@@ -38,7 +38,7 @@ class VehicleBehaviorTree : public BehaviorPluginBase
 public:
   void update(double current_time, double step_time) override;
   void configure(const rclcpp::Logger & logger) override;
-  const std::string getCurrentAction() const override;
+  const std::string & getCurrentAction() const override;
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \
   void set##NAME(const TYPE & value) override                                               \
