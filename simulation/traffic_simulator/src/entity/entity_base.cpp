@@ -31,6 +31,11 @@ EntityBase::EntityBase(const std::string & type, const std::string & name)
   status_ = boost::none;
 }
 
+void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
+{
+  return;
+}
+
 void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }

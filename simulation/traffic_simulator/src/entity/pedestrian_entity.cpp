@@ -38,6 +38,11 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
 }
 
+void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
+{
+  behavior_plugin_ptr_->appendDebugMarker(marker_array);
+}
+
 void PedestrianEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {

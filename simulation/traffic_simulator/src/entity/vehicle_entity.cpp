@@ -39,6 +39,11 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_->setVehicleParameters(parameters);
 }
 
+void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
+{
+  behavior_plugin_ptr_->appendDebugMarker(marker_array);
+}
+
 void VehicleEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
