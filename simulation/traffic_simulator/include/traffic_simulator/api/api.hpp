@@ -57,6 +57,8 @@ public:
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
+    debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
+      node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     initialize_client_(
       simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::initialize),
@@ -241,6 +243,8 @@ private:
   metrics::MetricsManager metrics_manager_;
 
   const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
+
+  const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr debug_marker_pub_;
 
   traffic_simulator::SimulationClock clock_;
 
