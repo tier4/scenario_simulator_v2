@@ -37,36 +37,34 @@ class PedestrianBehaviorTree : public BehaviorPluginBase
 public:
   void configure() override;
   void update(double current_time, double step_time) override;
-#define DEFINE_GETTER_SETTER(GETTER, SETTER, TYPE)                                    \
-  TYPE GETTER() override { return tree_.rootBlackboard()->get<TYPE>(GETTER##Key()); } \
-  void SETTER(const TYPE & value) override                                            \
-  {                                                                                   \
-    tree_.rootBlackboard()->set<TYPE>(GETTER##Key(), value);                          \
+
+#define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
+  TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \
+  void set##NAME(const TYPE & value) override                                               \
+  {                                                                                         \
+    tree_.rootBlackboard()->set<TYPE>(get##NAME##Key(), value);                             \
   }
-  DEFINE_GETTER_SETTER(getWaypoints, setWaypoints, traffic_simulator_msgs::msg::WaypointsArray)
-  DEFINE_GETTER_SETTER(
-    getObstacle, setObstacle, boost::optional<traffic_simulator_msgs::msg::Obstacle>)
-  DEFINE_GETTER_SETTER(
-    getUpdatedStatus, setUpdatedStatus, traffic_simulator_msgs::msg::EntityStatus)
-  DEFINE_GETTER_SETTER(getRequest, setRequest, std::string)
-  DEFINE_GETTER_SETTER(getHdMapUtils, setHdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)
-  DEFINE_GETTER_SETTER(getEntityTypeList, setEntityTypeList, EntityTypeDict)
-  DEFINE_GETTER_SETTER(
-    getTrafficLightManager, setTrafficLightManager,
-    std::shared_ptr<traffic_simulator::TrafficLightManager>)
-  DEFINE_GETTER_SETTER(
-    getPedestrianParameters, setPedestrianParameters,
-    traffic_simulator_msgs::msg::PedestrianParameters)
-  DEFINE_GETTER_SETTER(getDriverModel, setDriverModel, traffic_simulator_msgs::msg::DriverModel)
-  DEFINE_GETTER_SETTER(
-    getVehicleParameters, setVehicleParameters, traffic_simulator_msgs::msg::VehicleParameters)
-  DEFINE_GETTER_SETTER(getOtherEntityStatus, setOtherEntityStatus, EntityStatusDict)
-  DEFINE_GETTER_SETTER(getToLaneletId, setToLaneletId, std::int64_t)
-  DEFINE_GETTER_SETTER(getEntityStatus, setEntityStatus, traffic_simulator_msgs::msg::EntityStatus)
-  DEFINE_GETTER_SETTER(getTargetSpeed, setTargetSpeed, boost::optional<double>)
-  DEFINE_GETTER_SETTER(getRouteLanelets, setRouteLanelets, std::vector<std::int64_t>)
-  DEFINE_GETTER_SETTER(getCurrentTime, setCurrentTime, double)
-  DEFINE_GETTER_SETTER(getStepTime, setStepTime, double)
+
+  // clang-format off
+  DEFINE_GETTER_SETTER(CurrentTime, double)
+  DEFINE_GETTER_SETTER(DriverModel, traffic_simulator_msgs::msg::DriverModel)
+  DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
+  DEFINE_GETTER_SETTER(HdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)
+  DEFINE_GETTER_SETTER(Obstacle, boost::optional<traffic_simulator_msgs::msg::Obstacle>)
+  DEFINE_GETTER_SETTER(OtherEntityStatus, EntityStatusDict)
+  DEFINE_GETTER_SETTER(PedestrianParameters, traffic_simulator_msgs::msg::PedestrianParameters)
+  DEFINE_GETTER_SETTER(Request, std::string)
+  DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
+  DEFINE_GETTER_SETTER(StepTime, double)
+  DEFINE_GETTER_SETTER(TargetSpeed, boost::optional<double>)
+  DEFINE_GETTER_SETTER(ToLaneletId, std::int64_t)
+  DEFINE_GETTER_SETTER(TrafficLightManager,std::shared_ptr<traffic_simulator::TrafficLightManager>)
+  DEFINE_GETTER_SETTER(UpdatedStatus, traffic_simulator_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(VehicleParameters, traffic_simulator_msgs::msg::VehicleParameters)
+  DEFINE_GETTER_SETTER(Waypoints, traffic_simulator_msgs::msg::WaypointsArray)
+  // clang-format on
+
 #undef DEFINE_GETTER_SETTER
 
 private:
