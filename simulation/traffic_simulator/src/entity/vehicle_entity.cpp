@@ -34,7 +34,7 @@ VehicleEntity::VehicleEntity(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
 {
-  entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
+  entity_type_.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
 }
