@@ -58,20 +58,17 @@ void ContextPanel::contextCallback(const openscenario_interpreter_msgs::msg::Con
   condition_group_vec_.clear();
   item_vec_.clear();
   auto story_json = j_["OpenSCENARIO"]["Storyboard"]["Story"];
-  for (json::iterator it1 = story_json.begin(); it1 != story_json.end();
-       ++it1) {
-    for (json::iterator it2 = (*it1)["Act"].begin(); it2 != (*it1)["Act"].end();
-         ++it2) {
-      for (json::iterator it3 = (*it2)["ManeuverGroup"].begin(); it3 != (*it2)["ManeuverGroup"].end();
-           ++it3) {
+  for (json::iterator it1 = story_json.begin(); it1 != story_json.end(); ++it1) {
+    for (json::iterator it2 = (*it1)["Act"].begin(); it2 != (*it1)["Act"].end(); ++it2) {
+      for (json::iterator it3 = (*it2)["ManeuverGroup"].begin();
+           it3 != (*it2)["ManeuverGroup"].end(); ++it3) {
         for (json::iterator it4 = (*it3)["Maneuver"].begin(); it4 != (*it3)["Maneuver"].end();
              ++it4) {
-          for (json::iterator it5 = (*it4)["Event"].begin(); it5 != (*it4)["Event"].end();
-               ++it5) {
-            for (json::iterator it6 = (*it5)["StartTrigger"]["ConditionGroup"].begin(); it6 != (*it5)["StartTrigger"]["ConditionGroup"].end();
-                 ++it6) {
-              for (json::iterator it7 = (*it6)["Condition"].begin(); it7 != (*it6)["Condition"].end();
-                   ++it7) {
+          for (json::iterator it5 = (*it4)["Event"].begin(); it5 != (*it4)["Event"].end(); ++it5) {
+            for (json::iterator it6 = (*it5)["StartTrigger"]["ConditionGroup"].begin();
+                 it6 != (*it5)["StartTrigger"]["ConditionGroup"].end(); ++it6) {
+              for (json::iterator it7 = (*it6)["Condition"].begin();
+                   it7 != (*it6)["Condition"].end(); ++it7) {
                 auto condition_ = (*it7);
                 item_vec_.push_back(condition_["currentEvaluation"].dump());
                 item_vec_.push_back(condition_["currentValue"].dump());
@@ -86,8 +83,12 @@ void ContextPanel::contextCallback(const openscenario_interpreter_msgs::msg::Con
       }
     }
   }
-  std::sort(condition_group_vec_.begin(), condition_group_vec_.end(), [](auto& x, auto& y){return x[3] < y[3];});
-  condition_group_vec_.erase(std::unique(condition_group_vec_.begin(), condition_group_vec_.end()), condition_group_vec_.end());
+  std::sort(condition_group_vec_.begin(), condition_group_vec_.end(), [](auto & x, auto & y) {
+    return x[3] < y[3];
+  });
+  condition_group_vec_.erase(
+    std::unique(condition_group_vec_.begin(), condition_group_vec_.end()),
+    condition_group_vec_.end());
   display_trigger();
 }
 
