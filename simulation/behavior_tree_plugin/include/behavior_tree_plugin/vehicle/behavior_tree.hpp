@@ -18,6 +18,7 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
+#include <behavior_tree_plugin/transition_events/transition_events.hpp>
 #include <functional>
 #include <geometry_msgs/msg/point.hpp>
 #include <map>
@@ -77,6 +78,7 @@ private:
   std::string current_action_;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
+  std::shared_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;
 };
 }  // namespace entity_behavior
 

@@ -16,6 +16,7 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <behavior_tree_plugin/pedestrian/behavior_tree.hpp>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -29,6 +30,8 @@ void PedestrianBehaviorTree::configure(const rclcpp::Logger & logger)
   factory_.registerNodeType<entity_behavior::pedestrian::WalkStraightAction>("WalkStraightAction");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
+  logging_event_ptr_ = std::make_shared<behavior_tree_plugin::LoggingEvent>(
+    std::shared_ptr<BT::TreeNode>(tree_.rootNode()), logger);
   setupLogger();
   setRequest("none");
 }

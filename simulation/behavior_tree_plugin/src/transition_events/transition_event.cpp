@@ -18,7 +18,8 @@
 
 namespace behavior_tree_plugin
 {
-TransitionEvent::TransitionEvent(const std::shared_ptr<BT::Tree> & tree_ptr) : tree_ptr_(tree_ptr)
+TransitionEvent::TransitionEvent(const std::shared_ptr<BT::TreeNode> & root_node)
+: root_node_(root_node)
 {
   first_timestamp_ = std::chrono::high_resolution_clock::now();
   auto subscribeCallback = [this](
@@ -35,7 +36,7 @@ TransitionEvent::TransitionEvent(const std::shared_ptr<BT::Tree> & tree_ptr) : t
   auto visitor = [this, subscribeCallback](BT::TreeNode * node) {
     subscribers_.push_back(node->subscribeToStatusChange(std::move(subscribeCallback)));
   };
-  BT::applyRecursiveVisitor(tree_ptr_->rootNode(), visitor);
+  BT::applyRecursiveVisitor(root_node.get(), visitor);
 }
 
 void TransitionEvent::updateCurrentAction(const BT::NodeStatus & status, const BT::TreeNode & node)

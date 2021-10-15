@@ -19,8 +19,8 @@
 namespace behavior_tree_plugin
 {
 LoggingEvent::LoggingEvent(
-  const std::shared_ptr<BT::Tree> & tree_ptr, const rclcpp::Logger & logger)
-: TransitionEvent(tree_ptr), ros_logger_(logger)
+  const std::shared_ptr<BT::TreeNode> & root_node, const rclcpp::Logger & logger)
+: TransitionEvent(root_node), ros_logger_(logger)
 {
 }
 

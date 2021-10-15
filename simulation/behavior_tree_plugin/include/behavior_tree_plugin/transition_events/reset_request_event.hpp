@@ -25,7 +25,8 @@ class ResetRequestEvent : public TransitionEvent
 {
 public:
   ResetRequestEvent(
-    const std::shared_ptr<BT::Tree> & tree_ptr, std::function<std::string()> get_request_function,
+    const std::shared_ptr<BT::TreeNode> & root_node,
+    std::function<std::string()> get_request_function,
     std::function<void(std::string)> set_request_function);
   const std::string getCurrentAction() const;
 
@@ -33,7 +34,7 @@ private:
   void callback(
     BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
     BT::NodeStatus status) override;
-  std::shared_ptr<BT::Tree> tree_ptr_;
+  const std::shared_ptr<BT::TreeNode> & root_node_;
   std::function<std::string()> get_request_function_;
   std::function<void(std::string)> set_request_function_;
 };
