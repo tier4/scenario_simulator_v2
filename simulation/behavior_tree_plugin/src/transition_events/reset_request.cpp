@@ -14,28 +14,29 @@
 
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
-#include <behavior_tree_plugin/logger.hpp>
+#include <behavior_tree_plugin/transition_events/reset_request.hpp>
 
 namespace behavior_tree_plugin
 {
-Logger::Logger(const std::shared_ptr<BT::Tree> & tree_ptr, const rclcpp::Logger & logger)
-: TransitionEvent(tree_ptr_), ros_logger_(logger)
+ResetRequest::ResetRequest(
+  const std::shared_ptr<BT::Tree> & tree_ptr, std::function<std::string()> get_request_function,
+  std::function<void(std::string)> set_request_function)
+: TransitionEvent(tree_ptr_),
+  tree_ptr_(tree_ptr),
+  get_request_function_(get_request_function),
+  set_request_function_(set_request_function)
 {
 }
 
-void Logger::callback(
-  BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
+void ResetRequest::callback(
+  BT::Duration /*timestamp*/, const BT::TreeNode & node, BT::NodeStatus /*prev_status*/,
   BT::NodeStatus status)
 {
-  double since_epoch = std::chrono::duration<double>(timestamp).count();
-  RCLCPP_INFO_STREAM(
-    ros_logger_, "Action changed at " << since_epoch << ","
-                                      << "From : " << BT::toStr(prev_status, true) << ","
-                                      << "To : " << BT::toStr(status, true));
-  if (status != BT::NodeStatus::SUCCESS) {
-    current_action_ = node.name();
+  TransitionEvent::updateCurrentAction(status, node);
+  if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
+    if (get_request_function_() == current_action_) {
+      set_request_function_("none");
+    }
   }
 }
-
-const std::string Logger::getCurrentAction() const { return current_action_; }
 }  // namespace behavior_tree_plugin

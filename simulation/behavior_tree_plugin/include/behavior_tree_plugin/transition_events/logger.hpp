@@ -12,30 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENT_HPP_
-#define BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENT_HPP_
+#ifndef BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__LOGGER_HPP_
+#define BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__LOGGER_HPP_
 
-#include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
-
+#include <behavior_tree_plugin/transition_events/transition_event.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 
 namespace behavior_tree_plugin
 {
-class TransitionEvent
+class Logger : public TransitionEvent
 {
 public:
-  TransitionEvent(const std::shared_ptr<BT::Tree> & tree_ptr);
+  Logger(const std::shared_ptr<BT::Tree> & tree_ptr, const rclcpp::Logger & logger);
+  const std::string getCurrentAction() const;
 
-protected:
-  virtual void callback(
+private:
+  void callback(
     BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
-    BT::NodeStatus status) = 0;
-  std::shared_ptr<BT::Tree> tree_ptr_;
-  BT::TimePoint first_timestamp_;
-  std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
-  BT::TimestampType type_;
+    BT::NodeStatus status) override;
+  rclcpp::Logger ros_logger_;
+  std::string current_action_;
 };
 }  // namespace behavior_tree_plugin
 
-#endif  // BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENT_HPP_
+#endif  // BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__LOGGER_HPP_

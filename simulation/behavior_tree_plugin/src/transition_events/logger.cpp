@@ -14,18 +14,26 @@
 
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
-#include <behavior_tree_plugin/reset_request.hpp>
+#include <behavior_tree_plugin/transition_events/logger.hpp>
 
 namespace behavior_tree_plugin
 {
-ResetRequest::ResetRequest(const std::shared_ptr<BT::Tree> & tree_ptr)
-: TransitionEvent(tree_ptr_), tree_ptr_(tree_ptr)
+Logger::Logger(const std::shared_ptr<BT::Tree> & tree_ptr, const rclcpp::Logger & logger)
+: TransitionEvent(tree_ptr), ros_logger_(logger)
 {
 }
 
-void ResetRequest::callback(
+void Logger::callback(
   BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
   BT::NodeStatus status)
 {
+  double since_epoch = std::chrono::duration<double>(timestamp).count();
+  RCLCPP_INFO_STREAM(
+    ros_logger_, "Action changed at " << since_epoch << ","
+                                      << "From : " << BT::toStr(prev_status, true) << ","
+                                      << "To : " << BT::toStr(status, true));
+  TransitionEvent::updateCurrentAction(status, node);
 }
+
+const std::string Logger::getCurrentAction() const { return current_action_; }
 }  // namespace behavior_tree_plugin

@@ -12,27 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef BEHAVIOR_TREE_PLUGIN__RESET_REQUEST_HPP_
-#define BEHAVIOR_TREE_PLUGIN__RESET_REQUEST_HPP_
+#ifndef BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__TRANSITION_EVENT_HPP_
+#define BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__TRANSITION_EVENT_HPP_
 
-#include <behavior_tree_plugin/transition_event.hpp>
+#include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
+
+#include <functional>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 
 namespace behavior_tree_plugin
 {
-class ResetRequest : public TransitionEvent
+class TransitionEvent
 {
 public:
-  ResetRequest(const std::shared_ptr<BT::Tree> & tree_ptr);
-  const std::string getCurrentAction() const;
+  TransitionEvent(const std::shared_ptr<BT::Tree> & tree_ptr);
 
-private:
-  void callback(
+protected:
+  virtual void callback(
     BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
-    BT::NodeStatus status) override;
+    BT::NodeStatus status) = 0;
+  void updateCurrentAction(const BT::NodeStatus & status, const BT::TreeNode & node);
   std::shared_ptr<BT::Tree> tree_ptr_;
+  BT::TimePoint first_timestamp_;
+  std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
+  BT::TimestampType type_;
+  std::string current_action_;
 };
 }  // namespace behavior_tree_plugin
 
-#endif  // BEHAVIOR_TREE_PLUGIN__RESET_REQUEST_HPP_
+#endif  // BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__TRANSITION_EVENT_HPP_

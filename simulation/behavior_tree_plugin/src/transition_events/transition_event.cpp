@@ -14,7 +14,7 @@
 
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
-#include <behavior_tree_plugin/transition_event.hpp>
+#include <behavior_tree_plugin/transition_events/transition_event.hpp>
 
 namespace behavior_tree_plugin
 {
@@ -36,5 +36,12 @@ TransitionEvent::TransitionEvent(const std::shared_ptr<BT::Tree> & tree_ptr) : t
     subscribers_.push_back(node->subscribeToStatusChange(std::move(subscribeCallback)));
   };
   BT::applyRecursiveVisitor(tree_ptr_->rootNode(), visitor);
+}
+
+void TransitionEvent::updateCurrentAction(const BT::NodeStatus & status, const BT::TreeNode & node)
+{
+  if (status != BT::NodeStatus::SUCCESS) {
+    current_action_ = node.name();
+  }
 }
 }  // namespace behavior_tree_plugin
