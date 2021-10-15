@@ -34,8 +34,8 @@
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <limits>
 #include <mutex>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <thread>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <utility>
 
 namespace concealer
@@ -176,7 +176,7 @@ public:
 
   virtual auto getVelocity() const -> double = 0;
 
-  virtual auto getWaypoints() const -> openscenario_msgs::msg::WaypointsArray = 0;
+  virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   /*   */ auto initialized() const noexcept { return initialize_was_called; }
 

@@ -84,9 +84,10 @@ auto AutowareArchitectureProposal::getGearSign() const -> double
   return getVehicleCommand().shift.data == autoware_vehicle_msgs::msg::Shift::REVERSE ? -1.0 : 1.0;
 }
 
-auto AutowareArchitectureProposal::getWaypoints() const -> openscenario_msgs::msg::WaypointsArray
+auto AutowareArchitectureProposal::getWaypoints() const
+  -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  openscenario_msgs::msg::WaypointsArray waypoints;
+  traffic_simulator_msgs::msg::WaypointsArray waypoints;
 
   for (const auto & point : getTrajectory().points) {
     waypoints.waypoints.emplace_back(point.pose.position);

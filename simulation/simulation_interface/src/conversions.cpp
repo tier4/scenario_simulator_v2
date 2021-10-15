@@ -100,20 +100,22 @@ void toMsg(const geometry_msgs::Accel & proto, geometry_msgs::msg::Accel & a)
 }
 
 void toProto(
-  const openscenario_msgs::msg::BoundingBox & box, openscenario_msgs::BoundingBox & proto)
+  const traffic_simulator_msgs::msg::BoundingBox & box, traffic_simulator_msgs::BoundingBox & proto)
 {
   toProto(box.center, *proto.mutable_center());
   toProto(box.dimensions, *proto.mutable_dimensions());
 }
 
-void toMsg(const openscenario_msgs::BoundingBox & proto, openscenario_msgs::msg::BoundingBox & box)
+void toMsg(
+  const traffic_simulator_msgs::BoundingBox & proto, traffic_simulator_msgs::msg::BoundingBox & box)
 {
   toMsg(proto.center(), box.center);
   toMsg(proto.dimensions(), box.dimensions);
 }
 
 void toProto(
-  const openscenario_msgs::msg::Performance & performance, openscenario_msgs::Performance & proto)
+  const traffic_simulator_msgs::msg::Performance & performance,
+  traffic_simulator_msgs::Performance & proto)
 {
   proto.set_max_acceleration(performance.max_acceleration);
   proto.set_max_deceleration(performance.max_deceleration);
@@ -121,14 +123,15 @@ void toProto(
 }
 
 void toMsg(
-  const openscenario_msgs::Performance & proto, openscenario_msgs::msg::Performance & performance)
+  const traffic_simulator_msgs::Performance & proto,
+  traffic_simulator_msgs::msg::Performance & performance)
 {
   performance.max_acceleration = proto.max_acceleration();
   performance.max_deceleration = proto.max_deceleration();
   performance.max_speed = proto.max_speed();
 }
 
-void toProto(const openscenario_msgs::msg::Axle & axle, openscenario_msgs::Axle & proto)
+void toProto(const traffic_simulator_msgs::msg::Axle & axle, traffic_simulator_msgs::Axle & proto)
 {
   proto.set_position_x(axle.position_x);
   proto.set_position_z(axle.position_z);
@@ -137,7 +140,7 @@ void toProto(const openscenario_msgs::msg::Axle & axle, openscenario_msgs::Axle 
   proto.set_max_steering(axle.max_steering);
 }
 
-void toMsg(const openscenario_msgs::Axle & proto, openscenario_msgs::msg::Axle & axle)
+void toMsg(const traffic_simulator_msgs::Axle & proto, traffic_simulator_msgs::msg::Axle & axle)
 {
   axle.position_x = proto.position_x();
   axle.position_z = proto.position_z();
@@ -146,13 +149,14 @@ void toMsg(const openscenario_msgs::Axle & proto, openscenario_msgs::msg::Axle &
   axle.max_steering = proto.max_steering();
 }
 
-void toProto(const openscenario_msgs::msg::Axles & axles, openscenario_msgs::Axles & proto)
+void toProto(
+  const traffic_simulator_msgs::msg::Axles & axles, traffic_simulator_msgs::Axles & proto)
 {
   toProto(axles.front_axle, *proto.mutable_front_axle());
   toProto(axles.rear_axle, *proto.mutable_rear_axle());
 }
 
-void toMsg(const openscenario_msgs::Axles & proto, openscenario_msgs::msg::Axles & axles)
+void toMsg(const traffic_simulator_msgs::Axles & proto, traffic_simulator_msgs::msg::Axles & axles)
 {
   toMsg(proto.front_axle(), axles.front_axle);
   toMsg(proto.rear_axle(), axles.rear_axle);
@@ -160,22 +164,23 @@ void toMsg(const openscenario_msgs::Axles & proto, openscenario_msgs::msg::Axles
 
 /*
 void toProto(
-  const openscenario_msgs::msg::Property & p,
-  openscenario_msgs::Property & proto)
+  const traffic_simulator_msgs::msg::Property & p,
+  traffic_simulator_msgs::Property & proto)
 {
   // proto.set_is_ego(p.is_ego);
 }
 
 void toMsg(
-  const openscenario_msgs::Property & proto,
-  openscenario_msgs::msg::Property & p)
+  const traffic_simulator_msgs::Property & proto,
+  traffic_simulator_msgs::msg::Property & p)
 {
   // p.is_ego = proto.is_ego();
 }
 */
 
 void toProto(
-  const openscenario_msgs::msg::VehicleParameters & p, openscenario_msgs::VehicleParameters & proto)
+  const traffic_simulator_msgs::msg::VehicleParameters & p,
+  traffic_simulator_msgs::VehicleParameters & proto)
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   toProto(p.axles, *proto.mutable_axles());
@@ -186,7 +191,8 @@ void toProto(
 }
 
 void toMsg(
-  const openscenario_msgs::VehicleParameters & proto, openscenario_msgs::msg::VehicleParameters & p)
+  const traffic_simulator_msgs::VehicleParameters & proto,
+  traffic_simulator_msgs::msg::VehicleParameters & p)
 {
   toMsg(proto.axles(), p.axles);
   toMsg(proto.bounding_box(), p.bounding_box);
@@ -197,8 +203,8 @@ void toMsg(
 }
 
 void toProto(
-  const openscenario_msgs::msg::PedestrianParameters & p,
-  openscenario_msgs::PedestrianParameters & proto)
+  const traffic_simulator_msgs::msg::PedestrianParameters & p,
+  traffic_simulator_msgs::PedestrianParameters & proto)
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   proto.set_name(p.name);
@@ -206,8 +212,8 @@ void toProto(
 }
 
 void toMsg(
-  const openscenario_msgs::PedestrianParameters & proto,
-  openscenario_msgs::msg::PedestrianParameters & p)
+  const traffic_simulator_msgs::PedestrianParameters & proto,
+  traffic_simulator_msgs::msg::PedestrianParameters & p)
 {
   p.name = proto.name();
   p.pedestrian_category = proto.pedestrian_category();
@@ -215,8 +221,8 @@ void toMsg(
 }
 
 void toProto(
-  const openscenario_msgs::msg::MiscObjectParameters & p,
-  openscenario_msgs::MiscObjectParameters & proto)
+  const traffic_simulator_msgs::msg::MiscObjectParameters & p,
+  traffic_simulator_msgs::MiscObjectParameters & proto)
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   proto.set_name(p.name);
@@ -224,8 +230,8 @@ void toProto(
 }
 
 void toMsg(
-  const openscenario_msgs::MiscObjectParameters & proto,
-  openscenario_msgs::msg::MiscObjectParameters & p)
+  const traffic_simulator_msgs::MiscObjectParameters & proto,
+  traffic_simulator_msgs::msg::MiscObjectParameters & p)
 {
   p.name = proto.name();
   p.misc_object_category = proto.misc_object_category();
@@ -233,14 +239,15 @@ void toMsg(
 }
 
 void toProto(
-  const openscenario_msgs::msg::ActionStatus & s, openscenario_msgs::ActionStatus & proto)
+  const traffic_simulator_msgs::msg::ActionStatus & s, traffic_simulator_msgs::ActionStatus & proto)
 {
   proto.set_current_action(s.current_action);
   toProto(s.twist, *proto.mutable_twist());
   toProto(s.accel, *proto.mutable_accel());
 }
 
-void toMsg(const openscenario_msgs::ActionStatus & proto, openscenario_msgs::msg::ActionStatus & s)
+void toMsg(
+  const traffic_simulator_msgs::ActionStatus & proto, traffic_simulator_msgs::msg::ActionStatus & s)
 {
   s.current_action = proto.current_action();
   toMsg(proto.twist(), s.twist);
@@ -248,7 +255,8 @@ void toMsg(const openscenario_msgs::ActionStatus & proto, openscenario_msgs::msg
 }
 
 void toProto(
-  const openscenario_msgs::msg::LaneletPose & pose, openscenario_msgs::LaneletPose & proto)
+  const traffic_simulator_msgs::msg::LaneletPose & pose,
+  traffic_simulator_msgs::LaneletPose & proto)
 {
   proto.set_lanelet_id(pose.lanelet_id);
   proto.set_s(pose.s);
@@ -256,7 +264,9 @@ void toProto(
   toProto(pose.rpy, *proto.mutable_rpy());
 }
 
-void toMsg(const openscenario_msgs::LaneletPose & proto, openscenario_msgs::msg::LaneletPose & pose)
+void toMsg(
+  const traffic_simulator_msgs::LaneletPose & proto,
+  traffic_simulator_msgs::msg::LaneletPose & pose)
 {
   pose.lanelet_id = proto.lanelet_id();
   pose.s = proto.s();
@@ -264,19 +274,20 @@ void toMsg(const openscenario_msgs::LaneletPose & proto, openscenario_msgs::msg:
   toMsg(proto.rpy(), pose.rpy);
 }
 
-void toProto(const openscenario_msgs::msg::EntityType & type, openscenario_msgs::EntityType & proto)
+void toProto(
+  const traffic_simulator_msgs::msg::EntityType & type, traffic_simulator_msgs::EntityType & proto)
 {
-  if (type.type == openscenario_msgs::msg::EntityType::EGO) {
-    proto = openscenario_msgs::EntityType::EGO;
+  if (type.type == traffic_simulator_msgs::msg::EntityType::EGO) {
+    proto = traffic_simulator_msgs::EntityType::EGO;
     return;
-  } else if (type.type == openscenario_msgs::msg::EntityType::VEHICLE) {
-    proto = openscenario_msgs::EntityType::VEHICLE;
+  } else if (type.type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
+    proto = traffic_simulator_msgs::EntityType::VEHICLE;
     return;
-  } else if (type.type == openscenario_msgs::msg::EntityType::PEDESTRIAN) {
-    proto = openscenario_msgs::EntityType::PEDESTRIAN;
+  } else if (type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN) {
+    proto = traffic_simulator_msgs::EntityType::PEDESTRIAN;
     return;
-  } else if (type.type == openscenario_msgs::msg::EntityType::MISC_OBJECT) {
-    proto = openscenario_msgs::EntityType::MISC_OBJECT;
+  } else if (type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT) {
+    proto = traffic_simulator_msgs::EntityType::MISC_OBJECT;
     return;
   }
   // LCOV_EXCL_START
@@ -285,22 +296,23 @@ void toProto(const openscenario_msgs::msg::EntityType & type, openscenario_msgs:
   // LCOV_EXCL_STOP
 }
 
-void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::EntityType & type)
+void toMsg(
+  const traffic_simulator_msgs::EntityType & proto, traffic_simulator_msgs::msg::EntityType & type)
 {
-  if (proto == openscenario_msgs::EntityType::EGO) {
-    type.type = openscenario_msgs::msg::EntityType::EGO;
+  if (proto == traffic_simulator_msgs::EntityType::EGO) {
+    type.type = traffic_simulator_msgs::msg::EntityType::EGO;
     return;
   }
-  if (proto == openscenario_msgs::EntityType::VEHICLE) {
-    type.type = openscenario_msgs::msg::EntityType::VEHICLE;
+  if (proto == traffic_simulator_msgs::EntityType::VEHICLE) {
+    type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
     return;
   }
-  if (proto == openscenario_msgs::EntityType::PEDESTRIAN) {
-    type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
+  if (proto == traffic_simulator_msgs::EntityType::PEDESTRIAN) {
+    type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
     return;
   }
-  if (proto == openscenario_msgs::EntityType::MISC_OBJECT) {
-    type.type = openscenario_msgs::msg::EntityType::MISC_OBJECT;
+  if (proto == traffic_simulator_msgs::EntityType::MISC_OBJECT) {
+    type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
     return;
   }
   // LCOV_EXCL_START
@@ -310,9 +322,10 @@ void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::
 }
 
 void toProto(
-  const openscenario_msgs::msg::EntityStatus & status, openscenario_msgs::EntityStatus & proto)
+  const traffic_simulator_msgs::msg::EntityStatus & status,
+  traffic_simulator_msgs::EntityStatus & proto)
 {
-  openscenario_msgs::EntityType type;
+  traffic_simulator_msgs::EntityType type;
   toProto(status.type, type);
   proto.set_type(type);
   proto.set_time(status.time);
@@ -325,9 +338,10 @@ void toProto(
 }
 
 void toMsg(
-  const openscenario_msgs::EntityStatus & proto, openscenario_msgs::msg::EntityStatus & status)
+  const traffic_simulator_msgs::EntityStatus & proto,
+  traffic_simulator_msgs::msg::EntityStatus & status)
 {
-  openscenario_msgs::msg::EntityType type;
+  traffic_simulator_msgs::msg::EntityType type;
   toMsg(proto.type(), type);
   status.type = type;
   status.time = proto.time();

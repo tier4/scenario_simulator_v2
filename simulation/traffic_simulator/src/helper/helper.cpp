@@ -21,10 +21,10 @@ namespace traffic_simulator
 {
 namespace helper
 {
-openscenario_msgs::msg::ActionStatus constructActionStatus(
+traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
   double linear_vel, double angular_vel, double linear_accel, double angular_accel)
 {
-  openscenario_msgs::msg::ActionStatus status;
+  traffic_simulator_msgs::msg::ActionStatus status;
   geometry_msgs::msg::Twist twist;
   twist.linear.x = linear_vel;
   twist.angular.z = angular_vel;
@@ -36,10 +36,10 @@ openscenario_msgs::msg::ActionStatus constructActionStatus(
   return status;
 }
 
-openscenario_msgs::msg::LaneletPose constructLaneletPose(
+traffic_simulator_msgs::msg::LaneletPose constructLaneletPose(
   std::int64_t lanelet_id, double s, double offset, double roll, double pitch, double yaw)
 {
-  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s;
   lanelet_pose.offset = offset;
@@ -153,7 +153,8 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose)
+std::ostream & operator<<(
+  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose)
 {
   os << "lanelet id : " << ll_pose.lanelet_id << "\ns : " << ll_pose.s;
   return os;

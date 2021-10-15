@@ -31,14 +31,14 @@ MiscObject::MiscObject(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-MiscObject::operator openscenario_msgs::msg::MiscObjectParameters() const
+MiscObject::operator traffic_simulator_msgs::msg::MiscObjectParameters() const
 {
-  openscenario_msgs::msg::MiscObjectParameters misc_object_parameters;
+  traffic_simulator_msgs::msg::MiscObjectParameters misc_object_parameters;
   {
     misc_object_parameters.misc_object_category = boost::lexical_cast<String>(misc_object_category);
     misc_object_parameters.name = name;
     misc_object_parameters.bounding_box =
-      static_cast<const openscenario_msgs::msg::BoundingBox>(bounding_box);
+      static_cast<const traffic_simulator_msgs::msg::BoundingBox>(bounding_box);
   }
 
   return misc_object_parameters;

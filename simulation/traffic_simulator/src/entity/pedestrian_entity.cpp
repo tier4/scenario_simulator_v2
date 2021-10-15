@@ -25,7 +25,7 @@ namespace traffic_simulator
 namespace entity
 {
 PedestrianEntity::PedestrianEntity(
-  const std::string & name, const openscenario_msgs::msg::PedestrianParameters & params)
+  const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & params)
 : EntityBase(params.pedestrian_category, name),
   parameters(params),
   plugin_name("behavior_tree_plugin/PedestrianBehaviorTree"),
@@ -39,7 +39,7 @@ PedestrianEntity::PedestrianEntity(
 }
 
 void PedestrianEntity::requestAssignRoute(
-  const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
   behavior_plugin_ptr_->setRequest("follow_lane");
   if (!status_) {
@@ -53,7 +53,7 @@ void PedestrianEntity::requestAssignRoute(
 
 void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
-  std::vector<openscenario_msgs::msg::LaneletPose> route;
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> route;
   for (const auto & waypoint : waypoints) {
     const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint);
     if (lanelet_waypoint) {
@@ -68,7 +68,7 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
 void PedestrianEntity::requestWalkStraight() { behavior_plugin_ptr_->setRequest("walk_straight"); }
 
 void PedestrianEntity::requestAcquirePosition(
-  const openscenario_msgs::msg::LaneletPose & lanelet_pose)
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   behavior_plugin_ptr_->setRequest("follow_lane");
   if (!status_) {

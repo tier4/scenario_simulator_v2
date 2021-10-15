@@ -9,18 +9,19 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
-  <depend>rclcpp</depend>
+
   <depend>autoware_control_msgs</depend>
-  <depend>autoware_vehicle_msgs</depend>
   <depend>autoware_perception_msgs</depend>
-  <depend>geometry_msgs</depend>
-  <depend>openscenario_msgs</depend>
+  <depend>autoware_vehicle_msgs</depend>
   <depend>builtin_interfaces</depend>
-  <depend>rosgraph_msgs</depend>
-  <depend>protobuf</depend>
-  <depend>protobuf-dev</depend>
+  <depend>geometry_msgs</depend>
   <depend>libzmqpp-dev</depend>
+  <depend>protobuf-dev</depend>
+  <depend>protobuf</depend>
+  <depend>rclcpp</depend>
+  <depend>rosgraph_msgs</depend>
   <depend>scenario_simulator_exception</depend>
+  <depend>traffic_simulator_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>
