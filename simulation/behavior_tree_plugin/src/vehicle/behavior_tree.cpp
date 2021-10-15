@@ -52,31 +52,17 @@ void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
     "MoveBackward");
   factory_.registerNodeType<entity_behavior::vehicle::LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
-  current_action_ = "root";
   logging_event_ptr_ = std::make_shared<behavior_tree_plugin::LoggingEvent>(
     std::shared_ptr<BT::TreeNode>(tree_.rootNode()), logger);
-  setupLogger();
+  reset_request_event_ptr_ = std::make_shared<behavior_tree_plugin::ResetRequestEvent>(
+    std::shared_ptr<BT::TreeNode>(tree_.rootNode()), [&]() { return getRequest(); },
+    [&](std::string request) { return setRequest(request); });
   setRequest("none");
 }
 
-void VehicleBehaviorTree::setupLogger()
+const std::string VehicleBehaviorTree::getCurrentAction() const
 {
-  first_timestamp_ = std::chrono::high_resolution_clock::now();
-  auto subscribeCallback = [this](
-                             BT::TimePoint timestamp, const BT::TreeNode & node,
-                             BT::NodeStatus prev, BT::NodeStatus status) {
-    if (status != BT::NodeStatus::IDLE) {
-      if (type_ == BT::TimestampType::ABSOLUTE) {
-        this->callback(timestamp.time_since_epoch(), node, prev, status);
-      } else {
-        this->callback(timestamp - first_timestamp_, node, prev, status);
-      }
-    }
-  };
-  auto visitor = [this, subscribeCallback](BT::TreeNode * node) {
-    subscribers_.push_back(node->subscribeToStatusChange(std::move(subscribeCallback)));
-  };
-  BT::applyRecursiveVisitor(tree_.rootNode(), visitor);
+  return logging_event_ptr_->getCurrentAction();
 }
 
 void VehicleBehaviorTree::update(double current_time, double step_time)
@@ -93,21 +79,6 @@ BT::NodeStatus VehicleBehaviorTree::tickOnce(double current_time, double step_ti
   setStepTime(step_time);
   const auto ret = tree_.rootNode()->executeTick();
   return ret;
-}
-
-void VehicleBehaviorTree::callback(
-  BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
-  BT::NodeStatus status)
-{
-  double since_epoch = std::chrono::duration<double>(timestamp).count();
-  if (status != BT::NodeStatus::SUCCESS) {
-    current_action_ = node.name();
-  }
-  if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
-    if (getRequest() == current_action_) {
-      setRequest("none");
-    }
-  }
 }
 }  // namespace entity_behavior
 

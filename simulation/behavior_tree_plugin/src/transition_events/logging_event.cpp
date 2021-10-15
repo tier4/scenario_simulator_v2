@@ -29,8 +29,8 @@ void LoggingEvent::callback(
   BT::NodeStatus status)
 {
   RCLCPP_INFO_STREAM(
-    ros_logger_, "Action " << node.name() << " changed," << BT::toStr(prev_status, true) << " => "
-                           << BT::toStr(status, true));
+    ros_logger_, "Action " << node.name() << " changed status, " << BT::toStr(prev_status, true)
+                           << " => " << BT::toStr(status, true));
   TransitionEvent::updateCurrentAction(status, node);
 }
 

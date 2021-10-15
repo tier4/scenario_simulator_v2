@@ -29,31 +29,17 @@ void PedestrianBehaviorTree::configure(const rclcpp::Logger & logger)
   factory_.registerNodeType<entity_behavior::pedestrian::FollowLaneAction>("FollowLane");
   factory_.registerNodeType<entity_behavior::pedestrian::WalkStraightAction>("WalkStraightAction");
   tree_ = factory_.createTreeFromFile(path);
-  current_action_ = "root";
   logging_event_ptr_ = std::make_shared<behavior_tree_plugin::LoggingEvent>(
     std::shared_ptr<BT::TreeNode>(tree_.rootNode()), logger);
-  setupLogger();
+  reset_request_event_ptr_ = std::make_shared<behavior_tree_plugin::ResetRequestEvent>(
+    std::shared_ptr<BT::TreeNode>(tree_.rootNode()), [&]() { return getRequest(); },
+    [&](std::string request) { return setRequest(request); });
   setRequest("none");
 }
 
-void PedestrianBehaviorTree::setupLogger()
+const std::string PedestrianBehaviorTree::getCurrentAction() const
 {
-  first_timestamp_ = std::chrono::high_resolution_clock::now();
-  auto subscribeCallback = [this](
-                             BT::TimePoint timestamp, const BT::TreeNode & node,
-                             BT::NodeStatus prev, BT::NodeStatus status) {
-    if (status != BT::NodeStatus::IDLE) {
-      if (type_ == BT::TimestampType::ABSOLUTE) {
-        this->callback(timestamp.time_since_epoch(), node, prev, status);
-      } else {
-        this->callback(timestamp - first_timestamp_, node, prev, status);
-      }
-    }
-  };
-  auto visitor = [this, subscribeCallback](BT::TreeNode * node) {
-    subscribers_.push_back(node->subscribeToStatusChange(std::move(subscribeCallback)));
-  };
-  BT::applyRecursiveVisitor(tree_.rootNode(), visitor);
+  return logging_event_ptr_->getCurrentAction();
 }
 
 void PedestrianBehaviorTree::update(double current_time, double step_time)
@@ -69,20 +55,6 @@ BT::NodeStatus PedestrianBehaviorTree::tickOnce(double current_time, double step
   setCurrentTime(current_time);
   setStepTime(step_time);
   return tree_.rootNode()->executeTick();
-}
-
-void PedestrianBehaviorTree::callback(
-  BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
-  BT::NodeStatus status)
-{
-  if (status != BT::NodeStatus::SUCCESS) {
-    current_action_ = node.name();
-  }
-  if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
-    if (getRequest() == current_action_) {
-      setRequest("none");
-    }
-  }
 }
 }  // namespace entity_behavior
 
