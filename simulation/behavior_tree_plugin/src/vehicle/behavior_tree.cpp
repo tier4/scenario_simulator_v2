@@ -99,8 +99,6 @@ void VehicleBehaviorTree::callback(
   BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
   BT::NodeStatus status)
 {
-  constexpr const char * whitespaces = "                         ";
-  constexpr const size_t ws_count = 25;
   double since_epoch = std::chrono::duration<double>(timestamp).count();
   if (status != BT::NodeStatus::SUCCESS) {
     current_action_ = node.name();
