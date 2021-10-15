@@ -36,7 +36,7 @@ private:
   std::string current_action_;
 
 public:
-  virtual void configure() = 0;
+  virtual void configure(const rclcpp::Logger & logger) = 0;
   virtual void update(double current_time, double step_time) = 0;
   const std::string getCurrentAction() const { return current_action_; }
 

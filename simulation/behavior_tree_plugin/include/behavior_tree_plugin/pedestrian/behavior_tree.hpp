@@ -34,7 +34,7 @@ namespace entity_behavior
 class PedestrianBehaviorTree : public BehaviorPluginBase
 {
 public:
-  void configure() override;
+  void configure(const rclcpp::Logger & logger) override;
   void update(double current_time, double step_time) override;
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \

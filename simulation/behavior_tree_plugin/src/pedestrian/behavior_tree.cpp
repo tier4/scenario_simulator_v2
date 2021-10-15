@@ -21,7 +21,7 @@
 
 namespace entity_behavior
 {
-void PedestrianBehaviorTree::configure()
+void PedestrianBehaviorTree::configure(const rclcpp::Logger & logger)
 {
   std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
                      "/config/pedestrian_entity_behavior.xml";
