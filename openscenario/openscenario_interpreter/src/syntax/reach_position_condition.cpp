@@ -38,7 +38,7 @@ auto ReachPositionCondition::description() const -> String
 {
   std::stringstream description;
 
-  description << triggering_entities.description() << "'s distance to given position = ";
+  description << triggering_entities.description() << "s distance to given position = ";
 
   print_to(description, results);
 
@@ -49,20 +49,6 @@ auto ReachPositionCondition::description() const -> String
 
 auto ReachPositionCondition::evaluate() -> Element
 {
-  const auto reach_position = overload(
-    [](const WorldPosition & position, auto && triggering_entity, auto && tolerance) {
-      return evaluateReachPositionCondition(
-        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), tolerance);
-    },
-    [](const RelativeWorldPosition & position, auto && triggering_entity, auto && tolerance) {
-      return evaluateReachPositionCondition(
-        triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
-    },
-    [](const LanePosition & position, auto && triggering_entity, auto && tolerance) {
-      return evaluateReachPositionCondition(
-        triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
-    });
-
   // TODO USE DistanceCondition::distance
   const auto distance = overload(
     [&](const WorldPosition & position, auto && triggering_entity) {
@@ -85,7 +71,7 @@ auto ReachPositionCondition::evaluate() -> Element
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     results.push_back(apply<Double>(distance, position, triggering_entity));
-    return apply<bool>(reach_position, position, triggering_entity, tolerance);
+    return compare(results.back(), tolerance);
   }));
 }
 }  // namespace syntax

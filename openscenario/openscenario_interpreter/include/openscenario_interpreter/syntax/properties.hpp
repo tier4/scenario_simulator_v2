@@ -40,35 +40,27 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Properties
 {
-  /* ---- properties -----------------------------------------------------------
-   *
-   *  A name-value pair. The semantic of the name/values are subject of a
-   *  contract between the provider of a simulation environment and the author
-   *  of a scenario.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     A name-value pair. The semantic of the name/values are subject of a
+     contract between the provider of a simulation environment and the author
+     of a scenario.
+  */
   std::unordered_map<String, Property> properties;
 
-  /* ---- files ----------------------------------------------------------------
-   *
-   *  A list of arbitrary files attached to an object that owns the properties.
-   *  The semantic and the file formats are subject of a contract between the
-   *  provider of a simulation environment and the author of a scenario.
-   *
-   *  Note: currently ignored.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     A list of arbitrary files attached to an object that owns the properties.
+     The semantic and the file formats are subject of a contract between the
+     provider of a simulation environment and the author of a scenario.
+
+     NOTE: currently ignored.
+  */
   std::list<File> files;
 
   Properties() = default;
 
   explicit Properties(const pugi::xml_node &, Scope &);
 
-  template <typename... Ts>
-  auto operator[](Ts &&... xs) -> decltype(auto)
-  {
-    return properties.operator[](std::forward<decltype(xs)>(xs)...);
-  }
+  auto operator[](const String &) -> const Property &;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

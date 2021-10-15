@@ -40,11 +40,11 @@ struct AddEntityAction : private Scope
 
   explicit AddEntityAction(const pugi::xml_node &, Scope &);
 
-  static auto accomplished() noexcept -> bool { return endsImmediately(); }
+  static auto accomplished() noexcept -> bool;
 
-  static auto endsImmediately() noexcept -> bool { return true; }
+  static auto endsImmediately() noexcept -> bool;
 
-  auto operator()(const std::string &) const -> void;
+  /*  */ auto operator()(const EntityRef &) const -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -2,6 +2,27 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.5 (2021-10-13)
+------------------
+
+0.5.4 (2021-10-13)
+------------------
+* Merge pull request `#557 <https://github.com/tier4/scenario_simulator_v2/issues/557>`_ from tier4/revert/pr_544
+* Revert "Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status"
+* Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
+0.5.3 (2021-10-07)
+------------------
+
+0.5.2 (2021-10-06)
+------------------
+* Merge pull request `#544 <https://github.com/tier4/scenario_simulator_v2/issues/544>`_ from tier4/feature/remove_none_status
+* remove boost::none status in traffic_simulator
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.1 (2021-09-30)
 ------------------
 * Merge pull request `#530 <https://github.com/tier4/scenario_simulator_v2/issues/530>`_ from RobotecAI/traffic_lights

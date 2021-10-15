@@ -2,6 +2,22 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.5 (2021-10-13)
+------------------
+
+0.5.4 (2021-10-13)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
+* Contributors: yamacir-kit
+
+0.5.3 (2021-10-07)
+------------------
+
+0.5.2 (2021-10-06)
+------------------
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/speedup-build
+* Contributors: yamacir-kit
+
 0.5.1 (2021-09-30)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection

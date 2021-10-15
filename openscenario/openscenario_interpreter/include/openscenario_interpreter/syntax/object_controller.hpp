@@ -47,7 +47,9 @@ struct ObjectController : public ComplexType
 
   ~ObjectController();
 
-  auto isEgo() const & -> bool;
+  auto assign(const EntityRef &) -> void;
+
+  auto isUserDefinedController() const & -> bool;
 
   operator openscenario_msgs::msg::DriverModel() const;
 };

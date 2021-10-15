@@ -32,7 +32,17 @@ AddEntityAction::AddEntityAction(const Scope & scope, const Position & position)
 {
 }
 
-auto AddEntityAction::operator()(const std::string & entity_ref) const -> void
+auto AddEntityAction::accomplished() noexcept -> bool  //
+{
+  return endsImmediately();
+}
+
+auto AddEntityAction::endsImmediately() noexcept -> bool  //
+{
+  return true;
+}
+
+auto AddEntityAction::operator()(const EntityRef & entity_ref) const -> void
 try {
   const auto entity = global().entities.at(entity_ref);
 
@@ -54,23 +64,20 @@ try {
     position)
 
   auto add_entity_action = overload(
-
     [&](const Vehicle & vehicle) {
       if (APPLY_ADD_ENTITY_ACTION(
-            entity.as<ScenarioObject>().object_controller.isEgo(),  //
-            entity_ref,                                             //
+            entity.as<ScenarioObject>().object_controller.isUserDefinedController(),  //
+            entity_ref,                                                               //
             static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
-        applyAssignControllerAction(entity_ref, entity.as<ScenarioObject>().object_controller);
+        entity.as<ScenarioObject>().object_controller.assign(entity_ref);
         entity.as<ScenarioObject>().activateSensors();
         entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
       }
     },
-
     [&](const Pedestrian & pedestrian) {
       APPLY_ADD_ENTITY_ACTION(
         false, entity_ref, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
     },
-
     [&](const MiscObject & misc_object) {
       APPLY_ADD_ENTITY_ACTION(
         false, entity_ref, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));

@@ -41,6 +41,7 @@ void CppScenarioNode::update()
       stop(Result::FAILURE);
     }
   } catch (const common::scenario_simulator_exception::Error & e) {
+    RCLCPP_ERROR_STREAM(get_logger(), e.what());
     if (exception_expect_) {
       stop(Result::SUCCESS);
     } else {
