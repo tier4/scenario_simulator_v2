@@ -14,16 +14,17 @@
 
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
-#include <behavior_tree_plugin/transition_events/logger.hpp>
+#include <behavior_tree_plugin/transition_events/logging_event.hpp>
 
 namespace behavior_tree_plugin
 {
-Logger::Logger(const std::shared_ptr<BT::Tree> & tree_ptr, const rclcpp::Logger & logger)
+LoggingEvent::LoggingEvent(
+  const std::shared_ptr<BT::Tree> & tree_ptr, const rclcpp::Logger & logger)
 : TransitionEvent(tree_ptr), ros_logger_(logger)
 {
 }
 
-void Logger::callback(
+void LoggingEvent::callback(
   BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
   BT::NodeStatus status)
 {
@@ -35,5 +36,5 @@ void Logger::callback(
   TransitionEvent::updateCurrentAction(status, node);
 }
 
-const std::string Logger::getCurrentAction() const { return current_action_; }
+const std::string LoggingEvent::getCurrentAction() const { return current_action_; }
 }  // namespace behavior_tree_plugin

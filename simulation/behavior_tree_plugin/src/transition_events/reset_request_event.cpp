@@ -14,11 +14,11 @@
 
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
-#include <behavior_tree_plugin/transition_events/reset_request.hpp>
+#include <behavior_tree_plugin/transition_events/reset_request_event.hpp>
 
 namespace behavior_tree_plugin
 {
-ResetRequest::ResetRequest(
+ResetRequestEvent::ResetRequestEvent(
   const std::shared_ptr<BT::Tree> & tree_ptr, std::function<std::string()> get_request_function,
   std::function<void(std::string)> set_request_function)
 : TransitionEvent(tree_ptr_),
@@ -28,7 +28,7 @@ ResetRequest::ResetRequest(
 {
 }
 
-void ResetRequest::callback(
+void ResetRequestEvent::callback(
   BT::Duration /*timestamp*/, const BT::TreeNode & node, BT::NodeStatus /*prev_status*/,
   BT::NodeStatus status)
 {

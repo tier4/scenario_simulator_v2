@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__RESET_REQUEST_HPP_
-#define BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__RESET_REQUEST_HPP_
+#ifndef BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
+#define BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
 
 #include <behavior_tree_plugin/transition_events/transition_event.hpp>
 #include <memory>
@@ -21,22 +21,19 @@
 
 namespace behavior_tree_plugin
 {
-class ResetRequest : public TransitionEvent
+class LoggingEvent : public TransitionEvent
 {
 public:
-  ResetRequest(
-    const std::shared_ptr<BT::Tree> & tree_ptr, std::function<std::string()> get_request_function,
-    std::function<void(std::string)> set_request_function);
+  LoggingEvent(const std::shared_ptr<BT::Tree> & tree_ptr, const rclcpp::Logger & logger);
   const std::string getCurrentAction() const;
 
 private:
   void callback(
     BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
     BT::NodeStatus status) override;
-  std::shared_ptr<BT::Tree> tree_ptr_;
-  std::function<std::string()> get_request_function_;
-  std::function<void(std::string)> set_request_function_;
+  rclcpp::Logger ros_logger_;
+  std::string current_action_;
 };
 }  // namespace behavior_tree_plugin
 
-#endif  // BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS_RESET__REQUEST_HPP_
+#endif  // BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
