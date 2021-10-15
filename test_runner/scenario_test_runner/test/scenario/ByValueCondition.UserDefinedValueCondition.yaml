@@ -168,8 +168,8 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     UserDefinedValueCondition:
-                                      name: /simulation/this_node_name
-                                      value: 'this_node_name!'
+                                      name: /count_up
+                                      value: 100000000000000000000000
                                       rule: equalTo
                         Action:
                           - name: ''

@@ -15,12 +15,45 @@
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
+#include <openscenario_interpreter_msgs/msg/parameter_declaration.hpp>
 #include <regex>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+template <typename T>
+struct MagicSubscription : private rclcpp::Node, public T
+{
+  std::promise<void> promise;
+
+  std::thread thread;
+
+  std::exception_ptr thrown;
+
+  typename rclcpp::Subscription<T>::SharedPtr subscription;
+
+  explicit MagicSubscription(const std::string & node_name, const std::string & topic_name)
+  : rclcpp::Node(node_name),
+    thread(
+      [this](auto future) {
+        while (rclcpp::ok() and
+               future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
+          try {
+            rclcpp::spin_some(get_node_base_interface());
+          } catch (...) {
+            thrown = std::current_exception();
+          }
+        }
+      },
+      std::move(promise.get_future())),
+    subscription(create_subscription<T>(topic_name, 1, [this](const typename T::SharedPtr message) {
+      static_cast<T &>(*this) = *message;
+    }))
+  {
+  }
+};
+
 UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   value(readAttribute<String>("value", node, scope)),
@@ -34,11 +67,18 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     };
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
-    evaluateValue = [result]() {
-      PRINT(result.str(0));
-      PRINT(result.str(1));
-      return result.str(1);
+    using openscenario_interpreter_msgs::msg::ParameterDeclaration;
+
+    evaluateValue = [result]()  //
+    {
+      static auto current_message =
+        MagicSubscription<ParameterDeclaration>("receiver", result.str(0));
+      PRINT(current_message.name);
+      PRINT(current_message.parameter_type);
+      PRINT(current_message.value);
+      return "hoge!";
     };
+
   } else {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }

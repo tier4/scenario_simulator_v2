@@ -26,8 +26,8 @@ int main(const int argc, char const * const * const argv)
 
   auto node = std::make_shared<rclcpp::Node>("this_node_name");
 
-  auto publisher = node->create_publisher<ParameterDeclaration>(
-    "/simulation/this_node_name", rclcpp::QoS(1).reliable());
+  auto publisher =
+    node->create_publisher<ParameterDeclaration>("/count_up", rclcpp::QoS(1).reliable());
 
   auto make_message = [&, count = 0]() mutable  //
   {
