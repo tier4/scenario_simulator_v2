@@ -235,7 +235,7 @@
         <string>type</string>
        </property>
       </widget>
-      <widget class="QLabel" name="success_evalutation">
+      <widget class="QLabel" name="success_evaluation">
        <property name="geometry">
         <rect>
          <x>310</x>
