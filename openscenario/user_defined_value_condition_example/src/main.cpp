@@ -12,24 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <autoware_debug_msgs/msg/string_stamped.hpp>
+#include <boost/lexical_cast.hpp>
+#include <openscenario_interpreter_msgs/msg/parameter_declaration.hpp>
+#include <openscenario_interpreter_msgs/msg/parameter_type.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 int main(const int argc, char const * const * const argv)
 {
+  using openscenario_interpreter_msgs::msg::ParameterDeclaration;
+  using openscenario_interpreter_msgs::msg::ParameterType;
+
   rclcpp::init(argc, argv);
 
   auto node = std::make_shared<rclcpp::Node>("this_node_name");
 
-  auto publisher = node->create_publisher<autoware_debug_msgs::msg::StringStamped>(
+  auto publisher = node->create_publisher<ParameterDeclaration>(
     "/simulation/this_node_name", rclcpp::QoS(1).reliable());
 
   auto make_message = [&, count = 0]() mutable  //
   {
-    autoware_debug_msgs::msg::StringStamped message;
+    ParameterDeclaration message;
     {
-      message.stamp = node->now();
-      message.data = ++count < 100 ? "OK" : "Something went wrong!";
+      message.name = "Currently ParameterDeclaration::name will be ignored.";
+      message.parameter_type = ParameterType::UNSIGNED_INT;
+      message.value = boost::lexical_cast<decltype(message.value)>(++count);
     }
 
     return message;

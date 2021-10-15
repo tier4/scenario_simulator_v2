@@ -188,4 +188,3 @@ OpenSCENARIO:
                           rule: greaterThan
     StopTrigger:
       ConditionGroup: []
-
