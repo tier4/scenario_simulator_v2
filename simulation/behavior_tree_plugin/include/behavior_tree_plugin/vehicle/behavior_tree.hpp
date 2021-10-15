@@ -18,6 +18,7 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
+#include <behavior_tree_plugin/transition_events/transition_events.hpp>
 #include <functional>
 #include <geometry_msgs/msg/point.hpp>
 #include <map>
@@ -36,7 +37,8 @@ class VehicleBehaviorTree : public BehaviorPluginBase
 {
 public:
   void update(double current_time, double step_time) override;
-  void configure() override;
+  void configure(const rclcpp::Logger & logger) override;
+  const std::string & getCurrentAction() const override;
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \
   void set##NAME(const TYPE & value) override                                               \
@@ -67,17 +69,10 @@ public:
 #undef DEFINE_GETTER_SETTER
 private:
   BT::NodeStatus tickOnce(double current_time, double step_time);
-  std::shared_ptr<BT::StdCoutLogger> logger_cout_ptr_;
-  void callback(
-    BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
-    BT::NodeStatus status);
-  void setupLogger();
-  BT::TimestampType type_;
-  BT::TimePoint first_timestamp_;
-  std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
-  std::string current_action_;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
+  std::shared_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;
+  std::shared_ptr<behavior_tree_plugin::ResetRequestEvent> reset_request_event_ptr_;
 };
 }  // namespace entity_behavior
 

@@ -32,13 +32,10 @@ namespace entity_behavior
 {
 class BehaviorPluginBase
 {
-private:
-  std::string current_action_;
-
 public:
-  virtual void configure() = 0;
+  virtual void configure(const rclcpp::Logger & logger) = 0;
   virtual void update(double current_time, double step_time) = 0;
-  const std::string getCurrentAction() const { return current_action_; }
+  virtual const std::string & getCurrentAction() const = 0;
 
   typedef std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> EntityTypeDict;
   typedef std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus>

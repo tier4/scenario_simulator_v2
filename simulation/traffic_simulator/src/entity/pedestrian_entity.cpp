@@ -34,7 +34,7 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
 {
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-  behavior_plugin_ptr_->configure();
+  behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
 }
 
