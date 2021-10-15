@@ -17,8 +17,8 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
-#include <openscenario_msgs/msg/axle.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/axle.hpp>
 
 namespace openscenario_interpreter
 {
@@ -43,7 +43,7 @@ struct Axle
 
   explicit Axle(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::Axle() const;
+  explicit operator traffic_simulator_msgs::msg::Axle() const;
 };
 
 struct FrontAxle : public Axle

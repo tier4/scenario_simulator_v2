@@ -34,11 +34,11 @@ auto AcquirePositionAction::run() -> void
     },
     [](const RelativeWorldPosition & position, auto && actor) {
       return applyAcquirePositionAction(
-        actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+        actor, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
     },
     [](const LanePosition & position, auto && actor) {
       return applyAcquirePositionAction(
-        actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+        actor, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
     });
 
   for (const auto & actor : actors) {

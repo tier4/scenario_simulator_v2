@@ -107,7 +107,7 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getLaneletPolygon(std::
   return points;
 }
 
-double HdMapUtils::getHeight(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
+double HdMapUtils::getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   return toMapPose(lanelet_pose).pose.position.z;
 }
@@ -256,7 +256,7 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
   return exclude_subtype_lanelets;
 }
 
-boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
+boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, bool include_crosswalk)
 {
   const auto lanelet_id = getClosetLaneletId(pose, include_crosswalk);
@@ -266,7 +266,7 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   return toLaneletPose(pose, lanelet_id.get());
 }
 
-boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
+boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
@@ -278,7 +278,7 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
     quaternion_operation::getRotation(pose_on_centerline.orientation, pose.orientation));
   double offset = spline->getSquaredDistanceIn2D(pose.position, s.get());
-  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s.get();
   lanelet_pose.offset = offset;
@@ -780,7 +780,7 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
-  openscenario_msgs::msg::LaneletPose lanelet_pose)
+  traffic_simulator_msgs::msg::LaneletPose lanelet_pose)
 {
   return toMapPose(
     lanelet_pose.lanelet_id, lanelet_pose.s, lanelet_pose.offset,
@@ -790,7 +790,7 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   std::int64_t lanelet_id, double s, double offset)
 {
-  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s;
   lanelet_pose.offset = offset;
@@ -811,7 +811,7 @@ bool HdMapUtils::canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lan
 }
 
 boost::optional<double> HdMapUtils::getLongitudinalDistance(
-  openscenario_msgs::msg::LaneletPose from, openscenario_msgs::msg::LaneletPose to)
+  traffic_simulator_msgs::msg::LaneletPose from, traffic_simulator_msgs::msg::LaneletPose to)
 {
   return getLongitudinalDistance(from.lanelet_id, from.s, to.lanelet_id, to.s);
 }

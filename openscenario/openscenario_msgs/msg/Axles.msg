@@ -1,2 +1,0 @@
-openscenario_msgs/Axle front_axle
-openscenario_msgs/Axle rear_axle

@@ -20,8 +20,8 @@
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/pedestrian_category.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
-#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
 
 namespace openscenario_interpreter
 {
@@ -58,7 +58,7 @@ struct Pedestrian : public Scope
 
   explicit Pedestrian(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::PedestrianParameters() const;
+  explicit operator traffic_simulator_msgs::msg::PedestrianParameters() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

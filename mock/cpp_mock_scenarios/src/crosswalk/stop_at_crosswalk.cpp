@@ -17,9 +17,9 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
-#include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator_msgs/msg/driver_model.hpp>
 
 // headers in STL
 #include <memory>
@@ -70,7 +70,7 @@ private:
       traffic_simulator::helper::constructActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
     api_.requestAssignRoute(
-      "ego", std::vector<openscenario_msgs::msg::LaneletPose>{
+      "ego", std::vector<traffic_simulator_msgs::msg::LaneletPose>{
                traffic_simulator::helper::constructLaneletPose(34675, 0.0),
                traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
   }

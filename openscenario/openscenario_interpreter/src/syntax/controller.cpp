@@ -52,9 +52,9 @@ auto Controller::operator[](const String & name) -> const Property &  //
   return properties[name];
 }
 
-Controller::operator openscenario_msgs::msg::DriverModel()
+Controller::operator traffic_simulator_msgs::msg::DriverModel()
 {
-  openscenario_msgs::msg::DriverModel controller;
+  traffic_simulator_msgs::msg::DriverModel controller;
   {
     controller.see_around = not properties["isBlind"];
   }

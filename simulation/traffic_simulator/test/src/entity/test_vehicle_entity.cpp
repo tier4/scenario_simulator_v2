@@ -31,7 +31,7 @@ TEST(VEHICLE_ENTITYT, GET_VEHICLE_COMMAND)
 TEST(VEHICLE_ENTITY, SET_STATUS)
 {
   traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
-  openscenario_msgs::msg::EntityStatus status;
+  traffic_simulator_msgs::msg::EntityStatus status;
   status.lanelet_pose = traffic_simulator::helper::constructLaneletPose(34741, 0, 0);
   status.action_status = traffic_simulator::helper::constructActionStatus(3);
   status.bounding_box = entity.getBoundingBox();
@@ -42,7 +42,7 @@ TEST(VEHICLE_ENTITYT, UPDATE_ENTITY_TIMESTAMP)
 {
   traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
   EXPECT_NO_THROW(entity.updateEntityStatusTimestamp(3));
-  openscenario_msgs::msg::EntityStatus status;
+  traffic_simulator_msgs::msg::EntityStatus status;
   status.lanelet_pose = traffic_simulator::helper::constructLaneletPose(34741, 0, 0);
   status.action_status = traffic_simulator::helper::constructActionStatus(3);
   status.bounding_box = entity.getBoundingBox();

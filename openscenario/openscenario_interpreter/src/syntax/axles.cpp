@@ -26,12 +26,12 @@ Axles::Axles(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-Axles::operator openscenario_msgs::msg::Axles() const
+Axles::operator traffic_simulator_msgs::msg::Axles() const
 {
-  openscenario_msgs::msg::Axles axles;
+  traffic_simulator_msgs::msg::Axles axles;
   {
-    axles.front_axle = static_cast<openscenario_msgs::msg::Axle>(front_axle);
-    axles.rear_axle = static_cast<openscenario_msgs::msg::Axle>(rear_axle);
+    axles.front_axle = static_cast<traffic_simulator_msgs::msg::Axle>(front_axle);
+    axles.rear_axle = static_cast<traffic_simulator_msgs::msg::Axle>(rear_axle);
   }
 
   return axles;

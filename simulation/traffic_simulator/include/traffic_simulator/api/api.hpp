@@ -21,7 +21,6 @@
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <cassert>
 #include <memory>
-#include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/zmq_client.hpp>
@@ -36,6 +35,7 @@
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <utility>
 
 namespace traffic_simulator
@@ -109,15 +109,15 @@ public:
 
   bool spawn(
     const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::VehicleParameters & params);
+    const traffic_simulator_msgs::msg::VehicleParameters & params);
 
   bool spawn(
     const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::PedestrianParameters & params);
+    const traffic_simulator_msgs::msg::PedestrianParameters & params);
 
   bool spawn(
     const bool is_ego, const std::string & name,
-    const openscenario_msgs::msg::MiscObjectParameters & params);
+    const traffic_simulator_msgs::msg::MiscObjectParameters & params);
 
   template <typename Parameters, typename... Ts>
   auto spawn(const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
@@ -127,30 +127,30 @@ public:
 
   bool despawn(const std::string & name);
 
-  openscenario_msgs::msg::EntityStatus getEntityStatus(const std::string & name);
+  traffic_simulator_msgs::msg::EntityStatus getEntityStatus(const std::string & name);
 
   geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
   bool setEntityStatus(
-    const std::string & name, const openscenario_msgs::msg::EntityStatus & status);
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status);
   bool setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status =
+    const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
   bool setEntityStatus(
-    const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status =
+    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
+    const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
     const geometry_msgs::msg::Pose & relative_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status =
+    const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
     const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
-    const openscenario_msgs::msg::ActionStatus & action_status =
+    const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
 
   boost::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
@@ -158,7 +158,7 @@ public:
   bool reachPosition(
     const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance);
   bool reachPosition(
-    const std::string & name, const openscenario_msgs::msg::LaneletPose & target_pose,
+    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & target_pose,
     const double tolerance);
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
@@ -227,7 +227,7 @@ private:
   template <typename Parameters>
   bool spawn(
     const bool is_ego, const Parameters & parameters,
-    const openscenario_msgs::msg::EntityStatus & status)
+    const traffic_simulator_msgs::msg::EntityStatus & status)
   {
     return spawn(is_ego, parameters.toXml(), status);
   }

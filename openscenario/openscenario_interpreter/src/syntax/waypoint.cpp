@@ -26,10 +26,12 @@ Waypoint::Waypoint(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-Waypoint::operator openscenario_msgs::msg::LaneletPose() const
+Waypoint::operator traffic_simulator_msgs::msg::LaneletPose() const
 {
-  return apply<openscenario_msgs::msg::LaneletPose>(
-    [](auto && position) { return static_cast<openscenario_msgs::msg::LaneletPose>(position); },
+  return apply<traffic_simulator_msgs::msg::LaneletPose>(
+    [](auto && position) {
+      return static_cast<traffic_simulator_msgs::msg::LaneletPose>(position);
+    },
     position);
 }
 }  // namespace syntax
