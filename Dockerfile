@@ -3,6 +3,7 @@ FROM ros:${ROS_DISTRO}
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
+ARG ROS_DISTRO
 
 RUN sudo apt-get update && sudo apt-get -y install python3-pip python3-rospkg python3-rosdep software-properties-common
 RUN add-apt-repository ppa:kisak/kisak-mesa -y

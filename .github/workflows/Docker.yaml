@@ -39,11 +39,11 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: tier4/scenario_simulator_v2
-          tags: latest
+          tags: ${{ matrix.rosdistro }}
           no-cache: true
           build_args: |
             BUILDKIT_INLINE_CACHE=1
-            ROSDISTRO=${{ matrix.rosdistro }}
+            ROS_DISTRO=${{ matrix.rosdistro }}
           push: true
       - name: Build Docker Image
         if: ${{ github.event_name == 'pull_request'}}
@@ -54,9 +54,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: tier4/scenario_simulator_v2
-          tags: latest
+          tags: ${{ matrix.rosdistro }}
           no-cache: true
           build_args: |
             BUILDKIT_INLINE_CACHE=1
-            ROSDISTRO=${{ matrix.rosdistro }}
+            ROS_DISTRO=${{ matrix.rosdistro }}
           push: false
