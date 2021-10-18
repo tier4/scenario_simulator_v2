@@ -41,7 +41,8 @@ VehicleEntity::VehicleEntity(
 
 void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
 {
-  behavior_plugin_ptr_->appendDebugMarker(marker_array);
+  const auto marker = behavior_plugin_ptr_->getDebugMarker();
+  std::copy(marker.begin(), marker.end(), std::back_inserter(marker_array.markers));
 }
 
 void VehicleEntity::requestAssignRoute(
