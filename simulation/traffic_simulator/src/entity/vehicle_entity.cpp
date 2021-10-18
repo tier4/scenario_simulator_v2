@@ -37,6 +37,7 @@ VehicleEntity::VehicleEntity(
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
+  behavior_plugin_ptr_->setDebugMarker({});
 }
 
 void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
