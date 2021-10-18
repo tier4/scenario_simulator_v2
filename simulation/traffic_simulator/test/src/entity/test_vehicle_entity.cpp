@@ -22,7 +22,7 @@
 #include "../expect_eq_macros.hpp"
 
 /*
-TEST(VEHICLE_ENTITYT, GET_VEHICLE_COMMAND)
+TEST(VEHICLE_ENTITY, GET_VEHICLE_COMMAND)
 {
   traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
   EXPECT_THROW(entity.getVehicleCommand(), common::SimulationError);
@@ -38,7 +38,7 @@ TEST(VEHICLE_ENTITY, SET_STATUS)
   EXPECT_NO_THROW(entity.setStatus(status));
 }
 
-TEST(VEHICLE_ENTITYT, UPDATE_ENTITY_TIMESTAMP)
+TEST(VEHICLE_ENTITY, UPDATE_ENTITY_TIMESTAMP)
 {
   traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
   EXPECT_NO_THROW(entity.updateEntityStatusTimestamp(3));

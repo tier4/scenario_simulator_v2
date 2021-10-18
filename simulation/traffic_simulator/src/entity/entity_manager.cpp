@@ -290,7 +290,7 @@ auto EntityManager::getLongitudinalDistance(
  *
  * @param name name of the target entity
  * @return true lane matching is succeed
- * @return false lane mathing is failed
+ * @return false lane matching is failed
  */
 bool EntityManager::laneMatchingSucceed(const std::string & name)
 {
