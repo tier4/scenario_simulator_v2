@@ -71,8 +71,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
 
     evaluateValue = [result]()  //
     {
-      static auto current_message =
-        MagicSubscription<ParameterDeclaration>("receiver", result.str(0));
+      static MagicSubscription<ParameterDeclaration> current_message{"receiver", result.str(0)};
       PRINT(current_message.name);
       PRINT(current_message.parameter_type);
       PRINT(current_message.value);
