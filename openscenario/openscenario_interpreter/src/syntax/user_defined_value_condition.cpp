@@ -105,8 +105,13 @@ auto UserDefinedValueCondition::description() const -> String
 
 auto UserDefinedValueCondition::evaluate() -> Element
 {
-  return asBoolean(ParameterCondition::compare(result = evaluateValue(), rule, value));
-  // return asBoolean(rule(result = evaluateValue(), value));
+  result = evaluateValue();
+
+  if (result == unspecified) {
+    return false_v;
+  } else {
+    return asBoolean(ParameterCondition::compare(result, rule, value));
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -169,7 +169,7 @@ OpenSCENARIO:
                                   ByValueCondition:
                                     UserDefinedValueCondition:
                                       name: /count_up
-                                      value: 100000000000000000000000
+                                      value: 500
                                       rule: equalTo
                         Action:
                           - name: ''

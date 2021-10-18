@@ -34,9 +34,11 @@ auto check(const std::string & name) -> decltype(auto)
       "Parameter names starting with \"OSC\" are reserved for special use in future versions "
       "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix.");
   } else if (includes(name, {' ', '$', '\'', '"'})) {
-    throw SyntaxError(
-      "In parameter names, usage of symbols is restricted. Symbols that must not be used are: "
-      "whitespace, dollar-sign, single-quote, double-quote.");
+    // throw SyntaxError(
+    //   "In parameter names, usage of symbols is restricted. Symbols that must not be used are: "
+    //   "whitespace, dollar-sign, single-quote, double-quote. Given parameter name is ",
+    //   std::quoted(name));
+    return name;
   } else {
     return name;
   }
