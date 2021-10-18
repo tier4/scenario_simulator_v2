@@ -14,8 +14,8 @@
 
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/syntax/parameter_condition.hpp>
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
-#include <openscenario_interpreter/syntax/parameter_set_action.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
 #include <regex>
 
@@ -63,10 +63,14 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
   std::smatch result;
 
   if (std::regex_match(name, result, std::regex(R"(([^\.]+)\.(.+))"))) {
-    const std::unordered_map<std::string, std::function<std::string()>> dispatch{
-      std::make_pair("currentState", [result]() { return evaluateCurrentState(result.str(1)); }),
+    //
+    const std::unordered_map<std::string, std::function<Element()>> dispatch{
+      std::make_pair(
+        "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
     };
+
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
+
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
     //
     evaluateValue = [&, result]()  //
@@ -74,15 +78,15 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
       static MagicSubscription<openscenario_interpreter_msgs::msg::ParameterDeclaration>
         current_message{"receiver", result.str(0)};
 
-      static const ParameterDeclaration parameter_declaration{current_message, scope};
-
-      ParameterSetAction::set(scope, parameter_declaration.name, parameter_declaration.value);
-
-      PRINT(parameter_declaration.name);
-      PRINT(parameter_declaration.parameter_type);
-      PRINT(parameter_declaration.value);
-
-      return "hoge!";
+      if (not current_message.value.empty()) {
+        const auto parameter_declaration = ParameterDeclaration(current_message);
+        PRINT(parameter_declaration.name);
+        PRINT(parameter_declaration.parameter_type);
+        PRINT(parameter_declaration.value);
+        return parameter_declaration.evaluate();
+      } else {
+        return unspecified;
+      }
     };
 
   } else {
@@ -101,7 +105,8 @@ auto UserDefinedValueCondition::description() const -> String
 
 auto UserDefinedValueCondition::evaluate() -> Element
 {
-  return asBoolean(rule(result = evaluateValue(), value));
+  return asBoolean(ParameterCondition::compare(result = evaluateValue(), rule, value));
+  // return asBoolean(rule(result = evaluateValue(), value));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

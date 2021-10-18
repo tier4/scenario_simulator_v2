@@ -39,15 +39,17 @@ struct ParameterCondition : private Scope
 
   const String value;
 
-  const Rule compare;
+  const Rule rule;
 
   explicit ParameterCondition(Scope &);
 
   explicit ParameterCondition(const pugi::xml_node &, Scope &);
 
-  auto description() const -> String;
+  static auto compare(const Element &, const Rule &, const String &) -> bool;
 
-  auto evaluate() const -> Element;
+  /*  */ auto description() const -> String;
+
+  /*  */ auto evaluate() const -> Element;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

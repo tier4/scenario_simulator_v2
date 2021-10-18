@@ -40,9 +40,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 class UserDefinedValueCondition
 {
-  String result;
+  Element result;
 
-  std::function<std::string()> evaluateValue;
+  std::function<Element()> evaluateValue;
 
 public:
   const String name;

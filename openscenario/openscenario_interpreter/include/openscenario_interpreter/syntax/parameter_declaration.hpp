@@ -44,6 +44,8 @@ struct ParameterDeclaration
 
   explicit ParameterDeclaration() = default;
 
+  explicit ParameterDeclaration(const openscenario_interpreter_msgs::msg::ParameterDeclaration &);
+
   explicit ParameterDeclaration(
     const openscenario_interpreter_msgs::msg::ParameterDeclaration &, Scope &);
 
