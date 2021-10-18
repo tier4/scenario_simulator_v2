@@ -88,7 +88,7 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   return traffic_simulator::math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
 }
 
-const visualization_msgs::msg::MarkerArray EntityManager::getDebugMarker() const
+visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 {
   visualization_msgs::msg::MarkerArray marker;
   for (const auto & entity : entities_) {
