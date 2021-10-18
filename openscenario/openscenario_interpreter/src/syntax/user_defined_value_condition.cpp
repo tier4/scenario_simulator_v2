@@ -68,12 +68,12 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
     //
-    evaluateValue = [result]()  //
+    evaluateValue = [&, result]()  //
     {
       static MagicSubscription<openscenario_interpreter_msgs::msg::ParameterDeclaration>
         current_message{"receiver", result.str(0)};
 
-      const ParameterDeclaration parameter_declaration{current_message};
+      const ParameterDeclaration parameter_declaration{current_message, scope};
 
       PRINT(parameter_declaration.name);
       PRINT(parameter_declaration.parameter_type);

@@ -21,18 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-ParameterDeclaration::ParameterDeclaration(
-  const openscenario_interpreter_msgs::msg::ParameterDeclaration & message)
-: name(message.name),                      //
-  parameter_type(message.parameter_type),  //
-  value(message.value)
-{
-}
-
-ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
-: name(readAttribute<String>("name", node, scope)),
-  parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
-  value(readAttribute<String>("value", node, scope))
+auto check(const std::string & name) -> decltype(auto)
 {
   auto includes = [](const std::string & name, const std::vector<char> & chars) {
     return std::any_of(std::begin(chars), std::end(chars), [&](const auto & each) {
@@ -46,14 +35,28 @@ ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & 
       "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix.");
   } else if (includes(name, {' ', '$', '\'', '"'})) {
     throw SyntaxError(
-      "In parameter names, usage of symbols is restricted. Symbols that must not be used are:\n"
-      "  - \" \" (blank space)\n"
-      "  - $\n"
-      "  - \'\n"
-      "  - \"\n");
+      "In parameter names, usage of symbols is restricted. Symbols that must not be used are: "
+      "whitespace, dollar-sign, single-quote, double-quote.");
   } else {
-    scope.insert(name, evaluate());
+    return name;
   }
+}
+
+ParameterDeclaration::ParameterDeclaration(
+  const openscenario_interpreter_msgs::msg::ParameterDeclaration & message, Scope & scope)
+: name(message.name),                      //
+  parameter_type(message.parameter_type),  //
+  value(message.value)
+{
+  scope.insert(check(name), evaluate());
+}
+
+ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope)),
+  parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
+  value(readAttribute<String>("value", node, scope))
+{
+  scope.insert(check(name), evaluate());
 }
 
 auto ParameterDeclaration::evaluate() const -> Element
