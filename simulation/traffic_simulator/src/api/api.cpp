@@ -403,7 +403,7 @@ bool API::updateFrame()
     entity_manager_ptr_->broadcastEntityTransform();
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
-    debug_marker_pub_->publish(entity_manager_ptr_->getDebugMarker());
+    debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
     metrics_manager_.calculate();
     if (!updateEntityStatusInSim()) {
       return false;
@@ -414,7 +414,7 @@ bool API::updateFrame()
     entity_manager_ptr_->broadcastEntityTransform();
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
-    debug_marker_pub_->publish(entity_manager_ptr_->getDebugMarker());
+    debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
     metrics_manager_.calculate();
     return true;
   }

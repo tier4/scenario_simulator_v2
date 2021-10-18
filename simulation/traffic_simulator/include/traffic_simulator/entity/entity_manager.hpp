@@ -221,7 +221,7 @@ public:
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
 
-  const visualization_msgs::msg::MarkerArray getDebugMarker() const;
+  visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 
   bool trafficLightsChanged();
 
