@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
+#include <openscenario_interpreter/syntax/parameter_set_action.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
 #include <regex>
 
@@ -73,7 +74,9 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
       static MagicSubscription<openscenario_interpreter_msgs::msg::ParameterDeclaration>
         current_message{"receiver", result.str(0)};
 
-      const ParameterDeclaration parameter_declaration{current_message, scope};
+      static const ParameterDeclaration parameter_declaration{current_message, scope};
+
+      ParameterSetAction::set(scope, parameter_declaration.name, parameter_declaration.value);
 
       PRINT(parameter_declaration.name);
       PRINT(parameter_declaration.parameter_type);
