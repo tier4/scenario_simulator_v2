@@ -24,7 +24,10 @@ jobs:
   job1:
     name: Build Docker Image
     runs-on: ubuntu-20.04
-    timeout-minutes: 60
+    timeout-minutes: 90
+    strategy:
+      matrix:
+        rosdistro: [foxy, galactic]
     steps:
       - uses: actions/checkout@v2-beta
       - name: Build and Push Docker Image
@@ -38,7 +41,9 @@ jobs:
           repository: tier4/scenario_simulator_v2
           tags: latest
           no-cache: true
-          build_args: BUILDKIT_INLINE_CACHE=1
+          build_args: |
+            BUILDKIT_INLINE_CACHE=1
+            ROSDISTRO=${{ matrix.rosdistro }}
           push: true
       - name: Build Docker Image
         if: ${{ github.event_name == 'pull_request'}}
@@ -51,5 +56,7 @@ jobs:
           repository: tier4/scenario_simulator_v2
           tags: latest
           no-cache: true
-          build_args: BUILDKIT_INLINE_CACHE=1
+          build_args: |
+            BUILDKIT_INLINE_CACHE=1
+            ROSDISTRO=${{ matrix.rosdistro }}
           push: false

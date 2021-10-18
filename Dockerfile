@@ -1,4 +1,5 @@
-FROM ros:foxy
+ARG ROS_DISTRO
+FROM ros:${ROS_DISTRO}
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
@@ -13,12 +14,12 @@ COPY . $WORKDIR
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/
 RUN mkdir -p /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/external
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator
-RUN vcs import external < dependency_foxy.repos
+RUN vcs import external < dependency_${ROS_DISTRO}.repos
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src
-RUN source /opt/ros/foxy/setup.bash && rosdep install -iry --from-paths . --rosdistro foxy
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && rosdep install -iry --from-paths . --rosdistro ${ROS_DISTRO}
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
-RUN source /opt/ros/foxy/setup.bash && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 COPY ./docker-entrypoint.sh /
 RUN chmod a+x /docker-entrypoint.sh
 
