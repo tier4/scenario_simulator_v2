@@ -41,8 +41,7 @@ jobs:
           repository: tier4/scenario_simulator_v2
           tags: ${{ matrix.rosdistro }}
           no-cache: true
-          build_args: |
-            ROS_DISTRO=${{ matrix.rosdistro }}
+          build_args: ROS_DISTRO=${{ matrix.rosdistro }}
           push: true
       - name: Build Docker Image
         if: ${{ github.event_name == 'pull_request'}}
@@ -55,6 +54,5 @@ jobs:
           repository: tier4/scenario_simulator_v2
           tags: ${{ matrix.rosdistro }}
           no-cache: true
-          build_args: |
-            ROS_DISTRO=${{ matrix.rosdistro }}
+          build_args: ROS_DISTRO=${{ matrix.rosdistro }}
           push: false
