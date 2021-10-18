@@ -21,6 +21,14 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+ParameterDeclaration::ParameterDeclaration(
+  const openscenario_interpreter_msgs::msg::ParameterDeclaration & message)
+: name(message.name),                      //
+  parameter_type(message.parameter_type),  //
+  value(message.value)
+{
+}
+
 ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
@@ -52,13 +60,13 @@ auto ParameterDeclaration::evaluate() const -> Element
 {
   // clang-format off
   switch (parameter_type) {
-    case ParameterType::INTEGER:        return make<Integer      >(value);
+    case ParameterType::BOOLEAN:        return make<Boolean      >(value);
+    case ParameterType::DATE_TIME:      return make<String       >(value);
     case ParameterType::DOUBLE:         return make<Double       >(value);
+    case ParameterType::INTEGER:        return make<Integer      >(value);
     case ParameterType::STRING:         return make<String       >(value);
     case ParameterType::UNSIGNED_INT:   return make<UnsignedInt  >(value);
     case ParameterType::UNSIGNED_SHORT: return make<UnsignedShort>(value);
-    case ParameterType::BOOLEAN:        return make<Boolean      >(value);
-    case ParameterType::DATE_TIME:      return make<String       >(value);
 
     default:
       return unspecified;

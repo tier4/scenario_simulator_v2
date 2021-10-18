@@ -34,7 +34,7 @@ int main(const int argc, char const * const * const argv)
     ParameterDeclaration message;
     {
       message.name = "Currently ParameterDeclaration::name will be ignored.";
-      message.parameter_type = ParameterType::UNSIGNED_INT;
+      message.parameter_type.data = ParameterType::UNSIGNED_INT;
       message.value = boost::lexical_cast<decltype(message.value)>(++count);
     }
 

@@ -14,8 +14,8 @@
 
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/syntax/parameter_declaration.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
-#include <openscenario_interpreter_msgs/msg/parameter_declaration.hpp>
 #include <regex>
 
 namespace openscenario_interpreter
@@ -67,14 +67,18 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     };
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
-    using openscenario_interpreter_msgs::msg::ParameterDeclaration;
-
+    //
     evaluateValue = [result]()  //
     {
-      static MagicSubscription<ParameterDeclaration> current_message{"receiver", result.str(0)};
-      PRINT(current_message.name);
-      PRINT(current_message.parameter_type);
-      PRINT(current_message.value);
+      static MagicSubscription<openscenario_interpreter_msgs::msg::ParameterDeclaration>
+        current_message{"receiver", result.str(0)};
+
+      const ParameterDeclaration parameter_declaration{current_message};
+
+      PRINT(parameter_declaration.name);
+      PRINT(parameter_declaration.parameter_type);
+      PRINT(parameter_declaration.value);
+
       return "hoge!";
     };
 

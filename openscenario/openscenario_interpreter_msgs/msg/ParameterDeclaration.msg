@@ -1,3 +1,3 @@
 string name
-int8 parameter_type
+openscenario_interpreter_msgs/ParameterType parameter_type
 string value
