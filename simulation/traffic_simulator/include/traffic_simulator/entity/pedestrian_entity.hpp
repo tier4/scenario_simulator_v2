@@ -17,7 +17,6 @@
 
 #include <boost/optional.hpp>
 #include <memory>
-#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
 #include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
 #include <string>
@@ -25,6 +24,7 @@
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -35,9 +35,9 @@ class PedestrianEntity : public EntityBase
 {
 public:
   PedestrianEntity(
-    const std::string & name, const openscenario_msgs::msg::PedestrianParameters & parameters);
+    const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & parameters);
 
-  const openscenario_msgs::msg::PedestrianParameters parameters;
+  const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
 
@@ -49,7 +49,8 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override;
+  void requestAcquirePosition(
+    const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
@@ -73,13 +74,13 @@ public:
 
   void setTargetSpeed(double target_speed, bool continuous) override;
 
-  const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
+  const traffic_simulator_msgs::msg::BoundingBox getBoundingBox() const override
   {
     return parameters.bounding_box;
   }
 
   void requestAssignRoute(
-    const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
@@ -97,16 +98,19 @@ public:
     }
   }
 
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
+  boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
+  {
+    return boost::none;
+  }
 
-  std::vector<openscenario_msgs::msg::LaneletPose> getGoalPoses() override
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override
   {
     return route_planner_ptr_->getGoalPoses();
   }
 
-  const openscenario_msgs::msg::WaypointsArray getWaypoints() override
+  const traffic_simulator_msgs::msg::WaypointsArray getWaypoints() override
   {
-    return openscenario_msgs::msg::WaypointsArray();
+    return traffic_simulator_msgs::msg::WaypointsArray();
   };
 
   const std::string plugin_name;

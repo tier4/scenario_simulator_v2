@@ -16,9 +16,9 @@
 
 #include <boost/algorithm/clamp.hpp>
 #include <memory>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <string>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -26,7 +26,7 @@ namespace traffic_simulator
 namespace entity
 {
 VehicleEntity::VehicleEntity(
-  const std::string & name, const openscenario_msgs::msg::VehicleParameters & params)
+  const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & params)
 : EntityBase(params.vehicle_category, name),
   parameters(params),
   plugin_name("behavior_tree_plugin/VehicleBehaviorTree"),
@@ -34,7 +34,7 @@ VehicleEntity::VehicleEntity(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
 {
-  entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
+  entity_type_.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
 }
@@ -45,7 +45,7 @@ void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & mar
 }
 
 void VehicleEntity::requestAssignRoute(
-  const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
   if (status_ and status_->lanelet_pose_valid) {
     route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
@@ -54,7 +54,7 @@ void VehicleEntity::requestAssignRoute(
 
 void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
-  std::vector<openscenario_msgs::msg::LaneletPose> route;
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> route;
   for (const auto & waypoint : waypoints) {
     const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint);
     if (lanelet_waypoint) {
@@ -66,7 +66,8 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   requestAssignRoute(route);
 }
 
-void VehicleEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
+void VehicleEntity::requestAcquirePosition(
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   if (status_ and status_->lanelet_pose_valid) {
     route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);

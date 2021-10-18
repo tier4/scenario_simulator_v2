@@ -24,8 +24,8 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <iostream>
-#include <openscenario_msgs/msg/driver_model.hpp>
 #include <string>
+#include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <utility>
 
 namespace entity_behavior
@@ -60,7 +60,7 @@ void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
   setRequest("none");
 }
 
-const std::string VehicleBehaviorTree::getCurrentAction() const
+const std::string & VehicleBehaviorTree::getCurrentAction() const
 {
   return logging_event_ptr_->getCurrentAction();
 }

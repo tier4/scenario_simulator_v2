@@ -37,7 +37,7 @@ void PedestrianBehaviorTree::configure(const rclcpp::Logger & logger)
   setRequest("none");
 }
 
-const std::string PedestrianBehaviorTree::getCurrentAction() const
+const std::string & PedestrianBehaviorTree::getCurrentAction() const
 {
   return logging_event_ptr_->getCurrentAction();
 }

@@ -164,9 +164,9 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 }
 
 auto EntityManager::getEntityStatus(const std::string & name) const
-  -> const boost::optional<openscenario_msgs::msg::EntityStatus>
+  -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
-  openscenario_msgs::msg::EntityStatus status_msg;
+  traffic_simulator_msgs::msg::EntityStatus status_msg;
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     THROW_SEMANTIC_ERROR("entity : ", name, " does not exist.");
@@ -175,13 +175,13 @@ auto EntityManager::getEntityStatus(const std::string & name) const
   status_msg.bounding_box = getBoundingBox(name);
   status_msg.action_status.current_action = getCurrentAction(name);
   switch (getEntityType(name).type) {
-    case openscenario_msgs::msg::EntityType::EGO:
+    case traffic_simulator_msgs::msg::EntityType::EGO:
       status_msg.type.type = status_msg.type.EGO;
       break;
-    case openscenario_msgs::msg::EntityType::VEHICLE:
+    case traffic_simulator_msgs::msg::EntityType::VEHICLE:
       status_msg.type.type = status_msg.type.VEHICLE;
       break;
-    case openscenario_msgs::msg::EntityType::PEDESTRIAN:
+    case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
       status_msg.type.type = status_msg.type.PEDESTRIAN;
       break;
   }
@@ -191,9 +191,9 @@ auto EntityManager::getEntityStatus(const std::string & name) const
 }
 
 auto EntityManager::getEntityTypeList() const
-  -> const std::unordered_map<std::string, openscenario_msgs::msg::EntityType>
+  -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>
 {
-  std::unordered_map<std::string, openscenario_msgs::msg::EntityType> ret;
+  std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> ret;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     ret.emplace(it->first, it->second->getEntityType());
   }
@@ -206,7 +206,7 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
 }
 
 auto EntityManager::getLaneletPose(const std::string & name)
-  -> boost::optional<openscenario_msgs::msg::LaneletPose>
+  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   const auto status = getEntityStatus(name);
   if (!status) {
@@ -216,7 +216,7 @@ auto EntityManager::getLaneletPose(const std::string & name)
     return status->lanelet_pose;
   }
   bool include_crosswalk = true;
-  if (getEntityType(name).type == openscenario_msgs::msg::EntityType::VEHICLE) {
+  if (getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
     include_crosswalk = false;
   }
   return toLaneletPose(status->pose, include_crosswalk);
@@ -296,7 +296,7 @@ auto EntityManager::getLongitudinalDistance(
 
 /**
  * @brief If the target entity's lanelet pose is valid, return true
- * 
+ *
  * @param name name of the target entity
  * @return true lane matching is succeed
  * @return false lane mathing is failed
@@ -363,7 +363,7 @@ const std::string EntityManager::getEgoName() const
 }
 
 auto EntityManager::getObstacle(const std::string & name)
-  -> boost::optional<openscenario_msgs::msg::Obstacle>
+  -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   if (current_time_ < 0) {
     return boost::none;
@@ -414,19 +414,20 @@ auto EntityManager::getRelativePose(const std::string & from, const std::string 
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
-auto EntityManager::getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray
+auto EntityManager::getWaypoints(const std::string & name)
+  -> traffic_simulator_msgs::msg::WaypointsArray
 {
   if (current_time_ < 0) {
-    return openscenario_msgs::msg::WaypointsArray();
+    return traffic_simulator_msgs::msg::WaypointsArray();
   }
   return entities_.at(name)->getWaypoints();
 }
 
 void EntityManager::getGoalPoses(
-  const std::string & name, std::vector<openscenario_msgs::msg::LaneletPose> & goals)
+  const std::string & name, std::vector<traffic_simulator_msgs::msg::LaneletPose> & goals)
 {
   if (current_time_ < 0) {
-    goals = std::vector<openscenario_msgs::msg::LaneletPose>();
+    goals = std::vector<traffic_simulator_msgs::msg::LaneletPose>();
   }
   goals = entities_.at(name)->getGoalPoses();
 }
@@ -434,7 +435,7 @@ void EntityManager::getGoalPoses(
 void EntityManager::getGoalPoses(
   const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals)
 {
-  std::vector<openscenario_msgs::msg::LaneletPose> lanelet_poses;
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> lanelet_poses;
   if (current_time_ < 0) {
     goals = std::vector<geometry_msgs::msg::Pose>();
   }
@@ -446,7 +447,7 @@ void EntityManager::getGoalPoses(
 
 bool EntityManager::isEgo(const std::string & name) const
 {
-  return getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO;
+  return getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
 bool EntityManager::isInLanelet(
@@ -523,7 +524,7 @@ bool EntityManager::reachPosition(
   const std::string & name, const std::int64_t lanelet_id, const double s, const double offset,
   const double tolerance) const
 {
-  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
   {
     lanelet_pose.lanelet_id = lanelet_id;
     lanelet_pose.s = s;
@@ -570,7 +571,7 @@ void EntityManager::setTargetSpeed(const std::string & name, double target_speed
 }
 
 bool EntityManager::setEntityStatus(
-  const std::string & name, openscenario_msgs::msg::EntityStatus status)
+  const std::string & name, traffic_simulator_msgs::msg::EntityStatus status)
 {
   status.name = name;  // XXX UGLY CODE
   if (isEgo(name) && getCurrentTime() > 0) {
@@ -588,15 +589,15 @@ void EntityManager::setVerbose(const bool verbose)
   }
 }
 
-auto EntityManager::toMapPose(const openscenario_msgs::msg::LaneletPose & lanelet_pose) const
+auto EntityManager::toMapPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> const geometry_msgs::msg::Pose
 {
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
 }
 
-openscenario_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
+traffic_simulator_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
   const std::string & name,
-  const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & type_list)
+  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
 {
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
@@ -627,7 +628,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   setVerbose(configuration.verbose);
   auto type_list = getEntityTypeList();
-  std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
+  std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
   for (const auto & entity_name : entity_names) {
     if (entities_[entity_name]->statusSet()) {
@@ -640,21 +641,21 @@ void EntityManager::update(const double current_time, const double step_time)
     it->second->setOtherStatus(all_status);
   }
   auto entity_type_list = getEntityTypeList();
-  openscenario_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
+  traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
   for (const auto & status : all_status) {
-    openscenario_msgs::msg::EntityStatusWithTrajectory status_with_traj;
+    traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_traj;
     auto status_msg = status.second;
     status_msg.name = status.first;
     status_msg.bounding_box = getBoundingBox(status.first);
     status_msg.action_status.current_action = getCurrentAction(status.first);
     switch (getEntityType(status.first).type) {
-      case openscenario_msgs::msg::EntityType::EGO:
+      case traffic_simulator_msgs::msg::EntityType::EGO:
         status_msg.type.type = status_msg.type.EGO;
         break;
-      case openscenario_msgs::msg::EntityType::VEHICLE:
+      case traffic_simulator_msgs::msg::EntityType::VEHICLE:
         status_msg.type.type = status_msg.type.VEHICLE;
         break;
-      case openscenario_msgs::msg::EntityType::PEDESTRIAN:
+      case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
         status_msg.type.type = status_msg.type.PEDESTRIAN;
         break;
     }

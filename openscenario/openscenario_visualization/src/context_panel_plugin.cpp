@@ -17,7 +17,7 @@
 #include <openscenario_visualization/context_panel_plugin.hpp>
 
 #include "ui_context_panel_plugin.h"
-// for convenience
+
 using json = nlohmann::json;
 
 namespace openscenario_visualization
@@ -54,24 +54,41 @@ void ContextPanel::onDisable()
 void ContextPanel::contextCallback(const openscenario_interpreter_msgs::msg::Context::SharedPtr msg)
 {
   context_ = msg->data;
-  json j = json::parse(context_);
-  std::vector<std::vector<std::string>> condition_group;
-  auto condition_group_json = j["OpenSCENARIO"]["Storyboard"]["Story"][0]["Act"][0]["ManeuverGroup"]
-                               [0]["Maneuver"][0]["Event"][0]["StartTrigger"]["ConditionGroup"];
-  std::vector<std::string> item_vec;
-  for (json::iterator it1 = condition_group_json.begin(); it1 != condition_group_json.end();
-       ++it1) {
-    item_vec.clear();
-    for (json::iterator it2 = (*it1)["Condition"].begin(); it2 != (*it1)["Condition"].end();
-         ++it2) {
-      item_vec.push_back((*it2)["currentEvaluation"].dump());
-      item_vec.push_back((*it2)["currentValue"].dump());
-      item_vec.push_back((*it2)["name"].dump());
-      item_vec.push_back((*it2)["type"].dump());
+  json j_ = json::parse(context_);
+  condition_group_vec_.clear();
+  item_vec_.clear();
+  auto story_json = j_["OpenSCENARIO"]["Storyboard"]["Story"];
+  for (json::iterator it1 = story_json.begin(); it1 != story_json.end(); ++it1) {
+    for (json::iterator it2 = (*it1)["Act"].begin(); it2 != (*it1)["Act"].end(); ++it2) {
+      for (json::iterator it3 = (*it2)["ManeuverGroup"].begin();
+           it3 != (*it2)["ManeuverGroup"].end(); ++it3) {
+        for (json::iterator it4 = (*it3)["Maneuver"].begin(); it4 != (*it3)["Maneuver"].end();
+             ++it4) {
+          for (json::iterator it5 = (*it4)["Event"].begin(); it5 != (*it4)["Event"].end(); ++it5) {
+            for (json::iterator it6 = (*it5)["StartTrigger"]["ConditionGroup"].begin();
+                 it6 != (*it5)["StartTrigger"]["ConditionGroup"].end(); ++it6) {
+              for (json::iterator it7 = (*it6)["Condition"].begin();
+                   it7 != (*it6)["Condition"].end(); ++it7) {
+                auto condition_ = (*it7);
+                item_vec_.push_back(condition_["currentEvaluation"].dump());
+                item_vec_.push_back(condition_["currentValue"].dump());
+                item_vec_.push_back(condition_["name"].dump());
+                item_vec_.push_back(condition_["type"].dump());
+                condition_group_vec_.push_back(item_vec_);
+                item_vec_.clear();
+              }
+            }
+          }
+        }
+      }
     }
-    condition_group.push_back(item_vec);
   }
-  condition_group_vec = condition_group;
+  std::sort(condition_group_vec_.begin(), condition_group_vec_.end(), [](auto & x, auto & y) {
+    return x[3] < y[3];
+  });
+  condition_group_vec_.erase(
+    std::unique(condition_group_vec_.begin(), condition_group_vec_.end()),
+    condition_group_vec_.end());
   display_trigger();
 }
 
@@ -107,10 +124,10 @@ void ContextPanel::updateTopicCandidates()
 
 void ContextPanel::update_display()
 {
-  if (not condition_group_vec.empty()) {
+  if (not condition_group_vec_.empty()) {
     std::vector<std::vector<std::vector<std::string>>::iterator> true_it, false_it;
-    for (std::vector<std::vector<std::string>>::iterator it = condition_group_vec.begin();
-         it != condition_group_vec.end(); ++it) {
+    for (std::vector<std::vector<std::string>>::iterator it = condition_group_vec_.begin();
+         it != condition_group_vec_.end(); ++it) {
       if ((*it)[1].size() == 6) {
         true_it.push_back(it);
       } else {
@@ -120,9 +137,11 @@ void ContextPanel::update_display()
 
     if (true_it.size() == 0) {
       ui_->success_condition_name->clear();
+      ui_->success_condition_evaluation->clear();
       ui_->success_condition_status->clear();
     } else if (false_it.size() == 0) {
       ui_->failure_condition_name->clear();
+      ui_->failure_condition_evaluation->clear();
       ui_->failure_condition_status->clear();
     }
 
@@ -131,9 +150,11 @@ void ContextPanel::update_display()
          i != false_it.end(); i++) {
       if (i == false_it.begin()) {
         ui_->failure_condition_name->setText(QString::fromUtf8((*(*i))[3].c_str()));
+        ui_->failure_condition_evaluation->setText(QString::fromUtf8((*(*i))[0].c_str()));
         ui_->failure_condition_status->setText(QString::fromUtf8((*(*i))[1].c_str()));
       } else {
         ui_->failure_condition_name->append(QString::fromUtf8((*(*i))[3].c_str()));
+        ui_->failure_condition_evaluation->append(QString::fromUtf8((*(*i))[0].c_str()));
         ui_->failure_condition_status->append(QString::fromUtf8((*(*i))[1].c_str()));
       }
       ui_->failure_condition_status->setTextColor(QColor("red"));
@@ -142,9 +163,11 @@ void ContextPanel::update_display()
          i != true_it.end(); i++) {
       if (i == true_it.begin()) {
         ui_->success_condition_name->setText(QString::fromUtf8((*(*i))[3].c_str()));
+        ui_->success_condition_evaluation->setText(QString::fromUtf8((*(*i))[0].c_str()));
         ui_->success_condition_status->setText(QString::fromUtf8((*(*i))[1].c_str()));
       } else {
         ui_->success_condition_name->append(QString::fromUtf8((*(*i))[3].c_str()));
+        ui_->success_condition_evaluation->append(QString::fromUtf8((*(*i))[0].c_str()));
         ui_->success_condition_status->append(QString::fromUtf8((*(*i))[1].c_str()));
       }
       ui_->success_condition_status->setTextColor(QColor("blue"));

@@ -117,8 +117,8 @@ TEST(Conversion, Accel)
 
 TEST(Conversion, Performance)
 {
-  openscenario_msgs::Performance proto;
-  openscenario_msgs::msg::Performance performance;
+  traffic_simulator_msgs::Performance proto;
+  traffic_simulator_msgs::msg::Performance performance;
   performance.max_speed = 10;
   performance.max_deceleration = 3;
   simulation_interface::toProto(performance, proto);
@@ -126,7 +126,7 @@ TEST(Conversion, Performance)
   EXPECT_DOUBLE_EQ(performance.max_acceleration, proto.max_acceleration());
   EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
   EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
-  performance = openscenario_msgs::msg::Performance();
+  performance = traffic_simulator_msgs::msg::Performance();
   EXPECT_DOUBLE_EQ(performance.max_speed, 0);
   simulation_interface::toMsg(proto, performance);
   EXPECT_PERFORMANCE_EQ(performance, proto);
@@ -134,8 +134,8 @@ TEST(Conversion, Performance)
 
 TEST(Conversion, Axle)
 {
-  openscenario_msgs::Axle proto;
-  openscenario_msgs::msg::Axle axle;
+  traffic_simulator_msgs::Axle proto;
+  traffic_simulator_msgs::msg::Axle axle;
   axle.max_steering = 30;
   axle.position_x = 3;
   axle.position_z = 14;
@@ -143,7 +143,7 @@ TEST(Conversion, Axle)
   axle.wheel_diameter = 53;
   simulation_interface::toProto(axle, proto);
   EXPECT_AXLE_EQ(axle, proto);
-  axle = openscenario_msgs::msg::Axle();
+  axle = traffic_simulator_msgs::msg::Axle();
   EXPECT_DOUBLE_EQ(axle.max_steering, 0);
   simulation_interface::toMsg(proto, axle);
   EXPECT_AXLE_EQ(axle, proto);
@@ -151,8 +151,8 @@ TEST(Conversion, Axle)
 
 TEST(Conversion, Axles)
 {
-  openscenario_msgs::Axles proto;
-  openscenario_msgs::msg::Axles axles;
+  traffic_simulator_msgs::Axles proto;
+  traffic_simulator_msgs::msg::Axles axles;
   axles.front_axle.max_steering = 3;
   axles.front_axle.position_x = 35;
   axles.front_axle.position_z = 234;
@@ -165,7 +165,7 @@ TEST(Conversion, Axles)
   axles.rear_axle.wheel_diameter = 122;
   simulation_interface::toProto(axles, proto);
   EXPECT_AXLES_EQ(axles, proto);
-  axles = openscenario_msgs::msg::Axles();
+  axles = traffic_simulator_msgs::msg::Axles();
   EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, 0);
   simulation_interface::toMsg(proto, axles);
   EXPECT_AXLES_EQ(axles, proto);
@@ -173,8 +173,8 @@ TEST(Conversion, Axles)
 
 TEST(Conversion, BoundingBox)
 {
-  openscenario_msgs::BoundingBox proto;
-  openscenario_msgs::msg::BoundingBox box;
+  traffic_simulator_msgs::BoundingBox proto;
+  traffic_simulator_msgs::msg::BoundingBox box;
   box.center.x = 1.0;
   box.center.y = 1.23;
   box.center.z = 43.0;
@@ -183,7 +183,7 @@ TEST(Conversion, BoundingBox)
   box.dimensions.z = 4.0;
   simulation_interface::toProto(box, proto);
   EXPECT_BOUNDING_BOX_EQ(box, proto);
-  box = openscenario_msgs::msg::BoundingBox();
+  box = traffic_simulator_msgs::msg::BoundingBox();
   EXPECT_DOUBLE_EQ(box.center.x, 0);
   simulation_interface::toMsg(proto, box);
   EXPECT_BOUNDING_BOX_EQ(box, proto);
@@ -191,11 +191,11 @@ TEST(Conversion, BoundingBox)
 
 TEST(Conversion, VehicleParameters)
 {
-  openscenario_msgs::VehicleParameters proto;
-  openscenario_msgs::msg::VehicleParameters p;
+  traffic_simulator_msgs::VehicleParameters proto;
+  traffic_simulator_msgs::msg::VehicleParameters p;
   p.name = "foo";
   p.vehicle_category = "bar";
-  openscenario_msgs::msg::BoundingBox box;
+  traffic_simulator_msgs::msg::BoundingBox box;
   box.center.x = 1.0;
   box.center.y = 1.23;
   box.center.z = 43.0;
@@ -203,11 +203,11 @@ TEST(Conversion, VehicleParameters)
   box.dimensions.y = 3.9;
   box.dimensions.z = 4.0;
   p.bounding_box = box;
-  openscenario_msgs::msg::Performance performance;
+  traffic_simulator_msgs::msg::Performance performance;
   performance.max_speed = 10;
   performance.max_deceleration = 3;
   p.performance = performance;
-  openscenario_msgs::msg::Axle axle;
+  traffic_simulator_msgs::msg::Axle axle;
   axle.max_steering = 30;
   axle.position_x = 3;
   axle.position_z = 14;
@@ -217,7 +217,7 @@ TEST(Conversion, VehicleParameters)
   p.axles.rear_axle = axle;
   EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
   EXPECT_VEHICLE_PARAMETERS_EQ(p, proto);
-  p = openscenario_msgs::msg::VehicleParameters();
+  p = traffic_simulator_msgs::msg::VehicleParameters();
   EXPECT_DOUBLE_EQ(p.bounding_box.dimensions.x, 0);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
   EXPECT_VEHICLE_PARAMETERS_EQ(p, proto);
@@ -225,11 +225,11 @@ TEST(Conversion, VehicleParameters)
 
 TEST(Conversion, PedestrianParameters)
 {
-  openscenario_msgs::PedestrianParameters proto;
-  openscenario_msgs::msg::PedestrianParameters p;
+  traffic_simulator_msgs::PedestrianParameters proto;
+  traffic_simulator_msgs::msg::PedestrianParameters p;
   p.name = "foo";
   p.pedestrian_category = "bar";
-  openscenario_msgs::msg::BoundingBox box;
+  traffic_simulator_msgs::msg::BoundingBox box;
   box.center.x = 1.0;
   box.center.y = 1.23;
   box.center.z = 43.0;
@@ -239,7 +239,7 @@ TEST(Conversion, PedestrianParameters)
   p.bounding_box = box;
   EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
   EXPECT_PEDESTRIAN_PARAMETERS_EQ(p, proto);
-  p = openscenario_msgs::msg::PedestrianParameters();
+  p = traffic_simulator_msgs::msg::PedestrianParameters();
   EXPECT_DOUBLE_EQ(p.bounding_box.dimensions.x, 0);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
   EXPECT_PEDESTRIAN_PARAMETERS_EQ(p, proto);
@@ -247,9 +247,9 @@ TEST(Conversion, PedestrianParameters)
 
 TEST(Conversion, MiscObjectParameters)
 {
-  openscenario_msgs::MiscObjectParameters proto;
-  openscenario_msgs::msg::MiscObjectParameters p;
-  openscenario_msgs::msg::BoundingBox box;
+  traffic_simulator_msgs::MiscObjectParameters proto;
+  traffic_simulator_msgs::msg::MiscObjectParameters p;
+  traffic_simulator_msgs::msg::BoundingBox box;
   box.center.x = 1.0;
   box.center.y = 1.23;
   box.center.z = 43.0;
@@ -268,8 +268,8 @@ TEST(Conversion, MiscObjectParameters)
 
 TEST(Conversion, ActionStatus)
 {
-  openscenario_msgs::ActionStatus proto;
-  openscenario_msgs::msg::ActionStatus action;
+  traffic_simulator_msgs::ActionStatus proto;
+  traffic_simulator_msgs::msg::ActionStatus action;
   action.current_action = "test";
   action.twist.linear.x = 1.0;
   action.twist.linear.y = 2.0;
@@ -285,7 +285,7 @@ TEST(Conversion, ActionStatus)
   action.accel.angular.z = 98;
   simulation_interface::toProto(action, proto);
   EXPECT_ACTION_STATUS_EQ(action, proto);
-  action = openscenario_msgs::msg::ActionStatus();
+  action = traffic_simulator_msgs::msg::ActionStatus();
   EXPECT_DOUBLE_EQ(action.twist.linear.x, 0);
   simulation_interface::toMsg(proto, action);
   EXPECT_ACTION_STATUS_EQ(action, proto);
@@ -293,11 +293,11 @@ TEST(Conversion, ActionStatus)
 
 TEST(Conversion, EntityStatus)
 {
-  openscenario_msgs::EntityStatus proto;
-  openscenario_msgs::msg::EntityStatus status;
+  traffic_simulator_msgs::EntityStatus proto;
+  traffic_simulator_msgs::msg::EntityStatus status;
   status.name = "test";
   status.time = 3.0;
-  openscenario_msgs::msg::BoundingBox box;
+  traffic_simulator_msgs::msg::BoundingBox box;
   box.center.x = 1.0;
   box.center.y = 1.23;
   box.center.z = 43.0;
@@ -305,7 +305,7 @@ TEST(Conversion, EntityStatus)
   box.dimensions.y = 3.9;
   box.dimensions.z = 4.0;
   status.bounding_box = box;
-  openscenario_msgs::msg::ActionStatus action;
+  traffic_simulator_msgs::msg::ActionStatus action;
   action.current_action = "test";
   action.twist.linear.x = 1.0;
   action.twist.linear.y = 2.0;
@@ -329,7 +329,7 @@ TEST(Conversion, EntityStatus)
   pose.orientation.z = 9.3;
   pose.orientation.w = 10.2;
   status.pose = pose;
-  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = 23;
   lanelet_pose.s = 1.0;
   lanelet_pose.offset = 3.5;
@@ -340,7 +340,7 @@ TEST(Conversion, EntityStatus)
   status.lanelet_pose_valid = false;
   simulation_interface::toProto(status, proto);
   EXPECT_ENTITY_STATUS_EQ(status, proto);
-  status = openscenario_msgs::msg::EntityStatus();
+  status = traffic_simulator_msgs::msg::EntityStatus();
   EXPECT_TRUE(status.lanelet_pose_valid);
   simulation_interface::toMsg(proto, status);
   EXPECT_ENTITY_STATUS_EQ(status, proto);
@@ -524,35 +524,35 @@ TEST(Conversion, VehicleCommand)
 
 TEST(Conversion, EntityType)
 {
-  openscenario_msgs::EntityType proto;
-  openscenario_msgs::msg::EntityType msg;
+  traffic_simulator_msgs::EntityType proto;
+  traffic_simulator_msgs::msg::EntityType msg;
   msg.type = msg.VEHICLE;
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
-  EXPECT_EQ(proto, openscenario_msgs::EntityType::VEHICLE);
+  EXPECT_EQ(proto, traffic_simulator_msgs::EntityType::VEHICLE);
   msg.type = msg.MISC_OBJECT;
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
-  EXPECT_EQ(proto, openscenario_msgs::EntityType::MISC_OBJECT);
-  proto = openscenario_msgs::EntityType::VEHICLE;
+  EXPECT_EQ(proto, traffic_simulator_msgs::EntityType::MISC_OBJECT);
+  proto = traffic_simulator_msgs::EntityType::VEHICLE;
   msg.type = msg.EGO;
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
-  EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::VEHICLE);
+  EXPECT_EQ(msg.type, traffic_simulator_msgs::msg::EntityType::VEHICLE);
   msg.type = msg.VEHICLE;
-  proto = openscenario_msgs::EntityType::EGO;
+  proto = traffic_simulator_msgs::EntityType::EGO;
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
-  EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::EGO);
+  EXPECT_EQ(msg.type, traffic_simulator_msgs::msg::EntityType::EGO);
   msg.type = msg.VEHICLE;
-  proto = openscenario_msgs::EntityType::PEDESTRIAN;
+  proto = traffic_simulator_msgs::EntityType::PEDESTRIAN;
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
-  EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::PEDESTRIAN);
-  proto = openscenario_msgs::EntityType::MISC_OBJECT;
+  EXPECT_EQ(msg.type, traffic_simulator_msgs::msg::EntityType::PEDESTRIAN);
+  proto = traffic_simulator_msgs::EntityType::MISC_OBJECT;
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
-  EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::MISC_OBJECT);
+  EXPECT_EQ(msg.type, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT);
 }
 
 TEST(Conversion, LaneletPose)
 {
-  openscenario_msgs::msg::LaneletPose pose;
-  openscenario_msgs::LaneletPose proto;
+  traffic_simulator_msgs::msg::LaneletPose pose;
+  traffic_simulator_msgs::LaneletPose proto;
   pose.lanelet_id = 23;
   pose.s = 1.0;
   pose.offset = 3.5;
@@ -561,7 +561,7 @@ TEST(Conversion, LaneletPose)
   pose.rpy.z = 1.3;
   EXPECT_NO_THROW(simulation_interface::toProto(pose, proto));
   EXPECT_LANELET_POSE_EQ(pose, proto);
-  pose = openscenario_msgs::msg::LaneletPose();
+  pose = traffic_simulator_msgs::msg::LaneletPose();
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, pose));
   EXPECT_LANELET_POSE_EQ(pose, proto);
 }

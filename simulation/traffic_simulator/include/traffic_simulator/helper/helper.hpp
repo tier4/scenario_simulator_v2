@@ -21,9 +21,9 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <iostream>
-#include <openscenario_msgs/msg/action_status.hpp>
-#include <openscenario_msgs/msg/lanelet_pose.hpp>
 #include <string>
+#include <traffic_simulator_msgs/msg/action_status.hpp>
+#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
@@ -36,9 +36,9 @@ namespace helper
  * @param angular_vel angular velocity
  * @param linear_accel linear acceleration
  * @param angular_accel angular acceleration
- * @return openscenario_msgs::msg::ActionStatus
+ * @return traffic_simulator_msgs::msg::ActionStatus
  */
-openscenario_msgs::msg::ActionStatus constructActionStatus(
+traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
   double linear_vel = 0, double angular_vel = 0, double linear_accel = 0, double angular_accel = 0);
 
 /**
@@ -50,9 +50,9 @@ openscenario_msgs::msg::ActionStatus constructActionStatus(
  * @param roll roll value in the lane coordinate
  * @param pitch pitch value in the lane coordinate
  * @param yaw yaw value in the lane coordinate
- * @return openscenario_msgs::msg::LaneletPose
+ * @return traffic_simulator_msgs::msg::LaneletPose
  */
-openscenario_msgs::msg::LaneletPose constructLaneletPose(
+traffic_simulator_msgs::msg::LaneletPose constructLaneletPose(
   std::int64_t lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
   double yaw = 0);
 
@@ -100,6 +100,7 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose);
+std::ostream & operator<<(
+  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose);
 
 #endif  // TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_

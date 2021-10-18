@@ -17,9 +17,6 @@
 
 #include <boost/optional.hpp>
 #include <memory>
-#include <openscenario_msgs/msg/driver_model.hpp>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -28,6 +25,9 @@
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -38,9 +38,9 @@ class VehicleEntity : public EntityBase
 {
 public:
   VehicleEntity(
-    const std::string & name, const openscenario_msgs::msg::VehicleParameters & parameters);
+    const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & parameters);
 
-  const openscenario_msgs::msg::VehicleParameters parameters;
+  const traffic_simulator_msgs::msg::VehicleParameters parameters;
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
 
@@ -52,7 +52,7 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
+  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
@@ -60,12 +60,12 @@ public:
 
   void cancelRequest() override;
 
-  const boost::optional<openscenario_msgs::msg::VehicleParameters> getVehicleParameters() const
+  const boost::optional<traffic_simulator_msgs::msg::VehicleParameters> getVehicleParameters() const
   {
     return parameters;
   }
 
-  void setDriverModel(const openscenario_msgs::msg::DriverModel & model) override
+  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel & model) override
   {
     behavior_plugin_ptr_->setDriverModel(model);
   }
@@ -86,19 +86,19 @@ public:
 
   void setTargetSpeed(double target_speed, bool continuous) override;
 
-  const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
+  const traffic_simulator_msgs::msg::BoundingBox getBoundingBox() const override
   {
     return parameters.bounding_box;
   }
 
   void requestAssignRoute(
-    const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
   const std::string getCurrentAction() const { return behavior_plugin_ptr_->getCurrentAction(); }
 
-  const openscenario_msgs::msg::WaypointsArray getWaypoints() override
+  const traffic_simulator_msgs::msg::WaypointsArray getWaypoints() override
   {
     try {
       return behavior_plugin_ptr_->getWaypoints();
@@ -115,12 +115,12 @@ public:
     }
   }
 
-  std::vector<openscenario_msgs::msg::LaneletPose> getGoalPoses() override
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override
   {
     return route_planner_ptr_->getGoalPoses();
   }
 
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
+  boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
     return behavior_plugin_ptr_->getObstacle();
   }

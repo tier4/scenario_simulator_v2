@@ -16,11 +16,11 @@
 
 #include <functional>
 #include <memory>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
 #include <system_error>
 #include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -82,7 +82,7 @@ auto getVehicleModelType()
 auto makeSimulationModel(
   const VehicleModelType vehicle_model_type,
   const double step_time,  //
-  const openscenario_msgs::msg::VehicleParameters & parameters)
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
   -> const std::shared_ptr<SimModelInterface>
 {
   switch (vehicle_model_type) {
@@ -168,13 +168,13 @@ EgoEntity::EgoEntity(
   const std::string & name,             //
   const Configuration & configuration,  //
   const double step_time,               //
-  const openscenario_msgs::msg::VehicleParameters & parameters)
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
   autoware(makeAutoware(configuration)),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
-  entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
+  entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
 void EgoEntity::engage() { autoware->engage(); }
@@ -192,7 +192,7 @@ auto EgoEntity::getCurrentAction() const -> const std::string
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
-  -> const openscenario_msgs::msg::EntityStatus
+  -> const traffic_simulator_msgs::msg::EntityStatus
 {
   geometry_msgs::msg::Vector3 rpy;
   {
@@ -232,7 +232,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     v = quaternion_operation::getRotationMatrix((*initial_pose_).orientation) * v;
   }
 
-  openscenario_msgs::msg::EntityStatus status;
+  traffic_simulator_msgs::msg::EntityStatus status;
   {
     status.time = time;
     status.type.type = entity_type_.type;
@@ -273,12 +273,12 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto EgoEntity::getObstacle() -> boost::optional<openscenario_msgs::msg::Obstacle>
+auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return boost::none;
 }
 
-auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
+auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   return autoware->getWaypoints();
 }
@@ -360,7 +360,8 @@ auto EgoEntity::ready() const -> bool
   return autoware->ready();
 }
 
-void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
+void EgoEntity::requestAcquirePosition(
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   requestAssignRoute({lanelet_pose});
 }
@@ -371,7 +372,7 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
 }
 
 void EgoEntity::requestAssignRoute(
-  const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
   std::vector<geometry_msgs::msg::Pose> route;
 
@@ -414,11 +415,11 @@ void EgoEntity::requestLaneChange(const std::int64_t)
     "everything but their destination");
 }
 
-auto EgoEntity::setDriverModel(const openscenario_msgs::msg::DriverModel &) -> void  //
+auto EgoEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void  //
 {
 }
 
-bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
+bool EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
 {
   const bool success = VehicleEntity::setStatus(status);  // NOTE: setStatus always succeeds.
 

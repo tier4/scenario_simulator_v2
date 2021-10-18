@@ -52,7 +52,8 @@ auto TeleportAction::run() const -> void
         position.orientation);
     },
     [](const LanePosition & position, const auto & actor) {
-      return applyTeleportAction(actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+      return applyTeleportAction(
+        actor, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
     });
 
   for (const auto & actor : actors) {

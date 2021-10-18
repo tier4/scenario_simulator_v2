@@ -16,16 +16,16 @@
 #define TRAFFIC_SIMULATOR__BEHAVIOR__BEHAVIOR_PLUGIN_BASE_HPP_
 
 #include <boost/optional.hpp>
-#include <openscenario_msgs/msg/driver_model.hpp>
-#include <openscenario_msgs/msg/entity_status.hpp>
-#include <openscenario_msgs/msg/entity_type.hpp>
-#include <openscenario_msgs/msg/obstacle.hpp>
-#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/entity_type.hpp>
+#include <traffic_simulator_msgs/msg/obstacle.hpp>
+#include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
 
 namespace entity_behavior
@@ -36,10 +36,11 @@ public:
   virtual void configure(const rclcpp::Logger & logger) = 0;
   virtual void update(double current_time, double step_time) = 0;
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/){};
-  virtual const std::string getCurrentAction() const = 0;
+  virtual const std::string & getCurrentAction() const = 0;
 
-  typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityType> EntityTypeDict;
-  typedef std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> EntityStatusDict;
+  typedef std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> EntityTypeDict;
+  typedef std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus>
+    EntityStatusDict;
 
 #define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)     \
   virtual TYPE get##NAME() = 0;                   \
@@ -48,22 +49,22 @@ public:
 
   // clang-format off
   DEFINE_GETTER_SETTER(CurrentTime, "current_time", double)
-  DEFINE_GETTER_SETTER(DriverModel, "driver_model", openscenario_msgs::msg::DriverModel)
-  DEFINE_GETTER_SETTER(EntityStatus, "entity_status", openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(DriverModel, "driver_model", traffic_simulator_msgs::msg::DriverModel)
+  DEFINE_GETTER_SETTER(EntityStatus, "entity_status", traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, "entity_type_list", EntityTypeDict)
   DEFINE_GETTER_SETTER(HdMapUtils, "hdmap_utils", std::shared_ptr<hdmap_utils::HdMapUtils>)
-  DEFINE_GETTER_SETTER(Obstacle, "obstacle", boost::optional<openscenario_msgs::msg::Obstacle>)
+  DEFINE_GETTER_SETTER(Obstacle, "obstacle", boost::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus, "other_entity_status", EntityStatusDict)
-  DEFINE_GETTER_SETTER(PedestrianParameters, "pedestrian_parameters", openscenario_msgs::msg::PedestrianParameters)
+  DEFINE_GETTER_SETTER(PedestrianParameters, "pedestrian_parameters", traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(Request, "request", std::string)
   DEFINE_GETTER_SETTER(RouteLanelets, "route_lanelets", std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(StepTime, "step_time", double)
   DEFINE_GETTER_SETTER(TargetSpeed, "target_speed", boost::optional<double>)
   DEFINE_GETTER_SETTER(ToLaneletId, "to_lanelet_id", std::int64_t)
   DEFINE_GETTER_SETTER(TrafficLightManager, "traffic_light_manager",std::shared_ptr<traffic_simulator::TrafficLightManager>)
-  DEFINE_GETTER_SETTER(UpdatedStatus, "updated_status", openscenario_msgs::msg::EntityStatus)
-  DEFINE_GETTER_SETTER(VehicleParameters, "vehicle_parameters", openscenario_msgs::msg::VehicleParameters)
-  DEFINE_GETTER_SETTER(Waypoints, "waypoints", openscenario_msgs::msg::WaypointsArray)
+  DEFINE_GETTER_SETTER(UpdatedStatus, "updated_status", traffic_simulator_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(VehicleParameters, "vehicle_parameters", traffic_simulator_msgs::msg::VehicleParameters)
+  DEFINE_GETTER_SETTER(Waypoints, "waypoints", traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };

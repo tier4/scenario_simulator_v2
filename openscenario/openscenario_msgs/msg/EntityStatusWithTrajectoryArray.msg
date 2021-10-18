@@ -1,1 +1,0 @@
-openscenario_msgs/EntityStatusWithTrajectory[] data

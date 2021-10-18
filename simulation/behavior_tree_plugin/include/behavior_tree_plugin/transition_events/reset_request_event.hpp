@@ -27,16 +27,16 @@ public:
   ResetRequestEvent(
     const std::shared_ptr<BT::TreeNode> & root_node,
     std::function<std::string()> get_request_function,
-    std::function<void(std::string)> set_request_function);
-  const std::string getCurrentAction() const;
+    std::function<void(const std::string &)> set_request_function);
+  const std::string & getCurrentAction() const;
 
 private:
   void callback(
     BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
     BT::NodeStatus status) override;
-  const std::shared_ptr<BT::TreeNode> & root_node_;
+  const std::shared_ptr<BT::TreeNode> root_node_;
   std::function<std::string()> get_request_function_;
-  std::function<void(std::string)> set_request_function_;
+  std::function<void(const std::string &)> set_request_function_;
 };
 }  // namespace behavior_tree_plugin
 

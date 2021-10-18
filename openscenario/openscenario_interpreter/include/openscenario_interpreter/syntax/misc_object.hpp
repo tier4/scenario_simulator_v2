@@ -22,8 +22,8 @@
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include <openscenario_msgs/msg/misc_object_parameters.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/misc_object_parameters.hpp>
 
 namespace openscenario_interpreter
 {
@@ -61,7 +61,7 @@ struct MiscObject : public Scope
 
   explicit MiscObject(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::MiscObjectParameters() const;
+  explicit operator traffic_simulator_msgs::msg::MiscObjectParameters() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

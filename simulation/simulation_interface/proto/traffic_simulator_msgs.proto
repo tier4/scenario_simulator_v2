@@ -2,10 +2,10 @@ syntax = "proto3";
 
 import "geometry_msgs.proto";
 
-package openscenario_msgs;
+package traffic_simulator_msgs;
 
 /**
- * Protobuf definition of openscenario_msgs/msg/ActionStatus type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/ActionStatus type in ROS2.
  **/
 message ActionStatus {
   string current_action = 1;     // Current action of the entity.
@@ -14,7 +14,7 @@ message ActionStatus {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/BoundingBox type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/BoundingBox type in ROS2.
  **/
 message BoundingBox {
   geometry_msgs.Point center = 1;       // Center point of the bounding box.
@@ -22,7 +22,7 @@ message BoundingBox {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/LaneletPose type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/LaneletPose type in ROS2.
  **/
 message LaneletPose {
   int64 lanelet_id = 1;           // Lanelet id of the entity exists.
@@ -32,7 +32,7 @@ message LaneletPose {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/EntityType type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/EntityType type in ROS2.
  **/
 enum EntityType {
   EGO = 0;         // Ego Vehicle (Autoware Vehicle)
@@ -42,7 +42,7 @@ enum EntityType {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/EntityStatus type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/EntityStatus type in ROS2.
  **/
 message EntityStatus {
   EntityType type = 1;            // Type of the entity.
@@ -56,7 +56,7 @@ message EntityStatus {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/Performance type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Performance type in ROS2.
  **/
 message Performance {
   double max_speed = 1;        // Max speed of the entity.
@@ -65,7 +65,7 @@ message Performance {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/Axle type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Axle type in ROS2.
  **/
 message Axle {
   double max_steering = 1;   // Max steering of the entity axle.
@@ -76,7 +76,7 @@ message Axle {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/Axles type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Axles type in ROS2.
  **/
 message Axles {
   Axle front_axle = 1; // Parameters of the front axle of the entity.
@@ -84,12 +84,12 @@ message Axles {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/Property type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Property type in ROS2.
  **/
 message Property {}
 
 /**
- * Protobuf definition of openscenario_msgs/msg/VehicleParameters type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/VehicleParameters type in ROS2.
  **/
 message VehicleParameters {
   string name = 1;              // Name of the vehicle entity
@@ -101,7 +101,7 @@ message VehicleParameters {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/PedestrianParameters type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/PedestrianParameters type in ROS2.
  **/
 message PedestrianParameters {
   string name = 1;                // Name of the pedestrian entity.
@@ -116,7 +116,7 @@ message MiscObjectParameters {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/Waypoints type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Waypoints type in ROS2.
  **/
 message Waypoints {
   repeated geometry_msgs.Point waypoints = 1; // Waypoints of the entity.
