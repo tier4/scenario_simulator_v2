@@ -26,19 +26,19 @@ MoveBackwardAction::MoveBackwardAction(
 {
 }
 
-const boost::optional<openscenario_msgs::msg::Obstacle> MoveBackwardAction::calculateObstacle(
-  const openscenario_msgs::msg::WaypointsArray &)
+const boost::optional<traffic_simulator_msgs::msg::Obstacle> MoveBackwardAction::calculateObstacle(
+  const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   return boost::none;
 }
 
-const openscenario_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoints()
+const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoints()
 {
   if (!entity_status.lanelet_pose_valid) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
-    return openscenario_msgs::msg::WaypointsArray();
+    return traffic_simulator_msgs::msg::WaypointsArray();
   }
   const auto ids = hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id);
   traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ids));
@@ -51,7 +51,7 @@ const openscenario_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoi
       s_in_spline = hdmap_utils->getLaneletLength(id) + s_in_spline;
     }
   }
-  openscenario_msgs::msg::WaypointsArray waypoints;
+  traffic_simulator_msgs::msg::WaypointsArray waypoints;
   waypoints.waypoints = spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0);
   return waypoints;
 }

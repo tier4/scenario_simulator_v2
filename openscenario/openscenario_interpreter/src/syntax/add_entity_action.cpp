@@ -59,7 +59,7 @@ try {
       },                                                                                           \
       [&](const LanePosition & position) {                                                         \
         return applyAddEntityAction(                                                               \
-          __VA_ARGS__, static_cast<openscenario_msgs::msg::LaneletPose>(position));                \
+          __VA_ARGS__, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));           \
       }),                                                                                          \
     position)
 
@@ -68,7 +68,7 @@ try {
       if (APPLY_ADD_ENTITY_ACTION(
             entity.as<ScenarioObject>().object_controller.isUserDefinedController(),  //
             entity_ref,                                                               //
-            static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
+            static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle))) {
         entity.as<ScenarioObject>().object_controller.assign(entity_ref);
         entity.as<ScenarioObject>().activateSensors();
         entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
@@ -76,11 +76,13 @@ try {
     },
     [&](const Pedestrian & pedestrian) {
       APPLY_ADD_ENTITY_ACTION(
-        false, entity_ref, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
+        false, entity_ref,
+        static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
     },
     [&](const MiscObject & misc_object) {
       APPLY_ADD_ENTITY_ACTION(
-        false, entity_ref, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
+        false, entity_ref,
+        static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
     });
 
   if (not std::exchange(entity.as<ScenarioObject>().is_added, true)) {

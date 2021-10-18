@@ -14,19 +14,21 @@
 
 #ifndef BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__BEHAVIOR_TREE_HPP_
 #define BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__BEHAVIOR_TREE_HPP_
+
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
 #include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
 #include <behavior_tree_plugin/pedestrian/walk_straight_action.hpp>
+#include <behavior_tree_plugin/transition_events/transition_events.hpp>
 #include <functional>
 #include <geometry_msgs/msg/point.hpp>
 #include <map>
 #include <memory>
-#include <openscenario_msgs/msg/entity_status.hpp>
 #include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -34,8 +36,9 @@ namespace entity_behavior
 class PedestrianBehaviorTree : public BehaviorPluginBase
 {
 public:
-  void configure() override;
+  void configure(const rclcpp::Logger & logger) override;
   void update(double current_time, double step_time) override;
+  const std::string & getCurrentAction() const override;
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \
   void set##NAME(const TYPE & value) override                                               \
@@ -45,38 +48,32 @@ public:
 
   // clang-format off
   DEFINE_GETTER_SETTER(CurrentTime, double)
-  DEFINE_GETTER_SETTER(DriverModel, openscenario_msgs::msg::DriverModel)
-  DEFINE_GETTER_SETTER(EntityStatus, openscenario_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(DriverModel, traffic_simulator_msgs::msg::DriverModel)
+  DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
   DEFINE_GETTER_SETTER(HdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)
-  DEFINE_GETTER_SETTER(Obstacle, boost::optional<openscenario_msgs::msg::Obstacle>)
+  DEFINE_GETTER_SETTER(Obstacle, boost::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus, EntityStatusDict)
-  DEFINE_GETTER_SETTER(PedestrianParameters, openscenario_msgs::msg::PedestrianParameters)
+  DEFINE_GETTER_SETTER(PedestrianParameters, traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(Request, std::string)
   DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(StepTime, double)
   DEFINE_GETTER_SETTER(TargetSpeed, boost::optional<double>)
   DEFINE_GETTER_SETTER(ToLaneletId, std::int64_t)
   DEFINE_GETTER_SETTER(TrafficLightManager,std::shared_ptr<traffic_simulator::TrafficLightManager>)
-  DEFINE_GETTER_SETTER(UpdatedStatus, openscenario_msgs::msg::EntityStatus)
-  DEFINE_GETTER_SETTER(VehicleParameters, openscenario_msgs::msg::VehicleParameters)
-  DEFINE_GETTER_SETTER(Waypoints, openscenario_msgs::msg::WaypointsArray)
+  DEFINE_GETTER_SETTER(UpdatedStatus, traffic_simulator_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(VehicleParameters, traffic_simulator_msgs::msg::VehicleParameters)
+  DEFINE_GETTER_SETTER(Waypoints, traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on
+
 #undef DEFINE_GETTER_SETTER
 
 private:
   BT::NodeStatus tickOnce(double current_time, double step_time);
-  std::shared_ptr<BT::StdCoutLogger> logger_cout_ptr_;
-  void callback(
-    BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
-    BT::NodeStatus status);
-  void setupLogger();
-  BT::TimestampType type_;
-  BT::TimePoint first_timestamp_;
-  std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
-  std::string current_action_;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
+  std::shared_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;
+  std::shared_ptr<behavior_tree_plugin::ResetRequestEvent> reset_request_event_ptr_;
 };
 }  // namespace entity_behavior
 

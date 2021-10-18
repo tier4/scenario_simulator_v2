@@ -150,7 +150,7 @@ void ScenarioSimulator::despawnEntity(
 {
   bool found = false;
   res = simulation_api_schema::DespawnEntityResponse();
-  std::vector<openscenario_msgs::VehicleParameters> vehicles;
+  std::vector<traffic_simulator_msgs::VehicleParameters> vehicles;
   for (const auto vehicle : vehicles_) {
     if (vehicle.name() != req.name()) {
       vehicles.emplace_back(vehicle);
@@ -159,7 +159,7 @@ void ScenarioSimulator::despawnEntity(
     }
   }
   vehicles_ = vehicles;
-  std::vector<openscenario_msgs::PedestrianParameters> pedestrians;
+  std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians;
   for (const auto pedestrian : pedestrians_) {
     if (pedestrian.name() != req.name()) {
       pedestrians.emplace_back(pedestrian);
@@ -168,7 +168,7 @@ void ScenarioSimulator::despawnEntity(
     }
   }
   pedestrians_ = pedestrians;
-  std::vector<openscenario_msgs::MiscObjectParameters> misc_objects;
+  std::vector<traffic_simulator_msgs::MiscObjectParameters> misc_objects;
   for (const auto misc_object : misc_objects_) {
     if (misc_object.name() != req.name()) {
       misc_objects.emplace_back(misc_object);

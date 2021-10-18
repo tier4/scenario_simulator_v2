@@ -36,7 +36,7 @@ DetectionSensor::DetectionSensor(
 }
 
 void DetectionSensor::update(
-  double current_time, const std::vector<openscenario_msgs::EntityStatus> & status,
+  double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp, const std::vector<std::string> & detected_objects)
 {
   if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
@@ -50,18 +50,18 @@ void DetectionSensor::update(
         autoware_perception_msgs::msg::DynamicObject object;
         bool is_ego = false;
         switch (s.type()) {
-          case openscenario_msgs::EntityType::EGO:
+          case traffic_simulator_msgs::EntityType::EGO:
             is_ego = true;
             break;
-          case openscenario_msgs::EntityType::VEHICLE:
+          case traffic_simulator_msgs::EntityType::VEHICLE:
             object.semantic.type = object.semantic.CAR;
             object.semantic.confidence = 1;
             break;
-          case openscenario_msgs::EntityType::PEDESTRIAN:
+          case traffic_simulator_msgs::EntityType::PEDESTRIAN:
             object.semantic.type = object.semantic.PEDESTRIAN;
             object.semantic.confidence = 1;
             break;
-          case openscenario_msgs::EntityType::MISC_OBJECT:
+          case traffic_simulator_msgs::EntityType::MISC_OBJECT:
             break;
           default:
             throw SimulationRuntimeError("unsupported entity type!");

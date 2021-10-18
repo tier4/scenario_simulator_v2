@@ -19,10 +19,10 @@
 #include <autoware_vehicle_msgs.pb.h>
 #include <builtin_interfaces.pb.h>
 #include <geometry_msgs.pb.h>
-#include <openscenario_msgs.pb.h>
 #include <rosgraph_msgs.pb.h>
 #include <simulation_api_schema.pb.h>
 #include <std_msgs.pb.h>
+#include <traffic_simulator_msgs.pb.h>
 
 #include <autoware_control_msgs/msg/control_command.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state.hpp>
@@ -37,21 +37,21 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <iostream>
-#include <openscenario_msgs/msg/action_status.hpp>
-#include <openscenario_msgs/msg/axle.hpp>
-#include <openscenario_msgs/msg/axles.hpp>
-#include <openscenario_msgs/msg/bounding_box.hpp>
-#include <openscenario_msgs/msg/entity_status.hpp>
-#include <openscenario_msgs/msg/entity_type.hpp>
-#include <openscenario_msgs/msg/lanelet_pose.hpp>
-#include <openscenario_msgs/msg/misc_object_parameters.hpp>
-#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
-#include <openscenario_msgs/msg/performance.hpp>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/constants.hpp>
 #include <std_msgs/msg/header.hpp>
 #include <string>
+#include <traffic_simulator_msgs/msg/action_status.hpp>
+#include <traffic_simulator_msgs/msg/axle.hpp>
+#include <traffic_simulator_msgs/msg/axles.hpp>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/entity_type.hpp>
+#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
+#include <traffic_simulator_msgs/msg/misc_object_parameters.hpp>
+#include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
+#include <traffic_simulator_msgs/msg/performance.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 
 namespace simulation_interface
@@ -69,56 +69,70 @@ void toMsg(const geometry_msgs::Twist & proto, geometry_msgs::msg::Twist & t);
 void toProto(const geometry_msgs::msg::Accel & a, geometry_msgs::Accel & proto);
 void toMsg(const geometry_msgs::Accel & proto, geometry_msgs::msg::Accel & a);
 void toProto(
-  const openscenario_msgs::msg::BoundingBox & box, openscenario_msgs::BoundingBox & proto);
-void toMsg(const openscenario_msgs::BoundingBox & proto, openscenario_msgs::msg::BoundingBox & box);
-void toProto(
-  const openscenario_msgs::msg::Performance & performance, openscenario_msgs::Performance & proto);
+  const traffic_simulator_msgs::msg::BoundingBox & box,
+  traffic_simulator_msgs::BoundingBox & proto);
 void toMsg(
-  const openscenario_msgs::Performance & proto, openscenario_msgs::msg::Performance & performance);
-void toProto(const openscenario_msgs::msg::Axle & axle, openscenario_msgs::Axle & proto);
-void toMsg(const openscenario_msgs::Axle & proto, openscenario_msgs::msg::Axle & axle);
-void toProto(const openscenario_msgs::msg::Axles & axles, openscenario_msgs::Axles & proto);
-void toMsg(const openscenario_msgs::Axles & proto, openscenario_msgs::msg::Axles & axles);
+  const traffic_simulator_msgs::BoundingBox & proto,
+  traffic_simulator_msgs::msg::BoundingBox & box);
+void toProto(
+  const traffic_simulator_msgs::msg::Performance & performance,
+  traffic_simulator_msgs::Performance & proto);
+void toMsg(
+  const traffic_simulator_msgs::Performance & proto,
+  traffic_simulator_msgs::msg::Performance & performance);
+void toProto(const traffic_simulator_msgs::msg::Axle & axle, traffic_simulator_msgs::Axle & proto);
+void toMsg(const traffic_simulator_msgs::Axle & proto, traffic_simulator_msgs::msg::Axle & axle);
+void toProto(
+  const traffic_simulator_msgs::msg::Axles & axles, traffic_simulator_msgs::Axles & proto);
+void toMsg(const traffic_simulator_msgs::Axles & proto, traffic_simulator_msgs::msg::Axles & axles);
 /*
 void toProto(
-  const openscenario_msgs::msg::Property & p,
-  openscenario_msgs::Property & proto);
+  const traffic_simulator_msgs::msg::Property & p,
+  traffic_simulator_msgs::Property & proto);
 void toMsg(
-  const openscenario_msgs::Property & proto,
-  openscenario_msgs::msg::Property & p);
+  const traffic_simulator_msgs::Property & proto,
+  traffic_simulator_msgs::msg::Property & p);
 */
 void toProto(
-  const openscenario_msgs::msg::VehicleParameters & p,
-  openscenario_msgs::VehicleParameters & proto);
+  const traffic_simulator_msgs::msg::VehicleParameters & p,
+  traffic_simulator_msgs::VehicleParameters & proto);
 void toMsg(
-  const openscenario_msgs::VehicleParameters & proto,
-  openscenario_msgs::msg::VehicleParameters & p);
+  const traffic_simulator_msgs::VehicleParameters & proto,
+  traffic_simulator_msgs::msg::VehicleParameters & p);
 void toProto(
-  const openscenario_msgs::msg::PedestrianParameters & p,
-  openscenario_msgs::PedestrianParameters & proto);
+  const traffic_simulator_msgs::msg::PedestrianParameters & p,
+  traffic_simulator_msgs::PedestrianParameters & proto);
 void toMsg(
-  const openscenario_msgs::PedestrianParameters & proto,
-  openscenario_msgs::msg::PedestrianParameters & p);
+  const traffic_simulator_msgs::PedestrianParameters & proto,
+  traffic_simulator_msgs::msg::PedestrianParameters & p);
 void toProto(
-  const openscenario_msgs::msg::MiscObjectParameters & p,
-  openscenario_msgs::MiscObjectParameters & proto);
+  const traffic_simulator_msgs::msg::MiscObjectParameters & p,
+  traffic_simulator_msgs::MiscObjectParameters & proto);
 void toMsg(
-  const openscenario_msgs::MiscObjectParameters & proto,
-  openscenario_msgs::msg::MiscObjectParameters & p);
+  const traffic_simulator_msgs::MiscObjectParameters & proto,
+  traffic_simulator_msgs::msg::MiscObjectParameters & p);
 void toProto(
-  const openscenario_msgs::msg::ActionStatus & s, openscenario_msgs::ActionStatus & proto);
-void toMsg(const openscenario_msgs::ActionStatus & proto, openscenario_msgs::msg::ActionStatus & s);
-void toProto(
-  const openscenario_msgs::msg::LaneletPose & pose, openscenario_msgs::LaneletPose & proto);
+  const traffic_simulator_msgs::msg::ActionStatus & s,
+  traffic_simulator_msgs::ActionStatus & proto);
 void toMsg(
-  const openscenario_msgs::LaneletPose & proto, openscenario_msgs::msg::LaneletPose & pose);
+  const traffic_simulator_msgs::ActionStatus & proto,
+  traffic_simulator_msgs::msg::ActionStatus & s);
 void toProto(
-  const openscenario_msgs::msg::EntityType & type, openscenario_msgs::EntityType & proto);
-void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::EntityType & type);
-void toProto(
-  const openscenario_msgs::msg::EntityStatus & status, openscenario_msgs::EntityStatus & proto);
+  const traffic_simulator_msgs::msg::LaneletPose & pose,
+  traffic_simulator_msgs::LaneletPose & proto);
 void toMsg(
-  const openscenario_msgs::EntityStatus & proto, openscenario_msgs::msg::EntityStatus & status);
+  const traffic_simulator_msgs::LaneletPose & proto,
+  traffic_simulator_msgs::msg::LaneletPose & pose);
+void toProto(
+  const traffic_simulator_msgs::msg::EntityType & type, traffic_simulator_msgs::EntityType & proto);
+void toMsg(
+  const traffic_simulator_msgs::EntityType & proto, traffic_simulator_msgs::msg::EntityType & type);
+void toProto(
+  const traffic_simulator_msgs::msg::EntityStatus & status,
+  traffic_simulator_msgs::EntityStatus & proto);
+void toMsg(
+  const traffic_simulator_msgs::EntityStatus & proto,
+  traffic_simulator_msgs::msg::EntityStatus & status);
 void toProto(
   const builtin_interfaces::msg::Duration & duration, builtin_interfaces::Duration & proto);
 void toMsg(

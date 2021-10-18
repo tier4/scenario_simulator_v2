@@ -31,7 +31,7 @@ LanePosition::LanePosition(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-LanePosition::operator openscenario_msgs::msg::LaneletPose() const
+LanePosition::operator traffic_simulator_msgs::msg::LaneletPose() const
 {
   const geometry_msgs::msg::Vector3 rpy = orientation;
   return traffic_simulator::helper::constructLaneletPose(
@@ -40,7 +40,7 @@ LanePosition::operator openscenario_msgs::msg::LaneletPose() const
 
 LanePosition::operator geometry_msgs::msg::Pose() const
 {
-  return toWorldPosition(static_cast<openscenario_msgs::msg::LaneletPose>(*this));
+  return toWorldPosition(static_cast<traffic_simulator_msgs::msg::LaneletPose>(*this));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
