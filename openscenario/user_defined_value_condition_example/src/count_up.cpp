@@ -24,7 +24,7 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::init(argc, argv);
 
-  auto node = std::make_shared<rclcpp::Node>("this_node_name");
+  auto node = std::make_shared<rclcpp::Node>("count_up");
 
   auto publisher =
     node->create_publisher<ParameterDeclaration>("/count_up", rclcpp::QoS(1).reliable());
@@ -37,6 +37,9 @@ int main(const int argc, char const * const * const argv)
       message.parameter_type.data = ParameterType::UNSIGNED_INT;
       message.value = boost::lexical_cast<decltype(message.value)>(++count);
     }
+
+    std::cout << "message.value = " << boost::lexical_cast<decltype(count)>(message.value)
+              << std::endl;
 
     return message;
   };

@@ -14,7 +14,7 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_executable(${PROJECT_NAME}_node src/main.cpp)
+ament_auto_add_executable(count_up src/count_up.cpp)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

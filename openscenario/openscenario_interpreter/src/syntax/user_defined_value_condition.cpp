@@ -76,14 +76,10 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     evaluateValue = [&, result]()  //
     {
       static MagicSubscription<openscenario_interpreter_msgs::msg::ParameterDeclaration>
-        current_message{"receiver", result.str(0)};
+        current_message{result.str(1) + "_subscription", result.str(0)};
 
       if (not current_message.value.empty()) {
-        const auto parameter_declaration = ParameterDeclaration(current_message);
-        PRINT(parameter_declaration.name);
-        PRINT(parameter_declaration.parameter_type);
-        PRINT(parameter_declaration.value);
-        return parameter_declaration.evaluate();
+        return ParameterDeclaration(current_message).evaluate();
       } else {
         return unspecified;
       }
