@@ -39,6 +39,8 @@ public:
 
   const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 
+  void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
+
   auto getEntityTypename() const -> const std::string & override
   {
     static const std::string result = "PedestrianEntity";

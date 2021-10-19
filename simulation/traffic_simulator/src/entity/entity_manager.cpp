@@ -88,6 +88,15 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   return traffic_simulator::math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
 }
 
+visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
+{
+  visualization_msgs::msg::MarkerArray marker;
+  for (const auto & entity : entities_) {
+    entity.second->appendDebugMarker(marker);
+  }
+  return marker;
+}
+
 bool EntityManager::despawnEntity(const std::string & name)
 {
   return entityExists(name) && entities_.erase(name);
@@ -290,7 +299,7 @@ auto EntityManager::getLongitudinalDistance(
  *
  * @param name name of the target entity
  * @return true lane matching is succeed
- * @return false lane mathing is failed
+ * @return false lane matching is failed
  */
 bool EntityManager::laneMatchingSucceed(const std::string & name)
 {
