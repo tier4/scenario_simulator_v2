@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/syntax/unsigned_short.hpp>
+#include <openscenario_msgs/msg/parameter_type.hpp>
 
 namespace openscenario_interpreter
 {
@@ -52,16 +53,18 @@ inline namespace syntax
 struct ParameterType
 {
   enum value_type {
-    INTEGER,
-    DOUBLE,
-    STRING,
-    UNSIGNED_INT,
-    UNSIGNED_SHORT,
-    BOOLEAN,
-    DATE_TIME,
+    BOOLEAN = openscenario_msgs::msg::ParameterType::BOOLEAN,
+    DATE_TIME = openscenario_msgs::msg::ParameterType::DATE_TIME,
+    DOUBLE = openscenario_msgs::msg::ParameterType::DOUBLE,
+    INTEGER = openscenario_msgs::msg::ParameterType::INTEGER,
+    STRING = openscenario_msgs::msg::ParameterType::STRING,
+    UNSIGNED_INT = openscenario_msgs::msg::ParameterType::UNSIGNED_INT,
+    UNSIGNED_SHORT = openscenario_msgs::msg::ParameterType::UNSIGNED_SHORT,
   } value;
 
   explicit ParameterType() = default;
+
+  explicit ParameterType(const openscenario_msgs::msg::ParameterType &);
 
   constexpr operator value_type() const noexcept { return value; }
 };

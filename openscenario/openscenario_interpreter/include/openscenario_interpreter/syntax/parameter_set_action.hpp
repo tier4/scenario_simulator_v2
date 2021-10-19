@@ -42,6 +42,8 @@ struct ParameterSetAction : private Scope
 
   /*  */ auto run() const -> void;
 
+  static auto set(const Scope & scope, const String &, const String &) -> void;
+
   static auto start() noexcept -> void;
 };
 }  // namespace syntax
