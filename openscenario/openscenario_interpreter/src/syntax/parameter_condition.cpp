@@ -40,12 +40,12 @@ auto ParameterCondition::compare(const Element & parameter, const Rule & rule, c
     std::function<bool(const Element &, const Rule, const String &)>>
     overloads{
       // clang-format off
-      { typeid(Boolean        ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Boolean        >(), boost::lexical_cast<Boolean        >(rhs)); } },
-      { typeid(Double         ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Double         >(), boost::lexical_cast<Double         >(rhs)); } },
-      { typeid(Integer        ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Integer        >(), boost::lexical_cast<Integer        >(rhs)); } },
-      { typeid(String         ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<String         >(),                                      rhs ); } },
-      { typeid(UnsignedInteger), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<UnsignedInteger>(), boost::lexical_cast<UnsignedInteger>(rhs)); } },
-      { typeid(UnsignedShort  ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<UnsignedShort  >(), boost::lexical_cast<UnsignedShort  >(rhs)); } },
+      { typeid(Boolean        ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Boolean        >(), Boolean        (rhs)); } },
+      { typeid(Double         ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Double         >(), Double         (rhs)); } },
+      { typeid(Integer        ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Integer        >(), Integer        (rhs)); } },
+      { typeid(String         ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<String         >(),                 rhs ); } },
+      { typeid(UnsignedInteger), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<UnsignedInteger>(), UnsignedInteger(rhs)); } },
+      { typeid(UnsignedShort  ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<UnsignedShort  >(), UnsignedShort  (rhs)); } },
       // clang-format on
     };
 

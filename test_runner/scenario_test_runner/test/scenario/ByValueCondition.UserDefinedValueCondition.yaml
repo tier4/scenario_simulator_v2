@@ -171,6 +171,15 @@ OpenSCENARIO:
                                       name: /count_up
                                       value: 500
                                       rule: equalTo
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: /timeout
+                                      value: true
+                                      rule: equalTo
                         Action:
                           - name: ''
                             UserDefinedAction:

@@ -10,6 +10,8 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>autoware_api_msgs</depend>
+  <depend>autoware_system_msgs</depend>
   <depend>openscenario_interpreter_msgs</depend>
   <depend>rclcpp</depend>
 

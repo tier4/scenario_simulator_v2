@@ -34,6 +34,7 @@ struct MagicSubscription : private rclcpp::Node, public T
 
   typename rclcpp::Subscription<T>::SharedPtr subscription;
 
+public:
   explicit MagicSubscription(const std::string & node_name, const std::string & topic_name)
   : rclcpp::Node(node_name),
     thread(
@@ -52,6 +53,14 @@ struct MagicSubscription : private rclcpp::Node, public T
       static_cast<T &>(*this) = *message;
     }))
   {
+  }
+
+  ~MagicSubscription()
+  {
+    if (thread.joinable()) {
+      promise.set_value();
+      thread.join();
+    }
   }
 };
 
@@ -73,13 +82,17 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
 
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
     //
-    evaluateValue = [&, result]()  //
+    evaluateValue = [&, result,
+                     current_message = std::make_shared<
+                       MagicSubscription<openscenario_interpreter_msgs::msg::ParameterDeclaration>>(
+                       result.str(1) + "_subscription", result.str(0))]()  //
     {
-      static MagicSubscription<openscenario_interpreter_msgs::msg::ParameterDeclaration>
-        current_message{result.str(1) + "_subscription", result.str(0)};
-
-      if (not current_message.value.empty()) {
-        return ParameterDeclaration(current_message).evaluate();
+      if (not current_message->value.empty()) {
+        const auto hoge = ParameterDeclaration(*current_message);
+        PRINT(hoge.name);
+        PRINT(hoge.parameter_type);
+        PRINT(hoge.value);
+        return ParameterDeclaration(*current_message).evaluate();
       } else {
         return unspecified;
       }
