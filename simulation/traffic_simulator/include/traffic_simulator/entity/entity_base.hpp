@@ -51,6 +51,8 @@ public:
   virtual ~EntityBase() = default;
 
 public:
+  virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array);
+
   virtual void engage() {}
 
   virtual auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox = 0;

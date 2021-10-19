@@ -27,6 +27,7 @@
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace entity_behavior
 {
@@ -48,6 +49,7 @@ public:
 
   // clang-format off
   DEFINE_GETTER_SETTER(CurrentTime, "current_time", double)
+  DEFINE_GETTER_SETTER(DebugMarker, "debug_marker", std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DriverModel, "driver_model", traffic_simulator_msgs::msg::DriverModel)
   DEFINE_GETTER_SETTER(EntityStatus, "entity_status", traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, "entity_type_list", EntityTypeDict)

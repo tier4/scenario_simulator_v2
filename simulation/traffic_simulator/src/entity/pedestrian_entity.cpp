@@ -36,6 +36,13 @@ PedestrianEntity::PedestrianEntity(
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
+  behavior_plugin_ptr_->setDebugMarker({});
+}
+
+void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
+{
+  const auto marker = behavior_plugin_ptr_->getDebugMarker();
+  std::copy(marker.begin(), marker.end(), std::back_inserter(marker_array.markers));
 }
 
 void PedestrianEntity::requestAssignRoute(

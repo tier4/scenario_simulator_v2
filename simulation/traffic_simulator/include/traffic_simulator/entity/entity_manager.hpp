@@ -221,6 +221,8 @@ public:
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
 
+  visualization_msgs::msg::MarkerArray makeDebugMarker() const;
+
   bool trafficLightsChanged();
 
   void setTargetSpeed(const std::string & name, double target_speed, bool continuous);
