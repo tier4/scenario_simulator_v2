@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
-#include <openscenario_interpreter_msgs/msg/parameter_declaration.hpp>
-#include <openscenario_interpreter_msgs/msg/parameter_type.hpp>
+#include <openscenario_msgs/msg/parameter_declaration.hpp>
+#include <openscenario_msgs/msg/parameter_type.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 int main(const int argc, char const * const * const argv)
@@ -74,8 +74,8 @@ int main(const int argc, char const * const * const argv)
    *
    * ------------------------------------------------------------------------ */
 
-  using openscenario_interpreter_msgs::msg::ParameterDeclaration;
-  using openscenario_interpreter_msgs::msg::ParameterType;
+  using openscenario_msgs::msg::ParameterDeclaration;
+  using openscenario_msgs::msg::ParameterType;
 
   rclcpp::init(argc, argv);
 

@@ -45,7 +45,7 @@ auto check(const std::string & name) -> decltype(auto)
 }
 
 ParameterDeclaration::ParameterDeclaration(
-  const openscenario_interpreter_msgs::msg::ParameterDeclaration & message)
+  const openscenario_msgs::msg::ParameterDeclaration & message)
 : name(message.name),                      //
   parameter_type(message.parameter_type),  //
   value(message.value)
@@ -54,7 +54,7 @@ ParameterDeclaration::ParameterDeclaration(
 }
 
 ParameterDeclaration::ParameterDeclaration(
-  const openscenario_interpreter_msgs::msg::ParameterDeclaration & message, Scope & scope)
+  const openscenario_msgs::msg::ParameterDeclaration & message, Scope & scope)
 : name(message.name),                      //
   parameter_type(message.parameter_type),  //
   value(message.value)

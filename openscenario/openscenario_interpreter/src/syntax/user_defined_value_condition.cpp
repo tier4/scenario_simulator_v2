@@ -72,32 +72,23 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
   std::smatch result;
 
   if (std::regex_match(name, result, std::regex(R"(([^\.]+)\.(.+))"))) {
-    //
     const std::unordered_map<std::string, std::function<Element()>> dispatch{
       std::make_pair(
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
     };
-
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
-
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
-    //
-    evaluateValue = [&, result,
-                     current_message = std::make_shared<
-                       MagicSubscription<openscenario_interpreter_msgs::msg::ParameterDeclaration>>(
-                       result.str(1) + "_subscription", result.str(0))]()  //
-    {
-      if (not current_message->value.empty()) {
-        const auto hoge = ParameterDeclaration(*current_message);
-        PRINT(hoge.name);
-        PRINT(hoge.parameter_type);
-        PRINT(hoge.value);
-        return ParameterDeclaration(*current_message).evaluate();
-      } else {
-        return unspecified;
-      }
-    };
-
+    evaluateValue =
+      [&, result,
+       current_message =
+         std::make_shared<MagicSubscription<openscenario_msgs::msg::ParameterDeclaration>>(
+           result.str(1) + "_subscription", result.str(0))]() {
+        if (not current_message->value.empty()) {
+          return ParameterDeclaration(*current_message).evaluate();
+        } else {
+          return unspecified;
+        }
+      };
   } else {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }

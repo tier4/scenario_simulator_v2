@@ -23,7 +23,7 @@ static_assert(std::is_standard_layout<ParameterType>::value, "");
 
 static_assert(std::is_trivial<ParameterType>::value, "");
 
-ParameterType::ParameterType(const openscenario_interpreter_msgs::msg::ParameterType & message)
+ParameterType::ParameterType(const openscenario_msgs::msg::ParameterType & message)
 : value(static_cast<value_type>(message.data))
 {
 }

@@ -170,8 +170,8 @@ OpenSCENARIO:
                                     UserDefinedValueCondition:
                                       name: /count_up
                                       value: 500
-                                      rule: equalTo
-                            - Condition:
+                                      rule: greaterThan
+                            # - Condition:
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none

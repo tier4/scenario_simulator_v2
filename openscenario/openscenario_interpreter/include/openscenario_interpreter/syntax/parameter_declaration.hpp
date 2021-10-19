@@ -18,7 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include <openscenario_interpreter_msgs/msg/parameter_declaration.hpp>
+#include <openscenario_msgs/msg/parameter_declaration.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -44,10 +44,9 @@ struct ParameterDeclaration
 
   explicit ParameterDeclaration() = default;
 
-  explicit ParameterDeclaration(const openscenario_interpreter_msgs::msg::ParameterDeclaration &);
+  explicit ParameterDeclaration(const openscenario_msgs::msg::ParameterDeclaration &);
 
-  explicit ParameterDeclaration(
-    const openscenario_interpreter_msgs::msg::ParameterDeclaration &, Scope &);
+  explicit ParameterDeclaration(const openscenario_msgs::msg::ParameterDeclaration &, Scope &);
 
   explicit ParameterDeclaration(const pugi::xml_node &, Scope &);
 

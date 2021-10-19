@@ -1,3 +1,0 @@
-string name
-openscenario_interpreter_msgs/ParameterType parameter_type
-string value
