@@ -56,12 +56,12 @@ bool API::despawn(const std::string & name)
 
 bool API::spawn(
   const bool is_ego, const std::string & name,
-  const traffic_simulator_msgs::msg::VehicleParameters & params)
+  const traffic_simulator_msgs::msg::VehicleParameters & params, const std::string & plugin_name)
 {
   if (
     is_ego and not entity_manager_ptr_->entityExists(name) and
     not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
-      name, configuration, clock_.getStepTime(), params)) {
+      name, configuration, clock_.getStepTime(), params, plugin_name)) {
     return false;
   }
   if (
@@ -83,13 +83,13 @@ bool API::spawn(
 
 bool API::spawn(
   const bool is_ego, const std::string & name,
-  const traffic_simulator_msgs::msg::PedestrianParameters & params)
+  const traffic_simulator_msgs::msg::PedestrianParameters & params, const std::string & plugin_name)
 {
   if (is_ego) {
     THROW_SEMANTIC_ERROR("pedestrian should not be ego");
   }
   if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::PedestrianEntity>(
-        name, params)) {
+        name, params, plugin_name)) {
     return false;
   }
   if (configuration.standalone_mode) {

@@ -111,11 +111,13 @@ public:
 
   bool spawn(
     const bool is_ego, const std::string & name,
-    const traffic_simulator_msgs::msg::VehicleParameters & params);
+    const traffic_simulator_msgs::msg::VehicleParameters & params,
+    const std::string & plugin_name = "behavior_tree_plugin/VehicleBehaviorTree");
 
   bool spawn(
     const bool is_ego, const std::string & name,
-    const traffic_simulator_msgs::msg::PedestrianParameters & params);
+    const traffic_simulator_msgs::msg::PedestrianParameters & params,
+    const std::string & plugin_name = "behavior_tree_plugin/PedestrianBehaviorTree");
 
   bool spawn(
     const bool is_ego, const std::string & name,
