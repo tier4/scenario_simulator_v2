@@ -46,6 +46,10 @@ OpenSCENARIO:
     ScenarioObject:
       - name: ego
         CatalogReference:
+          ParameterAssignments:
+            ParameterAssignment:
+              - parameterRef: egoMaxSpeed
+                value: 50
           catalogName: all-in-one-vehicle
           entryName: ego-vehicle
         ObjectController:
@@ -56,44 +60,18 @@ OpenSCENARIO:
                 - name: isEgo
                   value: "false"
       - name: vehicle-1
-        Vehicle: &DefaultVehicle
-          name: ""
-          vehicleCategory: car
-          BoundingBox:
-            Center:
-              x: 0
-              y: 0
-              z: 1.25
-            Dimensions:
-              width: 1.8
-              length: 4
-              height: 2.5
-          Performance:
-            maxSpeed: 50
-            maxAcceleration: INF
-            maxDeceleration: INF
-          Axles:
-            FrontAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.6
-              trackWidth: 1.8
-              positionX: 2
-              positionZ: 0.3
-            RearAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.6
-              trackWidth: 1.8
-              positionX: 0
-              positionZ: 0.3
-          Properties:
-            Property: []
+        CatalogReference:
+          catalogName: all-in-one-vehicle
+          entryName: default-vehicle
         ObjectController: &DefaultObjectController
           Controller:
             name: ""
             Properties:
               Property: []
       - name: vehicle-2
-        Vehicle: *DefaultVehicle
+        CatalogReference:
+          catalogName: all-in-one-vehicle
+          entryName: default-vehicle
         ObjectController: *DefaultObjectController
       - name: barricade
         MiscObject:

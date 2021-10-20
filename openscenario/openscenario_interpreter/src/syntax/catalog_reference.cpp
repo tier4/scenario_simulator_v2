@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
+#include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
 #include "openscenario_interpreter/error.hpp"
@@ -37,27 +38,29 @@ Element CatalogReference::make(const pugi::xml_node & node, Scope & scope)
 {
   auto catalog_name = readAttribute<std::string>("catalogName", node, scope);
   auto entry_name = readAttribute<std::string>("entryName", node, scope);
-
-  // TODO: ParameterAssignment
+  auto parameter_assignments =
+    readElement<ParameterAssignments>("ParameterAssignments", node, scope);
 
   auto catalog_locations = scope.global().catalog_locations;
   if (catalog_locations) {
     for (auto & [type, catalog_location] : *catalog_locations) {
       auto found_catalog = catalog_location.find(catalog_name);
       if (found_catalog != catalog_location.end()) {
-        using ::openscenario_interpreter::make;
         const auto & xml_node = found_catalog->second;
+
+        using ::openscenario_interpreter::make;
         // clang-format off
+        // だめだわこれ、複数のVehicleのうち一つだけを取ってこなきゃいけない（これは全部取ってきてる）
         return choice(
           xml_node,  //
-          std::make_pair("Vehicle",     [&](auto && node) -> Element { return make<Vehicle>         (node, scope); }),
-          std::make_pair("Controller",  [&](auto && node) -> Element { return make<Controller>      (node, scope); }),
-          std::make_pair("Pedestrian",  [&](auto && node) -> Element { return make<Pedestrian>      (node, scope); }),
-          std::make_pair("MiscObject",  [&](auto && node) -> Element { return make<MiscObject>      (node, scope); }),
-          std::make_pair("Environment", [&](auto && node) -> Element { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;}),
-          std::make_pair("Maneuver",    [&](auto && node) -> Element { return make<Maneuver>        (node, scope); }),
-          std::make_pair("Trajectory",  [&](auto && node) -> Element { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); }),
-          std::make_pair("Route",       [&](auto && node) -> Element { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;})
+          std::make_pair("Vehicle",     [&scope](auto && node) { return make<Vehicle>   (node, scope); }),
+          std::make_pair("Controller",  [&scope](auto && node) { return make<Controller>(node, scope); }),
+          std::make_pair("Pedestrian",  [&scope](auto && node) { return make<Pedestrian>(node, scope); }),
+          std::make_pair("MiscObject",  [&scope](auto && node) { return make<MiscObject>(node, scope); }),
+          std::make_pair("Environment", [      ](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;}),
+          std::make_pair("Maneuver",    [&scope](auto && node) { return make<Maneuver>  (node, scope); }),
+          std::make_pair("Trajectory",  [      ](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;}),
+          std::make_pair("Route",       [      ](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;})
         );
         // clang-format on
       }
