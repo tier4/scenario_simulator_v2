@@ -21,8 +21,8 @@
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/orientation.hpp>
-#include <openscenario_msgs/msg/lanelet_pose.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace openscenario_interpreter
 {
@@ -55,7 +55,7 @@ struct RelativeWorldPosition
 
   explicit operator geometry_msgs::msg::Pose() const;
 
-  explicit operator openscenario_msgs::msg::LaneletPose() const;
+  explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

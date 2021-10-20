@@ -41,7 +41,7 @@ auto AssignRouteAction::run() -> void
 {
   for (const auto & actor : actors) {
     applyAssignRouteAction(
-      actor, static_cast<std::vector<openscenario_msgs::msg::LaneletPose>>(
+      actor, static_cast<std::vector<traffic_simulator_msgs::msg::LaneletPose>>(
                route_or_catalog_reference.as<const Route>()));
   }
 }

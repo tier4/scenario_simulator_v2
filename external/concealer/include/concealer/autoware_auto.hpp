@@ -140,7 +140,7 @@ public:
 
   double getGearSign() const override;
 
-  openscenario_msgs::msg::WaypointsArray getWaypoints() const override;
+  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
   double restrictTargetSpeed(double) const override;
 

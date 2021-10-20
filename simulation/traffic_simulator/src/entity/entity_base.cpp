@@ -31,6 +31,11 @@ EntityBase::EntityBase(const std::string & type, const std::string & name)
   status_ = boost::none;
 }
 
+void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
+{
+  return;
+}
+
 void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
@@ -65,7 +70,7 @@ void EntityBase::updateEntityStatusTimestamp(const double current_time)
 }
 
 void EntityBase::setOtherStatus(
-  const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status)
+  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
 {
   other_status_.clear();
   if (status_) {
@@ -83,7 +88,7 @@ void EntityBase::setOtherStatus(
   }
 }
 
-const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const
+const traffic_simulator_msgs::msg::EntityStatus EntityBase::getStatus() const
 {
   if (!status_) {
     THROW_SEMANTIC_ERROR("status is not set");
@@ -92,7 +97,7 @@ const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const
   }
 }
 
-bool EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)
+bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
 {
   status_ = status;
   status_->name = name;

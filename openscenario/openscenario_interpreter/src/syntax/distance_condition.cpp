@@ -176,7 +176,7 @@ auto DistanceCondition::distance<  //
       [&](const WorldPosition & position) {
         if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
           return getLongitudinalDistance(
-            triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+            triggering_entity, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
         } else {
           return std::numeric_limits<double>::quiet_NaN();
         }
@@ -184,7 +184,7 @@ auto DistanceCondition::distance<  //
       [&](const RelativeWorldPosition & position) {
         if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
           return getLongitudinalDistance(
-            triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+            triggering_entity, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
         } else {
           return std::numeric_limits<double>::quiet_NaN();
         }
@@ -192,7 +192,7 @@ auto DistanceCondition::distance<  //
       [&](const LanePosition & position) {
         if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
           return getLongitudinalDistance(
-            triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+            triggering_entity, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
         } else {
           return std::numeric_limits<double>::quiet_NaN();
         }

@@ -38,12 +38,12 @@
 #include <lanelet2_extension_psim/utility/utilities.hpp>
 #include <map>
 #include <memory>
-#include <openscenario_msgs/msg/entity_status.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -62,16 +62,16 @@ public:
     const visualization_msgs::msg::MarkerArray & a2) const;
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id, std::vector<double> s);
-  boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, bool include_crosswalk = false);
-  boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, std::int64_t lanelet_id);
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
-  geometry_msgs::msg::PoseStamped toMapPose(openscenario_msgs::msg::LaneletPose lanelet_pose);
+  geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
   geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset);
 
-  double getHeight(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
+  double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
 
   const std::vector<std::int64_t> getLaneletIds();
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
@@ -86,7 +86,7 @@ public:
   double getLaneletLength(std::int64_t lanelet_id);
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
-    openscenario_msgs::msg::LaneletPose from, openscenario_msgs::msg::LaneletPose to);
+    traffic_simulator_msgs::msg::LaneletPose from, traffic_simulator_msgs::msg::LaneletPose to);
   boost::optional<double> getLongitudinalDistance(
     std::int64_t from_lanelet_id, double from_s, std::int64_t to_lanelet_id, double to_s);
   double getSpeedLimit(std::vector<std::int64_t> lanelet_ids);

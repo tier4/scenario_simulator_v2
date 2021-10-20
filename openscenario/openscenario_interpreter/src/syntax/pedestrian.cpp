@@ -32,13 +32,13 @@ Pedestrian::Pedestrian(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-Pedestrian::operator openscenario_msgs::msg::PedestrianParameters() const
+Pedestrian::operator traffic_simulator_msgs::msg::PedestrianParameters() const
 {
-  openscenario_msgs::msg::PedestrianParameters parameter;
+  traffic_simulator_msgs::msg::PedestrianParameters parameter;
   {
     parameter.name = name;
     parameter.pedestrian_category = boost::lexical_cast<String>(pedestrian_category);
-    parameter.bounding_box = static_cast<openscenario_msgs::msg::BoundingBox>(bounding_box);
+    parameter.bounding_box = static_cast<traffic_simulator_msgs::msg::BoundingBox>(bounding_box);
   }
 
   return parameter;

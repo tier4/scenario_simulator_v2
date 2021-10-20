@@ -1,0 +1,3 @@
+string name
+string pedestrian_category
+traffic_simulator_msgs/BoundingBox bounding_box

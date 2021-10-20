@@ -46,9 +46,10 @@ RelativeWorldPosition::operator geometry_msgs::msg::Pose() const
   throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, geometry_msgs::msg::Pose);
 }
 
-RelativeWorldPosition::operator openscenario_msgs::msg::LaneletPose() const
+RelativeWorldPosition::operator traffic_simulator_msgs::msg::LaneletPose() const
 {
-  throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, openscenario_msgs::msg::LaneletPose);
+  throw UNSUPPORTED_CONVERSION_DETECTED(
+    RelativeWorldPosition, traffic_simulator_msgs::msg::LaneletPose);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

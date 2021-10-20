@@ -16,7 +16,6 @@ ament_auto_find_build_dependencies()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   msg/Context.msg
-  DEPENDENCIES builtin_interfaces
-)
+  DEPENDENCIES builtin_interfaces)
 
 ament_auto_package()

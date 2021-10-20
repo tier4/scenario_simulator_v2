@@ -22,10 +22,6 @@
 
 #include <boost/optional.hpp>
 #include <memory>
-#include <openscenario_msgs/msg/bounding_box.hpp>
-#include <openscenario_msgs/msg/driver_model.hpp>
-#include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
 #include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -41,6 +37,10 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
+#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -80,7 +80,8 @@ class EntityManager
 
   double current_time_;
 
-  using EntityStatusWithTrajectoryArray = openscenario_msgs::msg::EntityStatusWithTrajectoryArray;
+  using EntityStatusWithTrajectoryArray =
+    traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray;
   const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
 
   using MarkerArray = visualization_msgs::msg::MarkerArray;
@@ -92,7 +93,7 @@ class EntityManager
 
   const std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
 
-  using LaneletPose = openscenario_msgs::msg::LaneletPose;
+  using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
 public:
   template <typename Node>
@@ -220,13 +221,15 @@ public:
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
 
+  visualization_msgs::msg::MarkerArray makeDebugMarker() const;
+
   bool trafficLightsChanged();
 
   void setTargetSpeed(const std::string & name, double target_speed, bool continuous);
 
-  openscenario_msgs::msg::EntityStatus updateNpcLogic(
+  traffic_simulator_msgs::msg::EntityStatus updateNpcLogic(
     const std::string & name,
-    const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & type_list);
+    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list);
 
   void broadcastEntityTransform();
 
@@ -258,15 +261,15 @@ public:
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntityStatus(const std::string & name) const
-    -> const boost::optional<openscenario_msgs::msg::EntityStatus>;
+    -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>;
 
   auto getEntityTypeList() const
-    -> const std::unordered_map<std::string, openscenario_msgs::msg::EntityType>;
+    -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   auto getLaneletPose(const std::string & name)
-    -> boost::optional<openscenario_msgs::msg::LaneletPose>;
+    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   // clang-format off
   auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &, const double = 100) -> boost::optional<double>;
@@ -282,7 +285,8 @@ public:
 
   auto getNumberOfEgo() const -> std::size_t;
 
-  auto getObstacle(const std::string & name) -> boost::optional<openscenario_msgs::msg::Obstacle>;
+  auto getObstacle(const std::string & name)
+    -> boost::optional<traffic_simulator_msgs::msg::Obstacle>;
 
   // clang-format off
   auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose;
@@ -293,10 +297,10 @@ public:
 
   auto getStepTime() const noexcept -> double;
 
-  auto getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray;
+  auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
 
   void getGoalPoses(
-    const std::string & name, std::vector<openscenario_msgs::msg::LaneletPose> & goals);
+    const std::string & name, std::vector<traffic_simulator_msgs::msg::LaneletPose> & goals);
 
   void getGoalPoses(const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals);
 
@@ -319,7 +323,7 @@ public:
 
   void requestLaneChange(const std::string & name, const Direction & direction);
 
-  bool setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
+  bool setEntityStatus(const std::string & name, traffic_simulator_msgs::msg::EntityStatus status);
 
   void setVerbose(const bool verbose);
 
@@ -337,7 +341,7 @@ public:
     }
   }
 
-  auto toMapPose(const openscenario_msgs::msg::LaneletPose &) const
+  auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &) const
     -> const geometry_msgs::msg::Pose;
 
   template <typename MessageT, typename... Args>

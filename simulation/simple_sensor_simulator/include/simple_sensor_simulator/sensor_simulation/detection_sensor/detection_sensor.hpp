@@ -34,7 +34,7 @@ public:
     std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
       publisher_ptr);
   void update(
-    double current_time, const std::vector<openscenario_msgs::EntityStatus> & status,
+    double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
     const rclcpp::Time & stamp, const std::vector<std::string> & detected_objects);
 
 private:

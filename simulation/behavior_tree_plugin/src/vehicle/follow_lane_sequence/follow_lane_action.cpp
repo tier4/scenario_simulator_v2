@@ -31,33 +31,34 @@ FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfi
 {
 }
 
-const boost::optional<openscenario_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
-  const openscenario_msgs::msg::WaypointsArray &)
+const boost::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
+  const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   return boost::none;
 }
 
-const openscenario_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints()
+const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints()
 {
   if (!entity_status.lanelet_pose_valid) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
-    openscenario_msgs::msg::WaypointsArray waypoints;
+    traffic_simulator_msgs::msg::WaypointsArray waypoints;
     traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0);
     return waypoints;
   } else {
-    return openscenario_msgs::msg::WaypointsArray();
+    return traffic_simulator_msgs::msg::WaypointsArray();
   }
 }
 
 void FollowLaneAction::getBlackBoardValues()
 {
-  openscenario_msgs::msg::LaneletPose target_lanelet_pose;
+  traffic_simulator_msgs::msg::LaneletPose target_lanelet_pose;
   VehicleActionNode::getBlackBoardValues();
-  if (!getInput<openscenario_msgs::msg::LaneletPose>("target_lanelet_pose", target_lanelet_pose)) {
+  if (!getInput<traffic_simulator_msgs::msg::LaneletPose>(
+        "target_lanelet_pose", target_lanelet_pose)) {
     target_lanelet_pose_ = boost::none;
   } else {
     target_lanelet_pose_ = target_lanelet_pose;
