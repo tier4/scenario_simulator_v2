@@ -61,12 +61,12 @@ bool API::spawn(
   if (
     is_ego and not entity_manager_ptr_->entityExists(name) and
     not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
-      name, configuration, clock_.getStepTime(), params, plugin_name)) {
+      name, configuration, clock_.getStepTime(), params)) {
     return false;
   }
   if (
-    not is_ego and
-    not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::VehicleEntity>(name, params)) {
+    not is_ego and not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::VehicleEntity>(
+                     name, params, plugin_name)) {
     return false;
   }
   if (configuration.standalone_mode) {

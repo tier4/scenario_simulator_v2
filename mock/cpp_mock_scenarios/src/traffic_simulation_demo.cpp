@@ -95,18 +95,18 @@ private:
     api_.requestWalkStraight("tom");
     api_.setTargetSpeed("tom", 3, true);
     api_.spawn(
-      false, "bob", getPedestrianParameters(),
+      false, "bob", getPedestrianParameters(), "behavior_tree_plugin/PedestrianBehaviorTree",
       traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
     api_.spawn(
-      false, "npc1", getVehicleParameters(),
+      false, "npc1", getVehicleParameters(), "behavior_tree_plugin/VehicleBehaviorTree",
       traffic_simulator::helper::constructLaneletPose(34579, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
     lanechange_executed_ = false;
     api_.spawn(
-      false, "npc2", getVehicleParameters(),
+      false, "npc2", getVehicleParameters(), "behavior_tree_plugin/VehicleBehaviorTree",
       traffic_simulator::helper::constructLaneletPose(34606, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);

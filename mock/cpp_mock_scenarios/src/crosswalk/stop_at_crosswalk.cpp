@@ -65,7 +65,7 @@ private:
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 8, true);
     api_.spawn(
-      false, "bob", getPedestrianParameters(),
+      false, "bob", getPedestrianParameters(), "behavior_tree_plugin/PedestrianBehaviorTree",
       traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
