@@ -38,7 +38,8 @@ class VehicleEntity : public EntityBase
 {
 public:
   VehicleEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & parameters);
+    const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+    const std::string & plugin_name = "behavior_tree_plugin/VehicleBehaviorTree");
 
   const traffic_simulator_msgs::msg::VehicleParameters parameters;
 
