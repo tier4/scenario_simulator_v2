@@ -38,7 +38,7 @@ public:
       publisher_ptr);
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,
-    const std::vector<openscenario_msgs::EntityStatus> & status);
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status);
 
 private:
   std::vector<LidarSensor> lidar_sensors_;

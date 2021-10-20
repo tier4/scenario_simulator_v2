@@ -16,8 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_msgs/msg/driver_model.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/driver_model.hpp>
 
 namespace openscenario_interpreter
 {
@@ -51,7 +51,7 @@ struct ObjectController : public ComplexType
 
   auto isUserDefinedController() const & -> bool;
 
-  operator openscenario_msgs::msg::DriverModel() const;
+  operator traffic_simulator_msgs::msg::DriverModel() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

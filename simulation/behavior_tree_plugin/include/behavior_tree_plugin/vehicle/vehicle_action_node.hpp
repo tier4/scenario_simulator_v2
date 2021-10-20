@@ -19,13 +19,13 @@
 
 #include <behavior_tree_plugin/action_node.hpp>
 #include <memory>
-#include <openscenario_msgs/msg/driver_model.hpp>
-#include <openscenario_msgs/msg/obstacle.hpp>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
+#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/obstacle.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -39,24 +39,24 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
-      BT::InputPort<openscenario_msgs::msg::DriverModel>("driver_model"),
-      BT::InputPort<openscenario_msgs::msg::VehicleParameters>("vehicle_parameters")};
+      BT::InputPort<traffic_simulator_msgs::msg::DriverModel>("driver_model"),
+      BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
     }
     return ports;
   }
-  openscenario_msgs::msg::VehicleParameters vehicle_parameters;
-  openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
-  openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(
+  traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
+  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
+  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(
     double target_speed, const std::vector<std::int64_t> & following_lanelets);
-  openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
+  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
-  virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;
-  virtual const boost::optional<openscenario_msgs::msg::Obstacle> calculateObstacle(
-    const openscenario_msgs::msg::WaypointsArray & waypoints) = 0;
-  openscenario_msgs::msg::DriverModel driver_model;
+  virtual const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() = 0;
+  virtual const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
+    const traffic_simulator_msgs::msg::WaypointsArray & waypoints) = 0;
+  traffic_simulator_msgs::msg::DriverModel driver_model;
 };
 }  // namespace entity_behavior
 

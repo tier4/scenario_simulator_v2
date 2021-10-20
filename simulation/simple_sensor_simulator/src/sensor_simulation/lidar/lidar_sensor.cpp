@@ -39,7 +39,7 @@ const std::vector<std::string> & LidarSensor::getDetectedObjects() const
 }
 
 void LidarSensor::update(
-  double current_time, const std::vector<openscenario_msgs::EntityStatus> & status,
+  double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {
   if (current_time - last_update_stamp_ - configuration_.scan_duration() >= -0.002) {
@@ -51,7 +51,7 @@ void LidarSensor::update(
 }
 
 const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
-  const std::vector<openscenario_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
 {
   Raycaster raycaster;
   boost::optional<geometry_msgs::msg::Pose> ego_pose;

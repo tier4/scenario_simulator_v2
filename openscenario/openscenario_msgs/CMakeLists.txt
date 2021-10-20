@@ -1,31 +1,22 @@
 cmake_minimum_required(VERSION 3.5)
+
 project(openscenario_msgs)
 
-find_package(rosidl_default_generators REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake_auto REQUIRED)
+
+ament_auto_find_build_dependencies()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  msg/ActionStatus.msg
-  msg/Axle.msg
-  msg/Axles.msg
-  msg/BoundingBox.msg
-  msg/DriverModel.msg
-  msg/EntityStatus.msg
-  msg/EntityStatusWithTrajectory.msg
-  msg/EntityStatusWithTrajectoryArray.msg
-  msg/EntityType.msg
-  msg/LaneletPose.msg
-  msg/LaneletPoseAndStatus.msg
-  msg/MapPoseAndStatus.msg
-  msg/MiscObjectParameters.msg
-  msg/Obstacle.msg
-  msg/PedestrianParameters.msg
-  msg/Performance.msg
-  msg/VehicleParameters.msg
-  msg/WaypointsArray.msg
-  DEPENDENCIES std_msgs geometry_msgs
-)
+  msg/ParameterDeclaration.msg
+  msg/ParameterType.msg
+  DEPENDENCIES builtin_interfaces)
 
-ament_export_dependencies(rosidl_default_runtime)
-ament_package()
+ament_auto_package()

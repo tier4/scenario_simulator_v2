@@ -34,7 +34,7 @@
     </tr>
     <tr>
       <td>/entity/status</td>
-      <td>openscenario_msgs/msg/EntityStatusArray</td>
+      <td>traffic_simulator_msgs/msg/EntityStatusArray</td>
       <td>Subscribe</td>
       <td>Topics for publishing entity status in simulation.</td>
     </tr>

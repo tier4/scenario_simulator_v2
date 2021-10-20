@@ -18,6 +18,9 @@ add_library(behavior_tree_plugin SHARED
   src/pedestrian/follow_lane_action.cpp
   src/pedestrian/pedestrian_action_node.cpp
   src/pedestrian/walk_straight_action.cpp
+  src/transition_events/logging_event.cpp
+  src/transition_events/reset_request_event.cpp
+  src/transition_events/transition_event.cpp
   src/vehicle/behavior_tree.cpp
   src/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
   src/vehicle/follow_lane_sequence/follow_lane_action.cpp

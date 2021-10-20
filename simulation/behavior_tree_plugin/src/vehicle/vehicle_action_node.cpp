@@ -29,16 +29,16 @@ VehicleActionNode::VehicleActionNode(const std::string & name, const BT::NodeCon
 void VehicleActionNode::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
-  if (!getInput<openscenario_msgs::msg::DriverModel>("driver_model", driver_model)) {
-    driver_model = openscenario_msgs::msg::DriverModel();
+  if (!getInput<traffic_simulator_msgs::msg::DriverModel>("driver_model", driver_model)) {
+    driver_model = traffic_simulator_msgs::msg::DriverModel();
   }
-  if (!getInput<openscenario_msgs::msg::VehicleParameters>(
+  if (!getInput<traffic_simulator_msgs::msg::VehicleParameters>(
         "vehicle_parameters", vehicle_parameters)) {
     THROW_SIMULATION_ERROR("failed to get input vehicle_parameters in VehicleActionNode");
   }
 }
 
-openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
+traffic_simulator_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed)
 {
   geometry_msgs::msg::Accel accel_new;
@@ -68,7 +68,7 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
       hdmap_utils->getPreviousLaneletIds(entity_status.lanelet_pose.lanelet_id);
     new_lanelet_id = previous_lanelet_ids[0];
     new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id) - 0.01;
-    openscenario_msgs::msg::EntityStatus entity_status_updated;
+    traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;
     entity_status_updated.lanelet_pose.lanelet_id = new_lanelet_id;
     entity_status_updated.lanelet_pose.s = new_s;
@@ -106,7 +106,7 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
       THROW_SIMULATION_ERROR(
         "failed to calculate next status calculateEntityStatusUpdated function");
     }
-    openscenario_msgs::msg::EntityStatus entity_status_updated;
+    traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;
     entity_status_updated.lanelet_pose.lanelet_id = new_lanelet_id;
     entity_status_updated.lanelet_pose.s = new_s;
@@ -120,8 +120,8 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   THROW_SIMULATION_ERROR("failed to calculate next status calculateEntityStatusUpdated function");
 }
 
-openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(
-  double target_speed)
+traffic_simulator_msgs::msg::EntityStatus
+VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_speed)
 {
   if (target_speed > vehicle_parameters.performance.max_speed) {
     target_speed = vehicle_parameters.performance.max_speed;
@@ -168,7 +168,7 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   pose_new.position.x = trans_vec(0) + entity_status.pose.position.x;
   pose_new.position.y = trans_vec(1) + entity_status.pose.position.y;
   pose_new.position.z = trans_vec(2) + entity_status.pose.position.z;
-  openscenario_msgs::msg::EntityStatus entity_status_updated;
+  traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
   entity_status_updated.time = current_time + step_time;
   entity_status_updated.pose = pose_new;
   entity_status_updated.action_status.twist = twist_new;

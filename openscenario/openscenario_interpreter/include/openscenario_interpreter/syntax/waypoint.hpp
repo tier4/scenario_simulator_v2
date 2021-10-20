@@ -42,7 +42,7 @@ struct Waypoint
 
   explicit Waypoint(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::LaneletPose() const;
+  explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -1,3 +1,0 @@
-string name
-string misc_object_category
-openscenario_msgs/BoundingBox bounding_box

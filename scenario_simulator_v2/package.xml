@@ -10,13 +10,13 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <exec_depend>openscenario_interpreter</exec_depend>
-  <exec_depend>openscenario_msgs</exec_depend>
   <exec_depend>openscenario_utility</exec_depend>
   <exec_depend>openscenario_visualization</exec_depend>
+  <exec_depend>scenario_test_runner</exec_depend>
   <exec_depend>simple_sensor_simulator</exec_depend>
   <exec_depend>simulation_interface</exec_depend>
   <exec_depend>traffic_simulator</exec_depend>
-  <exec_depend>scenario_test_runner</exec_depend>
+  <exec_depend>traffic_simulator_msgs</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

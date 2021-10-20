@@ -21,12 +21,12 @@
 #include <concealer/autoware_architecture_proposal.hpp>
 #include <concealer/autoware_auto.hpp>
 #include <memory>
-#include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
+#include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -76,7 +76,7 @@ public:
     const std::string & name,             //
     const Configuration & configuration,  //
     const double step_time,               //
-    const openscenario_msgs::msg::VehicleParameters & parameters);
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 
@@ -93,33 +93,33 @@ public:
   auto getCurrentAction() const -> const std::string override;
 
   auto getEntityStatus(const double, const double) const
-    -> const openscenario_msgs::msg::EntityStatus;
+    -> const traffic_simulator_msgs::msg::EntityStatus;
 
   auto getEntityTypename() const -> const std::string & override;
 
-  auto getObstacle() -> boost::optional<openscenario_msgs::msg::Obstacle> override;
+  auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand override;
 
-  auto getWaypoints() -> const openscenario_msgs::msg::WaypointsArray override;
+  auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   void onUpdate(double current_time, double step_time) override;
 
   auto ready() const -> bool override;
 
-  void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose &) override;
+  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
-  void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> &) override;
+  void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
   void requestLaneChange(const std::int64_t) override;
 
-  auto setDriverModel(const openscenario_msgs::msg::DriverModel &) -> void override;
+  auto setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void override;
 
-  auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool override;
+  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool override;
 
   void setTargetSpeed(double, bool) override;
 

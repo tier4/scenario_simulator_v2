@@ -4,14 +4,14 @@
          type="entity_behavior::PedestrianBehaviorTree"
          base_class_type="entity_behavior::BehaviorPluginBase">
     <description>
-      A dynamixel hardware plugin for the ros2_control.
+      A behavior tree planner plugin for pedestrian NPC.
     </description>
   </class>
   <class name="behavior_tree_plugin/VehicleBehaviorTree"
          type="entity_behavior::VehicleBehaviorTree"
          base_class_type="entity_behavior::BehaviorPluginBase">
     <description>
-      A dynamixel hardware plugin for the ros2_control.
+      A behavior tree planner plugin for vehicle NPC.
     </description>
   </class>
 </library>
