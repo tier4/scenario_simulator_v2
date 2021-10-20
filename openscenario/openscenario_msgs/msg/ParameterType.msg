@@ -1,0 +1,9 @@
+int8 BOOLEAN=0
+int8 DATE_TIME=1
+int8 DOUBLE=2
+int8 INTEGER=3
+int8 STRING=4
+int8 UNSIGNED_INT=5
+int8 UNSIGNED_SHORT=6
+
+uint8 data

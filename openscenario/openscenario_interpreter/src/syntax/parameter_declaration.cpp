@@ -21,10 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
-: name(readAttribute<String>("name", node, scope)),
-  parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
-  value(readAttribute<String>("value", node, scope))
+auto check(const std::string & name) -> decltype(auto)
 {
   auto includes = [](const std::string & name, const std::vector<char> & chars) {
     return std::any_of(std::begin(chars), std::end(chars), [&](const auto & each) {
@@ -37,28 +34,53 @@ ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & 
       "Parameter names starting with \"OSC\" are reserved for special use in future versions "
       "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix.");
   } else if (includes(name, {' ', '$', '\'', '"'})) {
-    throw SyntaxError(
-      "In parameter names, usage of symbols is restricted. Symbols that must not be used are:\n"
-      "  - \" \" (blank space)\n"
-      "  - $\n"
-      "  - \'\n"
-      "  - \"\n");
+    // throw SyntaxError(
+    //   "In parameter names, usage of symbols is restricted. Symbols that must not be used are: "
+    //   "whitespace, dollar-sign, single-quote, double-quote. Given parameter name is ",
+    //   std::quoted(name));
+    return name;
   } else {
-    scope.insert(name, evaluate());
+    return name;
   }
+}
+
+ParameterDeclaration::ParameterDeclaration(
+  const openscenario_msgs::msg::ParameterDeclaration & message)
+: name(message.name),                      //
+  parameter_type(message.parameter_type),  //
+  value(message.value)
+{
+  check(name);
+}
+
+ParameterDeclaration::ParameterDeclaration(
+  const openscenario_msgs::msg::ParameterDeclaration & message, Scope & scope)
+: name(message.name),                      //
+  parameter_type(message.parameter_type),  //
+  value(message.value)
+{
+  scope.insert(check(name), evaluate());
+}
+
+ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope)),
+  parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
+  value(readAttribute<String>("value", node, scope))
+{
+  scope.insert(check(name), evaluate());
 }
 
 auto ParameterDeclaration::evaluate() const -> Element
 {
   // clang-format off
   switch (parameter_type) {
-    case ParameterType::INTEGER:        return make<Integer      >(value);
+    case ParameterType::BOOLEAN:        return make<Boolean      >(value);
+    case ParameterType::DATE_TIME:      return make<String       >(value);
     case ParameterType::DOUBLE:         return make<Double       >(value);
+    case ParameterType::INTEGER:        return make<Integer      >(value);
     case ParameterType::STRING:         return make<String       >(value);
     case ParameterType::UNSIGNED_INT:   return make<UnsignedInt  >(value);
     case ParameterType::UNSIGNED_SHORT: return make<UnsignedShort>(value);
-    case ParameterType::BOOLEAN:        return make<Boolean      >(value);
-    case ParameterType::DATE_TIME:      return make<String       >(value);
 
     default:
       return unspecified;

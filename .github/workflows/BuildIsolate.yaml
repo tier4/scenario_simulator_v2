@@ -25,6 +25,8 @@ jobs:
             kashiwanoha_map,
             lanelet2_extension_psim,
             openscenario_interpreter,
+            openscenario_interpreter_msgs,
+            openscenario_msgs,
             openscenario_utility,
             openscenario_visualization,
             scenario_simulator_exception,
