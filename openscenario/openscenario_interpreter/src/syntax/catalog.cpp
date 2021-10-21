@@ -15,6 +15,7 @@
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
