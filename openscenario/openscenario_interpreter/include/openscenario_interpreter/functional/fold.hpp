@@ -31,9 +31,7 @@ constexpr decltype(auto) fold_left(F &&, T && x)
 template <typename F, typename T, typename U, typename... Ts>
 constexpr decltype(auto) fold_left(F && f, T && x, U && y, Ts &&... xs)
 {
-  return fold_left(
-    f, f(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y)),
-    std::forward<decltype(xs)>(xs)...);
+  return fold_left(f, f(std::forward<T>(x), std::forward<U>(y)), std::forward<Ts>(xs)...);
 }
 
 template <typename F, typename T>

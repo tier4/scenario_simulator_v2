@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 
 #include <boost/filesystem.hpp>
+#include <openscenario_interpreter/functional/fold.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
@@ -40,15 +41,19 @@ struct CatalogReference
 {
   static auto make(const pugi::xml_node & node, Scope & scope) -> Element;
 
-  template <typename... T>
+  template <typename... Ts>
   static auto make(const pugi::xml_node & node, Scope & scope) -> Element
   {
-    auto ret = make(node, scope);
+    auto ret = CatalogReference::make(node, scope);
 
-    if (not(ret.is<T>() || ...)) {
+    bool ret_is_in_Ts = fold_right([](bool l, bool r) { return l or r; }, false, ret.is<Ts>()...);
+
+    if (!ret_is_in_Ts) {
       std::stringstream what;
       what << "Required type of catalog element is one of the following type: ";
-      ((what << typeid(T).name() << " "), ...);
+      fold_left(
+        [](auto & os, auto && type_id) -> decltype(auto) { return os << type_id.name(); }, what,
+        typeid(Ts)...);
       what << "\n But the type of this element is " << ret.type().name();
       THROW_SYNTAX_ERROR(what.str());
     }

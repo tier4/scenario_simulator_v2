@@ -110,7 +110,7 @@ public:
   decltype(auto) type() const { return binding().type(); }
 
   template <typename U>
-  decltype(auto) is() const
+  auto is() const -> bool
   {
     return type() == typeid(U);
   }
