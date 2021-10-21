@@ -35,8 +35,6 @@ class Pointer : public std::shared_ptr<T>
   template <typename Bound, typename ActualBound = Bound>
   struct Binder : public T, public ActualBound
   {
-    static_assert(std::is_base_of<Bound, ActualBound>::value);
-
     template <typename... Ts>
     explicit constexpr Binder(Ts &&... xs) : ActualBound(std::forward<decltype(xs)>(xs)...)
     {
@@ -89,8 +87,6 @@ public:
   template <typename U1, typename U2, typename... Ts>
   static Pointer bind_as(Ts &&... xs)
   {
-    static_assert(std::is_base_of<U1, U2>::value);
-    static_assert(std::is_constructible_v<U2, Ts...>);
     using Binding = Binder<U1, U2>;
     return static_cast<Pointer>(std::make_shared<Binding>(std::forward<decltype(xs)>(xs)...));
   }
