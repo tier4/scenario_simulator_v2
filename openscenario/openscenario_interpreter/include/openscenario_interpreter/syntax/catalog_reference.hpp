@@ -15,12 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 
+#include <boost/filesystem.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
-
-#include <boost/filesystem.hpp>
 
 namespace openscenario_interpreter
 {

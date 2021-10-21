@@ -20,8 +20,6 @@
 #include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
-#include "openscenario_interpreter/error.hpp"
-#include "openscenario_interpreter/object.hpp"
 
 namespace openscenario_interpreter
 {

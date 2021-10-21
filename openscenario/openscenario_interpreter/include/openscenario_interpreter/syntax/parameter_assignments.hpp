@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_assignment.hpp>
 #include <pugixml.hpp>
-#include "openscenario_interpreter/reader/element.hpp"
 
 namespace openscenario_interpreter
 {

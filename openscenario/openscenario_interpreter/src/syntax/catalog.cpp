@@ -16,16 +16,12 @@
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <openscenario_interpreter/syntax/catalog.hpp>
-
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/route.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
-#include "openscenario_interpreter/reader/attribute.hpp"
-#include "openscenario_interpreter/reader/element.hpp"
-#include "scenario_simulator_exception/exception.hpp"
 
 namespace openscenario_interpreter
 {
