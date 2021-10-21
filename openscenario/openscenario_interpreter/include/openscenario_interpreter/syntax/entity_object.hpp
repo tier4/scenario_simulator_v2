@@ -45,7 +45,7 @@ struct EntityObject : public Group
   // clang-format off
   : Group(
       choice(node,
-        std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference::make(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference::make<Vehicle, Pedestrian, MiscObject>(node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>         (node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>      (node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>      (node, std::forward<decltype(xs)>(xs)...); })))

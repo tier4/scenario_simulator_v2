@@ -50,7 +50,6 @@ def convert_scenarios(scenarios: List[Scenario], output_directory: Path):
             for path in convert(each.path, output_directory / each.path.stem, False):
                 result.append(Scenario(path, each.expect, each.frame_rate))
 
-    print("convert_scenarios:", [s.path for s in scenarios], "->", [r.path for r in result])
     return result
 
 

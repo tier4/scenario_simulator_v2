@@ -46,33 +46,28 @@ OpenSCENARIO:
     ScenarioObject:
       - name: ego
         CatalogReference:
-          ParameterAssignments:
-            ParameterAssignment:
-              - parameterRef: egoMaxSpeed
-                value: 50
           catalogName: all-in-one-vehicle
           entryName: ego-vehicle
         ObjectController:
-          Controller:
-            name: ""
-            Properties:
-              Property:
-                - name: isEgo
-                  value: "false"
+          CatalogReference:
+            catalogName: all-in-one-controller
+            entryName: ego-controller
       - name: vehicle-1
         CatalogReference:
           catalogName: all-in-one-vehicle
           entryName: default-vehicle
-        ObjectController: &DefaultObjectController
-          Controller:
-            name: ""
-            Properties:
-              Property: []
+        ObjectController:
+          CatalogReference:
+            catalogName: all-in-one-controller
+            entryName: default-object-controller
       - name: vehicle-2
         CatalogReference:
           catalogName: all-in-one-vehicle
           entryName: default-vehicle
-        ObjectController: *DefaultObjectController
+        ObjectController:
+          CatalogReference:
+            catalogName: all-in-one-controller
+            entryName: default-object-controller
       - name: barricade
         MiscObject:
           mass: 1.0

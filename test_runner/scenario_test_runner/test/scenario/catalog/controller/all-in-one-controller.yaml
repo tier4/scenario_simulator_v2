@@ -1,0 +1,18 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: "2021-06-21T07:36:35.584Z"
+    description: ""
+    author: ""
+  Catalog:
+    name: all-in-one-controller
+    Controller:
+      - name: ego-controller
+        Properties:
+          Property:
+            - name: isEgo
+              value: "false"
+      - name: default-object-controller
+        Properties:
+          Property: []

@@ -39,7 +39,23 @@ inline namespace syntax
 
 struct CatalogReference
 {
-  static Element make(const pugi::xml_node & node, Scope & scope);
+  static auto make(const pugi::xml_node & node, Scope & scope) -> Element;
+
+  template <typename... T>
+  static auto make(const pugi::xml_node & node, Scope & scope) -> Element
+  {
+    auto ret = make(node, scope);
+
+    if (not(ret.is<T>() || ...)) {
+      std::stringstream what;
+      what << "Required type of catalog element is one of the following type: ";
+      ((what << typeid(T).name() << " "), ...);
+      what << "\n But the type of this element is " << ret.type().name();
+      THROW_SYNTAX_ERROR(what.str());
+    }
+
+    return ret;
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

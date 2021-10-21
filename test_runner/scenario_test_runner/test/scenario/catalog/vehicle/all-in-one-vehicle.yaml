@@ -20,7 +20,7 @@ OpenSCENARIO:
             length: 4.77
             height: 2.5
         Performance:
-          maxSpeed: $egoMaxSpeed
+          maxSpeed: 50
           maxAcceleration: INF
           maxDeceleration: INF
         Axles:

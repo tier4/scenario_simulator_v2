@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/type_traits/if_has_member_function_evaluate.hpp>
 #include <openscenario_interpreter/type_traits/if_has_stream_output_operator.hpp>
 #include <openscenario_interpreter/utility/pair.hpp>
+#include <type_traits>
 #include <typeinfo>
 #include <utility>
 
@@ -31,11 +32,13 @@ namespace openscenario_interpreter
 template <typename T>
 class Pointer : public std::shared_ptr<T>
 {
-  template <typename Bound>
-  struct Binder : public T, public Bound
+  template <typename Bound, typename ActualBound = Bound>
+  struct Binder : public T, public ActualBound
   {
+    static_assert(std::is_base_of<Bound, ActualBound>::value);
+
     template <typename... Ts>
-    explicit constexpr Binder(Ts &&... xs) : Bound(std::forward<decltype(xs)>(xs)...)
+    explicit constexpr Binder(Ts &&... xs) : ActualBound(std::forward<decltype(xs)>(xs)...)
     {
     }
 
@@ -83,6 +86,15 @@ public:
     return static_cast<Pointer>(std::make_shared<Binding>(std::forward<decltype(xs)>(xs)...));
   }
 
+  template <typename U1, typename U2, typename... Ts>
+  static Pointer bind_as(Ts &&... xs)
+  {
+    static_assert(std::is_base_of<U1, U2>::value);
+    static_assert(std::is_constructible_v<U2, Ts...>);
+    using Binding = Binder<U1, U2>;
+    return static_cast<Pointer>(std::make_shared<Binding>(std::forward<decltype(xs)>(xs)...));
+  }
+
   template <typename U, typename... Ts>
   decltype(auto) rebind(Ts &&... xs)
   {
@@ -117,7 +129,6 @@ public:
     }
   }
 
-public:
   template <typename... Ts>
   decltype(auto) evaluate(Ts &&... xs) const
   {
