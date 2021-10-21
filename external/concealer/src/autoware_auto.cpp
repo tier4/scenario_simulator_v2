@@ -82,9 +82,9 @@ double AutowareAuto::getGearSign() const
            : +1.0;
 }
 
-openscenario_msgs::msg::WaypointsArray AutowareAuto::getWaypoints() const
+auto AutowareAuto::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  openscenario_msgs::msg::WaypointsArray waypoints;
+  traffic_simulator_msgs::msg::WaypointsArray waypoints;
 
   for (const auto & point : getTrajectory().points) {
     geometry_msgs::msg::Point waypoint;

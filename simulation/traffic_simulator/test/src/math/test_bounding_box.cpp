@@ -20,12 +20,12 @@
 TEST(BoundingBox, GetPolygonDistanceWithCollision)
 {
   geometry_msgs::msg::Pose pose0;
-  openscenario_msgs::msg::BoundingBox bbox0;
+  traffic_simulator_msgs::msg::BoundingBox bbox0;
   bbox0.dimensions.x = 3;
   bbox0.dimensions.y = 3;
   bbox0.dimensions.z = 3;
   geometry_msgs::msg::Pose pose1;
-  openscenario_msgs::msg::BoundingBox bbox1;
+  traffic_simulator_msgs::msg::BoundingBox bbox1;
   bbox1.dimensions.x = 1;
   bbox1.dimensions.y = 1;
   bbox1.dimensions.z = 1;
@@ -35,13 +35,13 @@ TEST(BoundingBox, GetPolygonDistanceWithCollision)
 TEST(BoundingBox, GetPolygonDistanceWithoutCollision)
 {
   geometry_msgs::msg::Pose pose0;
-  openscenario_msgs::msg::BoundingBox bbox0;
+  traffic_simulator_msgs::msg::BoundingBox bbox0;
   bbox0.dimensions.x = 3;
   bbox0.dimensions.y = 3;
   bbox0.dimensions.z = 3;
   geometry_msgs::msg::Pose pose1;
   pose1.position.y = 5;
-  openscenario_msgs::msg::BoundingBox bbox1;
+  traffic_simulator_msgs::msg::BoundingBox bbox1;
   bbox1.dimensions.x = 1;
   bbox1.dimensions.y = 1;
   bbox1.dimensions.z = 1;

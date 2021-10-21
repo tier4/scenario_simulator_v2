@@ -120,16 +120,16 @@ private:
   void updateTrafficLights(
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);
-  std::vector<openscenario_msgs::VehicleParameters> ego_vehicles_;
-  std::vector<openscenario_msgs::VehicleParameters> vehicles_;
-  std::vector<openscenario_msgs::PedestrianParameters> pedestrians_;
-  std::vector<openscenario_msgs::MiscObjectParameters> misc_objects_;
+  std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
+  std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
+  std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians_;
+  std::vector<traffic_simulator_msgs::MiscObjectParameters> misc_objects_;
   double realtime_factor_;
   double step_time_;
   double current_time_;
   rclcpp::Time current_ros_time_;
   bool initialized_;
-  std::vector<openscenario_msgs::EntityStatus> entity_status_;
+  std::vector<traffic_simulator_msgs::EntityStatus> entity_status_;
   zeromq::MultiServer server_;
 };
 }  // namespace simple_sensor_simulator

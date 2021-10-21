@@ -21,7 +21,7 @@ TEST(Collision, DifferentHeight)
 {
   geometry_msgs::msg::Pose pose0;
   geometry_msgs::msg::Pose pose1;
-  openscenario_msgs::msg::BoundingBox box;
+  traffic_simulator_msgs::msg::BoundingBox box;
   box.dimensions.x = 1.0;
   box.dimensions.y = 1.0;
   box.dimensions.z = 1.0;
@@ -33,7 +33,7 @@ TEST(Collision, SamePosition)
 {
   geometry_msgs::msg::Pose pose0;
   geometry_msgs::msg::Pose pose1;
-  openscenario_msgs::msg::BoundingBox box;
+  traffic_simulator_msgs::msg::BoundingBox box;
   box.dimensions.x = 1.0;
   box.dimensions.y = 1.0;
   box.dimensions.z = 1.0;
@@ -44,7 +44,7 @@ TEST(Collision, SameHeightNoCollision)
 {
   geometry_msgs::msg::Pose pose0;
   geometry_msgs::msg::Pose pose1;
-  openscenario_msgs::msg::BoundingBox box;
+  traffic_simulator_msgs::msg::BoundingBox box;
   box.dimensions.x = 1.0;
   box.dimensions.y = 1.0;
   box.dimensions.z = 1.0;

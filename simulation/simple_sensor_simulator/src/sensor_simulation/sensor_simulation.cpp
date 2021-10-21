@@ -39,7 +39,7 @@ void SensorSimulation::attachDetectionSensor(
 
 void SensorSimulation::updateSensorFrame(
   double current_time, const rclcpp::Time & current_ros_time,
-  const std::vector<openscenario_msgs::EntityStatus> & status)
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status)
 {
   std::vector<std::string> detected_objects = {};
   for (auto & sensor : lidar_sensors_) {

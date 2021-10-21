@@ -30,13 +30,13 @@ LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfi
 {
 }
 
-const boost::optional<openscenario_msgs::msg::Obstacle> LaneChangeAction::calculateObstacle(
-  const openscenario_msgs::msg::WaypointsArray &)
+const boost::optional<traffic_simulator_msgs::msg::Obstacle> LaneChangeAction::calculateObstacle(
+  const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   return boost::none;
 }
 
-const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
+const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
 {
   if (!curve_) {
     THROW_SIMULATION_ERROR("curve is null");
@@ -45,7 +45,7 @@ const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoint
     THROW_SIMULATION_ERROR("to lanelet id is null");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
-    openscenario_msgs::msg::WaypointsArray waypoints;
+    traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
     auto following_lanelets = hdmap_utils->getFollowingLanelets(to_lanelet_id_.get(), 0);
@@ -69,7 +69,7 @@ const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoint
     }
     return waypoints;
   } else {
-    return openscenario_msgs::msg::WaypointsArray();
+    return traffic_simulator_msgs::msg::WaypointsArray();
   }
 }
 
@@ -119,7 +119,7 @@ BT::NodeStatus LaneChangeAction::tick()
     current_s_ = current_s_ + current_linear_vel * step_time;
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
-      openscenario_msgs::msg::EntityStatus entity_status_updated;
+      traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
       entity_status_updated.pose = pose;
       auto lanelet_pose = hdmap_utils->toLaneletPose(pose);
       if (lanelet_pose) {
@@ -148,8 +148,8 @@ BT::NodeStatus LaneChangeAction::tick()
       double s = (current_s_ - curve_->getLength()) + target_s_;
       curve_ = boost::none;
       current_s_ = 0;
-      openscenario_msgs::msg::EntityStatus entity_status_updated;
-      openscenario_msgs::msg::LaneletPose lanelet_pose;
+      traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
+      traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = to_lanelet_id_.get();
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;

@@ -14,7 +14,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_auto REQUIRED)
-find_package(openscenario_msgs REQUIRED)
+find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
 include(FindProtobuf REQUIRED)
 
@@ -23,7 +23,6 @@ ament_auto_find_build_dependencies()
 ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
   src/behavior/behavior_plugin_base.cpp
-  src/behavior/black_board.cpp
   src/behavior/route_planner.cpp
   src/behavior/target_speed_planner.cpp
   src/color_utils/color_utils.cpp

@@ -17,9 +17,9 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
-#include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator_msgs/msg/driver_model.hpp>
 
 // headers in STL
 #include <memory>
@@ -58,7 +58,7 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("ego", 15, true);
-    openscenario_msgs::msg::DriverModel driver_model;
+    traffic_simulator_msgs::msg::DriverModel driver_model;
     driver_model.see_around = false;
     api_.setDriverModel("ego", driver_model);
     api_.spawn(false, "npc", getVehicleParameters());

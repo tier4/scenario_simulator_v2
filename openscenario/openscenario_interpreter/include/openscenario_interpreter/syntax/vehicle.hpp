@@ -22,8 +22,8 @@
 #include <openscenario_interpreter/syntax/performance.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/vehicle_category.hpp>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 
 namespace openscenario_interpreter
 {
@@ -60,7 +60,7 @@ struct Vehicle : public Scope  // for ParameterDeclarations
 
   explicit Vehicle(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::VehicleParameters() const;
+  explicit operator traffic_simulator_msgs::msg::VehicleParameters() const;
 
   template <typename... Ts>
   auto operator[](Ts &&... xs) -> decltype(auto)

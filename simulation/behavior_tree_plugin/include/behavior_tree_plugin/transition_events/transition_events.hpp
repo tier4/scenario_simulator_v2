@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/behavior/black_board.hpp>
+#ifndef BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
+#define BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
 
-namespace entity_behavior
-{
-boost::any BlackBoard::getValue(const std::string & key) const
-{
-  if (data_.find(key) == data_.end()) {
-    throw std::runtime_error("key : " + key + " does not exist.");
-  }
-  return data_.at(key);
-}
-}  // namespace entity_behavior
+#include "logging_event.hpp"
+#include "reset_request_event.hpp"
+
+#endif  // BEHAVIOR_TREE_PLUGIN__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_

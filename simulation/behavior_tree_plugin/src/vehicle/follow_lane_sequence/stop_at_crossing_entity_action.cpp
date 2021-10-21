@@ -33,9 +33,9 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   in_stop_sequence_ = false;
 }
 
-const boost::optional<openscenario_msgs::msg::Obstacle>
+const boost::optional<traffic_simulator_msgs::msg::Obstacle>
 StopAtCrossingEntityAction::calculateObstacle(
-  const openscenario_msgs::msg::WaypointsArray & waypoints)
+  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
 {
   if (!distance_to_stop_target_) {
     return boost::none;
@@ -47,25 +47,25 @@ StopAtCrossingEntityAction::calculateObstacle(
   if (distance_to_stop_target_.get() > spline.getLength()) {
     return boost::none;
   }
-  openscenario_msgs::msg::Obstacle obstacle;
+  traffic_simulator_msgs::msg::Obstacle obstacle;
   obstacle.type = obstacle.ENTITY;
   obstacle.s = distance_to_stop_target_.get();
   return obstacle;
 }
 
-const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
+const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
 {
   if (!entity_status.lanelet_pose_valid) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
-    openscenario_msgs::msg::WaypointsArray waypoints;
+    traffic_simulator_msgs::msg::WaypointsArray waypoints;
     traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0);
     return waypoints;
   } else {
-    return openscenario_msgs::msg::WaypointsArray();
+    return traffic_simulator_msgs::msg::WaypointsArray();
   }
 }
 
