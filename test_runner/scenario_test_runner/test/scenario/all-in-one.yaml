@@ -17,6 +17,9 @@ OpenSCENARIO:
     ControllerCatalog:
       Directory:
         path: src/simulator/scenario_simulator/test_runner/scenario_test_runner/test/scenario/catalog/controller
+    ManeuverCatalog:
+      Directory:
+        path: src/simulator/scenario_simulator/test_runner/scenario_test_runner/test/scenario/catalog/maneuver
   RoadNetwork:
     LogicFile:
       filepath: $(find-pkg-share kashiwanoha_map)/map
@@ -48,6 +51,10 @@ OpenSCENARIO:
         CatalogReference:
           catalogName: all-in-one-vehicle
           entryName: ego-vehicle
+          ParameterAssignments:
+            ParameterAssignment:
+              - parameterRef: maxSpeed
+                value: 50
         ObjectController:
           CatalogReference:
             catalogName: all-in-one-controller
@@ -375,37 +382,44 @@ OpenSCENARIO:
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef: []
-                Maneuver:
-                  - name: ""
-                    Event:
-                      - name: ""
-                        priority: parallel
-                        maximumExecutionCount: 100
-                        StartTrigger:
-                          ConditionGroup:
-                            - Condition:
-                                - name: "if signal(34802).state() == none"
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    TrafficSignalCondition:
-                                      name: "34802"
-                                      state: none
-                                - name: "if simple_controller.phase() == blank"
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    TrafficSignalControllerCondition:
-                                      trafficSignalControllerRef: simple-controller
-                                      phase: blank
-                        Action:
-                          - name: "change_phase(simple_controller, green)"
-                            GlobalAction:
-                              InfrastructureAction:
-                                TrafficSignalAction:
-                                  TrafficSignalControllerAction:
-                                    trafficSignalControllerRef: simple-controller
-                                    phase: green
+                CatalogReference:
+                  ParameterAssignments:
+                    ParameterAssignment:
+                      - parameterRef: controllerName
+                        value: simple-controller
+                  catalogName: all-in-one-maneuver
+                  entryName: traffic-signal
+                # Maneuver:
+                #   - name: ""
+                #     Event:
+                #       - name: ""
+                #         priority: parallel
+                #         maximumExecutionCount: 100
+                #         StartTrigger:
+                #           ConditionGroup:
+                #             - Condition:
+                #                 - name: "if signal(34802).state() == none"
+                #                   delay: 0
+                #                   conditionEdge: none
+                #                   ByValueCondition:
+                #                     TrafficSignalCondition:
+                #                       name: "34802"
+                #                       state: none
+                #                 - name: "if simple_controller.phase() == blank"
+                #                   delay: 0
+                #                   conditionEdge: none
+                #                   ByValueCondition:
+                #                     TrafficSignalControllerCondition:
+                #                       trafficSignalControllerRef: simple-controller
+                #                       phase: blank
+                #         Action:
+                #           - name: "change_phase(simple_controller, green)"
+                #             GlobalAction:
+                #               InfrastructureAction:
+                #                 TrafficSignalAction:
+                #                   TrafficSignalControllerAction:
+                #                     trafficSignalControllerRef: simple-controller
+                #                     phase: green
             StartTrigger:
               ConditionGroup:
                 - Condition:

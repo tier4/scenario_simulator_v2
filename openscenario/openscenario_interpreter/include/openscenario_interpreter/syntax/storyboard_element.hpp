@@ -150,18 +150,17 @@ protected:
   template <typename U, typename Node, typename... Ts>
   auto readCatalogedStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
   {
-    const auto name = rename(readAttribute<String>("name", node, inner_scope));
+    auto element = CatalogReference::make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
+    const auto & name = element.template as<U>().name;
 
-    if (unique(name)) {
-      auto element =
-        CatalogReference::make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
-      inner_scope.insert(name, element);
-      return element;
-    } else {
+    if (not unique(name)) {
       throw SyntaxError(
         "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
         typeid(U).name(), ")");
     }
+
+    inner_scope.insert(name, element);
+    return element;
   }
 
 public:
