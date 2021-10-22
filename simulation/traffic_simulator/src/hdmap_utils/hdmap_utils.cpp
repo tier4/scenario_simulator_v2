@@ -107,6 +107,40 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getLaneletPolygon(std::
   return points;
 }
 
+std::vector<std::int64_t> HdMapUtils::filterLaneletIds(
+  const std::vector<std::int64_t> & lanelet_ids, const char subtype[]) const
+{
+  const auto lanelets = getLanelets(lanelet_ids);
+  std::vector<lanelet::Lanelet> filtered_lanelets;
+  for (const auto & ll : lanelets) {
+    if (ll.hasAttribute(lanelet::AttributeName::Subtype)) {
+      lanelet::Attribute attr = ll.attribute(lanelet::AttributeName::Subtype);
+      if (attr.value() == subtype) {
+        filtered_lanelets.emplace_back(ll);
+      }
+    }
+  }
+  return getLaneletIds(filtered_lanelets);
+}
+
+std::vector<std::int64_t> HdMapUtils::getNearbyLaneletId(
+  const geometry_msgs::msg::Pose & pose, double distance_threshold) const
+{
+  std::vector<std::int64_t> lanelet_ids;
+  lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);
+  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
+    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 5);
+  if (nearest_lanelet.empty()) {
+    return {};
+  }
+  for (const auto & lanelet : nearest_lanelet) {
+    if (lanelet.first <= distance_threshold) {
+      lanelet_ids.emplace_back(lanelet.second.id());
+    }
+  }
+  return lanelet_ids;
+}
+
 double HdMapUtils::getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   return toMapPose(lanelet_pose).pose.position.z;
@@ -241,8 +275,23 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
   return ret;
 }
 
-std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLaneletsWithDistance(
-  const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[])
+std::vector<lanelet::Lanelet> HdMapUtils::filterLanelets(
+  const std::vector<lanelet::Lanelet> & lanelets, const char subtype[]) const
+{
+  std::vector<lanelet::Lanelet> filtered_lanelets;
+  for (const auto & ll : lanelets) {
+    if (ll.hasAttribute(lanelet::AttributeName::Subtype)) {
+      lanelet::Attribute attr = ll.attribute(lanelet::AttributeName::Subtype);
+      if (attr.value() != subtype) {
+        filtered_lanelets.push_back(ll);
+      }
+    }
+  }
+  return filtered_lanelets;
+}
+
+std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanelets(
+  const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]) const
 {
   std::vector<std::pair<double, lanelet::Lanelet>> exclude_subtype_lanelets;
   for (const auto & ll : lls) {
@@ -304,7 +353,7 @@ boost::optional<std::int64_t> HdMapUtils::getClosetLaneletId(
     return closest_lanelet.id();
   } else {
     const auto nearest_road_lanelet =
-      excludeSubtypeLaneletsWithDistance(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
+      excludeSubtypeLanelets(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
     if (nearest_road_lanelet.empty()) {
       return boost::none;
     }
@@ -1281,5 +1330,25 @@ std::vector<double> HdMapUtils::calcEuclidDist(
     dist_v.push_back(dist_v.at(i) + d);
   }
   return dist_v;
+}
+
+std::vector<lanelet::Lanelet> HdMapUtils::getLanelets(
+  const std::vector<std::int64_t> & lanelet_ids) const
+{
+  std::vector<lanelet::Lanelet> lanelets;
+  for (const auto & id : lanelet_ids) {
+    lanelets.emplace_back(lanelet_map_ptr_->laneletLayer.get(id));
+  }
+  return lanelets;
+}
+
+std::vector<std::int64_t> HdMapUtils::getLaneletIds(
+  const std::vector<lanelet::Lanelet> & lanelets) const
+{
+  std::vector<std::int64_t> ids;
+  for (const auto & lanelet : lanelets) {
+    ids.emplace_back(lanelet.id());
+  }
+  return ids;
 }
 }  // namespace hdmap_utils
