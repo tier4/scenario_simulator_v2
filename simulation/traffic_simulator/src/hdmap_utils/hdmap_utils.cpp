@@ -124,10 +124,10 @@ std::vector<std::int64_t> HdMapUtils::filterLaneletIds(
 }
 
 std::vector<std::int64_t> HdMapUtils::getNearbyLaneletId(
-  const geometry_msgs::msg::Pose & pose, double distance_threshold) const
+  const geometry_msgs::msg::Point & position, double distance_threshold) const
 {
   std::vector<std::int64_t> lanelet_ids;
-  lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);
+  lanelet::BasicPoint2d search_point(position.x, position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
     lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 5);
   if (nearest_lanelet.empty()) {

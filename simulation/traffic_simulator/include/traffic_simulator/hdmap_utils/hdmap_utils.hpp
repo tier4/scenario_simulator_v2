@@ -129,7 +129,7 @@ public:
   boost::optional<std::int64_t> getClosetLaneletId(
     geometry_msgs::msg::Pose pose, double distance_thresh = 30.0, bool include_crosswalk = false);
   std::vector<std::int64_t> getNearbyLaneletId(
-    const geometry_msgs::msg::Pose & pose, double distance_threshold) const;
+    const geometry_msgs::msg::Point & point, double distance_threshold) const;
   std::vector<std::int64_t> filterLaneletIds(
     const std::vector<std::int64_t> & lanlet_ids, const char subtype[]) const;
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
