@@ -300,6 +300,32 @@
         <string>evaluation</string>
        </property>
       </widget>
+      <widget class="QTextEdit" name="simulation_time_data">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>430</y>
+         <width>201</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="simulation_time_label">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>410</y>
+         <width>121</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Simulation time</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>
