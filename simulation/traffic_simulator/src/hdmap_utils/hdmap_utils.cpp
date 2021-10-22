@@ -259,7 +259,7 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, bool include_crosswalk)
 {
-  const auto lanelet_id = getClosetLaneletId(pose, include_crosswalk);
+  const auto lanelet_id = getClosestLaneletId(pose, include_crosswalk);
   if (!lanelet_id) {
     return boost::none;
   }
@@ -286,7 +286,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   return lanelet_pose;
 }
 
-boost::optional<std::int64_t> HdMapUtils::getClosetLaneletId(
+boost::optional<std::int64_t> HdMapUtils::getClosestLaneletId(
   geometry_msgs::msg::Pose pose, double distance_thresh, bool include_crosswalk)
 {
   lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);

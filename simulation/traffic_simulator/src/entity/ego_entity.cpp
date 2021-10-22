@@ -243,7 +243,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     status.pose.position.y = v(1) + initial_pose_.get().position.y;
     status.pose.position.z = v(2) + initial_pose_.get().position.z;
 
-    const auto closest_lanelet_id = hdmap_utils_ptr_->getClosetLaneletId(status.pose);
+    const auto closest_lanelet_id = hdmap_utils_ptr_->getClosestLaneletId(status.pose);
     if (!closest_lanelet_id) {
       THROW_SEMANTIC_ERROR("failed to find the closest lane, lane is too far away.");
     }
