@@ -123,7 +123,7 @@ std::vector<std::int64_t> HdMapUtils::filterLaneletIds(
   return getLaneletIds(filtered_lanelets);
 }
 
-std::vector<std::int64_t> HdMapUtils::getNearbyLaneletId(
+std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
   const geometry_msgs::msg::Point & position, double distance_threshold) const
 {
   std::vector<std::int64_t> lanelet_ids;

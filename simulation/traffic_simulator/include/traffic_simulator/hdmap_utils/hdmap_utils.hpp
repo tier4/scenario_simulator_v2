@@ -128,7 +128,7 @@ public:
     std::vector<std::int64_t> lanelet_ids) const;
   boost::optional<std::int64_t> getClosetLaneletId(
     geometry_msgs::msg::Pose pose, double distance_thresh = 30.0, bool include_crosswalk = false);
-  std::vector<std::int64_t> getNearbyLaneletId(
+  std::vector<std::int64_t> getNearbyLaneletIds(
     const geometry_msgs::msg::Point & point, double distance_threshold) const;
   std::vector<std::int64_t> filterLaneletIds(
     const std::vector<std::int64_t> & lanlet_ids, const char subtype[]) const;
