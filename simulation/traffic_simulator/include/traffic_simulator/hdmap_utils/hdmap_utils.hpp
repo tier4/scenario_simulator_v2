@@ -51,6 +51,8 @@
 
 namespace hdmap_utils
 {
+enum class LaneletType { LANE, CROSSWALK };
+
 class HdMapUtils
 {
 public:
@@ -126,6 +128,10 @@ public:
     std::vector<std::int64_t> lanelet_ids) const;
   boost::optional<std::int64_t> getClosestLaneletId(
     geometry_msgs::msg::Pose pose, double distance_thresh = 30.0, bool include_crosswalk = false);
+  std::vector<std::int64_t> getNearbyLaneletIds(
+    const geometry_msgs::msg::Point & point, double distance_threshold) const;
+  std::vector<std::int64_t> filterLaneletIds(
+    const std::vector<std::int64_t> & lanelet_ids, const char subtype[]) const;
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
   const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   const std::vector<std::int64_t> getTrafficLightIds() const;
@@ -149,8 +155,10 @@ private:
   CenterPointsCache center_points_cache_;
   LaneletLengthCache lanelet_length_cache_;
   lanelet::AutowareTrafficLightConstPtr getTrafficLight(const std::int64_t traffic_light_id) const;
-  std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
-    const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);
+  std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLanelets(
+    const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]) const;
+  std::vector<lanelet::Lanelet> filterLanelets(
+    const std::vector<lanelet::Lanelet> & lanelets, const char subtype[]) const;
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
   getTrafficLightRegElementsOnPath(const std::vector<std::int64_t> & lanelet_ids) const;
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
@@ -174,6 +182,8 @@ private:
     const std::vector<double> & accumulated_lengths, const double target_length);
   std::vector<double> calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string);
   std::vector<double> calculateSegmentDistances(const lanelet::ConstLineString3d & line_string);
+  std::vector<lanelet::Lanelet> getLanelets(const std::vector<std::int64_t> & lanelet_ids) const;
+  std::vector<std::int64_t> getLaneletIds(const std::vector<lanelet::Lanelet> & lanelets) const;
 };
 }  // namespace hdmap_utils
 
