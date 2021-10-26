@@ -131,7 +131,7 @@ public:
   std::vector<std::int64_t> getNearbyLaneletIds(
     const geometry_msgs::msg::Point & point, double distance_threshold) const;
   std::vector<std::int64_t> filterLaneletIds(
-    const std::vector<std::int64_t> & lanlet_ids, const char subtype[]) const;
+    const std::vector<std::int64_t> & lanelet_ids, const char subtype[]) const;
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
   const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   const std::vector<std::int64_t> getTrafficLightIds() const;
