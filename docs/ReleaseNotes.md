@@ -73,7 +73,7 @@
 ## Version 0.4.2
 - [Release Page](https://github.com/tier4/scenario_simulator_v2-docs/releases/0.4.2) on Github :fa-github:
 - Fix problems in coordinate conversion from world to lane in pedestrian entity.
-- Adding `include_crosswalk` option to the HdMapUtils::getClosetLaneletId() and HdMapUtils::toLaneletPose()
+- Adding `include_crosswalk` option to the HdMapUtils::getClosestLaneletId() and HdMapUtils::toLaneletPose()
 
 ## Version 0.4.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2-docs/releases/0.4.1) on Github :fa-github:

@@ -35,7 +35,8 @@ class PedestrianEntity : public EntityBase
 {
 public:
   PedestrianEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & parameters);
+    const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
+    const std::string & plugin_name = "behavior_tree_plugin/PedestrianBehaviorTree");
 
   const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 
