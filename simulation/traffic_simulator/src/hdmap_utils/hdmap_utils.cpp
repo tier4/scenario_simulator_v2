@@ -882,7 +882,7 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
   double distance = 0;
   for (const auto lanelet_id : route) {
     if (lanelet_id == from_lanelet_id) {
-      distance = distance + getLaneletLength(from_lanelet_id) - from_s;
+      distance = getLaneletLength(from_lanelet_id) - from_s;
     } else if (lanelet_id == to_lanelet_id) {
       distance = distance + to_s;
     } else {
