@@ -65,8 +65,7 @@ public:
   /// throws if the derived class return RUNNING.
   BT::NodeStatus executeTick() override;
 
-  /// You don't need to override this
-  void halt() override { setStatus(BT::NodeStatus::IDLE); }
+  void halt() override final { setStatus(BT::NodeStatus::IDLE); }
 
   static BT::PortsList providedPorts()
   {
