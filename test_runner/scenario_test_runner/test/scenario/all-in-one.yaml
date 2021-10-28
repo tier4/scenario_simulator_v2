@@ -13,13 +13,13 @@ OpenSCENARIO:
   CatalogLocations:
     VehicleCatalog:
       Directory:
-        path: src/simulator/scenario_simulator/test_runner/scenario_test_runner/test/scenario/catalog/vehicle
+        path: $(find-pkg-share scenario_test_runner)/test/scenario/catalog/vehicle
     ControllerCatalog:
       Directory:
-        path: src/simulator/scenario_simulator/test_runner/scenario_test_runner/test/scenario/catalog/controller
+        path: $(find-pkg-share scenario_test_runner)/test/scenario/catalog/controller
     ManeuverCatalog:
       Directory:
-        path: src/simulator/scenario_simulator/test_runner/scenario_test_runner/test/scenario/catalog/maneuver
+        path: $(find-pkg-share scenario_test_runner)/test/scenario/catalog/maneuver
   RoadNetwork:
     LogicFile:
       filepath: $(find-pkg-share kashiwanoha_map)/map
