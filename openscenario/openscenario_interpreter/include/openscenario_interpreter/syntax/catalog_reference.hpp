@@ -46,7 +46,8 @@ struct CatalogReference
   {
     auto ret = CatalogReference::make(node, scope);
 
-    bool ret_is_in_Ts = fold_right([](bool l, bool r) { return l or r; }, false, ret.is<Ts>()...);
+    bool ret_is_in_Ts =
+      fold_right([](bool l, bool r) { return l or r; }, false, ret.is_also<Ts>()...);
 
     if (!ret_is_in_Ts) {
       std::stringstream what;

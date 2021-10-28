@@ -57,34 +57,29 @@ struct Unspecified
 };
 
 auto operator<<(std::ostream &, const Unspecified &) -> std::ostream &;
-
-template <typename T, typename Function>
-auto invoke_dispatch(Element & datum, Function && function)
-{
-  if (datum.is_also<T>()) {
-    return function(datum.as<T>());
-  }
-  throw UNSUPPORTED_SETTING_DETECTED(TYPE, makeTypename(datum.type().name()));
-}
-
-template <typename T, typename... Ts, typename Function>
-auto invoke_dispatch(Element & datum, Function && function)
-{
-  if (datum.is_also<T>()) {
-    return function(datum.as<T>());
-  }
-
-  return invoke_dispatch<Ts...>(datum, std::forward<Function>(function));
-}
 }  // namespace openscenario_interpreter
 
-#define DEFINE_LAZY_VISITOR(TYPE, ...)                                                        \
-  template <typename Result, typename Function, typename... Args>                             \
-  auto apply(Function && function, TYPE & datum, Args &&... args)                             \
-  {                                                                                           \
-    return ::openscenario_interpreter::invoke_dispatch<__VA_ARGS__>(datum, [&](auto && arg) { \
-      return function(std::forward<decltype(arg)>(arg), std::forward<Args>(args)...);         \
-    });                                                                                       \
+#define CASE(TYPE)                                                               \
+  {                                                                              \
+    [](auto & datum) { return datum.template is_also<TYPE>(); },                 \
+      [&](auto & datum, auto &&... args) {                                       \
+        return function(datum.template as<TYPE>(), std::forward<Args>(args)...); \
+      }                                                                          \
   }
+
+#define DEFINE_LAZY_VISITOR(TYPE, ...)                                                             \
+  template <typename Result, typename Function, typename... Args>                                  \
+  Result apply(Function && function, TYPE & datum, Args &&... args)                                \
+  {                                                                                                \
+    std::vector<std::pair<std::function<bool(TYPE &)>, std::function<Result(TYPE &, Args &&...)>>> \
+      dispatcher{{__VA_ARGS__}};                                                                   \
+    for (auto & p : dispatcher) {                                                                  \
+      if (p.first(datum)) {                                                                        \
+        return p.second(datum, std::forward<Args>(args)...);                                       \
+      }                                                                                            \
+    }                                                                                              \
+    throw UNSUPPORTED_SETTING_DETECTED(TYPE, makeTypename(datum.type().name()));                   \
+  }                                                                                                \
+  static_assert(true, "")
 
 #endif  // OPENSCENARIO_INTERPRETER__OBJECT_HPP_
