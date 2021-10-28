@@ -2,6 +2,25 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#592 <https://github.com/tier4/scenario_simulator_v2/issues/592>`_ from tier4/fix/version
+* update version
+* Merge pull request `#582 <https://github.com/tier4/scenario_simulator_v2/issues/582>`_ from alexandrx/fix/rviz2-config
+* Fixed error in RVIZ2 config path in launch file
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2
+* Merge branch 'tier4:master' into matsuura/feature/add-icon-to-panel
+* Merge pull request `#567 <https://github.com/tier4/scenario_simulator_v2/issues/567>`_ from tier4/feature/interpreter/user-defined-value-condition
+* Move some messages into new package `openscenario_msgs`
+* Fix `UserDefinedValueCondition` to support to receive multiple message
+* Update `UserDefinedValueCondition` to return false if no message received
+* Update `UserDefinedValueCondition` to receive message
+* Add new message type `ParameterDeclaration` and `ParameterType`
+* Update `UserDefinedValueCondition` to reverive name of path-like pattern
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* Contributors: Alexander Carballo, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
 0.5.5 (2021-10-13)
 ------------------
 

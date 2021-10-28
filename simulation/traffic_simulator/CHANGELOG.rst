@@ -2,6 +2,83 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#586 <https://github.com/tier4/scenario_simulator_v2/issues/586>`_ from tier4/fix/get_longitudinal_distance
+* fix way of calculating longitudinal distance
+* Merge pull request `#585 <https://github.com/tier4/scenario_simulator_v2/issues/585>`_ from tier4/feature/get_nearby_lanelet
+* Merge pull request `#584 <https://github.com/tier4/scenario_simulator_v2/issues/584>`_ from tier4/fix/get_closet_lanelet_id
+* fix typo
+* add s in end
+* remove unused orientation
+* enable get nearby lanelet
+* fix typo
+* enable pass plugin name via constructor
+* Merge branch 'tier4:master' into matsuura/feature/add-icon-to-panel
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#573 <https://github.com/tier4/scenario_simulator_v2/issues/573>`_ from tier4/feature/behavior_debug_marker
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/galactic_docker_image
+* Merge pull request `#575 <https://github.com/tier4/scenario_simulator_v2/issues/575>`_ from tier4/fix/typo
+* fix compile errors
+* fix typo detected from https://github.com/tier4/scenario_simulator_v2/runs/3923309766?check_suite_focus=true
+* rename function
+* set initial value in entity constructor
+* enable get debug marker from blackboard
+* add debug marker setter/getter
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_debug_marker
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#570 <https://github.com/tier4/scenario_simulator_v2/issues/570>`_ from tier4/feature/cleanup_logger
+* change message type name
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/cleanup_logger
+* use const & in getCurrentAction function
+* Merge pull request `#571 <https://github.com/tier4/scenario_simulator_v2/issues/571>`_ from tier4/refactor/rename-message-type
+* enable publish debug marker
+* add appenDebugMarker function
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into refactor/rename-message-type
+* Rename package `openscenario_msgs` to `traffic_simulator_msgs`
+* Merge pull request `#568 <https://github.com/tier4/scenario_simulator_v2/issues/568>`_ from tier4/feature/clanup_macro_and_blackboard
+* remove transition step from setup logger function
+* enable pass logger
+* sort lines asending
+* remove blackboard and modify macro
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#566 <https://github.com/tier4/scenario_simulator_v2/issues/566>`_ from tier4/feature/behavior_plugin
+* link stdc++fs
+* comment out unused test cases
+* fix depends and LICENSE
+* modify install line
+* add boost to the depends
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* apply reformat
+* remove destructor
+* use destructor
+* add onDespawn function
+* remove debug commands
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* remove constructor and add configure function
+* enable pass compile
+* add debug lines
+* fix plugin macro
+* enable load plugin
+* update config directory
+* enable pass compile errors
+* remove const
+* add BehaviorTreePlugin class
+* use base class
+* add DEFINE_GETTER_SETTER macro
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* add setter functions
+* enable pass compile in traffic_simulator
+* define setter/getter
+* use shared ptr
+* add base class
+* add BlackBoard class
+* change include path
+* change include guard
+* move behavior source codes from traffic_simulator to behavior_tree_plugin
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
 0.5.5 (2021-10-13)
 ------------------
 * Merge pull request `#562 <https://github.com/tier4/scenario_simulator_v2/issues/562>`_ from tier4/fix/depends_in_rviz

@@ -2,6 +2,30 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2
+* Merge pull request `#572 <https://github.com/tier4/scenario_simulator_v2/issues/572>`_ from Utaro-M/matsuura/feature/add-icon-to-panel
+* Merge branch 'tier4:master' into matsuura/feature/add-icon-to-panel
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/galactic_docker_image
+* Merge pull request `#575 <https://github.com/tier4/scenario_simulator_v2/issues/575>`_ from tier4/fix/typo
+* fix typo detected from https://github.com/tier4/scenario_simulator_v2/runs/3923309766?check_suite_focus=true
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_debug_marker
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/cleanup_logger
+* fix spell
+* add icon to context panel
+* Merge pull request `#571 <https://github.com/tier4/scenario_simulator_v2/issues/571>`_ from tier4/refactor/rename-message-type
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/cleanup_logger
+* Merge pull request `#569 <https://github.com/tier4/scenario_simulator_v2/issues/569>`_ from Utaro-M/matsuura/feature/fix_context_panel
+* Rename package `openscenario_msgs` to `traffic_simulator_msgs`
+* fix format
+* fix context panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
 0.5.5 (2021-10-13)
 ------------------
 
