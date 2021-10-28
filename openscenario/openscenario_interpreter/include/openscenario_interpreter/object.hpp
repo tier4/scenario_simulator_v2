@@ -58,28 +58,33 @@ struct Unspecified
 
 auto operator<<(std::ostream &, const Unspecified &) -> std::ostream &;
 
-#define CASE(TYPE)                                                                   \
-  {                                                                                  \
-    typeid(TYPE), [](Function && function, auto && datum, Ts &&... xs) {             \
-      return function(datum.template as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
-    }                                                                                \
+template <typename T, typename Function>
+auto invoke_dispatch(Element & datum, Function && function)
+{
+  if (datum.is_also<T>()) {
+    return function(datum.as<T>());
+  }
+  throw UNSUPPORTED_SETTING_DETECTED(TYPE, makeTypename(datum.type().name()));
+}
+
+template <typename T, typename... Ts, typename Function>
+auto invoke_dispatch(Element & datum, Function && function)
+{
+  if (datum.is_also<T>()) {
+    return function(datum.as<T>());
   }
 
-#define DEFINE_LAZY_VISITOR(TYPE, ...)                                                         \
-  template <typename Result, typename Function, typename... Ts>                                \
-  auto apply(Function && function, TYPE & datum, Ts &&... xs)                                  \
-  {                                                                                            \
-    try {                                                                                      \
-      static const std::unordered_map<                                                         \
-        std::type_index, std::function<Result(Function &&, TYPE &, Ts &&...)>>                 \
-        overloads{__VA_ARGS__};                                                                \
-      return overloads.at(datum.type())(                                                       \
-        std::forward<decltype(function)>(function), datum, std::forward<decltype(xs)>(xs)...); \
-    } catch (const std::out_of_range &) {                                                      \
-      throw UNSUPPORTED_SETTING_DETECTED(TYPE, makeTypename(datum.type().name()));             \
-    }                                                                                          \
-  }                                                                                            \
-  static_assert(true, "")
+  return invoke_dispatch<Ts...>(datum, std::forward<Function>(function));
+}
 }  // namespace openscenario_interpreter
+
+#define DEFINE_LAZY_VISITOR(TYPE, ...)                                                        \
+  template <typename Result, typename Function, typename... Args>                             \
+  auto apply(Function && function, TYPE & datum, Args &&... args)                             \
+  {                                                                                           \
+    return ::openscenario_interpreter::invoke_dispatch<__VA_ARGS__>(datum, [&](auto && arg) { \
+      return function(std::forward<decltype(arg)>(arg), std::forward<Args>(args)...);         \
+    });                                                                                       \
+  }
 
 #endif  // OPENSCENARIO_INTERPRETER__OBJECT_HPP_

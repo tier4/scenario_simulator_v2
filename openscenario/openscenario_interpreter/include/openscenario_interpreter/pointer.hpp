@@ -32,11 +32,11 @@ namespace openscenario_interpreter
 template <typename T>
 class Pointer : public std::shared_ptr<T>
 {
-  template <typename Bound, typename ActualBound = Bound>
-  struct Binder : public T, public ActualBound
+  template <typename Bound>
+  struct Binder : public T, public Bound
   {
     template <typename... Ts>
-    explicit constexpr Binder(Ts &&... xs) : ActualBound(std::forward<decltype(xs)>(xs)...)
+    explicit constexpr Binder(Ts &&... xs) : Bound(std::forward<decltype(xs)>(xs)...)
     {
     }
 
@@ -84,13 +84,6 @@ public:
     return static_cast<Pointer>(std::make_shared<Binding>(std::forward<decltype(xs)>(xs)...));
   }
 
-  template <typename U1, typename U2, typename... Ts>
-  static Pointer bind_as(Ts &&... xs)
-  {
-    using Binding = Binder<U1, U2>;
-    return static_cast<Pointer>(std::make_shared<Binding>(std::forward<decltype(xs)>(xs)...));
-  }
-
   template <typename U, typename... Ts>
   decltype(auto) rebind(Ts &&... xs)
   {
@@ -113,6 +106,12 @@ public:
   auto is() const -> bool
   {
     return type() == typeid(U);
+  }
+
+  template <typename U>
+  auto is_also() const -> bool
+  {
+    return std::dynamic_pointer_cast<U>(*this) != nullptr;
   }
 
   template <typename U>
