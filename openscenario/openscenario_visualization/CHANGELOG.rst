@@ -2,8 +2,8 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.6 (2021-10-28)
+------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2
 * Merge pull request `#572 <https://github.com/tier4/scenario_simulator_v2/issues/572>`_ from Utaro-M/matsuura/feature/add-icon-to-panel
 * Merge branch 'tier4:master' into matsuura/feature/add-icon-to-panel

@@ -2,8 +2,8 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.6 (2021-10-28)
+------------------
 * Merge branch 'tier4:master' into matsuura/feature/add-icon-to-panel
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_debug_marker
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition

@@ -2,8 +2,8 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.6 (2021-10-28)
+------------------
 * Merge pull request `#592 <https://github.com/tier4/scenario_simulator_v2/issues/592>`_ from tier4/fix/version
 * update version
 * Merge pull request `#582 <https://github.com/tier4/scenario_simulator_v2/issues/582>`_ from alexandrx/fix/rviz2-config

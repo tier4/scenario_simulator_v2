@@ -2,8 +2,8 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.6 (2021-10-28)
+------------------
 * Merge pull request `#593 <https://github.com/tier4/scenario_simulator_v2/issues/593>`_ from tier4/fix/use_final_keyword
 * Merge pull request `#592 <https://github.com/tier4/scenario_simulator_v2/issues/592>`_ from tier4/fix/version
 * Limit overrides by final keyword rather than comments

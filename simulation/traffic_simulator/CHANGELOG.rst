@@ -2,8 +2,8 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.6 (2021-10-28)
+------------------
 * Merge pull request `#586 <https://github.com/tier4/scenario_simulator_v2/issues/586>`_ from tier4/fix/get_longitudinal_distance
 * fix way of calculating longitudinal distance
 * Merge pull request `#585 <https://github.com/tier4/scenario_simulator_v2/issues/585>`_ from tier4/feature/get_nearby_lanelet

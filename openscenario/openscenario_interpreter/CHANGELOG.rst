@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.6 (2021-10-28)
+------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2
 * Merge branch 'tier4:master' into matsuura/feature/add-icon-to-panel
 * Merge pull request `#567 <https://github.com/tier4/scenario_simulator_v2/issues/567>`_ from tier4/feature/interpreter/user-defined-value-condition
