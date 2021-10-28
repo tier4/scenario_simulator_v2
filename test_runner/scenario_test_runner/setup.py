@@ -6,7 +6,7 @@ package_name = "scenario_test_runner"
 
 setup(
     name=package_name,
-    version="0.0.0",
+    version="0.5.5",
     packages=[package_name],
     data_files=[
         ("share/" + package_name + "/config", glob("config/*")),

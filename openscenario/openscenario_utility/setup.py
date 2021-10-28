@@ -10,7 +10,7 @@ package_name = "openscenario_utility"
 
 setup(
     name=package_name,
-    version="0.0.0",
+    version="0.5.5",
     license="Apache License 2.0",
     author="Tatsuya Yamasaki",
     author_email="tatsuya.yamasaki@tier4.jp",
