@@ -2,6 +2,12 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.6 (2021-10-28)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* Contributors: MasayaKataoka
+
 0.5.5 (2021-10-13)
 ------------------
 

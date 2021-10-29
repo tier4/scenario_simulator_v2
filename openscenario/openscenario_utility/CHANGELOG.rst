@@ -2,6 +2,14 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.6 (2021-10-28)
+------------------
+* Merge pull request `#592 <https://github.com/tier4/scenario_simulator_v2/issues/592>`_ from tier4/fix/version
+* update version
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
+* Contributors: Masaya Kataoka, MasayaKataoka
+
 0.5.5 (2021-10-13)
 ------------------
 
