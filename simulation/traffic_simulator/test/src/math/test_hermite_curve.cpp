@@ -77,7 +77,7 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
 
 TEST(HermiteCurveTest, getNewtonMethodStepSize) {}
 
-TEST(HermiteCurveTest, CheckNormatVector)
+TEST(HermiteCurveTest, CheckNormalVector)
 {
   {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
     geometry_msgs::msg::Pose start_pose, goal_pose;
