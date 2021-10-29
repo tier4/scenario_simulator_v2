@@ -77,6 +77,90 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
 
 TEST(HermiteCurveTest, getNewtonMethodStepSize) {}
 
+TEST(HermiteCurveTest, CheckNormatVector)
+{
+  {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
+    geometry_msgs::msg::Pose start_pose, goal_pose;
+    geometry_msgs::msg::Vector3 start_vec, goal_vec;
+    start_pose.position.x = 0;
+    start_pose.position.y = 0;
+    goal_pose.position.x = 1;
+    goal_pose.position.y = 1;
+    start_vec.x = 1;
+    start_vec.y = 0;
+    goal_vec.x = 0;
+    goal_vec.y = 1;
+    traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
+    double norm = std::sqrt(
+      curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
+      curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
+    EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, 1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, 1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, -1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).y / norm, 1 / std::sqrt(2));
+  }
+  {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
+    geometry_msgs::msg::Pose start_pose, goal_pose;
+    geometry_msgs::msg::Vector3 start_vec, goal_vec;
+    start_pose.position.x = 0;
+    start_pose.position.y = 0;
+    goal_pose.position.x = 1;
+    goal_pose.position.y = -1;
+    start_vec.x = 1;
+    start_vec.y = 0;
+    goal_vec.x = 0;
+    goal_vec.y = -1;
+    traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
+    double norm = std::sqrt(
+      curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
+      curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
+    EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, 1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, -1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, 1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).y / norm, 1 / std::sqrt(2));
+  }
+  {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
+    geometry_msgs::msg::Pose start_pose, goal_pose;
+    geometry_msgs::msg::Vector3 start_vec, goal_vec;
+    start_pose.position.x = 1;
+    start_pose.position.y = 1;
+    goal_pose.position.x = 0;
+    goal_pose.position.y = 0;
+    start_vec.x = 0;
+    start_vec.y = -1;
+    goal_vec.x = -1;
+    goal_vec.y = 0;
+    traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
+    double norm = std::sqrt(
+      curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
+      curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
+    EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, -1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, -1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, 1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).y / norm, -1 / std::sqrt(2));
+  }
+  {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
+    geometry_msgs::msg::Pose start_pose, goal_pose;
+    geometry_msgs::msg::Vector3 start_vec, goal_vec;
+    start_pose.position.x = 1;
+    start_pose.position.y = -1;
+    goal_pose.position.x = 0;
+    goal_pose.position.y = 0;
+    start_vec.x = 0;
+    start_vec.y = 1;
+    goal_vec.x = -1;
+    goal_vec.y = 0;
+    traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
+    double norm = std::sqrt(
+      curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
+      curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
+    EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, -1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, 1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, -1 / std::sqrt(2));
+    EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).y / norm, -1 / std::sqrt(2));
+  }
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
