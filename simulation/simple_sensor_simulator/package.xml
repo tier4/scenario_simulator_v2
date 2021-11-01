@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>0.5.5</version>
+  <version>0.5.6</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -34,7 +34,7 @@
   <depend>eigen</depend>
   <depend>quaternion_operation</depend>
   <depend>simulation_interface</depend>
-  <depend>openscenario_msgs</depend>
+  <depend>traffic_simulator_msgs</depend>
   <depend>embree</depend>
   <depend>pcl_conversions</depend>
   <depend>libpcl-all-dev</depend>

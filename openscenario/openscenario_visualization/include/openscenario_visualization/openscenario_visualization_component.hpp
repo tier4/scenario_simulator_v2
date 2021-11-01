@@ -65,10 +65,10 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
+#include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <unordered_map>
 #include <visualization_msgs/msg/marker_array.hpp>
 
@@ -89,7 +89,7 @@ private:
    * @param msg entity status array message from openscenario interpreter.
    */
   void entityStatusCallback(
-    const openscenario_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg);
+    const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg);
   /**
    * @brief generate delete marker for target namespace.
    * @param ns namespace of the marker which you want to delete.
@@ -110,10 +110,10 @@ private:
    */
   int goal_pose_max_size = 0;
   const visualization_msgs::msg::MarkerArray generateMarker(
-    const openscenario_msgs::msg::EntityStatus & status,
+    const traffic_simulator_msgs::msg::EntityStatus & status,
     const std::vector<geometry_msgs::msg::Pose> & goal_pose,
-    const openscenario_msgs::msg::WaypointsArray & waypoints,
-    const openscenario_msgs::msg::Obstacle & obstacle, bool obstacle_find);
+    const traffic_simulator_msgs::msg::WaypointsArray & waypoints,
+    const traffic_simulator_msgs::msg::Obstacle & obstacle, bool obstacle_find);
   /**
    * @brief publisher of marker topic.
    */
@@ -121,7 +121,7 @@ private:
   /**
    * @brief subscriber of entity status array topic.
    */
-  rclcpp::Subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>::SharedPtr
+  rclcpp::Subscription<traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray>::SharedPtr
     entity_status_sub_;
   /**
    * @brief buffers for generated markers.

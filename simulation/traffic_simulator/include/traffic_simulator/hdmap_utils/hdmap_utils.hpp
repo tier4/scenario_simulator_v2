@@ -38,12 +38,12 @@
 #include <lanelet2_extension_psim/utility/utilities.hpp>
 #include <map>
 #include <memory>
-#include <openscenario_msgs/msg/entity_status.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -51,6 +51,8 @@
 
 namespace hdmap_utils
 {
+enum class LaneletType { LANE, CROSSWALK };
+
 class HdMapUtils
 {
 public:
@@ -62,16 +64,16 @@ public:
     const visualization_msgs::msg::MarkerArray & a2) const;
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id, std::vector<double> s);
-  boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, bool include_crosswalk = false);
-  boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, std::int64_t lanelet_id);
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
-  geometry_msgs::msg::PoseStamped toMapPose(openscenario_msgs::msg::LaneletPose lanelet_pose);
+  geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
   geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset);
 
-  double getHeight(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
+  double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
 
   const std::vector<std::int64_t> getLaneletIds();
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
@@ -86,7 +88,7 @@ public:
   double getLaneletLength(std::int64_t lanelet_id);
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
-    openscenario_msgs::msg::LaneletPose from, openscenario_msgs::msg::LaneletPose to);
+    traffic_simulator_msgs::msg::LaneletPose from, traffic_simulator_msgs::msg::LaneletPose to);
   boost::optional<double> getLongitudinalDistance(
     std::int64_t from_lanelet_id, double from_s, std::int64_t to_lanelet_id, double to_s);
   double getSpeedLimit(std::vector<std::int64_t> lanelet_ids);
@@ -124,8 +126,12 @@ public:
   const std::vector<std::int64_t> getRightOfWayLaneletIds(std::int64_t lanelet_id) const;
   const std::unordered_map<std::int64_t, std::vector<std::int64_t>> getRightOfWayLaneletIds(
     std::vector<std::int64_t> lanelet_ids) const;
-  boost::optional<std::int64_t> getClosetLaneletId(
+  boost::optional<std::int64_t> getClosestLaneletId(
     geometry_msgs::msg::Pose pose, double distance_thresh = 30.0, bool include_crosswalk = false);
+  std::vector<std::int64_t> getNearbyLaneletIds(
+    const geometry_msgs::msg::Point & point, double distance_threshold) const;
+  std::vector<std::int64_t> filterLaneletIds(
+    const std::vector<std::int64_t> & lanelet_ids, const char subtype[]) const;
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
   const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   const std::vector<std::int64_t> getTrafficLightIds() const;
@@ -149,8 +155,10 @@ private:
   CenterPointsCache center_points_cache_;
   LaneletLengthCache lanelet_length_cache_;
   lanelet::AutowareTrafficLightConstPtr getTrafficLight(const std::int64_t traffic_light_id) const;
-  std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
-    const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);
+  std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLanelets(
+    const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]) const;
+  std::vector<lanelet::Lanelet> filterLanelets(
+    const std::vector<lanelet::Lanelet> & lanelets, const char subtype[]) const;
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
   getTrafficLightRegElementsOnPath(const std::vector<std::int64_t> & lanelet_ids) const;
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
@@ -174,6 +182,8 @@ private:
     const std::vector<double> & accumulated_lengths, const double target_length);
   std::vector<double> calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string);
   std::vector<double> calculateSegmentDistances(const lanelet::ConstLineString3d & line_string);
+  std::vector<lanelet::Lanelet> getLanelets(const std::vector<std::int64_t> & lanelet_ids) const;
+  std::vector<std::int64_t> getLaneletIds(const std::vector<lanelet::Lanelet> & lanelets) const;
 };
 }  // namespace hdmap_utils
 

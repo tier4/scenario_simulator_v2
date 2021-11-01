@@ -1,9 +1,10 @@
 syntax = "proto3";
 
-import "geometry_msgs.proto";
-import "openscenario_msgs.proto";
-import "builtin_interfaces.proto";
 import "autoware_vehicle_msgs.proto";
+import "builtin_interfaces.proto";
+import "geometry_msgs.proto";
+import "traffic_simulator_msgs.proto";
+
 package simulation_api_schema;
 
 /**
@@ -39,7 +40,7 @@ message DetectionSensorConfiguration {
  **/
 message UpdatedEntityStatus {
   string name = 1;                                  // Name of the entity.
-  openscenario_msgs.ActionStatus action_status = 2; // Action status of the entity.
+  traffic_simulator_msgs.ActionStatus action_status = 2; // Action status of the entity.
   geometry_msgs.Pose pose = 3;                      // Pose of the entity in the map coordinate.
 }
 
@@ -77,7 +78,7 @@ message UpdateFrameResponse {
  * Requests spawning vehicle entity.
  **/
 message SpawnVehicleEntityRequest {
-  openscenario_msgs.VehicleParameters parameters = 1; // Parameters of vehicle entity.
+  traffic_simulator_msgs.VehicleParameters parameters = 1; // Parameters of vehicle entity.
   bool is_ego = 2;                                    // If true, the entity is Ego vehicle. (Autoware vehicle.)
 }
 
@@ -92,7 +93,7 @@ message SpawnVehicleEntityResponse {
  * Requests spawning pedestrian entity.
  **/
 message SpawnPedestrianEntityRequest {
-  openscenario_msgs.PedestrianParameters parameters = 1; // Parameters of pedestrian entity.
+  traffic_simulator_msgs.PedestrianParameters parameters = 1; // Parameters of pedestrian entity.
 }
 
 /**
@@ -106,7 +107,7 @@ message SpawnPedestrianEntityResponse {
  * Requests spawning misc object entity
  **/
 message SpawnMiscObjectEntityRequest {
-  openscenario_msgs.MiscObjectParameters parameters = 1; // Parameters of misc object entity.
+  traffic_simulator_msgs.MiscObjectParameters parameters = 1; // Parameters of misc object entity.
 }
 
 /**
@@ -134,10 +135,10 @@ message DespawnEntityResponse {
  * Requests updating entity status.
  **/
 message UpdateEntityStatusRequest {
-  repeated openscenario_msgs.EntityStatus status = 1;                 // List of updated entity status in traffic simulator.
-  autoware_vehicle_msgs.VehicleCommand vehicle_command = 2;           // Ego Vehicle Command of from Autoware
-  openscenario_msgs.EntityStatus ego_entity_status_before_update = 3; // Entity status of ego entity before running vehicle model
-  bool ego_entity_status_before_update_is_empty = 4;                  // If True,ego entity status before update is empty.
+  repeated traffic_simulator_msgs.EntityStatus status = 1;                 // List of updated entity status in traffic simulator.
+  autoware_vehicle_msgs.VehicleCommand vehicle_command = 2;                // Ego Vehicle Command of from Autoware
+  traffic_simulator_msgs.EntityStatus ego_entity_status_before_update = 3; // Entity status of ego entity before running vehicle model
+  bool ego_entity_status_before_update_is_empty = 4;                       // If True,ego entity status before update is empty.
 }
 
 /**

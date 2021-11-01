@@ -22,7 +22,7 @@
 #include "../expect_eq_macros.hpp"
 
 /*
-TEST(VEHICLE_ENTITYT, GET_VEHICLE_COMMAND)
+TEST(VEHICLE_ENTITY, GET_VEHICLE_COMMAND)
 {
   traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
   EXPECT_THROW(entity.getVehicleCommand(), common::SimulationError);
@@ -31,18 +31,18 @@ TEST(VEHICLE_ENTITYT, GET_VEHICLE_COMMAND)
 TEST(VEHICLE_ENTITY, SET_STATUS)
 {
   traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
-  openscenario_msgs::msg::EntityStatus status;
+  traffic_simulator_msgs::msg::EntityStatus status;
   status.lanelet_pose = traffic_simulator::helper::constructLaneletPose(34741, 0, 0);
   status.action_status = traffic_simulator::helper::constructActionStatus(3);
   status.bounding_box = entity.getBoundingBox();
   EXPECT_NO_THROW(entity.setStatus(status));
 }
 
-TEST(VEHICLE_ENTITYT, UPDATE_ENTITY_TIMESTAMP)
+TEST(VEHICLE_ENTITY, UPDATE_ENTITY_TIMESTAMP)
 {
   traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
   EXPECT_NO_THROW(entity.updateEntityStatusTimestamp(3));
-  openscenario_msgs::msg::EntityStatus status;
+  traffic_simulator_msgs::msg::EntityStatus status;
   status.lanelet_pose = traffic_simulator::helper::constructLaneletPose(34741, 0, 0);
   status.action_status = traffic_simulator::helper::constructActionStatus(3);
   status.bounding_box = entity.getBoundingBox();

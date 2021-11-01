@@ -86,7 +86,7 @@
   EXPECT_VECTOR3_EQ(MSG.angular, PROTO.angular());
 
 /**
- * @brief Expect equal macros for openscenario_msgs.
+ * @brief Expect equal macros for traffic_simulator_msgs.
  */
 
 #define EXPECT_PERFORMANCE_EQ(MSG, PROTO)                           \

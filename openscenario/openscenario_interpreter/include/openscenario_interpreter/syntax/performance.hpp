@@ -17,8 +17,8 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
-#include <openscenario_msgs/msg/performance.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/performance.hpp>
 
 namespace openscenario_interpreter
 {
@@ -43,7 +43,7 @@ struct Performance
 
   explicit Performance(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::Performance() const;
+  explicit operator traffic_simulator_msgs::msg::Performance() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

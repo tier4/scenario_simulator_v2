@@ -21,9 +21,9 @@
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
 #include <boost/optional.hpp>
 #include <memory>
-#include <openscenario_msgs/msg/entity_status.hpp>
 #include <string>
 #include <traffic_simulator/math/hermite_curve.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -44,9 +44,9 @@ public:
     }
     return ports;
   }
-  const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
-  const boost::optional<openscenario_msgs::msg::Obstacle> calculateObstacle(
-    const openscenario_msgs::msg::WaypointsArray & waypoints) override;
+  const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;
+  const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
+    const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
   void getBlackBoardValues();
 
 private:

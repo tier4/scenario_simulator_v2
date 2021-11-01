@@ -163,7 +163,7 @@ rocker --x11 scenario_simulator_v2 ros2 launch cpp_mock_scenarios mock_test.laun
 
 We automatically build docker images of scenario_simulator_v2 by using GitHub Actions and put them into our Docker Hub repository.
 
-[![Push Docker Image](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)
+[![Push Docker Image](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Docker.yaml)
 
 [![dockeri.co](https://dockeri.co/image/tier4/scenario_simulator_v2)](https://hub.docker.com/r/tier4/scenario_simulator_v2)
 
@@ -172,16 +172,18 @@ We can pull the docker image from Docker Hub and run simulation with scenario_si
 If your local machine has NVIDIA GPUs,
 
 ```bash
-docker pull tier4/scenario_simulator_v2:latest
-rocker --nvidia --x11 tier4/scenario_simulator_v2:latest ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
+docker pull tier4/scenario_simulator_v2:galactic
+rocker --nvidia --x11 tier4/scenario_simulator_v2:galactic ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
 ```
 
 If your local machine does not have NVIDIA GPUs,
 
 ```bash
-docker pull tier4/scenario_simulator_v2:latest
-rocker --x11 tier4/scenario_simulator_v2:latest ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
+docker pull tier4/scenario_simulator_v2:galactic
+rocker --x11 tier4/scenario_simulator_v2:galactic ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
 ```
+
+If you want to use docker with ROS2 Foxy, please replace galactic to foxy.
 
 <video
   class="c-video__embed"

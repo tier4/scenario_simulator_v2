@@ -3,7 +3,7 @@
 ## File format
 
 Result files should follow the JUnit format.  
-[This package](https://github.com/tier4/scenario_simulator_v2/tree/master/common/simple_junit) helps you to output JUnit-formatted files.
+[This package](https://github.com/tier4/scenario_simulator_v2-docs/tree/master/common/simple_junit) helps you to output JUnit-formatted files.
 An example of the result file is below:
 
 ```xml
@@ -48,7 +48,7 @@ or
 
 `Error` means that the test cases were failed with an error, such as some Autoware nodes were downed, failed to launch Autoware, etc.  
 All errors are thrown as errors from the API classes.
-If you want to see examples, please refer to [this code](https://github.com/tier4/scenario_simulator_v2/blob/c6d7c4da7556a593dc3d34b0a982bc[…]r/include/openscenario_interpreter/openscenario_interpreter.hpp).
+If you want to see examples, please refer to [this code](https://github.com/tier4/scenario_simulator_v2-docs/blob/c6d7c4da7556a593dc3d34b0a982bc[…]r/include/openscenario_interpreter/openscenario_interpreter.hpp).
 
 #### Error Types
 
@@ -74,7 +74,7 @@ Output format should be like below:
 <error type="(ERROR_TYPE)" message="(ERROR_MESSAGE)" />
 ```
 
-If you want to know all exception types defined in the scenario simulator exception package, please refer to [this code](https://github.com/tier4/scenario_simulator_v2/blob/master/common/scenario_simulator_exception/include/scenario_simulator_exception/exception.hpp) and [this document](ErrorCategories.md).  
+If you want to know all exception types defined in the scenario simulator exception package, please refer to [this code](https://github.com/tier4/scenario_simulator_v2-docs/blob/master/common/scenario_simulator_exception/include/scenario_simulator_exception/exception.hpp) and [this document](ErrorCategories.md).  
 (ERROR_MESSAGE) is an error message from an exception.
 
 ## Usage of simple_junit

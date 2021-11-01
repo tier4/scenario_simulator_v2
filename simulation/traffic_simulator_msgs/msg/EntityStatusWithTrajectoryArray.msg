@@ -1,0 +1,1 @@
+traffic_simulator_msgs/EntityStatusWithTrajectory[] data

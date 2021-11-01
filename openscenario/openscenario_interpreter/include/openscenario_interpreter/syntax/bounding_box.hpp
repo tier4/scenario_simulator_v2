@@ -18,8 +18,8 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/center.hpp>
 #include <openscenario_interpreter/syntax/dimensions.hpp>
-#include <openscenario_msgs/msg/bounding_box.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 
 namespace openscenario_interpreter
 {
@@ -45,7 +45,7 @@ struct BoundingBox
 
   explicit BoundingBox(const pugi::xml_node &, Scope &);
 
-  explicit operator openscenario_msgs::msg::BoundingBox() const;
+  explicit operator traffic_simulator_msgs::msg::BoundingBox() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

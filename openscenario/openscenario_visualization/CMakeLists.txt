@@ -16,21 +16,21 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
+find_package(Eigen3 REQUIRED)
 find_package(ament_cmake REQUIRED)
+find_package(class_loader REQUIRED)
+find_package(openscenario_interpreter_msgs REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(quaternion_operation REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
-find_package(visualization_msgs REQUIRED)
-find_package(traffic_simulator REQUIRED)
-find_package(openscenario_msgs REQUIRED)
-find_package(quaternion_operation REQUIRED)
-find_package(openscenario_interpreter_msgs REQUIRED)
 find_package(rviz2 REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(rviz_default_plugins REQUIRED)
-find_package(Eigen3 REQUIRED)
-find_package(class_loader REQUIRED)
-find_package(pluginlib REQUIRED)
+find_package(traffic_simulator REQUIRED)
+find_package(traffic_simulator_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
 
 ament_export_dependencies(class_loader REQUIRED)
 ament_export_dependencies(pluginlib REQUIRED)
@@ -53,7 +53,7 @@ ament_target_dependencies(openscenario_visualization_component
   rclcpp_lifecycle
   traffic_simulator
   visualization_msgs
-  openscenario_msgs
+  traffic_simulator_msgs
   quaternion_operation
 )
 add_executable(openscenario_visualization_node
@@ -61,13 +61,13 @@ add_executable(openscenario_visualization_node
 )
 target_link_libraries(openscenario_visualization_node openscenario_visualization_component)
 ament_target_dependencies(openscenario_visualization_node
+  quaternion_operation
   rclcpp
   rclcpp_components
   rclcpp_lifecycle
   traffic_simulator
+  traffic_simulator_msgs
   visualization_msgs
-  openscenario_msgs
-  quaternion_operation
 )
 
 ###############

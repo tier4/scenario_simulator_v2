@@ -35,7 +35,7 @@
     </tr>
     <tr>
       <td>/entity/status</td>
-      <td>openscenario_msgs/msg/EntityStatusWithTrajectoryArray</td>
+      <td>traffic_simulator_msgs/msg/EntityStatusWithTrajectoryArray</td>
       <td>Subscribe</td>
       <td>Topics for publishing entity status in simulation.</td>
     </tr>
@@ -60,14 +60,14 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
 {
   marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("entity/marker", 1);
   entity_status_sub_ =
-    this->create_subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
+    this->create_subscription<traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray>(
       "entity/status", 1,
       std::bind(
         &OpenscenarioVisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
 }
 
 void OpenscenarioVisualizationComponent::entityStatusCallback(
-  const openscenario_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg)
+  const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg)
 {
   visualization_msgs::msg::MarkerArray current_marker;
   std::vector<std::string> entity_name_lists;
@@ -117,10 +117,10 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
 }
 
 const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateMarker(
-  const openscenario_msgs::msg::EntityStatus & status,
+  const traffic_simulator_msgs::msg::EntityStatus & status,
   const std::vector<geometry_msgs::msg::Pose> & goal_pose,
-  const openscenario_msgs::msg::WaypointsArray & waypoints,
-  const openscenario_msgs::msg::Obstacle & obstacle, bool obstacle_find)
+  const traffic_simulator_msgs::msg::WaypointsArray & waypoints,
+  const traffic_simulator_msgs::msg::Obstacle & obstacle, bool obstacle_find)
 {
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();

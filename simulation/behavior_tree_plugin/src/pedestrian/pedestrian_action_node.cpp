@@ -28,13 +28,13 @@ PedestrianActionNode::PedestrianActionNode(
 void PedestrianActionNode::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
-  if (!getInput<openscenario_msgs::msg::PedestrianParameters>(
+  if (!getInput<traffic_simulator_msgs::msg::PedestrianParameters>(
         "pedestrian_parameters", pedestrian_parameters)) {
     THROW_SIMULATION_ERROR("failed to get input pedestrian_parameters in PedestrianActionNode");
   }
 }
 
-openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatusUpdated(
+traffic_simulator_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatusUpdated(
   double target_speed)
 {
   geometry_msgs::msg::Accel accel_new;
@@ -63,7 +63,7 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
       hdmap_utils->getPreviousLaneletIds(entity_status.lanelet_pose.lanelet_id);
     new_lanelet_id = previous_lanelet_ids[0];
     new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id) - 0.01;
-    openscenario_msgs::msg::EntityStatus entity_status_updated;
+    traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;
     entity_status_updated.lanelet_pose.lanelet_id = new_lanelet_id;
     entity_status_updated.lanelet_pose.s = new_s;
@@ -100,7 +100,7 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
       THROW_SIMULATION_ERROR(
         "failed to calculate next status calculateEntityStatusUpdated function");
     }
-    openscenario_msgs::msg::EntityStatus entity_status_updated;
+    traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;
     entity_status_updated.lanelet_pose.lanelet_id = new_lanelet_id;
     entity_status_updated.lanelet_pose.s = new_s;
@@ -114,8 +114,8 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
   THROW_SIMULATION_ERROR("failed to calculate next status calculateEntityStatusUpdated function");
 }
 
-openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(
-  double target_speed)
+traffic_simulator_msgs::msg::EntityStatus
+PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_speed)
 {
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
@@ -157,12 +157,12 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
   pose_new.position.x = trans_vec(0) + entity_status.pose.position.x;
   pose_new.position.y = trans_vec(1) + entity_status.pose.position.y;
   pose_new.position.z = trans_vec(2) + entity_status.pose.position.z;
-  openscenario_msgs::msg::EntityStatus entity_status_updated;
+  traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
   entity_status_updated.time = current_time + step_time;
   entity_status_updated.pose = pose_new;
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;
-  boost::optional<openscenario_msgs::msg::LaneletPose> lanelet_pose;
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
   if (entity_status.lanelet_pose_valid) {
     lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.lanelet_pose.lanelet_id);
   } else {

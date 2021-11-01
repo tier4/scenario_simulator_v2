@@ -36,8 +36,8 @@ namespace math
  * @retval 0 <= distance between two bounding boxes
  */
 boost::optional<double> getPolygonDistance(
-  const geometry_msgs::msg::Pose & pose0, const openscenario_msgs::msg::BoundingBox & bbox0,
-  const geometry_msgs::msg::Pose & pose1, const openscenario_msgs::msg::BoundingBox & bbox1)
+  const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
+  const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1)
 {
   const auto poly0 = get2DPolygon(pose0, bbox0);
   const auto poly1 = get2DPolygon(pose1, bbox1);
@@ -54,7 +54,7 @@ boost::optional<double> getPolygonDistance(
 }
 
 const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> get2DPolygon(
-  const geometry_msgs::msg::Pose & pose, const openscenario_msgs::msg::BoundingBox & bbox)
+  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox)
 {
   auto points = transformPoints(pose, getPointsFromBbox(bbox));
   typedef boost::geometry::model::d2::point_xy<double> bg_point;
@@ -67,7 +67,8 @@ const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<doubl
   return poly;
 }
 
-std::vector<geometry_msgs::msg::Point> getPointsFromBbox(openscenario_msgs::msg::BoundingBox bbox)
+std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
+  traffic_simulator_msgs::msg::BoundingBox bbox)
 {
   std::vector<geometry_msgs::msg::Point> points;
   geometry_msgs::msg::Point p0;

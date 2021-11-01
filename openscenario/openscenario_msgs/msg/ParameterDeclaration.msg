@@ -1,0 +1,3 @@
+string name
+openscenario_msgs/ParameterType parameter_type
+string value
