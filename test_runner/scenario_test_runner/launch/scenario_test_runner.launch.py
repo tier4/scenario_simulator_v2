@@ -189,6 +189,30 @@ def launch_setup(context, *args, **kwargs):
                 ),
             ],
         ),
+        # Node to generate planner evaluation metrics
+        Node(
+            package="planning_evaluator",
+            executable="planning_evaluator",
+            name="planning_evaluator",
+            output={"stderr": "log", "stdout": "log"},
+            parameters=[Path(get_package_share_directory(
+                "planning_evaluator"), "param", "planning_evaluator.defaults.yaml")],
+            remappings=[
+                ("~/input/trajectory", "/planning/scenario_planning/trajectory"),
+                ("~/input/reference_trajectory",
+                 "/planning/scenario_planning/lane_driving/motion_planning/obstacle_avoidance_planner/trajectory"),
+                ("~/input/objects", "/perception/object_recognition/objects"),
+                ("~/metrics", "/diagnostic/planning_evaluator/metrics"),
+            ],
+        ),
+        # Node to convert DiagnosticArray messages into ParameterDeclaration messages
+        Node(
+            package="diagnostic_converter",
+            executable="diagnostic_converter",
+            name="diagnostic_converter",
+            output={"stderr": "log", "stdout": "log"},
+            parameters=[{"diagnostic_topics" : ["/diagnostic/planning_evaluator/metrics"]}],
+        ),
     ]
 
 
