@@ -81,7 +81,7 @@ TEST(ConverterNode, ConvertDiagnostics)
     EXPECT_EQ(param.name, "a");
     EXPECT_EQ(param.value, "1");
   }
-  { // Case with multiple ParameterDeclaration converted from one DiagnosticArray
+  {  // Case with multiple ParameterDeclaration converted from one DiagnosticArray
     bool msg_received_xa = false;
     bool msg_received_xb = false;
     bool msg_received_ya = false;
