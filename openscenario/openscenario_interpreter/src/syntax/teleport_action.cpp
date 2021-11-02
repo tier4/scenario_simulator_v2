@@ -57,6 +57,7 @@ auto TeleportAction::run() const -> void
 
 auto TeleportAction::start() noexcept -> void  //
 {
+  // NO OPERATION
 }
 
 auto TeleportAction::teleport(const EntityRef & entity_ref, const Position & position) -> void
