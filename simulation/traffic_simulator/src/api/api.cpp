@@ -55,7 +55,7 @@ bool API::despawn(const std::string & name)
 }
 
 bool API::spawn(
-  const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & params,
+  const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const bool is_ego)
 {
   auto register_to_entity_manager = [&]() {
@@ -63,10 +63,10 @@ bool API::spawn(
       using traffic_simulator::entity::EgoEntity;
       return entity_manager_ptr_->entityExists(name) or
              entity_manager_ptr_->spawnEntity<EgoEntity>(
-               name, configuration, clock_.getStepTime(), params);
+               name, configuration, clock_.getStepTime(), parameters);
     } else {
       using traffic_simulator::entity::VehicleEntity;
-      return entity_manager_ptr_->spawnEntity<VehicleEntity>(name, params);
+      return entity_manager_ptr_->spawnEntity<VehicleEntity>(name, parameters);
     }
   };
 
@@ -76,7 +76,7 @@ bool API::spawn(
     } else {
       simulation_api_schema::SpawnVehicleEntityRequest req;
       simulation_api_schema::SpawnVehicleEntityResponse res;
-      simulation_interface::toProto(params, *req.mutable_parameters());
+      simulation_interface::toProto(parameters, *req.mutable_parameters());
       req.mutable_parameters()->set_name(name);
       req.set_is_ego(is_ego);
       spawn_vehicle_entity_client_.call(req, res);
@@ -88,28 +88,34 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & params)
+  const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & parameters)
 {
-  if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::PedestrianEntity>(
-        name, params)) {
-    return false;
-  }
-  if (configuration.standalone_mode) {
-    return true;
-  }
-  simulation_api_schema::SpawnPedestrianEntityRequest req;
-  simulation_api_schema::SpawnPedestrianEntityResponse res;
-  simulation_interface::toProto(params, *req.mutable_parameters());
-  req.mutable_parameters()->set_name(name);
-  spawn_pedestrian_entity_client_.call(req, res);
-  return res.result().success();
+  auto register_to_entity_manager = [&]() {
+    using traffic_simulator::entity::PedestrianEntity;
+    return entity_manager_ptr_->spawnEntity<PedestrianEntity>(name, parameters);
+  };
+
+  auto register_to_environment_simulator = [&]() {
+    if (configuration.standalone_mode) {
+      return true;
+    } else {
+      simulation_api_schema::SpawnPedestrianEntityRequest req;
+      simulation_api_schema::SpawnPedestrianEntityResponse res;
+      simulation_interface::toProto(parameters, *req.mutable_parameters());
+      req.mutable_parameters()->set_name(name);
+      spawn_pedestrian_entity_client_.call(req, res);
+      return res.result().success();
+    }
+  };
+
+  return register_to_entity_manager() and register_to_environment_simulator();
 }
 
 bool API::spawn(
-  const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params)
+  const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
 {
   if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::MiscObjectEntity>(
-        name, params)) {
+        name, parameters)) {
     return false;
   }
   if (configuration.standalone_mode) {
@@ -117,7 +123,7 @@ bool API::spawn(
   }
   simulation_api_schema::SpawnMiscObjectEntityRequest req;
   simulation_api_schema::SpawnMiscObjectEntityResponse res;
-  simulation_interface::toProto(params, *req.mutable_parameters());
+  simulation_interface::toProto(parameters, *req.mutable_parameters());
   req.mutable_parameters()->set_name(name);
   spawn_misc_object_entity_client_.call(req, res);
   return res.result().success();

@@ -110,9 +110,9 @@ public:
   void setVerbose(const bool verbose);
 
   // clang-format off
-  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters    & params, const bool is_ego = false);
-  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & params);
-  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params);
+  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters    &, const bool is_ego = false);
+  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters &);
+  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
   // clang-format on
 
   bool despawn(const std::string & name);
