@@ -67,7 +67,8 @@ bool API::spawn(
                name, configuration, clock_.getStepTime(), parameters);
     } else {
       using traffic_simulator::entity::VehicleEntity;
-      return entity_manager_ptr_->spawnEntity<VehicleEntity>(name, parameters);
+      return entity_manager_ptr_->spawnEntity<VehicleEntity>(
+        name, parameters, entity::VehicleEntity::default_behavior);
     }
   };
 
@@ -89,12 +90,13 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  const std::string & name,  //
-  const traffic_simulator_msgs::msg::PedestrianParameters & parameters)
+  const std::string & name,                                              //
+  const traffic_simulator_msgs::msg::PedestrianParameters & parameters,  //
+  const std::string & behavior)
 {
   auto register_to_entity_manager = [&]() {
     using traffic_simulator::entity::PedestrianEntity;
-    return entity_manager_ptr_->spawnEntity<PedestrianEntity>(name, parameters);
+    return entity_manager_ptr_->spawnEntity<PedestrianEntity>(name, parameters, behavior);
   };
 
   auto register_to_environment_simulator = [&]() {

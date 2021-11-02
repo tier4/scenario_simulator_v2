@@ -111,7 +111,7 @@ public:
 
   // clang-format off
   bool spawn(const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters    &, const bool is_ego = false);
-  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters &);
+  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters &, const std::string & = entity::PedestrianEntity::default_behavior);
   bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
   // clang-format on
 

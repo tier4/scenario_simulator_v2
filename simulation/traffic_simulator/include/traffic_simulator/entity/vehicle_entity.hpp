@@ -37,9 +37,16 @@ namespace entity
 class VehicleEntity : public EntityBase
 {
 public:
+  static constexpr auto behavior_tree = "behavior_tree_plugin/VehicleBehaviorTree";
+
+  // TODO static constexpr auto context_gamma = "...";
+
+  static constexpr auto default_behavior = behavior_tree;
+
   VehicleEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-    const std::string & plugin_name = "behavior_tree_plugin/VehicleBehaviorTree");
+    const std::string & name,                                //
+    const traffic_simulator_msgs::msg::VehicleParameters &,  //
+    const std::string & = default_behavior);
 
   const traffic_simulator_msgs::msg::VehicleParameters parameters;
 
