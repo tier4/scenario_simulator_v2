@@ -55,8 +55,8 @@ bool API::despawn(const std::string & name)
 }
 
 bool API::spawn(
-  const bool is_ego, const std::string & name,
-  const traffic_simulator_msgs::msg::VehicleParameters & params)
+  const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & params,
+  const bool is_ego)
 {
   if (
     is_ego and not entity_manager_ptr_->entityExists(name) and

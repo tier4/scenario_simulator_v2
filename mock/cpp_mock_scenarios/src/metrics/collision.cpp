@@ -42,12 +42,12 @@ private:
 
   void onInitialize() override
   {
-    api_.spawn(false, "ego", getVehicleParameters());
+    api_.spawn("ego", getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("ego", 0, true);
-    api_.spawn(false, "npc1", getVehicleParameters());
+    api_.spawn("npc1", getVehicleParameters());
     api_.setEntityStatus(
       "npc1", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
