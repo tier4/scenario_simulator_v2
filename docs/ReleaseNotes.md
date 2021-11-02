@@ -2,6 +2,7 @@
 
 ## Difference between the latest release and master
 - Needed to integrate the planner evaluation metrics with the scenario runner. ([link](https://github.com/tier4/scenario_simulator_v2-docs/pull/598))
+- Fix problem in getNormalVector function. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
 
 ## Version 0.5.6
 - Fix context panel to display conditions' status. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
