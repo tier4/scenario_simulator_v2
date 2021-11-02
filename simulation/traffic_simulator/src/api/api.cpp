@@ -58,27 +58,33 @@ bool API::spawn(
   const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & params,
   const bool is_ego)
 {
-  if (
-    is_ego and not entity_manager_ptr_->entityExists(name) and
-    not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
-      name, configuration, clock_.getStepTime(), params)) {
-    return false;
-  }
-  if (
-    not is_ego and
-    not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::VehicleEntity>(name, params)) {
-    return false;
-  }
-  if (configuration.standalone_mode) {
-    return true;
-  }
-  simulation_api_schema::SpawnVehicleEntityRequest req;
-  simulation_api_schema::SpawnVehicleEntityResponse res;
-  simulation_interface::toProto(params, *req.mutable_parameters());
-  req.mutable_parameters()->set_name(name);
-  req.set_is_ego(is_ego);
-  spawn_vehicle_entity_client_.call(req, res);
-  return res.result().success();
+  auto register_to_entity_manager = [&]() {
+    if (is_ego) {
+      using traffic_simulator::entity::EgoEntity;
+      return entity_manager_ptr_->entityExists(name) or
+             entity_manager_ptr_->spawnEntity<EgoEntity>(
+               name, configuration, clock_.getStepTime(), params);
+    } else {
+      using traffic_simulator::entity::VehicleEntity;
+      return entity_manager_ptr_->spawnEntity<VehicleEntity>(name, params);
+    }
+  };
+
+  auto register_to_environment_simulator = [&]() {
+    if (configuration.standalone_mode) {
+      return true;
+    } else {
+      simulation_api_schema::SpawnVehicleEntityRequest req;
+      simulation_api_schema::SpawnVehicleEntityResponse res;
+      simulation_interface::toProto(params, *req.mutable_parameters());
+      req.mutable_parameters()->set_name(name);
+      req.set_is_ego(is_ego);
+      spawn_vehicle_entity_client_.call(req, res);
+      return res.result().success();
+    }
+  };
+
+  return register_to_entity_manager() and register_to_environment_simulator();
 }
 
 bool API::spawn(
