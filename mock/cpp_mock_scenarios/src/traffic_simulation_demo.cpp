@@ -95,14 +95,14 @@ private:
                traffic_simulator::helper::constructLaneletPose(34675, 0.0),
                traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
 
-    api_.spawn(false, "tom", getPedestrianParameters());
+    api_.spawn("tom", getPedestrianParameters());
     api_.setEntityStatus(
       "tom", "ego", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
     api_.requestWalkStraight("tom");
     api_.setTargetSpeed("tom", 3, true);
 
-    api_.spawn(false, "bob", getPedestrianParameters());
+    api_.spawn("bob", getPedestrianParameters());
     api_.setEntityStatus(
       "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(1));
@@ -127,7 +127,7 @@ private:
       "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0),
       traffic_simulator::helper::constructActionStatus(10));
 
-    api_.spawn(false, "obstacle", getMiscObjectParameters());
+    api_.spawn("obstacle", getMiscObjectParameters());
     api_.setEntityStatus(
       "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());

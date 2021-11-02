@@ -82,12 +82,8 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  const bool is_ego, const std::string & name,
-  const traffic_simulator_msgs::msg::PedestrianParameters & params)
+  const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & params)
 {
-  if (is_ego) {
-    THROW_SEMANTIC_ERROR("pedestrian should not be ego");
-  }
   if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::PedestrianEntity>(
         name, params)) {
     return false;
@@ -104,12 +100,8 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  const bool is_ego, const std::string & name,
-  const traffic_simulator_msgs::msg::MiscObjectParameters & params)
+  const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params)
 {
-  if (is_ego) {
-    THROW_SEMANTIC_ERROR("misc object should not be ego");
-  }
   if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::MiscObjectEntity>(
         name, params)) {
     return false;

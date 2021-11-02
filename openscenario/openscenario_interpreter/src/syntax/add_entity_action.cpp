@@ -61,14 +61,12 @@ try {
     },
     [&](const Pedestrian & pedestrian) {
       applyAddEntityAction(
-        false, entity_ref,
-        static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+        entity_ref, static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
       TeleportAction::teleport(entity_ref, position);
     },
     [&](const MiscObject & misc_object) {
       applyAddEntityAction(
-        false, entity_ref,
-        static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
+        entity_ref, static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
       TeleportAction::teleport(entity_ref, position);
     });
 
