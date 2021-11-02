@@ -22,6 +22,7 @@ jobs:
             behavior_tree_plugin,
             concealer,
             cpp_mock_scenarios,
+            diagnostic_converter,
             kashiwanoha_map,
             lanelet2_extension_psim,
             openscenario_interpreter_msgs,
