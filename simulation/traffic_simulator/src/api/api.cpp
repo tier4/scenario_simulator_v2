@@ -55,7 +55,8 @@ bool API::despawn(const std::string & name)
 }
 
 bool API::spawn(
-  const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+  const std::string & name,                                           //
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters,  //
   const bool is_ego)
 {
   auto register_to_entity_manager = [&]() {
@@ -88,7 +89,8 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & parameters)
+  const std::string & name,  //
+  const traffic_simulator_msgs::msg::PedestrianParameters & parameters)
 {
   auto register_to_entity_manager = [&]() {
     using traffic_simulator::entity::PedestrianEntity;
@@ -112,21 +114,28 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
+  const std::string & name,  //
+  const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
 {
-  if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::MiscObjectEntity>(
-        name, parameters)) {
-    return false;
-  }
-  if (configuration.standalone_mode) {
-    return true;
-  }
-  simulation_api_schema::SpawnMiscObjectEntityRequest req;
-  simulation_api_schema::SpawnMiscObjectEntityResponse res;
-  simulation_interface::toProto(parameters, *req.mutable_parameters());
-  req.mutable_parameters()->set_name(name);
-  spawn_misc_object_entity_client_.call(req, res);
-  return res.result().success();
+  auto register_to_entity_manager = [&]() {
+    using traffic_simulator::entity::MiscObjectEntity;
+    return entity_manager_ptr_->spawnEntity<MiscObjectEntity>(name, parameters);
+  };
+
+  auto register_to_environment_simulator = [&]() {
+    if (configuration.standalone_mode) {
+      return true;
+    } else {
+      simulation_api_schema::SpawnMiscObjectEntityRequest req;
+      simulation_api_schema::SpawnMiscObjectEntityResponse res;
+      simulation_interface::toProto(parameters, *req.mutable_parameters());
+      req.mutable_parameters()->set_name(name);
+      spawn_misc_object_entity_client_.call(req, res);
+      return res.result().success();
+    }
+  };
+
+  return register_to_entity_manager() and register_to_environment_simulator();
 }
 
 geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
