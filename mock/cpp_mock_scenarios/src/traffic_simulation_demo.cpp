@@ -83,49 +83,56 @@ private:
 
   void onInitialize() override
   {
+    lanechange_executed_ = false;
+
     api_.spawn(false, "ego", getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(120545, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 8, true);
+    api_.requestAssignRoute(
+      "ego", std::vector<traffic_simulator_msgs::msg::LaneletPose>{
+               traffic_simulator::helper::constructLaneletPose(34675, 0.0),
+               traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
+
     api_.spawn(false, "tom", getPedestrianParameters());
     api_.setEntityStatus(
       "tom", "ego", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
     api_.requestWalkStraight("tom");
     api_.setTargetSpeed("tom", 3, true);
-    api_.spawn(
-      false, "bob", getPedestrianParameters(),
-      traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+
+    api_.spawn(false, "bob", getPedestrianParameters());
+    api_.setEntityStatus(
+      "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
-    api_.spawn(
-      false, "npc1", getVehicleParameters(),
-      traffic_simulator::helper::constructLaneletPose(34579, 20.0),
+
+    api_.spawn(false, "npc1", getVehicleParameters());
+    api_.setEntityStatus(
+      "npc1", traffic_simulator::helper::constructLaneletPose(34579, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
-    lanechange_executed_ = false;
-    api_.spawn(
-      false, "npc2", getVehicleParameters(),
-      traffic_simulator::helper::constructLaneletPose(34606, 20.0),
-      traffic_simulator::helper::constructActionStatus(5));
-    api_.setTargetSpeed("npc2", 0, true);
-    api_.requestAssignRoute(
-      "ego", std::vector<traffic_simulator_msgs::msg::LaneletPose>{
-               traffic_simulator::helper::constructLaneletPose(34675, 0.0),
-               traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
     api_.requestAcquirePosition(
       "npc1", traffic_simulator::helper::constructLaneletPose(34675, 0.0));
+
+    api_.spawn(false, "npc2", getVehicleParameters());
+    api_.setEntityStatus(
+      "npc2", traffic_simulator::helper::constructLaneletPose(34606, 20.0),
+      traffic_simulator::helper::constructActionStatus(5));
+    api_.setTargetSpeed("npc2", 0, true);
+
     api_.spawn(false, "npc3", getVehicleParameters());
     api_.setEntityStatus(
       "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0),
       traffic_simulator::helper::constructActionStatus(10));
+
     api_.spawn(false, "obstacle", getMiscObjectParameters());
     api_.setEntityStatus(
       "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
-    std::vector<std::pair<double, traffic_simulator::TrafficLightColor>> phase;
-    phase = {
+
+    const std::vector<std::pair<double, traffic_simulator::TrafficLightColor>> phase{
       {1, traffic_simulator::TrafficLightColor::GREEN},
       {1, traffic_simulator::TrafficLightColor::YELLOW},
       {1, traffic_simulator::TrafficLightColor::RED}};

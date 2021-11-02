@@ -47,7 +47,7 @@ auto AddEntityAction::operator()(const EntityRef & entity_ref) const -> void
 try {
   const auto entity = global().entities.at(entity_ref);
 
-  auto add_entity_action = overload(
+  const auto add_entity = overload(
     [&](const Vehicle & vehicle) {
       if (applyAddEntityAction(
             entity.as<ScenarioObject>().object_controller.isUserDefinedController(),  //
@@ -73,7 +73,7 @@ try {
     });
 
   if (not std::exchange(entity.as<ScenarioObject>().is_added, true)) {
-    apply<void>(add_entity_action, entity.as<EntityObject>());
+    apply<void>(add_entity, entity.as<EntityObject>());
   } else {
     throw SemanticError(
       "Applying action AddEntityAction to an entity ", std::quoted(entity_ref),

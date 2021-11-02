@@ -56,9 +56,10 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0.2, 1.3),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("ego", 0, true);
-    api_.spawn(
-      false, "bob", getPedestrianParameters(),
-      traffic_simulator::helper::constructLaneletPose(34741, 0, -0.874),
+
+    api_.spawn(false, "bob", getPedestrianParameters());
+    api_.setEntityStatus(
+      "bob", traffic_simulator::helper::constructLaneletPose(34741, 0, -0.874),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("bob", 0, true);
   }

@@ -121,13 +121,6 @@ public:
     const bool is_ego, const std::string & name,
     const traffic_simulator_msgs::msg::MiscObjectParameters & params);
 
-  template <typename Parameters, typename... Ts>
-  [[deprecated]] auto spawn(
-    const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
-  {
-    return spawn(is_ego, name, params) && setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
-  }
-
   bool despawn(const std::string & name);
 
   traffic_simulator_msgs::msg::EntityStatus getEntityStatus(const std::string & name);
