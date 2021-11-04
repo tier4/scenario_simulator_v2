@@ -41,6 +41,19 @@
 
 namespace traffic_simulator
 {
+struct VehicleBehavior : public entity::VehicleEntity::BuiltinBehavior
+{
+  static auto autoware() noexcept -> const std::string &
+  {
+    static const std::string name = "Autoware";
+    return name;
+  }
+};
+
+struct PedestrianBehavior : public entity::PedestrianEntity::BuiltinBehavior
+{
+};
+
 class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
@@ -110,20 +123,6 @@ public:
 
   void setVerbose(const bool verbose);
 
-  struct VehicleBehavior
-  {
-    static constexpr auto autoware() noexcept -> const char * { return "Autoware"; }
-
-    static constexpr auto behavior_tree() noexcept -> const char *
-    {
-      return "behavior_tree_plugin/VehicleBehaviorTree";
-    }
-
-    static constexpr auto context_gamma() noexcept -> const char * { return ""; }
-
-    static constexpr auto default_behavior() noexcept -> const char * { return behavior_tree(); }
-  };
-
   bool spawn(
     const std::string & name,                                //
     const traffic_simulator_msgs::msg::VehicleParameters &,  //
@@ -132,7 +131,7 @@ public:
   bool spawn(
     const std::string & name,                                   //
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
-    const std::string & = entity::PedestrianEntity::Plugin::behavior_tree());
+    const std::string & = PedestrianBehavior::default_behavior());
 
   bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
 

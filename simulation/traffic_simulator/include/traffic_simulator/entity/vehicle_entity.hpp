@@ -37,10 +37,27 @@ namespace entity
 class VehicleEntity : public EntityBase
 {
 public:
+  struct BuiltinBehavior
+  {
+    static auto behavior_tree() noexcept -> const std::string &
+    {
+      static const std::string name = "behavior_tree_plugin/VehicleBehaviorTree";
+      return name;
+    }
+
+    static auto context_gamma() noexcept -> const std::string &
+    {
+      static const std::string name = "TODO";
+      return name;
+    }
+
+    static auto default_behavior() noexcept -> const std::string & { return behavior_tree(); }
+  };
+
   explicit VehicleEntity(
     const std::string & name,                                //
     const traffic_simulator_msgs::msg::VehicleParameters &,  //
-    const std::string &);
+    const std::string & = BuiltinBehavior::default_behavior());
 
   const traffic_simulator_msgs::msg::VehicleParameters parameters;
 

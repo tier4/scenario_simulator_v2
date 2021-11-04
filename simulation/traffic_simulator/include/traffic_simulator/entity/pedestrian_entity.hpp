@@ -34,23 +34,27 @@ namespace entity
 class PedestrianEntity : public EntityBase
 {
 public:
-  struct Plugin
+  struct BuiltinBehavior
   {
-    static constexpr auto behavior_tree() noexcept -> const char *
+    static auto behavior_tree() noexcept -> const std::string &
     {
-      return "behavior_tree_plugin/PedestrianBehaviorTree";
+      static const std::string name = "behavior_tree_plugin/PedestrianBehaviorTree";
+      return name;
     }
 
-    static constexpr auto context_gamma() noexcept -> const char *  //
+    static auto context_gamma() noexcept -> const std::string &
     {
-      return "";
+      static const std::string name = "TODO";
+      return name;
     }
+
+    static auto default_behavior() noexcept -> const std::string & { return behavior_tree(); }
   };
 
   explicit PedestrianEntity(
     const std::string & name,                                   //
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
-    const std::string &);
+    const std::string & = BuiltinBehavior::default_behavior());
 
   const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 
