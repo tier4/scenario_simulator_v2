@@ -28,15 +28,9 @@ TeleportAction::TeleportAction(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto TeleportAction::accomplished() noexcept -> bool  //
-{
-  return true;
-}
+auto TeleportAction::accomplished() noexcept -> bool { return true; }
 
-auto TeleportAction::endsImmediately() noexcept -> bool  //
-{
-  return true;
-}
+auto TeleportAction::endsImmediately() noexcept -> bool { return true; }
 
 auto TeleportAction::evaluate() const -> Element
 {
