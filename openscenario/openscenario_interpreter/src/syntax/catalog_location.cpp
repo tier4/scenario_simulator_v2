@@ -27,9 +27,11 @@ namespace
 boost::filesystem::path convertScenario(
   const boost::filesystem::path & yaml_path, const boost::filesystem::path & output_dir)
 {
-  static auto conversion_py_path = "ros2 run openscenario_utility yaml2xosc";
+  constexpr auto yaml2xosc = "python3 $(which ros2) run openscenario_utility yaml2xosc";
+  //constexpr auto yaml2xosc =
+  //  "python3 -c \" from openscenario_utility import conversion; conversion.main() \"";
   std::stringstream command;
-  command << conversion_py_path << " --input " << yaml_path << " --output " << output_dir;
+  command << yaml2xosc << " --input " << yaml_path << " --output " << output_dir;
 
   if (std::system(command.str().c_str()) != 0) {
     THROW_SYNTAX_ERROR("failed to convert sceanrio: " + yaml_path.string());
