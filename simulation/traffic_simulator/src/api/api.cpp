@@ -68,7 +68,7 @@ bool API::spawn(
     } else {
       using traffic_simulator::entity::VehicleEntity;
       return entity_manager_ptr_->spawnEntity<VehicleEntity>(
-        name, parameters, entity::VehicleEntity::default_behavior);
+        name, parameters, entity::VehicleEntity::default_behavior());
     }
   };
 
