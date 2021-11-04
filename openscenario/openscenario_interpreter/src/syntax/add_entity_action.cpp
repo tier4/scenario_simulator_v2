@@ -52,7 +52,9 @@ try {
       if (applyAddEntityAction(
             entity_ref,                                                            //
             static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),  //
-            entity.as<ScenarioObject>().object_controller.isUserDefinedController())) {
+            entity.as<ScenarioObject>().object_controller.isUserDefinedController()
+              ? traffic_simulator::API::VehicleBehavior::autoware()
+              : traffic_simulator::API::VehicleBehavior::default_behavior())) {
         TeleportAction::teleport(entity_ref, position);
         entity.as<ScenarioObject>().object_controller.assign(entity_ref);
         entity.as<ScenarioObject>().activateSensors();

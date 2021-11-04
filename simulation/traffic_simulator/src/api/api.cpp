@@ -57,18 +57,17 @@ bool API::despawn(const std::string & name)
 bool API::spawn(
   const std::string & name,                                           //
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,  //
-  const bool is_ego)
+  const std::string & behavior)
 {
   auto register_to_entity_manager = [&]() {
-    if (is_ego) {
+    if (behavior == VehicleBehavior::autoware()) {
       using traffic_simulator::entity::EgoEntity;
       return entity_manager_ptr_->entityExists(name) or
              entity_manager_ptr_->spawnEntity<EgoEntity>(
                name, configuration, clock_.getStepTime(), parameters);
     } else {
       using traffic_simulator::entity::VehicleEntity;
-      return entity_manager_ptr_->spawnEntity<VehicleEntity>(
-        name, parameters, entity::VehicleEntity::default_behavior());
+      return entity_manager_ptr_->spawnEntity<VehicleEntity>(name, parameters, behavior);
     }
   };
 
@@ -80,7 +79,7 @@ bool API::spawn(
       simulation_api_schema::SpawnVehicleEntityResponse res;
       simulation_interface::toProto(parameters, *req.mutable_parameters());
       req.mutable_parameters()->set_name(name);
-      req.set_is_ego(is_ego);
+      req.set_is_ego(behavior == VehicleBehavior::autoware());
       spawn_vehicle_entity_client_.call(req, res);
       return res.result().success();
     }

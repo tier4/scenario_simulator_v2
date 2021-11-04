@@ -19,6 +19,7 @@
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <boost/variant.hpp>
 #include <cassert>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -109,11 +110,31 @@ public:
 
   void setVerbose(const bool verbose);
 
-  // clang-format off
-  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters    &, const bool is_ego = false);
-  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters &, const std::string & = entity::PedestrianEntity::default_behavior());
+  struct VehicleBehavior
+  {
+    static constexpr auto autoware() noexcept -> const char * { return "Autoware"; }
+
+    static constexpr auto behavior_tree() noexcept -> const char *
+    {
+      return "behavior_tree_plugin/VehicleBehaviorTree";
+    }
+
+    static constexpr auto context_gamma() noexcept -> const char * { return ""; }
+
+    static constexpr auto default_behavior() noexcept -> const char * { return behavior_tree(); }
+  };
+
+  bool spawn(
+    const std::string & name,                                //
+    const traffic_simulator_msgs::msg::VehicleParameters &,  //
+    const std::string & = VehicleBehavior::default_behavior());
+
+  bool spawn(
+    const std::string & name,                                   //
+    const traffic_simulator_msgs::msg::PedestrianParameters &,  //
+    const std::string & = entity::PedestrianEntity::Plugin::behavior_tree());
+
   bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
-  // clang-format on
 
   bool despawn(const std::string & name);
 
