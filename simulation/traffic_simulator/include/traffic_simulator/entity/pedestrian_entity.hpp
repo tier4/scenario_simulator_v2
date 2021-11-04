@@ -36,25 +36,25 @@ class PedestrianEntity : public EntityBase
 public:
   struct BuiltinBehavior
   {
-    static auto behavior_tree() noexcept -> const std::string &
+    static auto behaviorTree() noexcept -> const std::string &
     {
       static const std::string name = "behavior_tree_plugin/PedestrianBehaviorTree";
       return name;
     }
 
-    static auto context_gamma() noexcept -> const std::string &
+    static auto contextGamma() noexcept -> const std::string &
     {
       static const std::string name = "TODO";
       return name;
     }
 
-    static auto default_behavior() noexcept -> const std::string & { return behavior_tree(); }
+    static auto defaultBehavior() noexcept -> const std::string & { return behaviorTree(); }
   };
 
   explicit PedestrianEntity(
     const std::string & name,                                   //
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
-    const std::string & = BuiltinBehavior::default_behavior());
+    const std::string & = BuiltinBehavior::defaultBehavior());
 
   const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 

@@ -126,12 +126,12 @@ public:
   bool spawn(
     const std::string & name,                                //
     const traffic_simulator_msgs::msg::VehicleParameters &,  //
-    const std::string & = VehicleBehavior::default_behavior());
+    const std::string & = VehicleBehavior::defaultBehavior());
 
   bool spawn(
     const std::string & name,                                   //
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
-    const std::string & = PedestrianBehavior::default_behavior());
+    const std::string & = PedestrianBehavior::defaultBehavior());
 
   bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
