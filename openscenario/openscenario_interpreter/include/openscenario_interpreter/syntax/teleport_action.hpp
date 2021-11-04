@@ -47,6 +47,8 @@ struct TeleportAction : private Scope
   /*  */ auto run() const -> void;
 
   static auto start() noexcept -> void;
+
+  static auto teleport(const EntityRef &, const Position &) -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

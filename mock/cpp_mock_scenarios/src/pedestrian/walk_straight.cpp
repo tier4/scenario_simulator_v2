@@ -59,20 +59,21 @@ private:
 
   void onInitialize() override
   {
-    api_.spawn(false, "ego", getVehicleParameters());
+    api_.spawn("ego", getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(120545, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 8, true);
-    api_.spawn(
-      false, "bob", getPedestrianParameters(),
-      traffic_simulator::helper::constructLaneletPose(34378, 0.0),
-      traffic_simulator::helper::constructActionStatus(1));
-    api_.requestWalkStraight("bob");
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator_msgs::msg::LaneletPose>{
                traffic_simulator::helper::constructLaneletPose(34675, 0.0),
                traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
+
+    api_.spawn("bob", getPedestrianParameters());
+    api_.setEntityStatus(
+      "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+      traffic_simulator::helper::constructActionStatus(1));
+    api_.requestWalkStraight("bob");
   }
 
 private:
