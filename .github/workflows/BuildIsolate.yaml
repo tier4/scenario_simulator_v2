@@ -24,8 +24,8 @@ jobs:
             cpp_mock_scenarios,
             kashiwanoha_map,
             lanelet2_extension_psim,
-            openscenario_interpreter,
             openscenario_interpreter_msgs,
+            openscenario_interpreter,
             openscenario_msgs,
             openscenario_utility,
             openscenario_visualization,
@@ -35,8 +35,9 @@ jobs:
             simple_junit,
             simple_sensor_simulator,
             simulation_interface,
-            traffic_simulator,
             traffic_simulator_msgs,
+            traffic_simulator,
+            user_defined_value_condition_example,
           ]
         rosdistro: [foxy, galactic]
     env:
