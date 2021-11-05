@@ -59,11 +59,11 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(false, "ego", getVehicleParameters());
+    api_.spawn("ego", getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(15));
-    api_.spawn(false, "npc", getVehicleParameters());
+    api_.spawn("npc", getVehicleParameters());
     api_.setEntityStatus(
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
       traffic_simulator::helper::constructActionStatus(10));

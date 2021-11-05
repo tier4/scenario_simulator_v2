@@ -226,20 +226,30 @@ auto EntityManager::getLongitudinalDistance(
   const LaneletPose & from, const LaneletPose & to, const double max_distance)
   -> boost::optional<double>
 {
-  const auto forward_distance =
+  auto forward_distance =
     hdmap_utils_ptr_->getLongitudinalDistance(from.lanelet_id, from.s, to.lanelet_id, to.s);
 
-  if (forward_distance and forward_distance <= max_distance) {
-    return forward_distance;
+  if (forward_distance and forward_distance.get() > max_distance) {
+    forward_distance = boost::none;
   }
 
-  const auto backward_distance =
+  auto backward_distance =
     hdmap_utils_ptr_->getLongitudinalDistance(to.lanelet_id, to.s, from.lanelet_id, from.s);
 
-  if (backward_distance and backward_distance <= max_distance) {
+  if (backward_distance and backward_distance.get() > max_distance) {
+    backward_distance = boost::none;
+  }
+  if (forward_distance && backward_distance) {
+    if (forward_distance.get() > backward_distance.get()) {
+      return -backward_distance.get();
+    } else {
+      return forward_distance.get();
+    }
+  } else if (forward_distance) {
+    return forward_distance.get();
+  } else if (backward_distance) {
     return -backward_distance.get();
   }
-
   return boost::none;
 }
 

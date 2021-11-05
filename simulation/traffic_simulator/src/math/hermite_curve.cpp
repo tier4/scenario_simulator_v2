@@ -257,9 +257,11 @@ const geometry_msgs::msg::Vector3 HermiteCurve::getNormalVector(double s, bool a
   if (autoscale) {
     s = s / getLength();
   }
+  geometry_msgs::msg::Vector3 tangent_vec = getTangentVector(s);
+  double theta = M_PI / 2.0;
   geometry_msgs::msg::Vector3 vec;
-  vec.x = 3 * ay_ * s * s + 2 * by_ * s + cy_;
-  vec.y = (3 * ax_ * s * s + 2 * bx_ * s + cx_) * -1;
+  vec.x = tangent_vec.x * std::cos(theta) - tangent_vec.y * std::sin(theta);
+  vec.y = tangent_vec.x * std::sin(theta) + tangent_vec.y * std::cos(theta);
   return vec;
 }
 
