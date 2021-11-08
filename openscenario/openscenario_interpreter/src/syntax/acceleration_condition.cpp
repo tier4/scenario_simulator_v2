@@ -25,7 +25,7 @@ AccelerationCondition::AccelerationCondition(
 : value(readAttribute<Double>("value", node, scope)),
   compare(readAttribute<Rule>("rule", node, scope)),
   triggering_entities(triggering_entities),
-  last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), Double::nan())
 {
 }
 
@@ -35,7 +35,7 @@ auto AccelerationCondition::description() const -> std::string
 
   description << triggering_entities.description() << "'s acceleration = ";
 
-  print_to(description, last_checked_values);
+  print_to(description, results);
 
   description << " " << compare << " " << value << "?";
 
@@ -44,11 +44,11 @@ auto AccelerationCondition::description() const -> std::string
 
 auto AccelerationCondition::evaluate() -> Element
 {
-  last_checked_values.clear();
+  results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    last_checked_values.push_back(getEntityStatus(triggering_entity).action_status.accel.linear.x);
-    return compare(last_checked_values.back(), value);
+    results.push_back(getEntityStatus(triggering_entity).action_status.accel.linear.x);
+    return compare(results.back(), value);
   }));
 }
 }  // namespace syntax

@@ -41,7 +41,7 @@ struct AccelerationCondition
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<double> last_checked_values;  // for description
+  std::vector<double> results;  // for description
 
   explicit AccelerationCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
