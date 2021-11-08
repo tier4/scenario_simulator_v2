@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog_definition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-CatalogDefinition::CatalogDefinition(const pugi::xml_node &, Scope &) {}
+CatalogDefinition::CatalogDefinition(const pugi::xml_node & node, Scope & scope)
+: Catalog(readElement<Catalog>("Catalog", node, scope))
+{
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

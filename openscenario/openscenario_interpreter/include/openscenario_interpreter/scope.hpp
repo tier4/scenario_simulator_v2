@@ -17,6 +17,7 @@
 
 #include <boost/filesystem.hpp>
 #include <memory>
+#include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <unordered_map>
 #include <utility>
@@ -42,11 +43,11 @@ class EnvironmentFrame
 
   explicit EnvironmentFrame(EnvironmentFrame &, const std::string &);
 
+public:
   explicit EnvironmentFrame(const EnvironmentFrame &) = delete;
 
   explicit EnvironmentFrame(EnvironmentFrame &&) = delete;
 
-public:
   auto findElement(const std::string &) const -> Element;
 
   auto getQualifiedName() const -> std::string;
@@ -76,6 +77,8 @@ class Scope
     const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
     std::unordered_map<std::string, Element> entities;  // ScenarioObject or EntitySelection
+
+    CatalogLocations * catalog_locations;
 
     explicit GlobalEnvironment(const boost::filesystem::path &);
 

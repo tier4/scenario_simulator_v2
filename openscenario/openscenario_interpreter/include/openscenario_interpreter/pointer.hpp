@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/type_traits/if_has_member_function_evaluate.hpp>
 #include <openscenario_interpreter/type_traits/if_has_stream_output_operator.hpp>
 #include <openscenario_interpreter/utility/pair.hpp>
+#include <type_traits>
 #include <typeinfo>
 #include <utility>
 
@@ -41,7 +42,7 @@ class Pointer : public std::shared_ptr<T>
 
     virtual ~Binder() = default;
 
-    const std::type_info & type() const noexcept override { return typeid(Bound); }
+    auto type() const noexcept -> const std::type_info & override { return typeid(Bound); }
 
   private:
     bool accomplished() override  //
@@ -102,13 +103,19 @@ public:
   decltype(auto) type() const { return binding().type(); }
 
   template <typename U>
-  decltype(auto) is() const
+  auto is() const -> bool
   {
     return type() == typeid(U);
   }
 
   template <typename U>
-  U & as() const
+  auto is_also() const
+  {
+    return static_cast<bool>(std::dynamic_pointer_cast<U>(*this));
+  }
+
+  template <typename U>
+  auto as() const -> U &
   {
     if (const auto bound = std::dynamic_pointer_cast<U>(*this)) {
       return *bound;
@@ -117,7 +124,6 @@ public:
     }
   }
 
-public:
   template <typename... Ts>
   decltype(auto) evaluate(Ts &&... xs) const
   {

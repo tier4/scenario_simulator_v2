@@ -12,41 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ASSIGNMENTS_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ASSIGNMENTS_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/parameter_assignment.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- AssignRouteAction ------------------------------------------------------
+/* ---- ParameterAssignment--------------------------------------------------
  *
- *  <xsd:complexType name="AssignRouteAction">
- *    <xsd:choice>
- *      <xsd:element name="Route" type="Route"/>
- *      <xsd:element name="CatalogReference" type="CatalogReference"/>
- *    </xsd:choice>
- *  </xsd:complexType>
+ * <xsd:complexType name="ParameterAssignment">
+ *   <xsd:attribute name="parameterRef" type="String" use="required"/>
+ *   <xsd:attribute name="value" type="String" use="required"/>
+ * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AssignRouteAction : private Scope
+struct ParameterAssignments : std::list<ParameterAssignment>
 {
-  Element route;
-
-  explicit AssignRouteAction(const pugi::xml_node &, Scope &);
-
-  static auto accomplished() noexcept -> bool;
-
-  static auto endsImmediately() noexcept -> bool;
-
-  /*  */ auto run() -> void;
-
-  static auto start() -> void;
+  explicit ParameterAssignments() = default;
+  explicit ParameterAssignments(const pugi::xml_node & node, Scope & scope)
+  : std::list<ParameterAssignment>(
+      readElements<ParameterAssignment, 0>("ParameterAssignment", node, scope))
+  {
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ASSIGNMENTS_HPP_
