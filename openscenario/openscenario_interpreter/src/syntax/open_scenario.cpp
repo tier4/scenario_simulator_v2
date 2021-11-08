@@ -23,9 +23,9 @@ inline namespace syntax
 {
 OpenScenario::OpenScenario(const boost::filesystem::path & pathname)
 : Scope(pathname),
-  file_header(readElement<FileHeader>(
-    "FileHeader", load(global().pathname).child("OpenSCENARIO"), localScope())),
-  category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, localScope())),
+  file_header(
+    readElement<FileHeader>("FileHeader", load(global().pathname).child("OpenSCENARIO"), local())),
+  category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, local())),
   frame(0)
 {
 }

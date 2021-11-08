@@ -112,9 +112,9 @@ public:
 
   auto global() -> GlobalEnvironment &;
 
-  auto localScope() const noexcept -> const Scope &;
+  auto local() const noexcept -> const Scope &;
 
-  auto localScope() noexcept -> Scope &;
+  auto local() noexcept -> Scope &;
 
   auto makeChildScope(const std::string &) const -> Scope;
 

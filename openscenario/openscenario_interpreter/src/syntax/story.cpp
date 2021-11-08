@@ -26,11 +26,11 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
 : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope)))
 {
   callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
-    return make<ParameterDeclarations>(node, localScope());
+    return make<ParameterDeclarations>(node, local());
   });
 
   callWithElements(node, "Act", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Act>(node, localScope()));
+    return push_back(readStoryboardElement<Act>(node, local()));
   });
 }
 

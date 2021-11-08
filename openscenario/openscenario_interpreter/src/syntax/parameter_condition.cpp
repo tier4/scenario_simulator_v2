@@ -26,9 +26,9 @@ inline namespace syntax
 {
 ParameterCondition::ParameterCondition(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
-  parameter_ref(readAttribute<String>("parameterRef", node, localScope())),
-  value(readAttribute<String>("value", node, localScope())),
-  rule(readAttribute<Rule>("rule", node, localScope()))
+  parameter_ref(readAttribute<String>("parameterRef", node, local())),
+  value(readAttribute<String>("value", node, local())),
+  rule(readAttribute<Rule>("rule", node, local()))
 {
 }
 
@@ -63,7 +63,7 @@ auto ParameterCondition::description() const -> String
   std::stringstream description;
 
   description << "The value of parameter " << std::quoted(parameter_ref) << " = "
-              << localScope().findElement(parameter_ref) << " " << rule << " " << value << "?";
+              << local().findElement(parameter_ref) << " " << rule << " " << value << "?";
 
   return description.str();
 }
@@ -71,7 +71,7 @@ auto ParameterCondition::description() const -> String
 auto ParameterCondition::evaluate() const -> Element
 {
   try {
-    const auto & parameter = localScope().findElement(parameter_ref);
+    const auto & parameter = local().findElement(parameter_ref);
     if (not parameter) {
       THROW_SYNTAX_ERROR(parameter_ref, " cannot be found from this scope");
     } else {

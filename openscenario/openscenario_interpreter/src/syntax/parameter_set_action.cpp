@@ -23,9 +23,7 @@ inline namespace syntax
 {
 ParameterSetAction::ParameterSetAction(
   const pugi::xml_node & node, Scope & scope, const String & parameter_ref)
-: Scope(scope),
-  parameter_ref(parameter_ref),
-  value(readAttribute<String>("value", node, localScope()))
+: Scope(scope), parameter_ref(parameter_ref), value(readAttribute<String>("value", node, local()))
 {
 }
 
@@ -36,7 +34,7 @@ auto ParameterSetAction::accomplished() noexcept -> bool  //
 
 auto ParameterSetAction::run() const -> void  //
 {
-  set(localScope(), parameter_ref, value);
+  set(local(), parameter_ref, value);
 }
 
 auto ParameterSetAction::set(

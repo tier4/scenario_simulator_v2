@@ -23,9 +23,7 @@ inline namespace syntax
 {
 ParameterModifyAction::ParameterModifyAction(
   const pugi::xml_node & node, Scope & scope, const String & parameter_ref)
-: Scope(scope),
-  parameter_ref(parameter_ref),
-  rule(readElement<ModifyRule>("Rule", node, localScope()))
+: Scope(scope), parameter_ref(parameter_ref), rule(readElement<ModifyRule>("Rule", node, local()))
 {
 }
 
@@ -34,7 +32,7 @@ auto ParameterModifyAction::accomplished() noexcept -> bool { return true; }
 auto ParameterModifyAction::run() -> void
 {
   try {
-    const auto target = localScope().findElement(parameter_ref);
+    const auto target = local().findElement(parameter_ref);
     if (rule.is<ParameterAddValueRule>()) {
       rule.as<ParameterAddValueRule>()(target);
     } else {

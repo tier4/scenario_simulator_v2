@@ -26,8 +26,8 @@ inline namespace syntax
 Controller::Controller(const pugi::xml_node & node, Scope & scope)
 : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
   parameter_declarations(
-    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
-  properties(readElement<Properties>("Properties", node, localScope()))
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
+  properties(readElement<Properties>("Properties", node, local()))
 {
 }
 

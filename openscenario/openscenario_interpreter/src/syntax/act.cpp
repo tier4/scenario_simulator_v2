@@ -22,14 +22,14 @@ inline namespace syntax
 {
 Act::Act(const pugi::xml_node & node, Scope & scope)
 : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-  start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
+  start_trigger(readElement<Trigger>("StartTrigger", node, local()))
 {
   callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<ManeuverGroup>(node, localScope()));
+    return push_back(readStoryboardElement<ManeuverGroup>(node, local()));
   });
 
   callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
-    return stop_trigger.rebind<Trigger>(node, localScope());
+    return stop_trigger.rebind<Trigger>(node, local());
   });
 }
 

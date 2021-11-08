@@ -195,9 +195,9 @@ auto Scope::global() const -> const GlobalEnvironment & { return *global_environ
 
 auto Scope::global() -> GlobalEnvironment & { return *global_environment; }
 
-auto Scope::localScope() const noexcept -> const Scope & { return *this; }
+auto Scope::local() const noexcept -> const Scope & { return *this; }
 
-auto Scope::localScope() noexcept -> Scope & { return *this; }
+auto Scope::local() noexcept -> Scope & { return *this; }
 
 auto Scope::makeChildScope(const std::string & name) const -> Scope
 {

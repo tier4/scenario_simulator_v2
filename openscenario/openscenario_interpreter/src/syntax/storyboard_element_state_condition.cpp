@@ -22,10 +22,10 @@ inline namespace syntax
 StoryboardElementStateCondition::StoryboardElementStateCondition(
   const pugi::xml_node & node, const Scope & scope)
 : Scope(scope),
-  storyboard_element_ref(readAttribute<String>("storyboardElementRef", node, localScope())),
+  storyboard_element_ref(readAttribute<String>("storyboardElementRef", node, local())),
   storyboard_element_type(
-    readAttribute<StoryboardElementType>("storyboardElementType", node, localScope())),
-  state(readAttribute<StoryboardElementState>("state", node, localScope())),
+    readAttribute<StoryboardElementType>("storyboardElementType", node, local())),
+  state(readAttribute<StoryboardElementState>("state", node, local())),
   result(StoryboardElementState::standbyState)
 {
 }
@@ -44,7 +44,7 @@ auto StoryboardElementStateCondition::evaluate() -> Element
 {
   try {
     result =
-      localScope().findElement(storyboard_element_ref).currentState().as<StoryboardElementState>();
+      local().findElement(storyboard_element_ref).currentState().as<StoryboardElementState>();
     return asBoolean(result == state);
   } catch (const std::out_of_range &) {
     return false_v;

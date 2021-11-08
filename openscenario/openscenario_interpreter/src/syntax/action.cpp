@@ -25,9 +25,9 @@ Action::Action(const pugi::xml_node & node, Scope & scope)
 : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
   Element(
     choice(node,
-      std::make_pair(     "GlobalAction", [this](auto && node) { return make<     GlobalAction>(node, localScope()); }),
-      std::make_pair("UserDefinedAction", [this](auto && node) { return make<UserDefinedAction>(node, localScope()); }),
-      std::make_pair(    "PrivateAction", [this](auto && node) { return make<    PrivateAction>(node, localScope()); })))
+      std::make_pair(     "GlobalAction", [this](auto && node) { return make<     GlobalAction>(node, local()); }),
+      std::make_pair("UserDefinedAction", [this](auto && node) { return make<UserDefinedAction>(node, local()); }),
+      std::make_pair(    "PrivateAction", [this](auto && node) { return make<    PrivateAction>(node, local()); })))
 // clang-format on
 {
 }
