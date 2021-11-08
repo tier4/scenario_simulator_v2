@@ -29,7 +29,7 @@ static_assert(std::is_trivial<ConditionEdge>::value, "");
 
 Condition::Condition(const pugi::xml_node & node, Scope & scope)
 // clang-format off
-: Element(
+: ComplexType(
     choice(node,
       std::make_pair("ByEntityCondition", [&](auto && node) { return make<ByEntityCondition>(node, scope); }),
       std::make_pair( "ByValueCondition", [&](auto && node) { return make< ByValueCondition>(node, scope); }))),
@@ -41,12 +41,12 @@ Condition::Condition(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto Condition::evaluate() -> Element
+auto Condition::evaluate() -> Object
 {
   if (condition_edge == ConditionEdge::sticky and current_value) {
     return true_v;
   } else {
-    return asBoolean(current_value = Element::evaluate().as<Boolean>());
+    return asBoolean(current_value = Object::evaluate().as<Boolean>());
   }
 }
 

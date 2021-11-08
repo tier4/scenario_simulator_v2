@@ -36,7 +36,7 @@ inline namespace syntax
 template <typename... Ts>
 auto choice_by_attribute(const pugi::xml_node & node, const std::string & attribute, Ts &&... xs)
 {
-  using CalleeT = std::function<Element(const pugi::xml_node &)>;
+  using CalleeT = std::function<Object(const pugi::xml_node &)>;
 
   const std::unordered_map<std::string, CalleeT> callees{
     {std::forward<decltype(xs)>(xs)...}, sizeof...(Ts)};
@@ -88,7 +88,7 @@ struct CatalogInstance : public Derived
   }
 };
 
-auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) -> Element
+auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) -> Object
 {
   auto catalog_name = readAttribute<std::string>("catalogName", node, outer_scope);
 
@@ -108,7 +108,7 @@ auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) ->
       if (found_catalog != std::end(catalog_location)) {
         using ::openscenario_interpreter::make;
 
-        std::unordered_map<std::string, std::function<Element(const pugi::xml_node &)>> dispatcher{
+        std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
           // clang-format off
           std::make_pair("Vehicle",     [&](auto && node) { return make<CatalogInstance<Vehicle>>   (node, scope, parameter_assignments); }),
           std::make_pair("Controller",  [&](auto && node) { return make<CatalogInstance<Controller>>(node, scope, parameter_assignments); }),

@@ -55,10 +55,10 @@ auto operator>>(std::istream & is, Boolean & datum) -> std::istream &
   return is >> std::boolalpha >> datum.data;
 }
 
-const Element true_v = make<Boolean>(true);
+const Object true_v = make<Boolean>(true);
 
-const Element false_v = make<Boolean>(false);
+const Object false_v = make<Boolean>(false);
 
-auto asBoolean(bool value) -> const Element & { return value ? true_v : false_v; }
+auto asBoolean(bool value) -> const Object & { return value ? true_v : false_v; }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

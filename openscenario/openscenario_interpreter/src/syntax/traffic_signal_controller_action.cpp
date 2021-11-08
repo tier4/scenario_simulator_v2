@@ -23,9 +23,8 @@ inline namespace syntax
 TrafficSignalControllerAction::TrafficSignalControllerAction(
   const pugi::xml_node & node, const Scope & scope)
 : Scope(scope),
-  traffic_signal_controller_ref(
-    readAttribute<String>("trafficSignalControllerRef", node, localScope())),
-  phase(readAttribute<String>("phase", node, localScope()))
+  traffic_signal_controller_ref(readAttribute<String>("trafficSignalControllerRef", node, local())),
+  phase(readAttribute<String>("phase", node, local()))
 {
 }
 
@@ -35,7 +34,7 @@ auto TrafficSignalControllerAction::endsImmediately() noexcept -> bool { return 
 
 auto TrafficSignalControllerAction::run() -> void
 {
-  auto found = localScope().findElement(traffic_signal_controller_ref);
+  auto found = local().findObject(traffic_signal_controller_ref);
   if (found and found.is<TrafficSignalController>()) {
     found.as<TrafficSignalController>().changePhaseTo(phase);
   } else {

@@ -43,11 +43,11 @@ auto operator>>(std::istream &, Boolean &) -> std::istream &;
 
 auto operator<<(std::ostream &, const Boolean &) -> std::ostream &;
 
-extern const Element true_v;
+extern const Object true_v;
 
-extern const Element false_v;
+extern const Object false_v;
 
-auto asBoolean(bool) -> const Element &;
+auto asBoolean(bool) -> const Object &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

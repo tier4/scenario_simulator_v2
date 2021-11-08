@@ -41,7 +41,7 @@ Catalog::Catalog(const pugi::xml_node & node, Scope & scope)
         THROW_SYNTAX_ERROR("Only one type can be defined in a single category file"); \
       }                                                                               \
       already_found = true;                                                           \
-      for (Element & element : elements) {                                            \
+      for (const auto & element : elements) {                                         \
         scope.insert(element.template as<TYPE>().name, element);                      \
       }                                                                               \
     }                                                                                 \

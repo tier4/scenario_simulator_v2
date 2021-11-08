@@ -53,7 +53,7 @@ struct TrafficSignalControllerCondition
 
   auto description() const -> String;
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

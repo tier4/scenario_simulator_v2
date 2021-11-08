@@ -39,7 +39,7 @@ struct Trigger : public std::list<ConditionGroup>
 
   explicit Trigger(const pugi::xml_node &, Scope &);
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 
 auto operator<<(nlohmann::json &, const Trigger &) -> nlohmann::json &;

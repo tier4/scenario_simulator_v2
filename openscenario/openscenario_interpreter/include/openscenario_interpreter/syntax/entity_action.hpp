@@ -36,7 +36,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct EntityAction : public Element
+struct EntityAction : public ComplexType
 {
   const String entity_ref;
 

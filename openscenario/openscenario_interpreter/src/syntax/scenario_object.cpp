@@ -25,8 +25,8 @@ inline namespace syntax
 {
 ScenarioObject::ScenarioObject(const pugi::xml_node & node, Scope & scope)
 : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-  EntityObject(node, localScope()),
-  object_controller(readElement<ObjectController>("ObjectController", node, localScope()))
+  EntityObject(node, local()),
+  object_controller(readElement<ObjectController>("ObjectController", node, local()))
 {
 }
 

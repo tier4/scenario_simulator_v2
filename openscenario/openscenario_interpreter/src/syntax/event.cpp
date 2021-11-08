@@ -23,12 +23,12 @@ inline namespace syntax
 Event::Event(const pugi::xml_node & node, Scope & scope)
 : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
   StoryboardElement(
-    readAttribute<UnsignedInt>("maximumExecutionCount", node, localScope(), UnsignedInt(1))),
-  priority(readAttribute<Priority>("priority", node, localScope())),
-  start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
+    readAttribute<UnsignedInt>("maximumExecutionCount", node, local(), UnsignedInt(1))),
+  priority(readAttribute<Priority>("priority", node, local())),
+  start_trigger(readElement<Trigger>("StartTrigger", node, local()))
 {
   callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
-    return actions.push_back(readStoryboardElement<Action>(node, localScope()));
+    return actions.push_back(readStoryboardElement<Action>(node, local()));
   });
 }
 

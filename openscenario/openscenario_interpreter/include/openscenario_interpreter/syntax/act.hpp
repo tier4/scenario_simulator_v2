@@ -41,7 +41,7 @@ struct Act : public Scope, public StoryboardElement<Act>, public Elements
 {
   Trigger start_trigger;
 
-  Element stop_trigger;
+  Object stop_trigger;
 
   explicit Act(const pugi::xml_node &, Scope &);
 

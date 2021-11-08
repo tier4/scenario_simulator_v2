@@ -50,7 +50,7 @@ struct ParameterDeclaration
 
   explicit ParameterDeclaration(const pugi::xml_node &, Scope &);
 
-  auto evaluate() const -> Element;
+  auto evaluate() const -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

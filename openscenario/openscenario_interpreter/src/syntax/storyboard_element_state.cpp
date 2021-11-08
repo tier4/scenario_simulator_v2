@@ -72,13 +72,13 @@ auto operator<<(std::ostream & os, const StoryboardElementState & datum) -> std:
 }
 
 // clang-format off
-const Element start_transition = make<StoryboardElementState>(StoryboardElementState::startTransition);
-const Element   end_transition = make<StoryboardElementState>(StoryboardElementState::  endTransition);
-const Element  stop_transition = make<StoryboardElementState>(StoryboardElementState:: stopTransition);
-const Element  skip_transition = make<StoryboardElementState>(StoryboardElementState:: skipTransition);
-const Element    standby_state = make<StoryboardElementState>(StoryboardElementState::   standbyState);
-const Element    running_state = make<StoryboardElementState>(StoryboardElementState::   runningState);
-const Element   complete_state = make<StoryboardElementState>(StoryboardElementState::  completeState);
+const Object start_transition = make<StoryboardElementState>(StoryboardElementState::startTransition);
+const Object   end_transition = make<StoryboardElementState>(StoryboardElementState::  endTransition);
+const Object  stop_transition = make<StoryboardElementState>(StoryboardElementState:: stopTransition);
+const Object  skip_transition = make<StoryboardElementState>(StoryboardElementState:: skipTransition);
+const Object    standby_state = make<StoryboardElementState>(StoryboardElementState::   standbyState);
+const Object    running_state = make<StoryboardElementState>(StoryboardElementState::   runningState);
+const Object   complete_state = make<StoryboardElementState>(StoryboardElementState::  completeState);
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -40,10 +40,10 @@ inline namespace syntax
 
 struct CatalogReference
 {
-  static auto make(const pugi::xml_node &, Scope &) -> Element;
+  static auto make(const pugi::xml_node &, Scope &) -> Object;
 
   template <typename... Ts>
-  static auto make(const pugi::xml_node & node, Scope & scope) -> Element
+  static auto make(const pugi::xml_node & node, Scope & scope) -> Object
   {
     auto result = CatalogReference::make(node, scope);
 
