@@ -197,21 +197,8 @@ boost::optional<double> HermiteCurve::getSValue(
   }
   size_t value_index = std::distance(errors.begin(), min_iter);
   ret = s_values[value_index];
-  if (ret < 0) {
-    double error = getSquaredDistanceIn2D(point, 0, false);
-    if (error < (threshold_distance * threshold_distance)) {
-      ret = 0;
-    } else {
-      return boost::none;
-    }
-  }
-  if (ret > 1) {
-    double error = getSquaredDistanceIn2D(point, 0, false);
-    if (error < (threshold_distance * threshold_distance)) {
-      ret = 1;
-    } else {
-      return boost::none;
-    }
+  if (ret < 0 || ret > 1) {
+    return boost::none;
   }
   if (autoscale) {
     ret = ret * getLength();
