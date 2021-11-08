@@ -57,8 +57,9 @@ public:
   double getLength(size_t num_points) const;
   double getLength() const { return length_; }
   boost::optional<double> getSValue(
-    geometry_msgs::msg::Point position, unsigned int initial_resolution = 50,
-    unsigned int max_iteration = 30, double tolerance = 0.03, bool autoscale = false) const;
+    geometry_msgs::msg::Point position, double threshold_distance = 0.03,
+    unsigned int initial_resolution = 50, unsigned int max_iteration = 30, double tolerance = 0.001,
+    bool autoscale = false) const;
   double getSquaredDistanceIn2D(
     geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
   boost::optional<double> getCollisionPointIn2D(

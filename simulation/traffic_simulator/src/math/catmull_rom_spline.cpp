@@ -315,15 +315,15 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
 }
 
 boost::optional<double> CatmullRomSpline::getSValue(
-  geometry_msgs::msg::Point position, unsigned int initial_num_points, unsigned int max_iteration,
-  double tolerance)
+  geometry_msgs::msg::Point position, double threshold_distance, unsigned int initial_num_points,
+  unsigned int max_iteration, double tolerance)
 {
   std::vector<double> s_values;
   std::vector<double> error_values;
   std::vector<size_t> curve_index;
   for (size_t i = 0; i < curves_.size(); i++) {
-    auto s_value =
-      curves_[i].getSValue(position, initial_num_points, max_iteration, tolerance, true);
+    auto s_value = curves_[i].getSValue(
+      position, threshold_distance, initial_num_points, max_iteration, tolerance, true);
     if (s_value) {
       if (s_value.get() > 0 && s_value.get() < curves_[i].getLength()) {
         s_values.emplace_back(s_value.get());
