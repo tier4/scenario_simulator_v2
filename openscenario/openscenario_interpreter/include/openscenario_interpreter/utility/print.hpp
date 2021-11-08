@@ -36,7 +36,7 @@ auto & print_to(std::ostream & os, const SequenceContainer & sequence_container)
 }
 
 auto print_keys_to = [](auto & os, const auto & xs) -> decltype(auto) {
-  if (not std::empty(xs)) {
+  if (not xs.empty()) {
     for (auto iter = std::begin(xs); iter != std::end(xs); ++iter) {
       os << std::get<0>(*iter);
       switch (std::distance(iter, std::end(xs))) {
