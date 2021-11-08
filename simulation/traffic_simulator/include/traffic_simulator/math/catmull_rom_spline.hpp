@@ -39,9 +39,8 @@ public:
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution) const;
   boost::optional<double> getSValue(
-    geometry_msgs::msg::Point position, double threshold_distance = 0.03,
-    unsigned int initial_resolution = 50, unsigned int max_iteration = 30,
-    double tolerance = 0.001);
+    geometry_msgs::msg::Point position, unsigned int initial_resolution = 50,
+    unsigned int max_iteration = 30, double tolerance = 0.03);
   double getSquaredDistanceIn2D(geometry_msgs::msg::Point point, double s) const;
   boost::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
