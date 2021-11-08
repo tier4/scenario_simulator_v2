@@ -1,0 +1,70 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: "2021-06-21T07:36:35.584Z"
+    description: ""
+    author: ""
+  Catalog:
+    name: all-in-one-vehicle
+    Vehicle:
+      - name: ego-vehicle
+        vehicleCategory: car
+        BoundingBox:
+          Center:
+            x: 1.355
+            y: 0
+            z: 1.25
+          Dimensions:
+            width: 2.25
+            length: 4.77
+            height: 2.5
+        Performance:
+          maxSpeed: $maxSpeed
+          maxAcceleration: INF
+          maxDeceleration: INF
+        Axles:
+          FrontAxle:
+            maxSteering: 0.5236
+            wheelDiameter: 0.78
+            trackWidth: 1.63
+            positionX: 1.385
+            positionZ: 0.39
+          RearAxle:
+            maxSteering: 0.5236
+            wheelDiameter: 0.78
+            trackWidth: 1.63
+            positionX: -1.355
+            positionZ: 0.39
+        Properties:
+          Property: []
+      - name: default-vehicle
+        vehicleCategory: car
+        BoundingBox:
+          Center:
+            x: 0
+            y: 0
+            z: 1.25
+          Dimensions:
+            width: 1.8
+            length: 4
+            height: 2.5
+        Performance:
+          maxSpeed: 50
+          maxAcceleration: INF
+          maxDeceleration: INF
+        Axles:
+          FrontAxle:
+            maxSteering: 0.5236
+            wheelDiameter: 0.6
+            trackWidth: 1.8
+            positionX: 2
+            positionZ: 0.3
+          RearAxle:
+            maxSteering: 0.5236
+            wheelDiameter: 0.6
+            trackWidth: 1.8
+            positionX: 0
+            positionZ: 0.3
+        Properties:
+          Property: []

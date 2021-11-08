@@ -27,8 +27,7 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
   actors(readElement<Actors>("Actors", node, localScope()))
 {
   callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
-    return unspecified;
+    return push_back(readCatalogedStoryboardElement<Maneuver>(node, localScope()));
   });
 
   callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
