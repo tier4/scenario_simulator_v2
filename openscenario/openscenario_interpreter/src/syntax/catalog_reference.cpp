@@ -19,56 +19,36 @@
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
+#include <openscenario_interpreter/utility/print.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-#undef UNSUPPORTED_ELEMENT_SPECIFIED
-#define UNSUPPORTED_ELEMENT_SPECIFIED(ELEMENT)                 \
+#define UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(ELEMENT)       \
   SyntaxError(                                                 \
     "Given class ", ELEMENT,                                   \
     " is valid OpenSCENARIO element of class CatalogRefenrece" \
     ", but is not supported yet")
 
-namespace
-{
 template <typename... Ts>
-auto choice_by_attribute(const XML & node, const std::string & attribute, Ts &&... xs)
+auto choice_by_attribute(const pugi::xml_node & node, const std::string & attribute, Ts &&... xs)
 {
-  using CalleeT = std::function<Element(const XML &)>;
+  using CalleeT = std::function<Element(const pugi::xml_node &)>;
 
   const std::unordered_map<std::string, CalleeT> callees{
     {std::forward<decltype(xs)>(xs)...}, sizeof...(Ts)};
 
-  std::vector<std::pair<XML, CalleeT>> specs;
+  std::vector<std::pair<pugi::xml_node, CalleeT>> specs;
 
   for (auto && child : node.children()) {
-    auto it = callees.find(child.attribute(attribute.c_str()).as_string());
-    if (it != callees.end()) {
-      specs.emplace_back(child, it->second);
+    auto iter = callees.find(child.attribute(attribute.c_str()).as_string());
+    if (iter != std::end(callees)) {
+      specs.emplace_back(child, iter->second);
     }
   }
-
-  auto print_keys_to = [&](auto & os, const auto & xs) -> decltype(auto) {
-    if (not xs.empty()) {
-      for (auto iter = std::begin(xs); iter != std::end(xs); ++iter) {
-        os << std::get<0>(*iter);
-        switch (std::distance(iter, std::end(xs))) {
-          case 1:
-            return os;
-          case 2:
-            os << " and ";
-            break;
-          default:
-            os << ", ";
-            break;
-        }
-      }
-    }
-    return os;
-  };
 
   if (specs.empty()) {
     std::stringstream what;
@@ -77,6 +57,7 @@ auto choice_by_attribute(const XML & node, const std::string & attribute, Ts &&.
     what << ". But no element specified";
     throw SyntaxError(what.str());
   }
+
   if (1 < specs.size()) {
     std::stringstream what;
     what << node.name() << " requires just one of following " << std::quoted(attribute) << ": ";
@@ -92,9 +73,10 @@ auto choice_by_attribute(const XML & node, const std::string & attribute, Ts &&.
 }
 
 template <typename Derived>
-struct CatalogInstance : Derived
+struct CatalogInstance : public Derived
 {
   Scope scope;
+
   ParameterAssignments parameter_assignments;
 
   CatalogInstance(
@@ -105,11 +87,11 @@ struct CatalogInstance : Derived
   {
   }
 };
-}  // namespace
 
-Element CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope)
+auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) -> Element
 {
   auto catalog_name = readAttribute<std::string>("catalogName", node, outer_scope);
+
   auto entry_name = readAttribute<std::string>("entryName", node, outer_scope);
 
   auto scope = outer_scope.makeChildScope("");  // anonymous namespace
@@ -118,44 +100,50 @@ Element CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope)
     readElement<ParameterAssignments>("ParameterAssignments", node, scope);
 
   auto catalog_locations = scope.global().catalog_locations;
+
   if (catalog_locations) {
     for (auto & [type, catalog_location] : *catalog_locations) {
       auto found_catalog = catalog_location.find(catalog_name);
-      if (found_catalog != catalog_location.end()) {
+
+      if (found_catalog != std::end(catalog_location)) {
         using ::openscenario_interpreter::make;
-        // clang-format off
-        std::unordered_map<std::string, std::function<Element(const pugi::xml_node &)>> dispatcher = {
+
+        std::unordered_map<std::string, std::function<Element(const pugi::xml_node &)>> dispatcher{
+          // clang-format off
           std::make_pair("Vehicle",     [&](auto && node) { return make<CatalogInstance<Vehicle>>   (node, scope, parameter_assignments); }),
           std::make_pair("Controller",  [&](auto && node) { return make<CatalogInstance<Controller>>(node, scope, parameter_assignments); }),
           std::make_pair("Pedestrian",  [&](auto && node) { return make<CatalogInstance<Pedestrian>>(node, scope, parameter_assignments); }),
           std::make_pair("MiscObject",  [&](auto && node) { return make<CatalogInstance<MiscObject>>(node, scope, parameter_assignments); }),
-          std::make_pair("Environment", [ ](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;}),
+          std::make_pair("Environment", [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
           std::make_pair("Maneuver",    [&](auto && node) { return make<CatalogInstance<Maneuver>>  (node, scope, parameter_assignments); }),
-          std::make_pair("Trajectory",  [ ](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;}),
-          std::make_pair("Route",       [ ](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;})
+          std::make_pair("Trajectory",  [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
+          std::make_pair("Route",       [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;})
+          // clang-format on
         };
-        // clang-format on
 
-        const auto & catalog_xml = found_catalog->second;
         return choice_by_attribute(
-          catalog_xml, "name", std::make_pair(entry_name, [&](const pugi::xml_node & node) {
-            auto it = dispatcher.find(node.name());
-            if (it == dispatcher.end()) {
+          found_catalog->second, "name",
+          std::make_pair(entry_name, [&](const pugi::xml_node & node) {
+            auto iter = dispatcher.find(node.name());
+            if (iter != std::end(dispatcher)) {
+              return iter->second(node);
+            } else {
               std::stringstream what;
               what << "Catalog element must be one of following elements: ";
-              for (auto & it : dispatcher) {
-                what << it.first << ", ";
+              const auto * separator = "[";
+              for (auto & each : dispatcher) {
+                what << separator << each.first;
+                separator = ", ";
               }
-              what << ". But no element specified";
+              what << "]. But no element specified.";
               throw SyntaxError(what.str());
             }
-            return it->second(node);
           }));
       }
     }
   }
 
-  return Element{};
+  return unspecified;
 }
 
 }  // namespace syntax

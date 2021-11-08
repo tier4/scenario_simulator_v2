@@ -21,6 +21,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
+#include <openscenario_interpreter/utility/print.hpp>
 
 namespace openscenario_interpreter
 {
@@ -39,27 +40,22 @@ inline namespace syntax
 
 struct CatalogReference
 {
-  static auto make(const pugi::xml_node & node, Scope & scope) -> Element;
+  static auto make(const pugi::xml_node &, Scope &) -> Element;
 
   template <typename... Ts>
   static auto make(const pugi::xml_node & node, Scope & scope) -> Element
   {
-    auto ret = CatalogReference::make(node, scope);
+    auto result = CatalogReference::make(node, scope);
 
-    bool ret_is_in_Ts =
-      fold_right([](bool l, bool r) { return l or r; }, false, ret.is_also<Ts>()...);
-
-    if (!ret_is_in_Ts) {
+    if (fold_right(std::logical_or<void>(), result.is_also<Ts>()...)) {
+      return result;
+    } else {
       std::stringstream what;
       what << "Required type of catalog element is one of the following type: ";
-      fold_left(
-        [](auto & os, auto && type_id) -> decltype(auto) { return os << type_id.name(); }, what,
-        typeid(Ts)...);
-      what << "\n But the type of this element is " << ret.type().name();
-      THROW_SYNTAX_ERROR(what.str());
+      print_to(what, std::array<const char *, sizeof...(Ts)>{typeid(Ts).name()...});
+      what << ". But the type of this element is " << result.type().name() << ".";
+      throw SyntaxError(what.str());
     }
-
-    return ret;
   }
 };
 }  // namespace syntax
