@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATION_HPP_
 
-#include <boost/filesystem.hpp>
 #include <memory>
 #include <openscenario_interpreter/syntax/directory.hpp>
 #include <pugixml.hpp>
@@ -30,14 +29,14 @@ inline namespace syntax
  *
  *
  * -------------------------------------------------------------------------- */
-struct CatalogLocation : std::unordered_map<std::string, pugi::xml_node>
+class CatalogLocation : public std::unordered_map<std::string, pugi::xml_node>
 {
+  std::vector<std::shared_ptr<pugi::xml_document>> catalog_files;
+
+public:
   const Directory directory;
 
   explicit CatalogLocation(const pugi::xml_node &, Scope &);
-
-private:
-  std::vector<std::shared_ptr<pugi::xml_document>> catalog_files;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

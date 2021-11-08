@@ -31,9 +31,9 @@ inline namespace syntax
  *  </xsd:group>
  *
  * -------------------------------------------------------------------------- */
-struct CatalogDefinition : Catalog
+struct CatalogDefinition : public Catalog
 {
-  explicit CatalogDefinition(const pugi::xml_node & node, Scope & scope);
+  explicit CatalogDefinition(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

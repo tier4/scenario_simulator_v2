@@ -42,7 +42,7 @@ class Pointer : public std::shared_ptr<T>
 
     virtual ~Binder() = default;
 
-    const std::type_info & type() const noexcept override { return typeid(Bound); }
+    auto type() const noexcept -> const std::type_info & override { return typeid(Bound); }
 
   private:
     bool accomplished() override  //
@@ -109,13 +109,13 @@ public:
   }
 
   template <typename U>
-  auto is_also() const -> bool
+  auto is_also() const
   {
-    return std::dynamic_pointer_cast<U>(*this) != nullptr;
+    return static_cast<bool>(std::dynamic_pointer_cast<U>(*this));
   }
 
   template <typename U>
-  U & as() const
+  auto as() const -> U &
   {
     if (const auto bound = std::dynamic_pointer_cast<U>(*this)) {
       return *bound;

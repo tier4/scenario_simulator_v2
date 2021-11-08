@@ -43,8 +43,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Catalog
 {
-  std::string name;
-  explicit Catalog(const pugi::xml_node & node, Scope & scope);
+  const std::string name;
+
+  explicit Catalog(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

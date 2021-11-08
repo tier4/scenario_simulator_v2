@@ -43,7 +43,8 @@ inline namespace syntax
 struct CatalogLocations : public std::unordered_map<std::string, CatalogLocation>
 {
   explicit CatalogLocations() = default;
-  explicit CatalogLocations(const pugi::xml_node & node, Scope & scope);
+
+  explicit CatalogLocations(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

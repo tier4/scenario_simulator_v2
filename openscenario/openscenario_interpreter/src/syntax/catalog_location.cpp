@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/filesystem.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/catalog_location.hpp>
@@ -22,24 +23,21 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-namespace
-{
-boost::filesystem::path convertScenario(
+auto convertScenario(
   const boost::filesystem::path & yaml_path, const boost::filesystem::path & output_dir)
 {
-  // constexpr auto yaml2xosc = "python3 $(which ros2) run openscenario_utility yaml2xosc";
-  constexpr auto yaml2xosc =
-    "python3 -c \"from openscenario_utility import conversion; conversion.main()\"";
   std::stringstream command;
-  command << yaml2xosc << " --input " << yaml_path << " --output " << output_dir;
+
+  command << "python3 -c \"from openscenario_utility import conversion; conversion.main()\""
+          << " --input " << yaml_path  //
+          << " --output " << output_dir;
 
   if (std::system(command.str().c_str()) != 0) {
     THROW_SYNTAX_ERROR("failed to convert sceanrio: " + yaml_path.string());
+  } else {
+    return output_dir / yaml_path.filename().stem().replace_extension(".xosc");
   }
-
-  return output_dir / yaml_path.filename().stem().replace_extension(".xosc");
 }
-}  // namespace
 
 CatalogLocation::CatalogLocation(const pugi::xml_node & node, Scope & scope)
 : directory(readElement<Directory>("Directory", node, scope))
