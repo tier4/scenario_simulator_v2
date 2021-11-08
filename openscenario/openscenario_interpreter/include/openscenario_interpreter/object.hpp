@@ -31,9 +31,6 @@ using Group = Element;
 
 using Elements = std::list<Element>;
 
-template <typename... Ts>
-using IsOptionalElement = std::is_default_constructible<Ts...>;
-
 template <typename T, typename... Ts>
 constexpr auto make(Ts &&... xs) -> decltype(auto)
 {
