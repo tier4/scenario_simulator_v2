@@ -57,29 +57,29 @@ struct Unspecified
 };
 
 auto operator<<(std::ostream &, const Unspecified &) -> std::ostream &;
+}  // namespace openscenario_interpreter
 
-#define CASE(TYPE)                                                                   \
-  {                                                                                  \
-    typeid(TYPE), [](Function && function, auto && datum, Ts &&... xs) {             \
-      return function(datum.template as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
-    }                                                                                \
+#define CASE(TYPE)                                                               \
+  {                                                                              \
+    [](auto & datum) { return datum.template is_also<TYPE>(); },                 \
+      [&](auto & datum, auto &&... args) {                                       \
+        return function(datum.template as<TYPE>(), std::forward<Args>(args)...); \
+      }                                                                          \
   }
 
-#define DEFINE_LAZY_VISITOR(TYPE, ...)                                                         \
-  template <typename Result, typename Function, typename... Ts>                                \
-  auto apply(Function && function, TYPE & datum, Ts &&... xs)                                  \
-  {                                                                                            \
-    try {                                                                                      \
-      static const std::unordered_map<                                                         \
-        std::type_index, std::function<Result(Function &&, TYPE &, Ts &&...)>>                 \
-        overloads{__VA_ARGS__};                                                                \
-      return overloads.at(datum.type())(                                                       \
-        std::forward<decltype(function)>(function), datum, std::forward<decltype(xs)>(xs)...); \
-    } catch (const std::out_of_range &) {                                                      \
-      throw UNSUPPORTED_SETTING_DETECTED(TYPE, makeTypename(datum.type().name()));             \
-    }                                                                                          \
-  }                                                                                            \
+#define DEFINE_LAZY_VISITOR(TYPE, ...)                                                             \
+  template <typename Result, typename Function, typename... Args>                                  \
+  Result apply(Function && function, TYPE & datum, Args &&... args)                                \
+  {                                                                                                \
+    std::vector<std::pair<std::function<bool(TYPE &)>, std::function<Result(TYPE &, Args &&...)>>> \
+      dispatcher{{__VA_ARGS__}};                                                                   \
+    for (auto & p : dispatcher) {                                                                  \
+      if (p.first(datum)) {                                                                        \
+        return p.second(datum, std::forward<Args>(args)...);                                       \
+      }                                                                                            \
+    }                                                                                              \
+    throw UNSUPPORTED_SETTING_DETECTED(TYPE, makeTypename(datum.type().name()));                   \
+  }                                                                                                \
   static_assert(true, "")
-}  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__OBJECT_HPP_

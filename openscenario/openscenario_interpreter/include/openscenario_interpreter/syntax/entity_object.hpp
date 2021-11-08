@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 
+#include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
@@ -44,10 +45,10 @@ struct EntityObject : public Group
   // clang-format off
   : Group(
       choice(node,
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-        std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>   (node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>(node, std::forward<decltype(xs)>(xs)...); })))
+        std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference::make<Vehicle, Pedestrian, MiscObject>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>         (node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>      (node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>      (node, std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {
   }
@@ -55,7 +56,7 @@ struct EntityObject : public Group
 
 DEFINE_LAZY_VISITOR(
   EntityObject,
-  // CASE(CatalogReference),
+  // CASE(CatalogReference),  //
   CASE(Vehicle),     //
   CASE(Pedestrian),  //
   CASE(MiscObject),  //

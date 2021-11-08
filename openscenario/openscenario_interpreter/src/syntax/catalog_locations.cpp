@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <tuple>
 
@@ -20,11 +21,10 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-#define ELEMENT(TYPE)                                                   \
-  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {     \
-    return emplace(                                                     \
-      std::piecewise_construct, std::forward_as_tuple(#TYPE "Catalog"), \
-      std::forward_as_tuple(node, scope));                              \
+#define ELEMENT(TYPE)                                                                              \
+  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {                                \
+    return emplace(                                                                                \
+      std::piecewise_construct, std::forward_as_tuple(#TYPE), std::forward_as_tuple(node, scope)); \
   })
 
 CatalogLocations::CatalogLocations(const pugi::xml_node & node, Scope & scope)
@@ -37,6 +37,8 @@ CatalogLocations::CatalogLocations(const pugi::xml_node & node, Scope & scope)
   ELEMENT(Maneuver);
   ELEMENT(Trajectory);
   ELEMENT(Route);
+
+  scope.global().catalog_locations = this;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

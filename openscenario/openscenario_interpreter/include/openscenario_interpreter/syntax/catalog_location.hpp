@@ -15,9 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATION_HPP_
 
-#include <openscenario_interpreter/scope.hpp>
+#include <memory>
 #include <openscenario_interpreter/syntax/directory.hpp>
 #include <pugixml.hpp>
+#include <unordered_map>
+#include <vector>
 
 namespace openscenario_interpreter
 {
@@ -25,15 +27,13 @@ inline namespace syntax
 {
 /* ---- CatalogLocation --------------------------------------------------------
  *
- *  <xsd:complexType name="VehicleCatalogLocation">
- *    <xsd:all>
- *      <xsd:element name="Directory" type="Directory"/>
- *    </xsd:all>
- *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct CatalogLocation
+class CatalogLocation : public std::unordered_map<std::string, pugi::xml_node>
 {
+  std::vector<std::shared_ptr<pugi::xml_document>> catalog_files;
+
+public:
   const Directory directory;
 
   explicit CatalogLocation(const pugi::xml_node &, Scope &);

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 
@@ -31,7 +32,7 @@ ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
     choice(node,
-      std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference::make<Controller>(node, scope); }),
       std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, scope); })))
 // clang-format on
 {
