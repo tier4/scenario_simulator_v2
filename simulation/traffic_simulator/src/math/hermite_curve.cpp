@@ -191,10 +191,6 @@ boost::optional<double> HermiteCurve::getSValue(
     ret = ret - getNewtonMethodStepSize(point, ret);
   }
   std::vector<double>::iterator min_iter = std::min_element(errors.begin(), errors.end());
-  double min_error = *std::min_element(errors.begin(), errors.end());
-  if (min_error > (tolerance * tolerance)) {
-    return boost::none;
-  }
   size_t value_index = std::distance(errors.begin(), min_iter);
   ret = s_values[value_index];
   if (ret < 0 || ret > 1) {
