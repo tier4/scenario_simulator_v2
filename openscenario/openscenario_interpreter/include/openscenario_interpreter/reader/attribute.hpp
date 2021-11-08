@@ -30,8 +30,6 @@ namespace openscenario_interpreter
 {
 inline namespace reader
 {
-using XML = pugi::xml_node;
-
 /* ---- Dynamic Configuration --------------------------------------------------
  *
  *  See https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
