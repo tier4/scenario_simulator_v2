@@ -47,7 +47,7 @@ auto ReachPositionCondition::description() const -> String
   return description.str();
 }
 
-auto ReachPositionCondition::evaluate() -> Element
+auto ReachPositionCondition::evaluate() -> Object
 {
   // TODO USE DistanceCondition::distance
   const auto distance = overload(

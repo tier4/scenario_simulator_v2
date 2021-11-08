@@ -27,10 +27,10 @@ ParameterAddValueRule::ParameterAddValueRule(const pugi::xml_node & node, Scope 
 {
 }
 
-auto ParameterAddValueRule::operator()(const Element & target) const -> Element
+auto ParameterAddValueRule::operator()(const Object & target) const -> Object
 {
   static const std::unordered_map<
-    std::type_index, std::function<Element(const Element &, const Double &)> >
+    std::type_index, std::function<Object(const Object &, const Double &)> >
     overloads{
       {typeid(Integer),
        [](auto && target, auto && value) {

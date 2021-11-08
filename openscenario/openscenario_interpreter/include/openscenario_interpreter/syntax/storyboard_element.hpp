@@ -42,7 +42,7 @@ public:
 
   std::size_t current_execution_count;
 
-  Element current_state;
+  Object current_state;
 
   explicit constexpr StoryboardElement(const std::size_t maximum_execution_count = 0)
   : maximum_execution_count(maximum_execution_count),
@@ -72,7 +72,7 @@ public:
 
   template <typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
   auto changeStateIf(
-    Boolean && test, const Element & consequent_state, const Element & alternate_state)
+    Boolean && test, const Object & consequent_state, const Object & alternate_state)
   {
     if (test) {
       return current_state = consequent_state;
@@ -82,7 +82,7 @@ public:
   }
 
   template <typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
-  auto changeStateIf(Boolean && test, const Element & consequent_state) -> decltype(auto)
+  auto changeStateIf(Boolean && test, const Object & consequent_state) -> decltype(auto)
   {
     return changeStateIf(test, consequent_state, current_state);
   }

@@ -35,7 +35,7 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
 
 auto Act::accomplished() const -> bool
 {
-  return std::all_of(std::begin(*this), std::end(*this), [&](const Element & each) {
+  return std::all_of(std::begin(*this), std::end(*this), [&](const Object & each) {
     return each.as<ManeuverGroup>().complete();
   });
 }

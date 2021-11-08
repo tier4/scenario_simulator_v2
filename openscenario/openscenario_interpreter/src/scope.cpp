@@ -29,7 +29,7 @@ EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & parent, const std::string 
   }
 }
 
-auto EnvironmentFrame::findElement(const std::string & name) const -> Element
+auto EnvironmentFrame::findObject(const std::string & name) const -> Object
 {
   std::vector<std::string> split;
   {
@@ -52,7 +52,7 @@ auto EnvironmentFrame::findElement(const std::string & name) const -> Element
     if (top_scope) {
       return lookupQualifiedElement(top_scope, split.begin() + 1, split.end());
     } else {
-      return Element();
+      return Object();
     }
   }
 }
@@ -71,7 +71,7 @@ auto EnvironmentFrame::getQualifiedName() const -> std::string
   return ret;
 }
 
-auto EnvironmentFrame::insert(const std::string & name, Element element) -> void
+auto EnvironmentFrame::insert(const std::string & name, Object element) -> void
 {
   if (name.find(':') != std::string::npos) {
     THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':'");
@@ -80,13 +80,13 @@ auto EnvironmentFrame::insert(const std::string & name, Element element) -> void
   }
 }
 
-auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Element
+auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Object
 {
   std::vector<const EnvironmentFrame *> same_level{this};
 
   while (not same_level.empty()) {
     std::vector<const EnvironmentFrame *> next_level;
-    std::vector<Element> ret;
+    std::vector<Object> ret;
 
     for (auto * frame : same_level) {
       auto range = frame->environments.equal_range(name);
@@ -109,7 +109,7 @@ auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Ele
 
     same_level = std::move(next_level);
   }
-  return Element{};
+  return Object{};
 }
 
 auto EnvironmentFrame::lookupChildScope(const std::string & name) const
@@ -131,14 +131,14 @@ auto EnvironmentFrame::lookupChildScope(const std::string & name) const
 
 auto EnvironmentFrame::lookupQualifiedElement(
   const EnvironmentFrame * scope, std::vector<std::string>::iterator name_begin,
-  std::vector<std::string>::iterator name_end) -> Element
+  std::vector<std::string>::iterator name_end) -> Object
 {
   for (auto iter = name_begin; iter != name_end - 1; ++iter) {
     auto found = scope->lookupChildScope(*iter);
     if (found.size() == 1) {
       scope = found.front();
     } else if (found.empty()) {
-      return Element{};
+      return Object{};
     } else if (found.size() > 1) {
       THROW_SYNTAX_ERROR("ambiguous reference to ", std::quoted(*iter));
     }
@@ -147,7 +147,7 @@ auto EnvironmentFrame::lookupQualifiedElement(
   return scope->lookupChildElement(*(name_end - 1));
 }
 
-auto EnvironmentFrame::lookupUnqualifiedElement(const std::string & name) const -> Element
+auto EnvironmentFrame::lookupUnqualifiedElement(const std::string & name) const -> Object
 {
   for (auto * p = this; p != nullptr; p = p->parent) {
     auto found = p->lookupChildElement(name);
@@ -155,7 +155,7 @@ auto EnvironmentFrame::lookupUnqualifiedElement(const std::string & name) const 
       return found;
     }
   }
-  return Element{};
+  return Object{};
 }
 
 auto EnvironmentFrame::lookupUnqualifiedScope(const std::string & name) const
@@ -186,9 +186,9 @@ Scope::Scope(
 : frame(frame), global_environment(parent.global_environment), name(name), actors(parent.actors)
 {
 }
-auto Scope::findElement(const std::string & name_) const -> Element
+auto Scope::findObject(const std::string & name_) const -> Object
 {
-  return frame->findElement(name_);
+  return frame->findObject(name_);
 }
 
 auto Scope::global() const -> const GlobalEnvironment & { return *global_environment; }
@@ -204,7 +204,7 @@ auto Scope::makeChildScope(const std::string & name) const -> Scope
   return Scope(*this, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*frame, name)));
 }
 
-auto Scope::insert(const std::string & name_, const Element & element) -> void
+auto Scope::insert(const std::string & name_, const Object & element) -> void
 {
   return frame->insert(name_, element);
 }
@@ -214,7 +214,7 @@ Scope::GlobalEnvironment::GlobalEnvironment(const boost::filesystem::path & path
 {
 }
 
-auto Scope::GlobalEnvironment::entityRef(const EntityRef & entity_ref) const -> Element
+auto Scope::GlobalEnvironment::entityRef(const EntityRef & entity_ref) const -> Object
 {
   try {
     return entities.at(entity_ref);

@@ -40,11 +40,10 @@ auto StoryboardElementStateCondition::description() const -> String
   return description.str();
 }
 
-auto StoryboardElementStateCondition::evaluate() -> Element
+auto StoryboardElementStateCondition::evaluate() -> Object
 {
   try {
-    result =
-      local().findElement(storyboard_element_ref).currentState().as<StoryboardElementState>();
+    result = local().findObject(storyboard_element_ref).currentState().as<StoryboardElementState>();
     return asBoolean(result == state);
   } catch (const std::out_of_range &) {
     return false_v;

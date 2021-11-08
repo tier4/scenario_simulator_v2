@@ -34,7 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct AssignRouteAction : private Scope
 {
-  Element route;
+  Object route;
 
   explicit AssignRouteAction(const pugi::xml_node &, Scope &);
 

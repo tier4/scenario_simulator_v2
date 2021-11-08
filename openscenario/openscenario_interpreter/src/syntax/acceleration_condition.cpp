@@ -42,7 +42,7 @@ auto AccelerationCondition::description() const -> std::string
   return description.str();
 }
 
-auto AccelerationCondition::evaluate() -> Element
+auto AccelerationCondition::evaluate() -> Object
 {
   results.clear();
 

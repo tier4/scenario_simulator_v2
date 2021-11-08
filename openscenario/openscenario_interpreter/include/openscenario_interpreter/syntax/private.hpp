@@ -44,7 +44,7 @@ struct Private : public Scope
 
   auto endsImmediately() const -> bool;
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 
 auto operator<<(nlohmann::json &, const Private &) -> nlohmann::json &;

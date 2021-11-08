@@ -38,7 +38,7 @@ auto Private::endsImmediately() const -> bool
     [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
 }
 
-auto Private::evaluate() -> Element
+auto Private::evaluate() -> Object
 {
   for (auto && private_action : private_actions) {
     // NOTE: standbyState -> startTransition (if ready)

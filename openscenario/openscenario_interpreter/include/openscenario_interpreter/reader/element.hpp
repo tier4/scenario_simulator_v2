@@ -111,7 +111,7 @@ template <typename T, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, 
 auto readElementsAsElement(
   const std::string & name, const XML & node, Ts &&... xs)  // XXX UGLY NAME!!!
 {
-  std::list<Element> elements;
+  std::list<Object> elements;
 
   callWithElements(node, name, MinOccurs, MaxOccurs, [&](auto && x) {
     elements.emplace_back(make<T>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...));
@@ -123,7 +123,7 @@ auto readElementsAsElement(
 template <typename... Ts>
 auto choice(const XML & node, Ts &&... xs) -> decltype(auto)
 {
-  const std::unordered_map<std::string, std::function<Element(const XML &)>> callees{
+  const std::unordered_map<std::string, std::function<Object(const XML &)>> callees{
     std::forward<decltype(xs)>(xs)...};
 
   std::unordered_map<std::string, XML> specs{};

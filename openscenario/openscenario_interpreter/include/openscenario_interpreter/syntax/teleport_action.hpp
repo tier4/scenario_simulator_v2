@@ -42,7 +42,7 @@ struct TeleportAction : private Scope
 
   static auto endsImmediately() noexcept -> bool;
 
-  /*  */ auto evaluate() const -> Element;
+  /*  */ auto evaluate() const -> Object;
 
   /*  */ auto run() const -> void;
 

@@ -32,12 +32,12 @@ ParameterCondition::ParameterCondition(const pugi::xml_node & node, Scope & scop
 {
 }
 
-auto ParameterCondition::compare(const Element & parameter, const Rule & rule, const String & value)
+auto ParameterCondition::compare(const Object & parameter, const Rule & rule, const String & value)
   -> bool
 {
   static const std::unordered_map<
     std::type_index,  //
-    std::function<bool(const Element &, const Rule, const String &)>>
+    std::function<bool(const Object &, const Rule, const String &)>>
     overloads{
       // clang-format off
       { typeid(Boolean        ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Boolean        >(), Boolean        (rhs)); } },
@@ -63,15 +63,15 @@ auto ParameterCondition::description() const -> String
   std::stringstream description;
 
   description << "The value of parameter " << std::quoted(parameter_ref) << " = "
-              << local().findElement(parameter_ref) << " " << rule << " " << value << "?";
+              << local().findObject(parameter_ref) << " " << rule << " " << value << "?";
 
   return description.str();
 }
 
-auto ParameterCondition::evaluate() const -> Element
+auto ParameterCondition::evaluate() const -> Object
 {
   try {
-    const auto & parameter = local().findElement(parameter_ref);
+    const auto & parameter = local().findObject(parameter_ref);
     if (not parameter) {
       THROW_SYNTAX_ERROR(parameter_ref, " cannot be found from this scope");
     } else {

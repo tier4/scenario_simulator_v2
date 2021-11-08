@@ -200,7 +200,7 @@ auto DistanceCondition::distance<  //
     position);
 }
 
-auto DistanceCondition::evaluate() -> Element
+auto DistanceCondition::evaluate() -> Object
 {
   results.clear();
 

@@ -47,7 +47,7 @@ struct AccelerationCondition
 
   auto description() const -> std::string;
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

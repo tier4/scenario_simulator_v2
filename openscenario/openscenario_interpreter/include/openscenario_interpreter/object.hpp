@@ -23,31 +23,31 @@
 
 namespace openscenario_interpreter
 {
-using Element = Pointer<Expression>;
+using Object = Pointer<Expression>;
 
-using ComplexType = Element;
+using ComplexType = Object;
 
-using Group = Element;
+using Group = Object;
 
-using Elements = std::list<Element>;
+using Elements = std::list<Object>;
 
 template <typename T, typename... Ts>
 constexpr auto make(Ts &&... xs) -> decltype(auto)
 {
-  return Element::bind<T>(std::forward<decltype(xs)>(xs)...);
+  return Object::bind<T>(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename T>
 constexpr auto make(T && x) -> decltype(auto)
 {
-  return Element::bind<typename std::decay<decltype(x)>::type>(std::forward<decltype(x)>(x));
+  return Object::bind<typename std::decay<decltype(x)>::type>(std::forward<decltype(x)>(x));
 }
 
-extern const Element unspecified;
+extern const Object unspecified;
 
 struct Unspecified
 {
-  decltype(auto) evaluate() const noexcept
+  auto evaluate() const noexcept -> decltype(auto)
   {
     return unspecified;  // Self-evaluating.
   }

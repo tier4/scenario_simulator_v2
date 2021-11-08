@@ -41,7 +41,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Position : public Element
+struct Position : public ComplexType
 {
   explicit Position(const pugi::xml_node &, Scope &);
 

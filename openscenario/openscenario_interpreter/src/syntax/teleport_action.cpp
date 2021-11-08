@@ -32,7 +32,7 @@ auto TeleportAction::accomplished() noexcept -> bool { return true; }
 
 auto TeleportAction::endsImmediately() noexcept -> bool { return true; }
 
-auto TeleportAction::evaluate() const -> Element
+auto TeleportAction::evaluate() const -> Object
 {
   run();
   return unspecified;
