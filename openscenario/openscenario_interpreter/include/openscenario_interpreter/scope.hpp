@@ -49,11 +49,11 @@ public:
 
   explicit EnvironmentFrame(EnvironmentFrame &&) = delete;
 
-  auto findObject(const QualifiedIdentifier &) const -> Object;
+  auto findObject(const PrefixedName &) const -> Object;
 
   auto fullyQualifiedName() const -> std::string;
 
-  auto define(const UnqualifiedIdentifier &, const Object &) -> void;
+  auto define(const Name &, const Object &) -> void;
 
 private:
   /*  */ auto lookupChildElement(const std::string &) const -> Object;
@@ -117,7 +117,7 @@ public:
 
   auto local() noexcept -> Scope &;
 
-  auto insert(const UnqualifiedIdentifier &, const Object &) -> void;
+  auto insert(const Name &, const Object &) -> void;
 };
 }  // namespace openscenario_interpreter
 

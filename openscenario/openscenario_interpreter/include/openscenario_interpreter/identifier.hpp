@@ -22,32 +22,39 @@
 
 namespace openscenario_interpreter
 {
-struct UnqualifiedIdentifier
+struct Name : public std::string
 {
-  const std::string name;
-
   template <typename... Ts>
-  UnqualifiedIdentifier(Ts &&... xs) : name(std::forward<decltype(xs)>(xs)...)
+  Name(Ts &&... xs) : std::string(std::forward<decltype(xs)>(xs)...)
   {
-    if (name.find(':') != std::string::npos) {
-      throw SyntaxError("Invalid identifier ", std::quoted(name), ".");
+    if (find(':') != std::string::npos) {
+      throw SyntaxError("Invalid name reference ", std::quoted(*this), ".");
     }
   }
 };
 
-struct QualifiedIdentifier  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
+struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
 {
-  const std::vector<std::string> qualifiers;
+  // TODO
+  // const bool fully_prefixed;
 
-  const std::string name;
+  const std::vector<std::string> prefixes;
+
+  const Name name;
 
   template <template <typename> typename Container>
-  QualifiedIdentifier(const Container<std::string> given)
-  : qualifiers(std::begin(given), std::prev(std::end(given))), name(given.back())
+  PrefixedName(const Container<std::string> given)
+  : prefixes(std::begin(given), std::prev(std::end(given))), name(given.back())
+  // TODO
+  // : fully_prefixed(not given.empty() and given.front().empty()),
+  //   prefixes(
+  //     fully_prefixed ? std::next(std::begin(given)) : std::begin(given),
+  //     std::prev(std::end(given))),
+  //   name(given.back())
   {
   }
 
-  QualifiedIdentifier(const std::string & given) : QualifiedIdentifier(separate(given)) {}
+  PrefixedName(const std::string & given) : PrefixedName(separate(given)) {}
 
   static auto separate(const std::string & name) -> std::vector<std::string>
   {
@@ -69,14 +76,17 @@ struct QualifiedIdentifier  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO 
     return result;
   }
 
-  friend auto operator<<(std::ostream & os, const QualifiedIdentifier & identifier)
-    -> std::ostream &
+  friend auto operator<<(std::ostream & os, const PrefixedName & prefixed_name) -> std::ostream &
   {
-    for (const auto & qualifier : identifier.qualifiers) {
-      os << "::" << qualifier;
+    // if (prefixed_name.fully_prefixed) {
+    //   os << "{root}::";
+    // }
+
+    for (const auto & prefix : prefixed_name.prefixes) {
+      os << (prefix.empty() ? "{annonymous}" : prefix.c_str()) << "::";
     }
 
-    return os << "::" << identifier.name;
+    return os << prefixed_name.name;
   }
 };
 }  // namespace openscenario_interpreter
@@ -84,7 +94,7 @@ struct QualifiedIdentifier  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO 
 namespace std
 {
 template <>
-class hash<openscenario_interpreter::UnqualifiedIdentifier> : public hash<std::string>
+class hash<openscenario_interpreter::Name> : public hash<std::string>
 {
 };
 }  // namespace std

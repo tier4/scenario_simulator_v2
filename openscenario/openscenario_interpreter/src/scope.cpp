@@ -29,11 +29,11 @@ EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & parent, const std::string 
   }
 }
 
-auto EnvironmentFrame::findObject(const QualifiedIdentifier & identifier) const -> Object
+auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> Object
 {
-  auto split = identifier.qualifiers;
+  auto split = prefixed_name.prefixes;
 
-  split.push_back(identifier.name);
+  split.push_back(prefixed_name.name);
 
   if (split.size() == 1) {
     return lookupUnqualifiedElement(split.front());
@@ -58,10 +58,9 @@ auto EnvironmentFrame::fullyQualifiedName() const -> std::string
   return "::" + result;
 }
 
-auto EnvironmentFrame::define(const UnqualifiedIdentifier & identifier, const Object & element)
-  -> void
+auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
 {
-  environments.emplace(identifier.name, element);
+  environments.emplace(name, object);
 }
 
 auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Object
@@ -187,7 +186,7 @@ auto Scope::local() const noexcept -> const Scope & { return *this; }
 
 auto Scope::local() noexcept -> Scope & { return *this; }
 
-auto Scope::insert(const UnqualifiedIdentifier & identifier, const Object & object) -> void
+auto Scope::insert(const Name & identifier, const Object & object) -> void
 {
   return frame->define(identifier, object);
 }
