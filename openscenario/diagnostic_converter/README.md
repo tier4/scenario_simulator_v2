@@ -7,7 +7,7 @@ into `openscenario_msgs::msg::ParameterDeclaration` messages.
 
 ## Inner-workings / Algorithms
 
-The node subscribes to all topics listed in the parameters and assume they publish
+The node subscribes to all topics listed in the parameters and assumes they publish
 `DiagnosticArray` messages.
 Each time such message is received,
 it is converted into as many `ParameterDeclaration` messages as the number of `KeyValue` objects.
