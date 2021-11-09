@@ -57,27 +57,21 @@ auto EnvironmentFrame::findObject(const std::string & name) const -> Object
   }
 }
 
-auto EnvironmentFrame::getQualifiedName() const -> std::string
+auto EnvironmentFrame::fullyQualifiedName() const -> std::string
 {
-  std::list<const EnvironmentFrame *> ancestors;
-  for (auto * p = this; p != nullptr; p = p->parent) {
-    ancestors.push_back(p);
+  std::string result;
+
+  for (const auto * frame = this; frame; frame = frame->parent) {
+    result = (frame->qualifier.empty() ? std::string("{annonymous}") : frame->qualifier) + result;
   }
-  std::string ret;
-  for (auto it = ancestors.rbegin(); it != ancestors.rend(); ++it) {
-    ret += (it == ancestors.rbegin() ? "" : "::");
-    ret += (*it)->qualifier.empty() ? "{anonymous}" : (*it)->qualifier;
-  }
-  return ret;
+
+  return "::" + result;
 }
 
-auto EnvironmentFrame::insert(const std::string & name, const Object & element) -> void
+auto EnvironmentFrame::define(const UnqualifiedIdentifier & identifier, const Object & element)
+  -> void
 {
-  if (name.find(':') != std::string::npos) {
-    throw SyntaxError("Identifier ", std::quoted(name), " contains ':'");
-  } else {
-    environments.emplace(name, element);
-  }
+  environments.emplace(identifier.name, element);
 }
 
 auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Object
@@ -202,9 +196,9 @@ auto Scope::local() const noexcept -> const Scope & { return *this; }
 
 auto Scope::local() noexcept -> Scope & { return *this; }
 
-auto Scope::insert(const std::string & name_, const Object & element) -> void
+auto Scope::insert(const UnqualifiedIdentifier & identifier, const Object & object) -> void
 {
-  return frame->insert(name_, element);
+  return frame->define(identifier, object);
 }
 
 Scope::GlobalEnvironment::GlobalEnvironment(const boost::filesystem::path & pathname)

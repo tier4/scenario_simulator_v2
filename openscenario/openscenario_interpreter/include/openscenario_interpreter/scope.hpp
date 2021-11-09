@@ -17,6 +17,7 @@
 
 #include <boost/filesystem.hpp>
 #include <memory>
+#include <openscenario_interpreter/identifier.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <unordered_map>
@@ -50,9 +51,9 @@ public:
 
   auto findObject(const std::string &) const -> Object;
 
-  auto getQualifiedName() const -> std::string;
+  auto fullyQualifiedName() const -> std::string;
 
-  auto insert(const std::string &, const Object &) -> void;
+  auto define(const UnqualifiedIdentifier &, const Object &) -> void;
 
 private:
   /*  */ auto lookupChildElement(const std::string &) const -> Object;
@@ -115,7 +116,7 @@ public:
 
   auto local() noexcept -> Scope &;
 
-  auto insert(const std::string &, const Object &) -> void;
+  auto insert(const UnqualifiedIdentifier &, const Object &) -> void;
 };
 }  // namespace openscenario_interpreter
 
