@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.7 (2021-11-09)
+------------------
 * Merge pull request `#604 <https://github.com/tier4/scenario_simulator_v2/issues/604>`_ from tier4/refactor/interpreter/function-name
 * Remove type alias `XML`
 * Merge https://github.com/tier4/scenario_simulator_v2 into fix/get_s_value

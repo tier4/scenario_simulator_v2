@@ -2,8 +2,8 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.7 (2021-11-09)
+------------------
 * Merge pull request `#597 <https://github.com/tier4/scenario_simulator_v2/issues/597>`_ from tier4/refactor/traffic_simulator/spawning
 * Merge branch 'master' into feature/interpreter/catalog
 * Update `API::spawn` argument order

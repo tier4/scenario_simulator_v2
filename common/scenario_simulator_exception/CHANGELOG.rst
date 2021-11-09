@@ -2,8 +2,8 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.7 (2021-11-09)
+------------------
 * Merge branch 'master' into feature/interpreter/catalog
 * Merge branch 'master' into feature/interpreter/catalog
 * basic impl

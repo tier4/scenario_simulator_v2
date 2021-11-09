@@ -2,8 +2,8 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.7 (2021-11-09)
+------------------
 * Merge https://github.com/tier4/scenario_simulator_v2 into fix/get_s_value
 * Merge remote-tracking branch 'origin/master' into refactor/interpreter/function-name
 * Merge pull request `#579 <https://github.com/tier4/scenario_simulator_v2/issues/579>`_ from tier4/feature/interpreter/catalog

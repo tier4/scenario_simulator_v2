@@ -2,8 +2,8 @@
 Changelog for package user_defined_value_condition_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.7 (2021-11-09)
+------------------
 * Merge branch 'master' into feature/interpreter/catalog
 * Merge branch 'master' into feature/interpreter/catalog
 * Contributors: kyabe2718
