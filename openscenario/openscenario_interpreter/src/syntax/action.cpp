@@ -22,7 +22,7 @@ inline namespace syntax
 {
 Action::Action(const pugi::xml_node & node, Scope & scope)
 // clang-format off
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+: Scope(readAttribute<String>("name", node, scope), scope),
   ComplexType(
     choice(node,
       std::make_pair(     "GlobalAction", [this](auto && node) { return make<     GlobalAction>(node, local()); }),

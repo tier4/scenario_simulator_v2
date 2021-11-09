@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+: Scope(readAttribute<String>("name", node, scope), scope),
   parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
   callWithElements(node, "Event", 1, unbounded, [&](auto && node) {

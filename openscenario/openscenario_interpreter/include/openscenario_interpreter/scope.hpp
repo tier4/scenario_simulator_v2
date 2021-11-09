@@ -94,18 +94,22 @@ public:
 
   std::list<EntityRef> actors;
 
-  explicit Scope() = delete;
+  Scope() = delete;
+
+  Scope(const Scope &) = default;  // NOTE: shallow copy
+
+  Scope(Scope &&) noexcept = default;
+
+  explicit Scope(const std::string &, const Scope &);
 
   explicit Scope(const boost::filesystem::path &);
 
 private:
   explicit Scope(const Scope &, const std::string &, const std::shared_ptr<EnvironmentFrame> &);
 
+  auto makeChildScope(const std::string &) const -> Scope;
+
 public:
-  Scope(const Scope &) = default;  // NOTE: shallow copy
-
-  Scope(Scope &&) noexcept = default;
-
   auto findObject(const std::string & name_) const -> Object;
 
   auto global() const -> const GlobalEnvironment &;
@@ -115,8 +119,6 @@ public:
   auto local() const noexcept -> const Scope &;
 
   auto local() noexcept -> Scope &;
-
-  auto makeChildScope(const std::string &) const -> Scope;
 
   auto insert(const std::string & name_, const Object & element) -> void;
 };

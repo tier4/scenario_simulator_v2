@@ -181,11 +181,14 @@ Scope::Scope(const boost::filesystem::path & pathname)
 {
 }
 
+Scope::Scope(const std::string & name, const Scope & outer) : Scope(outer.makeChildScope(name)) {}
+
 Scope::Scope(
   const Scope & parent, const std::string & name, const std::shared_ptr<EnvironmentFrame> & frame)
 : frame(frame), global_environment(parent.global_environment), name(name), actors(parent.actors)
 {
 }
+
 auto Scope::findObject(const std::string & name_) const -> Object
 {
   return frame->findObject(name_);

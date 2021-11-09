@@ -94,7 +94,7 @@ auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) ->
 
   auto entry_name = readAttribute<std::string>("entryName", node, outer_scope);
 
-  auto scope = outer_scope.makeChildScope("");  // anonymous namespace
+  auto scope = Scope("", outer_scope);  // anonymous namespace
 
   auto parameter_assignments =
     readElement<ParameterAssignments>("ParameterAssignments", node, scope);
