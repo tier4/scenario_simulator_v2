@@ -52,7 +52,7 @@ auto EnvironmentFrame::findObject(const std::string & name) const -> Object
     if (top_scope) {
       return lookupQualifiedElement(top_scope, split.begin() + 1, split.end());
     } else {
-      return Object();
+      return unspecified;
     }
   }
 }
@@ -74,7 +74,7 @@ auto EnvironmentFrame::getQualifiedName() const -> std::string
 auto EnvironmentFrame::insert(const std::string & name, Object element) -> void
 {
   if (name.find(':') != std::string::npos) {
-    THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':'");
+    throw SyntaxError("Identifier ", std::quoted(name), " contains ':'");
   } else {
     environments.emplace(name, std::move(element));
   }
