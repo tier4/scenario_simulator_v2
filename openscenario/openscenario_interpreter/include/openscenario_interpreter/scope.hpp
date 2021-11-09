@@ -70,8 +70,6 @@ private:
 
 class Scope
 {
-  const std::shared_ptr<EnvironmentFrame> frame;
-
   struct GlobalEnvironment
   {
     const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
@@ -86,6 +84,8 @@ class Scope
 
     auto isAddedEntity(const EntityRef &) const -> bool;
   };
+
+  const std::shared_ptr<EnvironmentFrame> frame;
 
   const std::shared_ptr<GlobalEnvironment> global_environment;
 
@@ -106,8 +106,6 @@ public:
 
 private:
   explicit Scope(const Scope &, const std::string &, const std::shared_ptr<EnvironmentFrame> &);
-
-  auto makeChildScope(const std::string &) const -> Scope;
 
 public:
   auto findObject(const std::string & name_) const -> Object;

@@ -181,7 +181,10 @@ Scope::Scope(const boost::filesystem::path & pathname)
 {
 }
 
-Scope::Scope(const std::string & name, const Scope & outer) : Scope(outer.makeChildScope(name)) {}
+Scope::Scope(const std::string & name, const Scope & outer)
+: Scope(outer, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name)))
+{
+}
 
 Scope::Scope(
   const Scope & parent, const std::string & name, const std::shared_ptr<EnvironmentFrame> & frame)
@@ -201,11 +204,6 @@ auto Scope::global() -> GlobalEnvironment & { return *global_environment; }
 auto Scope::local() const noexcept -> const Scope & { return *this; }
 
 auto Scope::local() noexcept -> Scope & { return *this; }
-
-auto Scope::makeChildScope(const std::string & name) const -> Scope
-{
-  return Scope(*this, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*frame, name)));
-}
 
 auto Scope::insert(const std::string & name_, const Object & element) -> void
 {
