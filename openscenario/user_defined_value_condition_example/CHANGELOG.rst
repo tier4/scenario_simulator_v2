@@ -2,6 +2,12 @@
 Changelog for package user_defined_value_condition_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* Contributors: kyabe2718
+
 0.5.6 (2021-10-28)
 ------------------
 * Merge pull request `#590 <https://github.com/tier4/scenario_simulator_v2/issues/590>`_ from tier4/fix/package_version

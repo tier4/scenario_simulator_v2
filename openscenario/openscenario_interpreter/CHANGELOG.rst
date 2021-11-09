@@ -2,6 +2,55 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#604 <https://github.com/tier4/scenario_simulator_v2/issues/604>`_ from tier4/refactor/interpreter/function-name
+* Remove type alias `XML`
+* Merge https://github.com/tier4/scenario_simulator_v2 into fix/get_s_value
+* Rename type `Element` to `Object`
+* Rename member function `Scope::localScope` to `Scope::local`
+* Rename data member `last_checked_values` to `results`
+* Remove alias template `IsOptionalElement`
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/function-name
+* Merge pull request `#579 <https://github.com/tier4/scenario_simulator_v2/issues/579>`_ from tier4/feature/interpreter/catalog
+* Remove header `utility/pugi_extension.hpp`
+* Remove header `utility/indent.hpp`
+* Replace `std::empty(x)` to `x.empty()`
+* Lipsticks
+* Lipsticks
+* Merge pull request `#597 <https://github.com/tier4/scenario_simulator_v2/issues/597>`_ from tier4/refactor/traffic_simulator/spawning
+* Fix function name to lowerCamelCase from snake_case
+* Lipsticks
+* Lipsticks
+* Replace flag `is_ego` to string typed plugin name
+* fix invoking yaml2xoc
+* invoke yaml2xosc using python3 command
+* Merge branch 'master' into feature/interpreter/catalog
+* Update `API::spawn` argument order
+* Remove meaningless argument `is_ego` from some `spawn` overloads
+* Update `API::spawn` to not to apply `setEntityStatus` to rest arguments
+* Update `AddEntityAction::operator ()` to use `TeleportAction::teleport`
+* Add new member function `teleport` to class `TeleportAction`
+* apply() dispatches using is_also<T> instead of is<T>
+* fix binder
+* return former folder
+* remove fold expression
+* support foxy
+* fix trivial bug
+* ament_clang_format
+* add catalog test
+* add CatalogReference
+* Merge branch 'master' into feature/interpreter/catalog
+* catalog parameter
+* Merge branch 'master' into feature/interpreter/catalog
+* basic impl
+* convert scenario file from yaml to xosc
+* add catalog_reference.hpp
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* add Catalog
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.5.6 (2021-10-28)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2

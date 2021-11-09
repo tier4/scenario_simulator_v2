@@ -2,6 +2,42 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#603 <https://github.com/tier4/scenario_simulator_v2/issues/603>`_ from tier4/fix/get_s_value
+* apply reformat
+* use size_t in catmull rom spline class
+* use size_t in Hermite Curve class
+* fix torelance in test cases
+* use multiple initial value
+* remove torelance check
+* modify parameters
+* fix logics if the s value unders 0 and overs 1
+* Merge pull request `#597 <https://github.com/tier4/scenario_simulator_v2/issues/597>`_ from tier4/refactor/traffic_simulator/spawning
+* Fix function name to lowerCamelCase from snake_case
+* Lipsticks
+* Replace flag `is_ego` to string typed plugin name
+* Update predefined plugin names to use construnst on first use idiom
+* Merge branch 'master' into feature/interpreter/catalog
+* Add constexpr variable `default_behavior` as entity types member
+* Cleanup `API::spawn` for Misc type entity
+* Cleanup `API::spawn` for Pedestrian type entity
+* Cleanup `API::spawn` for Vehicle type entity
+* Update `API::spawn` argument order
+* Remove meaningless argument `is_ego` from some `spawn` overloads
+* Update `API::spawn` to not to apply `setEntityStatus` to rest arguments
+* Update `AddEntityAction::operator ()` to use `TeleportAction::teleport`
+* fix typo
+* fix calcuration method of normal vector
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* basic impl
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* Contributors: Masaya Kataoka, MasayaKataoka, Yutaro Matsuura, kyabe2718, yamacir-kit
+
 0.5.6 (2021-10-28)
 ------------------
 * Merge pull request `#586 <https://github.com/tier4/scenario_simulator_v2/issues/586>`_ from tier4/fix/get_longitudinal_distance

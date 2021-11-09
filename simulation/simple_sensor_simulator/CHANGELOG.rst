@@ -2,6 +2,15 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* basic impl
+* Merge branch 'master' into feature/interpreter/catalog
+* Contributors: kyabe2718
+
 0.5.6 (2021-10-28)
 ------------------
 * Merge branch 'tier4:master' into matsuura/feature/add-icon-to-panel
