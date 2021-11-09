@@ -104,11 +104,8 @@ public:
 
   explicit Scope(const boost::filesystem::path &);
 
-private:
-  explicit Scope(const Scope &, const std::string &, const std::shared_ptr<EnvironmentFrame> &);
-
 public:
-  auto findObject(const std::string & name_) const -> Object;
+  auto findObject(const std::string &) const -> Object;
 
   auto global() const -> const GlobalEnvironment &;
 

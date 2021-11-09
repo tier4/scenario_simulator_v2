@@ -182,13 +182,10 @@ Scope::Scope(const boost::filesystem::path & pathname)
 }
 
 Scope::Scope(const std::string & name, const Scope & outer)
-: Scope(outer, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name)))
-{
-}
-
-Scope::Scope(
-  const Scope & parent, const std::string & name, const std::shared_ptr<EnvironmentFrame> & frame)
-: frame(frame), global_environment(parent.global_environment), name(name), actors(parent.actors)
+: frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
+  global_environment(outer.global_environment),
+  name(name),
+  actors(outer.actors)
 {
 }
 
