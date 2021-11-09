@@ -44,7 +44,7 @@ public:
 
     static auto contextGamma() noexcept -> const std::string &
     {
-      static const std::string name = "TODO";
+      static const std::string name = "context_gamma_planner/PedestrianPlugin";
       return name;
     }
 
