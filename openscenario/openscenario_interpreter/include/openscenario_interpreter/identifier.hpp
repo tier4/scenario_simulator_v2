@@ -15,6 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__IDENTIFIER_HPP_
 #define OPENSCENARIO_INTERPRETER__IDENTIFIER_HPP_
 
+#include <iostream>
+#include <iterator>
 #include <openscenario_interpreter/error.hpp>
 #include <string>
 
@@ -30,6 +32,51 @@ struct UnqualifiedIdentifier
     if (name.find(':') != std::string::npos) {
       throw SyntaxError("Invalid identifier ", std::quoted(name), ".");
     }
+  }
+};
+
+struct QualifiedIdentifier  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
+{
+  const std::vector<std::string> qualifiers;
+
+  const std::string name;
+
+  template <template <typename> typename Container>
+  QualifiedIdentifier(const Container<std::string> given)
+  : qualifiers(std::begin(given), std::prev(std::end(given))), name(given.back())
+  {
+  }
+
+  QualifiedIdentifier(const std::string & given) : QualifiedIdentifier(separate(given)) {}
+
+  static auto separate(const std::string & name) -> std::vector<std::string>
+  {
+    const std::string separator = "::";
+
+    std::vector<std::string> result;
+
+    std::size_t prev_pos = 0;
+
+    std::size_t pos = 0;
+
+    while ((pos = name.find(separator, prev_pos)) != std::string::npos) {
+      result.push_back(name.substr(prev_pos, pos - prev_pos));
+      prev_pos = pos + separator.size();
+    }
+
+    result.push_back(name.substr(prev_pos, pos));
+
+    return result;
+  }
+
+  friend auto operator<<(std::ostream & os, const QualifiedIdentifier & identifier)
+    -> std::ostream &
+  {
+    for (const auto & qualifier : identifier.qualifiers) {
+      os << "::" << qualifier;
+    }
+
+    return os << "::" << identifier.name;
   }
 };
 }  // namespace openscenario_interpreter

@@ -49,7 +49,7 @@ public:
 
   explicit EnvironmentFrame(EnvironmentFrame &&) = delete;
 
-  auto findObject(const std::string &) const -> Object;
+  auto findObject(const QualifiedIdentifier &) const -> Object;
 
   auto fullyQualifiedName() const -> std::string;
 
@@ -61,8 +61,9 @@ private:
   /*  */ auto lookupChildScope(const std::string &) const -> std::list<const EnvironmentFrame *>;
 
   static auto lookupQualifiedElement(
-    const EnvironmentFrame *, std::vector<std::string>::iterator,
-    std::vector<std::string>::iterator) -> Object;
+    const EnvironmentFrame *,                  //
+    std::vector<std::string>::const_iterator,  //
+    std::vector<std::string>::const_iterator) -> Object;
 
   /*  */ auto lookupUnqualifiedElement(const std::string &) const -> Object;
 

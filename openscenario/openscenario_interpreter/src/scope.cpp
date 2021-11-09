@@ -29,21 +29,11 @@ EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & parent, const std::string 
   }
 }
 
-auto EnvironmentFrame::findObject(const std::string & name) const -> Object
+auto EnvironmentFrame::findObject(const QualifiedIdentifier & identifier) const -> Object
 {
-  std::vector<std::string> split;
-  {
-    const char * delim = "::";
-    const std::size_t delim_len = 2;
+  auto split = identifier.qualifiers;
 
-    std::size_t prev_pos = 0;
-    std::size_t pos = 0;
-    while ((pos = name.find(delim, prev_pos)) != std::string::npos) {
-      split.push_back(name.substr(prev_pos, pos - prev_pos));
-      prev_pos = pos + delim_len;
-    }
-    split.push_back(name.substr(prev_pos, pos));
-  }
+  split.push_back(identifier.name);
 
   if (split.size() == 1) {
     return lookupUnqualifiedElement(split.front());
@@ -124,8 +114,9 @@ auto EnvironmentFrame::lookupChildScope(const std::string & name) const
 }
 
 auto EnvironmentFrame::lookupQualifiedElement(
-  const EnvironmentFrame * scope, std::vector<std::string>::iterator name_begin,
-  std::vector<std::string>::iterator name_end) -> Object
+  const EnvironmentFrame * scope,                       //
+  std::vector<std::string>::const_iterator name_begin,  //
+  std::vector<std::string>::const_iterator name_end) -> Object
 {
   for (auto iter = name_begin; iter != name_end - 1; ++iter) {
     auto found = scope->lookupChildScope(*iter);
