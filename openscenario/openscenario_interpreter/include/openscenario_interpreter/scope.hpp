@@ -29,7 +29,7 @@ class EnvironmentFrame
 {
   friend struct Scope;
 
-  const std::string scope_name;
+  const std::string qualifier;
 
   std::unordered_multimap<std::string, Object> environments;
 
@@ -52,7 +52,7 @@ public:
 
   auto getQualifiedName() const -> std::string;
 
-  auto insert(const std::string &, Object) -> void;
+  auto insert(const std::string &, const Object &) -> void;
 
 private:
   /*  */ auto lookupChildElement(const std::string &) const -> Object;
@@ -115,7 +115,7 @@ public:
 
   auto local() noexcept -> Scope &;
 
-  auto insert(const std::string & name_, const Object & element) -> void;
+  auto insert(const std::string &, const Object &) -> void;
 };
 }  // namespace openscenario_interpreter
 

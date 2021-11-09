@@ -20,7 +20,7 @@
 namespace openscenario_interpreter
 {
 EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & parent, const std::string & name)
-: scope_name(name), parent(&parent)
+: qualifier(name), parent(&parent)
 {
   if (name.empty()) {
     parent.anonymous_children.push_back(this);
@@ -66,17 +66,17 @@ auto EnvironmentFrame::getQualifiedName() const -> std::string
   std::string ret;
   for (auto it = ancestors.rbegin(); it != ancestors.rend(); ++it) {
     ret += (it == ancestors.rbegin() ? "" : "::");
-    ret += (*it)->scope_name.empty() ? "{anonymous}" : (*it)->scope_name;
+    ret += (*it)->qualifier.empty() ? "{anonymous}" : (*it)->qualifier;
   }
   return ret;
 }
 
-auto EnvironmentFrame::insert(const std::string & name, Object element) -> void
+auto EnvironmentFrame::insert(const std::string & name, const Object & element) -> void
 {
   if (name.find(':') != std::string::npos) {
     throw SyntaxError("Identifier ", std::quoted(name), " contains ':'");
   } else {
-    environments.emplace(name, std::move(element));
+    environments.emplace(name, element);
   }
 }
 
