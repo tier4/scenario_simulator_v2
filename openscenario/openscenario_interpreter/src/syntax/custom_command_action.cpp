@@ -27,8 +27,8 @@ inline namespace syntax
 {
 CustomCommandAction::CustomCommandAction(const pugi::xml_node & node, const Scope & scope)
 : Scope(scope),
-  type(readAttribute<String>("type", node, localScope())),
-  content(readContent<String>(node, localScope()))
+  type(readAttribute<String>("type", node, local())),
+  content(readContent<String>(node, local()))
 {
 }
 
@@ -145,7 +145,7 @@ auto CustomCommandAction::run() -> void
   std::smatch result{};
 
   if (std::regex_match(type, result, pattern) and commands.find(result[1]) != std::end(commands)) {
-    commands.at(result[1])(split(result[3]), localScope());
+    commands.at(result[1])(split(result[3]), local());
   } else {
     fork_exec(type, content);
   }

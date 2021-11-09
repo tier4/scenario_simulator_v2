@@ -2,6 +2,26 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.7 (2021-11-09)
+------------------
+* Merge https://github.com/tier4/scenario_simulator_v2 into fix/get_s_value
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/function-name
+* Merge pull request `#579 <https://github.com/tier4/scenario_simulator_v2/issues/579>`_ from tier4/feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* fix setup.py and catalog path in scenario files
+* fix scenario_test_runner/setup.py for catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* add catalog test
+* add CatalogReference
+* Merge branch 'master' into feature/interpreter/catalog
+* catalog parameter
+* Merge branch 'master' into feature/interpreter/catalog
+* basic impl
+* convert scenario file from yaml to xosc
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.5.6 (2021-10-28)
 ------------------
 * Merge pull request `#592 <https://github.com/tier4/scenario_simulator_v2/issues/592>`_ from tier4/fix/version

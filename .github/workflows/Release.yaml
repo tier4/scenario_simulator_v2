@@ -18,7 +18,7 @@ jobs:
         uses: at-wat/catkin-release-action@v1
         with:
           issue_title: ${{ github.event.issue.title }}
-          git_user: Masasya Kataoka
+          git_user: Masaya Kataoka
           git_email: ms.kataoka@gmail.com
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: open pull-request

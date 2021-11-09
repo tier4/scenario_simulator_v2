@@ -26,7 +26,7 @@ Init::Init(const pugi::xml_node & node, Scope & scope)
 
 auto Init::endsImmediately() const -> bool { return actions.endsImmediately(); }
 
-auto Init::evaluate() -> Element { return actions.evaluate(); }
+auto Init::evaluate() -> Object { return actions.evaluate(); }
 
 auto operator<<(nlohmann::json & json, const Init & datum) -> nlohmann::json &
 {

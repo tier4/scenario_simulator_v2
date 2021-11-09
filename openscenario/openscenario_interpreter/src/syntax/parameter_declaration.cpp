@@ -70,7 +70,7 @@ ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & 
   scope.insert(check(name), evaluate());
 }
 
-auto ParameterDeclaration::evaluate() const -> Element
+auto ParameterDeclaration::evaluate() const -> Object
 {
   // clang-format off
   switch (parameter_type) {

@@ -2,7 +2,10 @@
 
 ## Difference between the latest release and master
 - Enable run t4v2_scenario_test with colcon test (with -DWITH_INTEGRATION_TEST=ON) ([link](https://github.com/tier4/scenario_simulator_v2/pull/531))
+
+## Version 0.5.7
 - Fix problem in getNormalVector function. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
+- Fix problem in getSValue function, this function allowed to return s values under 0 or over 1. ([link](https://github.com/tier4/scenario_simulator_v2-docs/pull/603))
 
 ## Version 0.5.6
 - Fix context panel to display conditions' status. (Contribution by [Utaro-M](https://github.com/Utaro-M)).

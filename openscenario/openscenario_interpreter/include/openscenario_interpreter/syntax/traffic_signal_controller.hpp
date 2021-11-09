@@ -85,9 +85,9 @@ public:
 
   explicit TrafficSignalController(const pugi::xml_node &, Scope &);
 
-  auto changePhaseTo(const String &) -> Element;
+  auto changePhaseTo(const String &) -> Object;
 
-  auto changePhaseTo(std::list<Phase>::iterator) -> Element;
+  auto changePhaseTo(std::list<Phase>::iterator) -> Object;
 
   auto currentPhaseExceeded() const -> bool;
 
@@ -97,7 +97,7 @@ public:
 
   auto cycleTime() const -> double;
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 
   auto notifyBegin() -> void;
 

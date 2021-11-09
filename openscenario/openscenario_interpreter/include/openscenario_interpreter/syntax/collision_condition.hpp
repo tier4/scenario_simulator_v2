@@ -38,7 +38,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct CollisionCondition : private Scope
 {
-  const Element another_given_entity;
+  const Object another_given_entity;
 
   const TriggeringEntities triggering_entities;
 
@@ -46,7 +46,7 @@ struct CollisionCondition : private Scope
 
   auto description() const -> std::string;
 
-  auto evaluate() const -> Element;
+  auto evaluate() const -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

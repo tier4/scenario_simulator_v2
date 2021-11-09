@@ -37,7 +37,7 @@ auto TrafficSignalCondition::description() const -> String
   return description.str();
 }
 
-auto TrafficSignalCondition::evaluate() -> Element
+auto TrafficSignalCondition::evaluate() -> Object
 {
   using LaneletId = TrafficSignalState::LaneletId;
 

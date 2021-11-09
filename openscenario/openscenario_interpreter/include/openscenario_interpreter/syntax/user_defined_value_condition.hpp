@@ -40,9 +40,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 class UserDefinedValueCondition
 {
-  Element result;
+  Object result;
 
-  std::function<Element()> evaluateValue;
+  std::function<Object()> evaluateValue;
 
 public:
   const String name;
@@ -55,7 +55,7 @@ public:
 
   auto description() const -> String;
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

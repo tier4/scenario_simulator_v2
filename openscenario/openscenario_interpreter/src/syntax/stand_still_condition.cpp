@@ -42,7 +42,7 @@ auto StandStillCondition::description() const -> String
   return description.str();
 }
 
-auto StandStillCondition::evaluate() -> Element
+auto StandStillCondition::evaluate() -> Object
 {
   results.clear();
 

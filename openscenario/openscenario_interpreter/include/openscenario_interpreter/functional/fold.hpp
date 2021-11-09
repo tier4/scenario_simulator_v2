@@ -47,6 +47,12 @@ constexpr decltype(auto) fold_right(F && f, T && x, Ts &&... xs)
 {
   return f(std::forward<decltype(x)>(x), fold_right(f, std::forward<decltype(xs)>(xs)...));
 }
+
+template <typename... Ts>
+constexpr auto fold(Ts &&... xs) -> decltype(auto)
+{
+  return fold_left(std::forward<decltype(xs)>(xs)...);
+}
 }  // namespace functional
 }  // namespace openscenario_interpreter
 

@@ -24,7 +24,7 @@ inline namespace syntax
 {
 ModifyRule::ModifyRule(const pugi::xml_node & node, Scope & scope)
 // clang-format off
-: Element(
+: ComplexType(
     choice(node,
       std::make_pair("AddValue",        [&](const auto & node) { return make<ParameterAddValueRule       >(node, scope); }),
       std::make_pair("MultiplyByValue", [&](const auto & node) { return make<ParameterMultiplyByValueRule>(node, scope); })))

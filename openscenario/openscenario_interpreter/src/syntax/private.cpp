@@ -22,12 +22,12 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Private::Private(const pugi::xml_node & node, Scope & scope)
-: Scope(scope), entity_ref(readAttribute<String>("entityRef", node, localScope()))
+: Scope(scope), entity_ref(readAttribute<String>("entityRef", node, local()))
 {
   actors.emplace_back(entity_ref);
 
   callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
-    return private_actions.emplace_back(node, localScope());
+    return private_actions.emplace_back(node, local());
   });
 }
 
@@ -38,7 +38,7 @@ auto Private::endsImmediately() const -> bool
     [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
 }
 
-auto Private::evaluate() -> Element
+auto Private::evaluate() -> Object
 {
   for (auto && private_action : private_actions) {
     // NOTE: standbyState -> startTransition (if ready)

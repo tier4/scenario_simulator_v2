@@ -36,7 +36,7 @@ struct ParameterAddValueRule
 
   explicit ParameterAddValueRule(const pugi::xml_node &, Scope &);
 
-  auto operator()(const Element & target) const -> Element;
+  auto operator()(const Object & target) const -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

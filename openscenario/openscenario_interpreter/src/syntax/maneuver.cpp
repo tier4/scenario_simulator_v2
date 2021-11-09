@@ -22,11 +22,10 @@ inline namespace syntax
 {
 Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
 : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-  parameter_declarations(
-    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope()))
+  parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
   callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Event>(node, localScope()));
+    return push_back(readStoryboardElement<Event>(node, local()));
   });
 }
 
