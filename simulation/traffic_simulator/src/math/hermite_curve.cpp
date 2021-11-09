@@ -182,8 +182,8 @@ boost::optional<double> HermiteCurve::solveNewtonMethod(
 }
 
 boost::optional<double> HermiteCurve::getSValue(
-  const geometry_msgs::msg::Point & point, size_t initial_resolution,
-  size_t max_iteration, double tolerance, bool autoscale) const
+  const geometry_msgs::msg::Point & point, size_t initial_resolution, size_t max_iteration,
+  double tolerance, bool autoscale) const
 {
   double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
   double ret = 0.0;
