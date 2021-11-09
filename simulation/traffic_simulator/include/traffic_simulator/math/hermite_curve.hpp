@@ -57,8 +57,8 @@ public:
   double getLength(size_t num_points) const;
   double getLength() const { return length_; }
   boost::optional<double> getSValue(
-    const geometry_msgs::msg::Point & point, unsigned int initial_resolution = 30,
-    unsigned int max_iteration = 30, double tolerance = 0.03, bool autoscale = false) const;
+    const geometry_msgs::msg::Point & point, size_t initial_resolution = 30,
+    size_t max_iteration = 30, double tolerance = 0.03, bool autoscale = false) const;
   double getSquaredDistanceIn2D(
     const geometry_msgs::msg::Point & point, double s, bool autoscale = false) const;
   boost::optional<double> getCollisionPointIn2D(
@@ -73,7 +73,7 @@ private:
   double length_;
   boost::optional<double> solveNewtonMethod(
     const geometry_msgs::msg::Point & point, double initial_value, double tolerance,
-    unsigned int max_iteration) const;
+    size_t max_iteration) const;
   double getNewtonMethodStepSize(
     const geometry_msgs::msg::Point & point, double s /*, bool autoscale = false*/) const;
 };

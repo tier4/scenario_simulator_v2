@@ -165,7 +165,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
 
 boost::optional<double> HermiteCurve::solveNewtonMethod(
   const geometry_msgs::msg::Point & point, double initial_value, double tolerance,
-  unsigned int max_iteration) const
+  size_t max_iteration) const
 {
   double ret = initial_value;
   for (unsigned i = 0; i < max_iteration; i++) {
@@ -182,14 +182,14 @@ boost::optional<double> HermiteCurve::solveNewtonMethod(
 }
 
 boost::optional<double> HermiteCurve::getSValue(
-  const geometry_msgs::msg::Point & point, unsigned int initial_resolution,
-  unsigned int max_iteration, double tolerance, bool autoscale) const
+  const geometry_msgs::msg::Point & point, size_t initial_resolution,
+  size_t max_iteration, double tolerance, bool autoscale) const
 {
   double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
   double ret = 0.0;
   std::vector<double> errors;
   std::vector<double> s_values;
-  for (unsigned int i = 0; i < initial_resolution; i++) {
+  for (size_t i = 0; i < initial_resolution; i++) {
     const auto s = solveNewtonMethod(
       point, (0.5 + static_cast<double>(i)) * step_size, tolerance, max_iteration);
     if (s) {
