@@ -315,7 +315,7 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
 }
 
 boost::optional<double> CatmullRomSpline::getSValue(
-  geometry_msgs::msg::Point position, unsigned int initial_num_points, unsigned int max_iteration,
+  geometry_msgs::msg::Point position, size_t initial_num_points, size_t max_iteration,
   double tolerance)
 {
   std::vector<double> s_values;
