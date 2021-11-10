@@ -21,7 +21,7 @@
 namespace openscenario_interpreter
 {
 EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & outer_frame, const std::string & name)
-: qualifier(name), outer_frame(&outer_frame)
+: outer_frame(&outer_frame)
 {
   if (name.empty()) {
     outer_frame.unnamed_inner_frames.push_back(this);
@@ -46,17 +46,6 @@ auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> O
       return unspecified;
     }
   }
-}
-
-auto EnvironmentFrame::fullyQualifiedName() const -> std::string
-{
-  std::string result;
-
-  for (const auto * frame = this; frame; frame = frame->outer_frame) {
-    result = (frame->qualifier.empty() ? std::string("{annonymous}") : frame->qualifier) + result;
-  }
-
-  return "::" + result;
 }
 
 auto EnvironmentFrame::define(const Name & name, const Object & object) -> void

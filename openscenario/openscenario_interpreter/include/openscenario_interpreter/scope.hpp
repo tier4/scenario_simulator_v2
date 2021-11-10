@@ -30,8 +30,6 @@ class EnvironmentFrame
 {
   friend struct Scope;
 
-  const std::string qualifier;
-
   std::unordered_multimap<std::string, Object> variables;
 
   EnvironmentFrame * const outer_frame = nullptr;
@@ -52,8 +50,6 @@ public:
   auto define(const Name &, const Object &) -> void;
 
   auto findObject(const PrefixedName &) const -> Object;
-
-  [[deprecated]] auto fullyQualifiedName() const -> std::string;
 
 private:
   auto lookdown(const std::string &) const -> Object;
