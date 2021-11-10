@@ -13,19 +13,20 @@
 // limitations under the License.
 
 #include <boost/algorithm/string.hpp>
+#include <iterator>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
 namespace openscenario_interpreter
 {
-EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & parent, const std::string & name)
-: qualifier(name), parent(&parent)
+EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & outer_frame, const std::string & name)
+: qualifier(name), outer_frame(&outer_frame)
 {
   if (name.empty()) {
-    parent.anonymous_children.push_back(this);
+    outer_frame.anonymous_children.push_back(this);
   } else {
-    parent.named_children.emplace(name, this);
+    outer_frame.named_children.emplace(name, this);
   }
 }
 
@@ -51,7 +52,7 @@ auto EnvironmentFrame::fullyQualifiedName() const -> std::string
 {
   std::string result;
 
-  for (const auto * frame = this; frame; frame = frame->parent) {
+  for (const auto * frame = this; frame; frame = frame->outer_frame) {
     result = (frame->qualifier.empty() ? std::string("{annonymous}") : frame->qualifier) + result;
   }
 
@@ -60,7 +61,7 @@ auto EnvironmentFrame::fullyQualifiedName() const -> std::string
 
 auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
 {
-  environments.emplace(name, object);
+  variables.emplace(name, object);
 }
 
 auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Object
@@ -69,10 +70,11 @@ auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Obj
 
   while (not same_level.empty()) {
     std::vector<const EnvironmentFrame *> next_level;
+
     std::vector<Object> ret;
 
     for (auto * frame : same_level) {
-      auto range = frame->environments.equal_range(name);
+      auto range = frame->variables.equal_range(name);
       for (auto it = range.first; it != range.second; ++it) {
         ret.push_back(it->second);
       }
@@ -92,7 +94,8 @@ auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Obj
 
     same_level = std::move(next_level);
   }
-  return Object{};
+
+  return Object();
 }
 
 auto EnvironmentFrame::lookupChildScope(const std::string & name) const
@@ -133,10 +136,10 @@ auto EnvironmentFrame::lookupQualifiedElement(
 
 auto EnvironmentFrame::lookup(const Name & name) const -> Object
 {
-  for (auto p = this; p; p = p->parent) {
-    auto found = p->lookupChildElement(name);
-    if (found) {
-      return found;
+  for (auto frame = this; frame; frame = frame->outer_frame) {
+    auto object = frame->lookupChildElement(name);
+    if (object) {
+      return object;
     }
   }
 
@@ -146,16 +149,16 @@ auto EnvironmentFrame::lookup(const Name & name) const -> Object
 auto EnvironmentFrame::lookupUnqualifiedScope(const std::string & name) const
   -> const EnvironmentFrame *
 {
-  if (parent == nullptr) {  // this is global scope
+  if (outer_frame == nullptr) {  // this is global scope
     return name.empty() ? this : nullptr;
   } else {
-    auto sibling_scope = parent->lookupChildScope(name);
+    auto sibling_scope = outer_frame->lookupChildScope(name);
     if (sibling_scope.size() == 1) {
       return sibling_scope.front();
     } else if (sibling_scope.size() > 1) {
       THROW_SYNTAX_ERROR("ambiguous reference to ", name);
-    } else if (sibling_scope.empty() && parent) {
-      return parent->lookupUnqualifiedScope(name);
+    } else if (sibling_scope.empty() && outer_frame) {
+      return outer_frame->lookupUnqualifiedScope(name);
     }
     return nullptr;
   }

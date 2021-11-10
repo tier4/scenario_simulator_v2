@@ -32,9 +32,9 @@ class EnvironmentFrame
 
   const std::string qualifier;
 
-  std::unordered_multimap<std::string, Object> environments;
+  std::unordered_multimap<std::string, Object> variables;
 
-  EnvironmentFrame * const parent = nullptr;
+  EnvironmentFrame * const outer_frame = nullptr;
 
   std::unordered_multimap<std::string, EnvironmentFrame *> named_children;
 
