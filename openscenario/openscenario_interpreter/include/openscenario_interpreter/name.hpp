@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__IDENTIFIER_HPP_
-#define OPENSCENARIO_INTERPRETER__IDENTIFIER_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__NAME_HPP_
+#define OPENSCENARIO_INTERPRETER__NAME_HPP_
 
 #include <iostream>
 #include <iterator>
@@ -27,8 +27,10 @@ struct Name : public std::string
   template <typename... Ts>
   Name(Ts &&... xs) : std::string(std::forward<decltype(xs)>(xs)...)
   {
-    if (find(':') != std::string::npos) {
-      throw SyntaxError("Invalid name reference ", std::quoted(*this), ".");
+    for (const auto each : ":") {
+      if (find(each) != std::string::npos) {
+        throw SyntaxError("Invalid name reference ", std::quoted(*this), ".");
+      }
     }
   }
 };
@@ -42,8 +44,7 @@ struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO referen
 
   const Name name;
 
-  template <template <typename> typename Container>
-  PrefixedName(const Container<std::string> given)
+  explicit PrefixedName(const std::vector<std::string> given)
   : prefixes(std::begin(given), std::prev(std::end(given))), name(given.back())
   // TODO
   // : fully_prefixed(not given.empty() and given.front().empty()),
@@ -99,4 +100,4 @@ class hash<openscenario_interpreter::Name> : public hash<std::string>
 };
 }  // namespace std
 
-#endif  // OPENSCENARIO_INTERPRETER__IDENTIFIER_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__NAME_HPP_

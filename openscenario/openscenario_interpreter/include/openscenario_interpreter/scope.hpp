@@ -17,7 +17,7 @@
 
 #include <boost/filesystem.hpp>
 #include <memory>
-#include <openscenario_interpreter/identifier.hpp>
+#include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <unordered_map>
