@@ -338,7 +338,7 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(const geometry_msgs::msg::
   }
   std::sort(matches.begin(), matches.end(), [](auto const& lhs, auto const& rhs) {
     return lhs.distance < rhs.distance;
-  }
+  });
   return matches[0].lanelet.id();
 }
 
