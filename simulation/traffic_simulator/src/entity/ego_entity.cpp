@@ -250,7 +250,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
 
     traffic_simulator::math::CatmullRomSpline spline(
       hdmap_utils_ptr_->getCenterPoints(closest_lanelet_id.get()));
-    if (const auto s_value = spline.getSValue(status.pose.position)) {
+    if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.get()).z;
     }
 

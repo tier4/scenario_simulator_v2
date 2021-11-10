@@ -319,7 +319,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
-  const auto s = spline->getSValue(pose.position);
+  const auto s = spline->getSValue(pose);
   if (!s) {
     return boost::none;
   }

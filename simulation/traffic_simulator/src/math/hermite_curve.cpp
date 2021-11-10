@@ -18,6 +18,7 @@
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
+#include <traffic_simulator/math/bounding_box.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -71,22 +72,6 @@ double HermiteCurve::getSquaredDistanceIn2D(
   double x_term = std::pow(point.x - point_on_curve.x, 2);
   double y_term = std::pow(point.y - point_on_curve.y, 2);
   double ret = x_term + y_term;
-  return ret;
-}
-
-double HermiteCurve::getNewtonMethodStepSize(
-  geometry_msgs::msg::Point point, double s /*, bool autoscale*/) const
-{
-  /*
-  if (autoscale) {
-    s = s / getLength();
-  }
-  */
-  const auto point_on_curve = getPoint(s, false /*autoscale*/);
-  double s2 = std::pow(s, 2);
-  double x_term_diff = 2 * (point.x - point_on_curve.x) * (-3 * ax_ * s2 - 2 * bx_ * s - cx_);
-  double y_term_diff = 2 * (point.y - point_on_curve.y) * (-3 * ay_ * s2 - 2 * by_ * s - cy_);
-  double ret = getSquaredDistanceIn2D(point, s, false /*autoscale*/) / (x_term_diff + y_term_diff);
   return ret;
 }
 
@@ -164,65 +149,20 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
 }
 
 boost::optional<double> HermiteCurve::getSValue(
-  geometry_msgs::msg::Point point, double threshold_distance, unsigned int initial_resolution,
-  unsigned int max_iteration, double tolerance, bool autoscale) const
+  const geometry_msgs::msg::Pose & pose, double threshold_distance, bool autoscale) const
 {
-  double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
-  double ret = 0.0;
-  std::vector<double> initial_value_candidates(initial_resolution);
-  std::vector<double> initial_errors(initial_resolution);
-  for (unsigned int i = 0; i < initial_resolution; i++) {
-    initial_value_candidates[i] = (0.5 + static_cast<double>(i)) * step_size;
-    initial_errors[i] = std::fabs(getSquaredDistanceIn2D(point, initial_value_candidates[i]));
-  }
-  std::vector<double>::iterator iter =
-    std::min_element(initial_errors.begin(), initial_errors.end());
-  size_t index = std::distance(initial_errors.begin(), iter);
-  ret = initial_value_candidates[index];
-  std::vector<double> errors;
-  std::vector<double> s_values;
-  for (unsigned i = 0; i < max_iteration; i++) {
-    double error = getSquaredDistanceIn2D(point, ret);
-    if (std::fabs(error) < (tolerance * tolerance)) {
-      return ret;
-    }
-    s_values.push_back(ret);
-    errors.push_back(error);
-    ret = ret - getNewtonMethodStepSize(point, ret);
-  }
-  std::vector<double>::iterator min_iter = std::min_element(errors.begin(), errors.end());
-  double min_error = *std::min_element(errors.begin(), errors.end());
-  if (min_error > (threshold_distance * threshold_distance)) {
-    return boost::none;
-  }
-  size_t value_index = std::distance(errors.begin(), min_iter);
-  ret = s_values[value_index];
-  if (ret < 0) {
-    return boost::none;
-    /*
-    double error = getSquaredDistanceIn2D(point, 0, false);
-    if (error < (threshold_distance * threshold_distance)) {
-      ret = 0;
-    } else {
-      return boost::none;
-    }
-    */
-  }
-  if (ret > 1) {
-    /*
-    double error = getSquaredDistanceIn2D(point, 0, false);
-    if (error < (threshold_distance * threshold_distance)) {
-      ret = 1;
-    } else {
-      return boost::none;
-    }
-    */
+  geometry_msgs::msg::Point p0, p1;
+  p0.y = threshold_distance;
+  p1.y = -threshold_distance;
+  const auto line = math::transformPoints(pose, {p0, p1});
+  const auto s = getCollisionPointIn2D(line[0], line[1], false);
+  if(!s){
     return boost::none;
   }
   if (autoscale) {
-    ret = ret * getLength();
+    return s.get() * getLength();
   }
-  return ret;
+  return s.get();
 }
 
 const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(
