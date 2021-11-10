@@ -30,6 +30,18 @@ EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & outer_frame, const std::st
   }
 }
 
+auto EnvironmentFrame::find(const Name & name) const -> Object
+{
+  for (auto frame = this; frame; frame = frame->outer_frame) {
+    auto object = frame->lookdown(name);
+    if (object) {
+      return object;
+    }
+  }
+
+  return Object();
+}
+
 auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> Object
 {
   auto split = prefixed_name.prefixes;
@@ -37,7 +49,7 @@ auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> O
   split.push_back(prefixed_name.name);
 
   if (prefixed_name.prefixes.empty()) {
-    return lookup(prefixed_name.name);
+    return find(prefixed_name.name);
   } else {
     auto top_scope = lookupUnqualifiedScope(split.front());
     if (top_scope) {
@@ -108,38 +120,27 @@ auto EnvironmentFrame::lookupChildScope(const std::string & name) const
 }
 
 auto EnvironmentFrame::lookupQualifiedElement(
-  const EnvironmentFrame * scope,                       //
-  std::vector<std::string>::const_iterator name_begin,  //
-  std::vector<std::string>::const_iterator name_end) -> Object
+  const EnvironmentFrame * scope,                  //
+  std::vector<std::string>::const_iterator begin,  //
+  std::vector<std::string>::const_iterator end) -> Object
 {
-  for (auto iter = name_begin; iter != name_end - 1; ++iter) {
+  for (auto iter = begin; iter != end - 1; ++iter) {
     auto found = scope->lookupChildScope(*iter);
-    if (found.size() == 1) {
-      scope = found.front();
-    } else if (found.empty()) {
-      return Object{};
-    } else if (found.size() > 1) {
-      throw SyntaxError("Ambiguous reference to ", std::quoted(*iter), ".");
+    switch (found.size()) {
+      case 0:
+        return Object();
+      case 1:
+        scope = found.front();
+        break;
+      default:
+        throw SyntaxError("Ambiguous reference to ", std::quoted(*iter), ".");
     }
   }
 
-  return scope->lookdown(*(name_end - 1));
+  return scope->lookdown(*(end - 1));
 }
 
-auto EnvironmentFrame::lookup(const Name & name) const -> Object
-{
-  for (auto frame = this; frame; frame = frame->outer_frame) {
-    auto object = frame->lookdown(name);
-    if (object) {
-      return object;
-    }
-  }
-
-  return Object();
-}
-
-auto EnvironmentFrame::lookupUnqualifiedScope(const std::string & name) const
-  -> const EnvironmentFrame *
+auto EnvironmentFrame::lookupUnqualifiedScope(const Name & name) const -> const EnvironmentFrame *
 {
   if (outer_frame == nullptr) {  // this is global scope
     return name.empty() ? this : nullptr;
@@ -148,7 +149,7 @@ auto EnvironmentFrame::lookupUnqualifiedScope(const std::string & name) const
     if (sibling_scope.size() == 1) {
       return sibling_scope.front();
     } else if (sibling_scope.size() > 1) {
-      THROW_SYNTAX_ERROR("ambiguous reference to ", name);
+      throw SyntaxError("ambiguous reference to ", std::quoted(name));
     } else if (sibling_scope.empty() && outer_frame) {
       return outer_frame->lookupUnqualifiedScope(name);
     }

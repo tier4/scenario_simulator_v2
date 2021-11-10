@@ -49,6 +49,8 @@ public:
 
   auto define(const Name &, const Object &) -> void;
 
+  auto find(const Name &) const -> Object;
+
   auto findObject(const PrefixedName &) const -> Object;
 
 private:
@@ -61,9 +63,7 @@ private:
     std::vector<std::string>::const_iterator,  //
     std::vector<std::string>::const_iterator) -> Object;
 
-  auto lookup(const Name &) const -> Object;
-
-  auto lookupUnqualifiedScope(const std::string &) const -> const EnvironmentFrame *;
+  auto lookupUnqualifiedScope(const Name &) const -> const EnvironmentFrame *;
 };
 
 class Scope
