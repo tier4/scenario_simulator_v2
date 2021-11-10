@@ -49,25 +49,25 @@ public:
 
   explicit EnvironmentFrame(EnvironmentFrame &&) = delete;
 
-  auto findObject(const PrefixedName &) const -> Object;
-
-  auto fullyQualifiedName() const -> std::string;
-
   auto define(const Name &, const Object &) -> void;
 
-private:
-  /*  */ auto lookupChildElement(const std::string &) const -> Object;
+  auto findObject(const PrefixedName &) const -> Object;
 
-  /*  */ auto lookupChildScope(const std::string &) const -> std::list<const EnvironmentFrame *>;
+  [[deprecated]] auto fullyQualifiedName() const -> std::string;
+
+private:
+  auto lookupChildElement(const std::string &) const -> Object;
+
+  auto lookupChildScope(const std::string &) const -> std::list<const EnvironmentFrame *>;
 
   static auto lookupQualifiedElement(
     const EnvironmentFrame *,                  //
     std::vector<std::string>::const_iterator,  //
     std::vector<std::string>::const_iterator) -> Object;
 
-  /*  */ auto lookupUnqualifiedElement(const std::string &) const -> Object;
+  auto lookup(const Name &) const -> Object;
 
-  /*  */ auto lookupUnqualifiedScope(const std::string &) const -> const EnvironmentFrame *;
+  auto lookupUnqualifiedScope(const std::string &) const -> const EnvironmentFrame *;
 };
 
 class Scope

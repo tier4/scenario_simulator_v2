@@ -35,8 +35,8 @@ auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> O
 
   split.push_back(prefixed_name.name);
 
-  if (split.size() == 1) {
-    return lookupUnqualifiedElement(split.front());
+  if (prefixed_name.prefixes.empty()) {
+    return lookup(prefixed_name.name);
   } else {
     auto top_scope = lookupUnqualifiedScope(split.front());
     if (top_scope) {
@@ -131,15 +131,16 @@ auto EnvironmentFrame::lookupQualifiedElement(
   return scope->lookupChildElement(*(name_end - 1));
 }
 
-auto EnvironmentFrame::lookupUnqualifiedElement(const std::string & name) const -> Object
+auto EnvironmentFrame::lookup(const Name & name) const -> Object
 {
-  for (auto * p = this; p != nullptr; p = p->parent) {
+  for (auto p = this; p; p = p->parent) {
     auto found = p->lookupChildElement(name);
     if (found) {
       return found;
     }
   }
-  return Object{};
+
+  return Object();
 }
 
 auto EnvironmentFrame::lookupUnqualifiedScope(const std::string & name) const
