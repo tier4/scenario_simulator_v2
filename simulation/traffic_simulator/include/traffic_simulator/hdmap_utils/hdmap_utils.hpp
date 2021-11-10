@@ -20,6 +20,7 @@
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/LaneletSequence.h>
+#include <lanelet2_matching/LaneletMatching.h>
 #include <lanelet2_routing/Route.h>
 #include <lanelet2_routing/RoutingCost.h>
 #include <lanelet2_routing/RoutingGraph.h>
