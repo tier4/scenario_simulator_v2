@@ -1,0 +1,200 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: '2021-09-06T09:09:41.856Z'
+    description: ''
+    author: ''
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: value
+        parameterType: string
+        value: "{root}::value"
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+    ScenarioObject:
+      - name: ego
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 2.25
+              length: 4.77
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: 1
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 0
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '34507'
+                        s: 50
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 2.778
+    Story:
+      - name: Story1
+        Act:
+          - name: Act1
+            ManeuverGroup:
+              - name: ManeuverGroup1
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: Maneuver1
+                    Event:
+                      - name: Event1
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: Condition1
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: value
+                                      rule: equalTo
+                                      value: "{root}::value"
+                        Action:
+                          - name: Action1
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: echo '[OK] value = {root}::value'
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: Condition1
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        ParameterCondition:
+                          parameterRef: value
+                          rule: equalTo
+                          value: "{root}::value"
+      - name: Story2
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: ::value
+                                      rule: equalTo
+                                      value: "{root}::value"
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 10
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
