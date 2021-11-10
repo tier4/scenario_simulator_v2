@@ -69,6 +69,7 @@ public:
     geometry_msgs::msg::Pose pose, bool include_crosswalk = false);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, std::int64_t lanelet_id);
+  boost::optional<std::int64_t> matchToLane(const geometry_msgs::msg::Pose & pose) const;
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
@@ -185,6 +186,9 @@ private:
   std::vector<double> calculateSegmentDistances(const lanelet::ConstLineString3d & line_string);
   std::vector<lanelet::Lanelet> getLanelets(const std::vector<std::int64_t> & lanelet_ids) const;
   std::vector<std::int64_t> getLaneletIds(const std::vector<lanelet::Lanelet> & lanelets) const;
+  lanelet::BasicPoint2d toPoint2d(const geometry_msgs::msg::Point & point) const;
+  lanelet::BasicPolygon2d absoluteHull(
+    const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const;
 };
 }  // namespace hdmap_utils
 
