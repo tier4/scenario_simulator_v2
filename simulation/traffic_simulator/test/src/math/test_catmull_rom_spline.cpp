@@ -138,9 +138,10 @@ TEST(CatmullRomSpline, GetSValue)
   p.x = 0.1;
   p.y = 0;
   p.z = 0;
-  EXPECT_TRUE(spline.getSValue(p, 30, 30, 0.001));
-  EXPECT_TRUE(spline.getSValue(p, 30, 30, 0.001).get() > 0.099);
-  EXPECT_TRUE(spline.getSValue(p, 30, 30, 0.001).get() < 0.101);
+  EXPECT_TRUE(spline.getSValue(p));
+  // std::cout << "result = " << spline.getSValue(p).get() << std::endl;
+  EXPECT_TRUE(spline.getSValue(p).get() > 0.099);
+  EXPECT_TRUE(spline.getSValue(p).get() < 0.101);
   p.x = 10;
   p.y = 0;
   p.z = 0;
