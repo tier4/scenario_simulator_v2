@@ -1,6 +1,6 @@
 # Scenario simulator with Autoware Architecture Proposal
 
-This document contains step-by-step instruction on how to build and run Autoware Architecture Proposal with `scenario_simulator_v2`.
+This document contains step-by-step instruction on how to build and run [Autoware Architecture Proposal](https://github.com/tier4/AutowareArchitectureProposal.proj) with `scenario_simulator_v2`.
 
 ## Prerequisites 
 
@@ -34,7 +34,16 @@ Execute:
 
 It will install system dependencies using `rosdep` and several other system dependencies.
 
-During execution script will ask about installation of CUDA and other GPU related tools:
+During execution script will ask about:
+
+- Entering a sudo password
+
+```bash
+BECOME password:
+```
+
+- Installation of CUDA and other GPU related tools:
+
 ```bash
 Would you like to install the optional GPU modules (cuda: 11.1, cudnn: 8.0.5, TensorRT: 7.2.1)? (y/n) [y]: 
 ```
@@ -84,4 +93,7 @@ During sample scenario following things are expected to happen:
 During scenario execution you should be able to see `rviz` view similar to the one below:
 
 ![scenario_simualtor_with_aap](../image/scenario_simulator_with_autoware_architecture_proposal.png)
+
+The chosen scenario will be executed 3 times.
+
 
