@@ -24,9 +24,9 @@ EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & outer_frame, const std::st
 : qualifier(name), outer_frame(&outer_frame)
 {
   if (name.empty()) {
-    outer_frame.anonymous_children.push_back(this);
+    outer_frame.unnamed_inner_frames.push_back(this);
   } else {
-    outer_frame.named_children.emplace(name, this);
+    outer_frame.inner_frames.emplace(name, this);
   }
 }
 
@@ -64,7 +64,7 @@ auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
   variables.emplace(name, object);
 }
 
-auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Object
+auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
 {
   std::vector<const EnvironmentFrame *> same_level{this};
 
@@ -79,7 +79,7 @@ auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Obj
         ret.push_back(it->second);
       }
 
-      for (auto * f : frame->anonymous_children) {
+      for (auto * f : frame->unnamed_inner_frames) {
         next_level.push_back(f);
       }
     }
@@ -101,18 +101,21 @@ auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Obj
 auto EnvironmentFrame::lookupChildScope(const std::string & name) const
   -> std::list<const EnvironmentFrame *>
 {
-  auto range = named_children.equal_range(name);
-  std::list<const EnvironmentFrame *> ret;
-  if (range.first != range.second) {
-    for (auto it = range.first; it != range.second; ++it) {
-      ret.push_back(it->second);
-    }
-  } else {
-    for (auto & child : anonymous_children) {
-      ret.merge(child->lookupChildScope(name));
+  std::list<const EnvironmentFrame *> result;
+
+  auto range = inner_frames.equal_range(name);
+
+  for (auto it = range.first; it != range.second; ++it) {
+    result.push_back(it->second);
+  }
+
+  if (result.empty()) {
+    for (auto & child : unnamed_inner_frames) {
+      result.merge(child->lookupChildScope(name));
     }
   }
-  return ret;
+
+  return result;
 }
 
 auto EnvironmentFrame::lookupQualifiedElement(
@@ -127,17 +130,17 @@ auto EnvironmentFrame::lookupQualifiedElement(
     } else if (found.empty()) {
       return Object{};
     } else if (found.size() > 1) {
-      THROW_SYNTAX_ERROR("ambiguous reference to ", std::quoted(*iter));
+      throw SyntaxError("Ambiguous reference to ", std::quoted(*iter), ".");
     }
   }
 
-  return scope->lookupChildElement(*(name_end - 1));
+  return scope->lookdown(*(name_end - 1));
 }
 
 auto EnvironmentFrame::lookup(const Name & name) const -> Object
 {
   for (auto frame = this; frame; frame = frame->outer_frame) {
-    auto object = frame->lookupChildElement(name);
+    auto object = frame->lookdown(name);
     if (object) {
       return object;
     }

@@ -36,9 +36,9 @@ class EnvironmentFrame
 
   EnvironmentFrame * const outer_frame = nullptr;
 
-  std::unordered_multimap<std::string, EnvironmentFrame *> named_children;
+  std::unordered_multimap<std::string, EnvironmentFrame *> inner_frames;
 
-  std::vector<EnvironmentFrame *> anonymous_children;
+  std::vector<EnvironmentFrame *> unnamed_inner_frames;
 
   explicit EnvironmentFrame() = default;
 
@@ -56,7 +56,7 @@ public:
   [[deprecated]] auto fullyQualifiedName() const -> std::string;
 
 private:
-  auto lookupChildElement(const std::string &) const -> Object;
+  auto lookdown(const std::string &) const -> Object;
 
   auto lookupChildScope(const std::string &) const -> std::list<const EnvironmentFrame *>;
 
