@@ -58,13 +58,14 @@ public:
 private:
   auto lookdown(const std::string &) const -> Object;
 
-  auto frames(const std::string &) const -> std::list<const EnvironmentFrame *>;
+  auto frames(const Name &) const -> std::list<const EnvironmentFrame *>;
 
   static auto lookupQualifiedElement(
     const EnvironmentFrame *,                  //
     std::vector<std::string>::const_iterator,  //
     std::vector<std::string>::const_iterator) -> Object;
 
+  // TODO RENAME TO "frame"
   auto lookupUnqualifiedScope(const Name &) const -> const EnvironmentFrame *;
 };
 

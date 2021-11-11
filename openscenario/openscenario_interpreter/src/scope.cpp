@@ -56,12 +56,8 @@ auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> O
   if (prefixed_name.prefixes.empty()) {
     return find(prefixed_name.name);
   } else {
-    auto top_scope = lookupUnqualifiedScope(split.front());
-    if (top_scope) {
-      return lookupQualifiedElement(top_scope, split.begin() + 1, split.end());
-    } else {
-      return unspecified;
-    }
+    return lookupQualifiedElement(
+      lookupUnqualifiedScope(split.front()), split.begin() + 1, split.end());
   }
 }
 
@@ -122,8 +118,7 @@ auto EnvironmentFrame::lookupQualifiedElement(
 
 auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
 
-auto EnvironmentFrame::frames(const std::string & name) const
-  -> std::list<const EnvironmentFrame *>
+auto EnvironmentFrame::frames(const Name & name) const -> std::list<const EnvironmentFrame *>
 {
   std::list<const EnvironmentFrame *> result;
 
@@ -145,17 +140,21 @@ auto EnvironmentFrame::frames(const std::string & name) const
 auto EnvironmentFrame::lookupUnqualifiedScope(const Name & name) const -> const EnvironmentFrame *
 {
   if (isOutermost()) {
-    return name.empty() ? this : nullptr;
+    return name.empty()
+             ? this
+             : throw SyntaxError("There is no StoryboardElement named ", std::quoted(name), ".");
   } else {
     auto sibling_scope = outer_frame->frames(name);
-    if (sibling_scope.size() == 1) {
-      return sibling_scope.front();
-    } else if (sibling_scope.size() > 1) {
-      throw SyntaxError("ambiguous reference to ", std::quoted(name));
-    } else if (sibling_scope.empty() && outer_frame) {
-      return outer_frame->lookupUnqualifiedScope(name);
+    switch (sibling_scope.size()) {
+      case 0:
+        return outer_frame->lookupUnqualifiedScope(name);
+      case 1:
+        return sibling_scope.front();
+      default:
+        throw SyntaxError(
+          "There are multiple StoryboardElements that can be referenced by the name ",
+          std::quoted(name), ".");
     }
-    return nullptr;
   }
 }
 
