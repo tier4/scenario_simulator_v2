@@ -124,15 +124,29 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
   auto solutions = solver_.solveCubicEquation(a, b, c, d);
   for (const auto solution : solutions) {
+    std::cout << "solution : " << solution << std::endl;
+    constexpr double epsilon = std::numeric_limits<double>::epsilon();
     double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
     double tx = (x - point0.x) / (point1.x - point0.x);
     double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
     double ty = (y - point0.y) / (point1.y - point0.y);
-    if (0 > tx || tx > 1) {
-      continue;
-    }
-    if (0 > ty || ty > 1) {
-      continue;
+    if (std::fabs(point1.x - point0.x) > epsilon) {
+      if (std::fabs(point1.y - point0.y) > epsilon) {
+        if (0 > tx || tx > 1) {
+          continue;
+        }
+        if (0 > ty || ty > 1) {
+          continue;
+        }
+      } else {
+        if (0 > tx || tx > 1) {
+          continue;
+        }
+      }
+    } else {
+      if (0 > ty || ty > 1) {
+        continue;
+      }
     }
     if (0 > solution || solution > 1) {
       continue;
@@ -156,10 +170,8 @@ boost::optional<double> HermiteCurve::getSValue(
   p1.y = -threshold_distance;
   const auto line = math::transformPoints(pose, {p0, p1});
   const auto s = getCollisionPointIn2D(line[0], line[1], false);
-  /*
   std::cout << "line[0]" << line[0].x << "," << line[0].y << "," << line[0].z << std::endl;
   std::cout << "line[1]" << line[1].x << "," << line[1].y << "," << line[1].z << std::endl;
-  */
   if (!s) {
     return boost::none;
   }
