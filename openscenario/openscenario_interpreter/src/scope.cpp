@@ -18,6 +18,9 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
+#undef NDEBUG
+#include <cassert>
+
 namespace openscenario_interpreter
 {
 EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & outer_frame, const std::string & name)
@@ -44,20 +47,25 @@ auto EnvironmentFrame::find(const Name & name) const -> Object
     }
   }
 
-  return Object();
+  return Object();  // TODO SYNTAX_ERROR
 }
 
 auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> Object
 {
-  auto split = prefixed_name.prefixes;
-
-  split.push_back(prefixed_name.name);
-
   if (prefixed_name.prefixes.empty()) {
     return find(prefixed_name.name);
   } else {
+    if (prefixed_name.fully_prefixed) {
+      assert(prefixed_name.prefixes.front().empty());
+    } else {
+      assert(not prefixed_name.prefixes.front().empty());
+    }
+
     return lookupQualifiedElement(
-      lookupUnqualifiedScope(split.front()), split.begin() + 1, split.end());
+      lookupFrame(prefixed_name.prefixes.front()),
+      prefixed_name.prefixes.begin() + 1,  //
+      prefixed_name.prefixes.end(),        //
+      prefixed_name.name);
   }
 }
 
@@ -98,9 +106,12 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
 auto EnvironmentFrame::lookupQualifiedElement(
   const EnvironmentFrame * scope,                  //
   std::vector<std::string>::const_iterator begin,  //
-  std::vector<std::string>::const_iterator end) -> Object
+  std::vector<std::string>::const_iterator end,    //
+  const Name & name) -> Object
 {
-  for (auto iter = begin; iter != end - 1; ++iter) {
+  assert(scope);
+
+  for (auto iter = begin; iter != end; ++iter) {
     auto found = scope->frames(*iter);
     switch (found.size()) {
       case 0:
@@ -113,7 +124,7 @@ auto EnvironmentFrame::lookupQualifiedElement(
     }
   }
 
-  return scope->lookdown(*(end - 1));
+  return scope->lookdown(name);
 }
 
 auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
@@ -137,8 +148,10 @@ auto EnvironmentFrame::frames(const Name & name) const -> std::list<const Enviro
   return result;
 }
 
-auto EnvironmentFrame::lookupUnqualifiedScope(const Name & name) const -> const EnvironmentFrame *
+auto EnvironmentFrame::lookupFrame(const Name & name) const -> const EnvironmentFrame *
 {
+  // assert(not name.empty());
+
   if (isOutermost()) {
     return name.empty()
              ? this
@@ -147,7 +160,7 @@ auto EnvironmentFrame::lookupUnqualifiedScope(const Name & name) const -> const 
     auto sibling_scope = outer_frame->frames(name);
     switch (sibling_scope.size()) {
       case 0:
-        return outer_frame->lookupUnqualifiedScope(name);
+        return outer_frame->lookupFrame(name);
       case 1:
         return sibling_scope.front();
       default:

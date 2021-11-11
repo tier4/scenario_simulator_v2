@@ -37,21 +37,19 @@ struct Name : public std::string
 
 struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
 {
-  // TODO
-  // const bool fully_prefixed;
+  const bool fully_prefixed;
 
   const std::vector<std::string> prefixes;
 
   const Name name;
 
   explicit PrefixedName(const std::vector<std::string> given)
-  : prefixes(std::begin(given), std::prev(std::end(given))), name(given.back())
-  // TODO
-  // : fully_prefixed(not given.empty() and given.front().empty()),
-  //   prefixes(
-  //     fully_prefixed ? std::next(std::begin(given)) : std::begin(given),
-  //     std::prev(std::end(given))),
-  //   name(given.back())
+  : fully_prefixed(not given.empty() and given.front().empty()),
+    prefixes(std::begin(given), std::prev(std::end(given))),
+    // prefixes(
+    //   fully_prefixed ? std::next(std::begin(given)) : std::begin(given),
+    //   std::prev(std::end(given))),
+    name(given.back())
   {
   }
 
@@ -79,9 +77,9 @@ struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO referen
 
   friend auto operator<<(std::ostream & os, const PrefixedName & prefixed_name) -> std::ostream &
   {
-    // if (prefixed_name.fully_prefixed) {
-    //   os << "{root}::";
-    // }
+    if (prefixed_name.fully_prefixed) {
+      os << "{root}::";
+    }
 
     for (const auto & prefix : prefixed_name.prefixes) {
       os << (prefix.empty() ? "{annonymous}" : prefix.c_str()) << "::";

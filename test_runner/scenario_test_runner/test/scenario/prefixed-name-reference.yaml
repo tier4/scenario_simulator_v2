@@ -205,7 +205,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 10
+                                      value: 3
                                       rule: greaterThan
                         Action:
                           - name: Action1

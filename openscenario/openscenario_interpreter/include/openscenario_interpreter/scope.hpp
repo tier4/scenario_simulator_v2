@@ -63,10 +63,10 @@ private:
   static auto lookupQualifiedElement(
     const EnvironmentFrame *,                  //
     std::vector<std::string>::const_iterator,  //
-    std::vector<std::string>::const_iterator) -> Object;
+    std::vector<std::string>::const_iterator,  //
+    const Name &) -> Object;
 
-  // TODO RENAME TO "frame"
-  auto lookupUnqualifiedScope(const Name &) const -> const EnvironmentFrame *;
+  auto lookupFrame(const Name &) const -> const EnvironmentFrame *;
 };
 
 class Scope
