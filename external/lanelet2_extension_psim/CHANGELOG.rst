@@ -2,6 +2,14 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.7 (2021-11-09)
+------------------
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* basic impl
+* Merge branch 'master' into feature/interpreter/catalog
+* Contributors: kyabe2718
+
 0.5.6 (2021-10-28)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_plugin
