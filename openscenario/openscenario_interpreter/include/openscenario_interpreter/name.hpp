@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <iterator>
+#include <list>
 #include <openscenario_interpreter/error.hpp>
 #include <string>
 
@@ -39,7 +40,7 @@ struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO referen
 {
   const bool fully_prefixed;
 
-  const std::vector<std::string> prefixes;
+  const std::list<std::string> prefixes;
 
   const Name name;
 

@@ -60,11 +60,10 @@ private:
 
   auto frames(const Name &) const -> std::list<const EnvironmentFrame *>;
 
-  static auto lookupQualifiedElement(
-    const EnvironmentFrame *,                  //
-    std::vector<std::string>::const_iterator,  //
-    std::vector<std::string>::const_iterator,  //
-    const Name &) -> Object;
+  auto lookupQualifiedElement(
+    std::list<std::string>::const_iterator,  //
+    std::list<std::string>::const_iterator,  //
+    const Name &) const -> Object;
 
   auto lookupFrame(const Name &) const -> const EnvironmentFrame *;
 };

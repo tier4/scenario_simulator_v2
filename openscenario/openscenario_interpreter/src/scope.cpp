@@ -61,11 +61,10 @@ auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> O
       assert(not prefixed_name.prefixes.front().empty());
     }
 
-    return lookupQualifiedElement(
-      lookupFrame(prefixed_name.prefixes.front()),
-      prefixed_name.prefixes.begin() + 1,  //
-      prefixed_name.prefixes.end(),        //
-      prefixed_name.name);
+    return lookupFrame(prefixed_name.prefixes.front())
+      ->lookupQualifiedElement(
+        std::next(prefixed_name.prefixes.begin()), prefixed_name.prefixes.end(),
+        prefixed_name.name);
   }
 }
 
@@ -104,27 +103,23 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
 }
 
 auto EnvironmentFrame::lookupQualifiedElement(
-  const EnvironmentFrame * scope,                  //
-  std::vector<std::string>::const_iterator begin,  //
-  std::vector<std::string>::const_iterator end,    //
-  const Name & name) -> Object
+  std::list<std::string>::const_iterator begin,  //
+  std::list<std::string>::const_iterator end,    //
+  const Name & name) const -> Object
 {
-  assert(scope);
-
-  for (auto iter = begin; iter != end; ++iter) {
-    auto found = scope->frames(*iter);
+  if (begin != end) {
+    auto found = frames(*begin);
     switch (found.size()) {
       case 0:
         return Object();
       case 1:
-        scope = found.front();
-        break;
+        return found.front()->lookupQualifiedElement(std::next(begin), end, name);
       default:
-        throw SyntaxError("Ambiguous reference to ", std::quoted(*iter), ".");
+        throw SyntaxError("Ambiguous reference to ", std::quoted(*begin), ".");
     }
+  } else {
+    return lookdown(name);
   }
-
-  return scope->lookdown(name);
 }
 
 auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
