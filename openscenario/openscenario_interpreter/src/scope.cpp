@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iterator>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
@@ -55,13 +56,10 @@ auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> O
   if (prefixed_name.prefixes.empty() and not prefixed_name.fully_prefixed) {
     return find(prefixed_name.name);
   } else if (prefixed_name.fully_prefixed) {
-    return lookupFrame("")->lookupQualifiedElement(
-      prefixed_name.prefixes.begin(), prefixed_name.prefixes.end(), prefixed_name.name);
+    return lookupFrame("")->lookupQualifiedElement(prefixed_name);
   } else {
     return lookupFrame(prefixed_name.prefixes.front())
-      ->lookupQualifiedElement(
-        std::next(prefixed_name.prefixes.begin()), prefixed_name.prefixes.end(),
-        prefixed_name.name);
+      ->lookupQualifiedElement(prefixed_name.inner());
   }
 }
 
@@ -99,23 +97,22 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
   return Object();
 }
 
-auto EnvironmentFrame::lookupQualifiedElement(
-  std::list<std::string>::const_iterator begin,  //
-  std::list<std::string>::const_iterator end,    //
-  const Name & name) const -> Object
+auto EnvironmentFrame::lookupQualifiedElement(const PrefixedName & prefixed_name) const -> Object
 {
-  if (begin != end) {
-    auto found = frames(*begin);
+  if (not prefixed_name.prefixes.empty()) {
+    auto found = frames(prefixed_name.prefixes.front());
     switch (found.size()) {
       case 0:
-        return Object();
+        return Object();  // TODO SYNTAX_ERROR
       case 1:
-        return found.front()->lookupQualifiedElement(std::next(begin), end, name);
+        return found.front()->lookupQualifiedElement(prefixed_name.inner());
       default:
-        throw SyntaxError("Ambiguous reference to ", std::quoted(*begin), ".");
+        throw SyntaxError(
+          "Ambiguous reference to ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)),
+          ".");
     }
   } else {
-    return lookdown(name);
+    return lookdown(prefixed_name.name);
   }
 }
 

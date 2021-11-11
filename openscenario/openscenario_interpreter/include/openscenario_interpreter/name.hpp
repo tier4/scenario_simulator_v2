@@ -48,6 +48,12 @@ struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO referen
 
   PrefixedName(const PrefixedName &) = delete;
 
+  explicit PrefixedName(
+    bool fully_prefixed, const std::list<std::string> & prefixes, const Name & name)
+  : fully_prefixed(fully_prefixed), prefixes(prefixes), name(name)
+  {
+  }
+
   explicit PrefixedName(const std::vector<std::string> given)
   : fully_prefixed(not given.empty() and given.front().empty()),
     prefixes(
@@ -58,6 +64,11 @@ struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO referen
   }
 
   PrefixedName(const std::string & given) : PrefixedName(separate(given)) {}
+
+  auto inner() const
+  {
+    return PrefixedName(false, {std::next(std::begin(prefixes)), std::end(prefixes)}, name);
+  }
 
   static auto separate(const std::string & name) -> std::vector<std::string>
   {
