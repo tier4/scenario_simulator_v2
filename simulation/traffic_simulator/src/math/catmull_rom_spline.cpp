@@ -317,41 +317,18 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
 boost::optional<double> CatmullRomSpline::getSValue(
   const geometry_msgs::msg::Pose & pose, double threshold_distance)
 {
-  std::vector<double> s_values;
-  std::vector<double> error_values;
-  std::vector<size_t> curve_index;
+  double s = 0;
   for (size_t i = 0; i < curves_.size(); i++) {
     auto s_value = curves_[i].getSValue(pose, threshold_distance);
     if (s_value) {
       if (s_value.get() > 0 && s_value.get() < curves_[i].getLength()) {
-        s_values.emplace_back(s_value.get());
-        error_values.emplace_back(
-          curves_[i].getSquaredDistanceIn2D(pose.position, s_value.get(), true));
-        curve_index.emplace_back(i);
+        s = s + s_value.get();
+        return s;
       }
     }
+    s = s + curves_[i].getLength();
   }
-  if (s_values.size() != error_values.size()) {
-    THROW_SIMULATION_ERROR("s values and error values size are does not match");  // LCOV_EXCL_LINE
-  }
-  if (s_values.size() != curve_index.size()) {
-    THROW_SIMULATION_ERROR("s values and error values size are does not match");  // LCOV_EXCL_LINE
-  }
-  if (s_values.empty()) {
-    return boost::none;
-  }
-  double s = 0;
-  auto iter = std::max_element(error_values.begin(), error_values.end());
-  size_t min_error_index = std::distance(error_values.begin(), iter);
-  for (size_t i = 0; i <= curve_index[min_error_index]; i++) {
-    if (i == curve_index[min_error_index]) {
-      s = s + s_values[min_error_index];
-      break;
-    } else {
-      s = s + curves_[i].getLength();
-    }
-  }
-  return s;
+  return boost::none;
 }
 
 double CatmullRomSpline::getSquaredDistanceIn2D(geometry_msgs::msg::Point point, double s) const
