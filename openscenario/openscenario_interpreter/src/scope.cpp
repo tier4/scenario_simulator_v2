@@ -14,13 +14,11 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <cassert>
 #include <iterator>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-
-#undef NDEBUG
-#include <cassert>
 
 namespace openscenario_interpreter
 {
@@ -72,10 +70,10 @@ auto EnvironmentFrame::find(const Prefixed<Name> & prefixed_name) const -> Objec
 
 auto EnvironmentFrame::findObject(const Prefixed<Name> & prefixed_name) const -> Object
 {
-  if (prefixed_name.prefixes.empty() and not prefixed_name.fully_prefixed) {
-    return find(prefixed_name.name);
-  } else if (prefixed_name.fully_prefixed) {
+  if (prefixed_name.absolute) {
     return outermostFrame().find(prefixed_name);
+  } else if (prefixed_name.prefixes.empty()) {
+    return find(prefixed_name.name);
   } else {
     return lookupFrame(prefixed_name.prefixes.front())->find(prefixed_name.strip<1>());
   }
@@ -88,12 +86,12 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
   while (not same_level.empty()) {
     std::vector<const EnvironmentFrame *> next_level;
 
-    std::vector<Object> ret;
+    std::vector<Object> result;
 
     for (auto * frame : same_level) {
       auto range = frame->variables.equal_range(name);
       for (auto it = range.first; it != range.second; ++it) {
-        ret.push_back(it->second);
+        result.push_back(it->second);
       }
 
       for (auto * f : frame->unnamed_inner_frames) {
@@ -101,15 +99,15 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
       }
     }
 
-    if (ret.size() == 1) {
-      return ret.front();
+    switch (result.size()) {
+      case 0:
+        same_level = std::move(next_level);
+        break;
+      case 1:
+        return result.front();
+      default:
+        throw SyntaxError("ambiguous reference to ", std::quoted(name));
     }
-
-    if (ret.size() > 1) {
-      THROW_SYNTAX_ERROR("ambiguous reference to ", std::quoted(name));
-    }
-
-    same_level = std::move(next_level);
   }
 
   return Object();

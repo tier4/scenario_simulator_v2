@@ -39,7 +39,7 @@ struct Name : public std::string
 template <typename Name>
 struct Prefixed  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
 {
-  const bool fully_prefixed;
+  const bool absolute;
 
   const std::list<std::string> prefixes;
 
@@ -47,16 +47,15 @@ struct Prefixed  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
 
   Prefixed() = delete;
 
-  explicit Prefixed(bool fully_prefixed, const std::list<std::string> & prefixes, const Name & name)
-  : fully_prefixed(fully_prefixed), prefixes(prefixes), name(name)
+  explicit Prefixed(bool absolute, const std::list<std::string> & prefixes, const Name & name)
+  : absolute(absolute), prefixes(prefixes), name(name)
   {
   }
 
   explicit Prefixed(const std::vector<std::string> given)
-  : fully_prefixed(not given.empty() and given.front().empty()),
+  : absolute(not given.empty() and given.front().empty()),
     prefixes(
-      fully_prefixed ? std::next(std::begin(given)) : std::begin(given),
-      std::prev(std::end(given))),
+      absolute ? std::next(std::begin(given)) : std::begin(given), std::prev(std::end(given))),
     name(given.back())
   {
   }
@@ -91,7 +90,7 @@ struct Prefixed  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
 
   friend auto operator<<(std::ostream & os, const Prefixed & prefixed_name) -> std::ostream &
   {
-    if (prefixed_name.fully_prefixed) {
+    if (prefixed_name.absolute) {
       os << "{root}::";
     }
 
