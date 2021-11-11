@@ -305,6 +305,43 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
   return exclude_subtype_lanelets;
 }
 
+lanelet::BasicPolygon2d HdMapUtils::absoluteHull(
+  const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const
+{
+  lanelet::BasicPolygon2d hullPoints;
+  hullPoints.reserve(relativeHull.size());
+  for (const auto & hullPt : relativeHull) {
+    hullPoints.push_back(pose * hullPt);
+  }
+  return hullPoints;
+}
+
+lanelet::BasicPoint2d HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & point) const
+{
+  return lanelet::BasicPoint2d{point.x, point.y};
+}
+
+boost::optional<std::int64_t> HdMapUtils::matchToLane(const geometry_msgs::msg::Pose & pose) const
+{
+  boost::optional<std::int64_t> id;
+  lanelet::matching::Object2d obj;
+  obj.pose.translation() = toPoint2d(pose.position);
+  obj.pose.linear() = Eigen::Rotation2D<double>(
+                        quaternion_operation::convertQuaternionToEulerAngle(pose.orientation).z)
+                        .matrix();
+  obj.absoluteHull = absoluteHull(
+    lanelet::matching::Hull2d{lanelet::BasicPoint2d{-2, -1}, lanelet::BasicPoint2d{2, 1}},
+    obj.pose);
+  auto matches = getDeterministicMatches(*lanelet_map_ptr_, obj, 3.0);
+  if (matches.empty()) {
+    return boost::none;
+  }
+  std::sort(matches.begin(), matches.end(), [](auto const& lhs, auto const& rhs) {
+    return lhs.distance < rhs.distance;
+  });
+  return matches[0].lanelet.id();
+}
+
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, bool include_crosswalk)
 {
