@@ -52,15 +52,12 @@ auto EnvironmentFrame::find(const Name & name) const -> Object
 
 auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> Object
 {
-  if (prefixed_name.prefixes.empty()) {
+  if (prefixed_name.prefixes.empty() and not prefixed_name.fully_prefixed) {
     return find(prefixed_name.name);
+  } else if (prefixed_name.fully_prefixed) {
+    return lookupFrame("")->lookupQualifiedElement(
+      prefixed_name.prefixes.begin(), prefixed_name.prefixes.end(), prefixed_name.name);
   } else {
-    if (prefixed_name.fully_prefixed) {
-      assert(prefixed_name.prefixes.front().empty());
-    } else {
-      assert(not prefixed_name.prefixes.front().empty());
-    }
-
     return lookupFrame(prefixed_name.prefixes.front())
       ->lookupQualifiedElement(
         std::next(prefixed_name.prefixes.begin()), prefixed_name.prefixes.end(),
@@ -155,8 +152,10 @@ auto EnvironmentFrame::lookupFrame(const Name & name) const -> const Environment
     auto sibling_scope = outer_frame->frames(name);
     switch (sibling_scope.size()) {
       case 0:
+        assert(outer_frame);
         return outer_frame->lookupFrame(name);
       case 1:
+        assert(sibling_scope.front());
         return sibling_scope.front();
       default:
         throw SyntaxError(
