@@ -58,11 +58,13 @@ public:
   auto isOutermost() const noexcept -> bool;
 
 private:
-  auto lookdown(const std::string &) const -> Object;
-
   auto frames(const Name &) const -> std::list<const EnvironmentFrame *>;
 
+  auto lookdown(const std::string &) const -> Object;
+
   auto lookupFrame(const Name &) const -> const EnvironmentFrame *;
+
+  auto outermostFrame() const noexcept -> const EnvironmentFrame &;
 };
 
 class Scope

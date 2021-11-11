@@ -59,7 +59,7 @@ auto EnvironmentFrame::find(const Prefixed<Name> & prefixed_name) const -> Objec
       case 0:
         return Object();  // TODO SYNTAX_ERROR
       case 1:
-        return found.front()->find(prefixed_name.inner<1>());
+        return found.front()->find(prefixed_name.strip<1>());
       default:
         throw SyntaxError(
           "Ambiguous reference to ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)),
@@ -75,9 +75,9 @@ auto EnvironmentFrame::findObject(const Prefixed<Name> & prefixed_name) const ->
   if (prefixed_name.prefixes.empty() and not prefixed_name.fully_prefixed) {
     return find(prefixed_name.name);
   } else if (prefixed_name.fully_prefixed) {
-    return lookupFrame("")->find(prefixed_name);
+    return outermostFrame().find(prefixed_name);
   } else {
-    return lookupFrame(prefixed_name.prefixes.front())->find(prefixed_name.inner<1>());
+    return lookupFrame(prefixed_name.prefixes.front())->find(prefixed_name.strip<1>());
   }
 }
 
@@ -136,14 +136,26 @@ auto EnvironmentFrame::frames(const Name & name) const -> std::list<const Enviro
   return result;
 }
 
+auto EnvironmentFrame::outermostFrame() const noexcept -> const EnvironmentFrame &
+{
+  auto frame = this;
+
+  while (not frame->isOutermost()) {
+    frame = frame->outer_frame;
+  }
+
+  assert(frame);
+  assert(frame->isOutermost());
+
+  return *frame;
+}
+
 auto EnvironmentFrame::lookupFrame(const Name & name) const -> const EnvironmentFrame *
 {
-  // assert(not name.empty());
+  assert(not name.empty());
 
   if (isOutermost()) {
-    return name.empty()
-             ? this
-             : throw SyntaxError("There is no StoryboardElement named ", std::quoted(name), ".");
+    return this;
   } else {
     auto sibling_scope = outer_frame->frames(name);
     switch (sibling_scope.size()) {

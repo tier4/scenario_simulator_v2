@@ -64,7 +64,7 @@ struct Prefixed  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
   Prefixed(const std::string & given) : Prefixed(separate(given)) {}
 
   template <std::size_t N>
-  auto inner() const
+  auto strip() const
   {
     return Prefixed(false, {std::next(std::begin(prefixes), N), std::end(prefixes)}, name);
   }
