@@ -321,7 +321,8 @@ lanelet::BasicPoint2d HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & po
   return lanelet::BasicPoint2d{point.x, point.y};
 }
 
-boost::optional<std::int64_t> HdMapUtils::matchToLane(const geometry_msgs::msg::Pose & pose) const
+boost::optional<std::int64_t> HdMapUtils::matchToLane(
+  const geometry_msgs::msg::Pose & pose, bool include_crosswalk) const
 {
   boost::optional<std::int64_t> id;
   lanelet::matching::Object2d obj;
@@ -332,11 +333,14 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(const geometry_msgs::msg::
   obj.absoluteHull = absoluteHull(
     lanelet::matching::Hull2d{lanelet::BasicPoint2d{-2, -1}, lanelet::BasicPoint2d{2, 1}},
     obj.pose);
-  auto matches = getDeterministicMatches(*lanelet_map_ptr_, obj, 3.0);
+  auto matches = lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, 3.0);
+  if (!include_crosswalk) {
+    matches = lanelet::matching::removeNonRuleCompliantMatches(matches, traffic_rules_vehicle_ptr_);
+  }
   if (matches.empty()) {
     return boost::none;
   }
-  std::sort(matches.begin(), matches.end(), [](auto const& lhs, auto const& rhs) {
+  std::sort(matches.begin(), matches.end(), [](auto const & lhs, auto const & rhs) {
     return lhs.distance < rhs.distance;
   });
   return matches[0].lanelet.id();

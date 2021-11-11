@@ -17,8 +17,8 @@
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/math/bounding_box.hpp>
+#include <traffic_simulator/math/hermite_curve.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -156,7 +156,7 @@ boost::optional<double> HermiteCurve::getSValue(
   p1.y = -threshold_distance;
   const auto line = math::transformPoints(pose, {p0, p1});
   const auto s = getCollisionPointIn2D(line[0], line[1], false);
-  if(!s){
+  if (!s) {
     return boost::none;
   }
   if (autoscale) {

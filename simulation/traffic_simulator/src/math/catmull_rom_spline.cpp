@@ -321,12 +321,12 @@ boost::optional<double> CatmullRomSpline::getSValue(
   std::vector<double> error_values;
   std::vector<size_t> curve_index;
   for (size_t i = 0; i < curves_.size(); i++) {
-    auto s_value = curves_[i].getSValue(
-      pose, threshold_distance);
+    auto s_value = curves_[i].getSValue(pose, threshold_distance);
     if (s_value) {
       if (s_value.get() > 0 && s_value.get() < curves_[i].getLength()) {
         s_values.emplace_back(s_value.get());
-        error_values.emplace_back(curves_[i].getSquaredDistanceIn2D(pose.position, s_value.get(), true));
+        error_values.emplace_back(
+          curves_[i].getSquaredDistanceIn2D(pose.position, s_value.get(), true));
         curve_index.emplace_back(i);
       }
     }

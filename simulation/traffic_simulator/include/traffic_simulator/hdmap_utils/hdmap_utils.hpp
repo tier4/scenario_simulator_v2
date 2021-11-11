@@ -69,14 +69,13 @@ public:
     geometry_msgs::msg::Pose pose, bool include_crosswalk = false);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, std::int64_t lanelet_id);
-  boost::optional<std::int64_t> matchToLane(const geometry_msgs::msg::Pose & pose) const;
+  boost::optional<std::int64_t> matchToLane(
+    const geometry_msgs::msg::Pose & pose, bool include_crosswalk = false) const;
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
   geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset);
-
   double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
-
   const std::vector<std::int64_t> getLaneletIds();
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;

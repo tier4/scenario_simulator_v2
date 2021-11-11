@@ -18,7 +18,7 @@
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
-TEST(HdMapUtils, HdMapUtils1)
+TEST(HdMapUtils, Construct)
 {
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
@@ -27,6 +27,19 @@ TEST(HdMapUtils, HdMapUtils1)
   origin.longitude = 139.78066608243;
   hdmap_utils::HdMapUtils hdmap_utils(path, origin);
   ASSERT_NO_THROW(hdmap_utils.toMapBin());
+}
+
+TEST(HdMapUtils, MatchToLane)
+{
+  std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+  geographic_msgs::msg::GeoPoint origin;
+  origin.latitude = 35.61836750154;
+  origin.longitude = 139.78066608243;
+  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  const auto id = hdmap_utils.matchToLane(hdmap_utils.toMapPose(34438, 1, 0).pose);
+  EXPECT_TRUE(id);
+  EXPECT_EQ(id.get(), 34438);
 }
 
 int main(int argc, char ** argv)
