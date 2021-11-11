@@ -53,10 +53,12 @@ public:
 
   auto findObject(const PrefixedName &) const -> Object;
 
+  auto isOutermost() const noexcept -> bool;
+
 private:
   auto lookdown(const std::string &) const -> Object;
 
-  auto lookupChildScope(const std::string &) const -> std::list<const EnvironmentFrame *>;
+  auto frames(const std::string &) const -> std::list<const EnvironmentFrame *>;
 
   static auto lookupQualifiedElement(
     const EnvironmentFrame *,                  //

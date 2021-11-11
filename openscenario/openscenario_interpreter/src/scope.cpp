@@ -30,6 +30,11 @@ EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & outer_frame, const std::st
   }
 }
 
+auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
+{
+  variables.emplace(name, object);
+}
+
 auto EnvironmentFrame::find(const Name & name) const -> Object
 {
   for (auto frame = this; frame; frame = frame->outer_frame) {
@@ -58,11 +63,6 @@ auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> O
       return unspecified;
     }
   }
-}
-
-auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
-{
-  variables.emplace(name, object);
 }
 
 auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
@@ -99,33 +99,13 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
   return Object();
 }
 
-auto EnvironmentFrame::lookupChildScope(const std::string & name) const
-  -> std::list<const EnvironmentFrame *>
-{
-  std::list<const EnvironmentFrame *> result;
-
-  auto range = inner_frames.equal_range(name);
-
-  for (auto it = range.first; it != range.second; ++it) {
-    result.push_back(it->second);
-  }
-
-  if (result.empty()) {
-    for (auto & child : unnamed_inner_frames) {
-      result.merge(child->lookupChildScope(name));
-    }
-  }
-
-  return result;
-}
-
 auto EnvironmentFrame::lookupQualifiedElement(
   const EnvironmentFrame * scope,                  //
   std::vector<std::string>::const_iterator begin,  //
   std::vector<std::string>::const_iterator end) -> Object
 {
   for (auto iter = begin; iter != end - 1; ++iter) {
-    auto found = scope->lookupChildScope(*iter);
+    auto found = scope->frames(*iter);
     switch (found.size()) {
       case 0:
         return Object();
@@ -140,12 +120,34 @@ auto EnvironmentFrame::lookupQualifiedElement(
   return scope->lookdown(*(end - 1));
 }
 
+auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
+
+auto EnvironmentFrame::frames(const std::string & name) const
+  -> std::list<const EnvironmentFrame *>
+{
+  std::list<const EnvironmentFrame *> result;
+
+  auto range = inner_frames.equal_range(name);
+
+  for (auto it = range.first; it != range.second; ++it) {
+    result.push_back(it->second);
+  }
+
+  if (result.empty()) {
+    for (auto & child : unnamed_inner_frames) {
+      result.merge(child->frames(name));
+    }
+  }
+
+  return result;
+}
+
 auto EnvironmentFrame::lookupUnqualifiedScope(const Name & name) const -> const EnvironmentFrame *
 {
-  if (outer_frame == nullptr) {  // this is global scope
+  if (isOutermost()) {
     return name.empty() ? this : nullptr;
   } else {
-    auto sibling_scope = outer_frame->lookupChildScope(name);
+    auto sibling_scope = outer_frame->frames(name);
     if (sibling_scope.size() == 1) {
       return sibling_scope.front();
     } else if (sibling_scope.size() > 1) {
