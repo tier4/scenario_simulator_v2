@@ -51,7 +51,9 @@ public:
 
   auto find(const Name &) const -> Object;
 
-  auto findObject(const PrefixedName &) const -> Object;
+  auto find(const Prefixed<Name> &) const -> Object;
+
+  auto findObject(const Prefixed<Name> &) const -> Object;
 
   auto isOutermost() const noexcept -> bool;
 
@@ -59,8 +61,6 @@ private:
   auto lookdown(const std::string &) const -> Object;
 
   auto frames(const Name &) const -> std::list<const EnvironmentFrame *>;
-
-  auto lookupQualifiedElement(const PrefixedName &) const -> Object;
 
   auto lookupFrame(const Name &) const -> const EnvironmentFrame *;
 };

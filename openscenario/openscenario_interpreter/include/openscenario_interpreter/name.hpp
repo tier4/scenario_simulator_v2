@@ -36,7 +36,8 @@ struct Name : public std::string
   }
 };
 
-struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
+template <typename Name>
+struct Prefixed  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
 {
   const bool fully_prefixed;
 
@@ -44,17 +45,14 @@ struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO referen
 
   const Name name;
 
-  PrefixedName() = delete;
+  Prefixed() = delete;
 
-  PrefixedName(const PrefixedName &) = delete;
-
-  explicit PrefixedName(
-    bool fully_prefixed, const std::list<std::string> & prefixes, const Name & name)
+  explicit Prefixed(bool fully_prefixed, const std::list<std::string> & prefixes, const Name & name)
   : fully_prefixed(fully_prefixed), prefixes(prefixes), name(name)
   {
   }
 
-  explicit PrefixedName(const std::vector<std::string> given)
+  explicit Prefixed(const std::vector<std::string> given)
   : fully_prefixed(not given.empty() and given.front().empty()),
     prefixes(
       fully_prefixed ? std::next(std::begin(given)) : std::begin(given),
@@ -63,11 +61,12 @@ struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO referen
   {
   }
 
-  PrefixedName(const std::string & given) : PrefixedName(separate(given)) {}
+  Prefixed(const std::string & given) : Prefixed(separate(given)) {}
 
+  template <std::size_t N>
   auto inner() const
   {
-    return PrefixedName(false, {std::next(std::begin(prefixes)), std::end(prefixes)}, name);
+    return Prefixed(false, {std::next(std::begin(prefixes), N), std::end(prefixes)}, name);
   }
 
   static auto separate(const std::string & name) -> std::vector<std::string>
@@ -90,7 +89,7 @@ struct PrefixedName  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO referen
     return result;
   }
 
-  friend auto operator<<(std::ostream & os, const PrefixedName & prefixed_name) -> std::ostream &
+  friend auto operator<<(std::ostream & os, const Prefixed & prefixed_name) -> std::ostream &
   {
     if (prefixed_name.fully_prefixed) {
       os << "{root}::";

@@ -51,15 +51,33 @@ auto EnvironmentFrame::find(const Name & name) const -> Object
   return Object();  // TODO SYNTAX_ERROR
 }
 
-auto EnvironmentFrame::findObject(const PrefixedName & prefixed_name) const -> Object
+auto EnvironmentFrame::find(const Prefixed<Name> & prefixed_name) const -> Object
+{
+  if (not prefixed_name.prefixes.empty()) {
+    auto found = frames(prefixed_name.prefixes.front());
+    switch (found.size()) {
+      case 0:
+        return Object();  // TODO SYNTAX_ERROR
+      case 1:
+        return found.front()->find(prefixed_name.inner<1>());
+      default:
+        throw SyntaxError(
+          "Ambiguous reference to ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)),
+          ".");
+    }
+  } else {
+    return lookdown(prefixed_name.name);
+  }
+}
+
+auto EnvironmentFrame::findObject(const Prefixed<Name> & prefixed_name) const -> Object
 {
   if (prefixed_name.prefixes.empty() and not prefixed_name.fully_prefixed) {
     return find(prefixed_name.name);
   } else if (prefixed_name.fully_prefixed) {
-    return lookupFrame("")->lookupQualifiedElement(prefixed_name);
+    return lookupFrame("")->find(prefixed_name);
   } else {
-    return lookupFrame(prefixed_name.prefixes.front())
-      ->lookupQualifiedElement(prefixed_name.inner());
+    return lookupFrame(prefixed_name.prefixes.front())->find(prefixed_name.inner<1>());
   }
 }
 
@@ -95,25 +113,6 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
   }
 
   return Object();
-}
-
-auto EnvironmentFrame::lookupQualifiedElement(const PrefixedName & prefixed_name) const -> Object
-{
-  if (not prefixed_name.prefixes.empty()) {
-    auto found = frames(prefixed_name.prefixes.front());
-    switch (found.size()) {
-      case 0:
-        return Object();  // TODO SYNTAX_ERROR
-      case 1:
-        return found.front()->lookupQualifiedElement(prefixed_name.inner());
-      default:
-        throw SyntaxError(
-          "Ambiguous reference to ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)),
-          ".");
-    }
-  } else {
-    return lookdown(prefixed_name.name);
-  }
 }
 
 auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
