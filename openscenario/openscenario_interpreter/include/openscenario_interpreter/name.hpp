@@ -95,7 +95,7 @@ struct Prefixed  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
     }
 
     for (const auto & prefix : prefixed_name.prefixes) {
-      os << (prefix.empty() ? "{annonymous}" : prefix.c_str()) << "::";
+      os << (prefix.empty() ? "{anonymous}" : prefix.c_str()) << "::";
     }
 
     return os << prefixed_name.name;
