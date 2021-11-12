@@ -323,7 +323,7 @@ lanelet::BasicPoint2d HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & po
 
 boost::optional<std::int64_t> HdMapUtils::matchToLane(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  bool include_crosswalk) const
+  bool include_crosswalk, double reduction_ratio) const
 {
   boost::optional<std::int64_t> id;
   lanelet::matching::Object2d obj;
@@ -334,9 +334,11 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(
   obj.absoluteHull = absoluteHull(
     lanelet::matching::Hull2d{
       lanelet::BasicPoint2d{
-        bbox.center.x + bbox.dimensions.x * 0.5, bbox.center.y + bbox.dimensions.y * 0.5},
+        bbox.center.x + bbox.dimensions.x * 0.5 * reduction_ratio,
+        bbox.center.y + bbox.dimensions.y * 0.5 * reduction_ratio},
       lanelet::BasicPoint2d{
-        bbox.center.x - bbox.dimensions.x * 0.5, bbox.center.y - bbox.dimensions.y * 0.5}},
+        bbox.center.x - bbox.dimensions.x * 0.5 * reduction_ratio,
+        bbox.center.y - bbox.dimensions.y * 0.5 * reduction_ratio}},
     obj.pose);
   auto matches = lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, 3.0);
   if (!include_crosswalk) {
@@ -383,13 +385,31 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  bool include_crosswalk = false)
+  bool include_crosswalk)
 {
   const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
   if (!lanelet_id) {
-    return boost::none;
+    return toLaneletPose(pose, include_crosswalk);
   }
-  return toLaneletPose(pose, lanelet_id.get());
+  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.get());
+  if (pose_in_target_lanelet) {
+    return pose_in_target_lanelet;
+  }
+  const auto previous = getPreviousLaneletIds(lanelet_id.get());
+  for (const auto id : previous) {
+    const auto pose_in_previous = toLaneletPose(pose, id);
+    if (pose_in_previous) {
+      return pose_in_previous;
+    }
+  }
+  const auto next = getNextLaneletIds(lanelet_id.get());
+  for (const auto id : previous) {
+    const auto pose_in_next = toLaneletPose(pose, id);
+    if (pose_in_next) {
+      return pose_in_next;
+    }
+  }
+  return toLaneletPose(pose, include_crosswalk);
 }
 
 boost::optional<std::int64_t> HdMapUtils::getClosestLaneletId(
