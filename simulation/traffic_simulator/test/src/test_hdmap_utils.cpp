@@ -42,14 +42,16 @@ TEST(HdMapUtils, MatchToLane)
   bbox.center.y = 0.0;
   bbox.dimensions.x = 1.0;
   bbox.dimensions.y = 1.0;
-  /*
-  const auto id = hdmap_utils.matchToLane(hdmap_utils.toMapPose(34438, 1, 0).pose);
-  EXPECT_TRUE(id);
-  EXPECT_EQ(id.get(), 34438);
-  */
-  const auto id = hdmap_utils.matchToLane(hdmap_utils.toMapPose(34411, 1, 0).pose, bbox);
-  EXPECT_TRUE(id);
-  EXPECT_EQ(id.get(), 34411);
+  {
+    const auto id = hdmap_utils.matchToLane(hdmap_utils.toMapPose(120659, 1, 0).pose, bbox);
+    EXPECT_TRUE(id);
+    EXPECT_EQ(id.get(), 120659);
+  }
+  {
+    const auto id = hdmap_utils.matchToLane(hdmap_utils.toMapPose(34411, 1, 0).pose, bbox);
+    EXPECT_TRUE(id);
+    EXPECT_EQ(id.get(), 34411);
+  }
 }
 
 int main(int argc, char ** argv)
