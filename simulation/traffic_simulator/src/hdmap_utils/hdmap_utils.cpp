@@ -322,7 +322,8 @@ lanelet::BasicPoint2d HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & po
 }
 
 boost::optional<std::int64_t> HdMapUtils::matchToLane(
-  const geometry_msgs::msg::Pose & pose, bool include_crosswalk) const
+  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  bool include_crosswalk) const
 {
   boost::optional<std::int64_t> id;
   lanelet::matching::Object2d obj;
@@ -331,7 +332,11 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(
                         quaternion_operation::convertQuaternionToEulerAngle(pose.orientation).z)
                         .matrix();
   obj.absoluteHull = absoluteHull(
-    lanelet::matching::Hull2d{lanelet::BasicPoint2d{-2, -1}, lanelet::BasicPoint2d{2, 1}},
+    lanelet::matching::Hull2d{
+      lanelet::BasicPoint2d{
+        bbox.center.x + bbox.dimensions.x * 0.5, bbox.center.y + bbox.dimensions.y * 0.5},
+      lanelet::BasicPoint2d{
+        bbox.center.x - bbox.dimensions.x * 0.5, bbox.center.y - bbox.dimensions.y * 0.5}},
     obj.pose);
   auto matches = lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, 3.0);
   if (!include_crosswalk) {
