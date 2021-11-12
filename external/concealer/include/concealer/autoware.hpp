@@ -125,7 +125,7 @@ public:
         }
         RCLCPP_INFO_STREAM(
           get_logger(),
-          "\x1b[32mShutting down Autoware: (1/3) Stoped publlishing/subscribing.\x1b[0m");
+          "\x1b[32mShutting down Autoware: (1/3) Stopped publishing/subscribing.\x1b[0m");
       },
       std::move(promise.get_future())),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...))
