@@ -381,6 +381,17 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   return lanelet_pose;
 }
 
+boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
+  geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  bool include_crosswalk = false)
+{
+  const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
+  if (!lanelet_id) {
+    return boost::none;
+  }
+  return toLaneletPose(pose, lanelet_id.get());
+}
+
 boost::optional<std::int64_t> HdMapUtils::getClosestLaneletId(
   geometry_msgs::msg::Pose pose, double distance_thresh, bool include_crosswalk)
 {

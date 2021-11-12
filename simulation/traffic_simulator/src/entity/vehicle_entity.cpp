@@ -59,7 +59,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> route;
   for (const auto & waypoint : waypoints) {
-    const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint);
+    const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint, false);
     if (lanelet_waypoint) {
       route.emplace_back(lanelet_waypoint.get());
     } else {
@@ -79,7 +79,7 @@ void VehicleEntity::requestAcquirePosition(
 
 void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
-  const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose);
+  const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, false);
   if (lanelet_pose) {
     requestAcquirePosition(lanelet_pose.get());
   } else {

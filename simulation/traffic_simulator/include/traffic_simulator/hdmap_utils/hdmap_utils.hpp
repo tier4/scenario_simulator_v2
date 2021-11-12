@@ -66,13 +66,17 @@ public:
     const visualization_msgs::msg::MarkerArray & a2) const;
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id, std::vector<double> s);
+  // [[deprecated("please use toLaneletPose with bounding box size")]]
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
-    geometry_msgs::msg::Pose pose, bool include_crosswalk = false);
+    geometry_msgs::msg::Pose pose, bool include_crosswalk);
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+    bool include_crosswalk);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, std::int64_t lanelet_id);
   boost::optional<std::int64_t> matchToLane(
     const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-    bool include_crosswalk = false) const;
+    bool include_crosswalk) const;
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);

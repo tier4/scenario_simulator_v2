@@ -22,10 +22,16 @@ static typename std::aligned_storage<
 
 traffic_simulator::API & connection = reinterpret_cast<traffic_simulator::API &>(memory);
 
+/**
+ * @todo please check passing false value is valid to the toLaneletPose function
+ */
 auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
-  decltype(connection.toLaneletPose(std::declval<decltype(pose)>()).get())>::type
+  decltype(connection.toLaneletPose(std::declval<decltype(pose)>(), false).get())>::type
 {
-  const auto result = connection.toLaneletPose(pose);
+  /**
+   * @todo please check passing false value is valid to the toLaneletPose function
+   */
+  const auto result = connection.toLaneletPose(pose, false);
 
   if (result) {
     return result.get();

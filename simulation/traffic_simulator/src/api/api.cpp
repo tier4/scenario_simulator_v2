@@ -181,7 +181,7 @@ bool API::setEntityStatus(
   traffic_simulator_msgs::msg::EntityStatus status;
   status.time = clock_.getCurrentSimulationTime();
   status.pose = pose;
-  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
+  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose, false);
   status.action_status = action_status;
   if (lanelet_pose) {
     status.lanelet_pose_valid = true;
@@ -252,7 +252,7 @@ bool API::setEntityStatus(
   const std::string & name, const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status)
 {
-  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(map_pose);
+  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(map_pose, false);
   traffic_simulator_msgs::msg::EntityStatus status;
   if (lanelet_pose) {
     status.lanelet_pose = lanelet_pose.get();
@@ -383,7 +383,7 @@ bool API::updateEntityStatusInSim()
     geometry_msgs::msg::Pose pose;
     simulation_interface::toMsg(status.pose(), pose);
     status_msg.pose = pose;
-    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
+    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose, false);
     if (lanelet_pose) {
       status_msg.lanelet_pose_valid = true;
       status_msg.lanelet_pose = lanelet_pose.get();
