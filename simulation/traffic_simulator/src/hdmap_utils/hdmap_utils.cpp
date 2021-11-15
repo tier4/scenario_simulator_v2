@@ -141,6 +141,39 @@ std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
   return lanelet_ids;
 }
 
+std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
+  const geometry_msgs::msg::Point & point, double distance_thresh, bool include_crosswalk) const
+{
+  std::vector<std::int64_t> lanelet_ids;
+  lanelet::BasicPoint2d search_point(point.x, point.y);
+  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
+    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 5);
+  if (include_crosswalk) {
+    if (nearest_lanelet.empty()) {
+      return {};
+    }
+    if (nearest_lanelet.front().first > distance_thresh) {
+      return {};
+    }
+    for (const auto & lanelet : nearest_lanelet) {
+      lanelet_ids.emplace_back(lanelet.second.id());
+    }
+  } else {
+    const auto nearest_road_lanelet =
+      excludeSubtypeLanelets(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
+    if (nearest_road_lanelet.empty()) {
+      return {};
+    }
+    if (nearest_road_lanelet.front().first > distance_thresh) {
+      return {};
+    }
+    for (const auto & lanelet : nearest_lanelet) {
+      lanelet_ids.emplace_back(lanelet.second.id());
+    }
+  }
+  return lanelet_ids;
+}
+
 double HdMapUtils::getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   return toMapPose(lanelet_pose).pose.position.z;
@@ -356,11 +389,17 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, bool include_crosswalk)
 {
-  const auto lanelet_id = getClosestLaneletId(pose, include_crosswalk);
-  if (!lanelet_id) {
+  const auto lanelet_ids = getNearbyLaneletIds(pose.position, 3.0, include_crosswalk);
+  if (lanelet_ids.empty()) {
     return boost::none;
   }
-  return toLaneletPose(pose, lanelet_id.get());
+  for (const auto & id : lanelet_ids) {
+    const auto lanelet_pose = toLaneletPose(pose, id);
+    if (lanelet_pose) {
+      return lanelet_pose;
+    }
+  }
+  return boost::none;
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(

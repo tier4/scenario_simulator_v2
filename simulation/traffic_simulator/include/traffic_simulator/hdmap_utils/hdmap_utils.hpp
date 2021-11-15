@@ -136,6 +136,9 @@ public:
     geometry_msgs::msg::Pose pose, double distance_thresh = 30.0, bool include_crosswalk = false);
   std::vector<std::int64_t> getNearbyLaneletIds(
     const geometry_msgs::msg::Point & point, double distance_threshold) const;
+  std::vector<std::int64_t> getNearbyLaneletIds(
+    const geometry_msgs::msg::Point & point, double distance_threshold,
+    bool include_crosswalk) const;
   std::vector<std::int64_t> filterLaneletIds(
     const std::vector<std::int64_t> & lanelet_ids, const char subtype[]) const;
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
