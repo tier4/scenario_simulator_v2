@@ -62,7 +62,7 @@ try {
  * @todo please check passing false value is valid to the toLaneletPose function
  */
 auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
-  decltype(connection.toLaneletPose(std::declval<decltype(pose)>(), false).get())>::type; 
+  decltype(connection.toLaneletPose(std::declval<decltype(pose)>(), false).get())>::type;
 
 #define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                     \
   template <typename... Ts>                                                       \
