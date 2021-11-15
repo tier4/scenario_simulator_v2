@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Remove newton methods in getSValue function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/612))
 
 ## Version 0.5.7
 - Fix problem in getNormalVector function. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
