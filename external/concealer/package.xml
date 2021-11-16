@@ -27,6 +27,7 @@
 
   <!-- TEMPORARY DEPENDENCY (FOR MERGING AAP & AUTOWARE.AUTO) -->
   <depend>autoware_auto_planning_msgs</depend>
+  <depend>autoware_auto_vehicle_msgs</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>

@@ -19,11 +19,11 @@
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
 #include <autoware_auto_planning_msgs/msg/trajectory.hpp>
+#include <autoware_auto_vehicle_msgs/msg/control_mode_command.hpp>
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
-#include <autoware_vehicle_msgs/msg/control_mode.hpp>
 #include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
@@ -67,15 +67,15 @@ class AutowareArchitectureProposal : public Autoware,
    *  Topic: /vehicle/status/control_mode
    *
    * ------------------------------------------------------------------------ */
-  using CurrentControlMode = autoware_vehicle_msgs::msg::ControlMode;
+  using CurrentControlMode = autoware_auto_vehicle_msgs::msg::ControlModeCommand;
 
   DEFINE_PUBLISHER(CurrentControlMode);
 
-  decltype(auto) setCurrentControlMode(const std::uint8_t mode = CurrentControlMode::AUTO)
+  auto setCurrentControlMode(const std::uint8_t mode = CurrentControlMode::AUTONOMOUS) -> decltype(auto)
   {
-    CurrentControlMode current_control_mode{};
+    CurrentControlMode current_control_mode;
     {
-      current_control_mode.data = mode;
+      current_control_mode.mode = mode;
     }
 
     return setCurrentControlMode(current_control_mode);
