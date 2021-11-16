@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+: Scope(readAttribute<String>("name", node, scope), scope),
   StoryboardElement(
     readAttribute<UnsignedInteger>("maximumExecutionCount", node, local(), UnsignedInteger())),
   actors(readElement<Actors>("Actors", node, local()))
