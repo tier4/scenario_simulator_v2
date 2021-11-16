@@ -80,14 +80,14 @@ During sample scenario following things are expected to happen:
 6. Ego stops and scenario ends with information about successful execution:
 
 ```
-[openscenario_interpreter_node-3] [INFO] [1636493579.969013627] [simulation.openscenario_interpreter]: Deactivating.
-[openscenario_interpreter_node-3] [INFO] [1636493580.123393080] [simulation.concealer]: Shutting down Autoware: (1/3) Stop publlishing/subscribing.
-[openscenario_interpreter_node-3] [INFO] [1636493580.123491540] [simulation.concealer]: Shutting down Autoware: (1/3) Stoped publlishing/subscribing.
-[openscenario_interpreter_node-3] [INFO] [1636493580.123604379] [simulation.concealer]: Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.
-[openscenario_interpreter_node-3] [INFO] [1636493580.123679047] [simulation.concealer]: Shutting down Autoware: (2/3) Terminating Autoware.
-...
-[openscenario_interpreter_node-3] [INFO] [1636493583.702040114] [simulation.concealer]: Shutting down Autoware: (3/3) Waiting for Autoware to be exited.
-[openscenario_interpreter_node-3] [INFO] [1636493583.778138473] [simulation.openscenario_interpreter]: Passed
+[openscenario_interpreter_node-3] [INFO] [1637068427.861947184] [simulation.openscenario_interpreter]: Deactivating.
+[openscenario_interpreter_node-3] [INFO] [1637068428.006686784] [simulation.concealer]: Shutting down Autoware: (1/3) Stop publishing/subscribing.
+[openscenario_interpreter_node-3] [INFO] [1637068428.006771774] [simulation.concealer]: Shutting down Autoware: (1/3) Stopped publishing/subscribing.
+[openscenario_interpreter_node-3] [INFO] [1637068428.006895180] [simulation.concealer]: Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.
+[openscenario_interpreter_node-3] [INFO] [1637068428.006931866] [simulation.concealer]: Shutting down Autoware: (2/3) Terminating Autoware.
+[openscenario_interpreter_node-3] [INFO] [1637068431.723729542] [simulation.concealer]: Shutting down Autoware: (3/3) Waiting for Autoware to be exited.
+[openscenario_interpreter_node-3] [INFO] [1637068431.842740614] [simulation.openscenario_interpreter]: Passed
+
 ```
 
 During scenario execution you should be able to see `rviz` view similar to the one below:
