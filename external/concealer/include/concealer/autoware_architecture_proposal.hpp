@@ -20,12 +20,12 @@
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
 #include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/engage.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
-#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
@@ -325,9 +325,6 @@ class AutowareArchitectureProposal : public Autoware,
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public:
-  /// FROM FundamentalAPI ///
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   /* ---- AutowareEngage -------------------------------------------------------
    *
    *  Topic: /awapi/autoware/put/engage
@@ -337,13 +334,19 @@ public:
    *    setAutowareEngage(const bool) const
    *
    * ------------------------------------------------------------------------ */
-  using AutowareEngage = autoware_vehicle_msgs::msg::Engage;
+  using AutowareEngage = autoware_auto_vehicle_msgs::msg::Engage;
 
   DEFINE_PUBLISHER(AutowareEngage);
 
-  decltype(auto) setAutowareEngage(const bool value = true)
+  auto setAutowareEngage(const bool value = true) -> decltype(auto)
   {
-    return setAutowareEngage(convertTo<AutowareEngage>(value));
+    AutowareEngage autoware_engage;
+    {
+      autoware_engage.stamp = get_clock()->now();
+      autoware_engage.engage = value;
+    }
+
+    return setAutowareEngage(autoware_engage);
   }
 
   /* ---- LaneChangeApproval ---------------------------------------------------
@@ -478,7 +481,7 @@ public:
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
     /// FundamentalAPI
-    INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
+    INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),  // MIGRATED
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
     INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
