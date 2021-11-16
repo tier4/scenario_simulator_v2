@@ -52,8 +52,6 @@ class AutowareArchitectureProposal : public Autoware,
 
   bool is_ready = false;
 
-  /// FROM MiscellaneousAPI ///
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /* ---- Checkpoint -----------------------------------------------------------
    *
    *  Set goal pose of Autoware.
@@ -345,15 +343,6 @@ public:
   {
     return setAutowareEngage(convertTo<AutowareEngage>(value));
   }
-
-  /* ---- AutowareRoute --------------------------------------------------------
-   *
-   *  Topic: /awapi/autoware/put/route
-   *
-   * ------------------------------------------------------------------------ */
-  // using AutowareRoute = autoware_planning_msgs::msg::Route;
-  //
-  // DEFINE_PUBLISHER(AutowareRoute);
 
   /* ---- LaneChangeApproval ---------------------------------------------------
    *
