@@ -46,7 +46,7 @@ auto TimeHeadwayCondition::description() const -> String
   return description.str();
 }
 
-auto TimeHeadwayCondition::evaluate() -> Element
+auto TimeHeadwayCondition::evaluate() -> Object
 {
   results.clear();
 

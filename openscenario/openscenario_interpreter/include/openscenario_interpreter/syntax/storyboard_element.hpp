@@ -21,6 +21,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <string>
 #include <type_traits>
@@ -41,7 +42,7 @@ public:
 
   std::size_t current_execution_count;
 
-  Element current_state;
+  Object current_state;
 
   explicit constexpr StoryboardElement(const std::size_t maximum_execution_count = 0)
   : maximum_execution_count(maximum_execution_count),
@@ -71,7 +72,7 @@ public:
 
   template <typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
   auto changeStateIf(
-    Boolean && test, const Element & consequent_state, const Element & alternate_state)
+    Boolean && test, const Object & consequent_state, const Object & alternate_state)
   {
     if (test) {
       return current_state = consequent_state;
@@ -81,7 +82,7 @@ public:
   }
 
   template <typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
-  auto changeStateIf(Boolean && test, const Element & consequent_state) -> decltype(auto)
+  auto changeStateIf(Boolean && test, const Object & consequent_state) -> decltype(auto)
   {
     return changeStateIf(test, consequent_state, current_state);
   }
@@ -144,6 +145,22 @@ protected:
         "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
         typeid(U).name(), ")");
     }
+  }
+
+  template <typename U, typename Node, typename... Ts>
+  auto readCatalogedStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
+  {
+    auto element = CatalogReference::make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
+    const auto & name = element.template as<U>().name;
+
+    if (not unique(name)) {
+      throw SyntaxError(
+        "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
+        typeid(U).name(), ")");
+    }
+
+    inner_scope.insert(name, element);
+    return element;
   }
 
 public:

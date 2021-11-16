@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/assign_route_action.hpp>
+#include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/route.hpp>
 #include <vector>
 
@@ -25,10 +26,10 @@ inline namespace syntax
 AssignRouteAction::AssignRouteAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : Scope(scope),
-  route_or_catalog_reference(
+  route(
     choice(node,
-      std::make_pair("Route",            [&](auto && node) { return make<Route>(node, localScope()); }),
-      std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+      std::make_pair("Route",            [&](auto && node) { return                   make<Route>(node, local()); }),
+      std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference::make<Route>(node, local()); })))
 // clang-format on
 {
 }
@@ -41,8 +42,8 @@ auto AssignRouteAction::run() -> void
 {
   for (const auto & actor : actors) {
     applyAssignRouteAction(
-      actor, static_cast<std::vector<traffic_simulator_msgs::msg::LaneletPose>>(
-               route_or_catalog_reference.as<const Route>()));
+      actor,
+      static_cast<std::vector<traffic_simulator_msgs::msg::LaneletPose>>(route.as<const Route>()));
   }
 }
 

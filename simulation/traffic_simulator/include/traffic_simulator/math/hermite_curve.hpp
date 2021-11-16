@@ -57,11 +57,10 @@ public:
   double getLength(size_t num_points) const;
   double getLength() const { return length_; }
   boost::optional<double> getSValue(
-    geometry_msgs::msg::Point position, double threshold_distance = 1.0,
-    unsigned int initial_resolution = 30, unsigned int max_iteration = 30, double tolerance = 0.001,
-    bool autoscale = false) const;
+    const geometry_msgs::msg::Point & point, size_t initial_resolution = 30,
+    size_t max_iteration = 30, double tolerance = 0.03, bool autoscale = false) const;
   double getSquaredDistanceIn2D(
-    geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
+    const geometry_msgs::msg::Point & point, double s, bool autoscale = false) const;
   boost::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     bool search_backward = false) const;
@@ -72,8 +71,11 @@ public:
 private:
   std::pair<double, double> get2DMinMaxCurvatureValue() const;
   double length_;
+  boost::optional<double> solveNewtonMethod(
+    const geometry_msgs::msg::Point & point, double initial_value, double tolerance,
+    size_t max_iteration) const;
   double getNewtonMethodStepSize(
-    geometry_msgs::msg::Point point, double s /*, bool autoscale = false*/) const;
+    const geometry_msgs::msg::Point & point, double s /*, bool autoscale = false*/) const;
 };
 }  // namespace math
 }  // namespace traffic_simulator

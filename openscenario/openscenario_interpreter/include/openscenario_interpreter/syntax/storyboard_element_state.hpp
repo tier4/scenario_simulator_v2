@@ -185,13 +185,13 @@ auto operator>>(std::istream &, StoryboardElementState &) -> std::istream &;
 auto operator<<(std::ostream &, const StoryboardElementState &) -> std::ostream &;
 
 // clang-format off
-extern const Element start_transition;
-extern const Element   end_transition;
-extern const Element  stop_transition;
-extern const Element  skip_transition;
-extern const Element   complete_state;
-extern const Element    running_state;
-extern const Element    standby_state;
+extern const Object start_transition;
+extern const Object   end_transition;
+extern const Object  stop_transition;
+extern const Object  skip_transition;
+extern const Object   complete_state;
+extern const Object    running_state;
+extern const Object    standby_state;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter

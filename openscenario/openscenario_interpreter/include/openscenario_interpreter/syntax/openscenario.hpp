@@ -51,7 +51,7 @@ struct OpenScenario : public Scope
 
   auto complete() const -> bool;
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 
   auto load(const boost::filesystem::path &) -> const pugi::xml_node &;
 };

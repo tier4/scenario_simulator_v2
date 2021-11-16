@@ -39,7 +39,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Condition : public Element
+struct Condition : public ComplexType
 {
   const String name;
 
@@ -51,7 +51,7 @@ struct Condition : public Element
 
   explicit Condition(const pugi::xml_node & node, Scope & scope);
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 
 auto operator<<(nlohmann::json &, const Condition &) -> nlohmann::json &;

@@ -40,7 +40,7 @@ struct InitActions : public Elements
 
   auto endsImmediately() const -> bool;
 
-  auto evaluate() const -> Element;
+  auto evaluate() const -> Object;
 };
 
 auto operator<<(nlohmann::json &, const InitActions &) -> nlohmann::json &;

@@ -21,13 +21,13 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 MiscObject::MiscObject(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-  mass(readAttribute<Double>("mass", node, localScope())),
-  misc_object_category(readAttribute<MiscObjectCategory>("miscObjectCategory", node, localScope())),
+: Scope(readAttribute<String>("name", node, scope), scope),
+  mass(readAttribute<Double>("mass", node, local())),
+  misc_object_category(readAttribute<MiscObjectCategory>("miscObjectCategory", node, local())),
   parameter_declarations(
-    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
-  bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
-  properties(readElement<Properties>("Properties", node, localScope()))
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, local())),
+  properties(readElement<Properties>("Properties", node, local()))
 {
 }
 

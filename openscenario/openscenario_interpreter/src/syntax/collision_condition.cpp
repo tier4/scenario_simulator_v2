@@ -47,7 +47,7 @@ auto CollisionCondition::description() const -> std::string
   return description.str();
 }
 
-auto CollisionCondition::evaluate() const -> Element
+auto CollisionCondition::evaluate() const -> Object
 {
   if (
     another_given_entity.is<EntityRef>() and

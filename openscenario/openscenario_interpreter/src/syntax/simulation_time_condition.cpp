@@ -37,7 +37,7 @@ auto SimulationTimeCondition::description() const -> String
   return description.str();
 }
 
-auto SimulationTimeCondition::evaluate() -> Element
+auto SimulationTimeCondition::evaluate() -> Object
 {
   return asBoolean(compare(result = getCurrentTime(), value));
 }

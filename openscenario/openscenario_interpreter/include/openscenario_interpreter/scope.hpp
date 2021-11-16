@@ -17,6 +17,8 @@
 
 #include <boost/filesystem.hpp>
 #include <memory>
+#include <openscenario_interpreter/name.hpp>
+#include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <unordered_map>
 #include <utility>
@@ -28,61 +30,61 @@ class EnvironmentFrame
 {
   friend struct Scope;
 
-  const std::string scope_name;
+  std::unordered_multimap<std::string, Object> variables;
 
-  std::unordered_multimap<std::string, Element> environments;
+  EnvironmentFrame * const outer_frame = nullptr;
 
-  EnvironmentFrame * const parent = nullptr;
+  std::unordered_multimap<std::string, EnvironmentFrame *> inner_frames;
 
-  std::unordered_multimap<std::string, EnvironmentFrame *> named_children;
-
-  std::vector<EnvironmentFrame *> anonymous_children;
+  std::vector<EnvironmentFrame *> unnamed_inner_frames;
 
   explicit EnvironmentFrame() = default;
 
   explicit EnvironmentFrame(EnvironmentFrame &, const std::string &);
 
+public:
   explicit EnvironmentFrame(const EnvironmentFrame &) = delete;
 
   explicit EnvironmentFrame(EnvironmentFrame &&) = delete;
 
-public:
-  auto findElement(const std::string &) const -> Element;
+  auto define(const Name &, const Object &) -> void;
 
-  auto getQualifiedName() const -> std::string;
+  auto find(const Name &) const -> Object;
 
-  auto insert(const std::string &, Element) -> void;
+  auto find(const Prefixed<Name> &) const -> Object;
+
+  auto findObject(const Prefixed<Name> &) const -> Object;
+
+  auto isOutermost() const noexcept -> bool;
 
 private:
-  /*  */ auto lookupChildElement(const std::string &) const -> Element;
+  auto frames(const Name &) const -> std::list<const EnvironmentFrame *>;
 
-  /*  */ auto lookupChildScope(const std::string &) const -> std::list<const EnvironmentFrame *>;
+  auto lookdown(const std::string &) const -> Object;
 
-  static auto lookupQualifiedElement(
-    const EnvironmentFrame *, std::vector<std::string>::iterator,
-    std::vector<std::string>::iterator) -> Element;
+  auto lookupFrame(const Name &) const -> const EnvironmentFrame *;
 
-  /*  */ auto lookupUnqualifiedElement(const std::string &) const -> Element;
-
-  /*  */ auto lookupUnqualifiedScope(const std::string &) const -> const EnvironmentFrame *;
+  auto outermostFrame() const noexcept -> const EnvironmentFrame &;
 };
 
 class Scope
 {
-  const std::shared_ptr<EnvironmentFrame> frame;
-
   struct GlobalEnvironment
   {
     const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
-    std::unordered_map<std::string, Element> entities;  // ScenarioObject or EntitySelection
+    std::unordered_map<std::string, Object> entities;  // ScenarioObject or EntitySelection
+
+    const CatalogLocations * catalog_locations;
 
     explicit GlobalEnvironment(const boost::filesystem::path &);
 
-    auto entityRef(const EntityRef &) const -> Element;  // TODO: RETURN ScenarioObject TYPE!
+    auto entityRef(const EntityRef &) const -> Object;  // TODO: RETURN ScenarioObject TYPE!
 
     auto isAddedEntity(const EntityRef &) const -> bool;
   };
+
+  const std::shared_ptr<EnvironmentFrame> frame;
 
   const std::shared_ptr<GlobalEnvironment> global_environment;
 
@@ -91,31 +93,28 @@ public:
 
   std::list<EntityRef> actors;
 
-  explicit Scope() = delete;
+  Scope() = delete;
 
-  explicit Scope(const boost::filesystem::path &);
-
-private:
-  explicit Scope(const Scope &, const std::string &, const std::shared_ptr<EnvironmentFrame> &);
-
-public:
   Scope(const Scope &) = default;  // NOTE: shallow copy
 
   Scope(Scope &&) noexcept = default;
 
-  auto findElement(const std::string & name_) const -> Element;
+  explicit Scope(const std::string &, const Scope &);
+
+  explicit Scope(const boost::filesystem::path &);
+
+public:
+  auto findObject(const std::string &) const -> Object;
 
   auto global() const -> const GlobalEnvironment &;
 
   auto global() -> GlobalEnvironment &;
 
-  auto localScope() const noexcept -> const Scope &;
+  auto local() const noexcept -> const Scope &;
 
-  auto localScope() noexcept -> Scope &;
+  auto local() noexcept -> Scope &;
 
-  auto makeChildScope(const std::string &) const -> Scope;
-
-  auto insert(const std::string & name_, const Element & element) -> void;
+  auto insert(const Name &, const Object &) -> void;
 };
 }  // namespace openscenario_interpreter
 
