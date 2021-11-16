@@ -18,11 +18,10 @@
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
+#include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
-#include <autoware_planning_msgs/msg/route.hpp>
-#include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
 #include <autoware_vehicle_msgs/msg/engage.hpp>
@@ -297,7 +296,7 @@ class AutowareArchitectureProposal : public Autoware,
    *  Topic: /planning/scenario_planning/trajectory
    *
    * ------------------------------------------------------------------------ */
-  using Trajectory = autoware_planning_msgs::msg::Trajectory;
+  using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
 
   DEFINE_SUBSCRIPTION(Trajectory);
 
@@ -487,7 +486,6 @@ public:
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
     /// FundamentalAPI
     INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
-    // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
     INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
