@@ -20,12 +20,12 @@
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
 #include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/engage.hpp>
-#include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
@@ -71,7 +71,8 @@ class AutowareArchitectureProposal : public Autoware,
 
   DEFINE_PUBLISHER(CurrentControlMode);
 
-  auto setCurrentControlMode(const std::uint8_t mode = CurrentControlMode::AUTONOMOUS) -> decltype(auto)
+  auto setCurrentControlMode(const std::uint8_t mode = CurrentControlMode::AUTONOMOUS)
+    -> decltype(auto)
   {
     CurrentControlMode current_control_mode;
     {
@@ -86,27 +87,29 @@ class AutowareArchitectureProposal : public Autoware,
    *  Topic: /vehicle/status/shift
    *
    *  Overloads:
-   *    setCurrentShift(const autoware_vehicle_msgs::msg::ShiftStamped &);
+   *    setCurrentShift(const autoware_auto_vehicle_msgs::msg::GearCommand &);
    *    setCurrentShift(const double);
    *
+   *  TODO AFTER AAP & .AUTO MERGED
+   *    Rename `CurrentShift` to `CurrentGearCommand`
+   *
    * ------------------------------------------------------------------------ */
-  using CurrentShift = autoware_vehicle_msgs::msg::ShiftStamped;
+  using CurrentShift = autoware_auto_vehicle_msgs::msg::GearCommand;
 
   DEFINE_PUBLISHER(CurrentShift);
 
   template <typename T, REQUIRES(std::is_floating_point<T>)>
-  decltype(auto) setCurrentShift(const T twist_linear_x)
+  auto setCurrentShift(const T twist_linear_x) -> decltype(auto)
   {
-    CurrentShift current_shift;
-    {
-      using autoware_vehicle_msgs::msg::Shift;
+    using autoware_auto_vehicle_msgs::msg::GearCommand;
 
-      current_shift.header.stamp = get_clock()->now();
-      current_shift.header.frame_id = "map";
-      current_shift.shift.data = twist_linear_x >= 0 ? Shift::DRIVE : Shift::REVERSE;
+    GearCommand gear_command;
+    {
+      gear_command.stamp = get_clock()->now();
+      gear_command.command = twist_linear_x >= 0 ? GearCommand::DRIVE : GearCommand::REVERSE;
     }
 
-    return setCurrentShift(current_shift);
+    return setCurrentShift(gear_command);
   }
 
   decltype(auto) setCurrentShift(const geometry_msgs::msg::Twist & twist)
@@ -426,15 +429,6 @@ public:
 
   DEFINE_SUBSCRIPTION(AutowareStatus);
 
-  /* ---- TrafficLightStatus ---------------------------------------------------
-   *
-   *  Topic: /awapi/traffic_light/get/status
-   *
-   * ------------------------------------------------------------------------ */
-  // using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
-  //
-  // DEFINE_SUBSCRIPTION(TrafficLightStatus);
-
   /* ---- VehicleStatus --------------------------------------------------------
    *
    *  Topic: /awapi/vehicle/get/status
@@ -464,15 +458,14 @@ public:
   DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
 #undef DEFINE_STATE_PREDICATE
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareArchitectureProposal(Ts &&... xs)
   : Autoware(std::forward<decltype(xs)>(xs)...),
     /// MiscellaneousAPI
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
-    INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
+    INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),  // MIGRATED
+    INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),               // MIGRATED
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
     INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),
     INIT_PUBLISHER(CurrentTwist, "/vehicle/status/twist"),
@@ -481,7 +474,7 @@ public:
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(LocalizationPose, "/localization/pose_with_covariance"),
     INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
-    INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
+    INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),  // MIGRATED
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
     /// FundamentalAPI
@@ -491,7 +484,6 @@ public:
     INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
-    // INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {})
   {
     waitpid_options = 0;
