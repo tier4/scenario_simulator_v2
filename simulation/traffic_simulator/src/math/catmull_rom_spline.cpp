@@ -319,7 +319,7 @@ boost::optional<double> CatmullRomSpline::getSValue(
 {
   double s = 0;
   for (size_t i = 0; i < curves_.size(); i++) {
-    auto s_value = curves_[i].getSValue(pose, threshold_distance);
+    auto s_value = curves_[i].getSValue(pose, threshold_distance, true);
     if (s_value) {
       s = s + s_value.get();
       return s;
