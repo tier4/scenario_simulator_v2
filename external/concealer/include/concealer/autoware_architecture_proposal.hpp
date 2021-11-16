@@ -22,6 +22,7 @@
 #include <autoware_auto_vehicle_msgs/msg/control_mode_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/engage.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
@@ -148,23 +149,24 @@ class AutowareArchitectureProposal : public Autoware,
    *
    *  Topic: /vehicle/status/turn_signal
    *
+   *  TODO: Rename `CurrentTurnSignal` to `CurrentTurnIndicatorsCommand`
+   *
    * ------------------------------------------------------------------------ */
-  using CurrentTurnSignal = autoware_vehicle_msgs::msg::TurnSignal;
+  using CurrentTurnSignal = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   DEFINE_PUBLISHER(CurrentTurnSignal);
 
-  decltype(auto) setCurrentTurnSignal()
+  auto setCurrentTurnSignal() -> decltype(auto)
   {
-    CurrentTurnSignal current_turn_signal{};
+    using autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
+
+    TurnIndicatorsCommand turn_indicators_command;
     {
-      current_turn_signal.header.stamp = get_clock()->now();
-      current_turn_signal.header.frame_id = "map";
-      current_turn_signal.data = autoware_vehicle_msgs::msg::TurnSignal::NONE;
+      turn_indicators_command.stamp = get_clock()->now();
+      turn_indicators_command.command = TurnIndicatorsCommand::NO_COMMAND;
     }
 
-    return setCurrentTurnSignal(current_turn_signal);
-
-    // return setCurrentTurnSignal(getTurnSignalCommand());
+    return setCurrentTurnSignal(turn_indicators_command);
   }
 
   /* ---- CurrentTwist ---------------------------------------------------------
@@ -470,7 +472,7 @@ public:
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),  // MIGRATED
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),               // MIGRATED
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
-    INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),
+    INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_indicators"),  // MIGRATED
     INIT_PUBLISHER(CurrentTwist, "/vehicle/status/twist"),
     INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity"),
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
