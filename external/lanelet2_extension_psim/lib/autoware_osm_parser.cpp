@@ -98,7 +98,7 @@ std::unique_ptr<LaneletMap> AutowareOsmParser::parse(
       point.y() = point.attribute("local_y").asDouble().value();
     }
   }
-  autoware_auto_msgs::msg::HADMapBin map_bin_msg;
+  autoware_auto_mapping_msgs::msg::HADMapBin map_bin_msg;
   lanelet::utils::conversion::toBinMsg(map, &map_bin_msg);
   lanelet::utils::conversion::fromBinMsg(map_bin_msg, map);
   return map;
