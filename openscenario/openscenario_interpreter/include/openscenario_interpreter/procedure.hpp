@@ -58,9 +58,6 @@ try {
   return result;
 }
 
-/**
- * @todo please check passing false value is valid to the toLaneletPose function
- */
 auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
   decltype(connection.toLaneletPose(std::declval<decltype(pose)>(), false).get())>::type;
 
