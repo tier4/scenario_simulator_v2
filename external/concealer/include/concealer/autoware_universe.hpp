@@ -158,7 +158,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   /* ---- CurrentTurnSignal ----------------------------------------------------
    *
-   *  Topic: /vehicle/status/turn_signal
+   *  Topic: /vehicle/status/turn_indicators_status
    *
    * ------------------------------------------------------------------------ */
   using CurrentTurnIndicators = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
@@ -389,7 +389,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   /* ---- Turn Signal Command --------------------------------------------------
    *
-   *  Topic: /control/turn_signal_cmd
+   *  Topic: /control/command/turn_indicators_cmd
    *
    * ------------------------------------------------------------------------ */
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
@@ -398,7 +398,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   /* ---- Hazard Lights Command --------------------------------------------------
    *
-   *  Topic: /control/turn_signal_cmd
+   *  Topic: /control/command/hazard_lights_cmd
    *
    * ------------------------------------------------------------------------ */
   using HazardLightsCommand = autoware_auto_vehicle_msgs::msg::HazardLightsCommand;
@@ -560,6 +560,7 @@ public:
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
 public:
+// TODO(murooka) should be changed for autoware_auto_system_msgs?
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                                                   \
   auto is##NAME() const noexcept                                                              \
   {                                                                                           \
