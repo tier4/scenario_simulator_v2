@@ -77,6 +77,12 @@ auto ScenarioObject::activateSensors() -> bool
                "/sensing/lidar/no_ground/pointcloud")) and
              attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
                name, "/perception/object_recognition/objects", 0.1));
+    } else if (architecture_type == "awf/universe") {
+      return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+               traffic_simulator::helper::LidarType::VLP16, name,
+               "/sensing/lidar/no_ground/pointcloud")) and
+             attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
+               name, "/perception/object_recognition/objects", 0.1));
     } else if (architecture_type == "awf/auto") {
       /*
          Autoware.Auto does not currently support object prediction however it

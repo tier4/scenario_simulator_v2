@@ -34,13 +34,13 @@
 // #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
 // #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/hazard_lights_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/hazard_lights_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
-// #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/conversion.hpp>
@@ -378,6 +378,15 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   DEFINE_SUBSCRIPTION(Trajectory);
 
+  /* ---- Gear Command --------------------------------------------------
+   *
+   *  Topic: /control/command/gear_cmd
+   *
+   * ------------------------------------------------------------------------ */
+  using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
+
+  DEFINE_SUBSCRIPTION(GearCommand);
+
   /* ---- Turn Signal Command --------------------------------------------------
    *
    *  Topic: /control/turn_signal_cmd
@@ -408,6 +417,8 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   // DEFINE_SUBSCRIPTION_WITH_OVERRIDE(AckermannControlCommand);
   DEFINE_SUBSCRIPTION(AckermannControlCommand);  // TODO(murooka) is this implementation correct?
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;
 
 public:
   /// FROM FundamentalAPI ///
@@ -588,6 +599,7 @@ public:
     // INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
     INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
+    INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd", []() {}),
     INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd", []() {}),
     INIT_SUBSCRIPTION(HazardLightsCommand, "/control/command/hazard_lights_cmd", []() {}),
     INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd", []() {}),
