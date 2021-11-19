@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <concealer/autoware_architecture_proposal.hpp>
+#include <concealer/autoware_universe.hpp>
 
 namespace concealer
 {
-AutowareArchitectureProposal::~AutowareArchitectureProposal() { shutdownAutoware(); }
+AutowareUniverse::~AutowareUniverse() { shutdownAutoware(); }
 
-auto AutowareArchitectureProposal::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
+auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
@@ -29,8 +29,7 @@ auto AutowareArchitectureProposal::initialize(const geometry_msgs::msg::Pose & i
   }
 }
 
-auto AutowareArchitectureProposal::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
-  -> void
+auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
   assert(!route.empty());
 
@@ -45,47 +44,47 @@ auto AutowareArchitectureProposal::plan(const std::vector<geometry_msgs::msg::Po
   });
 }
 
-auto AutowareArchitectureProposal::engage() -> void
+auto AutowareUniverse::engage() -> void
 {
   task_queue.delay(
     [this]() { waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); }); });
 }
 
-auto AutowareArchitectureProposal::update() -> void
+auto AutowareUniverse::update() -> void
 {
   setCurrentControlMode();
   setCurrentShift(current_twist);
-  setCurrentSteering(current_twist);
-  setCurrentTwist(current_twist);
+  // setCurrentSteering(current_twist);  // TODO(murooka)
+  // setCurrentTwist(current_twist);
   setCurrentVelocity(current_twist);
-  setLocalizationPose(current_pose);
-  setLocalizationTwist(current_twist);
+  // setLocalizationPose(current_pose);
+  // setLocalizationTwist(current_twist);
+  setLocalizationOdometry(current_pose, current_twist);
   setTransform(current_pose);
   setVehicleVelocity(current_upper_bound_speed);
 }
 
-auto AutowareArchitectureProposal::getAcceleration() const -> double
+auto AutowareUniverse::getAcceleration() const -> double
 {
   return getVehicleCommand().control.acceleration;
 }
 
-auto AutowareArchitectureProposal::getVelocity() const -> double
+auto AutowareUniverse::getVelocity() const -> double
 {
   return getVehicleCommand().control.velocity;
 }
 
-auto AutowareArchitectureProposal::getSteeringAngle() const -> double
+auto AutowareUniverse::getSteeringAngle() const -> double
 {
   return getVehicleCommand().control.steering_angle;
 }
 
-auto AutowareArchitectureProposal::getGearSign() const -> double
+auto AutowareUniverse::getGearSign() const -> double
 {
   return getVehicleCommand().shift.data == autoware_vehicle_msgs::msg::Shift::REVERSE ? -1.0 : 1.0;
 }
 
-auto AutowareArchitectureProposal::getWaypoints() const
-  -> traffic_simulator_msgs::msg::WaypointsArray
+auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
 
@@ -96,33 +95,33 @@ auto AutowareArchitectureProposal::getWaypoints() const
   return waypoints;
 }
 
-auto AutowareArchitectureProposal::restrictTargetSpeed(double value) const -> double
+auto AutowareUniverse::restrictTargetSpeed(double value) const -> double
 {
   // no restrictions here
   return value;
 }
 
-auto AutowareArchitectureProposal::getAutowareStateMessage() const -> std::string
+auto AutowareUniverse::getAutowareStateMessage() const -> std::string
 {
   return getAutowareStatus().autoware_state;
 }
 
-auto AutowareArchitectureProposal::sendSIGINT() -> void  //
+auto AutowareUniverse::sendSIGINT() -> void  //
 {
   ::kill(process_id, SIGINT);
 }
 
-auto AutowareArchitectureProposal::isReady() noexcept -> bool
+auto AutowareUniverse::isReady() noexcept -> bool
 {
   return is_ready or (is_ready = isWaitingForRoute());
 }
 
-auto AutowareArchitectureProposal::isNotReady() noexcept -> bool  //
+auto AutowareUniverse::isNotReady() noexcept -> bool  //
 {
   return not isReady();
 }
 
-auto AutowareArchitectureProposal::checkAutowareState() -> void
+auto AutowareUniverse::checkAutowareState() -> void
 {
   if (isReady() and isEmergency()) {
     // throw common::AutowareError("Autoware is in emergency state now");
