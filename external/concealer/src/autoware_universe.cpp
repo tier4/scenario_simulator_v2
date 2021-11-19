@@ -12,149 +12,120 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <concealer/autoware_universe.hpp>
+#include <concealer/autoware_architecture_proposal.hpp>
 
 namespace concealer
 {
-AutowareUniverse::~AutowareUniverse() { shutdownAutoware(); }
+AutowareArchitectureProposal::~AutowareArchitectureProposal() { shutdownAutoware(); }
 
-void AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
+auto AutowareArchitectureProposal::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
-      // TODO: wait for a correct state if necessary once state monitoring is there
       set(initial_pose);
-      setInitialPose(initial_pose);
+      waitForAutowareStateToBeInitializingVehicle();
+      waitForAutowareStateToBeWaitingForRoute([&]() { setInitialPose(initial_pose); });
     });
   }
 }
 
-void AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+auto AutowareArchitectureProposal::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+  -> void
 {
   assert(!route.empty());
 
-  if (route.size() > 1) {
-    AUTOWARE_WARN_STREAM(
-      "AutowareUniverse received route consisting of "
-      << route.size() << " poses but it does not support checkpoints. Ignoring first "
-      << route.size() - 1 << " poses and treating last pose as the goal.");
-  }
-
-  task_queue.delay([this, route]() {
-    // TODO: replace this sleep with proper state wait logic once state monitoring is there
-    // (waitForAutowareStateToBeWaitingForRoute)
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    geometry_msgs::msg::PoseStamped gp;
-    gp.pose = route.back().pose;
-    gp.pose.position.z = 0.0;
-    gp.header.stamp = get_clock()->now();
-    gp.header.frame_id = "map";
-    setGoalPose(gp);
+  task_queue.delay([this, route] {
+    waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
+    setGoalPose(route.back());
+    for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
+      setCheckpoint(each);
+    }
+    waitForAutowareStateToBePlanning();
+    waitForAutowareStateToBeWaitingForEngage();  // NOTE: Autoware.IV 0.11.1 waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
   });
 }
 
-void AutowareUniverse::engage()
+auto AutowareArchitectureProposal::engage() -> void
 {
   task_queue.delay(
-    // Engage is not implemented in Autoware.Auto
-    [this]() {});
+    [this]() { waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); }); });
 }
 
-void AutowareUniverse::update()
+auto AutowareArchitectureProposal::update() -> void
 {
+  setCurrentControlMode();
+  setCurrentShift(current_twist);
+  setCurrentSteering(current_twist);
+  setCurrentTwist(current_twist);
+  setCurrentVelocity(current_twist);
+  setLocalizationPose(current_pose);
+  setLocalizationTwist(current_twist);
   setTransform(current_pose);
-  setVehicleKinematicState(current_pose, current_twist);
-  setVehicleStateReport();
+  setVehicleVelocity(current_upper_bound_speed);
 }
 
-double AutowareUniverse::getAcceleration() const
+auto AutowareArchitectureProposal::getAcceleration() const -> double
 {
-  return getVehicleControlCommand().long_accel_mps2;
+  return getVehicleCommand().control.acceleration;
 }
 
-double AutowareUniverse::getVelocity() const { return getVehicleControlCommand().velocity_mps; }
-
-double AutowareUniverse::getSteeringAngle() const
+auto AutowareArchitectureProposal::getVelocity() const -> double
 {
-  return getVehicleControlCommand().front_wheel_angle_rad;
+  return getVehicleCommand().control.velocity;
 }
 
-double AutowareUniverse::getGearSign() const
+auto AutowareArchitectureProposal::getSteeringAngle() const -> double
 {
-  using autoware_auto_vehicle_msgs::msg::VehicleStateReport;
-  return getVehicleStateCommand().gear == VehicleStateReport::GEAR_REVERSE ? -1.0 : +1.0;
+  return getVehicleCommand().control.steering_angle;
 }
 
-auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
+auto AutowareArchitectureProposal::getGearSign() const -> double
+{
+  return getVehicleCommand().shift.data == autoware_vehicle_msgs::msg::Shift::REVERSE ? -1.0 : 1.0;
+}
+
+auto AutowareArchitectureProposal::getWaypoints() const
+  -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
 
   for (const auto & point : getTrajectory().points) {
-    geometry_msgs::msg::Point waypoint;
-    waypoint.x = point.pose.position.x;
-    waypoint.y = point.pose.position.y;
-    waypoint.z = 0;
-    waypoints.waypoints.push_back(waypoint);
+    waypoints.waypoints.emplace_back(point.pose.position);
   }
 
   return waypoints;
 }
 
-double AutowareUniverse::restrictTargetSpeed(double) const
+auto AutowareArchitectureProposal::restrictTargetSpeed(double value) const -> double
 {
-  // non-zero initial speed prevents behavioral planner from planning so it must be restricted to 0
-  return 0;
+  // no restrictions here
+  return value;
 }
 
-std::string AutowareUniverse::getAutowareStateMessage() const
+auto AutowareArchitectureProposal::getAutowareStateMessage() const -> std::string
 {
-  // TODO: implement when state monitoring is there
-  return {};
+  return getAutowareStatus().autoware_state;
 }
 
-autoware_vehicle_msgs::msg::VehicleCommand AutowareUniverse::getVehicleCommand() const
+auto AutowareArchitectureProposal::sendSIGINT() -> void  //
 {
-  // gathering information and converting it to autoware_vehicle_msgs::msg::VehicleCommand
-  autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
+  ::kill(process_id, SIGINT);
+}
 
-  auto vehicle_control_command = getVehicleControlCommand();
+auto AutowareArchitectureProposal::isReady() noexcept -> bool
+{
+  return is_ready or (is_ready = isWaitingForRoute());
+}
 
-  vehicle_command.header.stamp = vehicle_control_command.stamp;
+auto AutowareArchitectureProposal::isNotReady() noexcept -> bool  //
+{
+  return not isReady();
+}
 
-  vehicle_command.control.steering_angle = vehicle_control_command.front_wheel_angle_rad;
-  vehicle_command.control.velocity = vehicle_control_command.velocity_mps;
-  vehicle_command.control.acceleration = vehicle_control_command.long_accel_mps2;
-
-  auto vehicle_state_command = getVehicleStateCommand();
-
-  using autoware_auto_vehicle_msgs::msg::VehicleStateReport;
-
-  // handle gear enum remapping
-  switch (vehicle_state_command.gear) {
-    case VehicleStateReport::GEAR_DRIVE:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
-      break;
-    case VehicleStateReport::GEAR_REVERSE:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
-      break;
-    case VehicleStateReport::GEAR_PARK:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
-      break;
-    case VehicleStateReport::GEAR_LOW:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
-      break;
-    case VehicleStateReport::GEAR_NEUTRAL:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-      break;
+auto AutowareArchitectureProposal::checkAutowareState() -> void
+{
+  if (isReady() and isEmergency()) {
+    // throw common::AutowareError("Autoware is in emergency state now");
   }
-
-  // these fields are hard-coded because they are not present in AutowareUniverse
-  vehicle_command.header.frame_id = "";
-  vehicle_command.control.steering_angle_velocity = 0.0;
-  vehicle_command.emergency = 0;
-
-  return vehicle_command;
 }
-
-void AutowareUniverse::sendSIGINT() { sudokill(process_id); }
 }  // namespace concealer
