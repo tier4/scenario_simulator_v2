@@ -156,8 +156,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
     CurrentTurnIndicators current_turn_signal{};
     {
       current_turn_signal.stamp = get_clock()->now();
-      // TODO(murooka) there is no NONE in turn indicators report msg
-      // current_turn_signal.report = autoware_vehicle_msgs::msg::TurnIndicators::NONE;
+      // NOTE: NONE was returned here but there is no NONE type in this msg
     }
 
     return setCurrentTurnIndicators(current_turn_signal);
@@ -179,8 +178,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
     CurrentHazardLights current_turn_signal{};
     {
       current_turn_signal.stamp = get_clock()->now();
-      // TODO(murooka) there is no NONE in hazard lights report msg
-      // current_turn_signal.report = autoware_vehicle_msgs::msg::HazardLights::NONE;
+      // NOTE: NONE was returned here but there is no NONE type in this msg
     }
 
     return setCurrentHazardLights(current_turn_signal);
@@ -223,7 +221,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
     CurrentVelocity message{};
     {
       message.header.stamp = get_clock()->now();
-      message.header.frame_id = "base_link";  // TODO(murooka) check if base_link is correct
+      message.header.frame_id = "base_link";
       message.longitudinal_velocity = twist.linear.x;
       message.lateral_velocity = twist.linear.y;
       message.heading_rate = twist.angular.z;
@@ -338,7 +336,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   // this macro is used only once
   // however is is created to keep consistency with the previous DEFINE_SUBSCRIPTION macro usage
   // DEFINE_SUBSCRIPTION_WITH_OVERRIDE(AckermannControlCommand);
-  DEFINE_SUBSCRIPTION(AckermannControlCommand);  // TODO(murooka) is this implementation correct?
+  DEFINE_SUBSCRIPTION(AckermannControlCommand);
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;

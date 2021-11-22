@@ -140,7 +140,6 @@ autoware_vehicle_msgs::msg::VehicleCommand AutowareUniverse::getVehicleCommand()
   vehicle_command.control.velocity = vehicle_control_command.longitudinal.speed;
   vehicle_command.control.acceleration = vehicle_control_command.longitudinal.acceleration;
 
-  //auto vehicle_state_command = getVehicleStateCommand();
   auto turn_indicators_command = getGearCommand();
 
   using autoware_auto_vehicle_msgs::msg::GearCommand;
