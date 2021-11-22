@@ -127,29 +127,20 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
    *  Topic: /vehicle/status/steering_status
    *
    * ------------------------------------------------------------------------ */
-  // TODO(murooka) steering is tire angle, not tire angular velocity
-  /*
   using CurrentSteering = autoware_auto_vehicle_msgs::msg::SteeringReport;
 
   DEFINE_PUBLISHER(CurrentSteering);
 
-  template <typename T, REQUIRES(std::is_floating_point<T>)>
-  decltype(auto) setCurrentSteering(const T twist_linear_x)
+  decltype(auto) setCurrentSteering()
   {
     CurrentSteering current_steering;
     {
       current_steering.stamp = get_clock()->now();
-      current_steering.steering_tire_angle = twist_linear_x;
+      current_steering.steering_tire_angle = getSteeringAngle();
     }
 
     return setCurrentSteering(current_steering);
   }
-
-  decltype(auto) setCurrentSteering(const geometry_msgs::msg::Twist & twist)
-  {
-    return setCurrentSteering(twist.angular.z);
-  }
-  */
 
   /* ---- CurrentTurnSignal ----------------------------------------------------
    *
@@ -518,7 +509,7 @@ public:
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/gear_status"),
-    // INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering_status"),
+    INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering_status"),
     INIT_PUBLISHER(CurrentTurnIndicators, "/vehicle/status/turn_indicators_status"),
     INIT_PUBLISHER(CurrentHazardLights, "/vehicle/status/hazard_lights_status"),
     INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity_status"),

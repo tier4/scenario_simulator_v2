@@ -54,7 +54,7 @@ auto AutowareUniverse::update() -> void
 {
   setCurrentControlMode();
   setCurrentShift(current_twist);
-  // setCurrentSteering(current_twist);
+  setCurrentSteering();
   setCurrentVelocity(current_twist);
   setLocalizationOdometry(current_pose, current_twist);
   setTransform(current_pose);
