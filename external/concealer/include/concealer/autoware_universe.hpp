@@ -277,13 +277,15 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   decltype(auto) setLocalizationOdometry(
     const geometry_msgs::msg::Pose & pose = geometry_msgs::msg::Pose(),
-    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
+    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist(),
+    const std::array<double, 36> & covariance = {})
   {
     LocalizationOdometry localization_odometry;
     {
       localization_odometry.header.stamp = get_clock()->now();
       localization_odometry.header.frame_id = "map";
       localization_odometry.pose.pose = pose;
+      localization_odometry.pose.covariance = covariance;
       localization_odometry.twist.twist = twist;
     }
 
