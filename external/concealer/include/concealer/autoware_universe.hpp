@@ -19,6 +19,9 @@
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_auto_planning_msgs/msg/had_map_route.hpp>
+#include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/engage.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
@@ -30,10 +33,7 @@
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
-#include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
-#include <autoware_planning_msgs/msg/route.hpp>
-#include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <boost/range/adaptor/sliced.hpp>
@@ -304,7 +304,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
    *  Topic: /planning/scenario_planning/trajectory
    *
    * ------------------------------------------------------------------------ */
-  using Trajectory = autoware_planning_msgs::msg::Trajectory;
+  using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
 
   DEFINE_SUBSCRIPTION(Trajectory);
 
@@ -435,9 +435,9 @@ public:
    *  Topic: /awapi/traffic_light/put/traffic_light
    *
    * ------------------------------------------------------------------------ */
-  using TrafficLightStateArray = autoware_perception_msgs::msg::TrafficLightStateArray;
+  using TrafficSignalArray = autoware_auto_perception_msgs::msg::TrafficSignalArray;
 
-  DEFINE_PUBLISHER(TrafficLightStateArray);
+  DEFINE_PUBLISHER(TrafficSignalArray);
 
   /* ---- VehicleVelocity ------------------------------------------------------
    *
@@ -476,7 +476,7 @@ public:
    *  Topic: /awapi/traffic_light/get/status
    *
    * ------------------------------------------------------------------------ */
-  // using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
+  // using TrafficLightStatus = autoware_perception_msgs::msg::TrafficSignalArray;
   //
   // DEFINE_SUBSCRIPTION(TrafficLightStatus);
 
@@ -535,7 +535,7 @@ public:
     // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
-    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
+    INIT_PUBLISHER(TrafficSignalArray, "/awapi/traffic_light/put/traffic_light_status"),
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
     // INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
