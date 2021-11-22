@@ -33,7 +33,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct LongitudinalAction : public Element
+struct LongitudinalAction : public ComplexType
 {
   explicit LongitudinalAction(const pugi::xml_node &, Scope &);
 

@@ -21,18 +21,17 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+: Scope(readAttribute<String>("name", node, scope), scope),
   StoryboardElement(
-    readAttribute<UnsignedInteger>("maximumExecutionCount", node, localScope(), UnsignedInteger())),
-  actors(readElement<Actors>("Actors", node, localScope()))
+    readAttribute<UnsignedInteger>("maximumExecutionCount", node, local(), UnsignedInteger())),
+  actors(readElement<Actors>("Actors", node, local()))
 {
   callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
-    return unspecified;
+    return push_back(readCatalogedStoryboardElement<Maneuver>(node, local()));
   });
 
   callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Maneuver>(node, localScope()));
+    return push_back(readStoryboardElement<Maneuver>(node, local()));
   });
 }
 

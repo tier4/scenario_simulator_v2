@@ -165,7 +165,7 @@ auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) ->
   return Double::nan();
 }
 
-auto RelativeDistanceCondition::evaluate() -> Element
+auto RelativeDistanceCondition::evaluate() -> Object
 {
   results.clear();
 

@@ -37,8 +37,6 @@ namespace openscenario_interpreter
 {
 inline namespace reader
 {
-using XML = pugi::xml_node;
-
 using Cardinality =
   typename std::iterator_traits<typename pugi::xml_node::iterator>::difference_type;
 
@@ -46,10 +44,10 @@ constexpr auto unbounded = std::numeric_limits<Cardinality>::max();
 
 template <typename Callee>
 void callWithElements(
-  const XML & parent,            //
-  const std::string & name,      //
-  const Cardinality min_occurs,  //
-  const Cardinality max_occurs,  //
+  const pugi::xml_node & parent,  //
+  const std::string & name,       //
+  const Cardinality min_occurs,   //
+  const Cardinality max_occurs,   //
   Callee && call_with)
 {
   const auto children = parent.children(name.c_str());
@@ -78,7 +76,7 @@ void callWithElements(
 }
 
 template <typename T, typename... Ts>
-auto readElement(const std::string & name, const XML & parent, Ts &&... xs)
+auto readElement(const std::string & name, const pugi::xml_node & parent, Ts &&... xs)
 {
   if (const auto child = parent.child(name.c_str())) {
     return T(child, std::forward<decltype(xs)>(xs)...);
@@ -96,7 +94,7 @@ auto readElement(const std::string & name, const XML & parent, Ts &&... xs)
 }
 
 template <typename T, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, typename... Ts>
-auto readElements(const std::string & name, const XML & node, Ts &&... xs)
+auto readElements(const std::string & name, const pugi::xml_node & node, Ts &&... xs)
 {
   std::list<T> elements;
 
@@ -109,9 +107,9 @@ auto readElements(const std::string & name, const XML & node, Ts &&... xs)
 
 template <typename T, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, typename... Ts>
 auto readElementsAsElement(
-  const std::string & name, const XML & node, Ts &&... xs)  // XXX UGLY NAME!!!
+  const std::string & name, const pugi::xml_node & node, Ts &&... xs)  // XXX UGLY NAME!!!
 {
-  std::list<Element> elements;
+  std::list<Object> elements;
 
   callWithElements(node, name, MinOccurs, MaxOccurs, [&](auto && x) {
     elements.emplace_back(make<T>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...));
@@ -121,12 +119,12 @@ auto readElementsAsElement(
 }
 
 template <typename... Ts>
-auto choice(const XML & node, Ts &&... xs) -> decltype(auto)
+auto choice(const pugi::xml_node & node, Ts &&... xs) -> decltype(auto)
 {
-  const std::unordered_map<std::string, std::function<Element(const XML &)>> callees{
+  const std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> callees{
     std::forward<decltype(xs)>(xs)...};
 
-  std::unordered_map<std::string, XML> specs{};
+  std::unordered_map<std::string, pugi::xml_node> specs{};
 
   for (const auto & each : callees) {
     if (const auto child = node.child(std::get<0>(each).c_str())) {

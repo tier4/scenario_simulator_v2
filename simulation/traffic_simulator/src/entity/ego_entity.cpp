@@ -250,13 +250,13 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
 
     traffic_simulator::math::CatmullRomSpline spline(
       hdmap_utils_ptr_->getCenterPoints(closest_lanelet_id.get()));
-    if (const auto s_value = spline.getSValue(status.pose.position)) {
+    if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.get()).z;
     }
 
     status.pose.orientation = initial_pose_.get().orientation * pose.orientation;
 
-    const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
+    const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
 
     status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
     if (status.lanelet_pose_valid) {

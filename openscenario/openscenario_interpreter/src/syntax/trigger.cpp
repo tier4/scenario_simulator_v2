@@ -25,7 +25,7 @@ Trigger::Trigger(const pugi::xml_node & node, Scope & scope) : current_value()
     node, "ConditionGroup", 0, unbounded, [&](auto && node) { emplace_back(node, scope); });
 }
 
-auto Trigger::evaluate() -> Element
+auto Trigger::evaluate() -> Object
 {
   /* -------------------------------------------------------------------------
    *

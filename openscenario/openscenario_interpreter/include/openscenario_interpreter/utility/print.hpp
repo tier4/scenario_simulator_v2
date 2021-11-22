@@ -34,6 +34,25 @@ auto & print_to(std::ostream & os, const SequenceContainer & sequence_container)
 
   return os << "]";
 }
+
+auto print_keys_to = [](auto & os, const auto & xs) -> decltype(auto) {
+  if (not xs.empty()) {
+    for (auto iter = std::begin(xs); iter != std::end(xs); ++iter) {
+      os << std::get<0>(*iter);
+      switch (std::distance(iter, std::end(xs))) {
+        case 1:
+          return os;
+        case 2:
+          os << " and ";
+          break;
+        default:
+          os << ", ";
+          break;
+      }
+    }
+  }
+  return os;
+};
 }  // namespace utility
 }  // namespace openscenario_interpreter
 

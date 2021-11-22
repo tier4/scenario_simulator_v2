@@ -41,13 +41,13 @@ struct AccelerationCondition
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<double> last_checked_values;  // for description
+  std::vector<double> results;  // for description
 
   explicit AccelerationCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> std::string;
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -92,7 +92,7 @@ struct DistanceCondition : private Scope
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 
 // clang-format off

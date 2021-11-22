@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_DEFINITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_DEFINITION_HPP_
 
-#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/catalog.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -31,7 +31,7 @@ inline namespace syntax
  *  </xsd:group>
  *
  * -------------------------------------------------------------------------- */
-struct CatalogDefinition
+struct CatalogDefinition : public Catalog
 {
   explicit CatalogDefinition(const pugi::xml_node &, Scope &);
 };

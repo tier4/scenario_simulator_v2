@@ -43,7 +43,7 @@ auto SpeedCondition::description() const -> String
   return description.str();
 }
 
-auto SpeedCondition::evaluate() -> Element
+auto SpeedCondition::evaluate() -> Object
 {
   results.clear();
 

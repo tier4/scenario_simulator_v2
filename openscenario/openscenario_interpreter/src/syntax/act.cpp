@@ -21,21 +21,21 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Act::Act(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-  start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
+: Scope(readAttribute<String>("name", node, scope), scope),
+  start_trigger(readElement<Trigger>("StartTrigger", node, local()))
 {
   callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<ManeuverGroup>(node, localScope()));
+    return push_back(readStoryboardElement<ManeuverGroup>(node, local()));
   });
 
   callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
-    return stop_trigger.rebind<Trigger>(node, localScope());
+    return stop_trigger.rebind<Trigger>(node, local());
   });
 }
 
 auto Act::accomplished() const -> bool
 {
-  return std::all_of(std::begin(*this), std::end(*this), [&](const Element & each) {
+  return std::all_of(std::begin(*this), std::end(*this), [&](const Object & each) {
     return each.as<ManeuverGroup>().complete();
   });
 }

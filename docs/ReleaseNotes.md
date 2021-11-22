@@ -2,6 +2,10 @@
 
 ## Difference between the latest release and master
 - Enable run t4v2_scenario_test with colcon test (with -DWITH_INTEGRATION_TEST=ON) ([link](https://github.com/tier4/scenario_simulator_v2/pull/531))
+- Remove newton methods in getSValue function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/612))
+- Set withLaneChange parameter as false. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
+
+## Version 0.5.7
 - Fix problem in getNormalVector function. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
 
 ## Version 0.5.6

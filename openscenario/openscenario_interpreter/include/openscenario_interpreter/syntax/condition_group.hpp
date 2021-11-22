@@ -43,7 +43,7 @@ struct ConditionGroup : public std::list<Condition>
 
   explicit ConditionGroup(const pugi::xml_node &, Scope &);
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 
 auto operator<<(nlohmann::json &, const ConditionGroup &) -> nlohmann::json &;

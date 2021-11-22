@@ -33,7 +33,7 @@ TrafficSignals::TrafficSignals(const pugi::xml_node & node, Scope & scope)
   resolve_reference(scope);
 }
 
-auto TrafficSignals::evaluate() -> Element
+auto TrafficSignals::evaluate() -> Object
 {
   for (auto && controller : traffic_signal_controllers) {
     controller->evaluate();
@@ -47,7 +47,7 @@ auto TrafficSignals::resolve_reference(Scope & scope) -> void
   for (auto & each : traffic_signal_controllers) {
     if (not each->reference.empty()) {
       try {
-        auto & reference = scope.findElement(each->reference).as<TrafficSignalController>();
+        auto & reference = scope.findObject(each->reference).as<TrafficSignalController>();
         if (each->cycleTime() != reference.cycleTime()) {
           THROW_SEMANTIC_ERROR(
             "The cycle time of ", each->name, "(", each->cycleTime(), " sec) and ", each->reference,

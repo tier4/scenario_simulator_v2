@@ -35,7 +35,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ParameterAction : public Element
+struct ParameterAction : public ComplexType
 {
   explicit ParameterAction(const pugi::xml_node &, Scope &);
 

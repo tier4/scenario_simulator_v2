@@ -56,7 +56,7 @@ struct TrafficSignalState
 
   explicit TrafficSignalState(const pugi::xml_node &, Scope &);
 
-  auto evaluate() const -> Element;
+  auto evaluate() const -> Object;
 
   auto id() const -> LaneletId;
 };

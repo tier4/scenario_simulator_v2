@@ -79,7 +79,7 @@ struct RelativeDistanceCondition : private Scope
 
   auto distance(const EntityRef &) -> double;
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 
 // clang-format off
