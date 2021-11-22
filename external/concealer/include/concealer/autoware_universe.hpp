@@ -18,28 +18,23 @@
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/engage.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/hazard_lights_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/hazard_lights_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
-// #include <autoware_vehicle_msgs/msg/control_mode.hpp>
-#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
-// #include <autoware_vehicle_msgs/msg/engage.hpp>
-#include <autoware_auto_vehicle_msgs/msg/engage.hpp>
-// #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
-// #include <autoware_vehicle_msgs/msg/steering.hpp>
-#include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
-// #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/hazard_lights_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/hazard_lights_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware.hpp>
@@ -139,12 +134,12 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_PUBLISHER(CurrentSteering);
 
   template <typename T, REQUIRES(std::is_floating_point<T>)>
-  decltype(auto) setCurrentSteering(const T value)
+  decltype(auto) setCurrentSteering(const T twist_linear_x)
   {
-    CurrentSteering current_steering{};
+    CurrentSteering current_steering;
     {
       current_steering.stamp = get_clock()->now();
-      current_steering.report = value;
+      current_steering.steering_tire_angle = twist_linear_x;
     }
 
     return setCurrentSteering(current_steering);
@@ -232,21 +227,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   DEFINE_PUBLISHER(CurrentVelocity);
 
-  /*
-  template <typename T, REQUIRES(std::is_convertible<T, decltype(CurrentVelocity::data)>)>
-  decltype(auto) setCurrentVelocity(const T velocity)
-  {
-    CurrentVelocity message;
-    {
-      message.header.stamp = get_clock()->now();
-      message.header.frame_id = velocity.header.frame_id;
-      message.longitudinal_velocity = twist.linear.x;
-    }
-
-    return setCurrentVelocity(message);
-  }
-  */
-
   decltype(auto) setCurrentVelocity(const geometry_msgs::msg::Twist & twist)
   {
     CurrentVelocity message{};
@@ -294,56 +274,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
     return setInitialPose(initial_pose);
   }
-
-  /* ---- LocalizationPose -----------------------------------------------------
-    *
-    *  Topic: /localization/pose_with_covariance
-    *
-    * ------------------------------------------------------------------------ */
-  /*
-  using LocalizationPose = geometry_msgs::msg::PoseWithCovarianceStamped;
-
-  DEFINE_PUBLISHER(LocalizationPose);
-
-  auto setLocalizationPose(
-    const geometry_msgs::msg::Pose & pose = geometry_msgs::msg::Pose(),
-    const std::array<double, 36> & covariance = {}) -> decltype(auto)
-  {
-    geometry_msgs::msg::PoseWithCovarianceStamped pose_with_covariance_stamped;
-    {
-      pose_with_covariance_stamped.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-      pose_with_covariance_stamped.header.frame_id = "map";
-      pose_with_covariance_stamped.pose.pose = pose;
-      pose_with_covariance_stamped.pose.covariance = covariance;
-    }
-
-    return setLocalizationPose(pose_with_covariance_stamped);
-  }
-  */
-
-  /* ---- LocalizationTwist ----------------------------------------------------
-   *
-   *  Topic: /localization/twist
-   *
-   * ------------------------------------------------------------------------ */
-  /*
-  using LocalizationTwist = CurrentTwist;
-
-  DEFINE_PUBLISHER(LocalizationTwist);
-
-  decltype(auto) setLocalizationTwist(
-    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
-  {
-    LocalizationTwist localization_twist;
-    {
-      localization_twist.header.stamp = get_clock()->now();
-      localization_twist.header.frame_id = "map";
-      localization_twist.twist = twist;
-    }
-
-    return setLocalizationTwist(localization_twist);
-  }
-  */
 
   /* ---- LocalizationOdometry ----------------------------------------------------
    *
@@ -560,7 +490,6 @@ public:
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
 public:
-// TODO(murooka) should be changed for autoware_auto_system_msgs?
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                                                   \
   auto is##NAME() const noexcept                                                              \
   {                                                                                           \
@@ -592,12 +521,9 @@ public:
     // INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering_status"),
     INIT_PUBLISHER(CurrentTurnIndicators, "/vehicle/status/turn_indicators_status"),
     INIT_PUBLISHER(CurrentHazardLights, "/vehicle/status/hazard_lights_status"),
-    // INIT_PUBLISHER(CurrentTwist, "/vehicle/status/twist"),
     INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity_status"),
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
-    // INIT_PUBLISHER(LocalizationPose, "/localization/pose_with_covariance"),
-    // INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
     INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd", []() {}),

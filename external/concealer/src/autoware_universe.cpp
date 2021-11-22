@@ -54,11 +54,8 @@ auto AutowareUniverse::update() -> void
 {
   setCurrentControlMode();
   setCurrentShift(current_twist);
-  // setCurrentSteering(current_twist);  // TODO(murooka)
-  // setCurrentTwist(current_twist);
+  // setCurrentSteering(current_twist);
   setCurrentVelocity(current_twist);
-  // setLocalizationPose(current_pose);
-  // setLocalizationTwist(current_twist);
   setLocalizationOdometry(current_pose, current_twist);
   setTransform(current_pose);
   setVehicleVelocity(current_upper_bound_speed);
@@ -162,11 +159,6 @@ autoware_vehicle_msgs::msg::VehicleCommand AutowareUniverse::getVehicleCommand()
     case GearCommand::LOW:
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
       break;
-      /*
-    case VehicleStateReport::GEAR_NEUTRAL:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-      break;
-      */
   }
 
   // these fields are hard-coded because they are not present in AutowareAuto
