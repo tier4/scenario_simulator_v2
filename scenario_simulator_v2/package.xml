@@ -9,6 +9,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <exec_depend>behavior_tree_plugin</exec_depend>
   <exec_depend>openscenario_interpreter</exec_depend>
   <exec_depend>openscenario_utility</exec_depend>
   <exec_depend>openscenario_visualization</exec_depend>
