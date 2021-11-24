@@ -38,7 +38,6 @@
   <depend>embree</depend>
   <depend>pcl_conversions</depend>
   <depend>libpcl-all-dev</depend>
-  <depend>autoware_perception_msgs</depend>
   <depend>autoware_auto_perception_msgs</depend>
   <exec_depend>rviz2</exec_depend>
 

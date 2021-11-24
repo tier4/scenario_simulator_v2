@@ -30,7 +30,7 @@ void SensorSimulation::attachLidarSensor(
 void SensorSimulation::attachDetectionSensor(
   const double current_time,
   const simulation_api_schema::DetectionSensorConfiguration & configuration,
-  std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
+  std::shared_ptr<rclcpp::Publisher<autoware_auto_perception_msgs::msg::DetectedObjects>>
     publisher_ptr)
 {
   DetectionSensor detection_sensor(current_time, configuration, publisher_ptr);
