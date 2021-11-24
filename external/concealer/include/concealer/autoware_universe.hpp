@@ -426,9 +426,11 @@ public:
    *  Topic: /awapi/traffic_light/put/traffic_light
    *
    * ------------------------------------------------------------------------ */
+  /*
   using TrafficSignalArray = autoware_auto_perception_msgs::msg::TrafficSignalArray;
 
   DEFINE_PUBLISHER(TrafficSignalArray);
+  */
 
   /* ---- VehicleVelocity ------------------------------------------------------
    *
@@ -526,7 +528,7 @@ public:
     // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
-    INIT_PUBLISHER(TrafficSignalArray, "/awapi/traffic_light/put/traffic_light_status"),
+    // INIT_PUBLISHER(TrafficSignalArray, "/awapi/traffic_light/put/traffic_light_status"),
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
     // INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
