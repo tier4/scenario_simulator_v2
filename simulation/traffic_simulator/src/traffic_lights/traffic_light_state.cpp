@@ -60,29 +60,29 @@ std::ostream & operator<<(std::ostream & os, const TrafficLightColor & datum)
   // clang-format on
 }
 
-autoware_perception_msgs::msg::LampState makeLampState(const TrafficLightColor & datum)
+autoware_auto_perception_msgs::msg::TrafficLight makeLampState(const TrafficLightColor & datum)
 {
-  autoware_perception_msgs::msg::LampState lamp_state;
+  autoware_auto_perception_msgs::msg::TrafficLight lamp_state;
   {
     lamp_state.confidence = 1.0;
 
     switch (datum) {
       case TrafficLightColor::RED:
-        lamp_state.type = autoware_perception_msgs::msg::LampState::RED;
+        lamp_state.color = autoware_auto_perception_msgs::msg::TrafficLight::RED;
         break;
 
       case TrafficLightColor::GREEN:
-        lamp_state.type = autoware_perception_msgs::msg::LampState::GREEN;
+        lamp_state.color = autoware_auto_perception_msgs::msg::TrafficLight::GREEN;
         break;
 
       case TrafficLightColor::YELLOW:
-        lamp_state.type = autoware_perception_msgs::msg::LampState::YELLOW;
+        lamp_state.color = autoware_auto_perception_msgs::msg::TrafficLight::AMBER;
         break;
 
       default:
         std::stringstream what;
         what << "Casting TrafficLightColor::" << datum
-             << " to autoware_perception_msgs::msg::LampState is not supported.";
+             << " to autoware_auto_perception_msgs::msg::TrafficLight is not supported.";
         throw std::out_of_range(what.str());
     }
   }
@@ -129,29 +129,32 @@ std::ostream & operator<<(std::ostream & os, const TrafficLightArrow & datum)
   // clang-format on
 }
 
-autoware_perception_msgs::msg::LampState makeLampState(const TrafficLightArrow & datum)
+autoware_auto_perception_msgs::msg::TrafficLight makeLampState(const TrafficLightArrow & datum)
 {
-  autoware_perception_msgs::msg::LampState lamp_state;
+  autoware_auto_perception_msgs::msg::TrafficLight lamp_state;
   {
     lamp_state.confidence = 1.0;
 
     switch (datum) {
       case TrafficLightArrow::STRAIGHT:
-        lamp_state.type = autoware_perception_msgs::msg::LampState::UP;
+        lamp_state.shape = autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW;
+        lamp_state.color = autoware_auto_perception_msgs::msg::TrafficLight::RED;
         break;
 
       case TrafficLightArrow::LEFT:
-        lamp_state.type = autoware_perception_msgs::msg::LampState::LEFT;
+        lamp_state.shape = autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW;
+        lamp_state.color = autoware_auto_perception_msgs::msg::TrafficLight::RED;
         break;
 
       case TrafficLightArrow::RIGHT:
-        lamp_state.type = autoware_perception_msgs::msg::LampState::RIGHT;
+        lamp_state.shape = autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW;
+        lamp_state.color = autoware_auto_perception_msgs::msg::TrafficLight::RED;
         break;
 
       default:
         std::stringstream what;
         what << "Casting TrafficLightArrow::" << datum
-             << " to autoware_perception_msgs::msg::LampState is not supported.";
+             << " to autoware_auto_perception_msgs::msg::TrafficLight is not supported.";
         throw std::out_of_range(what.str());
     }
   }

@@ -24,8 +24,8 @@
 #include <std_msgs.pb.h>
 #include <traffic_simulator_msgs.pb.h>
 
+#include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
 #include <autoware_control_msgs/msg/control_command.hpp>
-#include <autoware_perception_msgs/msg/traffic_light_state.hpp>
 #include <autoware_vehicle_msgs/msg/shift.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
@@ -158,7 +158,7 @@ void toMsg(
   const autoware_vehicle_msgs::VehicleCommand & proto,
   autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command);
 void toProto(
-  const autoware_perception_msgs::msg::TrafficLightState & traffic_light_state,
+  const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto);
 }  // namespace simulation_interface
 

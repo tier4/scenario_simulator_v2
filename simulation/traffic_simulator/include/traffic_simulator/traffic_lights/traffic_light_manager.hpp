@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
 
-#include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -32,14 +32,14 @@ namespace traffic_simulator
 {
 class TrafficLightManager
 {
-  const rclcpp::Publisher<autoware_perception_msgs::msg::TrafficLightStateArray>::SharedPtr
+  const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::SharedPtr
     traffic_light_state_array_publisher_;
 
 public:
   explicit TrafficLightManager(
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
     const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr & publisher,
-    const rclcpp::Publisher<autoware_perception_msgs::msg::TrafficLightStateArray>::SharedPtr &,
+    const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::SharedPtr &,
     const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame = "map");
 
   bool hasAnyLightChanged();
@@ -79,14 +79,14 @@ private:
 
   decltype(auto) publishTrafficLightStateArray() const
   {
-    autoware_perception_msgs::msg::TrafficLightStateArray traffic_light_state_array;
+    autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;
     {
       traffic_light_state_array.header.frame_id = "camera_link";  // XXX DIRTY HACK!!!
       traffic_light_state_array.header.stamp = (*clock_ptr_).now();
 
       for (const auto & each : traffic_lights_) {
-        traffic_light_state_array.states.push_back(
-          static_cast<autoware_perception_msgs::msg::TrafficLightState>(std::get<1>(each)));
+        traffic_light_state_array.signals.push_back(
+          static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(std::get<1>(each)));
       }
     }
 

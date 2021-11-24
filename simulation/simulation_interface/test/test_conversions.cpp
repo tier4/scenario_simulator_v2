@@ -569,48 +569,45 @@ TEST(Conversion, LaneletPose)
 TEST(Conversion, TrafficLights)
 {
   simulation_api_schema::TrafficLightState proto;
-  autoware_perception_msgs::msg::TrafficLightState msg;
-  msg.id = 123;
-  autoware_perception_msgs::msg::LampState ls0;
-  autoware_perception_msgs::msg::LampState ls1;
-  autoware_perception_msgs::msg::LampState ls2;
-  autoware_perception_msgs::msg::LampState ls3;
-  autoware_perception_msgs::msg::LampState ls4;
-  autoware_perception_msgs::msg::LampState ls5;
-  autoware_perception_msgs::msg::LampState ls6;
-  autoware_perception_msgs::msg::LampState ls7;
-  ls0.type = ls0.UNKNOWN;
+  autoware_auto_perception_msgs::msg::TrafficSignal msg;
+  msg.map_primitive_id = 123;
+  autoware_auto_perception_msgs::msg::TrafficLight ls0;
+  autoware_auto_perception_msgs::msg::TrafficLight ls1;
+  autoware_auto_perception_msgs::msg::TrafficLight ls2;
+  autoware_auto_perception_msgs::msg::TrafficLight ls3;
+  autoware_auto_perception_msgs::msg::TrafficLight ls4;
+  autoware_auto_perception_msgs::msg::TrafficLight ls5;
+  autoware_auto_perception_msgs::msg::TrafficLight ls6;
+  autoware_auto_perception_msgs::msg::TrafficLight ls7;
+  ls0.color = ls0.UNKNOWN;
   ls0.confidence = 12.12;
 
-  ls1.type = ls1.RED;
-  ls2.type = ls2.GREEN;
-  ls3.type = ls3.YELLOW;
+  ls1.color = ls1.RED;
+  ls2.color = ls2.GREEN;
+  ls3.color = ls3.AMBER;
 
-  ls4.type = ls4.LEFT;
-  ls5.type = ls5.RIGHT;
-  ls6.type = ls6.UP;
-  ls7.type = ls7.DOWN;
+  ls4.shape = ls4.LEFT_ARROW;
+  ls4.color = ls4.RED;
+  ls5.shape = ls5.RIGHT_ARROW;
+  ls5.color = ls5.RED;
+  ls6.shape = ls6.UP_ARROW;
+  ls6.color = ls6.RED;
+  ls7.shape = ls7.DOWN_ARROW;
+  ls7.color = ls7.RED;
 
-  msg.lamp_states = {ls0, ls1, ls2, ls3, ls4, ls5, ls6, ls7};
+  msg.lights = {ls0, ls1, ls2, ls3, ls4, ls5, ls6, ls7};
 
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
   EXPECT_EQ(proto.id(), 123);
-  EXPECT_NE(proto.lamp_states()[0].confidence(), 12.12);
-  EXPECT_EQ(
-    proto.lamp_states()[0].type(), simulation_api_schema::TrafficLightState::LampState::UNKNOWN);
-  EXPECT_EQ(
-    proto.lamp_states()[1].type(), simulation_api_schema::TrafficLightState::LampState::RED);
-  EXPECT_EQ(
-    proto.lamp_states()[2].type(), simulation_api_schema::TrafficLightState::LampState::GREEN);
-  EXPECT_EQ(
-    proto.lamp_states()[3].type(), simulation_api_schema::TrafficLightState::LampState::YELLOW);
-  EXPECT_EQ(
-    proto.lamp_states()[4].type(), simulation_api_schema::TrafficLightState::LampState::LEFT);
-  EXPECT_EQ(
-    proto.lamp_states()[5].type(), simulation_api_schema::TrafficLightState::LampState::RIGHT);
-  EXPECT_EQ(proto.lamp_states()[6].type(), simulation_api_schema::TrafficLightState::LampState::UP);
-  EXPECT_EQ(
-    proto.lamp_states()[7].type(), simulation_api_schema::TrafficLightState::LampState::DOWN);
+  EXPECT_NE(proto.lights()[0].confidence(), 12.12);
+  EXPECT_EQ(proto.lights()[0].type(), simulation_api_schema::TrafficLightState::LampState::UNKNOWN);
+  EXPECT_EQ(proto.lights()[1].type(), simulation_api_schema::TrafficLightState::LampState::RED);
+  EXPECT_EQ(proto.lights()[2].type(), simulation_api_schema::TrafficLightState::LampState::GREEN);
+  EXPECT_EQ(proto.lights()[3].type(), simulation_api_schema::TrafficLightState::LampState::YELLOW);
+  EXPECT_EQ(proto.lights()[4].type(), simulation_api_schema::TrafficLightState::LampState::LEFT);
+  EXPECT_EQ(proto.lights()[5].type(), simulation_api_schema::TrafficLightState::LampState::RIGHT);
+  EXPECT_EQ(proto.lights()[6].type(), simulation_api_schema::TrafficLightState::LampState::UP);
+  EXPECT_EQ(proto.lights()[7].type(), simulation_api_schema::TrafficLightState::LampState::DOWN);
 }
 
 int main(int argc, char ** argv)
