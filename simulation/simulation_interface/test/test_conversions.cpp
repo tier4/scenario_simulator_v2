@@ -404,122 +404,168 @@ TEST(Conversion, Clock)
   EXPECT_CLOCK_EQ(msg, proto);
 }
 
-TEST(Conversion, ControlCommand)
+TEST(Conversion, AckermannControlCommand)
 {
-  autoware_control_msgs::ControlCommand proto;
+  autoware_auto_control_msgs::AckermannControlCommand proto;
   autoware_auto_control_msgs::msg::AckermannControlCommand msg;
   msg.longitudinal.acceleration = 3;
   msg.lateral.steering_tire_angle = 1.4;
-  msg.lateral.steering_tire_rotation_angle = 13.4;
+  msg.lateral.steering_tire_rotation_rate = 13.4;
   msg.longitudinal.speed = 11.3;
   simulation_interface::toProto(msg, proto);
   EXPECT_CONTROL_COMMAND_EQ(msg, proto);
   msg.longitudinal.acceleration = 0;
   msg.lateral.steering_tire_angle = 0;
-  msg.lateral.steering_tire_rotation_ratio = 0;
+  msg.lateral.steering_tire_rotation_rate = 0;
   msg.longitudinal.speed = 0;
   simulation_interface::toMsg(proto, msg);
   EXPECT_CONTROL_COMMAND_EQ(msg, proto);
 }
 
-TEST(Conversion, Shift)
+TEST(Conversion, GearCommand)
 {
   /**
    * @note Convert low shift value
    */
-  autoware_vehicle_msgs::Shift proto;
-  proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING);
-  autoware_vehicle_msgs::msg::Shift msg;
-  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  autoware_auto_vehicle_msgs::GearCommand proto;
+  proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::PARKING);
+  autoware_auto_vehicle_msgs::msg::GearCommand msg;
+  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.data, proto.data());
-  msg.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-  EXPECT_FALSE(msg.data == proto.data());
-  simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.data, proto.data());
+  EXPECT_EQ(msg.command, proto.data());
   /**
    * @note Convert parking shift value
    */
-  msg.data = autoware_vehicle_msgs::msg::Shift::PARKING;
-  EXPECT_FALSE(msg.data == proto.data());
+  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::PARK;
+  EXPECT_FALSE(msg.command == proto.data());
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.data, proto.data());
-  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
-  EXPECT_FALSE(msg.data == proto.data());
+  EXPECT_EQ(msg.command, proto.data());
+  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
+  EXPECT_FALSE(msg.command == proto.data());
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.data, proto.data());
+  EXPECT_EQ(msg.command, proto.data());
   /**
    * @note Convert drive shift value
    */
-  msg.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
-  EXPECT_FALSE(msg.data == proto.data());
+  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE;
+  EXPECT_FALSE(msg.command == proto.data());
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.data, proto.data());
-  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
-  EXPECT_FALSE(msg.data == proto.data());
+  EXPECT_EQ(msg.command, proto.data());
+  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
+  EXPECT_FALSE(msg.command == proto.data());
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.data, proto.data());
+  EXPECT_EQ(msg.command, proto.data());
   /**
    * @note Convert reverse shift value
    */
-  msg.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
-  EXPECT_FALSE(msg.data == proto.data());
+  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE;
+  EXPECT_FALSE(msg.command == proto.data());
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.data, proto.data());
-  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
-  EXPECT_FALSE(msg.data == proto.data());
+  EXPECT_EQ(msg.command, proto.data());
+  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
+  EXPECT_FALSE(msg.command == proto.data());
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.data, proto.data());
-  /**
-   * @note Convert none shift value
-   */
-  msg.data = autoware_vehicle_msgs::msg::Shift::NONE;
-  EXPECT_FALSE(msg.data == proto.data());
-  simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.data, proto.data());
-  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
-  EXPECT_FALSE(msg.data == proto.data());
-  simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.data, proto.data());
+  EXPECT_EQ(msg.command, proto.data());
   /**
    * @note Invalid value input
    */
-  msg.data = 1023;
+  msg.command = 1023;
   EXPECT_THROW(
     simulation_interface::toProto(msg, proto),
     common::scenario_simulator_exception::SimulationError);
 }
 
-TEST(Conversion, VehicleCommand)
+TEST(Conversion, GearReport)
 {
-  autoware_vehicle_msgs::VehicleCommand proto;
-  autoware_vehicle_msgs::msg::VehicleCommand msg;
-  msg.control.velocity = 1.2;
-  msg.control.steering_angle_velocity = 19.3;
-  msg.control.steering_angle = 12.0;
-  msg.control.steering_angle_velocity = 192.4;
-  msg.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-  msg.emergency = 1;
-  msg.header.frame_id = "base_link";
-  msg.header.stamp.nanosec = 99;
-  msg.header.stamp.sec = 3;
+  /**
+   * @note Convert low shift value
+   */
+  autoware_auto_vehicle_msgs::GearReport proto;
+  proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::PARKING);
+  autoware_auto_vehicle_msgs::msg::GearReport msg;
+  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::LOW;
   simulation_interface::toProto(msg, proto);
-  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
-  msg.shift.data = 1023;
-  EXPECT_THROW(
-    simulation_interface::toProto(msg, proto),
-    common::scenario_simulator_exception::SimulationError);
-  EXPECT_HEADER_EQ(msg.header, proto.header());
-  EXPECT_EQ(msg.emergency, proto.emergency());
-  msg = autoware_vehicle_msgs::msg::VehicleCommand();
+  EXPECT_EQ(msg.report, proto.data());
+  /**
+   * @note Convert parking shift value
+   */
+  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::PARK;
+  EXPECT_FALSE(msg.report == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.report, proto.data());
+  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::LOW;
+  EXPECT_FALSE(msg.report == proto.data());
   simulation_interface::toMsg(proto, msg);
-  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
-  msg.shift.data = 1023;
+  EXPECT_EQ(msg.report, proto.data());
+  /**
+   * @note Convert drive shift value
+   */
+  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::DRIVE;
+  EXPECT_FALSE(msg.report == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.report, proto.data());
+  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::LOW;
+  EXPECT_FALSE(msg.report == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.report, proto.data());
+  /**
+   * @note Convert reverse shift value
+   */
+  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::REVERSE;
+  EXPECT_FALSE(msg.report == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.report, proto.data());
+  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::LOW;
+  EXPECT_FALSE(msg.report == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.report, proto.data());
+  /**
+   * @note Invalid value input
+   */
+  msg.report = 1023;
   EXPECT_THROW(
     simulation_interface::toProto(msg, proto),
     common::scenario_simulator_exception::SimulationError);
-  EXPECT_HEADER_EQ(msg.header, proto.header());
-  EXPECT_EQ(msg.emergency, proto.emergency());
+}
+
+TEST(Conversion, DeprecatedVehicleCommand)
+{
+  autoware_auto_vehicle_msgs::DeprecatedVehicleCommand proto;
+  autoware_auto_control_msgs::msg::AckermannControlCommand control_command_msg;
+  autoware_auto_vehicle_msgs::msg::GearCommand gear_command_msg;
+  autoware_vehicle_msgs::msg::VehicleEmergencyStamped vehicle_emergency_stamped_msg;
+
+  control_command_msg.stamp.nanosec = 99;
+  control_command_msg.stamp.sec = 3;
+  control_command_msg.longitudinal.speed = 1.2;
+  control_command_msg.lateral.steering_tire_rotation_rate = 19.3;
+  control_command_msg.lateral.steering_tire_angle = 12.0;
+  control_command_msg.lateral.steering_tire_rotation_rate = 192.4;
+
+  gear_command_msg.stamp.nanosec = 99;
+  gear_command_msg.stamp.sec = 3;
+  gear_command_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::PARK;
+
+  vehicle_emergency_stamped_msg.stamp.nanosec = 99;
+  vehicle_emergency_stamped_msg.stamp.sec = 3;
+  vehicle_emergency_stamped_msg.emergency = 1;
+
+  simulation_interface::toProto(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto);
+  EXPECT_VEHICLE_COMMAND_EQ(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto);
+  gear_command_msg.command = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto),
+    common::scenario_simulator_exception::SimulationError);
+
+  control_command_msg = autoware_auto_control_msgs::msg::AckermannControlCommand();
+  gear_command_msg = autoware_auto_vehicle_msgs::msg::GearCommand();
+  vehicle_emergency_stamped_msg = autoware_vehicle_msgs::msg::VehicleEmergencyStamped();
+  simulation_interface::toMsg(proto, control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg);
+  EXPECT_VEHICLE_COMMAND_EQ(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto);
+  gear_command_msg.command = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto),
+    common::scenario_simulator_exception::SimulationError);
 }
 
 TEST(Conversion, EntityType)
