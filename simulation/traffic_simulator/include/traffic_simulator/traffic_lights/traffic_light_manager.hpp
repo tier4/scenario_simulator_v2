@@ -90,9 +90,6 @@ private:
         }
       }
     }
-    if (traffic_light_state_array.states.empty()) {
-      return;
-    }
     traffic_light_state_array_publisher_->publish(traffic_light_state_array);
   }
 
