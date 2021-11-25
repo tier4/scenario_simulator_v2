@@ -25,9 +25,11 @@
 #include <traffic_simulator_msgs.pb.h>
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
-#include <autoware_control_msgs/msg/control_command.hpp>
-#include <autoware_vehicle_msgs/msg/shift.hpp>
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_vehicle_msgs/msg/vehicle_emergency_state.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -144,11 +146,11 @@ void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & time)
 void toProto(const std_msgs::msg::Header & header, std_msgs::Header & proto);
 void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header);
 void toProto(
-  const autoware_control_msgs::msg::ControlCommand & control_command,
+  const autoware_auto_control_msgs::msg::AckermannControlCommand & control_command,
   autoware_control_msgs::ControlCommand & proto);
 void toMsg(
   const autoware_control_msgs::ControlCommand & proto,
-  autoware_control_msgs::msg::ControlCommand & control_command);
+  autoware_auto_control_msgs::msg::AckermannControlCommand & control_command);
 void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto);
 void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift);
 void toProto(
