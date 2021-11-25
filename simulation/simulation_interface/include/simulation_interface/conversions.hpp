@@ -16,6 +16,7 @@
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
 #include <autoware_control_msgs.pb.h>
+#include <autoware_vehicle_msgs.pb.h>
 #include <autoware_auto_vehicle_msgs.pb.h>
 #include <builtin_interfaces.pb.h>
 #include <geometry_msgs.pb.h>
@@ -156,15 +157,39 @@ void toMsg(const autoware_auto_vehicle_msgs::GearCommand & proto, autoware_auto_
 void toProto(const autoware_auto_vehicle_msgs::msg::GearReport & shift, autoware_auto_vehicle_msgs::GearReport & proto);
 void toMsg(const autoware_auto_vehicle_msgs::GearReport & proto, autoware_auto_vehicle_msgs::msg::GearReport & shift);
 void toProto(
-  const autoware_auto_control_msgs::msg::AckermannControlCommand & control_command,
-  const autoware_auto_vehicle_msgs::msg::GearCommand & gear_command,
-  const autoware_vehicle_msgs::msg::VehicleEmergencyStamped & vehicle_emergency_stamped,
-  autoware_auto_vehicle_msgs::VehicleCommand & proto);
+  const autoware_auto_control_msgs::msg::AckermannLateralCommand &,
+  autoware_auto_control_msgs::AckermannLateralCommand &);
 void toMsg(
-  const autoware_vehicle_msgs::VehicleCommand & proto,
-  autoware_auto_control_msgs::msg::AckermannControlCommand & control_command,
-  autoware_auto_vehicle_msgs::msg::GearCommand & gear_command,
-  autoware_vehicle_msgs::msg::VehicleEmergencyStamped & vehicle_emergency_stamped);
+  const autoware_auto_control_msgs::AckermannLateralCommand &,
+  autoware_auto_control_msgs::msg::AckermannLateralCommand &);
+void toProto(
+  const autoware_auto_control_msgs::msg::LongitudinalCommand &,
+  autoware_auto_control_msgs::LongitudinalCommand &);
+void toMsg(
+  const autoware_auto_control_msgs::LongitudinalCommand &,
+  autoware_auto_control_msgs::msg::LongitudinalCommand &);
+void toProto(
+  const autoware_auto_control_msgs::msg::AckermannControlCommand &,
+  autoware_auto_control_msgs::AckermannControlCommand &);
+void toMsg(
+  const autoware_auto_control_msgs::AckermannControlCommand &,
+  autoware_auto_control_msgs::msg::AckermannControlCommand &);
+void toProto(
+  const autoware_vehicle_msgs::msg::VehicleEmergencyStamped &,
+  autoware_vehicle_msgs::VehicleEmergencyStamped &);
+void toMsg(
+  const autoware_vehicle_msgs::VehicleEmergencyStamped &,
+  autoware_vehicle_msgs::msg::VehicleEmergencyStamped &);
+void toProto(
+  const autoware_auto_control_msgs::msg::AckermannControlCommand &,
+  const autoware_auto_vehicle_msgs::msg::GearReport &,
+  const autoware_vehicle_msgs::msg::VehicleEmergencyStamped &,
+  autoware_auto_vehicle_msgs::DeprecatedVehicleCommand &);
+void toMsg(
+  const autoware_auto_vehicle_msgs::DeprecatedVehicleCommand &,
+  autoware_auto_control_msgs::msg::AckermannControlCommand &,
+  autoware_auto_vehicle_msgs::msg::GearReport &,
+  autoware_vehicle_msgs::msg::VehicleEmergencyStamped &);
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto);

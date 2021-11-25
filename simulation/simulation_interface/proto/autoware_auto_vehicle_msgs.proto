@@ -1,7 +1,10 @@
 syntax = "proto3";
 
-import "std_msgs.proto";
+import "autoware_auto_control_msgs.proto";
 import "autoware_control_msgs.proto";
+import "autoware_vehicle_msgs.proto";
+import "std_msgs.proto";
+
 package autoware_auto_vehicle_msgs;
 
 enum GEAR_POSITIONS {
@@ -17,13 +20,8 @@ message GearCommand { GEAR_POSITIONS data = 1; }
 
 message GearReport { GEAR_POSITIONS data = 1; }
 
-/**
- * Protobuf definition of the autoware_auto_vehicle_msgs/msg/VehicleCommand type in
- *ROS2.
- **/
-message VehicleCommand {
-  std_msgs.Header header = 1;
-  autoware_control_msgs.ControlCommand control = 2;
-  GearCommand gear_command = 3;
-  int32 emergency = 4;
+message DeprecatedVehicleCommand {
+  autoware_auto_control_msgs.AckermannControlCommand ackermann_control_command = 1;
+  autoware_auto_vehicle_msgs.GearReport gear_report = 2;
+  autoware_vehicle_msgs.VehicleEmergencyStamped vehicle_emergency_stamped = 3;
 }
