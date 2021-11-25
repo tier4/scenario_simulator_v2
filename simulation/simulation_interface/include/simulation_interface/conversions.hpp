@@ -181,16 +181,6 @@ void toMsg(
   const autoware_vehicle_msgs::VehicleEmergencyStamped &,
   autoware_vehicle_msgs::msg::VehicleEmergencyStamped &);
 void toProto(
-  const autoware_auto_control_msgs::msg::AckermannControlCommand &,
-  const autoware_auto_vehicle_msgs::msg::GearCommand &,
-  const autoware_vehicle_msgs::msg::VehicleEmergencyStamped &,
-  autoware_auto_vehicle_msgs::DeprecatedVehicleCommand &);
-void toMsg(
-  const autoware_auto_vehicle_msgs::DeprecatedVehicleCommand &,
-  autoware_auto_control_msgs::msg::AckermannControlCommand &,
-  autoware_auto_vehicle_msgs::msg::GearCommand &,
-  autoware_vehicle_msgs::msg::VehicleEmergencyStamped &);
-void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto);
 }  // namespace simulation_interface

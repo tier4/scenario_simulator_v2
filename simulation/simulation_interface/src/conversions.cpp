@@ -621,28 +621,6 @@ void toMsg(
 }
 
 void toProto(
-  const autoware_auto_control_msgs::msg::AckermannControlCommand & ackermann_control_command,
-  const autoware_auto_vehicle_msgs::msg::GearCommand & gear_command,
-  const autoware_vehicle_msgs::msg::VehicleEmergencyStamped & vehicle_emergency_stamped,
-  autoware_auto_vehicle_msgs::DeprecatedVehicleCommand & proto)
-{
-  toProto(ackermann_control_command, *proto.mutable_ackermann_control_command());
-  toProto(gear_command, *proto.mutable_gear_command());
-  toProto(vehicle_emergency_stamped, *proto.mutable_vehicle_emergency_stamped());
-}
-
-void toMsg(
-  const autoware_auto_vehicle_msgs::DeprecatedVehicleCommand & proto,
-  autoware_auto_control_msgs::msg::AckermannControlCommand & ackermann_control_command,
-  autoware_auto_vehicle_msgs::msg::GearCommand & gear_command,
-  autoware_vehicle_msgs::msg::VehicleEmergencyStamped & vehicle_emergency_stamped)
-{
-  toMsg(proto.ackermann_control_command(), ackermann_control_command);
-  toMsg(proto.gear_command(), gear_command);
-  toMsg(proto.vehicle_emergency_stamped(), vehicle_emergency_stamped);
-}
-
-void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto)
 {

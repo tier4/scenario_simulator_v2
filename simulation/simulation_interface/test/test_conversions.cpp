@@ -528,46 +528,6 @@ TEST(Conversion, GearReport)
     common::scenario_simulator_exception::SimulationError);
 }
 
-TEST(Conversion, DeprecatedVehicleCommand)
-{
-  autoware_auto_vehicle_msgs::DeprecatedVehicleCommand proto;
-  autoware_auto_control_msgs::msg::AckermannControlCommand control_command_msg;
-  autoware_auto_vehicle_msgs::msg::GearCommand gear_command_msg;
-  autoware_vehicle_msgs::msg::VehicleEmergencyStamped vehicle_emergency_stamped_msg;
-
-  control_command_msg.stamp.nanosec = 99;
-  control_command_msg.stamp.sec = 3;
-  control_command_msg.longitudinal.speed = 1.2;
-  control_command_msg.lateral.steering_tire_rotation_rate = 19.3;
-  control_command_msg.lateral.steering_tire_angle = 12.0;
-  control_command_msg.lateral.steering_tire_rotation_rate = 192.4;
-
-  gear_command_msg.stamp.nanosec = 99;
-  gear_command_msg.stamp.sec = 3;
-  gear_command_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::PARK;
-
-  vehicle_emergency_stamped_msg.stamp.nanosec = 99;
-  vehicle_emergency_stamped_msg.stamp.sec = 3;
-  vehicle_emergency_stamped_msg.emergency = 1;
-
-  simulation_interface::toProto(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto);
-  EXPECT_VEHICLE_COMMAND_EQ(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto);
-  gear_command_msg.command = 1023;
-  EXPECT_THROW(
-    simulation_interface::toProto(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto),
-    common::scenario_simulator_exception::SimulationError);
-
-  control_command_msg = autoware_auto_control_msgs::msg::AckermannControlCommand();
-  gear_command_msg = autoware_auto_vehicle_msgs::msg::GearCommand();
-  vehicle_emergency_stamped_msg = autoware_vehicle_msgs::msg::VehicleEmergencyStamped();
-  simulation_interface::toMsg(proto, control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg);
-  EXPECT_VEHICLE_COMMAND_EQ(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto);
-  gear_command_msg.command = 1023;
-  EXPECT_THROW(
-    simulation_interface::toProto(control_command_msg, gear_command_msg, vehicle_emergency_stamped_msg, proto),
-    common::scenario_simulator_exception::SimulationError);
-}
-
 TEST(Conversion, EntityType)
 {
   traffic_simulator_msgs::EntityType proto;

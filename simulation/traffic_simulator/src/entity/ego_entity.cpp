@@ -194,11 +194,6 @@ EgoEntity::EgoEntity(
 
 void EgoEntity::engage() { autoware->engage(); }
 
-auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
-{
-  return autoware->getVehicleCommand();
-}
-
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
   const auto state = autoware->getAutowareStateMessage();

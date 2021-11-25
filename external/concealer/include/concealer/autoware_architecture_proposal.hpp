@@ -319,10 +319,7 @@ class AutowareArchitectureProposal : public Autoware,
    * ------------------------------------------------------------------------ */
   using VehicleCommand = autoware_vehicle_msgs::msg::VehicleCommand;
 
-  // this macro is used only once
-  // however is is created to keep consistency with the previous DEFINE_SUBSCRIPTION macro usage
-  DEFINE_SUBSCRIPTION_WITH_OVERRIDE(VehicleCommand);
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  DEFINE_SUBSCRIPTION(VehicleCommand);
 
 public:
   /// FROM FundamentalAPI ///

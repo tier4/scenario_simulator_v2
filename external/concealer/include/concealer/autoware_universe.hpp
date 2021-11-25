@@ -35,7 +35,6 @@
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/conversion.hpp>
@@ -333,18 +332,9 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
    * ------------------------------------------------------------------------ */
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
 
-  // this macro is used only once
-  // however is is created to keep consistency with the previous DEFINE_SUBSCRIPTION macro usage
-  // DEFINE_SUBSCRIPTION_WITH_OVERRIDE(AckermannControlCommand);
   DEFINE_SUBSCRIPTION(AckermannControlCommand);
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;
 
 public:
-  /// FROM FundamentalAPI ///
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   /* ---- AutowareEngage -------------------------------------------------------
    *
    *  Topic: /awapi/autoware/put/engage

@@ -211,7 +211,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightArrow);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
-  FORWARD_TO_ENTITY_MANAGER(getVehicleCommand);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(ready);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);

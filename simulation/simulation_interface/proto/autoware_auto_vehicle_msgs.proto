@@ -19,9 +19,3 @@ enum GEAR_POSITIONS {
 message GearCommand { GEAR_POSITIONS data = 1; }
 
 message GearReport { GEAR_POSITIONS data = 1; }
-
-message DeprecatedVehicleCommand {
-  autoware_auto_control_msgs.AckermannControlCommand ackermann_control_command = 1;
-  autoware_auto_vehicle_msgs.GearCommand gear_command = 2;
-  autoware_vehicle_msgs.VehicleEmergencyStamped vehicle_emergency_stamped = 3;
-}

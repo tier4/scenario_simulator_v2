@@ -19,7 +19,6 @@
 
 #include <sys/wait.h>
 
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/conversion.hpp>
@@ -171,8 +170,6 @@ public:
   virtual auto getGearSign() const -> double = 0;
 
   virtual auto getSteeringAngle() const -> double = 0;
-
-  virtual auto getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand = 0;
 
   virtual auto getVelocity() const -> double = 0;
 

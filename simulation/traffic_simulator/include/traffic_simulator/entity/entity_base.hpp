@@ -15,7 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <boost/optional.hpp>
 #include <memory>
 #include <queue>
@@ -80,8 +79,6 @@ public:
   /*   */ auto getStandStillDuration() const -> boost::optional<double>;
 
   /*   */ auto getVisibility() { return visibility_; }
-
-  virtual auto getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand;
 
   /*   */ auto getVehicleParameters() const
     -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>

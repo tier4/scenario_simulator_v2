@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "autoware_control_msgs.proto";
 import "builtin_interfaces.proto";
 import "std_msgs.proto";
 
@@ -16,17 +15,6 @@ enum SHIFT_POSITIONS {
 }
 
 message Shift { SHIFT_POSITIONS data = 1; }
-
-/**
- * Protobuf definition of the autoware_vehicle_msgs/msg/VehicleCommand type in
- * ROS2.
- **/
-message VehicleCommand {
-  std_msgs.Header header = 1;
-  autoware_control_msgs.ControlCommand control = 2;
-  Shift shift = 3;
-  int32 emergency = 4;
-}
 
 message VehicleEmergencyStamped {
   builtin_interfaces.Time stamp = 1;
