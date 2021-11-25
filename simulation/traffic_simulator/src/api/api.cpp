@@ -347,6 +347,9 @@ bool API::updateTrafficLightsInSim()
 bool API::updateEntityStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
+
+  // @todo Send EgoEntity's dynamics to E2E Simulator (https://github.com/tier4/scenario_simulator_v2/pull/617/commits/aeb2184485952b7dbaafdc01b838fa042b20f9ca)
+
   const auto names = entity_manager_ptr_->getEntityNames();
   for (const auto name : names) {
     auto status = entity_manager_ptr_->getEntityStatus(name);

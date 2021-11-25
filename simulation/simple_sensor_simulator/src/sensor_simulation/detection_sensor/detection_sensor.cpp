@@ -35,6 +35,17 @@ DetectionSensor::DetectionSensor(
   last_update_stamp_ = current_time;
 }
 
+auto makeObjectClassification = [](const auto & label)
+{
+  autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
+  {
+    object_classification.label = label;
+    object_classification.probability = 1;
+  }
+
+  return object_classification;
+};
+
 void DetectionSensor::update(
   double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp, const std::vector<std::string> & detected_objects)
@@ -54,12 +65,14 @@ void DetectionSensor::update(
             is_ego = true;
             break;
           case traffic_simulator_msgs::EntityType::VEHICLE:
-            object.classification.type = object.classification.CAR;
-            object.classification.confidence = 1;
+            object.classification.push_back(
+              makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::CAR));
             break;
           case traffic_simulator_msgs::EntityType::PEDESTRIAN:
-            object.classification.type = object.classification.PEDESTRIAN;
-            object.classification.confidence = 1;
+            object.classification.push_back(
+              makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
             break;
           case traffic_simulator_msgs::EntityType::MISC_OBJECT:
             break;
@@ -68,26 +81,26 @@ void DetectionSensor::update(
             break;
         }
         if (!is_ego) {
-          boost::uuids::uuid base =
-            boost::uuids::string_generator()("0123456789abcdef0123456789abcdef");
-          boost::uuids::name_generator gen(base);
-          boost::uuids::uuid uuid = gen(s.name());
-          std::copy(uuid.begin(), uuid.end(), object.id.uuid.begin());
+          // boost::uuids::uuid base =
+          //   boost::uuids::string_generator()("0123456789abcdef0123456789abcdef");
+          // boost::uuids::name_generator gen(base);
+          // boost::uuids::uuid uuid = gen(s.name());
+          // std::copy(uuid.begin(), uuid.end(), object.id.uuid.begin());
           simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
           geometry_msgs::msg::Pose pose;
           simulation_interface::toMsg(s.pose(), pose);
-          object.kinematics.pose_covariance.pose = pose;
-          object.kinematics.pose_covariance.covariance = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-                                                          0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-                                                          0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
+          object.kinematics.pose_with_covariance.pose = pose;
+          object.kinematics.pose_with_covariance.covariance = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+                                                               0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+                                                               0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
+          object.kinematics.has_position_covariance = true;
+          object.kinematics.orientation_availability =
+            autoware_auto_perception_msgs::msg::DetectedObjectKinematics::AVAILABLE;
+          simulation_interface::toMsg(
+            s.action_status().twist(), object.kinematics.twist_with_covariance.twist);
+          object.kinematics.has_twist = true;
+          object.kinematics.has_twist_covariance = false;
           object.shape.type = object.shape.BOUNDING_BOX;
-          object.kinematics.orientation_reliable = true;
-          simulation_interface::toMsg(
-            s.action_status().twist(), object.kinematics.twist_covariance.twist);
-          object.kinematics.twist_reliable = true;
-          simulation_interface::toMsg(
-            s.action_status().accel(), object.kinematics.acceleration_covariance.accel);
-          object.kinematics.acceleration_reliable = true;
           msg.objects.emplace_back(object);
         }
       }
