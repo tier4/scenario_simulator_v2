@@ -77,20 +77,20 @@ private:
 
   void drawMarkers() const;
 
-  decltype(auto) publishTrafficLightStateArray() const
+  void publishTrafficLightStateArray() const
   {
     autoware_perception_msgs::msg::TrafficLightStateArray traffic_light_state_array;
     {
       traffic_light_state_array.header.frame_id = "camera_link";  // XXX DIRTY HACK!!!
       traffic_light_state_array.header.stamp = (*clock_ptr_).now();
-
       for (const auto & each : traffic_lights_) {
-        traffic_light_state_array.states.push_back(
-          static_cast<autoware_perception_msgs::msg::TrafficLightState>(std::get<1>(each)));
+        if (each.second.getColor() != TrafficLightColor::NONE) {
+          traffic_light_state_array.states.push_back(
+            static_cast<autoware_perception_msgs::msg::TrafficLightState>(std::get<1>(each)));
+        }
       }
     }
-
-    return (*traffic_light_state_array_publisher_).publish(traffic_light_state_array);
+    traffic_light_state_array_publisher_->publish(traffic_light_state_array);
   }
 
   std::unordered_map<std::int64_t, TrafficLight> traffic_lights_;
