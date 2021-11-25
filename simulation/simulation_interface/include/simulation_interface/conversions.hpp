@@ -29,7 +29,7 @@
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_vehicle_msgs/msg/vehicle_emergency_state.hpp>
+#include <autoware_vehicle_msgs/msg/vehicle_emergency_stamped.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <geometry_msgs/msg/accel.hpp>
