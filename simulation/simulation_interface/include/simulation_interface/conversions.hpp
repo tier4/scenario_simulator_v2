@@ -16,7 +16,7 @@
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
 #include <autoware_control_msgs.pb.h>
-#include <autoware_vehicle_msgs.pb.h>
+#include <autoware_auto_vehicle_msgs.pb.h>
 #include <builtin_interfaces.pb.h>
 #include <geometry_msgs.pb.h>
 #include <rosgraph_msgs.pb.h>
@@ -151,14 +151,20 @@ void toProto(
 void toMsg(
   const autoware_control_msgs::ControlCommand & proto,
   autoware_auto_control_msgs::msg::AckermannControlCommand & control_command);
-void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto);
-void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift);
+void toProto(const autoware_auto_vehicle_msgs::msg::GearCommand & shift, autoware_auto_vehicle_msgs::GearCommand & proto);
+void toMsg(const autoware_auto_vehicle_msgs::GearCommand & proto, autoware_auto_vehicle_msgs::msg::GearCommand & shift);
+void toProto(const autoware_auto_vehicle_msgs::msg::GearReport & shift, autoware_auto_vehicle_msgs::GearReport & proto);
+void toMsg(const autoware_auto_vehicle_msgs::GearReport & proto, autoware_auto_vehicle_msgs::msg::GearReport & shift);
 void toProto(
-  const autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command,
-  autoware_vehicle_msgs::VehicleCommand & proto);
+  const autoware_auto_control_msgs::msg::AckermannControlCommand & control_command,
+  const autoware_auto_vehicle_msgs::msg::GearCommand & gear_command,
+  const autoware_vehicle_msgs::msg::VehicleEmergencyStamped & vehicle_emergency_stamped,
+  autoware_auto_vehicle_msgs::VehicleCommand & proto);
 void toMsg(
   const autoware_vehicle_msgs::VehicleCommand & proto,
-  autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command);
+  autoware_auto_control_msgs::msg::AckermannControlCommand & control_command,
+  autoware_auto_vehicle_msgs::msg::GearCommand & gear_command,
+  autoware_vehicle_msgs::msg::VehicleEmergencyStamped & vehicle_emergency_stamped);
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto);
