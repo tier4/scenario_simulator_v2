@@ -335,7 +335,7 @@ bool API::updateTrafficLightsInSim()
       simulation_api_schema::TrafficLightState state;
       auto traffic_light = entity_manager_ptr_->getTrafficLightInstance(id);
       simulation_interface::toProto(
-        static_cast<const autoware_perception_msgs::msg::TrafficLightState>(traffic_light), state);
+        static_cast<const autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
       *req.add_states() = state;
     }
     update_traffic_lights_client_.call(req, res);
@@ -347,20 +347,9 @@ bool API::updateTrafficLightsInSim()
 bool API::updateEntityStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
-  if (entity_manager_ptr_->getNumberOfEgo() != 0) {
-    simulation_interface::toProto(
-      entity_manager_ptr_->getVehicleCommand(entity_manager_ptr_->getEgoName()),
-      *req.mutable_vehicle_command());
-    const auto ego_status_before_update =
-      entity_manager_ptr_->getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName());
-    if (ego_status_before_update) {
-      req.set_ego_entity_status_before_update_is_empty(false);
-      simulation_interface::toProto(
-        ego_status_before_update.get(), *req.mutable_ego_entity_status_before_update());
-    } else {
-      req.set_ego_entity_status_before_update_is_empty(true);
-    }
-  }
+
+  // @todo Send EgoEntity's dynamics to E2E Simulator (https://github.com/tier4/scenario_simulator_v2/pull/617/commits/aeb2184485952b7dbaafdc01b838fa042b20f9ca)
+
   const auto names = entity_manager_ptr_->getEntityNames();
   for (const auto name : names) {
     auto status = entity_manager_ptr_->getEntityStatus(name);

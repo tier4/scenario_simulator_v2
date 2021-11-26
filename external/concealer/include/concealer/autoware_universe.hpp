@@ -12,35 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__AUTOWARE_ARCHITECTURE_PROPOSAL_HPP_
-#define CONCEALER__AUTOWARE_ARCHITECTURE_PROPOSAL_HPP_
+#ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
+#define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_auto_planning_msgs/msg/had_map_route.hpp>
+#include <autoware_auto_planning_msgs/msg/trajectory.hpp>
+#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/engage.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/hazard_lights_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/hazard_lights_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
-#include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
-#include <autoware_planning_msgs/msg/route.hpp>
-#include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
-#include <autoware_vehicle_msgs/msg/control_mode.hpp>
-#include <autoware_vehicle_msgs/msg/engage.hpp>
-#include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
-#include <autoware_vehicle_msgs/msg/steering.hpp>
-#include <autoware_vehicle_msgs/msg/turn_signal.hpp>
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
+#include <nav_msgs/msg/odometry.hpp>
 
 namespace concealer
 {
-class AutowareArchitectureProposal : public Autoware,
-                                     public TransitionAssertion<AutowareArchitectureProposal>
+class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUniverse>
 {
-  friend class TransitionAssertion<AutowareArchitectureProposal>;
+  friend class TransitionAssertion<AutowareUniverse>;
 
   void sendSIGINT() override;
 
@@ -70,15 +75,15 @@ class AutowareArchitectureProposal : public Autoware,
    *  Topic: /vehicle/status/control_mode
    *
    * ------------------------------------------------------------------------ */
-  using CurrentControlMode = autoware_vehicle_msgs::msg::ControlMode;
+  using CurrentControlMode = autoware_auto_vehicle_msgs::msg::ControlModeReport;
 
   DEFINE_PUBLISHER(CurrentControlMode);
 
-  decltype(auto) setCurrentControlMode(const std::uint8_t mode = CurrentControlMode::AUTO)
+  decltype(auto) setCurrentControlMode(const std::uint8_t mode = CurrentControlMode::AUTONOMOUS)
   {
     CurrentControlMode current_control_mode{};
     {
-      current_control_mode.data = mode;
+      current_control_mode.mode = mode;
     }
 
     return setCurrentControlMode(current_control_mode);
@@ -86,14 +91,14 @@ class AutowareArchitectureProposal : public Autoware,
 
   /* ---- CurrentShift ---------------------------------------------------------
    *
-   *  Topic: /vehicle/status/shift
+   *  Topic: /vehicle/status/gear_status
    *
    *  Overloads:
-   *    setCurrentShift(const autoware_vehicle_msgs::msg::ShiftStamped &);
+   *    setCurrentShift(const autoware_auto_vehicle_msgs::msg::GearReport &);
    *    setCurrentShift(const double);
    *
    * ------------------------------------------------------------------------ */
-  using CurrentShift = autoware_vehicle_msgs::msg::ShiftStamped;
+  using CurrentShift = autoware_auto_vehicle_msgs::msg::GearReport;
 
   DEFINE_PUBLISHER(CurrentShift);
 
@@ -102,11 +107,10 @@ class AutowareArchitectureProposal : public Autoware,
   {
     CurrentShift current_shift;
     {
-      using autoware_vehicle_msgs::msg::Shift;
+      using autoware_auto_vehicle_msgs::msg::GearReport;
 
-      current_shift.header.stamp = get_clock()->now();
-      current_shift.header.frame_id = "map";
-      current_shift.shift.data = twist_linear_x >= 0 ? Shift::DRIVE : Shift::REVERSE;
+      current_shift.stamp = get_clock()->now();
+      current_shift.report = twist_linear_x >= 0 ? GearReport::DRIVE : GearReport::REVERSE;
     }
 
     return setCurrentShift(current_shift);
@@ -119,52 +123,66 @@ class AutowareArchitectureProposal : public Autoware,
 
   /* ---- CurrentSteering ------------------------------------------------------
    *
-   *  Topic: /vehicle/status/steering
+   *  Topic: /vehicle/status/steering_status
    *
    * ------------------------------------------------------------------------ */
-  using CurrentSteering = autoware_vehicle_msgs::msg::Steering;
+  using CurrentSteering = autoware_auto_vehicle_msgs::msg::SteeringReport;
 
   DEFINE_PUBLISHER(CurrentSteering);
 
-  template <typename T, REQUIRES(std::is_floating_point<T>)>
-  decltype(auto) setCurrentSteering(const T value)
+  decltype(auto) setCurrentSteering()
   {
-    CurrentSteering current_steering{};
+    CurrentSteering current_steering;
     {
-      current_steering.header.stamp = get_clock()->now();
-      current_steering.header.frame_id = "base_link";
-      current_steering.data = value;
+      current_steering.stamp = get_clock()->now();
+      current_steering.steering_tire_angle = getSteeringAngle();
     }
 
     return setCurrentSteering(current_steering);
   }
 
-  decltype(auto) setCurrentSteering(const geometry_msgs::msg::Twist & twist)
-  {
-    return setCurrentSteering(twist.angular.z);
-  }
-
   /* ---- CurrentTurnSignal ----------------------------------------------------
    *
-   *  Topic: /vehicle/status/turn_signal
+   *  Topic: /vehicle/status/turn_indicators_status
    *
    * ------------------------------------------------------------------------ */
-  using CurrentTurnSignal = autoware_vehicle_msgs::msg::TurnSignal;
+  using CurrentTurnIndicators = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
 
-  DEFINE_PUBLISHER(CurrentTurnSignal);
+  DEFINE_PUBLISHER(CurrentTurnIndicators);
 
-  decltype(auto) setCurrentTurnSignal()
+  decltype(auto) setCurrentTurnIndicators()
   {
-    CurrentTurnSignal current_turn_signal{};
+    CurrentTurnIndicators current_turn_signal{};
     {
-      current_turn_signal.header.stamp = get_clock()->now();
-      current_turn_signal.header.frame_id = "map";
-      current_turn_signal.data = autoware_vehicle_msgs::msg::TurnSignal::NONE;
+      current_turn_signal.stamp = get_clock()->now();
+      // NOTE: NONE was returned here but there is no NONE type in this msg
     }
 
-    return setCurrentTurnSignal(current_turn_signal);
+    return setCurrentTurnIndicators(current_turn_signal);
 
-    // return setCurrentTurnSignal(getTurnSignalCommand());
+    // return setCurrentTurnIndicators(getTurnIndicatorsCommand());
+  }
+
+  /* ---- CurrentHazardLights ----------------------------------------------------
+   *
+   *  Topic: /vehicle/status/hazard_lights_status
+   *
+   * ------------------------------------------------------------------------ */
+  using CurrentHazardLights = autoware_auto_vehicle_msgs::msg::HazardLightsReport;
+
+  DEFINE_PUBLISHER(CurrentHazardLights);
+
+  decltype(auto) setCurrentHazardLights()
+  {
+    CurrentHazardLights current_turn_signal{};
+    {
+      current_turn_signal.stamp = get_clock()->now();
+      // NOTE: NONE was returned here but there is no NONE type in this msg
+    }
+
+    return setCurrentHazardLights(current_turn_signal);
+
+    // return setCurrentHazardLights(getHazardLightsCommand());
   }
 
   /* ---- CurrentTwist ---------------------------------------------------------
@@ -190,28 +208,25 @@ class AutowareArchitectureProposal : public Autoware,
 
   /* ---- CurrentVelocity ------------------------------------------------------
    *
-   *  Topic: /vehicle/status/velocity
+   *  Topic: /vehicle/status/velocity_status
    *
    * ------------------------------------------------------------------------ */
-  using CurrentVelocity = autoware_debug_msgs::msg::Float32Stamped;
+  using CurrentVelocity = autoware_auto_vehicle_msgs::msg::VelocityReport;
 
   DEFINE_PUBLISHER(CurrentVelocity);
 
-  template <typename T, REQUIRES(std::is_convertible<T, decltype(CurrentVelocity::data)>)>
-  decltype(auto) setCurrentVelocity(const T twist_linear_x)
+  decltype(auto) setCurrentVelocity(const geometry_msgs::msg::Twist & twist)
   {
-    CurrentVelocity message;
+    CurrentVelocity message{};
     {
-      message.stamp = get_clock()->now();
-      message.data = twist_linear_x;
+      message.header.stamp = get_clock()->now();
+      message.header.frame_id = "base_link";
+      message.longitudinal_velocity = twist.linear.x;
+      message.lateral_velocity = twist.linear.y;
+      message.heading_rate = twist.angular.z;
     }
 
     return setCurrentVelocity(message);
-  }
-
-  decltype(auto) setCurrentVelocity(const geometry_msgs::msg::Twist & twist)
-  {
-    return setCurrentVelocity(twist.linear.x);
   }
 
   /* ---- GoalPose -------------------------------------------------------------
@@ -248,50 +263,30 @@ class AutowareArchitectureProposal : public Autoware,
     return setInitialPose(initial_pose);
   }
 
-  /* ---- LocalizationPose -----------------------------------------------------
-    *
-    *  Topic: /localization/pose_with_covariance
-    *
-    * ------------------------------------------------------------------------ */
-  using LocalizationPose = geometry_msgs::msg::PoseWithCovarianceStamped;
-
-  DEFINE_PUBLISHER(LocalizationPose);
-
-  auto setLocalizationPose(
-    const geometry_msgs::msg::Pose & pose = geometry_msgs::msg::Pose(),
-    const std::array<double, 36> & covariance = {}) -> decltype(auto)
-  {
-    geometry_msgs::msg::PoseWithCovarianceStamped pose_with_covariance_stamped;
-    {
-      pose_with_covariance_stamped.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-      pose_with_covariance_stamped.header.frame_id = "map";
-      pose_with_covariance_stamped.pose.pose = pose;
-      pose_with_covariance_stamped.pose.covariance = covariance;
-    }
-
-    return setLocalizationPose(pose_with_covariance_stamped);
-  }
-
-  /* ---- LocalizationTwist ----------------------------------------------------
+  /* ---- LocalizationOdometry ----------------------------------------------------
    *
-   *  Topic: /localization/twist
+   *  Topic: /localization/kinematic_state
    *
    * ------------------------------------------------------------------------ */
-  using LocalizationTwist = CurrentTwist;
+  using LocalizationOdometry = nav_msgs::msg::Odometry;
 
-  DEFINE_PUBLISHER(LocalizationTwist);
+  DEFINE_PUBLISHER(LocalizationOdometry);
 
-  decltype(auto) setLocalizationTwist(
-    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
+  decltype(auto) setLocalizationOdometry(
+    const geometry_msgs::msg::Pose & pose = geometry_msgs::msg::Pose(),
+    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist(),
+    const std::array<double, 36> & covariance = {})
   {
-    LocalizationTwist localization_twist;
+    LocalizationOdometry localization_odometry;
     {
-      localization_twist.header.stamp = get_clock()->now();
-      localization_twist.header.frame_id = "map";
-      localization_twist.twist = twist;
+      localization_odometry.header.stamp = get_clock()->now();
+      localization_odometry.header.frame_id = "map";
+      localization_odometry.pose.pose = pose;
+      localization_odometry.pose.covariance = covariance;
+      localization_odometry.twist.twist = twist;
     }
 
-    return setLocalizationTwist(localization_twist);
+    return setLocalizationOdometry(localization_odometry);
   }
 
   /* ---- Trajectory -----------------------------------------------------------
@@ -299,32 +294,47 @@ class AutowareArchitectureProposal : public Autoware,
    *  Topic: /planning/scenario_planning/trajectory
    *
    * ------------------------------------------------------------------------ */
-  using Trajectory = autoware_planning_msgs::msg::Trajectory;
+  using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
 
   DEFINE_SUBSCRIPTION(Trajectory);
 
+  /* ---- Gear Command --------------------------------------------------
+   *
+   *  Topic: /control/command/gear_cmd
+   *
+   * ------------------------------------------------------------------------ */
+  using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
+
+  DEFINE_SUBSCRIPTION(GearCommand);
+
   /* ---- Turn Signal Command --------------------------------------------------
    *
-   *  Topic: /control/turn_signal_cmd
+   *  Topic: /control/command/turn_indicators_cmd
    *
    * ------------------------------------------------------------------------ */
-  using TurnSignalCommand = autoware_vehicle_msgs::msg::TurnSignal;
+  using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  DEFINE_SUBSCRIPTION(TurnSignalCommand);
+  DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
 
-  /* ---- VehicleCommand -------------------------------------------------------
+  /* ---- Hazard Lights Command --------------------------------------------------
    *
-   *  Topic: /control/vehicle_cmd
+   *  Topic: /control/command/hazard_lights_cmd
    *
    * ------------------------------------------------------------------------ */
-  using VehicleCommand = autoware_vehicle_msgs::msg::VehicleCommand;
+  using HazardLightsCommand = autoware_auto_vehicle_msgs::msg::HazardLightsCommand;
 
-  DEFINE_SUBSCRIPTION(VehicleCommand);
+  DEFINE_SUBSCRIPTION(HazardLightsCommand);
+
+  /* ---- AckermannControlCommand -------------------------------------------------------
+   *
+   *  Topic: /control/command/control_cmd
+   *
+   * ------------------------------------------------------------------------ */
+  using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
+
+  DEFINE_SUBSCRIPTION(AckermannControlCommand);
 
 public:
-  /// FROM FundamentalAPI ///
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   /* ---- AutowareEngage -------------------------------------------------------
    *
    *  Topic: /awapi/autoware/put/engage
@@ -334,13 +344,20 @@ public:
    *    setAutowareEngage(const bool) const
    *
    * ------------------------------------------------------------------------ */
-  using AutowareEngage = autoware_vehicle_msgs::msg::Engage;
+  using AutowareEngage = autoware_auto_vehicle_msgs::msg::Engage;
 
   DEFINE_PUBLISHER(AutowareEngage);
 
   decltype(auto) setAutowareEngage(const bool value = true)
   {
-    return setAutowareEngage(convertTo<AutowareEngage>(value));
+    // return setAutowareEngage(convertTo<AutowareEngage>(value));
+    AutowareEngage message{};
+    {
+      message.stamp = get_clock()->now();
+      message.engage = value;
+    }
+
+    return setAutowareEngage(message);
   }
 
   /* ---- AutowareRoute --------------------------------------------------------
@@ -399,9 +416,11 @@ public:
    *  Topic: /awapi/traffic_light/put/traffic_light
    *
    * ------------------------------------------------------------------------ */
-  using TrafficLightStateArray = autoware_perception_msgs::msg::TrafficLightStateArray;
+  /*
+  using TrafficSignalArray = autoware_auto_perception_msgs::msg::TrafficSignalArray;
 
-  DEFINE_PUBLISHER(TrafficLightStateArray);
+  DEFINE_PUBLISHER(TrafficSignalArray);
+  */
 
   /* ---- VehicleVelocity ------------------------------------------------------
    *
@@ -440,7 +459,7 @@ public:
    *  Topic: /awapi/traffic_light/get/status
    *
    * ------------------------------------------------------------------------ */
-  // using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
+  // using TrafficLightStatus = autoware_perception_msgs::msg::TrafficSignalArray;
   //
   // DEFINE_SUBSCRIPTION(TrafficLightStatus);
 
@@ -476,29 +495,30 @@ public:
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   template <typename... Ts>
-  CONCEALER_PUBLIC explicit AutowareArchitectureProposal(Ts &&... xs)
+  CONCEALER_PUBLIC explicit AutowareUniverse(Ts &&... xs)
   : Autoware(std::forward<decltype(xs)>(xs)...),
     /// MiscellaneousAPI
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
-    INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
-    INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),
-    INIT_PUBLISHER(CurrentTwist, "/vehicle/status/twist"),
-    INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity"),
+    INIT_PUBLISHER(CurrentShift, "/vehicle/status/gear_status"),
+    INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering_status"),
+    INIT_PUBLISHER(CurrentTurnIndicators, "/vehicle/status/turn_indicators_status"),
+    INIT_PUBLISHER(CurrentHazardLights, "/vehicle/status/hazard_lights_status"),
+    INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity_status"),
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
-    INIT_PUBLISHER(LocalizationPose, "/localization/pose_with_covariance"),
-    INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
+    INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
-    INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
-    INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
+    INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd", []() {}),
+    INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd", []() {}),
+    INIT_SUBSCRIPTION(HazardLightsCommand, "/control/command/hazard_lights_cmd", []() {}),
+    INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd", []() {}),
     /// FundamentalAPI
     INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
-    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
+    // INIT_PUBLISHER(TrafficSignalArray, "/awapi/traffic_light/put/traffic_light_status"),
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
     // INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
@@ -510,7 +530,7 @@ public:
     setLaneChangeApproval();
   }
 
-  virtual ~AutowareArchitectureProposal();
+  virtual ~AutowareUniverse();
 
   auto engage() -> void override;
 
@@ -536,4 +556,4 @@ public:
 };
 }  // namespace concealer
 
-#endif  // CONCEALER__AUTOWARE_ARCHITECTURE_PROPOSAL_HPP_
+#endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_

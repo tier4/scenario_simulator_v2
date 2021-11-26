@@ -34,7 +34,7 @@ public:
   void update(
     double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
     const rclcpp::Time & stamp);
-  const std::vector<std::string> & getDetectedObjects() const;
+  const std::vector<std::string> & getPredictedObjects() const;
 
 private:
   simulation_api_schema::LidarConfiguration configuration_;
@@ -42,7 +42,7 @@ private:
   const sensor_msgs::msg::PointCloud2 raycast(
     const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp);
   double last_update_stamp_;
-  std::vector<std::string> detected_objects_;
+  std::vector<std::string> predicted_objects_;
 };
 }  // namespace simple_sensor_simulator
 

@@ -33,9 +33,9 @@ LidarSensor::LidarSensor(
   last_update_stamp_ = current_time;
 }
 
-const std::vector<std::string> & LidarSensor::getDetectedObjects() const
+const std::vector<std::string> & LidarSensor::getPredictedObjects() const
 {
-  return detected_objects_;
+  return predicted_objects_;
 }
 
 void LidarSensor::update(
@@ -46,7 +46,7 @@ void LidarSensor::update(
     last_update_stamp_ = current_time;
     publisher_ptr_->publish(raycast(status, stamp));
   } else {
-    detected_objects_ = {};
+    predicted_objects_ = {};
   }
 }
 
@@ -83,7 +83,7 @@ const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
     }
     const auto pointcloud = raycaster.raycast(
       "base_link", stamp, ego_pose.get(), configuration_.horizontal_resolution(), vertical_angles);
-    detected_objects_ = raycaster.getDetectedObject();
+    predicted_objects_ = raycaster.getPredictedObject();
     return pointcloud;
   }
   throw simple_sensor_simulator::SimulationRuntimeError("failed to found ego vehicle");

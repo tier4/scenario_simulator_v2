@@ -25,7 +25,7 @@ namespace traffic_simulator
 TrafficLightManager::TrafficLightManager(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr & publisher,
-  const rclcpp::Publisher<autoware_perception_msgs::msg::TrafficLightStateArray>::SharedPtr &
+  const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::SharedPtr &
     traffic_light_state_array_publisher,
   const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame)
 : traffic_light_state_array_publisher_(traffic_light_state_array_publisher),

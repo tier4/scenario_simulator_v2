@@ -135,10 +135,7 @@ message DespawnEntityResponse {
  * Requests updating entity status.
  **/
 message UpdateEntityStatusRequest {
-  repeated traffic_simulator_msgs.EntityStatus status = 1;                 // List of updated entity status in traffic simulator.
-  autoware_vehicle_msgs.VehicleCommand vehicle_command = 2;                // Ego Vehicle Command of from Autoware
-  traffic_simulator_msgs.EntityStatus ego_entity_status_before_update = 3; // Entity status of ego entity before running vehicle model
-  bool ego_entity_status_before_update_is_empty = 4;                       // If True,ego entity status before update is empty.
+  repeated traffic_simulator_msgs.EntityStatus status = 1;  // List of updated entity status in traffic simulator.
 }
 
 /**
@@ -209,7 +206,7 @@ message TrafficLightState {
     float confidence = 2;
   }
   int32 id = 1;
-  repeated LampState lamp_states = 2;
+  repeated LampState lights = 2;
 }
 
 /**

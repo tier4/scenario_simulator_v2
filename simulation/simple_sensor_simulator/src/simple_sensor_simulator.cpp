@@ -188,7 +188,7 @@ void ScenarioSimulator::attachDetectionSensor(
   const simulation_api_schema::AttachDetectionSensorRequest & req,
   simulation_api_schema::AttachDetectionSensorResponse & res)
 {
-  const auto pub = this->create_publisher<autoware_perception_msgs::msg::DynamicObjectArray>(
+  const auto pub = this->create_publisher<autoware_auto_perception_msgs::msg::PredictedObjects>(
     req.configuration().topic_name(), 1);
   sensor_sim_.attachDetectionSensor(current_time_, req.configuration(), pub);
   res = simulation_api_schema::AttachDetectionSensorResponse();

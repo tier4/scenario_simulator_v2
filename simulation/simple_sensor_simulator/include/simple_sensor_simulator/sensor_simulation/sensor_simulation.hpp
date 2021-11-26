@@ -34,7 +34,7 @@ public:
   void attachDetectionSensor(
     const double current_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
-    std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
+    std::shared_ptr<rclcpp::Publisher<autoware_auto_perception_msgs::msg::PredictedObjects>>
       publisher_ptr);
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,

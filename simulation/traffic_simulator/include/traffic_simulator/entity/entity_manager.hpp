@@ -137,7 +137,7 @@ public:
     traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(
       hdmap_utils_ptr_,
       rclcpp::create_publisher<MarkerArray>(node, "traffic_light/marker", LaneletMarkerQoS()),
-      rclcpp::create_publisher<autoware_perception_msgs::msg::TrafficLightStateArray>(
+      rclcpp::create_publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>(
         node, "/awapi/traffic_light/put/traffic_light_status", rclcpp::QoS(10).transient_local()),
       clock_ptr_))
   {
@@ -209,7 +209,6 @@ public:
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(ready, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );

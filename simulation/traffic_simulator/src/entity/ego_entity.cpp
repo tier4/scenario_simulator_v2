@@ -60,6 +60,8 @@ auto getVehicleModelType()
 
   if (architecture_type == "tier4/proposal") {
     vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
+  } else if (architecture_type == "awf/universe") {
+    vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
   } else if (architecture_type == "awf/auto") {
     // hard-coded for now
     // it would require changes in https://github.com/tier4/lexus_description.iv.universe
@@ -146,6 +148,19 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "rviz_config:=" + configuration.rviz_config_path.string(),
                  "scenario_simulation:=true")
              : std::make_unique<concealer::AutowareArchitectureProposal>();
+  } else if (architecture_type == "awf/universe") {
+    return getParameter<bool>("launch_autoware", true)
+             ? std::make_unique<concealer::AutowareUniverse>(
+                 getParameter<std::string>("autoware_launch_package"),
+                 getParameter<std::string>("autoware_launch_file"),
+                 "map_path:=" + configuration.map_path.string(),
+                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
+                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                 "rviz_config:=" + configuration.rviz_config_path.string(),
+                 "scenario_simulation:=true")
+             : std::make_unique<concealer::AutowareUniverse>();
   } else if (architecture_type == "awf/auto") {
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareAuto>(
@@ -178,11 +193,6 @@ EgoEntity::EgoEntity(
 }
 
 void EgoEntity::engage() { autoware->engage(); }
-
-auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
-{
-  return autoware->getVehicleCommand();
-}
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {

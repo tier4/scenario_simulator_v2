@@ -404,20 +404,20 @@ TEST(Conversion, Clock)
   EXPECT_CLOCK_EQ(msg, proto);
 }
 
-TEST(Conversion, ControlCommand)
+TEST(Conversion, AckermannControlCommand)
 {
-  autoware_control_msgs::ControlCommand proto;
-  autoware_control_msgs::msg::ControlCommand msg;
-  msg.acceleration = 3;
-  msg.steering_angle = 1.4;
-  msg.steering_angle_velocity = 13.4;
-  msg.velocity = 11.3;
+  autoware_auto_control_msgs::AckermannControlCommand proto;
+  autoware_auto_control_msgs::msg::AckermannControlCommand msg;
+  msg.longitudinal.acceleration = 3;
+  msg.lateral.steering_tire_angle = 1.4;
+  msg.lateral.steering_tire_rotation_rate = 13.4;
+  msg.longitudinal.speed = 11.3;
   simulation_interface::toProto(msg, proto);
   EXPECT_CONTROL_COMMAND_EQ(msg, proto);
-  msg.acceleration = 0;
-  msg.steering_angle = 0;
-  msg.steering_angle_velocity = 0;
-  msg.velocity = 0;
+  msg.longitudinal.acceleration = 0;
+  msg.lateral.steering_tire_angle = 0;
+  msg.lateral.steering_tire_rotation_rate = 0;
+  msg.longitudinal.speed = 0;
   simulation_interface::toMsg(proto, msg);
   EXPECT_CONTROL_COMMAND_EQ(msg, proto);
 }
@@ -490,38 +490,6 @@ TEST(Conversion, Shift)
     common::scenario_simulator_exception::SimulationError);
 }
 
-TEST(Conversion, VehicleCommand)
-{
-  autoware_vehicle_msgs::VehicleCommand proto;
-  autoware_vehicle_msgs::msg::VehicleCommand msg;
-  msg.control.velocity = 1.2;
-  msg.control.steering_angle_velocity = 19.3;
-  msg.control.steering_angle = 12.0;
-  msg.control.steering_angle_velocity = 192.4;
-  msg.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-  msg.emergency = 1;
-  msg.header.frame_id = "base_link";
-  msg.header.stamp.nanosec = 99;
-  msg.header.stamp.sec = 3;
-  simulation_interface::toProto(msg, proto);
-  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
-  msg.shift.data = 1023;
-  EXPECT_THROW(
-    simulation_interface::toProto(msg, proto),
-    common::scenario_simulator_exception::SimulationError);
-  EXPECT_HEADER_EQ(msg.header, proto.header());
-  EXPECT_EQ(msg.emergency, proto.emergency());
-  msg = autoware_vehicle_msgs::msg::VehicleCommand();
-  simulation_interface::toMsg(proto, msg);
-  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
-  msg.shift.data = 1023;
-  EXPECT_THROW(
-    simulation_interface::toProto(msg, proto),
-    common::scenario_simulator_exception::SimulationError);
-  EXPECT_HEADER_EQ(msg.header, proto.header());
-  EXPECT_EQ(msg.emergency, proto.emergency());
-}
-
 TEST(Conversion, EntityType)
 {
   traffic_simulator_msgs::EntityType proto;
@@ -566,52 +534,49 @@ TEST(Conversion, LaneletPose)
   EXPECT_LANELET_POSE_EQ(pose, proto);
 }
 
-TEST(Conversion, TrafficLights)
-{
-  simulation_api_schema::TrafficLightState proto;
-  autoware_perception_msgs::msg::TrafficLightState msg;
-  msg.id = 123;
-  autoware_perception_msgs::msg::LampState ls0;
-  autoware_perception_msgs::msg::LampState ls1;
-  autoware_perception_msgs::msg::LampState ls2;
-  autoware_perception_msgs::msg::LampState ls3;
-  autoware_perception_msgs::msg::LampState ls4;
-  autoware_perception_msgs::msg::LampState ls5;
-  autoware_perception_msgs::msg::LampState ls6;
-  autoware_perception_msgs::msg::LampState ls7;
-  ls0.type = ls0.UNKNOWN;
-  ls0.confidence = 12.12;
-
-  ls1.type = ls1.RED;
-  ls2.type = ls2.GREEN;
-  ls3.type = ls3.YELLOW;
-
-  ls4.type = ls4.LEFT;
-  ls5.type = ls5.RIGHT;
-  ls6.type = ls6.UP;
-  ls7.type = ls7.DOWN;
-
-  msg.lamp_states = {ls0, ls1, ls2, ls3, ls4, ls5, ls6, ls7};
-
-  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
-  EXPECT_EQ(proto.id(), 123);
-  EXPECT_NE(proto.lamp_states()[0].confidence(), 12.12);
-  EXPECT_EQ(
-    proto.lamp_states()[0].type(), simulation_api_schema::TrafficLightState::LampState::UNKNOWN);
-  EXPECT_EQ(
-    proto.lamp_states()[1].type(), simulation_api_schema::TrafficLightState::LampState::RED);
-  EXPECT_EQ(
-    proto.lamp_states()[2].type(), simulation_api_schema::TrafficLightState::LampState::GREEN);
-  EXPECT_EQ(
-    proto.lamp_states()[3].type(), simulation_api_schema::TrafficLightState::LampState::YELLOW);
-  EXPECT_EQ(
-    proto.lamp_states()[4].type(), simulation_api_schema::TrafficLightState::LampState::LEFT);
-  EXPECT_EQ(
-    proto.lamp_states()[5].type(), simulation_api_schema::TrafficLightState::LampState::RIGHT);
-  EXPECT_EQ(proto.lamp_states()[6].type(), simulation_api_schema::TrafficLightState::LampState::UP);
-  EXPECT_EQ(
-    proto.lamp_states()[7].type(), simulation_api_schema::TrafficLightState::LampState::DOWN);
-}
+// TEST(Conversion, TrafficLights)
+// {
+//   simulation_api_schema::TrafficLightState proto;
+//   autoware_auto_perception_msgs::msg::TrafficSignal msg;
+//   msg.map_primitive_id = 123;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls0;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls1;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls2;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls3;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls4;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls5;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls6;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls7;
+//   ls0.color = ls0.UNKNOWN;
+//   ls0.confidence = 12.12;
+//
+//   ls1.color = ls1.RED;
+//   ls2.color = ls2.GREEN;
+//   ls3.color = ls3.AMBER;
+//
+//   ls4.shape = ls4.LEFT_ARROW;
+//   ls4.color = ls4.RED;
+//   ls5.shape = ls5.RIGHT_ARROW;
+//   ls5.color = ls5.RED;
+//   ls6.shape = ls6.UP_ARROW;
+//   ls6.color = ls6.RED;
+//   ls7.shape = ls7.DOWN_ARROW;
+//   ls7.color = ls7.RED;
+//
+//   msg.lights = {ls0, ls1, ls2, ls3, ls4, ls5, ls6, ls7};
+//
+//   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+//   EXPECT_EQ(proto.id(), 123);
+//   EXPECT_NE(proto.lights()[0].confidence(), 12.12);
+//   EXPECT_EQ(proto.lights()[0].type(), simulation_api_schema::TrafficLightState::LampState::UNKNOWN);
+//   EXPECT_EQ(proto.lights()[1].type(), simulation_api_schema::TrafficLightState::LampState::RED);
+//   EXPECT_EQ(proto.lights()[2].type(), simulation_api_schema::TrafficLightState::LampState::GREEN);
+//   EXPECT_EQ(proto.lights()[3].type(), simulation_api_schema::TrafficLightState::LampState::YELLOW);
+//   EXPECT_EQ(proto.lights()[4].type(), simulation_api_schema::TrafficLightState::LampState::LEFT);
+//   EXPECT_EQ(proto.lights()[5].type(), simulation_api_schema::TrafficLightState::LampState::RIGHT);
+//   EXPECT_EQ(proto.lights()[6].type(), simulation_api_schema::TrafficLightState::LampState::UP);
+//   EXPECT_EQ(proto.lights()[7].type(), simulation_api_schema::TrafficLightState::LampState::DOWN);
+// }
 
 int main(int argc, char ** argv)
 {

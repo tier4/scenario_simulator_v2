@@ -20,6 +20,7 @@
 #include <boost/optional.hpp>
 #include <concealer/autoware_architecture_proposal.hpp>
 #include <concealer/autoware_auto.hpp>
+#include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
@@ -98,8 +99,6 @@ public:
   auto getEntityTypename() const -> const std::string & override;
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
-
-  auto getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 

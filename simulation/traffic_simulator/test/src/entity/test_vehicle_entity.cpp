@@ -22,12 +22,6 @@
 #include "../expect_eq_macros.hpp"
 
 /*
-TEST(VEHICLE_ENTITY, GET_VEHICLE_COMMAND)
-{
-  traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
-  EXPECT_THROW(entity.getVehicleCommand(), common::SimulationError);
-}
-
 TEST(VEHICLE_ENTITY, SET_STATUS)
 {
   traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());

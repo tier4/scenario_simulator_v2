@@ -59,13 +59,16 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   return raycast(frame_id, stamp, origin, directions, max_distance, min_distance);
 }
 
-const std::vector<std::string> & Raycaster::getDetectedObject() const { return detected_objects_; }
+const std::vector<std::string> & Raycaster::getPredictedObject() const
+{
+  return predicted_objects_;
+}
 
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
   std::vector<geometry_msgs::msg::Quaternion> directions, double max_distance, double min_distance)
 {
-  detected_objects_ = {};
+  predicted_objects_ = {};
   std::vector<unsigned int> detected_ids = {};
   scene_ = rtcNewScene(device_);
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
@@ -109,7 +112,7 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     }
   }
   for (const auto & id : detected_ids) {
-    detected_objects_.emplace_back(geometry_ids_[id]);
+    predicted_objects_.emplace_back(geometry_ids_[id]);
   }
   sensor_msgs::msg::PointCloud2 pointcloud_msg;
   pcl::toROSMsg(*cloud, pointcloud_msg);
