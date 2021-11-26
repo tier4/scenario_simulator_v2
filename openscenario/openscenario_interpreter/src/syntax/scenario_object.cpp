@@ -74,13 +74,13 @@ auto ScenarioObject::activateSensors() -> bool
     if (architecture_type == "tier4/proposal") {
       return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
                traffic_simulator::helper::LidarType::VLP16, name,
-               "/sensing/lidar/no_ground/pointcloud")) and
+               "/perception/object_segmentation/pointcloud")) and
              attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
                name, "/perception/object_recognition/objects", 0.1));
     } else if (architecture_type == "awf/universe") {
       return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
                traffic_simulator::helper::LidarType::VLP16, name,
-               "/sensing/lidar/no_ground/pointcloud")) and
+               "/perception/object_segmentation/pointcloud")) and
              attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
                name, "/perception/object_recognition/objects", 0.1));
     } else if (architecture_type == "awf/auto") {
