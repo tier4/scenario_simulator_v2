@@ -420,32 +420,26 @@ void toMsg(
   control_command.lateral.steering_tire_rotation_rate = proto.steering_angle_velocity();
 }
 
-void toProto(
-  const autoware_auto_vehicle_msgs::msg::GearCommand & shift,
-  autoware_auto_vehicle_msgs::GearCommand & proto)
+void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto)
 {
-  switch (shift.command) {
-    /*
-    case autoware_auto_vehicle_msgs::msg::GearCommand::NONE:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::NONE);
+  switch (shift.data) {
+    case autoware_vehicle_msgs::msg::Shift::NONE:
+      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::NONE);
       break;
-    */
-    case autoware_auto_vehicle_msgs::msg::GearCommand::PARK:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::PARKING);
+    case autoware_vehicle_msgs::msg::Shift::PARKING:
+      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING);
       break;
-    case autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::REVERSE);
+    case autoware_vehicle_msgs::msg::Shift::REVERSE:
+      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::REVERSE);
       break;
-      /*
-    case autoware_auto_vehicle_msgs::msg::GearCommand::NEUTRAL:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::NEUTRAL);
+    case autoware_vehicle_msgs::msg::Shift::NEUTRAL:
+      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::NEUTRAL);
       break;
-      */
-    case autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::DRIVE);
+    case autoware_vehicle_msgs::msg::Shift::DRIVE:
+      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::DRIVE);
       break;
-    case autoware_auto_vehicle_msgs::msg::GearCommand::LOW:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::LOW);
+    case autoware_vehicle_msgs::msg::Shift::LOW:
+      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::LOW);
       break;
     default:
       THROW_SIMULATION_ERROR(
@@ -454,100 +448,26 @@ void toProto(
   }
 }
 
-void toMsg(
-  const autoware_auto_vehicle_msgs::GearCommand & proto,
-  autoware_auto_vehicle_msgs::msg::GearCommand & shift)
+void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift)
 {
   switch (proto.data()) {
-    /*
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::NONE:
-      shift.command = autoware_auto_vehicle_msgs::msg::GearCommand::NONE;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::NONE:
+      shift.data = autoware_vehicle_msgs::msg::Shift::NONE;
       break;
-    */
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::PARKING:
-      shift.command = autoware_auto_vehicle_msgs::msg::GearCommand::PARK;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING:
+      shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
       break;
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::REVERSE:
-      shift.command = autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::REVERSE:
+      shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
       break;
-      /*
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::NEUTRAL:
-      shift.command = autoware_auto_vehicle_msgs::msg::GearCommand::NEUTRAL;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::NEUTRAL:
+      shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
       break;
-      */
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::DRIVE:
-      shift.command = autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::DRIVE:
+      shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
       break;
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::LOW:
-      shift.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
-      break;
-    default:
-      THROW_SIMULATION_ERROR(
-        "shift position is invalid while converting proto to ROS2 message, shit position is ",
-        proto.data());
-  }
-}
-
-void toProto(
-  const autoware_auto_vehicle_msgs::msg::GearReport & shift,
-  autoware_auto_vehicle_msgs::GearReport & proto)
-{
-  switch (shift.report) {
-    /*
-    case autoware_auto_vehicle_msgs::msg::GearReport::NONE:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::NONE);
-      break;
-    */
-    case autoware_auto_vehicle_msgs::msg::GearReport::PARK:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::PARKING);
-      break;
-    case autoware_auto_vehicle_msgs::msg::GearReport::REVERSE:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::REVERSE);
-      break;
-      /*
-    case autoware_auto_vehicle_msgs::msg::GearReport::NEUTRAL:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::NEUTRAL);
-      break;
-      */
-    case autoware_auto_vehicle_msgs::msg::GearReport::DRIVE:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::DRIVE);
-      break;
-    case autoware_auto_vehicle_msgs::msg::GearReport::LOW:
-      proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::LOW);
-      break;
-    default:
-      THROW_SIMULATION_ERROR(
-        "shift position is invalid while converting ROS2 message to proto, shit position is ",
-        proto.data());
-  }
-}
-
-void toMsg(
-  const autoware_auto_vehicle_msgs::GearReport & proto,
-  autoware_auto_vehicle_msgs::msg::GearReport & shift)
-{
-  switch (proto.data()) {
-    /*
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::NONE:
-      shift.report = autoware_auto_vehicle_msgs::msg::GearReport::NONE;
-      break;
-    */
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::PARKING:
-      shift.report = autoware_auto_vehicle_msgs::msg::GearReport::PARK;
-      break;
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::REVERSE:
-      shift.report = autoware_auto_vehicle_msgs::msg::GearReport::REVERSE;
-      break;
-      /*
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::NEUTRAL:
-      shift.report = autoware_auto_vehicle_msgs::msg::GearReport::NEUTRAL;
-      break;
-      */
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::DRIVE:
-      shift.report = autoware_auto_vehicle_msgs::msg::GearReport::DRIVE;
-      break;
-    case autoware_auto_vehicle_msgs::GEAR_POSITIONS::LOW:
-      shift.report = autoware_auto_vehicle_msgs::msg::GearReport::LOW;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::LOW:
+      shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
       break;
     default:
       THROW_SIMULATION_ERROR(

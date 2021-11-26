@@ -15,7 +15,7 @@
 #ifndef SIMULATION_INTERFACE__CONVERSIONS_HPP_
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
-#include <autoware_auto_vehicle_msgs.pb.h>
+#include <autoware_auto_control_msgs.pb.h>
 #include <autoware_control_msgs.pb.h>
 #include <autoware_vehicle_msgs.pb.h>
 #include <builtin_interfaces.pb.h>
@@ -27,8 +27,7 @@
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
+#include <autoware_vehicle_msgs/msg/shift.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_emergency_stamped.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
@@ -151,18 +150,8 @@ void toProto(
 void toMsg(
   const autoware_control_msgs::ControlCommand & proto,
   autoware_auto_control_msgs::msg::AckermannControlCommand & control_command);
-void toProto(
-  const autoware_auto_vehicle_msgs::msg::GearCommand & shift,
-  autoware_auto_vehicle_msgs::GearCommand & proto);
-void toMsg(
-  const autoware_auto_vehicle_msgs::GearCommand & proto,
-  autoware_auto_vehicle_msgs::msg::GearCommand & shift);
-void toProto(
-  const autoware_auto_vehicle_msgs::msg::GearReport & shift,
-  autoware_auto_vehicle_msgs::GearReport & proto);
-void toMsg(
-  const autoware_auto_vehicle_msgs::GearReport & proto,
-  autoware_auto_vehicle_msgs::msg::GearReport & shift);
+void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto);
+void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift);
 void toProto(
   const autoware_auto_control_msgs::msg::AckermannLateralCommand &,
   autoware_auto_control_msgs::AckermannLateralCommand &);

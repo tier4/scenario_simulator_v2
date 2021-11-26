@@ -422,107 +422,69 @@ TEST(Conversion, AckermannControlCommand)
   EXPECT_CONTROL_COMMAND_EQ(msg, proto);
 }
 
-TEST(Conversion, GearCommand)
+TEST(Conversion, Shift)
 {
   /**
    * @note Convert low shift value
    */
-  autoware_auto_vehicle_msgs::GearCommand proto;
-  proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::PARKING);
-  autoware_auto_vehicle_msgs::msg::GearCommand msg;
-  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
+  autoware_vehicle_msgs::Shift proto;
+  proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING);
+  autoware_vehicle_msgs::msg::Shift msg;
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.command, proto.data());
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
   /**
    * @note Convert parking shift value
    */
-  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::PARK;
-  EXPECT_FALSE(msg.command == proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::PARKING;
+  EXPECT_FALSE(msg.data == proto.data());
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.command, proto.data());
-  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
-  EXPECT_FALSE(msg.command == proto.data());
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.command, proto.data());
+  EXPECT_EQ(msg.data, proto.data());
   /**
    * @note Convert drive shift value
    */
-  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE;
-  EXPECT_FALSE(msg.command == proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
+  EXPECT_FALSE(msg.data == proto.data());
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.command, proto.data());
-  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
-  EXPECT_FALSE(msg.command == proto.data());
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.command, proto.data());
+  EXPECT_EQ(msg.data, proto.data());
   /**
    * @note Convert reverse shift value
    */
-  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE;
-  EXPECT_FALSE(msg.command == proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
+  EXPECT_FALSE(msg.data == proto.data());
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.command, proto.data());
-  msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
-  EXPECT_FALSE(msg.command == proto.data());
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.command, proto.data());
+  EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Convert none shift value
+   */
+  msg.data = autoware_vehicle_msgs::msg::Shift::NONE;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
   /**
    * @note Invalid value input
    */
-  msg.command = 1023;
-  EXPECT_THROW(
-    simulation_interface::toProto(msg, proto),
-    common::scenario_simulator_exception::SimulationError);
-}
-
-TEST(Conversion, GearReport)
-{
-  /**
-   * @note Convert low shift value
-   */
-  autoware_auto_vehicle_msgs::GearReport proto;
-  proto.set_data(autoware_auto_vehicle_msgs::GEAR_POSITIONS::PARKING);
-  autoware_auto_vehicle_msgs::msg::GearReport msg;
-  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::LOW;
-  simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.report, proto.data());
-  /**
-   * @note Convert parking shift value
-   */
-  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::PARK;
-  EXPECT_FALSE(msg.report == proto.data());
-  simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.report, proto.data());
-  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::LOW;
-  EXPECT_FALSE(msg.report == proto.data());
-  simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.report, proto.data());
-  /**
-   * @note Convert drive shift value
-   */
-  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::DRIVE;
-  EXPECT_FALSE(msg.report == proto.data());
-  simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.report, proto.data());
-  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::LOW;
-  EXPECT_FALSE(msg.report == proto.data());
-  simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.report, proto.data());
-  /**
-   * @note Convert reverse shift value
-   */
-  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::REVERSE;
-  EXPECT_FALSE(msg.report == proto.data());
-  simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.report, proto.data());
-  msg.report = autoware_auto_vehicle_msgs::msg::GearReport::LOW;
-  EXPECT_FALSE(msg.report == proto.data());
-  simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.report, proto.data());
-  /**
-   * @note Invalid value input
-   */
-  msg.report = 1023;
+  msg.data = 1023;
   EXPECT_THROW(
     simulation_interface::toProto(msg, proto),
     common::scenario_simulator_exception::SimulationError);
@@ -572,49 +534,49 @@ TEST(Conversion, LaneletPose)
   EXPECT_LANELET_POSE_EQ(pose, proto);
 }
 
-TEST(Conversion, TrafficLights)
-{
-  simulation_api_schema::TrafficLightState proto;
-  autoware_auto_perception_msgs::msg::TrafficSignal msg;
-  msg.map_primitive_id = 123;
-  autoware_auto_perception_msgs::msg::TrafficLight ls0;
-  autoware_auto_perception_msgs::msg::TrafficLight ls1;
-  autoware_auto_perception_msgs::msg::TrafficLight ls2;
-  autoware_auto_perception_msgs::msg::TrafficLight ls3;
-  autoware_auto_perception_msgs::msg::TrafficLight ls4;
-  autoware_auto_perception_msgs::msg::TrafficLight ls5;
-  autoware_auto_perception_msgs::msg::TrafficLight ls6;
-  autoware_auto_perception_msgs::msg::TrafficLight ls7;
-  ls0.color = ls0.UNKNOWN;
-  ls0.confidence = 12.12;
-
-  ls1.color = ls1.RED;
-  ls2.color = ls2.GREEN;
-  ls3.color = ls3.AMBER;
-
-  ls4.shape = ls4.LEFT_ARROW;
-  ls4.color = ls4.RED;
-  ls5.shape = ls5.RIGHT_ARROW;
-  ls5.color = ls5.RED;
-  ls6.shape = ls6.UP_ARROW;
-  ls6.color = ls6.RED;
-  ls7.shape = ls7.DOWN_ARROW;
-  ls7.color = ls7.RED;
-
-  msg.lights = {ls0, ls1, ls2, ls3, ls4, ls5, ls6, ls7};
-
-  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
-  EXPECT_EQ(proto.id(), 123);
-  EXPECT_NE(proto.lights()[0].confidence(), 12.12);
-  EXPECT_EQ(proto.lights()[0].type(), simulation_api_schema::TrafficLightState::LampState::UNKNOWN);
-  EXPECT_EQ(proto.lights()[1].type(), simulation_api_schema::TrafficLightState::LampState::RED);
-  EXPECT_EQ(proto.lights()[2].type(), simulation_api_schema::TrafficLightState::LampState::GREEN);
-  EXPECT_EQ(proto.lights()[3].type(), simulation_api_schema::TrafficLightState::LampState::YELLOW);
-  EXPECT_EQ(proto.lights()[4].type(), simulation_api_schema::TrafficLightState::LampState::LEFT);
-  EXPECT_EQ(proto.lights()[5].type(), simulation_api_schema::TrafficLightState::LampState::RIGHT);
-  EXPECT_EQ(proto.lights()[6].type(), simulation_api_schema::TrafficLightState::LampState::UP);
-  EXPECT_EQ(proto.lights()[7].type(), simulation_api_schema::TrafficLightState::LampState::DOWN);
-}
+// TEST(Conversion, TrafficLights)
+// {
+//   simulation_api_schema::TrafficLightState proto;
+//   autoware_auto_perception_msgs::msg::TrafficSignal msg;
+//   msg.map_primitive_id = 123;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls0;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls1;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls2;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls3;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls4;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls5;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls6;
+//   autoware_auto_perception_msgs::msg::TrafficLight ls7;
+//   ls0.color = ls0.UNKNOWN;
+//   ls0.confidence = 12.12;
+//
+//   ls1.color = ls1.RED;
+//   ls2.color = ls2.GREEN;
+//   ls3.color = ls3.AMBER;
+//
+//   ls4.shape = ls4.LEFT_ARROW;
+//   ls4.color = ls4.RED;
+//   ls5.shape = ls5.RIGHT_ARROW;
+//   ls5.color = ls5.RED;
+//   ls6.shape = ls6.UP_ARROW;
+//   ls6.color = ls6.RED;
+//   ls7.shape = ls7.DOWN_ARROW;
+//   ls7.color = ls7.RED;
+//
+//   msg.lights = {ls0, ls1, ls2, ls3, ls4, ls5, ls6, ls7};
+//
+//   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+//   EXPECT_EQ(proto.id(), 123);
+//   EXPECT_NE(proto.lights()[0].confidence(), 12.12);
+//   EXPECT_EQ(proto.lights()[0].type(), simulation_api_schema::TrafficLightState::LampState::UNKNOWN);
+//   EXPECT_EQ(proto.lights()[1].type(), simulation_api_schema::TrafficLightState::LampState::RED);
+//   EXPECT_EQ(proto.lights()[2].type(), simulation_api_schema::TrafficLightState::LampState::GREEN);
+//   EXPECT_EQ(proto.lights()[3].type(), simulation_api_schema::TrafficLightState::LampState::YELLOW);
+//   EXPECT_EQ(proto.lights()[4].type(), simulation_api_schema::TrafficLightState::LampState::LEFT);
+//   EXPECT_EQ(proto.lights()[5].type(), simulation_api_schema::TrafficLightState::LampState::RIGHT);
+//   EXPECT_EQ(proto.lights()[6].type(), simulation_api_schema::TrafficLightState::LampState::UP);
+//   EXPECT_EQ(proto.lights()[7].type(), simulation_api_schema::TrafficLightState::LampState::DOWN);
+// }
 
 int main(int argc, char ** argv)
 {
