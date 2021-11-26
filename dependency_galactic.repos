@@ -13,7 +13,7 @@ repositories:
   AutowareArchitectureProposal_msgs:
     type: git
     url: https://github.com/tier4/AutowareArchitectureProposal_msgs.git
-    version: main
+    version: use-autoware-auto-msgs
   AutowareArchitectureProposal_api_msgs:
     type: git
     url: https://github.com/tier4/AutowareArchitectureProposal_api_msgs.git
