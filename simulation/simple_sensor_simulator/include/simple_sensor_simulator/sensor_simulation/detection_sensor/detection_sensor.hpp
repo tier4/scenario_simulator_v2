@@ -17,7 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_auto_perception_msgs/msg/predicted_objects.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -31,15 +31,15 @@ public:
   DetectionSensor(
     const double current_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
-    std::shared_ptr<rclcpp::Publisher<autoware_auto_perception_msgs::msg::DetectedObjects>>
+    std::shared_ptr<rclcpp::Publisher<autoware_auto_perception_msgs::msg::PredictedObjects>>
       publisher_ptr);
   void update(
     double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const rclcpp::Time & stamp, const std::vector<std::string> & detected_objects);
+    const rclcpp::Time & stamp, const std::vector<std::string> & predicted_objects);
 
 private:
   simulation_api_schema::DetectionSensorConfiguration configuration_;
-  std::shared_ptr<rclcpp::Publisher<autoware_auto_perception_msgs::msg::DetectedObjects>>
+  std::shared_ptr<rclcpp::Publisher<autoware_auto_perception_msgs::msg::PredictedObjects>>
     publisher_ptr_;
   double last_update_stamp_;
 };

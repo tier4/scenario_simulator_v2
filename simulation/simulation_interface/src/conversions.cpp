@@ -420,7 +420,9 @@ void toMsg(
   control_command.lateral.steering_tire_rotation_rate = proto.steering_angle_velocity();
 }
 
-void toProto(const autoware_auto_vehicle_msgs::msg::GearCommand & shift, autoware_auto_vehicle_msgs::GearCommand & proto)
+void toProto(
+  const autoware_auto_vehicle_msgs::msg::GearCommand & shift,
+  autoware_auto_vehicle_msgs::GearCommand & proto)
 {
   switch (shift.command) {
     /*
@@ -452,7 +454,9 @@ void toProto(const autoware_auto_vehicle_msgs::msg::GearCommand & shift, autowar
   }
 }
 
-void toMsg(const autoware_auto_vehicle_msgs::GearCommand & proto, autoware_auto_vehicle_msgs::msg::GearCommand & shift)
+void toMsg(
+  const autoware_auto_vehicle_msgs::GearCommand & proto,
+  autoware_auto_vehicle_msgs::msg::GearCommand & shift)
 {
   switch (proto.data()) {
     /*
@@ -484,7 +488,9 @@ void toMsg(const autoware_auto_vehicle_msgs::GearCommand & proto, autoware_auto_
   }
 }
 
-void toProto(const autoware_auto_vehicle_msgs::msg::GearReport & shift, autoware_auto_vehicle_msgs::GearReport & proto)
+void toProto(
+  const autoware_auto_vehicle_msgs::msg::GearReport & shift,
+  autoware_auto_vehicle_msgs::GearReport & proto)
 {
   switch (shift.report) {
     /*
@@ -516,7 +522,9 @@ void toProto(const autoware_auto_vehicle_msgs::msg::GearReport & shift, autoware
   }
 }
 
-void toMsg(const autoware_auto_vehicle_msgs::GearReport & proto, autoware_auto_vehicle_msgs::msg::GearReport & shift)
+void toMsg(
+  const autoware_auto_vehicle_msgs::GearReport & proto,
+  autoware_auto_vehicle_msgs::msg::GearReport & shift)
 {
   switch (proto.data()) {
     /*
