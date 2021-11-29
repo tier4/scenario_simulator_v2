@@ -404,20 +404,20 @@ TEST(Conversion, Clock)
   EXPECT_CLOCK_EQ(msg, proto);
 }
 
-TEST(Conversion, AckermannControlCommand)
+TEST(Conversion, ControlCommand)
 {
-  autoware_auto_control_msgs::AckermannControlCommand proto;
-  autoware_auto_control_msgs::msg::AckermannControlCommand msg;
-  msg.longitudinal.acceleration = 3;
-  msg.lateral.steering_tire_angle = 1.4;
-  msg.lateral.steering_tire_rotation_rate = 13.4;
-  msg.longitudinal.speed = 11.3;
+  autoware_control_msgs::ControlCommand proto;
+  autoware_control_msgs::msg::ControlCommand msg;
+  msg.acceleration = 3;
+  msg.steering_angle = 1.4;
+  msg.steering_angle_velocity = 13.4;
+  msg.velocity = 11.3;
   simulation_interface::toProto(msg, proto);
   EXPECT_CONTROL_COMMAND_EQ(msg, proto);
-  msg.longitudinal.acceleration = 0;
-  msg.lateral.steering_tire_angle = 0;
-  msg.lateral.steering_tire_rotation_rate = 0;
-  msg.longitudinal.speed = 0;
+  msg.acceleration = 0;
+  msg.steering_angle = 0;
+  msg.steering_angle_velocity = 0;
+  msg.velocity = 0;
   simulation_interface::toMsg(proto, msg);
   EXPECT_CONTROL_COMMAND_EQ(msg, proto);
 }
@@ -488,6 +488,38 @@ TEST(Conversion, Shift)
   EXPECT_THROW(
     simulation_interface::toProto(msg, proto),
     common::scenario_simulator_exception::SimulationError);
+}
+
+TEST(Conversion, VehicleCommand)
+{
+  autoware_vehicle_msgs::VehicleCommand proto;
+  autoware_vehicle_msgs::msg::VehicleCommand msg;
+  msg.control.velocity = 1.2;
+  msg.control.steering_angle_velocity = 19.3;
+  msg.control.steering_angle = 12.0;
+  msg.control.steering_angle_velocity = 192.4;
+  msg.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+  msg.emergency = 1;
+  msg.header.frame_id = "base_link";
+  msg.header.stamp.nanosec = 99;
+  msg.header.stamp.sec = 3;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
+  msg.shift.data = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(msg, proto),
+    common::scenario_simulator_exception::SimulationError);
+  EXPECT_HEADER_EQ(msg.header, proto.header());
+  EXPECT_EQ(msg.emergency, proto.emergency());
+  msg = autoware_vehicle_msgs::msg::VehicleCommand();
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
+  msg.shift.data = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(msg, proto),
+    common::scenario_simulator_exception::SimulationError);
+  EXPECT_HEADER_EQ(msg.header, proto.header());
+  EXPECT_EQ(msg.emergency, proto.emergency());
 }
 
 TEST(Conversion, EntityType)

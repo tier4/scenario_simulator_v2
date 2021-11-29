@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "builtin_interfaces.proto";
 import "std_msgs.proto";
 import "autoware_control_msgs.proto";
 package autoware_vehicle_msgs;
@@ -25,9 +24,4 @@ message VehicleCommand {
   autoware_control_msgs.ControlCommand control = 2;
   Shift shift = 3;
   int32 emergency = 4;
-}
-
-message VehicleEmergencyStamped {
-  builtin_interfaces.Time stamp = 1;
-  bool emergency = 2;
 }

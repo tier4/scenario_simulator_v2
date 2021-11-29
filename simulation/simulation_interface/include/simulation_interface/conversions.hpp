@@ -15,7 +15,6 @@
 #ifndef SIMULATION_INTERFACE__CONVERSIONS_HPP_
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
-#include <autoware_auto_control_msgs.pb.h>
 #include <autoware_control_msgs.pb.h>
 #include <autoware_vehicle_msgs.pb.h>
 #include <builtin_interfaces.pb.h>
@@ -25,12 +24,10 @@
 #include <std_msgs.pb.h>
 #include <traffic_simulator_msgs.pb.h>
 
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
 #include <autoware_control_msgs/msg/control_command.hpp>
 #include <autoware_vehicle_msgs/msg/shift.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
-#include <autoware_vehicle_msgs/msg/vehicle_emergency_stamped.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -88,14 +85,6 @@ void toMsg(const traffic_simulator_msgs::Axle & proto, traffic_simulator_msgs::m
 void toProto(
   const traffic_simulator_msgs::msg::Axles & axles, traffic_simulator_msgs::Axles & proto);
 void toMsg(const traffic_simulator_msgs::Axles & proto, traffic_simulator_msgs::msg::Axles & axles);
-/*
-void toProto(
-  const traffic_simulator_msgs::msg::Property & p,
-  traffic_simulator_msgs::Property & proto);
-void toMsg(
-  const traffic_simulator_msgs::Property & proto,
-  traffic_simulator_msgs::msg::Property & p);
-*/
 void toProto(
   const traffic_simulator_msgs::msg::VehicleParameters & p,
   traffic_simulator_msgs::VehicleParameters & proto);
@@ -152,12 +141,6 @@ void toProto(
 void toMsg(
   const autoware_control_msgs::ControlCommand & proto,
   autoware_control_msgs::msg::ControlCommand & control_command);
-void toProto(
-  const autoware_auto_control_msgs::msg::AckermannControlCommand & control_command,
-  autoware_control_msgs::ControlCommand & proto);
-void toMsg(
-  const autoware_control_msgs::ControlCommand & proto,
-  autoware_auto_control_msgs::msg::AckermannControlCommand & control_command);
 void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto);
 void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift);
 void toProto(
@@ -166,30 +149,6 @@ void toProto(
 void toMsg(
   const autoware_vehicle_msgs::VehicleCommand & proto,
   autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command);
-void toProto(
-  const autoware_auto_control_msgs::msg::AckermannLateralCommand &,
-  autoware_auto_control_msgs::AckermannLateralCommand &);
-void toMsg(
-  const autoware_auto_control_msgs::AckermannLateralCommand &,
-  autoware_auto_control_msgs::msg::AckermannLateralCommand &);
-void toProto(
-  const autoware_auto_control_msgs::msg::LongitudinalCommand &,
-  autoware_auto_control_msgs::LongitudinalCommand &);
-void toMsg(
-  const autoware_auto_control_msgs::LongitudinalCommand &,
-  autoware_auto_control_msgs::msg::LongitudinalCommand &);
-void toProto(
-  const autoware_auto_control_msgs::msg::AckermannControlCommand &,
-  autoware_auto_control_msgs::AckermannControlCommand &);
-void toMsg(
-  const autoware_auto_control_msgs::AckermannControlCommand &,
-  autoware_auto_control_msgs::msg::AckermannControlCommand &);
-void toProto(
-  const autoware_vehicle_msgs::msg::VehicleEmergencyStamped &,
-  autoware_vehicle_msgs::VehicleEmergencyStamped &);
-void toMsg(
-  const autoware_vehicle_msgs::VehicleEmergencyStamped &,
-  autoware_vehicle_msgs::msg::VehicleEmergencyStamped &);
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto);

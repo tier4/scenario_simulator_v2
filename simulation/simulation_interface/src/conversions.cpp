@@ -420,26 +420,6 @@ void toMsg(
   control_command.steering_angle_velocity = proto.steering_angle_velocity();
 }
 
-void toProto(
-  const autoware_auto_control_msgs::msg::AckermannControlCommand & control_command,
-  autoware_control_msgs::ControlCommand & proto)
-{
-  proto.set_velocity(control_command.longitudinal.speed);
-  proto.set_acceleration(control_command.longitudinal.acceleration);
-  proto.set_steering_angle(control_command.lateral.steering_tire_angle);
-  proto.set_steering_angle_velocity(control_command.lateral.steering_tire_rotation_rate);
-}
-
-void toMsg(
-  const autoware_control_msgs::ControlCommand & proto,
-  autoware_auto_control_msgs::msg::AckermannControlCommand & control_command)
-{
-  control_command.longitudinal.speed = proto.velocity();
-  control_command.longitudinal.acceleration = proto.acceleration();
-  control_command.lateral.steering_tire_angle = proto.steering_angle();
-  control_command.lateral.steering_tire_rotation_rate = proto.steering_angle_velocity();
-}
-
 void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto)
 {
   switch (shift.data) {
@@ -514,78 +494,6 @@ void toMsg(
   vehicle_command.emergency = proto.emergency();
   toMsg(proto.header(), vehicle_command.header);
   toMsg(proto.shift(), vehicle_command.shift);
-}
-
-void toProto(
-  const autoware_auto_control_msgs::msg::AckermannLateralCommand & message,
-  autoware_auto_control_msgs::AckermannLateralCommand & proto)
-{
-  toProto(message.stamp, *proto.mutable_stamp());
-  proto.set_steering_tire_angle(message.steering_tire_angle);
-  proto.set_steering_tire_rotation_rate(message.steering_tire_rotation_rate);
-}
-
-void toMsg(
-  const autoware_auto_control_msgs::AckermannLateralCommand & proto,
-  autoware_auto_control_msgs::msg::AckermannLateralCommand & message)
-{
-  toMsg(proto.stamp(), message.stamp);
-  message.steering_tire_angle = proto.steering_tire_angle();
-  message.steering_tire_rotation_rate = proto.steering_tire_rotation_rate();
-}
-
-void toProto(
-  const autoware_auto_control_msgs::msg::LongitudinalCommand & message,
-  autoware_auto_control_msgs::LongitudinalCommand & proto)
-{
-  toProto(message.stamp, *proto.mutable_stamp());
-  proto.set_speed(message.speed);
-  proto.set_acceleration(message.acceleration);
-  proto.set_jerk(message.jerk);
-}
-
-void toMsg(
-  const autoware_auto_control_msgs::LongitudinalCommand & proto,
-  autoware_auto_control_msgs::msg::LongitudinalCommand & message)
-{
-  toMsg(proto.stamp(), message.stamp);
-  message.speed = proto.speed();
-  message.acceleration = proto.acceleration();
-  message.jerk = proto.jerk();
-}
-
-void toProto(
-  const autoware_auto_control_msgs::msg::AckermannControlCommand & message,
-  autoware_auto_control_msgs::AckermannControlCommand & proto)
-{
-  toProto(message.stamp, *proto.mutable_stamp());
-  toProto(message.lateral, *proto.mutable_lateral());
-  toProto(message.longitudinal, *proto.mutable_longitudinal());
-}
-
-void toMsg(
-  const autoware_auto_control_msgs::AckermannControlCommand & proto,
-  autoware_auto_control_msgs::msg::AckermannControlCommand & message)
-{
-  toMsg(proto.stamp(), message.stamp);
-  toMsg(proto.lateral(), message.lateral);
-  toMsg(proto.longitudinal(), message.longitudinal);
-}
-
-void toProto(
-  const autoware_vehicle_msgs::msg::VehicleEmergencyStamped & message,
-  autoware_vehicle_msgs::VehicleEmergencyStamped & proto)
-{
-  toProto(message.stamp, *proto.mutable_stamp());
-  proto.set_emergency(message.emergency);
-}
-
-void toMsg(
-  const autoware_vehicle_msgs::VehicleEmergencyStamped & proto,
-  autoware_vehicle_msgs::msg::VehicleEmergencyStamped & message)
-{
-  toMsg(proto.stamp(), message.stamp);
-  message.emergency = proto.emergency();
 }
 
 void toProto(
