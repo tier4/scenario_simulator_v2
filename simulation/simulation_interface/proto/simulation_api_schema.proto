@@ -209,7 +209,7 @@ message TrafficLightState {
     float confidence = 2;
   }
   int32 id = 1;
-  repeated LampState lights = 2;
+  repeated LampState lamp_states = 2;
 }
 
 /**
