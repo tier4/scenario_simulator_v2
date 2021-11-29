@@ -401,6 +401,26 @@ void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header)
 }
 
 void toProto(
+  const autoware_control_msgs::msg::ControlCommand & control_command,
+  autoware_control_msgs::ControlCommand & proto)
+{
+  proto.set_velocity(control_command.velocity);
+  proto.set_acceleration(control_command.acceleration);
+  proto.set_steering_angle(control_command.steering_angle);
+  proto.set_steering_angle_velocity(control_command.steering_angle_velocity);
+}
+
+void toMsg(
+  const autoware_control_msgs::ControlCommand & proto,
+  autoware_control_msgs::msg::ControlCommand & control_command)
+{
+  control_command.velocity = proto.velocity();
+  control_command.acceleration = proto.acceleration();
+  control_command.steering_angle = proto.steering_angle();
+  control_command.steering_angle_velocity = proto.steering_angle_velocity();
+}
+
+void toProto(
   const autoware_auto_control_msgs::msg::AckermannControlCommand & control_command,
   autoware_control_msgs::ControlCommand & proto)
 {
@@ -474,6 +494,26 @@ void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::ms
         "shift position is invalid while converting proto to ROS2 message, shit position is ",
         proto.data());
   }
+}
+
+void toProto(
+  const autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command,
+  autoware_vehicle_msgs::VehicleCommand & proto)
+{
+  toProto(vehicle_command.control, *proto.mutable_control());
+  proto.set_emergency(vehicle_command.emergency);
+  toProto(vehicle_command.header, *proto.mutable_header());
+  toProto(vehicle_command.shift, *proto.mutable_shift());
+}
+
+void toMsg(
+  const autoware_vehicle_msgs::VehicleCommand & proto,
+  autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command)
+{
+  toMsg(proto.control(), vehicle_command.control);
+  vehicle_command.emergency = proto.emergency();
+  toMsg(proto.header(), vehicle_command.header);
+  toMsg(proto.shift(), vehicle_command.shift);
 }
 
 void toProto(
