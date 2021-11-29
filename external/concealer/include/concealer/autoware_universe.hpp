@@ -542,6 +542,8 @@ public:
 
   auto getSteeringAngle() const -> double override;
 
+  auto getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand override;
+
   auto getVelocity() const -> double override;
 
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;

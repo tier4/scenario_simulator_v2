@@ -100,6 +100,8 @@ class AutowareAuto : public Autoware
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   DEFINE_SUBSCRIPTION(Trajectory);
 
+  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;
+
 public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareAuto(Ts &&... xs)

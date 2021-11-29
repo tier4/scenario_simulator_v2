@@ -108,5 +108,46 @@ std::string AutowareAuto::getAutowareStateMessage() const
   return {};
 }
 
+autoware_vehicle_msgs::msg::VehicleCommand AutowareAuto::getVehicleCommand() const
+{
+  // gathering information and converting it to autoware_vehicle_msgs::msg::VehicleCommand
+  autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
+  {
+    auto vehicle_control_command = getVehicleControlCommand();
+
+    vehicle_command.header.stamp = vehicle_control_command.stamp;
+    vehicle_command.control.steering_angle = vehicle_control_command.front_wheel_angle_rad;
+    vehicle_command.control.velocity = vehicle_control_command.velocity_mps;
+    vehicle_command.control.acceleration = vehicle_control_command.long_accel_mps2;
+
+    auto vehicle_state_command = getVehicleStateCommand();
+
+    switch (vehicle_state_command.gear) {
+      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_DRIVE:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
+        break;
+      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_REVERSE:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
+        break;
+      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_PARK:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
+        break;
+      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_LOW:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
+        break;
+      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_NEUTRAL:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+        break;
+    }
+
+    // these fields are hard-coded because they are not present in AutowareAuto
+    vehicle_command.header.frame_id = "";
+    vehicle_command.control.steering_angle_velocity = 0.0;
+    vehicle_command.emergency = 0;
+  }
+
+  return vehicle_command;
+}
+
 void AutowareAuto::sendSIGINT() { sudokill(process_id); }
 }  // namespace concealer

@@ -125,4 +125,44 @@ auto AutowareUniverse::checkAutowareState() -> void
     // throw common::AutowareError("Autoware is in emergency state now");
   }
 }
+
+auto AutowareUniverse::getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand
+{
+  autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
+  {
+    auto ackermann_control_command = getAckermannControlCommand();
+
+    vehicle_command.header.stamp = ackermann_control_command.stamp;
+    vehicle_command.control.steering_angle = ackermann_control_command.lateral.steering_tire_angle;
+    vehicle_command.control.velocity = ackermann_control_command.longitudinal.speed;
+    vehicle_command.control.acceleration = ackermann_control_command.longitudinal.acceleration;
+
+    auto gear_command = getGearCommand();
+
+    switch (gear_command.command) {
+      case autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
+        break;
+      case autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
+        break;
+      case autoware_auto_vehicle_msgs::msg::GearCommand::PARK:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
+        break;
+      case autoware_auto_vehicle_msgs::msg::GearCommand::LOW:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
+        break;
+      case 0:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+        break;
+    }
+
+    // these fields are hard-coded because they are not present in AutowareAuto
+    vehicle_command.header.frame_id = "";
+    vehicle_command.control.steering_angle_velocity = 0.0;
+    vehicle_command.emergency = 0;
+  }
+
+  return vehicle_command;
+}
 }  // namespace concealer
