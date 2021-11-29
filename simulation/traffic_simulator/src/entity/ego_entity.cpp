@@ -179,11 +179,6 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
   }
 }
 
-auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
-{
-  return autoware->getVehicleCommand();
-}
-
 EgoEntity::EgoEntity(
   const std::string & name,             //
   const Configuration & configuration,  //
@@ -198,6 +193,11 @@ EgoEntity::EgoEntity(
 }
 
 void EgoEntity::engage() { autoware->engage(); }
+
+auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
+{
+  return autoware->getVehicleCommand();
+}
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
