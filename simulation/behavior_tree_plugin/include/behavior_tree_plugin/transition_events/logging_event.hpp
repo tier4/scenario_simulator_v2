@@ -32,7 +32,6 @@ private:
     BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
     BT::NodeStatus status) override;
   rclcpp::Logger ros_logger_;
-  std::string current_action_;
 };
 }  // namespace behavior_tree_plugin
 

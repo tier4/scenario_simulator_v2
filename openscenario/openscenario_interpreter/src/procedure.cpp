@@ -23,9 +23,9 @@ static typename std::aligned_storage<
 traffic_simulator::API & connection = reinterpret_cast<traffic_simulator::API &>(memory);
 
 auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
-  decltype(connection.toLaneletPose(std::declval<decltype(pose)>()).get())>::type
+  decltype(connection.toLaneletPose(std::declval<decltype(pose)>(), false).get())>::type
 {
-  const auto result = connection.toLaneletPose(pose);
+  const auto result = connection.toLaneletPose(pose, false);
 
   if (result) {
     return result.get();

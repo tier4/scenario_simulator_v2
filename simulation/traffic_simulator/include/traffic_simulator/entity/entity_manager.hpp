@@ -138,7 +138,8 @@ public:
       hdmap_utils_ptr_,
       rclcpp::create_publisher<MarkerArray>(node, "traffic_light/marker", LaneletMarkerQoS()),
       rclcpp::create_publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>(
-        node, "/awapi/traffic_light/put/traffic_light_status", rclcpp::QoS(10).transient_local()),
+        node, "/perception/traffic_light_recognition/traffic_light_states",
+        rclcpp::QoS(10).transient_local()),
       clock_ptr_))
   {
     updateHdmapMarker();
