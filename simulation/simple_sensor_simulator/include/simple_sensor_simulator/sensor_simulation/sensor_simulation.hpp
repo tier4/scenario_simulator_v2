@@ -28,21 +28,27 @@ namespace simple_sensor_simulator
 class SensorSimulation
 {
 public:
-  void attachLidarSensor(
-    const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
-    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
-  void attachDetectionSensor(
-    const double current_time,
-    const simulation_api_schema::DetectionSensorConfiguration & configuration,
-    std::shared_ptr<rclcpp::Publisher<autoware_auto_perception_msgs::msg::PredictedObjects>>
-      publisher_ptr);
+  template <typename... Ts>
+  void attachLidarSensor(Ts &&... xs)
+  {
+    lidar_sensors_.emplace_back(std::forward<decltype(xs)>(xs)...);
+  }
+
+  template <typename... Ts>
+  void attachDetectionSensor(Ts &&... xs)
+  {
+    detection_sensors_.push_back(
+      std::make_unique<DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>>(
+        std::forward<decltype(xs)>(xs)...));
+  }
+
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,
     const std::vector<traffic_simulator_msgs::EntityStatus> & status);
 
 private:
   std::vector<LidarSensor> lidar_sensors_;
-  std::vector<DetectionSensor> detection_sensors_;
+  std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
 };
 }  // namespace simple_sensor_simulator
 

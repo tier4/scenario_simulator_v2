@@ -18,6 +18,7 @@
 #include <simulation_api_schema.pb.h>
 
 #include <autoware_auto_perception_msgs/msg/predicted_objects.hpp>
+#include <autoware_perception_msgs/msg/dynamic_object_array.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -25,24 +26,54 @@
 
 namespace simple_sensor_simulator
 {
-class DetectionSensor
+class DetectionSensorBase
 {
-public:
-  DetectionSensor(
-    const double current_time,
-    const simulation_api_schema::DetectionSensorConfiguration & configuration,
-    std::shared_ptr<rclcpp::Publisher<autoware_auto_perception_msgs::msg::PredictedObjects>>
-      publisher_ptr);
-  void update(
-    double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const rclcpp::Time & stamp, const std::vector<std::string> & predicted_objects);
-
-private:
-  simulation_api_schema::DetectionSensorConfiguration configuration_;
-  std::shared_ptr<rclcpp::Publisher<autoware_auto_perception_msgs::msg::PredictedObjects>>
-    publisher_ptr_;
+protected:
   double last_update_stamp_;
+
+  simulation_api_schema::DetectionSensorConfiguration configuration_;
+
+public:
+  explicit DetectionSensorBase(
+    const double last_update_stamp,
+    const simulation_api_schema::DetectionSensorConfiguration & configuration)
+  : last_update_stamp_(last_update_stamp), configuration_(configuration)
+  {
+  }
+
+  virtual void update(
+    const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
+    const std::vector<std::string> &) = 0;
 };
+
+template <typename T>
+class DetectionSensor : public DetectionSensorBase
+{
+  std::shared_ptr<rclcpp::Publisher<T>> publisher_ptr_;
+
+public:
+  explicit DetectionSensor(
+    const double current_time,
+    const simulation_api_schema::DetectionSensorConfiguration & configuration, rclcpp::Node & node)
+  : DetectionSensorBase(current_time, configuration),
+    publisher_ptr_(node.create_publisher<T>(configuration.topic_name(), 1))
+  {
+  }
+
+  void update(
+    const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
+    const rclcpp::Time & stamp, const std::vector<std::string> &) override;
+};
+
+template <>
+void DetectionSensor<autoware_perception_msgs::msg::DynamicObjectArray>::update(
+  const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
+  const std::vector<std::string> &);
+
+template <>
+void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
+  const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
+  const std::vector<std::string> &);
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_

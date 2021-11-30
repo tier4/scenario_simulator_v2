@@ -76,7 +76,7 @@ geometry_msgs::msg::Pose constructPose(
 }
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
-  std::string entity, std::string topic_name, double update_duration)
+  const std::string & entity, const std::string & topic_name, const double update_duration)
 {
   simulation_api_schema::DetectionSensorConfiguration configuration;
   configuration.set_entity(entity);
@@ -86,7 +86,8 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 }
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
-  LidarType type, std::string entity, std::string topic_name, double horizontal_resolution)
+  const LidarType type, const std::string & entity, const std::string & topic_name,
+  const double horizontal_resolution)
 {
   simulation_api_schema::LidarConfiguration configuration;
   configuration.set_horizontal_resolution(horizontal_resolution);
