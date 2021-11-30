@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware_universe.hpp>
 
 namespace concealer
@@ -24,14 +25,22 @@ auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
     task_queue.delay([this, initial_pose]() {
       set(initial_pose);
       waitForAutowareStateToBeInitializingVehicle();
-      waitForAutowareStateToBeWaitingForRoute([&]() { setInitialPose(initial_pose); });
+      waitForAutowareStateToBeWaitingForRoute([&]() {
+        InitialPose initial_pose;
+        {
+          initial_pose.header.stamp = get_clock()->now();
+          initial_pose.header.frame_id = "map";
+          initial_pose.pose.pose = current_pose;
+        }
+        return setInitialPose(initial_pose);
+      });
     });
   }
 }
 
 auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
-  assert(!route.empty());
+  assert(not route.empty());
 
   task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
@@ -46,19 +55,69 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
 
 auto AutowareUniverse::engage() -> void
 {
-  task_queue.delay(
-    [this]() { waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); }); });
+  task_queue.delay([this]() {
+    waitForAutowareStateToBeDriving([this]() {
+      AutowareEngage message;
+      {
+        message.stamp = get_clock()->now();
+        message.engage = true;
+      }
+      return setAutowareEngage(message);
+    });
+  });
 }
 
 auto AutowareUniverse::update() -> void
 {
-  setCurrentControlMode();
-  setCurrentShift(current_twist);
-  setCurrentSteering();
-  setCurrentVelocity(current_twist);
-  setLocalizationOdometry(current_pose, current_twist);
+  CurrentControlMode current_control_mode;
+  {
+    current_control_mode.mode = CurrentControlMode::AUTONOMOUS;
+  }
+  setCurrentControlMode(current_control_mode);
+
+  CurrentShift current_shift;
+  {
+    using autoware_auto_vehicle_msgs::msg::GearReport;
+    current_shift.stamp = get_clock()->now();
+    current_shift.report = current_twist.linear.x >= 0 ? GearReport::DRIVE : GearReport::REVERSE;
+  }
+  setCurrentShift(current_shift);
+
+  CurrentSteering current_steering;
+  {
+    current_steering.stamp = get_clock()->now();
+    current_steering.steering_tire_angle = getSteeringAngle();
+  }
+  setCurrentSteering(current_steering);
+
+  CurrentVelocity current_velocity;
+  {
+    current_velocity.header.stamp = get_clock()->now();
+    current_velocity.header.frame_id = "base_link";
+    current_velocity.longitudinal_velocity = current_twist.linear.x;
+    current_velocity.lateral_velocity = current_twist.linear.y;
+    current_velocity.heading_rate = current_twist.angular.z;
+  }
+  setCurrentVelocity(current_velocity);
+
+  LocalizationOdometry localization_odometry;
+  {
+    localization_odometry.header.stamp = get_clock()->now();
+    localization_odometry.header.frame_id = "map";
+    localization_odometry.pose.pose = current_pose;
+    localization_odometry.pose.covariance = {};
+    localization_odometry.twist.twist = current_twist;
+  }
+  setLocalizationOdometry(localization_odometry);
+
+  VehicleVelocity vehicle_velocity;
+  {
+    vehicle_velocity.stamp = get_clock()->now();
+    vehicle_velocity.max_velocity = current_upper_bound_speed;
+  }
+  setVehicleVelocity(vehicle_velocity);
+
   setTransform(current_pose);
-  setVehicleVelocity(current_upper_bound_speed);
 }
 
 auto AutowareUniverse::getAcceleration() const -> double
@@ -78,8 +137,8 @@ auto AutowareUniverse::getSteeringAngle() const -> double
 
 auto AutowareUniverse::getGearSign() const -> double
 {
-  return getGearCommand().command == autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE ? -1.0
-                                                                                           : 1.0;
+  using autoware_auto_vehicle_msgs::msg::GearCommand;
+  return getGearCommand().command == GearCommand::REVERSE ? -1.0 : 1.0;
 }
 
 auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
@@ -112,11 +171,6 @@ auto AutowareUniverse::sendSIGINT() -> void  //
 auto AutowareUniverse::isReady() noexcept -> bool
 {
   return is_ready or (is_ready = isWaitingForRoute());
-}
-
-auto AutowareUniverse::isNotReady() noexcept -> bool  //
-{
-  return not isReady();
 }
 
 auto AutowareUniverse::checkAutowareState() -> void
