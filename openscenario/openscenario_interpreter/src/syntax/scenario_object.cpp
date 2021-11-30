@@ -70,19 +70,15 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
 auto ScenarioObject::activateSensors() -> bool
 {
   if (object_controller.isUserDefinedController()) {
+    attachLidarSensor(name);
+
     const auto architecture_type = getParameter<std::string>("architecture_type", "");
     if (architecture_type == "tier4/proposal") {
-      return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-               traffic_simulator::helper::LidarType::VLP16, name,
-               "/sensing/lidar/no_ground/pointcloud")) and
-             attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-               name, "/perception/object_recognition/objects", 0.1));
+      return attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
+        name, "/perception/object_recognition/objects", 0.1));
     } else if (architecture_type == "awf/universe") {
-      return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-               traffic_simulator::helper::LidarType::VLP16, name,
-               "/perception/object_segmentation/pointcloud")) and
-             attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-               name, "/perception/object_recognition/objects", 0.1));
+      return attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
+        name, "/perception/object_recognition/objects", 0.1));
     } else if (architecture_type == "awf/auto") {
       /*
          Autoware.Auto does not currently support object prediction however it
@@ -90,8 +86,6 @@ auto ScenarioObject::activateSensors() -> bool
          autoware_auto_msgs::msg::PredictedObjects will probably be used here
          topic name is yet unknown.
       */
-      return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-        traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
     } else {
       throw SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type), " specified");

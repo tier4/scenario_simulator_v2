@@ -286,7 +286,7 @@ bool API::initialize(double realtime_factor, double step_time)
 }
 
 bool API::attachDetectionSensor(
-  simulation_api_schema::DetectionSensorConfiguration sensor_configuration)
+  const simulation_api_schema::DetectionSensorConfiguration & sensor_configuration)
 {
   if (configuration.standalone_mode) {
     return true;
@@ -299,7 +299,7 @@ bool API::attachDetectionSensor(
   }
 }
 
-bool API::attachLidarSensor(simulation_api_schema::LidarConfiguration lidar_configuration)
+bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
 {
   if (configuration.standalone_mode) {
     return true;

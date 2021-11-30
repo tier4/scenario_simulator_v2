@@ -173,9 +173,30 @@ public:
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
 
-  bool attachLidarSensor(simulation_api_schema::LidarConfiguration configuration);
+  bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
 
-  bool attachDetectionSensor(simulation_api_schema::DetectionSensorConfiguration configuration);
+  auto attachLidarSensor(
+    const std::string & name,
+    const helper::LidarType lidar_type = traffic_simulator::helper::LidarType::VLP16) -> bool
+  {
+    const auto architecture_type = getParameter<std::string>("architecture_type", "");
+
+    if (architecture_type == "tier4/proposal") {
+      return attachLidarSensor(helper::constructLidarConfiguration(
+        lidar_type, name, "/sensing/lidar/no_ground/pointcloud"));
+    } else if (architecture_type == "awf/universe") {
+      return attachLidarSensor(helper::constructLidarConfiguration(
+        lidar_type, name, "/perception/object_segmentation/pointcloud"));
+    } else if (architecture_type == "awf/auto") {
+      return attachLidarSensor(
+        helper::constructLidarConfiguration(lidar_type, name, "/perception/points_nonground"));
+    } else {
+      throw common::scenario_simulator_exception::SemanticError(
+        "Unexpected architecture_type ", std::quoted(architecture_type), " specified");
+    }
+  }
+
+  bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
 
   bool initialize(double realtime_factor, double step_time);
 
