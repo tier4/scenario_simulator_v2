@@ -60,7 +60,7 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     }
     const auto pointcloud = raycaster.raycast(
       "base_link", stamp, ego_pose.get(), configuration_.horizontal_resolution(), vertical_angles);
-    predicted_objects_ = raycaster.getPredictedObject();
+    detected_objects_ = raycaster.getDetectedObject();
     return pointcloud;
   }
   throw simple_sensor_simulator::SimulationRuntimeError("failed to found ego vehicle");

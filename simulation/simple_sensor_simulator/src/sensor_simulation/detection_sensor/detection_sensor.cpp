@@ -90,7 +90,7 @@ void DetectionSensor<autoware_perception_msgs::msg::DynamicObjectArray>::update(
 template <>
 void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-  const rclcpp::Time & stamp, const std::vector<std::string> & predicted_objects)
+  const rclcpp::Time & stamp, const std::vector<std::string> & detected_objects)
 {
   auto makeObjectClassification = [](const auto & label) {
     autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
@@ -108,8 +108,8 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
     msg.header.frame_id = "map";
     last_update_stamp_ = current_time;
     for (const auto & s : status) {
-      auto result = std::find(predicted_objects.begin(), predicted_objects.end(), s.name());
-      if (result != predicted_objects.end()) {
+      auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
+      if (result != detected_objects.end()) {
         autoware_auto_perception_msgs::msg::PredictedObject object;
         bool is_ego = false;
         switch (s.type()) {

@@ -32,7 +32,7 @@ protected:
 
   simulation_api_schema::LidarConfiguration configuration_;
 
-  std::vector<std::string> predicted_objects_;
+  std::vector<std::string> detected_objects_;
 
   explicit LiDARSensorBase(
     const double last_update_stamp, const simulation_api_schema::LidarConfiguration & configuration)
@@ -45,10 +45,7 @@ public:
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
     -> void = 0;
 
-  auto getPredictedObjects() const -> const std::vector<std::string> &
-  {
-    return predicted_objects_;
-  }
+  auto getDetectedObjects() const -> const std::vector<std::string> & { return detected_objects_; }
 };
 
 template <typename T>
@@ -75,7 +72,7 @@ public:
       last_update_stamp_ = current_time;
       publisher_ptr_->publish(raycast(status, stamp));
     } else {
-      predicted_objects_ = {};
+      detected_objects_ = {};
     }
   }
 };

@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
@@ -60,15 +61,15 @@ public:
     -> void
   {
     if (configuration.architecture_type() == "tier4/proposal") {
-      using message_type = autoware_perception_msgs::msg::DynamicObjectArray;
-      detection_sensors_.push_back(std::make_unique<DetectionSensor<message_type>>(
+      using Message = autoware_perception_msgs::msg::DynamicObjectArray;
+      detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
-        node.create_publisher<message_type>("/perception/object_recognition/objects", 1)));
+        node.create_publisher<Message>("/perception/object_recognition/objects", 1)));
     } else if (configuration.architecture_type() == "awf/universe") {
-      using message_type = autoware_auto_perception_msgs::msg::PredictedObjects;
-      detection_sensors_.push_back(std::make_unique<DetectionSensor<message_type>>(
+      using Message = autoware_auto_perception_msgs::msg::PredictedObjects;
+      detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
-        node.create_publisher<message_type>("/perception/object_recognition/objects", 1)));
+        node.create_publisher<Message>("/perception/object_recognition/objects", 1)));
     } else if (configuration.architecture_type() == "awf/auto") {
       /* Autoware.Auto does not currently support object prediction however it is
          work-in-progress for Cargo ODD msgs are already implemented and
