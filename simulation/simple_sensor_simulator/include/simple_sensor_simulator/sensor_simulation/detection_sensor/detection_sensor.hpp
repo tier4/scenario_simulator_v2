@@ -33,7 +33,6 @@ protected:
 
   simulation_api_schema::DetectionSensorConfiguration configuration_;
 
-public:
   explicit DetectionSensorBase(
     const double last_update_stamp,
     const simulation_api_schema::DetectionSensorConfiguration & configuration)
@@ -41,6 +40,7 @@ public:
   {
   }
 
+public:
   virtual void update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> &) = 0;
@@ -49,7 +49,7 @@ public:
 template <typename T>
 class DetectionSensor : public DetectionSensorBase
 {
-  std::shared_ptr<rclcpp::Publisher<T>> publisher_ptr_;
+  const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
 public:
   explicit DetectionSensor(
@@ -61,8 +61,8 @@ public:
   }
 
   void update(
-    const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const rclcpp::Time & stamp, const std::vector<std::string> &) override;
+    const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
+    const std::vector<std::string> &) override;
 };
 
 template <>

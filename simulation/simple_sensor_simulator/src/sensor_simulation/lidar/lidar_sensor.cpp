@@ -25,21 +25,9 @@
 
 namespace simple_sensor_simulator
 {
-LidarSensor::LidarSensor(
-  const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
-  std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
-: configuration_(configuration), publisher_ptr_(publisher_ptr)
-{
-  last_update_stamp_ = current_time;
-}
-
-const std::vector<std::string> & LidarSensor::getPredictedObjects() const
-{
-  return predicted_objects_;
-}
-
-void LidarSensor::update(
-  double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
+template <>
+void LidarSensor<sensor_msgs::msg::PointCloud2>::update(
+  const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {
   if (current_time - last_update_stamp_ - configuration_.scan_duration() >= -0.002) {
@@ -50,8 +38,10 @@ void LidarSensor::update(
   }
 }
 
-const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
+template <>
+auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
+  -> sensor_msgs::msg::PointCloud2
 {
   Raycaster raycaster;
   boost::optional<geometry_msgs::msg::Pose> ego_pose;

@@ -25,16 +25,6 @@
 
 namespace simple_sensor_simulator
 {
-auto makeObjectClassification = [](const auto & label) {
-  autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
-  {
-    object_classification.label = label;
-    object_classification.probability = 1;
-  }
-
-  return object_classification;
-};
-
 template <>
 void DetectionSensor<autoware_perception_msgs::msg::DynamicObjectArray>::update(
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
@@ -102,6 +92,16 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp, const std::vector<std::string> & predicted_objects)
 {
+  auto makeObjectClassification = [](const auto & label) {
+    autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
+    {
+      object_classification.label = label;
+      object_classification.probability = 1;
+    }
+
+    return object_classification;
+  };
+
   if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
     autoware_auto_perception_msgs::msg::PredictedObjects msg;
     msg.header.stamp = stamp;
@@ -130,12 +130,7 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
             throw SimulationRuntimeError("unsupported entity type!");
             break;
         }
-        if (!is_ego) {
-          // boost::uuids::uuid base =
-          //   boost::uuids::string_generator()("0123456789abcdef0123456789abcdef");
-          // boost::uuids::name_generator gen(base);
-          // boost::uuids::uuid uuid = gen(s.name());
-          // std::copy(uuid.begin(), uuid.end(), object.id.uuid.begin());
+        if (not is_ego) {
           simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
           geometry_msgs::msg::Pose pose;
           simulation_interface::toMsg(s.pose(), pose);

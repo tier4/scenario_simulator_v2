@@ -31,7 +31,8 @@ public:
   template <typename... Ts>
   void attachLidarSensor(Ts &&... xs)
   {
-    lidar_sensors_.emplace_back(std::forward<decltype(xs)>(xs)...);
+    lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
+      std::forward<decltype(xs)>(xs)...));
   }
 
   template <typename... Ts>
@@ -47,7 +48,7 @@ public:
     const std::vector<traffic_simulator_msgs::EntityStatus> & status);
 
 private:
-  std::vector<LidarSensor> lidar_sensors_;
+  std::vector<std::unique_ptr<LiDARSensorBase>> lidar_sensors_;
   std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
 };
 }  // namespace simple_sensor_simulator

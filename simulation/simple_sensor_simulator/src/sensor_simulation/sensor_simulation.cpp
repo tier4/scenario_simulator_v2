@@ -25,8 +25,8 @@ void SensorSimulation::updateSensorFrame(
 {
   std::vector<std::string> predicted_objects = {};
   for (auto & sensor : lidar_sensors_) {
-    sensor.update(current_time, status, current_ros_time);
-    const auto objects = sensor.getPredictedObjects();
+    sensor->update(current_time, status, current_ros_time);
+    const auto objects = sensor->getPredictedObjects();
     for (const auto & obj : objects) {
       if (std::count(predicted_objects.begin(), predicted_objects.end(), obj) == 0) {
         predicted_objects.push_back(obj);
