@@ -54,15 +54,15 @@ class DetectionSensor : public DetectionSensorBase
 public:
   explicit DetectionSensor(
     const double current_time,
-    const simulation_api_schema::DetectionSensorConfiguration & configuration, rclcpp::Node & node)
-  : DetectionSensorBase(current_time, configuration),
-    publisher_ptr_(node.create_publisher<T>(configuration.topic_name(), 1))
+    const simulation_api_schema::DetectionSensorConfiguration & configuration,
+    const typename rclcpp::Publisher<T>::SharedPtr & publisher)
+  : DetectionSensorBase(current_time, configuration), publisher_ptr_(publisher)
   {
   }
 
-  void update(
+  auto update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    const std::vector<std::string> &) override;
+    const std::vector<std::string> &) -> void override;
 };
 
 template <>

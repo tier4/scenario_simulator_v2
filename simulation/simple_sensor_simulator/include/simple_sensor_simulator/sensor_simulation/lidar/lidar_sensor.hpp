@@ -62,25 +62,28 @@ class LidarSensor : public LiDARSensorBase
 public:
   explicit LidarSensor(
     const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
-    const rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr & publisher_ptr)
+    const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
   : LiDARSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr)
   {
   }
 
   auto update(
-    const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
-    -> void override;
+    const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
+    const rclcpp::Time & stamp) -> void override
+  {
+    if (current_time - last_update_stamp_ - configuration_.scan_duration() >= -0.002) {
+      last_update_stamp_ = current_time;
+      publisher_ptr_->publish(raycast(status, stamp));
+    } else {
+      predicted_objects_ = {};
+    }
+  }
 };
 
 template <>
 auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
   -> sensor_msgs::msg::PointCloud2;
-
-template <>
-auto LidarSensor<sensor_msgs::msg::PointCloud2>::update(
-  const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
-  -> void;
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_

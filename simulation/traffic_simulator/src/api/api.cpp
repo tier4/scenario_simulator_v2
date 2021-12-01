@@ -301,27 +301,8 @@ bool API::attachDetectionSensor(
 
 bool API::attachDetectionSensor(const std::string & entity_name)
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "");
-
-  auto attach = [&](const auto & topic_name) {
-    return attachDetectionSensor(
-      helper::constructDetectionSensorConfiguration(entity_name, topic_name, 0.1));
-  };
-
-  if (architecture_type == "tier4/proposal") {
-    return attach("/perception/object_recognition/objects");
-  } else if (architecture_type == "awf/universe") {
-    return attach("/perception/object_recognition/objects");
-  } else if (architecture_type == "awf/auto") {
-    /* Autoware.Auto does not currently support object prediction however it is
-       work-in-progress for Cargo ODD msgs are already implemented and
-       autoware_auto_msgs::msg::PredictedObjects will probably be used here
-       topic name is yet unknown. */
-    return true;
-  } else {
-    throw common::scenario_simulator_exception::SemanticError(
-      "Unexpected architecture_type ", std::quoted(architecture_type), " specified.");
-  }
+  return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
+    entity_name, getParameter<std::string>("architecture_type", ""), 0.1));
 }
 
 bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
@@ -339,23 +320,8 @@ bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & li
 
 bool API::attachLidarSensor(const std::string & entity_name, const helper::LidarType lidar_type)
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "");
-
-  auto attach = [&](const auto & topic_name) {
-    return attachLidarSensor(
-      helper::constructLidarConfiguration(lidar_type, entity_name, topic_name));
-  };
-
-  if (architecture_type == "tier4/proposal") {
-    return attach("/sensing/lidar/no_ground/pointcloud");
-  } else if (architecture_type == "awf/universe") {
-    return attach("/perception/object_segmentation/pointcloud");
-  } else if (architecture_type == "awf/auto") {
-    return attach("/perception/points_nonground");
-  } else {
-    throw common::scenario_simulator_exception::SemanticError(
-      "Unexpected architecture_type ", std::quoted(architecture_type), " specified.");
-  }
+  return attachLidarSensor(helper::constructLidarConfiguration(
+    lidar_type, entity_name, getParameter<std::string>("architecture_type", "")));
 }
 
 bool API::updateSensorFrame()

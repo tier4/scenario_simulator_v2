@@ -26,19 +26,6 @@
 namespace simple_sensor_simulator
 {
 template <>
-void LidarSensor<sensor_msgs::msg::PointCloud2>::update(
-  const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-  const rclcpp::Time & stamp)
-{
-  if (current_time - last_update_stamp_ - configuration_.scan_duration() >= -0.002) {
-    last_update_stamp_ = current_time;
-    publisher_ptr_->publish(raycast(status, stamp));
-  } else {
-    predicted_objects_ = {};
-  }
-}
-
-template <>
 auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
   -> sensor_msgs::msg::PointCloud2

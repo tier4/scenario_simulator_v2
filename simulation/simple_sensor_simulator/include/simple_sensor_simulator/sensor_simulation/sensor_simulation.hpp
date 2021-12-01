@@ -28,19 +28,58 @@ namespace simple_sensor_simulator
 class SensorSimulation
 {
 public:
-  template <typename... Ts>
-  void attachLidarSensor(Ts &&... xs)
+  auto attachLidarSensor(
+    const double current_simulation_time,
+    const simulation_api_schema::LidarConfiguration & configuration, rclcpp::Node & node) -> void
   {
-    lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
-      std::forward<decltype(xs)>(xs)...));
+    if (configuration.architecture_type() == "tier4/proposal") {
+      lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
+        current_simulation_time, configuration,
+        node.create_publisher<sensor_msgs::msg::PointCloud2>(
+          "/sensing/lidar/no_ground/pointcloud", 1)));
+    } else if (configuration.architecture_type() == "awf/universe") {
+      lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
+        current_simulation_time, configuration,
+        node.create_publisher<sensor_msgs::msg::PointCloud2>(
+          "/perception/object_segmentation/pointcloud", 1)));
+    } else if (configuration.architecture_type() == "awf/auto") {
+      lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
+        current_simulation_time, configuration,
+        node.create_publisher<sensor_msgs::msg::PointCloud2>("/perception/points_nonground", 1)));
+    } else {
+      std::stringstream ss;
+      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
+         << " given.";
+      throw std::runtime_error(ss.str());
+    }
   }
 
-  template <typename... Ts>
-  void attachDetectionSensor(Ts &&... xs)
+  auto attachDetectionSensor(
+    const double current_simulation_time,
+    const simulation_api_schema::DetectionSensorConfiguration & configuration, rclcpp::Node & node)
+    -> void
   {
-    detection_sensors_.push_back(
-      std::make_unique<DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>>(
-        std::forward<decltype(xs)>(xs)...));
+    if (configuration.architecture_type() == "tier4/proposal") {
+      using message_type = autoware_perception_msgs::msg::DynamicObjectArray;
+      detection_sensors_.push_back(std::make_unique<DetectionSensor<message_type>>(
+        current_simulation_time, configuration,
+        node.create_publisher<message_type>("/perception/object_recognition/objects", 1)));
+    } else if (configuration.architecture_type() == "awf/universe") {
+      using message_type = autoware_auto_perception_msgs::msg::PredictedObjects;
+      detection_sensors_.push_back(std::make_unique<DetectionSensor<message_type>>(
+        current_simulation_time, configuration,
+        node.create_publisher<message_type>("/perception/object_recognition/objects", 1)));
+    } else if (configuration.architecture_type() == "awf/auto") {
+      /* Autoware.Auto does not currently support object prediction however it is
+         work-in-progress for Cargo ODD msgs are already implemented and
+         autoware_auto_msgs::msg::PredictedObjects will probably be used here
+         topic name is yet unknown. */
+    } else {
+      std::stringstream ss;
+      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
+         << " given.";
+      throw std::runtime_error(ss.str());
+    }
   }
 
   void updateSensorFrame(
