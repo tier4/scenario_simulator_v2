@@ -1206,7 +1206,7 @@ lanelet::AutowareTrafficLightConstPtr HdMapUtils::getTrafficLight(
     for (auto light_string : light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
+        if (id == traffic_light_id) {
           return light;
         }
       }
