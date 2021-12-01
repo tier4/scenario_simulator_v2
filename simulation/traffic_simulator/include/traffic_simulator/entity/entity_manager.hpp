@@ -117,10 +117,7 @@ public:
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const Configuration & configuration)
   : configuration(configuration),
-    node_topics_interface([](auto && node) {
-      using rclcpp::node_interfaces::get_node_topics_interface;
-      return get_node_topics_interface(node);
-    }(node)),
+    node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
@@ -134,13 +131,7 @@ public:
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(
-      hdmap_utils_ptr_,
-      rclcpp::create_publisher<MarkerArray>(node, "traffic_light/marker", LaneletMarkerQoS()),
-      rclcpp::create_publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>(
-        node, "/perception/traffic_light_recognition/traffic_light_states",
-        rclcpp::QoS(10).transient_local()),
-      clock_ptr_))
+    traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_, node))
   {
     updateHdmapMarker();
   }

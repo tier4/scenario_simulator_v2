@@ -22,44 +22,6 @@
 
 namespace traffic_simulator
 {
-TrafficLightManager::TrafficLightManager(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
-  const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr & publisher,
-  const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::SharedPtr &
-    traffic_light_state_array_publisher,
-  const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame)
-: traffic_light_state_array_publisher_(traffic_light_state_array_publisher),
-  traffic_lights_(),
-  marker_pub_(publisher),
-  clock_ptr_(clock_ptr),
-  map_frame_(map_frame)
-{
-  for (const auto id : (*hdmap_utils_ptr).getTrafficLightIds()) {
-    std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions;
-
-    const auto red_position =
-      hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::RED);
-    if (red_position) {
-      color_positions.emplace(TrafficLightColor::RED, red_position.get());
-    }
-
-    const auto yellow_position =
-      hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW);
-    if (yellow_position) {
-      color_positions.emplace(TrafficLightColor::YELLOW, yellow_position.get());
-    }
-
-    const auto green_position =
-      hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::GREEN);
-    if (green_position) {
-      color_positions.emplace(TrafficLightColor::GREEN, green_position.get());
-    }
-
-    traffic_lights_.emplace(
-      std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, color_positions));
-  }
-}
-
 std::vector<std::int64_t> TrafficLightManager::getIds() const
 {
   std::vector<std::int64_t> result;
