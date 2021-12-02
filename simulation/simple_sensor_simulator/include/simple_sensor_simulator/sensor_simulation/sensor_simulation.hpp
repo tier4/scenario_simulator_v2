@@ -42,7 +42,7 @@ public:
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
         node.create_publisher<sensor_msgs::msg::PointCloud2>(
-          "/perception/object_segmentation/pointcloud", 1)));
+          "/perception/obstacle_segmentation/pointcloud", 1)));
     } else if (configuration.architecture_type() == "awf/auto") {
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
