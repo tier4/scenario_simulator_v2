@@ -30,8 +30,6 @@ namespace openscenario_interpreter
 {
 inline namespace reader
 {
-using XML = pugi::xml_node;
-
 /* ---- Dynamic Configuration --------------------------------------------------
  *
  *  See https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
@@ -51,7 +49,7 @@ auto substitute(std::string attribute, Scope & scope)
 
       {"var",
        [](auto && name, auto && scope) -> String {
-         const auto found = scope.findElement(name);
+         const auto found = scope.findObject(name);
          if (found) {
            return boost::lexical_cast<String>(found);
          } else {
@@ -90,7 +88,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
       return T();
 #endif
     } else if (value.front() == '$') {
-      const auto found = scope.findElement(value.substr(1));
+      const auto found = scope.findObject(value.substr(1));
       if (found) {
         return boost::lexical_cast<T>(boost::lexical_cast<String>(found));
       } else {

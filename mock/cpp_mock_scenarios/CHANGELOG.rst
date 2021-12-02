@@ -2,6 +2,19 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.7 (2021-11-09)
+------------------
+* Merge pull request `#597 <https://github.com/tier4/scenario_simulator_v2/issues/597>`_ from tier4/refactor/traffic_simulator/spawning
+* Merge branch 'master' into feature/interpreter/catalog
+* Update `API::spawn` argument order
+* Remove meaningless argument `is_ego` from some `spawn` overloads
+* Update `API::spawn` to not to apply `setEntityStatus` to rest arguments
+* Merge branch 'master' into feature/interpreter/catalog
+* Merge branch 'master' into feature/interpreter/catalog
+* basic impl
+* Merge branch 'master' into feature/interpreter/catalog
+* Contributors: Masaya Kataoka, kyabe2718, yamacir-kit
+
 0.5.6 (2021-10-28)
 ------------------
 * Merge branch 'tier4:master' into matsuura/feature/add-icon-to-panel

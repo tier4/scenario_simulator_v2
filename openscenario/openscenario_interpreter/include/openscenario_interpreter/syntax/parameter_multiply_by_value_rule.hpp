@@ -36,7 +36,7 @@ struct ParameterMultiplyByValueRule
 
   explicit ParameterMultiplyByValueRule(const pugi::xml_node &, Scope &);
 
-  auto operator()(const Element &) const -> Element;
+  auto operator()(const Object &) const -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -11,7 +11,15 @@ OpenSCENARIO:
         parameterType: unsignedInt
         value: &count-default 0
   CatalogLocations:
-    CatalogLocation: []
+    VehicleCatalog:
+      Directory:
+        path: $(find-pkg-share scenario_test_runner)/test/scenario/catalog/vehicle
+    ControllerCatalog:
+      Directory:
+        path: $(find-pkg-share scenario_test_runner)/test/scenario/catalog/controller
+    ManeuverCatalog:
+      Directory:
+        path: $(find-pkg-share scenario_test_runner)/test/scenario/catalog/maneuver
   RoadNetwork:
     LogicFile:
       filepath: $(find-pkg-share kashiwanoha_map)/map
@@ -40,84 +48,33 @@ OpenSCENARIO:
   Entities:
     ScenarioObject:
       - name: ego
-        Vehicle:
-          name: ""
-          vehicleCategory: car
-          BoundingBox:
-            Center:
-              x: 1.355
-              y: 0
-              z: 1.25
-            Dimensions:
-              width: 2.25
-              length: 4.77
-              height: 2.5
-          Performance:
-            maxSpeed: 50
-            maxAcceleration: INF
-            maxDeceleration: INF
-          Axles:
-            FrontAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.78
-              trackWidth: 1.63
-              positionX: 1.385
-              positionZ: 0.39
-            RearAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.78
-              trackWidth: 1.63
-              positionX: -1.355
-              positionZ: 0.39
-          Properties:
-            Property: []
+        CatalogReference:
+          catalogName: all-in-one-vehicle
+          entryName: ego-vehicle
+          ParameterAssignments:
+            ParameterAssignment:
+              - parameterRef: maxSpeed
+                value: 50
         ObjectController:
-          Controller:
-            name: ""
-            Properties:
-              Property:
-                - name: isEgo
-                  value: "false"
+          CatalogReference:
+            catalogName: all-in-one-controller
+            entryName: ego-controller
       - name: vehicle-1
-        Vehicle: &DefaultVehicle
-          name: ""
-          vehicleCategory: car
-          BoundingBox:
-            Center:
-              x: 0
-              y: 0
-              z: 1.25
-            Dimensions:
-              width: 1.8
-              length: 4
-              height: 2.5
-          Performance:
-            maxSpeed: 50
-            maxAcceleration: INF
-            maxDeceleration: INF
-          Axles:
-            FrontAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.6
-              trackWidth: 1.8
-              positionX: 2
-              positionZ: 0.3
-            RearAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.6
-              trackWidth: 1.8
-              positionX: 0
-              positionZ: 0.3
-          Properties:
-            Property: []
-        ObjectController: &DefaultObjectController
-          Controller:
-            name: ""
-            Properties:
-              Property: []
+        CatalogReference:
+          catalogName: all-in-one-vehicle
+          entryName: default-vehicle
+        ObjectController:
+          CatalogReference:
+            catalogName: all-in-one-controller
+            entryName: default-object-controller
       - name: vehicle-2
-        Vehicle: *DefaultVehicle
-        ObjectController: *DefaultObjectController
+        CatalogReference:
+          catalogName: all-in-one-vehicle
+          entryName: default-vehicle
+        ObjectController:
+          CatalogReference:
+            catalogName: all-in-one-controller
+            entryName: default-object-controller
       - name: barricade
         MiscObject:
           mass: 1.0
@@ -425,37 +382,44 @@ OpenSCENARIO:
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef: []
-                Maneuver:
-                  - name: ""
-                    Event:
-                      - name: ""
-                        priority: parallel
-                        maximumExecutionCount: 100
-                        StartTrigger:
-                          ConditionGroup:
-                            - Condition:
-                                - name: "if signal(34802).state() == none"
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    TrafficSignalCondition:
-                                      name: "34802"
-                                      state: none
-                                - name: "if simple_controller.phase() == blank"
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    TrafficSignalControllerCondition:
-                                      trafficSignalControllerRef: simple-controller
-                                      phase: blank
-                        Action:
-                          - name: "change_phase(simple_controller, green)"
-                            GlobalAction:
-                              InfrastructureAction:
-                                TrafficSignalAction:
-                                  TrafficSignalControllerAction:
-                                    trafficSignalControllerRef: simple-controller
-                                    phase: green
+                CatalogReference:
+                  ParameterAssignments:
+                    ParameterAssignment:
+                      - parameterRef: controllerName
+                        value: simple-controller
+                  catalogName: all-in-one-maneuver
+                  entryName: traffic-signal
+                # Maneuver:
+                #   - name: ""
+                #     Event:
+                #       - name: ""
+                #         priority: parallel
+                #         maximumExecutionCount: 100
+                #         StartTrigger:
+                #           ConditionGroup:
+                #             - Condition:
+                #                 - name: "if signal(34802).state() == none"
+                #                   delay: 0
+                #                   conditionEdge: none
+                #                   ByValueCondition:
+                #                     TrafficSignalCondition:
+                #                       name: "34802"
+                #                       state: none
+                #                 - name: "if simple_controller.phase() == blank"
+                #                   delay: 0
+                #                   conditionEdge: none
+                #                   ByValueCondition:
+                #                     TrafficSignalControllerCondition:
+                #                       trafficSignalControllerRef: simple-controller
+                #                       phase: blank
+                #         Action:
+                #           - name: "change_phase(simple_controller, green)"
+                #             GlobalAction:
+                #               InfrastructureAction:
+                #                 TrafficSignalAction:
+                #                   TrafficSignalControllerAction:
+                #                     trafficSignalControllerRef: simple-controller
+                #                     phase: green
             StartTrigger:
               ConditionGroup:
                 - Condition:

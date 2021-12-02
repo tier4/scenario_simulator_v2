@@ -141,6 +141,39 @@ std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
   return lanelet_ids;
 }
 
+std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
+  const geometry_msgs::msg::Point & point, double distance_thresh, bool include_crosswalk) const
+{
+  std::vector<std::int64_t> lanelet_ids;
+  lanelet::BasicPoint2d search_point(point.x, point.y);
+  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
+    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 5);
+  if (include_crosswalk) {
+    if (nearest_lanelet.empty()) {
+      return {};
+    }
+    if (nearest_lanelet.front().first > distance_thresh) {
+      return {};
+    }
+    for (const auto & lanelet : nearest_lanelet) {
+      lanelet_ids.emplace_back(lanelet.second.id());
+    }
+  } else {
+    const auto nearest_road_lanelet =
+      excludeSubtypeLanelets(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
+    if (nearest_road_lanelet.empty()) {
+      return {};
+    }
+    if (nearest_road_lanelet.front().first > distance_thresh) {
+      return {};
+    }
+    for (const auto & lanelet : nearest_lanelet) {
+      lanelet_ids.emplace_back(lanelet.second.id());
+    }
+  }
+  return lanelet_ids;
+}
+
 double HdMapUtils::getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   return toMapPose(lanelet_pose).pose.position.z;
@@ -305,21 +338,75 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
   return exclude_subtype_lanelets;
 }
 
+lanelet::BasicPolygon2d HdMapUtils::absoluteHull(
+  const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const
+{
+  lanelet::BasicPolygon2d hullPoints;
+  hullPoints.reserve(relativeHull.size());
+  for (const auto & hullPt : relativeHull) {
+    hullPoints.push_back(pose * hullPt);
+  }
+  return hullPoints;
+}
+
+lanelet::BasicPoint2d HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & point) const
+{
+  return lanelet::BasicPoint2d{point.x, point.y};
+}
+
+boost::optional<std::int64_t> HdMapUtils::matchToLane(
+  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  bool include_crosswalk, double reduction_ratio) const
+{
+  boost::optional<std::int64_t> id;
+  lanelet::matching::Object2d obj;
+  obj.pose.translation() = toPoint2d(pose.position);
+  obj.pose.linear() = Eigen::Rotation2D<double>(
+                        quaternion_operation::convertQuaternionToEulerAngle(pose.orientation).z)
+                        .matrix();
+  obj.absoluteHull = absoluteHull(
+    lanelet::matching::Hull2d{
+      lanelet::BasicPoint2d{
+        bbox.center.x + bbox.dimensions.x * 0.5 * reduction_ratio,
+        bbox.center.y + bbox.dimensions.y * 0.5 * reduction_ratio},
+      lanelet::BasicPoint2d{
+        bbox.center.x - bbox.dimensions.x * 0.5 * reduction_ratio,
+        bbox.center.y - bbox.dimensions.y * 0.5 * reduction_ratio}},
+    obj.pose);
+  auto matches = lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, 3.0);
+  if (!include_crosswalk) {
+    matches = lanelet::matching::removeNonRuleCompliantMatches(matches, traffic_rules_vehicle_ptr_);
+  }
+  if (matches.empty()) {
+    return boost::none;
+  }
+  std::sort(matches.begin(), matches.end(), [](auto const & lhs, auto const & rhs) {
+    return lhs.distance < rhs.distance;
+  });
+  return matches[0].lanelet.id();
+}
+
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, bool include_crosswalk)
 {
-  const auto lanelet_id = getClosestLaneletId(pose, include_crosswalk);
-  if (!lanelet_id) {
+  const auto lanelet_ids = getNearbyLaneletIds(pose.position, 3.0, include_crosswalk);
+  if (lanelet_ids.empty()) {
     return boost::none;
   }
-  return toLaneletPose(pose, lanelet_id.get());
+  for (const auto & id : lanelet_ids) {
+    const auto lanelet_pose = toLaneletPose(pose, id);
+    if (lanelet_pose) {
+      return lanelet_pose;
+    }
+  }
+  return boost::none;
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
-  const auto s = spline->getSValue(pose.position);
+  const auto s = spline->getSValue(pose);
   if (!s) {
     return boost::none;
   }
@@ -333,6 +420,35 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   lanelet_pose.offset = offset;
   lanelet_pose.rpy = rpy;
   return lanelet_pose;
+}
+
+boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
+  geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  bool include_crosswalk)
+{
+  const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
+  if (!lanelet_id) {
+    return toLaneletPose(pose, include_crosswalk);
+  }
+  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.get());
+  if (pose_in_target_lanelet) {
+    return pose_in_target_lanelet;
+  }
+  const auto previous = getPreviousLaneletIds(lanelet_id.get());
+  for (const auto id : previous) {
+    const auto pose_in_previous = toLaneletPose(pose, id);
+    if (pose_in_previous) {
+      return pose_in_previous;
+    }
+  }
+  const auto next = getNextLaneletIds(lanelet_id.get());
+  for (const auto id : previous) {
+    const auto pose_in_next = toLaneletPose(pose, id);
+    if (pose_in_next) {
+      return pose_in_next;
+    }
+  }
+  return toLaneletPose(pose, include_crosswalk);
 }
 
 boost::optional<std::int64_t> HdMapUtils::getClosestLaneletId(
@@ -512,7 +628,7 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
   lanelet::Optional<lanelet::routing::Route> route =
-    vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, true);
+    vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, false);
   if (!route) {
     route_cache_.appendData(from_lanelet_id, to_lanelet_id, ret);
     return ret;

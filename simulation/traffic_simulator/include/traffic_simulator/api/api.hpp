@@ -19,6 +19,7 @@
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <boost/variant.hpp>
 #include <cassert>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -40,6 +41,19 @@
 
 namespace traffic_simulator
 {
+struct VehicleBehavior : public entity::VehicleEntity::BuiltinBehavior
+{
+  static auto autoware() noexcept -> const std::string &
+  {
+    static const std::string name = "Autoware";
+    return name;
+  }
+};
+
+struct PedestrianBehavior : public entity::PedestrianEntity::BuiltinBehavior
+{
+};
+
 class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
@@ -110,22 +124,16 @@ public:
   void setVerbose(const bool verbose);
 
   bool spawn(
-    const bool is_ego, const std::string & name,
-    const traffic_simulator_msgs::msg::VehicleParameters & params);
+    const std::string & name,                                //
+    const traffic_simulator_msgs::msg::VehicleParameters &,  //
+    const std::string & = VehicleBehavior::defaultBehavior());
 
   bool spawn(
-    const bool is_ego, const std::string & name,
-    const traffic_simulator_msgs::msg::PedestrianParameters & params);
+    const std::string & name,                                   //
+    const traffic_simulator_msgs::msg::PedestrianParameters &,  //
+    const std::string & = PedestrianBehavior::defaultBehavior());
 
-  bool spawn(
-    const bool is_ego, const std::string & name,
-    const traffic_simulator_msgs::msg::MiscObjectParameters & params);
-
-  template <typename Parameters, typename... Ts>
-  auto spawn(const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
-  {
-    return spawn(is_ego, name, params) && setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
-  }
+  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
   bool despawn(const std::string & name);
 
@@ -229,9 +237,10 @@ private:
   template <typename Parameters>
   bool spawn(
     const bool is_ego, const Parameters & parameters,
-    const traffic_simulator_msgs::msg::EntityStatus & status)
+    const traffic_simulator_msgs::msg::EntityStatus & status,
+    const std::string & behavior = PedestrianBehavior::defaultBehavior())
   {
-    return spawn(is_ego, parameters.toXml(), status);
+    return spawn(is_ego, parameters.toXml(), status, behavior);
   }
 
   const Configuration configuration;

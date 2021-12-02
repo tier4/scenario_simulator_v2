@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 TeleportAction::TeleportAction(const pugi::xml_node & node, Scope & scope)
-: Scope(scope), position(readElement<Position>("Position", node, localScope()))
+: Scope(scope), position(readElement<Position>("Position", node, local()))
 {
 }
 
@@ -32,7 +32,7 @@ auto TeleportAction::accomplished() noexcept -> bool { return true; }
 
 auto TeleportAction::endsImmediately() noexcept -> bool { return true; }
 
-auto TeleportAction::evaluate() const -> Element
+auto TeleportAction::evaluate() const -> Object
 {
   run();
   return unspecified;
@@ -40,31 +40,39 @@ auto TeleportAction::evaluate() const -> Element
 
 auto TeleportAction::run() const -> void
 {
-  auto teleport_action = overload(
-    [](const WorldPosition & position, const auto & actor) {
-      return applyTeleportAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
-    },
-    [](const RelativeWorldPosition & position, const auto & actor) {
-      return applyTeleportAction(
-        actor,
-        position.reference,  // name
-        position,            // geometry_msgs::msg::Point
-        position.orientation);
-    },
-    [](const LanePosition & position, const auto & actor) {
-      return applyTeleportAction(
-        actor, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
-    });
-
   for (const auto & actor : actors) {
     if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
-      AddEntityAction(localScope(), position)(actor);  // NOTE: Tier IV extension
+      AddEntityAction(local(), position)(actor);  // NOTE: Tier IV extension
     } else {
-      apply<void>(teleport_action, position, actor);
+      return teleport(actor, position);
     }
   }
 }
 
-auto TeleportAction::start() noexcept -> void {}
+auto TeleportAction::start() noexcept -> void  //
+{
+  // NO OPERATION
+}
+
+auto TeleportAction::teleport(const EntityRef & entity_ref, const Position & position) -> void
+{
+  auto teleport = overload(
+    [&](const WorldPosition & position) {
+      return applyTeleportAction(entity_ref, static_cast<geometry_msgs::msg::Pose>(position));
+    },
+    [&](const RelativeWorldPosition & position) {
+      return applyTeleportAction(
+        entity_ref,
+        position.reference,  // name
+        position,            // geometry_msgs::msg::Point
+        position.orientation);
+    },
+    [&](const LanePosition & position) {
+      return applyTeleportAction(
+        entity_ref, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
+    });
+
+  return apply<void>(teleport, position);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

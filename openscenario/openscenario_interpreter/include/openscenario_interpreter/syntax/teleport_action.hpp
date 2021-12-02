@@ -42,11 +42,13 @@ struct TeleportAction : private Scope
 
   static auto endsImmediately() noexcept -> bool;
 
-  /*  */ auto evaluate() const -> Element;
+  /*  */ auto evaluate() const -> Object;
 
   /*  */ auto run() const -> void;
 
   static auto start() noexcept -> void;
+
+  static auto teleport(const EntityRef &, const Position &) -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -23,12 +23,12 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope("Storyboard")),
-  init(readElement<Init>("Init", node, localScope())),
-  stop_trigger(readElement<Trigger>("StopTrigger", node, localScope()))
+: Scope("Storyboard", scope),  // FIXME DIRTY HACK
+  init(readElement<Init>("Init", node, local())),
+  stop_trigger(readElement<Trigger>("StopTrigger", node, local()))
 {
   callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Story>(node, localScope()));
+    return push_back(readStoryboardElement<Story>(node, local()));
   });
 
   if (not init.endsImmediately()) {

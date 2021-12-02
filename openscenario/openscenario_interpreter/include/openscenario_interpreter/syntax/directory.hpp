@@ -15,12 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DIRECTORY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DIRECTORY_HPP_
 
-#include <openscenario_interpreter/scope.hpp>
+#include <boost/filesystem.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
+struct Scope;
 inline namespace syntax
 {
 /* ---- Directory --------------------------------------------------------------
@@ -32,9 +34,15 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Directory
 {
-  const String path;
+  const boost::filesystem::path path;
 
   explicit Directory(const pugi::xml_node &, Scope &);
+
+  static auto ls(const Directory & dir)
+  {
+    using dir_it = boost::filesystem::directory_iterator;
+    return std::vector<boost::filesystem::path>(dir_it(dir.path), dir_it());
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

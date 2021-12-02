@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/type_traits/has_stream_output_operator.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
-#include <openscenario_interpreter/utility/indent.hpp>
 
 namespace openscenario_interpreter
 {

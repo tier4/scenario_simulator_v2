@@ -20,6 +20,7 @@
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/LaneletSequence.h>
+#include <lanelet2_matching/LaneletMatching.h>
 #include <lanelet2_routing/Route.h>
 #include <lanelet2_routing/RoutingCost.h>
 #include <lanelet2_routing/RoutingGraph.h>
@@ -43,6 +44,7 @@
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
 #include <utility>
@@ -65,16 +67,20 @@ public:
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id, std::vector<double> s);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
-    geometry_msgs::msg::Pose pose, bool include_crosswalk = false);
+    geometry_msgs::msg::Pose pose, bool include_crosswalk);
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+    bool include_crosswalk);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, std::int64_t lanelet_id);
+  boost::optional<std::int64_t> matchToLane(
+    const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+    bool include_crosswalk, double reduction_ratio = 0.8) const;
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
   geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset);
-
   double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
-
   const std::vector<std::int64_t> getLaneletIds();
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
@@ -130,6 +136,9 @@ public:
     geometry_msgs::msg::Pose pose, double distance_thresh = 30.0, bool include_crosswalk = false);
   std::vector<std::int64_t> getNearbyLaneletIds(
     const geometry_msgs::msg::Point & point, double distance_threshold) const;
+  std::vector<std::int64_t> getNearbyLaneletIds(
+    const geometry_msgs::msg::Point & point, double distance_threshold,
+    bool include_crosswalk) const;
   std::vector<std::int64_t> filterLaneletIds(
     const std::vector<std::int64_t> & lanelet_ids, const char subtype[]) const;
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
@@ -184,6 +193,9 @@ private:
   std::vector<double> calculateSegmentDistances(const lanelet::ConstLineString3d & line_string);
   std::vector<lanelet::Lanelet> getLanelets(const std::vector<std::int64_t> & lanelet_ids) const;
   std::vector<std::int64_t> getLaneletIds(const std::vector<lanelet::Lanelet> & lanelets) const;
+  lanelet::BasicPoint2d toPoint2d(const geometry_msgs::msg::Point & point) const;
+  lanelet::BasicPolygon2d absoluteHull(
+    const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const;
 };
 }  // namespace hdmap_utils
 

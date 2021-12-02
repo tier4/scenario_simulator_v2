@@ -24,9 +24,9 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 ScenarioObject::ScenarioObject(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-  EntityObject(node, localScope()),
-  object_controller(readElement<ObjectController>("ObjectController", node, localScope()))
+: Scope(readAttribute<String>("name", node, scope), scope),
+  EntityObject(node, local()),
+  object_controller(readElement<ObjectController>("ObjectController", node, local()))
 {
 }
 

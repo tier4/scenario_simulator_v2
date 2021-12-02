@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/syntax/teleport_action.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 
 namespace openscenario_interpreter
@@ -46,47 +47,33 @@ auto AddEntityAction::operator()(const EntityRef & entity_ref) const -> void
 try {
   const auto entity = global().entities.at(entity_ref);
 
-  // XXX DIRTY HACK!!!
-#define APPLY_ADD_ENTITY_ACTION(...)                                                               \
-  apply<bool>(                                                                                     \
-    overload(                                                                                      \
-      [&](const WorldPosition & position) {                                                        \
-        return applyAddEntityAction(__VA_ARGS__, static_cast<geometry_msgs::msg::Pose>(position)); \
-      },                                                                                           \
-      [&](const RelativeWorldPosition & position) {                                                \
-        return applyAddEntityAction(                                                               \
-          __VA_ARGS__, position.reference, position, position.orientation);                        \
-      },                                                                                           \
-      [&](const LanePosition & position) {                                                         \
-        return applyAddEntityAction(                                                               \
-          __VA_ARGS__, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));           \
-      }),                                                                                          \
-    position)
-
-  auto add_entity_action = overload(
+  const auto add_entity = overload(
     [&](const Vehicle & vehicle) {
-      if (APPLY_ADD_ENTITY_ACTION(
-            entity.as<ScenarioObject>().object_controller.isUserDefinedController(),  //
-            entity_ref,                                                               //
-            static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle))) {
+      if (applyAddEntityAction(
+            entity_ref,                                                            //
+            static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),  //
+            entity.as<ScenarioObject>().object_controller.isUserDefinedController()
+              ? traffic_simulator::VehicleBehavior::autoware()
+              : traffic_simulator::VehicleBehavior::defaultBehavior())) {
+        TeleportAction::teleport(entity_ref, position);
         entity.as<ScenarioObject>().object_controller.assign(entity_ref);
         entity.as<ScenarioObject>().activateSensors();
         entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
       }
     },
     [&](const Pedestrian & pedestrian) {
-      APPLY_ADD_ENTITY_ACTION(
-        false, entity_ref,
-        static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+      applyAddEntityAction(
+        entity_ref, static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+      TeleportAction::teleport(entity_ref, position);
     },
     [&](const MiscObject & misc_object) {
-      APPLY_ADD_ENTITY_ACTION(
-        false, entity_ref,
-        static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
+      applyAddEntityAction(
+        entity_ref, static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
+      TeleportAction::teleport(entity_ref, position);
     });
 
   if (not std::exchange(entity.as<ScenarioObject>().is_added, true)) {
-    apply<void>(add_entity_action, entity.as<EntityObject>());
+    apply<void>(add_entity, entity.as<EntityObject>());
   } else {
     throw SemanticError(
       "Applying action AddEntityAction to an entity ", std::quoted(entity_ref),

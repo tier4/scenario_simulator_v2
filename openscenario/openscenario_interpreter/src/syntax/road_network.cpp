@@ -26,6 +26,6 @@ RoadNetwork::RoadNetwork(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto RoadNetwork::evaluate() -> Element { return traffic_signals.evaluate(); }
+auto RoadNetwork::evaluate() -> Object { return traffic_signals.evaluate(); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

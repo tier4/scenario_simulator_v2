@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATIONS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATIONS_HPP_
 
-#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog_location.hpp>
 #include <pugixml.hpp>
 #include <unordered_map>
@@ -40,11 +39,12 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct CatalogLocations : public std::unordered_map<String, CatalogLocation>
+
+struct CatalogLocations : public std::unordered_map<std::string, CatalogLocation>
 {
   explicit CatalogLocations() = default;
 
-  explicit CatalogLocations(const pugi::xml_node & node, Scope & scope);
+  explicit CatalogLocations(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

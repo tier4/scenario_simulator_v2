@@ -56,7 +56,7 @@ struct ScenarioDefinition
 
   auto complete() -> bool;
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 
 auto operator<<(std::ostream &, const ScenarioDefinition &) -> std::ostream &;

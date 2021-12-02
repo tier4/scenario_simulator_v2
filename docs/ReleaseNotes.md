@@ -1,7 +1,12 @@
 # Release Notes
 
 ## Difference between the latest release and master
-- Needed to integrate the planner evaluation metrics with the scenario runner. ([link](https://github.com/tier4/scenario_simulator_v2-docs/pull/598))
+- Remove newton methods in getSValue function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/612))
+- Set withLaneChange parameter as false. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
+- Change traffic light topic name to "/perception/traffic_light_recognition/traffic_light_states" ([link](https://github.com/tier4/scenario_simulator_v2/pull/621))
+- Add node to convert from DiagnosticArray to ParameterDeclaration type (Needed to integrate the planner evaluation metrics with the scenario runner). ([link](https://github.com/tier4/scenario_simulator_v2-docs/pull/598))
+
+## Version 0.5.7
 - Fix problem in getNormalVector function. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
 
 ## Version 0.5.6

@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/assign_controller_action.hpp>
+#include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
 
 namespace openscenario_interpreter
@@ -30,7 +31,7 @@ AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scop
 : ComplexType(
     choice(node,
       std::make_pair("Controller",       [&](const auto & node) { return make<Controller>(node, scope); }),
-      std::make_pair("CatalogReference", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+      std::make_pair("CatalogReference", [&](const auto & node) { return CatalogReference::make<Controller>(node, scope); })))
 // clang-format on
 {
 }

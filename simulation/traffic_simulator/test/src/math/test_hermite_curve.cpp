@@ -39,10 +39,10 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
   EXPECT_DOUBLE_EQ(curve.getPoint(0.5, false).x, 0.5);
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
   EXPECT_DOUBLE_EQ(curve.getMaximum2DCurvature(), 0);
-  geometry_msgs::msg::Point p;
-  p.x = 0.1;
-  p.y = 0;
-  p.z = 0;
+  geometry_msgs::msg::Pose p;
+  p.position.x = 0.1;
+  p.position.y = 0;
+  p.position.z = 0;
   EXPECT_TRUE(curve.getSValue(p, true));
   EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) && (curve.getSValue(p, true).get() < 0.101));
   {

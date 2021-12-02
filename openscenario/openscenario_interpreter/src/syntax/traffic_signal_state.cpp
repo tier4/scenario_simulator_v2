@@ -28,7 +28,7 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 {
 }
 
-auto TrafficSignalState::evaluate() const -> Element
+auto TrafficSignalState::evaluate() const -> Object
 {
   /* ---- NOTE -----------------------------------------------------------------
    *

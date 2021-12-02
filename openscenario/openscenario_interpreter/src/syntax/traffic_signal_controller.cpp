@@ -46,7 +46,7 @@ TrafficSignalController::TrafficSignalController(const pugi::xml_node & node, Sc
   }
 }
 
-auto TrafficSignalController::changePhaseTo(const String & phase_name) -> Element
+auto TrafficSignalController::changePhaseTo(const String & phase_name) -> Object
 {
   auto iter = std::find_if(std::begin(phases), std::end(phases), [&](const auto & phase) {
     return phase.name == phase_name;
@@ -60,7 +60,7 @@ auto TrafficSignalController::changePhaseTo(const String & phase_name) -> Elemen
   }
 }
 
-auto TrafficSignalController::changePhaseTo(std::list<Phase>::iterator next) -> Element
+auto TrafficSignalController::changePhaseTo(std::list<Phase>::iterator next) -> Object
 {
   const auto current_time = getCurrentTime();
 
@@ -99,7 +99,7 @@ auto TrafficSignalController::cycleTime() const -> double
     [](const auto & sum, const auto & phase) { return sum + phase.duration; });
 }
 
-auto TrafficSignalController::evaluate() -> Element
+auto TrafficSignalController::evaluate() -> Object
 {
   if (shouldChangePhaseToBegin()) {
     return changePhaseTo(std::begin(phases));

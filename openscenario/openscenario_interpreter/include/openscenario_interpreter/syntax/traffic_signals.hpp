@@ -44,7 +44,7 @@ public:
 
   explicit TrafficSignals(const pugi::xml_node &, Scope &);
 
-  auto evaluate() -> Element;
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

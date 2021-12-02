@@ -21,14 +21,14 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Vehicle::Vehicle(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-  vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, localScope())),
+: Scope(readAttribute<String>("name", node, scope), scope),
+  vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, local())),
   parameter_declarations(
-    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
-  bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
-  performance(readElement<Performance>("Performance", node, localScope())),
-  axles(readElement<Axles>("Axles", node, localScope())),
-  properties(readElement<Properties>("Properties", node, localScope()))
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, local())),
+  performance(readElement<Performance>("Performance", node, local())),
+  axles(readElement<Axles>("Axles", node, local())),
+  properties(readElement<Properties>("Properties", node, local()))
 {
 }
 

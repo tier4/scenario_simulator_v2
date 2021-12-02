@@ -21,14 +21,14 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Pedestrian::Pedestrian(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
-  mass(readAttribute<Double>("mass", node, localScope())),
-  model(readAttribute<String>("model", node, localScope())),
-  pedestrian_category(readAttribute<PedestrianCategory>("pedestrianCategory", node, localScope())),
+: Scope(readAttribute<String>("name", node, scope), scope),
+  mass(readAttribute<Double>("mass", node, local())),
+  model(readAttribute<String>("model", node, local())),
+  pedestrian_category(readAttribute<PedestrianCategory>("pedestrianCategory", node, local())),
   parameter_declarations(
-    readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
-  bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
-  properties(readElement<Properties>("Properties", node, localScope()))
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, local())),
+  properties(readElement<Properties>("Properties", node, local()))
 {
 }
 
