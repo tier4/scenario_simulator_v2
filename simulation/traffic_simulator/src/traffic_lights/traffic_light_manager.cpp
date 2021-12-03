@@ -107,17 +107,36 @@ auto TrafficLightManagerBase::update(const double step_time) -> void
 
 template <>
 auto TrafficLightManager<
+  autoware_perception_msgs::msg::TrafficLightStateArray>::publishTrafficLightStateArray() const
+  -> void
+{
+  autoware_perception_msgs::msg::TrafficLightStateArray traffic_light_state_array;
+  {
+    traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
+    traffic_light_state_array.header.stamp = clock_ptr_->now();
+    for (const auto & each : traffic_lights_) {
+      if (each.second.getColor() != TrafficLightColor::NONE) {
+        traffic_light_state_array.states.push_back(
+          static_cast<autoware_perception_msgs::msg::TrafficLightState>(each.second));
+      }
+    }
+  }
+  traffic_light_state_array_publisher_->publish(traffic_light_state_array);
+}
+
+template <>
+auto TrafficLightManager<
   autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
   -> void
 {
   autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;
   {
-    traffic_light_state_array.header.frame_id = "camera_link";  // XXX DIRTY HACK!!!
-    traffic_light_state_array.header.stamp = (*clock_ptr_).now();
+    traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
+    traffic_light_state_array.header.stamp = clock_ptr_->now();
     for (const auto & each : traffic_lights_) {
       if (each.second.getColor() != TrafficLightColor::NONE) {
         traffic_light_state_array.signals.push_back(
-          static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(std::get<1>(each)));
+          static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(each.second));
       }
     }
   }
