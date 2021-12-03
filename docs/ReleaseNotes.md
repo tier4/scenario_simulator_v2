@@ -4,6 +4,7 @@
 - Remove newton methods in getSValue function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/612))
 - Set withLaneChange parameter as false. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
 - Change traffic light topic name to "/perception/traffic_light_recognition/traffic_light_states" ([link](https://github.com/tier4/scenario_simulator_v2/pull/621))
+- Remove hard coded parameters in behavior tree plugin and use accelearaion and deceleration value in traffic_simulator_msgs/msg/DriverModel. ([link](https://github.com/tier4/scenario_simulator_v2/pull/624))
 
 ## Version 0.5.7
 - Fix problem in getNormalVector function. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
