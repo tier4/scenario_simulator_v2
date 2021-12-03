@@ -91,7 +91,7 @@ class EntityManager
 
   MarkerArray markers_raw_;
 
-  const std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
+  const std::shared_ptr<TrafficLightManagerBase> traffic_light_manager_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -131,7 +131,9 @@ public:
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_, node))
+    traffic_light_manager_ptr_(
+      std::make_shared<TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
+        hdmap_utils_ptr_, node))
   {
     updateHdmapMarker();
   }
