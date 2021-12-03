@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
 
 #include <autoware_auto_perception_msgs/msg/traffic_light.hpp>
+#include <autoware_perception_msgs/msg/lamp_state.hpp>
 #include <iostream>
 #include <stdexcept>
 
@@ -27,15 +28,33 @@ std::istream & operator>>(std::istream &, TrafficLightColor &);
 
 std::ostream & operator<<(std::ostream &, const TrafficLightColor &);
 
-autoware_auto_perception_msgs::msg::TrafficLight makeLampState(const TrafficLightColor &);
-
 enum class TrafficLightArrow { NONE, STRAIGHT, LEFT, RIGHT };
 
 std::istream & operator>>(std::istream &, TrafficLightArrow &);
 
 std::ostream & operator<<(std::ostream &, const TrafficLightArrow &);
 
-autoware_auto_perception_msgs::msg::TrafficLight makeLampState(const TrafficLightArrow &);
+template <typename T>
+auto convert(const TrafficLightArrow &) -> T;
+
+template <>
+auto convert<autoware_perception_msgs::msg::LampState>(const TrafficLightArrow &)
+  -> autoware_perception_msgs::msg::LampState;
+
+template <>
+auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLightArrow &)
+  -> autoware_auto_perception_msgs::msg::TrafficLight;
+
+template <typename T>
+auto convert(const TrafficLightColor &) -> T;
+
+template <>
+auto convert<autoware_perception_msgs::msg::LampState>(const TrafficLightColor &)
+  -> autoware_perception_msgs::msg::LampState;
+
+template <>
+auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLightColor &)
+  -> autoware_auto_perception_msgs::msg::TrafficLight;
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_

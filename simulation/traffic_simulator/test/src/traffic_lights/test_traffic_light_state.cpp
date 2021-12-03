@@ -18,31 +18,45 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 
-TEST(TrafficLights, makeLampState)
+TEST(TrafficLights, conversion)
 {
-  // EXPECT_EQ(
-  //   traffic_simulator::makeLampState(traffic_simulator::TrafficLightColor::RED).color,
-  //   autoware_auto_perception_msgs::msg::TrafficLight::RED);
-  // EXPECT_EQ(
-  //   traffic_simulator::makeLampState(traffic_simulator::TrafficLightColor::GREEN).color,
-  //   autoware_auto_perception_msgs::msg::TrafficLight::GREEN);
-  // EXPECT_EQ(
-  //   traffic_simulator::makeLampState(traffic_simulator::TrafficLightColor::YELLOW).color,
-  //   autoware_auto_perception_msgs::msg::TrafficLight::AMBER);
+  EXPECT_EQ(
+    traffic_simulator::convert<autoware_perception_msgs::msg::LampState>(
+      traffic_simulator::TrafficLightColor::RED)
+      .type,
+    autoware_perception_msgs::msg::LampState::RED);
+  EXPECT_EQ(
+    traffic_simulator::convert<autoware_perception_msgs::msg::LampState>(
+      traffic_simulator::TrafficLightColor::GREEN)
+      .type,
+    autoware_perception_msgs::msg::LampState::GREEN);
+  EXPECT_EQ(
+    traffic_simulator::convert<autoware_perception_msgs::msg::LampState>(
+      traffic_simulator::TrafficLightColor::YELLOW)
+      .type,
+    autoware_perception_msgs::msg::LampState::YELLOW);
   EXPECT_THROW(
-    traffic_simulator::makeLampState(traffic_simulator::TrafficLightColor::NONE),
+    traffic_simulator::convert<autoware_perception_msgs::msg::LampState>(
+      traffic_simulator::TrafficLightColor::NONE),
     std::out_of_range);
-  // EXPECT_EQ(
-  //   traffic_simulator::makeLampState(traffic_simulator::TrafficLightArrow::STRAIGHT).color,
-  //   autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW);
-  // EXPECT_EQ(
-  //   traffic_simulator::makeLampState(traffic_simulator::TrafficLightArrow::RIGHT).color,
-  //   autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW);
-  // EXPECT_EQ(
-  //   traffic_simulator::makeLampState(traffic_simulator::TrafficLightArrow::LEFT).color,
-  //   autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW);
+  EXPECT_EQ(
+    traffic_simulator::convert<autoware_perception_msgs::msg::LampState>(
+      traffic_simulator::TrafficLightArrow::STRAIGHT)
+      .type,
+    autoware_perception_msgs::msg::LampState::UP);
+  EXPECT_EQ(
+    traffic_simulator::convert<autoware_perception_msgs::msg::LampState>(
+      traffic_simulator::TrafficLightArrow::RIGHT)
+      .type,
+    autoware_perception_msgs::msg::LampState::RIGHT);
+  EXPECT_EQ(
+    traffic_simulator::convert<autoware_perception_msgs::msg::LampState>(
+      traffic_simulator::TrafficLightArrow::LEFT)
+      .type,
+    autoware_perception_msgs::msg::LampState::LEFT);
   EXPECT_THROW(
-    traffic_simulator::makeLampState(traffic_simulator::TrafficLightArrow::NONE),
+    traffic_simulator::convert<autoware_perception_msgs::msg::LampState>(
+      traffic_simulator::TrafficLightArrow::NONE),
     std::out_of_range);
 }
 
