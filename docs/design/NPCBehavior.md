@@ -4,7 +4,7 @@ Behavior logic of the NPC(non-player-character) is plugable.
 If you want to use your own behavior, please see [this document](BehaviorPlugin.md).
 
 In this document, we describe how default behavior tree NPC works in traffic environment.
-Default behavior tree NPC logics are in [this pacakge](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/behavior_tree_plugin).
+Default behavior tree NPC logics are in [this package](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/behavior_tree_plugin).
 
 ## Vehicle NPC
 Behavior tree of vehicle NPC is here.
