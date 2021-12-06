@@ -26,7 +26,11 @@ TransitionEvent::TransitionEvent(const std::shared_ptr<BT::TreeNode> & root_node
                              BT::TimePoint timestamp, const BT::TreeNode & node,
                              BT::NodeStatus prev, BT::NodeStatus status) {
     if (status != BT::NodeStatus::IDLE) {
+#if FOXY
+      if (type_ == BT::TimestampType::absolute) {
+#else
       if (type_ == BT::TimestampType::ABSOLUTE) {
+#endif
         this->callback(timestamp.time_since_epoch(), node, prev, status);
       } else {
         this->callback(timestamp - first_timestamp_, node, prev, status);
