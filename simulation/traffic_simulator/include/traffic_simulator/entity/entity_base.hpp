@@ -93,7 +93,15 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
 
-  virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) {}
+  virtual auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel
+  {
+    THROW_SIMULATION_ERROR("getDriverModel function can be used with only ego/vehicle entity.");
+  };
+
+  virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &)
+  {
+    THROW_SIMULATION_ERROR("setDriverModel function can be used with only ego/vehicle entity.");
+  };
 
   /*   */ void setEntityTypeList(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &
