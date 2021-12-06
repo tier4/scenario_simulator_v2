@@ -91,3 +91,44 @@ private:
 
 #endif  // BEHAVIOR_TREE_PLUGIN__PEDESTRIAN__BEHAVIOR_TREE_HPP_
 ```
+
+If you want to develop behavior plugin, first, you have to add three functions below.
+
+```C++
+void configure(const rclcpp::Logger & logger) override;
+```
+configure plugin class, this function only calls once at the start of simulation.
+```C++
+void update(double current_time, double step_time) override;
+```
+update plugin class, this function calls once in every frames in simulaton.
+```C++
+const std::string & getCurrentAction() const override;
+```
+return current actions of NPC, this result only use for visualization.
+
+After that, you have to define getter and setters for each data.  
+You can get unique key for each data by calling `BehaviorPluginBase::get(FOO)Key` function, such as `BehaviorPluginBase::getCurrentTimeKey()`.  
+Getter are named as get(FOO), such as `BehaviorPluginClass::getCurrentTime();`.  
+Setters are named as set(Foo), such as `BehaviorPluginClass::setCurrentTime(double value);`.
+
+|         Name         |                      Description                      |                           Type                            |
+| -------------------- | ----------------------------------------------------- | --------------------------------------------------------- |
+| CurrentTime          | Elapsed time in simulation                            | `double`                                                  |
+| DebugMarker          | Rviz marker for debugging NPC behavior                | `std::vector<visualization_msgs::msg::Marker>`            |
+| DriverModel          | Driver behavior parameters                            | `traffic_simulator_msgs::msg::DriverModel`                |
+| EntityStatus         | Entity status of the NPC you want to control          | `traffic_simulator_msgs::msg::EntityStatus`               |
+| EntityTypeList       | Dictionary of NPC name and it's type.                 | `EntityTypeDict`                                          |
+| HdMapUtils           | Shared pointer of HdMapUtils class.                   | `std::shared_ptr<hdmap_utils::HdMapUtils>`                |
+| Obstacle             | Target obstacle of your NPC.                          | `boost::optional<traffic_simulator_msgs::msg::Obstacle>`  |
+| OtherEntityStatus    | Dictionay of other entity status.                     | `EntityStatusDict`                                        |
+| PedestrianParameters | Entity parameters for pedestrian.                     | `traffic_simulator_msgs::msg::PedestrianParameters`       |
+| Request              | Request to the NPC you want to control                | `std::string`                                             |
+| RouteLanelets        | Lanelet ids on entity route                           | `std::vector<std::int64_t>`                               |
+| StepTime             | Step time of the simulation.                          | `double`                                                  |
+| TargetSpeed          | Target speed of the NPC you want to control           | `boost::optional<double>`                                 |
+| ToLaneletId          | Goal lanelet ID                                       | `std::int64_t`                                            |
+| TrafficLightManager  | Shared pointer to the traffic light manager           | `std::shared_ptr<traffic_simulator::TrafficLightManager>` |
+| UpdatedStatus        | Updated entity status of the NPC you want to control. | `traffic_simulator_msgs::msg::EntityStatus`               |
+| VehicleParameters    | Parameters of vehicle entity.                         | `traffic_simulator_msgs::msg::VehicleParameters`          |
+| Waypoints            | Waypoints of the NPC you want to control.             | `traffic_simulator_msgs::msg::WaypointsArray`             |
