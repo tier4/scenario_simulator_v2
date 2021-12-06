@@ -42,5 +42,5 @@ graph TD
 | StopAtTrafficLight   | Stopping at a traffic light until it becomes green. | The traffic light become green.                    |                                                                                         |
 | StopAtStopLine       | Stopping at a stop line.                            | The NPC was stopped at stop line.                  | Overrun stop line.                                                                      |
 | StopAtCrossingEntity | Stopping at crossing entity.                        | Target entity was crossed.                         |                                                                                         |
-| Yield                | Yeild to right-of-way entity.                       | Right of way entity is moved.                      |                                                                                         |
+| Yield                | Yield to right-of-way entity.                       | Right of way entity is moved.                      |                                                                                         |
 | MoveBackward         | Move backward on lane.                              | Another request and new goal point was suggested.  |                                                                                         |
