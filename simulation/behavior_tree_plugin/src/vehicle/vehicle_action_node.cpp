@@ -45,9 +45,9 @@ traffic_simulator_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStat
   accel_new = entity_status.action_status.accel;
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(target_accel, -5, 0);
+    target_accel = boost::algorithm::clamp(target_accel, driver_model.deceleration * -1, 0);
   } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, 3);
+    target_accel = boost::algorithm::clamp(target_accel, 0, driver_model.acceleration);
   }
   accel_new.linear.x = target_accel;
   geometry_msgs::msg::Twist twist_new;
