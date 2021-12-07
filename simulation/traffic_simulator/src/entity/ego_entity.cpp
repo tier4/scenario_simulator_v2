@@ -55,7 +55,7 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-  auto architecture_type = getParameter<std::string>("architecture_type", std::string(""));
+  auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
   std::string vehicle_model_type;
 
   if (architecture_type == "tier4/proposal") {
@@ -133,7 +133,7 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "unspecified");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
 
   if (architecture_type == "tier4/proposal") {
     return getParameter<bool>("launch_autoware", true)

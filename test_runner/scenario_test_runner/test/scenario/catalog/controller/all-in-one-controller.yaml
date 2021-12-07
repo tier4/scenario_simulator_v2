@@ -12,7 +12,7 @@ OpenSCENARIO:
         Properties:
           Property:
             - name: isEgo
-              value: "false"
+              value: "true"
       - name: default-object-controller
         Properties:
           Property: []

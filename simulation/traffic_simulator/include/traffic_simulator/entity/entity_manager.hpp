@@ -117,7 +117,7 @@ public:
   template <typename... Ts>
   auto makeTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
   {
-    const auto architecture_type = getParameter<std::string>("architecture_type", "unspecified");
+    const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
 
     if (architecture_type == "awf/universe") {
       return std::make_shared<
