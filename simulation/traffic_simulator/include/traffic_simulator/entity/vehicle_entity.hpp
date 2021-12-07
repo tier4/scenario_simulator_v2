@@ -89,6 +89,8 @@ public:
     behavior_plugin_ptr_->setDriverModel(model);
   }
 
+  auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel override;
+
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
   {
     EntityBase::setHdMapUtils(ptr);

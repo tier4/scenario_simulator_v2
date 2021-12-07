@@ -78,7 +78,7 @@ boost::optional<double> YieldAction::calculateTargetSpeed()
     distance_to_stop_target_.get() - (vehicle_parameters.bounding_box.dimensions.x) - 10;
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
-      return std::sqrt(2 * 5 * rest_distance);
+      return std::sqrt(2 * driver_model.deceleration * rest_distance);
     } else {
       return 0;
     }
