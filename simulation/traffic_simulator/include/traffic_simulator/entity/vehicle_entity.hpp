@@ -89,6 +89,10 @@ public:
     behavior_plugin_ptr_->setDriverModel(model);
   }
 
+  void setAcceleration(double acceleration) override;
+
+  void setDeceleration(double deceleration) override;
+
   auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel override;
 
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
