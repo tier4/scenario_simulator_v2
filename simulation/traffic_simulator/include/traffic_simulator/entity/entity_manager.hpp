@@ -205,6 +205,7 @@ public:
   FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
+  FORWARD_TO_ENTITY(getDriverModel, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
