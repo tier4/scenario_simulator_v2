@@ -15,11 +15,24 @@
 #ifndef CONCEALER__AUTOWARE_AUTO_HPP_
 #define CONCEALER__AUTOWARE_AUTO_HPP_
 
+#ifndef SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE  // NOTE: SUPER DIRTY HACK
 #include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/vehicle_state_report.hpp>
+#define AUTOWARE_AUTO_PLANNING_MSGS autoware_auto_planning_msgs
+#define AUTOWARE_AUTO_VEHICLE_MSGS autoware_auto_vehicle_msgs
+#else
+#include <autoware_auto_msgs/msg/trajectory.hpp>
+#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
+#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_state_report.hpp>
+#define AUTOWARE_AUTO_PLANNING_MSGS autoware_auto_msgs
+#define AUTOWARE_AUTO_VEHICLE_MSGS autoware_auto_msgs
+#endif  // SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE
+
 #include <concealer/autoware.hpp>
 #include <concealer/define_macro.hpp>
 
@@ -32,13 +45,13 @@ class AutowareAuto : public Autoware
   using GoalPose = geometry_msgs::msg::PoseStamped;
   DEFINE_PUBLISHER(GoalPose);
 
-  using VehicleControlCommand = autoware_auto_vehicle_msgs::msg::VehicleControlCommand;
+  using VehicleControlCommand = AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleControlCommand;
   DEFINE_SUBSCRIPTION(VehicleControlCommand);
 
-  using VehicleStateCommand = autoware_auto_vehicle_msgs::msg::VehicleStateCommand;
+  using VehicleStateCommand = AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateCommand;
   DEFINE_SUBSCRIPTION(VehicleStateCommand);
 
-  using VehicleStateReport = autoware_auto_vehicle_msgs::msg::VehicleStateReport;
+  using VehicleStateReport = AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateReport;
   DEFINE_PUBLISHER(VehicleStateReport);
   decltype(auto) setVehicleStateReport()
   {
@@ -58,7 +71,7 @@ class AutowareAuto : public Autoware
     return setVehicleStateReport(report);
   }
 
-  using VehicleKinematicState = autoware_auto_vehicle_msgs::msg::VehicleKinematicState;
+  using VehicleKinematicState = AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleKinematicState;
   DEFINE_PUBLISHER(VehicleKinematicState);
   auto setVehicleKinematicState(
     const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Twist & twist)
@@ -97,7 +110,7 @@ class AutowareAuto : public Autoware
     return setInitialPose(initial_pose);
   }
 
-  using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
+  using Trajectory = AUTOWARE_AUTO_PLANNING_MSGS::msg::Trajectory;
   DEFINE_SUBSCRIPTION(Trajectory);
 
   autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;

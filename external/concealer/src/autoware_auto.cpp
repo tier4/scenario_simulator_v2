@@ -77,7 +77,7 @@ double AutowareAuto::getSteeringAngle() const
 
 double AutowareAuto::getGearSign() const
 {
-  using autoware_auto_vehicle_msgs::msg::VehicleStateReport;
+  using AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateReport;
   return getVehicleStateCommand().gear == VehicleStateReport::GEAR_REVERSE ? -1.0 : +1.0;
 }
 
@@ -123,19 +123,19 @@ autoware_vehicle_msgs::msg::VehicleCommand AutowareAuto::getVehicleCommand() con
     auto vehicle_state_command = getVehicleStateCommand();
 
     switch (vehicle_state_command.gear) {
-      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_DRIVE:
+      case AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateReport::GEAR_DRIVE:
         vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
         break;
-      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_REVERSE:
+      case AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateReport::GEAR_REVERSE:
         vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
         break;
-      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_PARK:
+      case AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateReport::GEAR_PARK:
         vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
         break;
-      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_LOW:
+      case AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateReport::GEAR_LOW:
         vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
         break;
-      case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_NEUTRAL:
+      case AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateReport::GEAR_NEUTRAL:
         vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
         break;
     }
