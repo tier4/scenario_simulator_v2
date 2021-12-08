@@ -786,7 +786,7 @@ Visualization Manager:
                         Durability Policy: Volatile
                         History Policy: Keep Last
                         Reliability Policy: Reliable
-                        Value: /planning/scenario_planning/lane_driving/behavior_planning/debug/crosswalk
+                        Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/crosswalk
                       Value: true
                     - Class: rviz_default_plugins/MarkerArray
                       Enabled: true
@@ -798,7 +798,7 @@ Visualization Manager:
                         Durability Policy: Volatile
                         History Policy: Keep Last
                         Reliability Policy: Reliable
-                        Value: /planning/scenario_planning/lane_driving/behavior_planning/debug/intersection
+                        Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/intersection
                       Value: true
                     - Class: rviz_default_plugins/MarkerArray
                       Enabled: true
@@ -810,7 +810,7 @@ Visualization Manager:
                         Durability Policy: Volatile
                         History Policy: Keep Last
                         Reliability Policy: Reliable
-                        Value: /planning/scenario_planning/lane_driving/behavior_planning/debug/blind_spot
+                        Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/blind_spot
                       Value: true
                     - Class: rviz_default_plugins/MarkerArray
                       Enabled: true
@@ -822,7 +822,7 @@ Visualization Manager:
                         Durability Policy: Volatile
                         History Policy: Keep Last
                         Reliability Policy: Reliable
-                        Value: /planning/scenario_planning/lane_driving/behavior_planning/debug/traffic_light
+                        Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/traffic_light
                       Value: true
                     - Class: rviz_default_plugins/MarkerArray
                       Enabled: true
@@ -834,7 +834,7 @@ Visualization Manager:
                         Durability Policy: Volatile
                         History Policy: Keep Last
                         Reliability Policy: Reliable
-                        Value: /planning/scenario_planning/lane_driving/behavior_planning/debug/stop_line
+                        Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/stop_line
                       Value: true
                     - Class: rviz_default_plugins/MarkerArray
                       Enabled: true
@@ -846,7 +846,7 @@ Visualization Manager:
                         Durability Policy: Volatile
                         History Policy: Keep Last
                         Reliability Policy: Reliable
-                        Value: /planning/scenario_planning/lane_driving/behavior_planning/debug/detection_area
+                        Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/detection_area
                       Value: true
                     - Class: rviz_default_plugins/MarkerArray
                       Enabled: true
