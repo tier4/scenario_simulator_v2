@@ -26,7 +26,7 @@ markdown_extensions:
   - codehilite: { guess_lang: false }
   - fontawesome_markdown
   - mdx_math
-  - mdx_unimoji
+#  - mdx_unimoji
   - plantuml_markdown: { server: http://www.plantuml.com/plantuml }
   - pymdownx.arithmatex
   - pymdownx.emoji: { emoji_generator: !!python/name:pymdownx.emoji.to_svg  }
@@ -69,6 +69,8 @@ nav:
   - Design:
       - About: design/About.md
       - design/AutowareAPI.md
+      - design/NPCBehavior.md
+      - design/BehaviorPlugin.md
       - design/ErrorCategories.md
       - design/OpenSCENARIOSupport.md
       - design/SimpleSensorSimulator.md

@@ -113,5 +113,15 @@ void EntityBase::stopAtEndOfRoad()
     status_.get().action_status.accel = geometry_msgs::msg::Accel();
   }
 }
+
+auto EntityBase::getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel
+{
+  THROW_SIMULATION_ERROR("getDriverModel function can be used with only ego/vehicle entity.");
+}
+
+void EntityBase::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &)
+{
+  THROW_SIMULATION_ERROR("setDriverModel function can be used with only ego/vehicle entity.");
+}
 }  // namespace entity
 }  // namespace traffic_simulator

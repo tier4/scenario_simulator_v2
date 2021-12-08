@@ -628,7 +628,7 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
   lanelet::Optional<lanelet::routing::Route> route =
-    vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, true);
+    vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, false);
   if (!route) {
     route_cache_.appendData(from_lanelet_id, to_lanelet_id, ret);
     return ret;
@@ -1206,7 +1206,7 @@ lanelet::AutowareTrafficLightConstPtr HdMapUtils::getTrafficLight(
     for (auto light_string : light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
+        if (id == traffic_light_id) {
           return light;
         }
       }
