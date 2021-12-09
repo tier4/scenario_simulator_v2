@@ -27,7 +27,12 @@ TEST(TrafficLightManager, getIds)
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, node, "map");
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+  traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
+#else
+  traffic_simulator::TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>
+#endif
+    manager(hdmap_utils_ptr, node, "map");
   const auto ids = manager.getIds();
   EXPECT_FALSE(std::find(ids.begin(), ids.end(), 34836) == ids.end());
   EXPECT_FALSE(std::find(ids.begin(), ids.end(), 34802) == ids.end());
@@ -43,7 +48,12 @@ TEST(TrafficLightManager, setColor)
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, node, "map");
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+  traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
+#else
+  traffic_simulator::TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>
+#endif
+    manager(hdmap_utils_ptr, node, "map");
   const auto ids = manager.getIds();
   for (const auto id : ids) {
     EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::NONE);
@@ -67,7 +77,12 @@ TEST(TrafficLightManager, setArrow)
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, node, "map");
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+  traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
+#else
+  traffic_simulator::TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>
+#endif
+    manager(hdmap_utils_ptr, node, "map");
   const auto ids = manager.getIds();
   for (const auto id : ids) {
     EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::NONE);

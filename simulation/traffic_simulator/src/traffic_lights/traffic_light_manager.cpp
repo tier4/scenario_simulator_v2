@@ -22,39 +22,39 @@
 
 namespace traffic_simulator
 {
-std::vector<std::int64_t> TrafficLightManager::getIds() const
+auto TrafficLightManagerBase::getIds() const -> std::vector<LaneletID>
 {
-  std::vector<std::int64_t> result;
+  std::vector<LaneletID> result;
 
   std::transform(
     std::begin(traffic_lights_), std::end(traffic_lights_), std::back_inserter(result),
-    [](const auto & each) { return std::get<0>(each); });
+    [](const auto & each) { return each.first; });
 
   return result;
 }
 
-TrafficLight TrafficLightManager::getInstance(const std::int64_t lanelet_id)
+auto TrafficLightManagerBase::getInstance(const LaneletID lanelet_id) const -> TrafficLight
 {
   return traffic_lights_.at(lanelet_id);
 }
 
-void TrafficLightManager::deleteAllMarkers() const
+auto TrafficLightManagerBase::deleteAllMarkers() const -> void
 {
-  visualization_msgs::msg::MarkerArray msg;
+  visualization_msgs::msg::MarkerArray message;
   {
     visualization_msgs::msg::Marker marker;
     marker.action = marker.DELETEALL;
-    msg.markers.push_back(marker);
+    message.markers.push_back(marker);
   }
 
-  marker_pub_->publish(msg);
+  marker_pub_->publish(message);
 }
 
-void TrafficLightManager::drawMarkers() const
+auto TrafficLightManagerBase::drawMarkers() const -> void
 {
-  visualization_msgs::msg::MarkerArray msg;
+  visualization_msgs::msg::MarkerArray marker_array;
 
-  const auto now = (*clock_ptr_).now();
+  const auto now = clock_ptr_->now();
 
   for (const auto & light : traffic_lights_) {
     const auto color = std::get<1>(light).getColor();
@@ -73,14 +73,14 @@ void TrafficLightManager::drawMarkers() const
       marker.scale.y = 0.3;
       marker.scale.z = 0.3;
       marker.color = color_utils::makeColorMsg(boost::lexical_cast<std::string>(color));
-      msg.markers.push_back(marker);
+      marker_array.markers.push_back(marker);
     }
   }
 
-  marker_pub_->publish(msg);
+  marker_pub_->publish(marker_array);
 }
 
-bool TrafficLightManager::hasAnyLightChanged()
+auto TrafficLightManagerBase::hasAnyLightChanged() -> bool
 {
   return std::any_of(
     std::begin(traffic_lights_), std::end(traffic_lights_), [](const auto & id_and_traffic_light) {
@@ -90,7 +90,7 @@ bool TrafficLightManager::hasAnyLightChanged()
     });
 }
 
-void TrafficLightManager::update(const double step_time)
+auto TrafficLightManagerBase::update(const double step_time) -> void
 {
   publishTrafficLightStateArray();
 
@@ -104,4 +104,44 @@ void TrafficLightManager::update(const double step_time)
 
   drawMarkers();
 }
+
+template <>
+auto TrafficLightManager<
+  autoware_perception_msgs::msg::TrafficLightStateArray>::publishTrafficLightStateArray() const
+  -> void
+{
+  autoware_perception_msgs::msg::TrafficLightStateArray traffic_light_state_array;
+  {
+    traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
+    traffic_light_state_array.header.stamp = clock_ptr_->now();
+    for (const auto & each : traffic_lights_) {
+      if (each.second.getColor() != TrafficLightColor::NONE) {
+        traffic_light_state_array.states.push_back(
+          static_cast<autoware_perception_msgs::msg::TrafficLightState>(each.second));
+      }
+    }
+  }
+  traffic_light_state_array_publisher_->publish(traffic_light_state_array);
+}
+
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+template <>
+auto TrafficLightManager<
+  autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
+  -> void
+{
+  autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;
+  {
+    traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
+    traffic_light_state_array.header.stamp = clock_ptr_->now();
+    for (const auto & each : traffic_lights_) {
+      if (each.second.getColor() != TrafficLightColor::NONE) {
+        traffic_light_state_array.signals.push_back(
+          static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(each.second));
+      }
+    }
+  }
+  traffic_light_state_array_publisher_->publish(traffic_light_state_array);
+}
+#endif
 }  // namespace traffic_simulator

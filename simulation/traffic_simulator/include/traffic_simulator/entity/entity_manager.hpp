@@ -91,7 +91,7 @@ class EntityManager
 
   MarkerArray markers_raw_;
 
-  const std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
+  const std::shared_ptr<TrafficLightManagerBase> traffic_light_manager_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -114,6 +114,29 @@ public:
     return origin;
   }
 
+  template <typename... Ts>
+  auto makeTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
+  {
+    const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+    if (architecture_type == "awf/universe") {
+      return std::make_shared<
+        TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
+        std::forward<decltype(xs)>(xs)...);
+    } else
+#endif
+    if (architecture_type == "tier4/proposal" or architecture_type == "awf/auto") {
+      return std::make_shared<
+        TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>>(
+        std::forward<decltype(xs)>(xs)...);
+    } else {
+      std::stringstream what;
+      what << "Unexpected architecture_type " << std::quoted(architecture_type) << " given.";
+      throw std::invalid_argument(what.str());
+    }
+  }
+
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const Configuration & configuration)
   : configuration(configuration),
@@ -131,7 +154,7 @@ public:
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_, node))
+    traffic_light_manager_ptr_(makeTrafficLightManager(hdmap_utils_ptr_, node))
   {
     updateHdmapMarker();
   }
@@ -196,6 +219,7 @@ public:
   FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
+  FORWARD_TO_ENTITY(getDriverModel, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);

@@ -302,7 +302,7 @@ bool API::attachDetectionSensor(
 bool API::attachDetectionSensor(const std::string & entity_name)
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
-    entity_name, getParameter<std::string>("architecture_type", ""), 0.1));
+    entity_name, getParameter<std::string>("architecture_type", "tier4/proposal"), 0.1));
 }
 
 bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
@@ -321,7 +321,7 @@ bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & li
 bool API::attachLidarSensor(const std::string & entity_name, const helper::LidarType lidar_type)
 {
   return attachLidarSensor(helper::constructLidarConfiguration(
-    lidar_type, entity_name, getParameter<std::string>("architecture_type", "")));
+    lidar_type, entity_name, getParameter<std::string>("architecture_type", "tier4/proposal")));
 }
 
 bool API::updateSensorFrame()
@@ -349,7 +349,12 @@ bool API::updateTrafficLightsInSim()
       simulation_api_schema::TrafficLightState state;
       auto traffic_light = entity_manager_ptr_->getTrafficLightInstance(id);
       simulation_interface::toProto(
-        static_cast<const autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light),
+#else
+        static_cast<autoware_perception_msgs::msg::TrafficLightState>(traffic_light),
+#endif
+        state);
       *req.add_states() = state;
     }
     update_traffic_lights_client_.call(req, res);
