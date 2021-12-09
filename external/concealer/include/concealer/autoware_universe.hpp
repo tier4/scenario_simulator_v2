@@ -15,7 +15,7 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
-#ifndef SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
@@ -187,13 +187,13 @@ public:
 };
 }  // namespace concealer
 
-#else  // ifndef SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE
+#else  // ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 
 #include <concealer/autoware.hpp>
 
 namespace concealer
 {
-class AutowareUniverse : public Autoware
+struct AutowareUniverse : public Autoware
 {
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareUniverse(Ts &&... xs)
@@ -231,6 +231,6 @@ class AutowareUniverse : public Autoware
 };
 }  // namespace concealer
 
-#endif  // SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE
+#endif  // SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_

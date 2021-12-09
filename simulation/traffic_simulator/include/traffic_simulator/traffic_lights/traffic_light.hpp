@@ -15,7 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
+#endif
+
 #include <autoware_perception_msgs/msg/traffic_light_state.hpp>
 #include <iostream>
 #include <limits>
@@ -99,6 +102,7 @@ public:
     return traffic_light_state;
   }
 
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
   explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const
   {
     autoware_auto_perception_msgs::msg::TrafficSignal traffic_light_state;
@@ -122,6 +126,7 @@ public:
 
     return traffic_light_state;
   }
+#endif
 
 private:
   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;

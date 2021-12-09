@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware_universe.hpp>
@@ -223,7 +223,7 @@ auto AutowareUniverse::getVehicleCommand() const -> autoware_vehicle_msgs::msg::
 }
 }  // namespace concealer
 
-#else  // ifndef SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE
+#else  // ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 
 #include <concealer/autoware_universe.hpp>
 
@@ -264,4 +264,4 @@ auto AutowareUniverse::restrictTargetSpeed(double value) const -> double { retur
 auto AutowareUniverse::sendSIGINT() -> void { ::kill(process_id, SIGINT); }
 }  // namespace concealer
 
-#endif  // SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE
+#endif  // SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO

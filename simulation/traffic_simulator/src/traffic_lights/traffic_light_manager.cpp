@@ -124,6 +124,7 @@ auto TrafficLightManager<
   traffic_light_state_array_publisher_->publish(traffic_light_state_array);
 }
 
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto TrafficLightManager<
   autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
@@ -142,4 +143,5 @@ auto TrafficLightManager<
   }
   traffic_light_state_array_publisher_->publish(traffic_light_state_array);
 }
+#endif
 }  // namespace traffic_simulator

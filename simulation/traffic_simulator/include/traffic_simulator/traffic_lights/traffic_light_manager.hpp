@@ -15,7 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
 
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#endif
+
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <iomanip>
 #include <memory>
@@ -140,10 +143,12 @@ auto TrafficLightManager<
   autoware_perception_msgs::msg::TrafficLightStateArray>::publishTrafficLightStateArray() const
   -> void;
 
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto TrafficLightManager<
   autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
   -> void;
+#endif
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
