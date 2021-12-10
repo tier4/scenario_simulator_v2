@@ -57,7 +57,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   String output_directory;
 
-  Element script;
+  Object script;
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 

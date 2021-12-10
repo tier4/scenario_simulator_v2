@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 TeleportAction::TeleportAction(const pugi::xml_node & node, Scope & scope)
-: Scope(scope), position(readElement<Position>("Position", node, localScope()))
+: Scope(scope), position(readElement<Position>("Position", node, local()))
 {
 }
 
@@ -32,7 +32,7 @@ auto TeleportAction::accomplished() noexcept -> bool { return true; }
 
 auto TeleportAction::endsImmediately() noexcept -> bool { return true; }
 
-auto TeleportAction::evaluate() const -> Element
+auto TeleportAction::evaluate() const -> Object
 {
   run();
   return unspecified;
@@ -42,7 +42,7 @@ auto TeleportAction::run() const -> void
 {
   for (const auto & actor : actors) {
     if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
-      AddEntityAction(localScope(), position)(actor);  // NOTE: Tier IV extension
+      AddEntityAction(local(), position)(actor);  // NOTE: Tier IV extension
     } else {
       return teleport(actor, position);
     }

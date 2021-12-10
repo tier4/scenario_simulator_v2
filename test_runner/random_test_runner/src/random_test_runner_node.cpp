@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,13 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// Co-developed by Tier IV, Inc. and Robotec.AI sp. z o.o.
 
-#ifndef OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
-#define OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
+#include "random_test_runner/random_test_runner.hpp"
 
-#include <ostream>
-#include <pugixml.hpp>
-
-std::ostream & operator<<(std::ostream &, const pugi::xml_node &);
-
-#endif  // OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  rclcpp::NodeOptions options;
+  auto component = std::make_shared<RandomTestRunner>(options);
+  rclcpp::spin(component);
+  rclcpp::shutdown();
+  return 0;
+}

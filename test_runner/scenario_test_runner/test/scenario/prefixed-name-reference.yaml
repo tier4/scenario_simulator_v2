@@ -1,0 +1,226 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: '2021-09-06T09:09:41.856Z'
+    description: ''
+    author: 'Tatsuya Yamasaki'
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: value
+        parameterType: string
+        value: "{root}::value"
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+  Storyboard:
+    Init:
+      Actions:
+    Story:
+      - name: Story1
+        ParameterDeclarations:
+          ParameterDeclaration:
+            - name: value
+              parameterType: string
+              value: "{root}::Story1::value"
+        Act:
+          - name: Act1
+            ManeuverGroup:
+              - name: ManeuverGroup1
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: Maneuver1
+                    ParameterDeclarations:
+                      ParameterDeclaration:
+                        - name: value
+                          parameterType: string
+                          value: "{root}::Story1::Act1::ManeuverGroup1::Maneuver1::value"
+                    Event:
+                      - name: Event1
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: Condition1
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: ::value
+                                      rule: equalTo
+                                      value: "{root}::value"
+                                - name: Condition2
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: value
+                                      rule: equalTo
+                                      value: "{root}::Story1::Act1::ManeuverGroup1::Maneuver1::value"
+                                - name: Condition3
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: Story1::value
+                                      rule: equalTo
+                                      value: "{root}::Story1::value"
+                                - name: Condition4
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: Story1::Act1::ManeuverGroup1::Maneuver1::value
+                                      rule: equalTo
+                                      value: "{root}::Story1::Act1::ManeuverGroup1::Maneuver1::value"
+                        Action:
+                          - name: Action1
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: echo [DEBUG] ::value = $(var ::value)
+                          - name: Action2
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: echo [DEBUG] value = $(var value)
+                          - name: Action3
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: echo [DEBUG] Story1::value = $(var Story1::value)
+                          - name: Action4
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: echo [DEBUG] Story1::Act1::ManeuverGroup1::Maneuver1::value = $(var Story1::Act1::ManeuverGroup1::Maneuver1::value)
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: Condition1
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        ParameterCondition:
+                          parameterRef: ::value
+                          rule: equalTo
+                          value: "{root}::value"
+                    - name: Condition2
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        ParameterCondition:
+                          parameterRef: value
+                          rule: equalTo
+                          value: "{root}::Story1::value"
+                    - name: Condition3
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        ParameterCondition:
+                          parameterRef: Story1::value
+                          rule: equalTo
+                          value: "{root}::Story1::value"
+                    - name: Condition4
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        ParameterCondition:
+                          parameterRef: Story1::Act1::ManeuverGroup1::Maneuver1::value
+                          rule: equalTo
+                          value: "{root}::Story1::Act1::ManeuverGroup1::Maneuver1::value"
+      - name: Story2
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ManeuverGroup1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: Maneuver1
+                    Event:
+                      - name: Event1
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: Condition1
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: Story1
+                                      storyboardElementType: story
+                                      state: completeState
+                                - name: Condition2
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: ::value
+                                      rule: equalTo
+                                      value: "{root}::value"
+                                - name: Condition3
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: value
+                                      rule: equalTo
+                                      value: "{root}::value"
+                                - name: Condition4
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: Story1::value
+                                      rule: equalTo
+                                      value: "{root}::Story1::value"
+                                - name: Condition5
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: Story1::Act1::ManeuverGroup1::Maneuver1::value
+                                      rule: equalTo
+                                      value: "{root}::Story1::Act1::ManeuverGroup1::Maneuver1::value"
+                        Action:
+                          - name: Action1
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: Event2
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: Condition1
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 3
+                                      rule: greaterThan
+                        Action:
+                          - name: Action1
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: Condition1
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

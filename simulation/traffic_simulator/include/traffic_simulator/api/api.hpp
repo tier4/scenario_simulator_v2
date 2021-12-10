@@ -203,6 +203,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
+  FORWARD_TO_ENTITY_MANAGER(getDriverModel);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
@@ -237,9 +238,10 @@ private:
   template <typename Parameters>
   bool spawn(
     const bool is_ego, const Parameters & parameters,
-    const traffic_simulator_msgs::msg::EntityStatus & status)
+    const traffic_simulator_msgs::msg::EntityStatus & status,
+    const std::string & behavior = PedestrianBehavior::defaultBehavior())
   {
-    return spawn(is_ego, parameters.toXml(), status);
+    return spawn(is_ego, parameters.toXml(), status, behavior);
   }
 
   const Configuration configuration;

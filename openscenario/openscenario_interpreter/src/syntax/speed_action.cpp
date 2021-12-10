@@ -22,8 +22,8 @@ inline namespace syntax
 {
 SpeedAction::SpeedAction(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
-  speed_action_dynamics(readElement<TransitionDynamics>("SpeedActionDynamics", node, localScope())),
-  speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, localScope()))
+  speed_action_dynamics(readElement<TransitionDynamics>("SpeedActionDynamics", node, local())),
+  speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, local()))
 {
 }
 

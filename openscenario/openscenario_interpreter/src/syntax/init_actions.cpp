@@ -41,7 +41,7 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto InitActions::evaluate() const -> Element
+auto InitActions::evaluate() const -> Object
 {
   for (auto && each : *this) {
     each.evaluate();
@@ -52,7 +52,7 @@ auto InitActions::evaluate() const -> Element
 
 auto InitActions::endsImmediately() const -> bool
 {
-  return std::all_of(begin(), end(), [=](const Element & e) {
+  return std::all_of(begin(), end(), [=](const Object & e) {
     if (e.is<GlobalAction>()) {
       return e.as<GlobalAction>().endsImmediately();
     } else if (e.is<UserDefinedAction>()) {

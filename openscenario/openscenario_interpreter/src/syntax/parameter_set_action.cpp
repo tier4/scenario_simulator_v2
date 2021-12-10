@@ -23,9 +23,7 @@ inline namespace syntax
 {
 ParameterSetAction::ParameterSetAction(
   const pugi::xml_node & node, Scope & scope, const String & parameter_ref)
-: Scope(scope),
-  parameter_ref(parameter_ref),
-  value(readAttribute<String>("value", node, localScope()))
+: Scope(scope), parameter_ref(parameter_ref), value(readAttribute<String>("value", node, local()))
 {
 }
 
@@ -36,26 +34,26 @@ auto ParameterSetAction::accomplished() noexcept -> bool  //
 
 auto ParameterSetAction::run() const -> void  //
 {
-  set(localScope(), parameter_ref, value);
+  set(local(), parameter_ref, value);
 }
 
 auto ParameterSetAction::set(
   const Scope & scope, const String & parameter_ref, const String & value) -> void
 {
   static const std::unordered_map<
-    std::type_index, std::function<void(const Element &, const String &)>>
+    std::type_index, std::function<void(const Object &, const String &)>>
     overloads{
       // clang-format off
-      { typeid(Boolean),         [](const Element & parameter, const auto & value) { parameter.as<Boolean        >() = boost::lexical_cast<Boolean        >(value); } },
-      { typeid(Double),          [](const Element & parameter, const auto & value) { parameter.as<Double         >() = boost::lexical_cast<Double         >(value); } },
-      { typeid(Integer),         [](const Element & parameter, const auto & value) { parameter.as<Integer        >() = boost::lexical_cast<Integer        >(value); } },
-      { typeid(String),          [](const Element & parameter, const auto & value) { parameter.as<String         >() =                                      value ; } },
-      { typeid(UnsignedInteger), [](const Element & parameter, const auto & value) { parameter.as<UnsignedInteger>() = boost::lexical_cast<UnsignedInteger>(value); } },
-      { typeid(UnsignedShort),   [](const Element & parameter, const auto & value) { parameter.as<UnsignedShort  >() = boost::lexical_cast<UnsignedShort  >(value); } },
+      { typeid(Boolean),         [](const Object & parameter, const auto & value) { parameter.as<Boolean        >() = boost::lexical_cast<Boolean        >(value); } },
+      { typeid(Double),          [](const Object & parameter, const auto & value) { parameter.as<Double         >() = boost::lexical_cast<Double         >(value); } },
+      { typeid(Integer),         [](const Object & parameter, const auto & value) { parameter.as<Integer        >() = boost::lexical_cast<Integer        >(value); } },
+      { typeid(String),          [](const Object & parameter, const auto & value) { parameter.as<String         >() =                                      value ; } },
+      { typeid(UnsignedInteger), [](const Object & parameter, const auto & value) { parameter.as<UnsignedInteger>() = boost::lexical_cast<UnsignedInteger>(value); } },
+      { typeid(UnsignedShort),   [](const Object & parameter, const auto & value) { parameter.as<UnsignedShort  >() = boost::lexical_cast<UnsignedShort  >(value); } },
       // clang-format on
     };
 
-  const auto parameter = scope.findElement(parameter_ref);
+  const auto parameter = scope.findObject(parameter_ref);
 
   overloads.at(parameter.type())(parameter, value);
 }

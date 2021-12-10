@@ -1,0 +1,40 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: "2021-10-21T12:00:00"
+    description: ""
+    author: ""
+  Catalog:
+    name: all-in-one-maneuver
+    Maneuver:
+      - name: traffic-signal
+        Event:
+          - name: ""
+            priority: parallel
+            maximumExecutionCount: 100
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: "if signal(34802).state() == none"
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        TrafficSignalCondition:
+                          name: "34802"
+                          state: none
+                    - name: "if simple_controller.phase() == blank"
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        TrafficSignalControllerCondition:
+                          trafficSignalControllerRef: $controllerName
+                          phase: blank
+            Action:
+              - name: "change_phase(simple_controller, green)"
+                GlobalAction:
+                  InfrastructureAction:
+                    TrafficSignalAction:
+                      TrafficSignalControllerAction:
+                        trafficSignalControllerRef: $controllerName
+                        phase: green

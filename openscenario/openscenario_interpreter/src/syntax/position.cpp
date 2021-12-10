@@ -22,7 +22,7 @@ inline namespace syntax
 {
 Position::Position(const pugi::xml_node & node, Scope & scope)
 // clang-format off
-: Element(
+: ComplexType(
     choice(node,
       std::make_pair(         "WorldPosition", [&](auto && node) { return make<        WorldPosition>(node, scope); }),
       std::make_pair( "RelativeWorldPosition", [&](auto && node) { return make<RelativeWorldPosition>(node, scope); }),

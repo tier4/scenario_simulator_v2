@@ -86,7 +86,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
   INTERPRETER_INFO_STREAM("Configuring.");
 
   return withExceptionHandler(
-    [this](auto &&...) {
+    [](auto &&...) {
       return Interpreter::Result::FAILURE;  // => Unconfigured
     },
     [this]() {

@@ -24,10 +24,10 @@ inline namespace syntax
 {
 LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
-  target_lane_offset(readAttribute<Double>("targetLaneOffset", node, localScope(), Double())),
+  target_lane_offset(readAttribute<Double>("targetLaneOffset", node, local(), Double())),
   lane_change_action_dynamics(
-    readElement<TransitionDynamics>("LaneChangeActionDynamics", node, localScope())),
-  lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, localScope()))
+    readElement<TransitionDynamics>("LaneChangeActionDynamics", node, local())),
+  lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, local()))
 {
 }
 

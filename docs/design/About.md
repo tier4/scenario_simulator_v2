@@ -35,3 +35,7 @@ If you want to know TierIV Scenario format Version 2.0 , which is a default scen
 ## Vehicle Model
 
 If you want to know about vehicle dynamics model in simulation, please check [this documentation](VehicleDynamics.md).
+
+## NPC Behavior
+
+If you want to know about NPC behavior, please check [this documentation](NPCBehavior.md)

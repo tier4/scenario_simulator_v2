@@ -19,7 +19,7 @@ namespace concealer
 {
 void Autoware::shutdownAutoware()
 {
-  AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publlishing/subscribing.");
+  AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
   {
     if (spinner.joinable()) {
       promise.set_value();

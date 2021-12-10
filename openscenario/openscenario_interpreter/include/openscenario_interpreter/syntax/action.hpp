@@ -38,7 +38,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Action : public Scope, public StoryboardElement<Action>, public Element
+struct Action : public Scope, public ComplexType, public StoryboardElement<Action>
 {
   bool overridden = false;
 
@@ -57,7 +57,7 @@ struct Action : public Scope, public StoryboardElement<Action>, public Element
    *  complete in order to reach the completeState of the Action.
    *
    * ---------------------------------------------------------------------- */
-  using Element::accomplished;
+  using ComplexType::accomplished;
 
   using StoryboardElement::evaluate;
 

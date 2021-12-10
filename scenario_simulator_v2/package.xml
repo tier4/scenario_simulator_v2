@@ -2,16 +2,18 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>scenario_simulator_v2</name>
-  <version>0.5.6</version>
+  <version>0.5.7</version>
   <description>scenario testing framework for Autoware</description>
   <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <exec_depend>behavior_tree_plugin</exec_depend>
   <exec_depend>openscenario_interpreter</exec_depend>
   <exec_depend>openscenario_utility</exec_depend>
   <exec_depend>openscenario_visualization</exec_depend>
+  <exec_depend>random_test_runner</exec_depend>
   <exec_depend>scenario_test_runner</exec_depend>
   <exec_depend>simple_sensor_simulator</exec_depend>
   <exec_depend>simulation_interface</exec_depend>
