@@ -126,7 +126,8 @@ public:
         std::forward<decltype(xs)>(xs)...);
     } else
 #endif
-    if (architecture_type == "tier4/proposal" or architecture_type == "awf/auto") {
+      // NOTE: This broken indent is due to ament_clang_format.
+      if (architecture_type == "tier4/proposal" or architecture_type == "awf/auto") {
       return std::make_shared<
         TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>>(
         std::forward<decltype(xs)>(xs)...);
