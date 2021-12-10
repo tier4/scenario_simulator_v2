@@ -30,6 +30,7 @@ jobs:
             openscenario_msgs,
             openscenario_utility,
             openscenario_visualization,
+            random_test_runner,
             scenario_simulator_exception,
             scenario_simulator_v2,
             scenario_test_runner,

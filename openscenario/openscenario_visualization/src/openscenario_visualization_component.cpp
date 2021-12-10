@@ -393,7 +393,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text_action);
 
-  if (waypoints.waypoints.size() != 0) {
+  if (waypoints.waypoints.size() > 2) {
     traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
 
     /**
