@@ -2,8 +2,8 @@
 Changelog for package user_defined_value_condition_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.8 (2021-12-13)
+------------------
 * Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
 * Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
 * Contributors: Piotr Zyskowski, yamacir-kit

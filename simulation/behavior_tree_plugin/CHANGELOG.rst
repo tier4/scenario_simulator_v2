@@ -2,8 +2,8 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.8 (2021-12-13)
+------------------
 * Merge remote-tracking branch 'tier/master' into AJD-254-simple_abstract_scenario_for_simple_random_testing
 * Merge pull request `#624 <https://github.com/tier4/scenario_simulator_v2/issues/624>`_ from tier4/fix/use_deceleration_acceleration_in_driver_model
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/use_deceleration_acceleration_in_driver_model
