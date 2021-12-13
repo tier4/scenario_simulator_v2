@@ -23,6 +23,8 @@ namespace math
 {
 const geometry_msgs::msg::Pose getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to);
+const geometry_msgs::msg::Point transformPoint(
+  const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Point & point);
 std::vector<geometry_msgs::msg::Point> transformPoints(
   geometry_msgs::msg::Pose pose, std::vector<geometry_msgs::msg::Point> points);
 }  // namespace math
