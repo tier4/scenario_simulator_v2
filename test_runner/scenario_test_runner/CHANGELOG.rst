@@ -2,6 +2,17 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_newton_method_from_get_s_value
+* Merge pull request `#605 <https://github.com/tier4/scenario_simulator_v2/issues/605>`_ from tier4/refactor/interpreter/reference
+* Update `lookupQualifiedElement` argument iterators to not to include variable name
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
+* Update test scenario `prefixed-name-reference.yaml`
+* Add new test scenario `prefixed-name-reference.yaml`
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, yamacir-kit
+
 0.5.7 (2021-11-09)
 ------------------
 * Merge https://github.com/tier4/scenario_simulator_v2 into fix/get_s_value

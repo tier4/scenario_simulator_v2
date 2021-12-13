@@ -2,6 +2,23 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'tier/master' into AJD-254-simple_abstract_scenario_for_simple_random_testing
+* Merge pull request `#624 <https://github.com/tier4/scenario_simulator_v2/issues/624>`_ from tier4/fix/use_deceleration_acceleration_in_driver_model
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/use_deceleration_acceleration_in_driver_model
+* Merge pull request `#625 <https://github.com/tier4/scenario_simulator_v2/issues/625>`_ from tier4/fix/ci
+* add FOXY definition
+* remove hard coded parameters in behavior tree plugin and use accelearaion and deceleration value in traffic_simulator_msgs/msg/DriverModel
+* Merge pull request `#616 <https://github.com/tier4/scenario_simulator_v2/issues/616>`_ from tier4/fix/current_action
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* remove current_action\_ member variable from inherit class
+* Merge pull request `#612 <https://github.com/tier4/scenario_simulator_v2/issues/612>`_ from tier4/feature/remove_newton_method_from_get_s_value
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* consider bounding box if possible
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.5.7 (2021-11-09)
 ------------------
 * Merge branch 'master' into feature/interpreter/catalog

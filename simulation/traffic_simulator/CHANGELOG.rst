@@ -2,6 +2,53 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#630 <https://github.com/tier4/scenario_simulator_v2/issues/630>`_ from tier4/feature/add_ideal_accel_model
+* Merge commit 'ce08abe39ed83d7ec0630560d293187fbcf08b5e' into feature/add_ideal_accel_model
+* Merge pull request `#631 <https://github.com/tier4/scenario_simulator_v2/issues/631>`_ from tier4/fix/set_driver_model
+* Merge pull request `#619 <https://github.com/tier4/scenario_simulator_v2/issues/619>`_ from RobotecAI/AJD-254-simple_abstract_scenario_for_simple_random_testing
+* disable throw errors while calling setDriverModel error
+* add IDEAL_ACCEL model
+* Merge remote-tracking branch 'tier/master' into AJD-254-simple_abstract_scenario_for_simple_random_testing
+* Merge pull request `#626 <https://github.com/tier4/scenario_simulator_v2/issues/626>`_ from tier4/feature/get_driver_model
+* add getDriverModel function
+* fix compile errors
+* move functions into .cpp file
+* add getter setter to the base class
+* Merge pull request `#623 <https://github.com/tier4/scenario_simulator_v2/issues/623>`_ from RobotecAI/fix/traffic_light_lookup
+* traffic lights to stop line lookup fix
+* Merge pull request `#621 <https://github.com/tier4/scenario_simulator_v2/issues/621>`_ from tier4/fix/empty_trafic_light
+* publish empty message
+* change topic name
+* Merge pull request `#618 <https://github.com/tier4/scenario_simulator_v2/issues/618>`_ from tier4/fix/remove_lanechange_route
+* random test runner
+* set withLaneChange parameter as false
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* Merge pull request `#612 <https://github.com/tier4/scenario_simulator_v2/issues/612>`_ from tier4/feature/remove_newton_method_from_get_s_value
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* use autoscale option
+* add getNearbyLaneletIds function
+* consider bounding box if possible
+* remove default argument
+* modify test cases
+* add bounding box to the argument
+* remove debug line
+* enable consider edge case (tx and ty sometimes inf)
+* simplify get s value algorithum
+* add matchToLane function
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
+* Merge branch 'feature/lane_matching' into feature/remove_newton_method_from_get_s_value
+* remove newton method
+* return boost::none when the value under 0 or over 1
+* Revert "Merge pull request `#603 <https://github.com/tier4/scenario_simulator_v2/issues/603>`_ from tier4/fix/get_s_value"
+* fix compile error
+* add matchToLane function
+* add lanelet2_matching package to the external directory
+* Merge pull request `#609 <https://github.com/tier4/scenario_simulator_v2/issues/609>`_ from tier4/feature/load_plugin_in_spawn_api
+* put values into TODO
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, dai0912th, yamacir-kit
+
 0.5.7 (2021-11-09)
 ------------------
 * Merge pull request `#603 <https://github.com/tier4/scenario_simulator_v2/issues/603>`_ from tier4/fix/get_s_value

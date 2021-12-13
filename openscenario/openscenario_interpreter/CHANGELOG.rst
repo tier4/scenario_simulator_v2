@@ -2,6 +2,43 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* Merge pull request `#612 <https://github.com/tier4/scenario_simulator_v2/issues/612>`_ from tier4/feature/remove_newton_method_from_get_s_value
+* remove todo comment
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_newton_method_from_get_s_value
+* apply reformat
+* remove default argument
+* Merge pull request `#605 <https://github.com/tier4/scenario_simulator_v2/issues/605>`_ from tier4/refactor/interpreter/reference
+* Fix typo
+* Rename `Prefixed::fully_prefixed` to `Prefixed::absolute`
+* Add new member function `EnvironmentFrame::outermostFrame`
+* Rename member function `lookupQualifiedElement` to `find`
+* Update `lookupQualifiedElement` to receive `PrefixedName`
+* Update `PrefixedName::prefixes.front()` to not to store empty string
+* Update `lookupQualifiedElement` to be non-static member function
+* Update `lookupQualifiedElement` argument iterators to not to include variable name
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
+* Update `EnvironmentFrame::lookupUnqualifiedScope` to not to return nullptr
+* Rename member function `lookupChildScope` to `frames`
+* Lipsticks
+* Remove deprecated member function `EnvironmentFrame::fullyQualifiedName`
+* Rename data member `anonymous_children` to `unnamed_inner_frames`
+* Rename data member `parent` to `outer_frame`
+* Rename member function `lookupUnqualifiedElement` to `lookup`
+* Rename header `identifier.hpp` to `name.hpp`
+* Rename some typenames
+* Add new type `QualifiedIdentifier`
+* Add new type `UnqualifiedIdentifier`
+* Rename `EnvironmentFrame::scope_name` to `EnvironmentFrame::qualifier`
+* Remove `Scope`'s private constructor
+* Remove member function `Scope::makeChildScope`
+* Update member function `Scope::makeChildScope` to be private
+* Lipsticks
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, yamacir-kit
+
 0.5.7 (2021-11-09)
 ------------------
 * Merge pull request `#604 <https://github.com/tier4/scenario_simulator_v2/issues/604>`_ from tier4/refactor/interpreter/function-name
