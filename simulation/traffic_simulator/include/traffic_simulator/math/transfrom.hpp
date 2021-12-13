@@ -23,6 +23,8 @@ namespace math
 {
 const geometry_msgs::msg::Pose getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to);
+std::vector<geometry_msgs::msg::Point> transformPoints(
+  geometry_msgs::msg::Pose pose, std::vector<geometry_msgs::msg::Point> points);
 }  // namespace math
 }  // namespace traffic_simulator
 

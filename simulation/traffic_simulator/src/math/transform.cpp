@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
@@ -57,6 +58,29 @@ const geometry_msgs::msg::Pose getRelativePose(
     tf2::toMsg(tf_delta, ret);
   }
 
+  return ret;
+}
+
+std::vector<geometry_msgs::msg::Point> transformPoints(
+  geometry_msgs::msg::Pose pose, std::vector<geometry_msgs::msg::Point> points)
+{
+  auto mat = quaternion_operation::getRotationMatrix(pose.orientation);
+  std::vector<geometry_msgs::msg::Point> ret;
+  for (const auto & point : points) {
+    Eigen::VectorXd v(3);
+    v(0) = point.x;
+    v(1) = point.y;
+    v(2) = point.z;
+    v = mat * v;
+    v(0) = v(0) + pose.position.x;
+    v(1) = v(1) + pose.position.y;
+    v(2) = v(2) + pose.position.z;
+    geometry_msgs::msg::Point transformed;
+    transformed.x = v(0);
+    transformed.y = v(1);
+    transformed.z = v(2);
+    ret.emplace_back(transformed);
+  }
   return ret;
 }
 }  // namespace math
