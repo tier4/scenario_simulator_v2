@@ -25,7 +25,7 @@
 
 namespace simple_sensor_simulator
 {
-class LiDARSensorBase
+class LidarSensorBase
 {
 protected:
   double last_update_stamp_;
@@ -34,7 +34,7 @@ protected:
 
   std::vector<std::string> detected_objects_;
 
-  explicit LiDARSensorBase(
+  explicit LidarSensorBase(
     const double last_update_stamp, const simulation_api_schema::LidarConfiguration & configuration)
   : last_update_stamp_(last_update_stamp), configuration_(configuration)
   {
@@ -49,7 +49,7 @@ public:
 };
 
 template <typename T>
-class LidarSensor : public LiDARSensorBase
+class LidarSensor : public LidarSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
@@ -60,7 +60,7 @@ public:
   explicit LidarSensor(
     const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
-  : LiDARSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr)
+  : LidarSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr)
   {
   }
 

@@ -96,7 +96,7 @@ public:
     const std::vector<traffic_simulator_msgs::EntityStatus> & status);
 
 private:
-  std::vector<std::unique_ptr<LiDARSensorBase>> lidar_sensors_;
+  std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
   std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
 };
 }  // namespace simple_sensor_simulator
