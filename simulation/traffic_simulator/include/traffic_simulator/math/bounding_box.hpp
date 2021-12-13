@@ -23,6 +23,7 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <traffic_simulator/math/transfrom.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
 
@@ -35,8 +36,6 @@ boost::optional<double> getPolygonDistance(
   const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1);
 const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> get2DPolygon(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox);
-std::vector<geometry_msgs::msg::Point> transformPoints(
-  geometry_msgs::msg::Pose pose, std::vector<geometry_msgs::msg::Point> points);
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   traffic_simulator_msgs::msg::BoundingBox bbox);
 }  // namespace math
