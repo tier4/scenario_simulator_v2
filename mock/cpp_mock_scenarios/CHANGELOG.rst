@@ -2,6 +2,12 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.8 (2021-12-13)
+------------------
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
+* Contributors: Piotr Zyskowski, yamacir-kit
+
 0.5.7 (2021-11-09)
 ------------------
 * Merge pull request `#597 <https://github.com/tier4/scenario_simulator_v2/issues/597>`_ from tier4/refactor/traffic_simulator/spawning
