@@ -1,0 +1,11 @@
+/**:
+  ros__parameters:
+    # control parameters
+    "output_dir": "/tmp"
+    "input_dir": ""
+
+    # test suite parameters
+    "test_name": "random_test"
+    "map_name": "kashiwanoha_map"
+    "ego_goal_lanelet_id": 34600 # -1 means full goal randomization
+    "ego_goal_s": 5.0
