@@ -26,7 +26,7 @@ const geometry_msgs::msg::Pose getRelativePose(
 const geometry_msgs::msg::Point transformPoint(
   const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Point & point);
 std::vector<geometry_msgs::msg::Point> transformPoints(
-  geometry_msgs::msg::Pose pose, std::vector<geometry_msgs::msg::Point> points);
+  const geometry_msgs::msg::Pose & pose, const std::vector<geometry_msgs::msg::Point> & points);
 }  // namespace math
 }  // namespace traffic_simulator
 

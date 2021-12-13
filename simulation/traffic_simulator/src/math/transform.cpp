@@ -81,7 +81,7 @@ const geometry_msgs::msg::Point transformPoint(
 }
 
 std::vector<geometry_msgs::msg::Point> transformPoints(
-  geometry_msgs::msg::Pose pose, std::vector<geometry_msgs::msg::Point> points)
+  const geometry_msgs::msg::Pose & pose, const std::vector<geometry_msgs::msg::Point> & points)
 {
   std::vector<geometry_msgs::msg::Point> ret;
   for (const auto & point : points) {
