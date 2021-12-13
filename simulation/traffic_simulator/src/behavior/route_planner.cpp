@@ -100,7 +100,7 @@ std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame()
   const auto lanelet_poses = getGoalPoses();
   std::vector<geometry_msgs::msg::Pose> ret;
   for (const auto & lanelet_pose : lanelet_poses) {
-    ret.emplace_back(hdmap_utils_ptr_->toMapPose(lanelet_pose));
+    ret.emplace_back(hdmap_utils_ptr_->toMapPose(lanelet_pose).pose);
   }
   return ret;
 }
