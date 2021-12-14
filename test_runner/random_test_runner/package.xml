@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>random_test_runner</name>
+  <version>0.5.8</version>
+  <description>Random behavior test runner</description>
+  <maintainer email="piotr-zyskowski@robotec.ai">piotr-zyskowski-rai</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>traffic_simulator</depend>
+  <depend>simple_sensor_simulator</depend>
+  <depend>simple_junit</depend>
+  <depend>yaml-cpp</depend>
+  <depend>fmt</depend>
+  <depend>traffic_simulator_msgs</depend>
+  <depend>geometry_msgs</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_clang_format</test_depend>
+  <test_depend>ament_cmake_copyright</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
+  <test_depend>ament_cmake_pep257</test_depend>
+  <test_depend>ament_cmake_xmllint</test_depend>
+
+  <exec_depend>openscenario_visualization</exec_depend>
+  <exec_depend>behavior_tree_plugin</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

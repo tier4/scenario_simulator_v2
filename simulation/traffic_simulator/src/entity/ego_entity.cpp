@@ -70,6 +70,8 @@ auto getVehicleModelType()
 
   if (vehicle_model_type == "IDEAL_STEER") {
     return VehicleModelType::IDEAL_STEER;
+  } else if (vehicle_model_type == "IDEAL_ACCEL") {
+    return VehicleModelType::IDEAL_ACCEL;
   } else if (vehicle_model_type == "DELAY_STEER") {
     return VehicleModelType::DELAY_STEER;
   } else if (vehicle_model_type == "DELAY_STEER_ACC") {
@@ -88,6 +90,11 @@ auto makeSimulationModel(
   switch (vehicle_model_type) {
     case VehicleModelType::IDEAL_STEER:
       return std::make_shared<SimModelIdealSteer>(getParameter<double>(
+        "wheel_base",
+        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x));
+
+    case VehicleModelType::IDEAL_ACCEL:
+      return std::make_shared<SimModelIdealAccel>(getParameter<double>(
         "wheel_base",
         parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x));
 
@@ -326,6 +333,14 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         (*vehicle_model_ptr_).setInput(input);
       } break;
 
+      case VehicleModelType::IDEAL_ACCEL: {
+        Eigen::VectorXd input(2);
+
+        input << autoware->getAcceleration(), autoware->getSteeringAngle();
+
+        (*vehicle_model_ptr_).setInput(input);
+      } break;
+
       case VehicleModelType::DELAY_STEER_ACC: {
         Eigen::VectorXd input(3);
 
@@ -342,6 +357,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     (*vehicle_model_ptr_).update(step_time);
 
     setStatus(getEntityStatus(current_time + step_time, step_time));
+    updateStandStillDuration(step_time);
 
     if (previous_linear_velocity_) {
       linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
@@ -449,6 +465,13 @@ void EgoEntity::setTargetSpeed(double value, bool)
     case VehicleModelType::IDEAL_STEER: {
       Eigen::VectorXd v(3);
       v << 0, 0, 0;
+
+      (*vehicle_model_ptr_).setState(v);
+    } break;
+
+    case VehicleModelType::IDEAL_ACCEL: {
+      Eigen::VectorXd v(4);
+      v << 0, 0, 0, autoware->restrictTargetSpeed(value);
 
       (*vehicle_model_ptr_).setState(v);
     } break;

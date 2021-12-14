@@ -2,6 +2,18 @@
 Changelog for package scenario_simulator_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.8 (2021-12-13)
+------------------
+* Merge commit 'ce08abe39ed83d7ec0630560d293187fbcf08b5e' into feature/add_ideal_accel_model
+* Merge pull request `#619 <https://github.com/tier4/scenario_simulator_v2/issues/619>`_ from RobotecAI/AJD-254-simple_abstract_scenario_for_simple_random_testing
+* Merge remote-tracking branch 'tier/master' into AJD-254-simple_abstract_scenario_for_simple_random_testing
+* review changes application
+* Merge pull request `#620 <https://github.com/tier4/scenario_simulator_v2/issues/620>`_ from tier4/update-package-dependency
+* add behavior_tree_plugin dependency in scenario_simulator_v2
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
+* Contributors: Masaya Kataoka, Piotr Zyskowski, Takayuki Murooka, dai0912th, yamacir-kit
+
 0.5.7 (2021-11-09)
 ------------------
 * Merge branch 'master' into feature/interpreter/catalog
