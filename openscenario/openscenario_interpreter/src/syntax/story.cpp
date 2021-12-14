@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Story::Story(const pugi::xml_node & node, Scope & scope)
-: Scope(scope.makeChildScope(readAttribute<String>("name", node, scope)))
+: Scope(readAttribute<String>("name", node, scope), scope)
 {
   callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
     return make<ParameterDeclarations>(node, local());

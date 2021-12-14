@@ -138,7 +138,8 @@ public:
       hdmap_utils_ptr_,
       rclcpp::create_publisher<MarkerArray>(node, "traffic_light/marker", LaneletMarkerQoS()),
       rclcpp::create_publisher<autoware_perception_msgs::msg::TrafficLightStateArray>(
-        node, "/awapi/traffic_light/put/traffic_light_status", rclcpp::QoS(10).transient_local()),
+        node, "/perception/traffic_light_recognition/traffic_light_states",
+        rclcpp::QoS(10).transient_local()),
       clock_ptr_))
   {
     updateHdmapMarker();
@@ -204,6 +205,7 @@ public:
   FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
+  FORWARD_TO_ENTITY(getDriverModel, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);

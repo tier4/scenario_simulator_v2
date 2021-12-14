@@ -13,166 +13,161 @@
 // limitations under the License.
 
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+#include <cassert>
+#include <iterator>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
 namespace openscenario_interpreter
 {
-EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & parent, const std::string & name)
-: scope_name(name), parent(&parent)
+EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & outer_frame, const std::string & name)
+: outer_frame(&outer_frame)
 {
   if (name.empty()) {
-    parent.anonymous_children.push_back(this);
+    outer_frame.unnamed_inner_frames.push_back(this);
   } else {
-    parent.named_children.emplace(name, this);
+    outer_frame.inner_frames.emplace(name, this);
   }
 }
 
-auto EnvironmentFrame::findObject(const std::string & name) const -> Object
+auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
 {
-  std::vector<std::string> split;
-  {
-    const char * delim = "::";
-    const std::size_t delim_len = 2;
+  variables.emplace(name, object);
+}
 
-    std::size_t prev_pos = 0;
-    std::size_t pos = 0;
-    while ((pos = name.find(delim, prev_pos)) != std::string::npos) {
-      split.push_back(name.substr(prev_pos, pos - prev_pos));
-      prev_pos = pos + delim_len;
-    }
-    split.push_back(name.substr(prev_pos, pos));
-  }
-
-  if (split.size() == 1) {
-    return lookupUnqualifiedElement(split.front());
-  } else {
-    auto top_scope = lookupUnqualifiedScope(split.front());
-    if (top_scope) {
-      return lookupQualifiedElement(top_scope, split.begin() + 1, split.end());
-    } else {
-      return Object();
+auto EnvironmentFrame::find(const Name & name) const -> Object
+{
+  for (auto frame = this; frame; frame = frame->outer_frame) {
+    auto object = frame->lookdown(name);
+    if (object) {
+      return object;
     }
   }
+
+  return Object();  // TODO SYNTAX_ERROR
 }
 
-auto EnvironmentFrame::getQualifiedName() const -> std::string
+auto EnvironmentFrame::find(const Prefixed<Name> & prefixed_name) const -> Object
 {
-  std::list<const EnvironmentFrame *> ancestors;
-  for (auto * p = this; p != nullptr; p = p->parent) {
-    ancestors.push_back(p);
-  }
-  std::string ret;
-  for (auto it = ancestors.rbegin(); it != ancestors.rend(); ++it) {
-    ret += (it == ancestors.rbegin() ? "" : "::");
-    ret += (*it)->scope_name.empty() ? "{anonymous}" : (*it)->scope_name;
-  }
-  return ret;
-}
-
-auto EnvironmentFrame::insert(const std::string & name, Object element) -> void
-{
-  if (name.find(':') != std::string::npos) {
-    THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':'");
+  if (not prefixed_name.prefixes.empty()) {
+    auto found = frames(prefixed_name.prefixes.front());
+    switch (found.size()) {
+      case 0:
+        return Object();  // TODO SYNTAX_ERROR
+      case 1:
+        return found.front()->find(prefixed_name.strip<1>());
+      default:
+        throw SyntaxError(
+          "Ambiguous reference to ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)),
+          ".");
+    }
   } else {
-    environments.emplace(name, std::move(element));
+    return lookdown(prefixed_name.name);
   }
 }
 
-auto EnvironmentFrame::lookupChildElement(const std::string & name) const -> Object
+auto EnvironmentFrame::findObject(const Prefixed<Name> & prefixed_name) const -> Object
+{
+  if (prefixed_name.absolute) {
+    return outermostFrame().find(prefixed_name);
+  } else if (prefixed_name.prefixes.empty()) {
+    return find(prefixed_name.name);
+  } else {
+    return lookupFrame(prefixed_name.prefixes.front())->find(prefixed_name.strip<1>());
+  }
+}
+
+auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
 {
   std::vector<const EnvironmentFrame *> same_level{this};
 
   while (not same_level.empty()) {
     std::vector<const EnvironmentFrame *> next_level;
-    std::vector<Object> ret;
+
+    std::vector<Object> result;
 
     for (auto * frame : same_level) {
-      auto range = frame->environments.equal_range(name);
+      auto range = frame->variables.equal_range(name);
       for (auto it = range.first; it != range.second; ++it) {
-        ret.push_back(it->second);
+        result.push_back(it->second);
       }
 
-      for (auto * f : frame->anonymous_children) {
+      for (auto * f : frame->unnamed_inner_frames) {
         next_level.push_back(f);
       }
     }
 
-    if (ret.size() == 1) {
-      return ret.front();
+    switch (result.size()) {
+      case 0:
+        same_level = std::move(next_level);
+        break;
+      case 1:
+        return result.front();
+      default:
+        throw SyntaxError("ambiguous reference to ", std::quoted(name));
     }
-
-    if (ret.size() > 1) {
-      THROW_SYNTAX_ERROR("ambiguous reference to ", std::quoted(name));
-    }
-
-    same_level = std::move(next_level);
   }
-  return Object{};
+
+  return Object();
 }
 
-auto EnvironmentFrame::lookupChildScope(const std::string & name) const
-  -> std::list<const EnvironmentFrame *>
+auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
+
+auto EnvironmentFrame::frames(const Name & name) const -> std::list<const EnvironmentFrame *>
 {
-  auto range = named_children.equal_range(name);
-  std::list<const EnvironmentFrame *> ret;
-  if (range.first != range.second) {
-    for (auto it = range.first; it != range.second; ++it) {
-      ret.push_back(it->second);
+  std::list<const EnvironmentFrame *> result;
+
+  auto range = inner_frames.equal_range(name);
+
+  for (auto it = range.first; it != range.second; ++it) {
+    result.push_back(it->second);
+  }
+
+  if (result.empty()) {
+    for (auto & child : unnamed_inner_frames) {
+      result.merge(child->frames(name));
     }
+  }
+
+  return result;
+}
+
+auto EnvironmentFrame::outermostFrame() const noexcept -> const EnvironmentFrame &
+{
+  auto frame = this;
+
+  while (not frame->isOutermost()) {
+    frame = frame->outer_frame;
+  }
+
+  assert(frame);
+  assert(frame->isOutermost());
+
+  return *frame;
+}
+
+auto EnvironmentFrame::lookupFrame(const Name & name) const -> const EnvironmentFrame *
+{
+  assert(not name.empty());
+
+  if (isOutermost()) {
+    return this;
   } else {
-    for (auto & child : anonymous_children) {
-      ret.merge(child->lookupChildScope(name));
+    auto sibling_scope = outer_frame->frames(name);
+    switch (sibling_scope.size()) {
+      case 0:
+        assert(outer_frame);
+        return outer_frame->lookupFrame(name);
+      case 1:
+        assert(sibling_scope.front());
+        return sibling_scope.front();
+      default:
+        throw SyntaxError(
+          "There are multiple StoryboardElements that can be referenced by the name ",
+          std::quoted(name), ".");
     }
-  }
-  return ret;
-}
-
-auto EnvironmentFrame::lookupQualifiedElement(
-  const EnvironmentFrame * scope, std::vector<std::string>::iterator name_begin,
-  std::vector<std::string>::iterator name_end) -> Object
-{
-  for (auto iter = name_begin; iter != name_end - 1; ++iter) {
-    auto found = scope->lookupChildScope(*iter);
-    if (found.size() == 1) {
-      scope = found.front();
-    } else if (found.empty()) {
-      return Object{};
-    } else if (found.size() > 1) {
-      THROW_SYNTAX_ERROR("ambiguous reference to ", std::quoted(*iter));
-    }
-  }
-
-  return scope->lookupChildElement(*(name_end - 1));
-}
-
-auto EnvironmentFrame::lookupUnqualifiedElement(const std::string & name) const -> Object
-{
-  for (auto * p = this; p != nullptr; p = p->parent) {
-    auto found = p->lookupChildElement(name);
-    if (found) {
-      return found;
-    }
-  }
-  return Object{};
-}
-
-auto EnvironmentFrame::lookupUnqualifiedScope(const std::string & name) const
-  -> const EnvironmentFrame *
-{
-  if (parent == nullptr) {  // this is global scope
-    return name.empty() ? this : nullptr;
-  } else {
-    auto sibling_scope = parent->lookupChildScope(name);
-    if (sibling_scope.size() == 1) {
-      return sibling_scope.front();
-    } else if (sibling_scope.size() > 1) {
-      THROW_SYNTAX_ERROR("ambiguous reference to ", name);
-    } else if (sibling_scope.empty() && parent) {
-      return parent->lookupUnqualifiedScope(name);
-    }
-    return nullptr;
   }
 }
 
@@ -181,11 +176,14 @@ Scope::Scope(const boost::filesystem::path & pathname)
 {
 }
 
-Scope::Scope(
-  const Scope & parent, const std::string & name, const std::shared_ptr<EnvironmentFrame> & frame)
-: frame(frame), global_environment(parent.global_environment), name(name), actors(parent.actors)
+Scope::Scope(const std::string & name, const Scope & outer)
+: frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
+  global_environment(outer.global_environment),
+  name(name),
+  actors(outer.actors)
 {
 }
+
 auto Scope::findObject(const std::string & name_) const -> Object
 {
   return frame->findObject(name_);
@@ -199,14 +197,9 @@ auto Scope::local() const noexcept -> const Scope & { return *this; }
 
 auto Scope::local() noexcept -> Scope & { return *this; }
 
-auto Scope::makeChildScope(const std::string & name) const -> Scope
+auto Scope::insert(const Name & identifier, const Object & object) -> void
 {
-  return Scope(*this, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*frame, name)));
-}
-
-auto Scope::insert(const std::string & name_, const Object & element) -> void
-{
-  return frame->insert(name_, element);
+  return frame->define(identifier, object);
 }
 
 Scope::GlobalEnvironment::GlobalEnvironment(const boost::filesystem::path & pathname)

@@ -219,7 +219,7 @@ auto EntityManager::getLaneletPose(const std::string & name)
   if (getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
     include_crosswalk = false;
   }
-  return toLaneletPose(status->pose, include_crosswalk);
+  return toLaneletPose(status->pose, getBoundingBox(name), include_crosswalk);
 }
 
 auto EntityManager::getLongitudinalDistance(

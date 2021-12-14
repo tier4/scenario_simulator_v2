@@ -80,7 +80,7 @@ boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(double curren
     distance_to_stopline_.get() - (vehicle_parameters.bounding_box.dimensions.x);
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
-      return std::sqrt(2 * 5 * rest_distance);
+      return std::sqrt(2 * driver_model.deceleration * rest_distance);
     } else {
       return 0;
     }

@@ -17,6 +17,7 @@
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
+#include <traffic_simulator/math/bounding_box.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <vector>
 
@@ -65,28 +66,12 @@ HermiteCurve::HermiteCurve(
 }
 
 double HermiteCurve::getSquaredDistanceIn2D(
-  const geometry_msgs::msg::Point & point, double s, bool autoscale) const
+  geometry_msgs::msg::Point point, double s, bool autoscale) const
 {
   const auto point_on_curve = getPoint(s, autoscale);
   double x_term = std::pow(point.x - point_on_curve.x, 2);
   double y_term = std::pow(point.y - point_on_curve.y, 2);
   double ret = x_term + y_term;
-  return ret;
-}
-
-double HermiteCurve::getNewtonMethodStepSize(
-  const geometry_msgs::msg::Point & point, double s /*, bool autoscale*/) const
-{
-  /*
-  if (autoscale) {
-    s = s / getLength();
-  }
-  */
-  const auto point_on_curve = getPoint(s, false /*autoscale*/);
-  double s2 = std::pow(s, 2);
-  double x_term_diff = 2 * (point.x - point_on_curve.x) * (-3 * ax_ * s2 - 2 * bx_ * s - cx_);
-  double y_term_diff = 2 * (point.y - point_on_curve.y) * (-3 * ay_ * s2 - 2 * by_ * s - cy_);
-  double ret = getSquaredDistanceIn2D(point, s, false /*autoscale*/) / (x_term_diff + y_term_diff);
   return ret;
 }
 
@@ -139,15 +124,28 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
   auto solutions = solver_.solveCubicEquation(a, b, c, d);
   for (const auto solution : solutions) {
+    constexpr double epsilon = std::numeric_limits<double>::epsilon();
     double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
     double tx = (x - point0.x) / (point1.x - point0.x);
     double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
     double ty = (y - point0.y) / (point1.y - point0.y);
-    if (0 > tx || tx > 1) {
-      continue;
-    }
-    if (0 > ty || ty > 1) {
-      continue;
+    if (std::fabs(point1.x - point0.x) > epsilon) {
+      if (std::fabs(point1.y - point0.y) > epsilon) {
+        if (0 > tx || tx > 1) {
+          continue;
+        }
+        if (0 > ty || ty > 1) {
+          continue;
+        }
+      } else {
+        if (0 > tx || tx > 1) {
+          continue;
+        }
+      }
+    } else {
+      if (0 > ty || ty > 1) {
+        continue;
+      }
     }
     if (0 > solution || solution > 1) {
       continue;
@@ -163,53 +161,21 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   return *std::min_element(s_values.begin(), s_values.end());
 }
 
-boost::optional<double> HermiteCurve::solveNewtonMethod(
-  const geometry_msgs::msg::Point & point, double initial_value, double tolerance,
-  size_t max_iteration) const
-{
-  double ret = initial_value;
-  for (unsigned i = 0; i < max_iteration; i++) {
-    double error = getSquaredDistanceIn2D(point, ret);
-    if (std::fabs(error) < (tolerance * tolerance)) {
-      return ret;
-    }
-    ret = ret - getNewtonMethodStepSize(point, ret);
-    if (ret < 0 || ret > 1) {
-      return boost::none;
-    }
-  }
-  return ret;
-}
-
 boost::optional<double> HermiteCurve::getSValue(
-  const geometry_msgs::msg::Point & point, size_t initial_resolution, size_t max_iteration,
-  double tolerance, bool autoscale) const
+  const geometry_msgs::msg::Pose & pose, double threshold_distance, bool autoscale) const
 {
-  double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
-  double ret = 0.0;
-  std::vector<double> errors;
-  std::vector<double> s_values;
-  for (size_t i = 0; i < initial_resolution; i++) {
-    const auto s = solveNewtonMethod(
-      point, (0.5 + static_cast<double>(i)) * step_size, tolerance, max_iteration);
-    if (s) {
-      s_values.emplace_back(s.get());
-      errors.emplace_back(std::fabs(getSquaredDistanceIn2D(point, s.get())));
-    }
-  }
-  if (s_values.empty()) {
-    return boost::none;
-  }
-  std::vector<double>::iterator min_iter = std::min_element(errors.begin(), errors.end());
-  size_t value_index = std::distance(errors.begin(), min_iter);
-  ret = s_values[value_index];
-  if (ret < 0 || ret > 1) {
+  geometry_msgs::msg::Point p0, p1;
+  p0.y = threshold_distance;
+  p1.y = -threshold_distance;
+  const auto line = math::transformPoints(pose, {p0, p1});
+  const auto s = getCollisionPointIn2D(line[0], line[1], false);
+  if (!s) {
     return boost::none;
   }
   if (autoscale) {
-    ret = ret * getLength();
+    return s.get() * getLength();
   }
-  return ret;
+  return s.get();
 }
 
 const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(

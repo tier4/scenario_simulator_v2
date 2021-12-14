@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>0.5.7</version>
+  <version>0.5.8</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -19,6 +19,7 @@
   <depend>lanelet2_core</depend>
   <depend>lanelet2_extension_psim</depend>
   <depend>lanelet2_io</depend>
+  <depend>lanelet2_matching</depend>
   <depend>lanelet2_projection</depend>
   <depend>lanelet2_routing</depend>
   <depend>libboost-dev</depend>
@@ -26,8 +27,8 @@
   <depend>nlohmann-json-dev</depend>
   <depend>pugixml-dev</depend>
   <depend>quaternion_operation</depend>
-  <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
+  <depend>rclcpp</depend>
   <depend>rosgraph_msgs</depend>
   <depend>rviz2</depend>
   <depend>simulation_interface</depend>

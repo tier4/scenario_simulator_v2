@@ -11,5 +11,5 @@ To convert OpenSCENARIO, use these arguments
 You can execute scenario conversion by using ros2 command
 
 ```
-ros2 run scenario_test_utility.py --input="path to input yaml file" --output="path to output directory"
+ros2 run openscenario_utility yaml2xosc --input /path/to/scenario.yaml --output /path/to/output/directory
 ```
