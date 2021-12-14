@@ -54,8 +54,14 @@ auto Controller::operator[](const String & name) -> const Property &  //
 
 Controller::operator traffic_simulator_msgs::msg::DriverModel()
 {
-  traffic_simulator_msgs::msg::DriverModel controller = connection.getDriverModel();
-  controller.see_around = not properties["isBlind"];
+  // traffic_simulator_msgs::msg::DriverModel controller = connection.getDriverModel();
+  // controller.see_around = not properties["isBlind"];
+
+  traffic_simulator_msgs::msg::DriverModel controller;
+  {
+    controller.see_around = not properties["isBlind"];
+  }
+
   return controller;
 }
 }  // namespace syntax

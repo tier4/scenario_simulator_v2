@@ -73,7 +73,7 @@ OpenSCENARIO:
                     LanePosition:
                       roadId: ''
                       laneId: '34513'
-                      s: 0
+                      s: 1
                       offset: 0
                       Orientation:
                         type: relative
