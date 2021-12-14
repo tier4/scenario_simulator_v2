@@ -39,14 +39,10 @@ auto Controller::assign(const EntityRef & entity_ref) -> void
     setUpperBoundSpeed(entity_ref, Double(max_speed.value));
   }
 
-  applyAssignControllerAction(entity_ref, [this]() {
-    // traffic_simulator_msgs::msg::DriverModel controller = connection.getDriverModel();
-    // controller.see_around = not properties["isBlind"];
-
-    traffic_simulator_msgs::msg::DriverModel controller;
-    controller.see_around = not properties["isBlind"];
-
-    return controller;
+  applyAssignControllerAction(entity_ref, [&]() {
+    auto message = connection.getDriverModel(entity_ref);
+    message.see_around = not properties["isBlind"];
+    return message;
   }());
 }
 
