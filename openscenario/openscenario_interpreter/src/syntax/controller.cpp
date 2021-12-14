@@ -39,7 +39,15 @@ auto Controller::assign(const EntityRef & entity_ref) -> void
     setUpperBoundSpeed(entity_ref, Double(max_speed.value));
   }
 
-  applyAssignControllerAction(entity_ref, *this);
+  applyAssignControllerAction(entity_ref, [this]() {
+    // traffic_simulator_msgs::msg::DriverModel controller = connection.getDriverModel();
+    // controller.see_around = not properties["isBlind"];
+
+    traffic_simulator_msgs::msg::DriverModel controller;
+    controller.see_around = not properties["isBlind"];
+
+    return controller;
+  }());
 }
 
 auto Controller::isUserDefinedController() & -> bool
@@ -61,19 +69,6 @@ auto Controller::defaultDriverModel() -> const traffic_simulator_msgs::msg::Driv
 auto Controller::operator[](const String & name) -> const Property &  //
 {
   return properties[name];
-}
-
-Controller::operator traffic_simulator_msgs::msg::DriverModel()
-{
-  // traffic_simulator_msgs::msg::DriverModel controller = connection.getDriverModel();
-  // controller.see_around = not properties["isBlind"];
-
-  traffic_simulator_msgs::msg::DriverModel controller;
-  {
-    controller.see_around = not properties["isBlind"];
-  }
-
-  return controller;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

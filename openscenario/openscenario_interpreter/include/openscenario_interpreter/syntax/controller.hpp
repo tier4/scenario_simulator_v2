@@ -60,8 +60,6 @@ struct Controller : public Scope
   static auto defaultDriverModel() -> const traffic_simulator_msgs::msg::DriverModel &;
 
   auto operator[](const String &) -> const Property &;
-
-  operator traffic_simulator_msgs::msg::DriverModel();
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
