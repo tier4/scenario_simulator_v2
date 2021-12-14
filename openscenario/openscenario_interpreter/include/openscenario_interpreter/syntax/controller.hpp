@@ -57,6 +57,8 @@ struct Controller : public Scope
 
   auto isUserDefinedController() & -> bool;
 
+  static auto makeDefaultDriverModel() -> const traffic_simulator_msgs::msg::DriverModel &;
+
   auto operator[](const String &) -> const Property &;
 
   operator traffic_simulator_msgs::msg::DriverModel();

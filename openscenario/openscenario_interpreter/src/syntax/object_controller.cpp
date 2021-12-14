@@ -65,9 +65,7 @@ ObjectController::operator traffic_simulator_msgs::msg::DriverModel() const
   if (is<Controller>()) {
     return static_cast<traffic_simulator_msgs::msg::DriverModel>(as<Controller>());
   } else {
-    traffic_simulator_msgs::msg::DriverModel controller = connection.getDriverModel();
-    controller.see_around = not Properties()["isBlind"];
-    return controller;
+    return Controller::makeDefaultDriverModel();
   }
 }
 }  // namespace syntax

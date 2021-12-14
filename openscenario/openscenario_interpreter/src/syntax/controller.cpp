@@ -47,6 +47,17 @@ auto Controller::isUserDefinedController() & -> bool
   return static_cast<bool>(properties["isEgo"]);
 }
 
+auto Controller::makeDefaultDriverModel() -> const traffic_simulator_msgs::msg::DriverModel &
+{
+  static const auto result = []() {
+    traffic_simulator_msgs::msg::DriverModel controller;
+    controller.see_around = not Properties()["isBlind"];
+    return controller;
+  }();
+
+  return result;
+}
+
 auto Controller::operator[](const String & name) -> const Property &  //
 {
   return properties[name];
@@ -54,8 +65,14 @@ auto Controller::operator[](const String & name) -> const Property &  //
 
 Controller::operator traffic_simulator_msgs::msg::DriverModel()
 {
-  traffic_simulator_msgs::msg::DriverModel controller = connection.getDriverModel();
-  controller.see_around = not properties["isBlind"];
+  // traffic_simulator_msgs::msg::DriverModel controller = connection.getDriverModel();
+  // controller.see_around = not properties["isBlind"];
+
+  traffic_simulator_msgs::msg::DriverModel controller;
+  {
+    controller.see_around = not properties["isBlind"];
+  }
+
   return controller;
 }
 }  // namespace syntax
