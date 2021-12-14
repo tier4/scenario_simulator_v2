@@ -47,12 +47,12 @@ auto Controller::isUserDefinedController() & -> bool
   return static_cast<bool>(properties["isEgo"]);
 }
 
-auto Controller::makeDefaultDriverModel() -> const traffic_simulator_msgs::msg::DriverModel &
+auto Controller::defaultDriverModel() -> const traffic_simulator_msgs::msg::DriverModel &
 {
   static const auto result = []() {
-    traffic_simulator_msgs::msg::DriverModel controller;
-    controller.see_around = not Properties()["isBlind"];
-    return controller;
+    traffic_simulator_msgs::msg::DriverModel message;
+    message.see_around = not Properties()["isBlind"];
+    return message;
   }();
 
   return result;

@@ -59,14 +59,5 @@ auto ObjectController::isUserDefinedController() const & -> bool
 {
   return is<Controller>() and as<Controller>().isUserDefinedController();
 }
-
-ObjectController::operator traffic_simulator_msgs::msg::DriverModel() const
-{
-  if (is<Controller>()) {
-    return static_cast<traffic_simulator_msgs::msg::DriverModel>(as<Controller>());
-  } else {
-    return Controller::makeDefaultDriverModel();
-  }
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
