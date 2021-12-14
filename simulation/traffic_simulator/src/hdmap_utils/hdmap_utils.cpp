@@ -1153,7 +1153,7 @@ const std::vector<std::int64_t> HdMapUtils::getRightOfWayLaneletIds(std::int64_t
 }
 
 std::vector<std::shared_ptr<const lanelet::TrafficSign>>
-HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<std::int64_t> lanelet_ids)
+HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<std::int64_t> lanelet_ids) const
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
   for (const auto & lanelet_id : lanelet_ids) {
@@ -1197,9 +1197,10 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
   return ret;
 }
 
-lanelet::AutowareTrafficLightConstPtr HdMapUtils::getTrafficLight(
+std::vector<lanelet::AutowareTrafficLightConstPtr> HdMapUtils::getTrafficLights(
   const std::int64_t traffic_light_id) const
 {
+  std::vector<lanelet::AutowareTrafficLightConstPtr> ret;
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto light : autoware_traffic_lights) {
@@ -1207,37 +1208,47 @@ lanelet::AutowareTrafficLightConstPtr HdMapUtils::getTrafficLight(
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
         if (id == traffic_light_id) {
-          return light;
+          ret.emplace_back(light);
         }
       }
     }
   }
-  THROW_SEMANTIC_ERROR("traffic_light_id does not match. ID : ", traffic_light_id);
+  if (ret.empty()) {
+    THROW_SEMANTIC_ERROR("traffic_light_id does not match. ID : ", traffic_light_id);
+  }
+  return ret;
 }
 
-const boost::optional<std::int64_t> HdMapUtils::getTrafficLightStopLineId(
+std::vector<std::int64_t> HdMapUtils::getTrafficLightStopLineIds(
   const std::int64_t & traffic_light_id) const
 {
-  const auto traffic_light = getTrafficLight(traffic_light_id);
-  if (traffic_light->stopLine()) {
-    return traffic_light->stopLine()->id();
+  std::vector<std::int64_t> ret;
+  const auto traffic_lights = getTrafficLights(traffic_light_id);
+  for (const auto & traffic_light : traffic_lights) {
+    if (traffic_light->stopLine()) {
+      ret.emplace_back(traffic_light->stopLine()->id());
+    }
   }
-  return boost::none;
+  return ret;
 }
 
-const std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLinePoints(
+std::vector<std::vector<geometry_msgs::msg::Point>> HdMapUtils::getTrafficLightStopLinesPoints(
   std::int64_t traffic_light_id) const
 {
-  std::vector<geometry_msgs::msg::Point> ret;
-  const auto traffic_light = getTrafficLight(traffic_light_id);
-  const auto stop_line = traffic_light->stopLine();
-  if (stop_line) {
-    for (const auto point : stop_line.get()) {
-      geometry_msgs::msg::Point p;
-      p.x = point.x();
-      p.y = point.y();
-      p.z = point.z();
-      ret.emplace_back(p);
+  std::vector<std::vector<geometry_msgs::msg::Point>> ret;
+  const auto traffic_lights = getTrafficLights(traffic_light_id);
+  for (const auto & traffic_light : traffic_lights) {
+    ret.emplace_back(std::vector<geometry_msgs::msg::Point>{});
+    const auto stop_line = traffic_light->stopLine();
+    if (stop_line) {
+      auto & current_stop_line = ret.back();
+      for (const auto point : stop_line.get()) {
+        geometry_msgs::msg::Point p;
+        p.x = point.x();
+        p.y = point.y();
+        p.z = point.z();
+        current_stop_line.emplace_back(p);
+      }
     }
   }
   return ret;
@@ -1304,12 +1315,14 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
     return boost::none;
   }
   traffic_simulator::math::CatmullRomSpline spline(waypoints);
-  const auto stop_line = getTrafficLightStopLinePoints(traffic_light_id);
-  if (stop_line.size() <= 1) {
-    return boost::none;
+  const auto stop_lines = getTrafficLightStopLinesPoints(traffic_light_id);
+  for (const auto & stop_line : stop_lines) {
+    const auto collision_point = spline.getCollisionPointIn2D(stop_line);
+    if (collision_point) {
+      return collision_point;
+    }
   }
-  const auto collision_point = spline.getCollisionPointIn2D(stop_line);
-  return collision_point;
+  return boost::none;
 }
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
