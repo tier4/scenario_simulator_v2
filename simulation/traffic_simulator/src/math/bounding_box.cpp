@@ -93,28 +93,5 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   points.emplace_back(p3);
   return points;
 }
-
-std::vector<geometry_msgs::msg::Point> transformPoints(
-  geometry_msgs::msg::Pose pose, std::vector<geometry_msgs::msg::Point> points)
-{
-  auto mat = quaternion_operation::getRotationMatrix(pose.orientation);
-  std::vector<geometry_msgs::msg::Point> ret;
-  for (const auto & point : points) {
-    Eigen::VectorXd v(3);
-    v(0) = point.x;
-    v(1) = point.y;
-    v(2) = point.z;
-    v = mat * v;
-    v(0) = v(0) + pose.position.x;
-    v(1) = v(1) + pose.position.y;
-    v(2) = v(2) + pose.position.z;
-    geometry_msgs::msg::Point transformed;
-    transformed.x = v(0);
-    transformed.y = v(1);
-    transformed.z = v(2);
-    ret.emplace_back(transformed);
-  }
-  return ret;
-}
 }  // namespace math
 }  // namespace traffic_simulator
