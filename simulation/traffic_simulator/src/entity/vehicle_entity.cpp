@@ -127,6 +127,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     if (status_->lanelet_pose_valid) {
       behavior_plugin_ptr_->setRouteLanelets(
         route_planner_ptr_->getRouteLanelets(status_->lanelet_pose));
+      // behavior_plugin_ptr_->setGoalPoses(route_planner_ptr_->getGoalPoses());
     } else {
       std::vector<std::int64_t> empty = {};
       behavior_plugin_ptr_->setRouteLanelets(empty);
