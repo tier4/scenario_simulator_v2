@@ -36,6 +36,7 @@ public:
     traffic_simulator_msgs::msg::LaneletPose entity_lanelet_pose, double horizon = 100);
   void cancelGoal();
   std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses();
+  std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame();
 
 private:
   void cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
