@@ -1,10 +1,10 @@
-#include <openscenario_interpreter/reader/evaluate.hpp>
-#include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <functional>
 #include <iostream>
+#include <openscenario_interpreter/reader/evaluate.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/parameter_type.hpp>
 
 #if __cplusplus >= 201606
 #include <variant>
