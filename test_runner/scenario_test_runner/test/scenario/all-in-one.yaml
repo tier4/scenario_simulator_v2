@@ -163,7 +163,7 @@ OpenSCENARIO:
     Story:
       - name: "main"
         Act:
-          - name: "count-up!"
+          - name: "count_up"
             ManeuverGroup:
               - maximumExecutionCount: 1
                 name: ""
@@ -177,21 +177,24 @@ OpenSCENARIO:
                         - name: count
                           parameterType: unsignedInt
                           value: 0
+                        - name: count_max
+                          parameterType: unsignedInt
+                          value: 100
                     Event:
                       - name: ""
                         priority: parallel
-                        maximumExecutionCount: &count-max 100
+                        maximumExecutionCount: $count_max
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: "if (global count < *count-max)"
+                                - name: "if (global count < count_max)"
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
                                     ParameterCondition:
                                       parameterRef: ::count
                                       rule: lessThan
-                                      value: *count-max
+                                      value: $count_max
                         Action:
                           - name: "global count += 1"
                             GlobalAction:
@@ -200,7 +203,7 @@ OpenSCENARIO:
                                 ModifyAction:
                                   Rule:
                                     AddValue:
-                                      value: 1
+                                      value: ${2 * 2 - 3}
                       - name: ""
                         priority: parallel
                         maximumExecutionCount: 100
@@ -696,7 +699,7 @@ OpenSCENARIO:
                                     ParameterCondition:
                                       parameterRef: count
                                       rule: greaterThan
-                                      value: *count-max
+                                      value: $count_up::count_max
                         Action:
                           - name: "return EXIT_FAILURE"
                             UserDefinedAction:
@@ -712,7 +715,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     StoryboardElementStateCondition:
-                                      storyboardElementRef: "count-up!"
+                                      storyboardElementRef: count_up
                                       storyboardElementType: act
                                       state: skipTransition
                         Action:
@@ -730,7 +733,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     ParameterCondition:
-                                      parameterRef: count-up!::count
+                                      parameterRef: count_up::count
                                       rule: greaterThan
                                       value: *count-up-local-count-max
                         Action:
@@ -811,6 +814,94 @@ OpenSCENARIO:
               ConditionGroup:
                 - Condition:
                     - name: "if (0 < t)"
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: "expression"
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ""
+                    ParameterDeclarations:
+                      ParameterDeclaration:
+                        - name: e0
+                          parameterType: double
+                          value: ${pow(2, 8) - 1}
+                        - name: e1
+                          parameterType: integer
+                          value: ${-round(2.6)}
+                        - name: nine
+                          parameterType: double
+                          value: 9
+                        - name: e2
+                          parameterType: double
+                          value: ${1 + sqrt($nine) * 2.2}
+                        - name: A
+                          parameterType: boolean
+                          value: true
+                        - name: B
+                          parameterType: boolean
+                          value: false
+                        - name: e3
+                          parameterType: boolean
+                          value: ${not $A and $B}
+                    Event:
+                      - name: ""
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: e0
+                                      rule: notEqualTo
+                                      value: 255
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: e1
+                                      rule: notEqualTo
+                                      value: -3
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: e2
+                                      rule: notEqualTo
+                                      value: 7.6
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: e3
+                                      rule: notEqualTo
+                                      value: false
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: "always-true"
                       delay: 0
                       conditionEdge: none
                       ByValueCondition:
