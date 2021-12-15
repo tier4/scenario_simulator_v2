@@ -103,7 +103,6 @@ public:
 
   explicit Scope(const boost::filesystem::path &);
 
-public:
   auto findObject(const std::string &) const -> Object;
 
   auto global() const -> const GlobalEnvironment &;

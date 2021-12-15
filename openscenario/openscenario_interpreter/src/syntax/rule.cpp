@@ -37,9 +37,12 @@ auto operator>>(std::istream & is, Rule & datum) -> std::istream &
   }                                 \
   static_assert(true, "")
 
+  BOILERPLATE(equalTo);
   BOILERPLATE(greaterThan);
   BOILERPLATE(lessThan);
-  BOILERPLATE(equalTo);
+  BOILERPLATE(greaterOrEqual);
+  BOILERPLATE(lessOrEqual);
+  BOILERPLATE(notEqualTo);
 
 #undef BOILERPLATE
 
@@ -53,9 +56,12 @@ auto operator<<(std::ostream & os, const Rule & datum) -> std::ostream &
     return os << #ID;
 
   switch (datum) {
+    BOILERPLATE(equalTo);
     BOILERPLATE(greaterThan);
     BOILERPLATE(lessThan);
-    BOILERPLATE(equalTo);
+    BOILERPLATE(greaterOrEqual);
+    BOILERPLATE(lessOrEqual);
+    BOILERPLATE(notEqualTo);
 
     default:
       throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(Rule, datum);
