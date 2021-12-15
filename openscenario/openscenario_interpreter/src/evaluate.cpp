@@ -1,13 +1,10 @@
+#include <openscenario_interpreter/reader/evaluate.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <functional>
 #include <iostream>
-#include <openscenario_interpreter/reader/evaluate.hpp>
-#include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/parameter_type.hpp>
-
-#include "openscenario_interpreter/syntax/integer.hpp"
-#include "scenario_simulator_exception/exception.hpp"
 
 #if __cplusplus >= 201606
 #include <variant>
@@ -222,8 +219,6 @@ std::string evaluate(const std::string & expression, const Scope & scope)
   auto first = expression.begin();
   auto last = expression.end();
   qi::phrase_parse(first, last, parser, ascii::space, output);
-
-  std::cout << "\n\nevalueate: " << expression << " = " << output << "\n\n" << std::endl;
 
   if (first != last) {
     THROW_SYNTAX_ERROR("Failed to parse ", std::quoted(expression));
