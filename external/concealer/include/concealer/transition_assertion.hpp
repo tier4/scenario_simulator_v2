@@ -23,9 +23,10 @@
   void waitForAutowareStateToBe##STATE(                                                          \
     Thunk thunk = []() {}, Seconds interval = std::chrono::seconds(1))                           \
   {                                                                                              \
+    thunk();                                                                                     \
     for (rclcpp::WallRate rate{interval}; not static_cast<const Node &>(*this).is##STATE();      \
          rate.sleep()) {                                                                         \
-      if (0 < (remains -= interval).count()) {                                                   \
+      if (0 <= (remains -= interval).count()) {                                                  \
         RCLCPP_INFO_STREAM(                                                                      \
           static_cast<Node &>(*this).get_logger(),                                               \
           "Simulator waiting for Autoware state to be " #STATE " (" << remains.count() << ")."); \
