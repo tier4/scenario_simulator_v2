@@ -66,7 +66,7 @@ def launch_setup(context, *args, **kwargs):
     global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
     global_real_time_factor = LaunchConfiguration("global_real_time_factor", default=1.0)
     global_timeout          = LaunchConfiguration("global_timeout",          default=180)
-    initialize_duration     = LaunchConfiguration("initialize_duration",     default=50)
+    initialize_duration     = LaunchConfiguration("initialize_duration",     default=30)
     launch_autoware         = LaunchConfiguration("launch_autoware",         default=True)
     launch_rviz             = LaunchConfiguration("launch_rviz",             default=False)
     output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
