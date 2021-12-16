@@ -30,7 +30,7 @@ rosdep update
 ```bash
 mkdir -p ~/scenario_simulator_ws/src
 cd ~/scenario_simulator_ws/src
-git clone https://github.com/tier4/scenario_simulator_v2-docs.git
+git clone https://github.com/tier4/scenario_simulator_v2.git
 # These lines are necessary right now, but it will be removed in the near future
 cd scenario_simulator_v2
 # This script clones the part of the source codes in Autoware and add it to the workspace
