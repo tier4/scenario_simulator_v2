@@ -1,4 +1,8 @@
 repositories:
+  autoware_auto_msgs:
+    type: git
+    url: https://github.com/tier4/autoware_auto_msgs.git
+    version: tier4/main
   quaternion_operation:
     type: git
     url: https://github.com/OUXT-Polaris/quaternion_operation.git
@@ -9,7 +13,7 @@ repositories:
   AutowareArchitectureProposal_msgs:
     type: git
     url: https://github.com/tier4/AutowareArchitectureProposal_msgs.git
-    version: main
+    version: use-autoware-auto-msgs
   AutowareArchitectureProposal_api_msgs:
     type: git
     url: https://github.com/tier4/AutowareArchitectureProposal_api_msgs.git
