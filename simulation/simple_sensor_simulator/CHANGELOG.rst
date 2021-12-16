@@ -2,6 +2,26 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.0 (2021-12-16)
+------------------
+* Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Rename `LiDAR` to `Lidar`
+* Update CMakeLists to not to reference undefined variable
+* Update packages to compile with `awf/autoware_auto_msgs` if flag given
+* Merge pull request `#622 <https://github.com/tier4/scenario_simulator_v2/issues/622>`_ from tier4/fix-pointcloud-topic
+* fix topic name of pointcloud
+* Lipsticks
+* Update class `SensorSimulation` to choice topic name and type based on Autoware's architecture type
+* Add new virtual class `LiDARSensorBase`
+* Add new virtual class `DetectionSensorBase`
+* Merge pull request `#617 <https://github.com/tier4/scenario_simulator_v2/issues/617>`_ from tier4/autoware-universe-concealer
+* detected object -> predicted object, and apply ament_clang_format
+* Update DetectionSensor to use `autoware_auto_perception_msgs`
+* use auto_msgs for dynamic objects
+* use auto_msgs for traffic lights
+* Contributors: MasayaKataoka, Takayuki Murooka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.8 (2021-12-13)
 ------------------
 * Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction

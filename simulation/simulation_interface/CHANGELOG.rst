@@ -2,6 +2,31 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.0 (2021-12-16)
+------------------
+* Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Rename `LiDAR` to `Lidar`
+* Update CMakeLists to not to reference undefined variable
+* Update packages to compile with `awf/autoware_auto_msgs` if flag given
+* Update class `SensorSimulation` to choice topic name and type based on Autoware's architecture type
+* Rename protobuf message `TrafficLightState` field `lights` to `lamp_states`
+* Remove `autoware_auto_control_msgs.proto`
+* Remove unused protobuf <=> message conversions
+* Restore virtual function `EntityBase::getVehicleCommand`
+* Merge pull request `#617 <https://github.com/tier4/scenario_simulator_v2/issues/617>`_ from tier4/autoware-universe-concealer
+* Comment-out some tests and Remove protobuf type `GearCommand`, `GearReport`
+* detected object -> predicted object, and apply ament_clang_format
+* Remove member function `getVehicleCommand` from Vehicle type entity
+* dealt with test conversion, and fix proto of deprecated vehicle command
+* Add some protobuf <=> ROS2 message conversions
+* fix toProt/Msgs of shift
+* fix topic type name
+* control command -> ackermann control command
+* use auto_msgs for dynamic objects
+* use auto_msgs for traffic lights
+* Contributors: MasayaKataoka, Takayuki Murooka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.8 (2021-12-13)
 ------------------
 * Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction

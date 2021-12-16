@@ -2,6 +2,55 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.0 (2021-12-16)
+------------------
+* Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
+* Merge pull request `#640 <https://github.com/tier4/scenario_simulator_v2/issues/640>`_ from RobotecAI/fix/multi-lane-traffic-light-stopline-search
+* multiple lane traffic light stopline search fix
+* Merge pull request `#637 <https://github.com/tier4/scenario_simulator_v2/issues/637>`_ from tier4/feature/pass_goal_poses_to_the_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Merge pull request `#633 <https://github.com/tier4/scenario_simulator_v2/issues/633>`_ from tier4/feature/transform_point
+* remove header
+* add getGoalPosesInWorldFrame();
+* Merge branch 'feature/transform_point' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* use const &
+* Merge branch 'feature/transform_point' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* add transformPoint function
+* move transform points to the transform.cpp and hpp
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* add key
+* add getGoalPoses function to the plugin
+* Break indentation (due to ament_clang_format)
+* Update CMakeLists to not to reference undefined variable
+* Update packages to compile with `awf/autoware_auto_msgs` if flag given
+* Remove `autoware_auto_msgs` from dependency
+* Set default `architecture_type` to `tier4/proposal`
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* Update `EntityManager` to select `TrafficLightManager` message type
+* Update `TrafficLight(Arrow|Color)` to ROS2 message type conversion
+* Update `TrafficLightManager` publisher to be parameterizable
+* Merge pull request `#622 <https://github.com/tier4/scenario_simulator_v2/issues/622>`_ from tier4/fix-pointcloud-topic
+* fix topic name of pointcloud
+* Update `TrafficLightManager` to create publishers by itself
+* Update class `SensorSimulation` to choice topic name and type based on Autoware's architecture type
+* Add new virtual class `DetectionSensorBase`
+* Update `API::attachDetectionSensor` to detect Autoware architecture
+* Update `API::attachLidarSensor` to detect Autoware architecture
+* Remove `autoware_auto_control_msgs.proto`
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* Restore virtual function `EntityBase::getVehicleCommand`
+* Merge pull request `#617 <https://github.com/tier4/scenario_simulator_v2/issues/617>`_ from tier4/autoware-universe-concealer
+* Comment-out some tests and Remove protobuf type `GearCommand`, `GearReport`
+* change no_ground pointcloud topic name
+* Update DetectionSensor to use `autoware_auto_perception_msgs`
+* Remove member function `getVehicleCommand` from Vehicle type entity
+* use auto_msgs for traffic lights
+* remove autoware_auto_msgs dependency
+* some changes to run psim with autoware_universe
+* Update some packages to use `tier4/autoware_auto_msgs`
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Takayuki Murooka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.8 (2021-12-13)
 ------------------
 * Merge pull request `#630 <https://github.com/tier4/scenario_simulator_v2/issues/630>`_ from tier4/feature/add_ideal_accel_model

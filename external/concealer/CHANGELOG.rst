@@ -2,6 +2,39 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.0 (2021-12-16)
+------------------
+* Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
+* Fix `waitForAutowareStateToBe*` to receive std::chrono::seconds
+* Fix `TransitionAssertion` to stop if class `Autoware` down
+* Fix `waitForAutowareStateToBe*` to call thunk at least one time.
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Update CMakeLists to not to reference undefined variable
+* Update packages to compile with `awf/autoware_auto_msgs` if flag given
+* Add macro to switching Autoware.Auto or Autoware.Unvierse (DIRTY HACK)
+* Remove `autoware_auto_msgs` from dependency
+* Simplify `autoware_universe.hpp`
+* Restore virtual function `Autoware::getVehicleCommand` for backward compatibility
+* Merge pull request `#617 <https://github.com/tier4/scenario_simulator_v2/issues/617>`_ from tier4/autoware-universe-concealer
+* Lipsticks
+* detected object -> predicted object, and apply ament_clang_format
+* Remove member function `getVehicleCommand` from Vehicle type entity
+* fix concealer to execute without segmentation fault
+* remove autoware_auto_msgs dependency
+* check TODO(murooka), and remove them
+* add covariance to odometry
+* enable CurrentSteering publisher
+* use autoware_auto_perception/planning_msgs
+* remove unnecessary codes
+* add some comments
+* some changes to run psim with autoware_universe
+* impelement autoware_universe
+* set autoware_universe as aap
+* add autoware_universe
+* fix dependency
+* Update some packages to use `tier4/autoware_auto_msgs`
+* Contributors: MasayaKataoka, Takayuki Murooka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.8 (2021-12-13)
 ------------------
 * Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
