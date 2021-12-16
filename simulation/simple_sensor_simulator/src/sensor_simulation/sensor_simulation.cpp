@@ -19,40 +19,22 @@
 
 namespace simple_sensor_simulator
 {
-void SensorSimulation::attachLidarSensor(
-  const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
-  std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
-{
-  LidarSensor lidar_sensor(current_time, configuration, publisher_ptr);
-  lidar_sensors_.push_back(lidar_sensor);
-}
-
-void SensorSimulation::attachDetectionSensor(
-  const double current_time,
-  const simulation_api_schema::DetectionSensorConfiguration & configuration,
-  std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
-    publisher_ptr)
-{
-  DetectionSensor detection_sensor(current_time, configuration, publisher_ptr);
-  detection_sensors_.push_back(detection_sensor);
-}
-
 void SensorSimulation::updateSensorFrame(
   double current_time, const rclcpp::Time & current_ros_time,
   const std::vector<traffic_simulator_msgs::EntityStatus> & status)
 {
   std::vector<std::string> detected_objects = {};
   for (auto & sensor : lidar_sensors_) {
-    sensor.update(current_time, status, current_ros_time);
-    const auto objects = sensor.getDetectedObjects();
+    sensor->update(current_time, status, current_ros_time);
+    const auto objects = sensor->getDetectedObjects();
     for (const auto & obj : objects) {
       if (std::count(detected_objects.begin(), detected_objects.end(), obj) == 0) {
-        detected_objects.emplace_back(obj);
+        detected_objects.push_back(obj);
       }
     }
   }
   for (auto & sensor : detection_sensors_) {
-    sensor.update(current_time, status, current_ros_time, detected_objects);
+    sensor->update(current_time, status, current_ros_time, detected_objects);
   }
 }
 }  // namespace simple_sensor_simulator

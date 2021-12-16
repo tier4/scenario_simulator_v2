@@ -1008,7 +1008,7 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
   return distance;
 }
 
-const autoware_auto_msgs::msg::HADMapBin HdMapUtils::toMapBin()
+const autoware_auto_mapping_msgs::msg::HADMapBin HdMapUtils::toMapBin()
 {
   std::stringstream ss;
   boost::archive::binary_oarchive oa(ss);
@@ -1016,7 +1016,7 @@ const autoware_auto_msgs::msg::HADMapBin HdMapUtils::toMapBin()
   auto id_counter = lanelet::utils::getId();
   oa << id_counter;
   std::string tmp_str = ss.str();
-  autoware_auto_msgs::msg::HADMapBin msg;
+  autoware_auto_mapping_msgs::msg::HADMapBin msg;
   msg.data.clear();
   msg.data.resize(tmp_str.size());
   msg.data.assign(tmp_str.begin(), tmp_str.end());

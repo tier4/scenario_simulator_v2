@@ -83,7 +83,7 @@ public:
       BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>(
         "entity_type_list"),
       BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManagerBase>>(
         "traffic_light_manager"),
       BT::OutputPort<boost::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
@@ -91,7 +91,7 @@ public:
   void getBlackBoardValues();
   std::string request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
-  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager;
+  std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager;
   traffic_simulator_msgs::msg::EntityStatus entity_status;
   double current_time;
   double step_time;

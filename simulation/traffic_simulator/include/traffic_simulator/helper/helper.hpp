@@ -91,12 +91,11 @@ geometry_msgs::msg::Pose constructPose(
 enum class LidarType { VLP16, VLP32 };
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
-  LidarType type, std::string entity, std::string topic_name,
-  double horizontal_resolution = 1.0 / 180.0 * M_PI);
+  const LidarType type, const std::string & entity, const std::string & architecture_type,
+  const double horizontal_resolution = 1.0 / 180.0 * M_PI);
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
-  std::string entity, std::string topic_name, double update_duration);
-
+  const std::string & entity, const std::string & architecture_type, const double update_duration);
 }  // namespace helper
 }  // namespace traffic_simulator
 

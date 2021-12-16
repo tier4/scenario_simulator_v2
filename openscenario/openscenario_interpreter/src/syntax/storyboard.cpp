@@ -66,7 +66,7 @@ auto Storyboard::run() -> void
   } else {
     throw common::AutowareError(
       "Autoware did not reach an engageable state within the specified time "
-      "(initialize_duration). It is likely that some nodes were corrupted during launch");
+      "(initialize_duration).");
   }
 }
 

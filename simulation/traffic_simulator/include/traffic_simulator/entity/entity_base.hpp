@@ -117,7 +117,7 @@ public:
   virtual void setTargetSpeed(double target_speed, bool continuous) = 0;
 
   virtual void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
+    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
   {
     traffic_light_manager_ = ptr;
   }
@@ -170,7 +170,7 @@ protected:
   std::queue<traffic_simulator_msgs::msg::LaneletPose> waypoints_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;
+  std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
 
   bool verbose_;
   bool visibility_;

@@ -20,13 +20,19 @@
 
 TEST(TrafficLightManager, getIds)
 {
+  const auto node = std::make_shared<rclcpp::Node>("getIds");
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
   geographic_msgs::msg::GeoPoint origin;
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, nullptr, nullptr, nullptr, "map");
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+  traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
+#else
+  traffic_simulator::TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>
+#endif
+    manager(hdmap_utils_ptr, node, "map");
   const auto ids = manager.getIds();
   EXPECT_FALSE(std::find(ids.begin(), ids.end(), 34836) == ids.end());
   EXPECT_FALSE(std::find(ids.begin(), ids.end(), 34802) == ids.end());
@@ -35,13 +41,19 @@ TEST(TrafficLightManager, getIds)
 
 TEST(TrafficLightManager, setColor)
 {
+  const auto node = std::make_shared<rclcpp::Node>("setColor");
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
   geographic_msgs::msg::GeoPoint origin;
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, nullptr, nullptr, nullptr, "map");
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+  traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
+#else
+  traffic_simulator::TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>
+#endif
+    manager(hdmap_utils_ptr, node, "map");
   const auto ids = manager.getIds();
   for (const auto id : ids) {
     EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::NONE);
@@ -58,13 +70,19 @@ TEST(TrafficLightManager, setColor)
 
 TEST(TrafficLightManager, setArrow)
 {
+  const auto node = std::make_shared<rclcpp::Node>("setArrow");
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
   geographic_msgs::msg::GeoPoint origin;
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, nullptr, nullptr, nullptr, "map");
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+  traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
+#else
+  traffic_simulator::TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>
+#endif
+    manager(hdmap_utils_ptr, node, "map");
   const auto ids = manager.getIds();
   for (const auto id : ids) {
     EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::NONE);
@@ -82,5 +100,6 @@ TEST(TrafficLightManager, setArrow)
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
+  rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
