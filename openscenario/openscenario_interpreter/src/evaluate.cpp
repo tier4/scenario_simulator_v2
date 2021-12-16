@@ -1,10 +1,10 @@
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <functional>
-#include <iostream>
 #include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
+#include <openscenario_interpreter/utility/overload.hpp>
 
 #if __cplusplus >= 201606
 #include <variant>
@@ -218,6 +218,7 @@ std::string evaluate(const std::string & expression, const Scope & scope)
   Value output;
   auto first = expression.begin();
   auto last = expression.end();
+
   qi::phrase_parse(first, last, parser, ascii::space, output);
 
   if (first != last) {
@@ -225,13 +226,9 @@ std::string evaluate(const std::string & expression, const Scope & scope)
   }
 
   return visit(
-    [](auto v) -> std::string {
-      if constexpr (std::is_same<decltype(v), bool>::value) {
-        return v ? "true" : "false";
-      } else {
-        return std::to_string(v);
-      }
-    },
+    overload(
+      [](bool v) -> std::string { return v ? "true" : "false"; },
+      [](auto v) -> std::string { return std::to_string(v); }),
     output.data);
 }
 

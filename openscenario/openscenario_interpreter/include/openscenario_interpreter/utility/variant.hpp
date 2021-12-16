@@ -73,16 +73,32 @@ auto visit(Visitor && visitor, boost::variant<Ts...> && arg0)
   return boost::apply_visitor(f, std::move(arg0));
 }
 
-template <typename Visitor, typename Variant0, typename... Variants>
-auto visit(Visitor && visitor, Variant0 && arg0, Variants &&... args)
+template <typename Visitor, typename... Ts, typename... Variants>
+auto visit(Visitor && visitor, const boost::variant<Ts...> & var0, Variants &&... vars)
 {
-  auto f = [&visitor, &args...](auto && x0) {
-    auto new_visitor = [&](auto &&... xs) {
-      return visitor(std::forward<decltype(x0)>(x0), std::forward<decltype(xs)>(xs)...);
-    };
-    return visit(new_visitor, std::forward<Variants>(args)...);
-  };
-  return visit(f, std::forward<Variant0>(arg0));
+  return visit(
+    [&visitor, &vars...](auto && arg0) {
+      return visit(
+        [&visitor, &arg0](auto &&... args) {
+          return visitor(arg0, std::forward<decltype(args)>(args)...);
+        },
+        std::forward<decltype(vars)>(vars)...);
+    },
+    var0);
+}
+
+template <typename Visitor, typename... Ts, typename... Variants>
+auto visit(Visitor && visitor, boost::variant<Ts...> && var0, Variants &&... vars)
+{
+  return visit(
+    [&visitor, &vars...](auto && arg0) {
+      return visit(
+        [&visitor, &arg0](auto &&... args) {
+          return visitor(arg0, std::forward<decltype(args)>(args)...);
+        },
+        std::forward<decltype(vars)>(vars)...);
+    },
+    std::move(var0));
 }
 #endif
 }  // namespace openscenario_interpreter
