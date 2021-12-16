@@ -2,8 +2,8 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.0 (2021-12-16)
+------------------
 * Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
 * Fix `TransitionAssertion` to stop if class `Autoware` down
 * Fix `waitForAutowareStateToBe*` to call thunk at least one time.
