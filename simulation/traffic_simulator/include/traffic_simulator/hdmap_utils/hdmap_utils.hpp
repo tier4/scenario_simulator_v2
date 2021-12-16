@@ -146,9 +146,8 @@ public:
   const std::vector<std::int64_t> getTrafficLightIds() const;
   const boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, traffic_simulator::TrafficLightColor color) const;
-  const boost::optional<std::int64_t> getTrafficLightStopLineId(
-    const std::int64_t & traffic_light_id) const;
-  const std::vector<geometry_msgs::msg::Point> getTrafficLightStopLinePoints(
+  std::vector<std::int64_t> getTrafficLightStopLineIds(const std::int64_t & traffic_light_id) const;
+  std::vector<std::vector<geometry_msgs::msg::Point>> getTrafficLightStopLinesPoints(
     std::int64_t traffic_light_id) const;
   const boost::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<geometry_msgs::msg::Point> & waypoints,
@@ -163,7 +162,8 @@ private:
   RouteCache route_cache_;
   CenterPointsCache center_points_cache_;
   LaneletLengthCache lanelet_length_cache_;
-  lanelet::AutowareTrafficLightConstPtr getTrafficLight(const std::int64_t traffic_light_id) const;
+  std::vector<lanelet::AutowareTrafficLightConstPtr> getTrafficLights(
+    const std::int64_t traffic_light_id) const;
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLanelets(
     const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]) const;
   std::vector<lanelet::Lanelet> filterLanelets(
@@ -171,7 +171,7 @@ private:
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
   getTrafficLightRegElementsOnPath(const std::vector<std::int64_t> & lanelet_ids) const;
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
-    std::vector<std::int64_t> lanelet_ids);
+    std::vector<std::int64_t> lanelet_ids) const;
   std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(std::vector<std::int64_t> lanelet_ids);
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
   void mapCallback(const autoware_auto_msgs::msg::HADMapBin & msg);
