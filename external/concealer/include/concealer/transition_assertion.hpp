@@ -55,8 +55,9 @@ struct TransitionAssertion
 #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                             \
   template <typename Thunk = void (*)()>                                                        \
   void waitForAutowareStateToBe##STATE(                                                         \
-    Thunk thunk = []() {}, rclcpp::WallRate rate = rclcpp::WallRate(std::chrono::seconds(1)))   \
+    Thunk thunk = []() {}, const std::chrono::seconds & interval = std::chrono::seconds(1))     \
   {                                                                                             \
+    rclcpp::WallRate rate{interval};                                                            \
     for (thunk(); static_cast<Autoware &>(*this).currentFuture().wait_for(                      \
                     std::chrono::milliseconds(1)) == std::future_status::timeout and            \
                   not static_cast<const Autoware &>(*this).is##STATE();                         \
