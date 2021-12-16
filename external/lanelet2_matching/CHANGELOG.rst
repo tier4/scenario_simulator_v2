@@ -2,6 +2,12 @@
 Changelog for package lanelet2_matching
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* Contributors: MasayaKataoka, yamacir-kit
+
 0.5.8 (2021-12-13)
 ------------------
 * Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
