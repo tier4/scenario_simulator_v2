@@ -29,7 +29,7 @@
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-#include <autoware_auto_msgs/msg/had_map_bin.hpp>
+#include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
@@ -60,7 +60,7 @@ class HdMapUtils
 public:
   explicit HdMapUtils(const boost::filesystem::path &, const geographic_msgs::msg::GeoPoint &);
 
-  const autoware_auto_msgs::msg::HADMapBin toMapBin();
+  const autoware_auto_mapping_msgs::msg::HADMapBin toMapBin();
   void insertMarkerArray(
     visualization_msgs::msg::MarkerArray & a1,
     const visualization_msgs::msg::MarkerArray & a2) const;
@@ -174,7 +174,7 @@ private:
     std::vector<std::int64_t> lanelet_ids) const;
   std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(std::vector<std::int64_t> lanelet_ids);
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
-  void mapCallback(const autoware_auto_msgs::msg::HADMapBin & msg);
+  void mapCallback(const autoware_auto_mapping_msgs::msg::HADMapBin & msg);
   lanelet::LaneletMapPtr lanelet_map_ptr_;
   lanelet::routing::RoutingGraphConstPtr vehicle_routing_graph_ptr_;
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;

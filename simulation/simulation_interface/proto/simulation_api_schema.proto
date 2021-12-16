@@ -23,16 +23,16 @@ message LidarConfiguration {
   double horizontal_resolution = 2;    // Horizontal resolutions of the lidar.
   repeated double vertical_angles = 3; // Vertical resolutions of the lidar.
   double scan_duration = 4;            // Scan duration of the lidar.
-  string topic_name = 5;               // Topic name of the lidar pointcloud.
+  string architecture_type = 5;        // Autoware architecture type.
 }
 
 /**
  * Parameter configuration of the detection sensor
  **/
 message DetectionSensorConfiguration {
-  string entity = 1;          // Name of the entity which you want to attach detection sensor.
-  double update_duration = 2; // Update duration of the detection sensor.
-  string topic_name = 3;      // Topic name of the detection result.
+  string entity = 1;             // Name of the entity which you want to attach detection sensor.
+  double update_duration = 2;    // Update duration of the detection sensor.
+  string architecture_type = 3;  // Autoware architecture type.
 }
 
 /**

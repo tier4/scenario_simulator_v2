@@ -17,8 +17,8 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
 #include <boost/variant.hpp>
 #include <cassert>
 #include <memory>
@@ -173,9 +173,12 @@ public:
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
 
-  bool attachLidarSensor(simulation_api_schema::LidarConfiguration configuration);
+  bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
+  bool attachLidarSensor(
+    const std::string &, const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
 
-  bool attachDetectionSensor(simulation_api_schema::DetectionSensorConfiguration configuration);
+  bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
+  bool attachDetectionSensor(const std::string &);
 
   bool initialize(double realtime_factor, double step_time);
 

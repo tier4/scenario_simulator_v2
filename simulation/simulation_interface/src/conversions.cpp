@@ -507,4 +507,18 @@ void toProto(
     *proto.add_lamp_states() = lamp_state;
   }
 }
+
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+void toProto(
+  const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
+  simulation_api_schema::TrafficLightState & proto)
+{
+  proto.set_id(traffic_light_state.map_primitive_id);
+  for (const autoware_auto_perception_msgs::msg::TrafficLight & ls : traffic_light_state.lights) {
+    simulation_api_schema::TrafficLightState::LampState lamp_state;
+    // TODO(murooka) type is separated into color, shape, status
+    *proto.add_lamp_states() = lamp_state;
+  }
+}
+#endif
 }  // namespace simulation_interface
