@@ -15,10 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 
+#include "scenario_simulator_exception/exception.hpp"
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <functional>
+#include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <openscenario_interpreter/utility/highlighter.hpp>
 #include <pugixml.hpp>
@@ -87,7 +89,12 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
 #else
       return T();
 #endif
-    } else if (value.front() == '$') {
+    }
+    if (value.substr(0, 2) == "${" and value.back() == '}') {
+      return boost::lexical_cast<T>(
+        evaluate(std::string(value.begin() + 2, value.end() - 1), scope));
+    }
+    if (value.front() == '$') {
       const auto found = scope.findObject(value.substr(1));
       if (found) {
         return boost::lexical_cast<T>(boost::lexical_cast<String>(found));

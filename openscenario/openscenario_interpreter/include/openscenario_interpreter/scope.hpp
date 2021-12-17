@@ -75,7 +75,7 @@ class Scope
 
     std::unordered_map<std::string, Object> entities;  // ScenarioObject or EntitySelection
 
-    const CatalogLocations * catalog_locations;
+    const CatalogLocations * catalog_locations = nullptr;
 
     explicit GlobalEnvironment(const boost::filesystem::path &);
 
@@ -103,7 +103,6 @@ public:
 
   explicit Scope(const boost::filesystem::path &);
 
-public:
   auto findObject(const std::string &) const -> Object;
 
   auto global() const -> const GlobalEnvironment &;

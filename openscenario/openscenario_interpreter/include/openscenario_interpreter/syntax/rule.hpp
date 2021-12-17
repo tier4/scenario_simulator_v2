@@ -30,9 +30,12 @@ inline namespace syntax
  *   <xsd:union>
  *     <xsd:simpleType>
  *       <xsd:restriction base="xsd:string">
+ *         <xsd:enumeration value="equalTo"/>
  *         <xsd:enumeration value="greaterThan"/>
  *         <xsd:enumeration value="lessThan"/>
- *         <xsd:enumeration value="equalTo"/>
+ *         <xsd:enumeration value="greaterOrEqual"/>
+ *         <xsd:enumeration value="lessOrEqual"/>
+ *         <xsd:enumeration value="notEqualTo"/>
  *       </xsd:restriction>
  *     </xsd:simpleType>
  *     <xsd:simpleType>
@@ -45,9 +48,12 @@ inline namespace syntax
 struct Rule
 {
   enum value_type {
+    equalTo,
     greaterThan,
     lessThan,
-    equalTo,
+    greaterOrEqual,
+    lessOrEqual,
+    notEqualTo,
   } value;
 
   explicit Rule() = default;
@@ -60,17 +66,23 @@ struct Rule
   constexpr auto operator()(const T & lhs, const U & rhs) const noexcept
   {
     switch (value) {
+      case equalTo:
+        return equal_to<T>()(std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case greaterThan:
         return std::greater<void>()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
-
       case lessThan:
         return std::less<void>()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
-
-      case equalTo:
-        return equal_to<T>()(std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
-
+      case greaterOrEqual:
+        return std::greater_equal<T>()(
+          std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
+      case lessOrEqual:
+        return std::less_equal<T>()(
+          std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
+      case notEqualTo:
+        return std::not_equal_to<T>()(
+          std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       default:
         return false;
     }
