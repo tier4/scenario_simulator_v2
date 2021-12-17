@@ -93,6 +93,8 @@ public:
 
   auto getCurrentAction() const -> const std::string override;
 
+  auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel override;
+
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
 

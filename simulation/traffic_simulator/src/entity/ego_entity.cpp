@@ -213,6 +213,18 @@ auto EgoEntity::getCurrentAction() const -> const std::string
   return state.empty() ? "Launching" : state;
 }
 
+auto EgoEntity::getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel
+{
+  traffic_simulator_msgs::msg::DriverModel model;
+  /**
+   * @brief TODO, Input values get from autoware.
+   */
+  model.see_around = true;
+  model.acceleration = 0;
+  model.deceleration = 0;
+  return model;
+}
+
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   -> const traffic_simulator_msgs::msg::EntityStatus
 {
