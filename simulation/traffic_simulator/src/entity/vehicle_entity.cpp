@@ -156,7 +156,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   }
 }
 
-void VehicleEntity::setAcceleration(double acceleration)
+void VehicleEntity::setAccelerationLimit(double acceleration)
 {
   if (acceleration <= 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
@@ -166,7 +166,7 @@ void VehicleEntity::setAcceleration(double acceleration)
   setDriverModel(driver_model);
 }
 
-void VehicleEntity::setDeceleration(double deceleration)
+void VehicleEntity::setDecelerationLimit(double deceleration)
 {
   if (deceleration <= 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");

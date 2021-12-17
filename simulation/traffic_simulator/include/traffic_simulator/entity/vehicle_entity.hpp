@@ -89,9 +89,9 @@ public:
     behavior_plugin_ptr_->setDriverModel(model);
   }
 
-  void setAcceleration(double acceleration) override;
+  void setAccelerationLimit(double acceleration) override;
 
-  void setDeceleration(double deceleration) override;
+  void setDecelerationLimit(double deceleration) override;
 
   auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel override;
 

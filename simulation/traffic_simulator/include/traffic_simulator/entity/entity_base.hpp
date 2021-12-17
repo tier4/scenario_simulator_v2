@@ -97,9 +97,9 @@ public:
 
   virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);
 
-  virtual void setAcceleration(double acceleration);
+  virtual void setAccelerationLimit(double acceleration);
 
-  virtual void setDeceleration(double deceleration);
+  virtual void setDecelerationLimit(double deceleration);
 
   /*   */ void setEntityTypeList(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &
