@@ -20,6 +20,7 @@
 #include <boost/optional.hpp>
 #include <concealer/autoware_architecture_proposal.hpp>
 #include <concealer/autoware_auto.hpp>
+#include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
@@ -91,6 +92,8 @@ public:
   auto engage() -> void override;
 
   auto getCurrentAction() const -> const std::string override;
+
+  auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel override;
 
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>0.5.8</version>
+  <version>0.6.0</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -38,6 +38,7 @@
   <depend>embree</depend>
   <depend>pcl_conversions</depend>
   <depend>libpcl-all-dev</depend>
+  <depend>autoware_auto_perception_msgs</depend>
   <depend>autoware_perception_msgs</depend>
   <exec_depend>rviz2</exec_depend>
 

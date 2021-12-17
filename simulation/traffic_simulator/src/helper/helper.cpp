@@ -76,21 +76,22 @@ geometry_msgs::msg::Pose constructPose(
 }
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
-  std::string entity, std::string topic_name, double update_duration)
+  const std::string & entity, const std::string & architecture_type, const double update_duration)
 {
   simulation_api_schema::DetectionSensorConfiguration configuration;
   configuration.set_entity(entity);
-  configuration.set_topic_name(topic_name);
+  configuration.set_architecture_type(architecture_type);
   configuration.set_update_duration(update_duration);
   return configuration;
 }
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
-  LidarType type, std::string entity, std::string topic_name, double horizontal_resolution)
+  const LidarType type, const std::string & entity, const std::string & architecture_type,
+  const double horizontal_resolution)
 {
   simulation_api_schema::LidarConfiguration configuration;
   configuration.set_horizontal_resolution(horizontal_resolution);
-  configuration.set_topic_name(topic_name);
+  configuration.set_architecture_type(architecture_type);
   configuration.set_entity(entity);
   switch (type) {
     case LidarType::VLP16:

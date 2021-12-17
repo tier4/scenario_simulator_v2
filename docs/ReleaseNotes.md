@@ -2,6 +2,9 @@
 
 ## Difference between the latest release and master
 
+## Version 0.6.0
+- Start supporting Autoware.Universe. ([link](https://github.com/tier4/scenario_simulator_v2/pull/614))
+
 ## Version 0.5.8
 - Remove newton methods in getSValue function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/612))
 - Set withLaneChange parameter as false. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
@@ -10,6 +13,7 @@
 - Enable build with foxy latest version of behavior_tree_cpp_v3. ([link](https://github.com/tier4/scenario_simulator_v2/pull/625))
 - Add API::getDriverModel function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/626))
 - Add Random test runner. [Link](https://github.com/tier4/scenario_simulator_v2-docs/pull/619) (Contribution by [Robotec.ai](https://robotec.ai/)).
+- Support new Autoware architecture `Universe` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/614)).
 
 ## Version 0.5.7
 - Fix problem in getNormalVector function. (Contribution by [Utaro-M](https://github.com/Utaro-M)).

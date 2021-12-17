@@ -330,7 +330,7 @@ Visualization Manager:
                 Filter size: 10
                 History Policy: Keep Last
                 Reliability Policy: Reliable
-                Value: /sensing/lidar/no_ground/pointcloud
+                Value: /perception/obstacle_segmentation/pointcloud
               Use Fixed Frame: true
               Use rainbow: true
               Value: true
@@ -1113,7 +1113,7 @@ Visualization Manager:
             Filter size: 10
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /sensing/lidar/no_ground/pointcloud
+            Value: /perception/obstacle_segmentation/pointcloud
           Use Fixed Frame: true
           Use rainbow: true
           Value: true

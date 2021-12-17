@@ -79,7 +79,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_auto_msgs
+      autoware_auto_mapping_msgs
       geometry_msgs
       visualization_msgs
     )
@@ -97,7 +97,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_auto_msgs
+      autoware_auto_mapping_msgs
       geometry_msgs
       visualization_msgs
     )
@@ -115,7 +115,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_auto_msgs
+      autoware_auto_mapping_msgs
       geometry_msgs
       visualization_msgs
     )
@@ -133,7 +133,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_auto_msgs
+      autoware_auto_mapping_msgs
       geometry_msgs
       visualization_msgs
     )
@@ -151,7 +151,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_auto_msgs
+      autoware_auto_mapping_msgs
       geometry_msgs
       visualization_msgs
     )

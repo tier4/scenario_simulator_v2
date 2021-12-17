@@ -31,7 +31,7 @@ from pathlib import Path
 
 
 def architecture_types():
-    return ["awf/auto", "tier4/proposal"]
+    return ["awf/auto", "awf/universe", "tier4/proposal"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -41,6 +41,7 @@ def default_autoware_launch_package_of(architecture_type):
         )
     return {
         "awf/auto": "scenario_simulator_launch",
+        "awf/universe": "autoware_launch",
         "tier4/proposal": "autoware_launch",
     }[architecture_type]
 
@@ -52,6 +53,7 @@ def default_autoware_launch_file_of(architecture_type):
         )
     return {
         "awf/auto": "autoware_auto.launch.py",
+        "awf/universe": "planning_simulator.launch.xml",
         "tier4/proposal": "planning_simulator.launch.xml",
     }[architecture_type]
 

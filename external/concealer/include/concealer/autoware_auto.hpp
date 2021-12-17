@@ -15,11 +15,24 @@
 #ifndef CONCEALER__AUTOWARE_AUTO_HPP_
 #define CONCEALER__AUTOWARE_AUTO_HPP_
 
+#ifndef SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE  // NOTE: SUPER DIRTY HACK
+#include <autoware_auto_planning_msgs/msg/trajectory.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_kinematic_state.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_state_report.hpp>
+#define AUTOWARE_AUTO_PLANNING_MSGS autoware_auto_planning_msgs
+#define AUTOWARE_AUTO_VEHICLE_MSGS autoware_auto_vehicle_msgs
+#else
 #include <autoware_auto_msgs/msg/trajectory.hpp>
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_report.hpp>
+#define AUTOWARE_AUTO_PLANNING_MSGS autoware_auto_msgs
+#define AUTOWARE_AUTO_VEHICLE_MSGS autoware_auto_msgs
+#endif  // SCENARIO_SIMULATOR_V2_DOES_NOT_HAVE_TO_SUPPORT_AUTOWARE_UNIVERSE
+
 #include <concealer/autoware.hpp>
 #include <concealer/define_macro.hpp>
 
@@ -29,18 +42,16 @@ class AutowareAuto : public Autoware
 {
   void sendSIGINT() override;
 
-  /// FROM MiscellaneousAPI ///
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   using GoalPose = geometry_msgs::msg::PoseStamped;
   DEFINE_PUBLISHER(GoalPose);
 
-  using VehicleControlCommand = autoware_auto_msgs::msg::VehicleControlCommand;
+  using VehicleControlCommand = AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleControlCommand;
   DEFINE_SUBSCRIPTION(VehicleControlCommand);
 
-  using VehicleStateCommand = autoware_auto_msgs::msg::VehicleStateCommand;
+  using VehicleStateCommand = AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateCommand;
   DEFINE_SUBSCRIPTION(VehicleStateCommand);
 
-  using VehicleStateReport = autoware_auto_msgs::msg::VehicleStateReport;
+  using VehicleStateReport = AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleStateReport;
   DEFINE_PUBLISHER(VehicleStateReport);
   decltype(auto) setVehicleStateReport()
   {
@@ -60,26 +71,26 @@ class AutowareAuto : public Autoware
     return setVehicleStateReport(report);
   }
 
-  using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
+  using VehicleKinematicState = AUTOWARE_AUTO_VEHICLE_MSGS::msg::VehicleKinematicState;
   DEFINE_PUBLISHER(VehicleKinematicState);
-  decltype(auto) setVehicleKinematicState(
+  auto setVehicleKinematicState(
     const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Twist & twist)
+    -> decltype(auto)
   {
     VehicleKinematicState kinematic_state;
     {
       kinematic_state.header.stamp = get_clock()->now();
       kinematic_state.header.frame_id = "map";
-      autoware_auto_msgs::msg::TrajectoryPoint state;
-      state.x = pose.position.x;
-      state.y = pose.position.y;
-      state.heading.real = pose.orientation.w;  // from motion_common package of autoware.auto
-      state.heading.imag = pose.orientation.z;  // from motion_common package of autoware.auto
-      state.longitudinal_velocity_mps = twist.linear.x;
-      state.lateral_velocity_mps = twist.linear.y;
-      state.acceleration_mps2 = getVehicleControlCommand().long_accel_mps2;
-      state.heading_rate_rps = 0.0;  // TODO - what should be the value here?
-      state.front_wheel_angle_rad = getVehicleControlCommand().front_wheel_angle_rad;
-      kinematic_state.state = state;
+      kinematic_state.state.pose.position.x = pose.position.x;
+      kinematic_state.state.pose.position.y = pose.position.y;
+      kinematic_state.state.pose.orientation.w = pose.orientation.w;
+      kinematic_state.state.pose.orientation.z = pose.orientation.z;
+      kinematic_state.state.longitudinal_velocity_mps = twist.linear.x;
+      kinematic_state.state.lateral_velocity_mps = twist.linear.y;
+      kinematic_state.state.acceleration_mps2 = getVehicleControlCommand().long_accel_mps2;
+      kinematic_state.state.heading_rate_rps = 0.0;  // TODO - what should be the value here?
+      kinematic_state.state.front_wheel_angle_rad =
+        getVehicleControlCommand().front_wheel_angle_rad;
     }
 
     return setVehicleKinematicState(kinematic_state);
@@ -99,12 +110,10 @@ class AutowareAuto : public Autoware
     return setInitialPose(initial_pose);
   }
 
-  using Trajectory = autoware_auto_msgs::msg::Trajectory;
+  using Trajectory = AUTOWARE_AUTO_PLANNING_MSGS::msg::Trajectory;
   DEFINE_SUBSCRIPTION(Trajectory);
 
   autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public:
   template <typename... Ts>

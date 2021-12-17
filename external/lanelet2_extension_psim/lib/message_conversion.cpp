@@ -38,7 +38,8 @@ namespace utils
 {
 namespace conversion
 {
-void toBinMsg(const std::unique_ptr<LaneletMap> & map, autoware_auto_msgs::msg::HADMapBin * msg)
+void toBinMsg(
+  const std::unique_ptr<LaneletMap> & map, autoware_auto_mapping_msgs::msg::HADMapBin * msg)
 {
   if (msg == nullptr) {
     std::stringstream sstream;
@@ -58,7 +59,7 @@ void toBinMsg(const std::unique_ptr<LaneletMap> & map, autoware_auto_msgs::msg::
   msg->data.assign(data_str.begin(), data_str.end());
 }
 
-void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_msgs::msg::HADMapBin * msg)
+void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_mapping_msgs::msg::HADMapBin * msg)
 {
   if (msg == nullptr) {
     std::stringstream sstream;
@@ -78,7 +79,7 @@ void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_msgs::msg::HADMa
   msg->data.assign(data_str.begin(), data_str.end());
 }
 
-void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map)
+void fromBinMsg(const autoware_auto_mapping_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map)
 {
   if (!map) {
     std::stringstream sstream;
@@ -100,7 +101,7 @@ void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::Lanelet
 }
 
 void fromBinMsg(
-  const autoware_auto_msgs::msg::HADMapBin & msg, const std::unique_ptr<LaneletMap> & map)
+  const autoware_auto_mapping_msgs::msg::HADMapBin & msg, const std::unique_ptr<LaneletMap> & map)
 {
   if (!map) {
     std::stringstream sstream;
@@ -122,7 +123,7 @@ void fromBinMsg(
 }
 
 void fromBinMsg(
-  const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map,
+  const autoware_auto_mapping_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map,
   lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,
   lanelet::routing::RoutingGraphPtr * routing_graph)
 {

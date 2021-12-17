@@ -55,10 +55,12 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-  auto architecture_type = getParameter<std::string>("architecture_type", std::string(""));
+  auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
   std::string vehicle_model_type;
 
   if (architecture_type == "tier4/proposal") {
+    vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
+  } else if (architecture_type == "awf/universe") {
     vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
   } else if (architecture_type == "awf/auto") {
     // hard-coded for now
@@ -138,7 +140,7 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "unspecified");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
 
   if (architecture_type == "tier4/proposal") {
     return getParameter<bool>("launch_autoware", true)
@@ -153,6 +155,19 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "rviz_config:=" + configuration.rviz_config_path.string(),
                  "scenario_simulation:=true")
              : std::make_unique<concealer::AutowareArchitectureProposal>();
+  } else if (architecture_type == "awf/universe") {
+    return getParameter<bool>("launch_autoware", true)
+             ? std::make_unique<concealer::AutowareUniverse>(
+                 getParameter<std::string>("autoware_launch_package"),
+                 getParameter<std::string>("autoware_launch_file"),
+                 "map_path:=" + configuration.map_path.string(),
+                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
+                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                 "rviz_config:=" + configuration.rviz_config_path.string(),
+                 "scenario_simulation:=true")
+             : std::make_unique<concealer::AutowareUniverse>();
   } else if (architecture_type == "awf/auto") {
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareAuto>(
@@ -196,6 +211,18 @@ auto EgoEntity::getCurrentAction() const -> const std::string
   const auto state = autoware->getAutowareStateMessage();
 
   return state.empty() ? "Launching" : state;
+}
+
+auto EgoEntity::getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel
+{
+  traffic_simulator_msgs::msg::DriverModel model;
+  /**
+   * @brief TODO, Input values get from autoware.
+   */
+  model.see_around = true;
+  model.acceleration = 0;
+  model.deceleration = 0;
+  return model;
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const

@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>concealer</name>
-  <version>0.5.8</version>
+  <version>0.6.0</version>
   <description>Provides a class 'Autoware' to conceal miscellaneous things to simplify Autoware management of the simulator.</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
@@ -10,14 +10,23 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
+  <!-- Autoware.Universe & Autoware.Auto -->
+  <depend>autoware_auto_control_msgs</depend>
+  <depend>autoware_auto_perception_msgs</depend>
+  <depend>autoware_auto_planning_msgs</depend>
+  <depend>autoware_auto_vehicle_msgs</depend>
+  <depend>nav_msgs</depend>
+
+  <!-- AutowareArchitectureProposal -->
   <depend>autoware_api_msgs</depend>
-  <depend>autoware_auto_msgs</depend>
   <depend>autoware_control_msgs</depend>
   <depend>autoware_debug_msgs</depend>
   <depend>autoware_perception_msgs</depend>
   <depend>autoware_planning_msgs</depend>
   <depend>autoware_system_msgs</depend>
   <depend>autoware_vehicle_msgs</depend>
+
+  <!-- Common -->
   <depend>geometry_msgs</depend>
   <depend>rclcpp</depend>
   <depend>scenario_simulator_exception</depend>

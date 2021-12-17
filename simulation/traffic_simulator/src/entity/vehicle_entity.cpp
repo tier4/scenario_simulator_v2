@@ -39,6 +39,7 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
+  behavior_plugin_ptr_->setDriverModel(traffic_simulator_msgs::msg::DriverModel());
 }
 
 void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
@@ -127,6 +128,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     if (status_->lanelet_pose_valid) {
       behavior_plugin_ptr_->setRouteLanelets(
         route_planner_ptr_->getRouteLanelets(status_->lanelet_pose));
+      // behavior_plugin_ptr_->setGoalPoses(route_planner_ptr_->getGoalPoses());
     } else {
       std::vector<std::int64_t> empty = {};
       behavior_plugin_ptr_->setRouteLanelets(empty);

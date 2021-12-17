@@ -61,6 +61,8 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 
   std::promise<void> promise;
 
+  std::future<void> future;
+
   std::thread spinner;
 
   rclcpp::TimerBase::SharedPtr updater;
@@ -82,6 +84,8 @@ protected:
 
   double current_upper_bound_speed = std::numeric_limits<double>::max();
 
+  auto currentFuture() -> auto & { return future; }
+
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
   virtual void sendSIGINT() = 0;
@@ -95,39 +99,37 @@ protected:
 public:
   CONCEALER_PUBLIC explicit Autoware()
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    spinner(
-      [this](auto future) {
-        while (rclcpp::ok() and
-               future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-          try {
-            rclcpp::spin_some(get_node_base_interface());
-          } catch (...) {
-            thrown = std::current_exception();
-          }
+    future(std::move(promise.get_future())),
+    spinner([this]() {
+      while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
+                                std::future_status::timeout) {
+        try {
+          rclcpp::spin_some(get_node_base_interface());
+        } catch (...) {
+          thrown = std::current_exception();
         }
-      },
-      std::move(promise.get_future()))
+      }
+    })
   {
   }
 
   template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    spinner(
-      [this](auto future) {
-        while (rclcpp::ok() and
-               future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-          try {
-            rclcpp::spin_some(get_node_base_interface());
-          } catch (...) {
-            thrown = std::current_exception();
-          }
+    future(std::move(promise.get_future())),
+    spinner([this]() {
+      while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
+                                std::future_status::timeout) {
+        try {
+          rclcpp::spin_some(get_node_base_interface());
+        } catch (...) {
+          thrown = std::current_exception();
         }
-        RCLCPP_INFO_STREAM(
-          get_logger(),
-          "\x1b[32mShutting down Autoware: (1/3) Stopped publishing/subscribing.\x1b[0m");
-      },
-      std::move(promise.get_future())),
+      }
+      RCLCPP_INFO_STREAM(
+        get_logger(),
+        "\x1b[32mShutting down Autoware: (1/3) Stopped publishing/subscribing.\x1b[0m");
+    }),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...))
   {
   }

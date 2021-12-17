@@ -188,9 +188,7 @@ void ScenarioSimulator::attachDetectionSensor(
   const simulation_api_schema::AttachDetectionSensorRequest & req,
   simulation_api_schema::AttachDetectionSensorResponse & res)
 {
-  const auto pub = this->create_publisher<autoware_perception_msgs::msg::DynamicObjectArray>(
-    req.configuration().topic_name(), 1);
-  sensor_sim_.attachDetectionSensor(current_time_, req.configuration(), pub);
+  sensor_sim_.attachDetectionSensor(current_time_, req.configuration(), *this);
   res = simulation_api_schema::AttachDetectionSensorResponse();
   res.mutable_result()->set_success(true);
 }
@@ -199,9 +197,7 @@ void ScenarioSimulator::attachLidarSensor(
   const simulation_api_schema::AttachLidarSensorRequest & req,
   simulation_api_schema::AttachLidarSensorResponse & res)
 {
-  const auto pub =
-    this->create_publisher<sensor_msgs::msg::PointCloud2>(req.configuration().topic_name(), 1);
-  sensor_sim_.attachLidarSensor(current_time_, req.configuration(), pub);
+  sensor_sim_.attachLidarSensor(current_time_, req.configuration(), *this);
   res = simulation_api_schema::AttachLidarSensorResponse();
   res.mutable_result()->set_success(true);
 }

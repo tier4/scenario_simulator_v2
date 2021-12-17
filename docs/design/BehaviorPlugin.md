@@ -119,6 +119,7 @@ Setters are named as set(Foo), such as `BehaviorPluginClass::setCurrentTime(doub
 | DriverModel          | Driver behavior parameters                            | `traffic_simulator_msgs::msg::DriverModel`                |
 | EntityStatus         | Entity status of the NPC you want to control          | `traffic_simulator_msgs::msg::EntityStatus`               |
 | EntityTypeList       | Dictionary of NPC name and it's type.                 | `EntityTypeDict`                                          |
+| GoalPoses            | Goal poses of entity.                                 | `std::vector<geometry_msgs::msg::Pose>`                   |
 | HdMapUtils           | Shared pointer of HdMapUtils class.                   | `std::shared_ptr<hdmap_utils::HdMapUtils>`                |
 | Obstacle             | Target obstacle of your NPC.                          | `boost::optional<traffic_simulator_msgs::msg::Obstacle>`  |
 | OtherEntityStatus    | Dictionay of other entity status.                     | `EntityStatusDict`                                        |

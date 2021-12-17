@@ -50,8 +50,6 @@ struct ObjectController : public ComplexType
   auto assign(const EntityRef &) -> void;
 
   auto isUserDefinedController() const & -> bool;
-
-  operator traffic_simulator_msgs::msg::DriverModel() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

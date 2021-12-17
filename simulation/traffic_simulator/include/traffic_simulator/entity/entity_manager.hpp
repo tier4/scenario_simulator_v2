@@ -91,7 +91,7 @@ class EntityManager
 
   MarkerArray markers_raw_;
 
-  const std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
+  const std::shared_ptr<TrafficLightManagerBase> traffic_light_manager_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -114,13 +114,34 @@ public:
     return origin;
   }
 
+  template <typename... Ts>
+  auto makeTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
+  {
+    const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+
+#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+    if (architecture_type == "awf/universe") {
+      return std::make_shared<
+        TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
+        std::forward<decltype(xs)>(xs)...);
+    } else
+#endif
+      // NOTE: This broken indent is due to ament_clang_format.
+      if (architecture_type == "tier4/proposal" or architecture_type == "awf/auto") {
+      return std::make_shared<
+        TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>>(
+        std::forward<decltype(xs)>(xs)...);
+    } else {
+      std::stringstream what;
+      what << "Unexpected architecture_type " << std::quoted(architecture_type) << " given.";
+      throw std::invalid_argument(what.str());
+    }
+  }
+
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const Configuration & configuration)
   : configuration(configuration),
-    node_topics_interface([](auto && node) {
-      using rclcpp::node_interfaces::get_node_topics_interface;
-      return get_node_topics_interface(node);
-    }(node)),
+    node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
@@ -134,13 +155,7 @@ public:
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(
-      hdmap_utils_ptr_,
-      rclcpp::create_publisher<MarkerArray>(node, "traffic_light/marker", LaneletMarkerQoS()),
-      rclcpp::create_publisher<autoware_perception_msgs::msg::TrafficLightStateArray>(
-        node, "/perception/traffic_light_recognition/traffic_light_states",
-        rclcpp::QoS(10).transient_local()),
-      clock_ptr_))
+    traffic_light_manager_ptr_(makeTrafficLightManager(hdmap_utils_ptr_, node))
   {
     updateHdmapMarker();
   }
