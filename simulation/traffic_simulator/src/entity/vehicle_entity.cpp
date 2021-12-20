@@ -155,5 +155,25 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     updateStandStillDuration(step_time);
   }
 }
+
+void VehicleEntity::setAccelerationLimit(double acceleration)
+{
+  if (acceleration <= 0.0) {
+    THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
+  }
+  auto driver_model = getDriverModel();
+  driver_model.acceleration = acceleration;
+  setDriverModel(driver_model);
+}
+
+void VehicleEntity::setDecelerationLimit(double deceleration)
+{
+  if (deceleration <= 0.0) {
+    THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
+  }
+  auto driver_model = getDriverModel();
+  driver_model.deceleration = deceleration;
+  setDriverModel(driver_model);
+}
 }  // namespace entity
 }  // namespace traffic_simulator
