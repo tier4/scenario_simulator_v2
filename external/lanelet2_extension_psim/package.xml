@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>lanelet2_extension_psim</name>
-  <version>0.5.8</version>
+  <version>0.6.0</version>
   <description>The lanelet2_extension_psim pacakge contains libraries to handle Lanelet2 format data.</description>
 
   <maintainer email="ryohsuke.mitsudome@tier4.jp">mitsudome-r</maintainer>
@@ -20,7 +20,7 @@
   <depend>lanelet2_routing</depend>
   <depend>lanelet2_traffic_rules</depend>
   <depend>lanelet2_validation</depend>
-  <depend>autoware_auto_msgs</depend>
+  <depend>autoware_auto_mapping_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>visualization_msgs</depend>
   <depend>pugixml-dev</depend>

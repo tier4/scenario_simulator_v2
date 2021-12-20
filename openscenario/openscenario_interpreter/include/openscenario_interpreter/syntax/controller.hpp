@@ -58,8 +58,6 @@ struct Controller : public Scope
   auto isUserDefinedController() & -> bool;
 
   auto operator[](const String &) -> const Property &;
-
-  operator traffic_simulator_msgs::msg::DriverModel();
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

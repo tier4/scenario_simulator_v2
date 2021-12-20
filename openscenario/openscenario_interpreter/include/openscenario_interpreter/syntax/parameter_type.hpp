@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/syntax/unsigned_short.hpp>
+#include <openscenario_interpreter/utility/variant.hpp>
 #include <openscenario_msgs/msg/parameter_type.hpp>
 
 namespace openscenario_interpreter

@@ -69,30 +69,8 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
 
 auto ScenarioObject::activateSensors() -> bool
 {
-  if (object_controller.isUserDefinedController()) {
-    const auto architecture_type = getParameter<std::string>("architecture_type", "");
-    if (architecture_type == "tier4/proposal") {
-      return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-               traffic_simulator::helper::LidarType::VLP16, name,
-               "/sensing/lidar/no_ground/pointcloud")) and
-             attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-               name, "/perception/object_recognition/objects", 0.1));
-    } else if (architecture_type == "awf/auto") {
-      /*
-         Autoware.Auto does not currently support object prediction however it
-         is work-in-progress for Cargo ODD msgs are already implemented and
-         autoware_auto_msgs::msg::PredictedObjects will probably be used here
-         topic name is yet unknown.
-      */
-      return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-        traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
-    } else {
-      throw SemanticError(
-        "Unexpected architecture_type ", std::quoted(architecture_type), " specified");
-    }
-  } else {
-    return true;
-  }
+  return object_controller.isUserDefinedController() and attachLidarSensor(name) and
+         attachDetectionSensor(name);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

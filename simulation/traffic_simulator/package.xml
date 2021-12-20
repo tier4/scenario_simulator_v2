@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>0.5.8</version>
+  <version>0.6.0</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -12,7 +12,6 @@
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>ament_index_cpp</depend>
-  <depend>autoware_auto_msgs</depend>
   <depend>concealer</depend>
   <depend>geographic_msgs</depend>
   <depend>geometry_msgs</depend>

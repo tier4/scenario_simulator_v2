@@ -85,7 +85,7 @@ public:
   }
 
   void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override
+    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr) override
   {
     EntityBase::setTrafficLightManager(ptr);
     behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
