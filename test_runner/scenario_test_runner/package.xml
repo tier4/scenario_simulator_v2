@@ -16,6 +16,7 @@
   <exec_depend>lexus_description</exec_depend>
   <exec_depend>openscenario_interpreter</exec_depend>
   <exec_depend>openscenario_utility</exec_depend>
+  <exec_depend>kashiwanoha_map</exec_depend>
 
   <!-- AutowareAuto launch -->
   <!-- <exec_depend>scenario_simulator_launch</exec_depend> -->
