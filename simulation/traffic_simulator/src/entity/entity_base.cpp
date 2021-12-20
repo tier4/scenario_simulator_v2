@@ -124,12 +124,12 @@ void EntityBase::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &
   // THROW_SIMULATION_ERROR("setDriverModel function can be used with only ego/vehicle entity.");
 }
 
-virtual void EntityBase::setAccelerationLimit(double acceleration)
+void EntityBase::setAccelerationLimit(double)
 {
   THROW_SIMULATION_ERROR("setAccelerationLimit function can be used with only ego/vehicle entity.");
 }
 
-virtual void EntityBase::setDecelerationLimit(double deceleration)
+void EntityBase::setDecelerationLimit(double)
 {
   THROW_SIMULATION_ERROR("setAccelerationLimit function can be used with only ego/vehicle entity.");
 }
