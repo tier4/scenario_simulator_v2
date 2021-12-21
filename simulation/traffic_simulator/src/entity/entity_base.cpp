@@ -47,8 +47,8 @@ void EntityBase::requestSpeedChange(
     case traffic_simulator_msgs::msg::RequestSpeedChangeParameter::LINEAR: {
       auto status = getStatus();
       status.action_status.twist.linear.x = parameter.target_speed;
-      setAccelerationLimit(std::fabs(parameter.constraint_value));
-      setDecelerationLimit(std::fabs(parameter.constraint_value) * -1);
+      setAccelerationLimit(parameter.constraint_value);
+      setDecelerationLimit(parameter.constraint_value);
       setTargetSpeed(parameter.target_speed, parameter.continuous);
       break;
     }

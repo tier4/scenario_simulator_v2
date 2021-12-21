@@ -41,17 +41,17 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getEntityStatus("ego").action_status.twist.linear.x < 10.0) {
+    if (api_.getEntityStatus("front").action_status.twist.linear.x < 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       api_.getCurrentTime() <= 0.9 &&
-      api_.getEntityStatus("front").action_status.twist.linear.x > 10.0) {
+      api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       api_.getCurrentTime() >= 1.0 &&
-      api_.getEntityStatus("front").action_status.twist.linear.x <= 10.0) {
+      api_.getEntityStatus("ego").action_status.twist.linear.x <= 10.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -61,7 +61,7 @@ private:
     api_.spawn("ego", getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
-      traffic_simulator::helper::constructActionStatus(3));
+      traffic_simulator::helper::constructActionStatus(0));
     traffic_simulator_msgs::msg::RequestSpeedChangeParameter param_ego;
     param_ego.constraint =
       traffic_simulator_msgs::msg::RequestSpeedChangeParameter::LATERAL_ACCELERATION;
@@ -74,7 +74,7 @@ private:
     api_.spawn("front", getVehicleParameters());
     api_.setEntityStatus(
       "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
-      traffic_simulator::helper::constructActionStatus(3));
+      traffic_simulator::helper::constructActionStatus(0));
     traffic_simulator_msgs::msg::RequestSpeedChangeParameter param_front;
     param_front.constraint =
       traffic_simulator_msgs::msg::RequestSpeedChangeParameter::LATERAL_ACCELERATION;
@@ -82,6 +82,7 @@ private:
     param_front.constraint_value = 10.0;
     param_front.target_speed = 10.0;
     param_front.continuous = true;
+    api_.requestSpeedChange("front", param_front);
   }
 };
 
