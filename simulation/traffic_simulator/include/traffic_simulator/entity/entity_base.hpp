@@ -27,6 +27,7 @@
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
+#include <traffic_simulator_msgs/msg/request_speed_change_parameter.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
@@ -145,6 +146,9 @@ public:
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) = 0;
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints) = 0;
+
+  virtual void requestSpeedChange(
+    const traffic_simulator_msgs::msg::RequestSpeedChangeParameter & parameter);
 
   virtual void requestLaneChange(const std::int64_t){};
 

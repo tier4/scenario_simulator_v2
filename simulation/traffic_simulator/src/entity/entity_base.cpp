@@ -40,6 +40,34 @@ void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
+void EntityBase::requestSpeedChange(
+  const traffic_simulator_msgs::msg::RequestSpeedChangeParameter & parameter)
+{
+  switch (parameter.transition) {
+    case traffic_simulator_msgs::msg::RequestSpeedChangeParameter::LINEAR: {
+      auto status = getStatus();
+      status.action_status.twist.linear.x = parameter.target_speed;
+      setAccelerationLimit(std::fabs(parameter.constraint_value));
+      setDecelerationLimit(std::fabs(parameter.constraint_value) * -1);
+      setTargetSpeed(parameter.target_speed, parameter.continuous);
+      break;
+    }
+    case traffic_simulator_msgs::msg::RequestSpeedChangeParameter::STEP: {
+      auto status = getStatus();
+      status.action_status.twist.linear.x = parameter.target_speed;
+      setTargetSpeed(parameter.target_speed, parameter.continuous);
+      setStatus(status);
+      break;
+    }
+    default: {
+      THROW_SIMULATION_ERROR(
+        "transition is invalid, value : ", parameter.transition,
+        " Currently, LINEAR and STEP is only supported.");
+      break;
+    }
+  }
+}
+
 const autoware_vehicle_msgs::msg::VehicleCommand EntityBase::getVehicleCommand()
 {
   THROW_SIMULATION_ERROR("get vehicle command does not support in ", type, " entity type");

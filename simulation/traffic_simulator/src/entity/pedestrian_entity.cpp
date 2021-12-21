@@ -98,6 +98,14 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
   }
 }
 
+void PedestrianEntity::requestSpeedChange(
+  const traffic_simulator_msgs::msg::RequestSpeedChangeParameter &)
+{
+  THROW_SEMANTIC_ERROR(
+    "Currently, requestSpeedChange function does not works in pedestrian because users cannot "
+    "specify acceleration and deceleration in pedestrian entity.");
+}
+
 void PedestrianEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest("none");
