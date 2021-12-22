@@ -20,6 +20,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -149,6 +150,10 @@ public:
 
   virtual void requestSpeedChange(
     const traffic_simulator_msgs::msg::RequestSpeedChangeParameter & parameter);
+
+  virtual void requestSpeedChange(
+    const double target_speed, const SpeedChangeTransition transition,
+    const SpeedChangeConstraint constaint, const bool continuous);
 
   virtual void requestLaneChange(const std::int64_t){};
 

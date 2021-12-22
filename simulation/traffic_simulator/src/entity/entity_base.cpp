@@ -41,6 +41,29 @@ void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
 void EntityBase::requestSpeedChange(
+  const double target_speed, const SpeedChangeTransition transition,
+  const SpeedChangeConstraint constraint, const bool continuous)
+{
+  switch (transition) {
+    case SpeedChangeTransition::LINEAR: {
+      auto status = getStatus();
+      status.action_status.twist.linear.x = target_speed;
+      setAccelerationLimit(std::fabs(constraint.value));
+      setDecelerationLimit(std::fabs(constraint.value));
+      setTargetSpeed(target_speed, continuous);
+      break;
+    }
+    case SpeedChangeTransition::STEP: {
+      auto status = getStatus();
+      status.action_status.twist.linear.x = target_speed;
+      setTargetSpeed(target_speed, continuous);
+      setStatus(status);
+      break;
+    }
+  }
+}
+
+void EntityBase::requestSpeedChange(
   const traffic_simulator_msgs::msg::RequestSpeedChangeParameter & parameter)
 {
   switch (parameter.transition) {
