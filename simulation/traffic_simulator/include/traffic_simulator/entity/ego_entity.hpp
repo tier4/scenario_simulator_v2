@@ -25,8 +25,9 @@
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
+#include <traffic_simulator/vehicle_model/sim_model.hpp>
+// #include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
+// #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <unordered_map>
 #include <vector>
@@ -47,10 +48,16 @@ namespace traffic_simulator
 namespace entity
 {
 enum class VehicleModelType {
-  DELAY_STEER,
+  // DELAY_STEER,
+  // DELAY_STEER_ACC,
+  // IDEAL_ACCEL,
+  // IDEAL_STEER,
+
   DELAY_STEER_ACC,
-  IDEAL_ACCEL,
-  IDEAL_STEER,
+  DELAY_STEER_ACC_GEARED,
+  IDEAL_STEER_ACC,
+  IDEAL_STEER_ACC_GEARED,
+  IDEAL_STEER_VEL,
 };
 
 class EgoEntity : public VehicleEntity
