@@ -22,7 +22,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/Obstacle.msg
   msg/PedestrianParameters.msg
   msg/Performance.msg
-  msg/RequestSpeedChangeParameter.msg
   msg/VehicleParameters.msg
   msg/WaypointsArray.msg
   DEPENDENCIES std_msgs geometry_msgs
