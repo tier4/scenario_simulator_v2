@@ -1,26 +1,39 @@
-external/autoware_auto_msgs
-external/operational-design-domains
-external/doxybook2
-external/quaternion_operation
+# other settings
+.vscode
+
+# backup file
+*.bak
+
+# log file
+*.log
+
+# files too large
+*.pcd
+
+# external packages
 external/autoware_api_msgs
+external/autoware_auto_msgs
+external/autoware_control_msgs
+external/autoware_debug_msgs
+external/autoware_iv_msgs
 external/autoware_perception_msgs
 external/autoware_planning_msgs
 external/autoware_system_msgs
 external/autoware_vehicle_msgs
-external/autoware_control_msgs
-external/autoware_debug_msgs
-external/lanelet2
-external/mrt_cmake_modules
-external/AutowareArchitectureProposal_msgs
 external/AutowareArchitectureProposal_api_msgs
+external/AutowareArchitectureProposal_msgs
+external/doxybook2
+external/lanelet2
+external/lexus_description
+external/mrt_cmake_modules
+external/operational-design-domains
+external/ouxt_common
+external/quaternion_operation
+external/tier4_msgs
+
+# auto-generated files
 html
 latex
 scenario_simulator.tar
 site
-
-.vscode
-
-*.bak
-*.log
-*.pcd
 *.pyc
