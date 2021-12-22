@@ -63,7 +63,7 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.requestSpeedChange(
-      10.0, traffic_simulator::SpeedChangeTransition::LINEAR,
+      "ego", 10.0, traffic_simulator::SpeedChangeTransition::LINEAR,
       traffic_simulator::SpeedChangeConstraint(
         traffic_simulator::SpeedChangeConstraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
@@ -72,7 +72,7 @@ private:
       "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.requestSpeedChange(
-      10.0, traffic_simulator::SpeedChangeTransition::STEP,
+      "front", 10.0, traffic_simulator::SpeedChangeTransition::STEP,
       traffic_simulator::SpeedChangeConstraint(
         traffic_simulator::SpeedChangeConstraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);

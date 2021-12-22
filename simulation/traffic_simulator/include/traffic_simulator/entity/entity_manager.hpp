@@ -233,7 +233,6 @@ public:
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
-  FORWARD_TO_ENTITY(requestSpeedChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
@@ -247,6 +246,10 @@ public:
   bool trafficLightsChanged();
 
   void setTargetSpeed(const std::string & name, double target_speed, bool continuous);
+
+  void requestSpeedChange(
+    const std::string & name, const double target_speed, const SpeedChangeTransition transition,
+    const SpeedChangeConstraint constaint, const bool continuous);
 
   traffic_simulator_msgs::msg::EntityStatus updateNpcLogic(
     const std::string & name,
