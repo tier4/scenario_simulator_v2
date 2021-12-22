@@ -213,7 +213,7 @@ auto EgoEntity::getCurrentAction() const -> const std::string
   return state.empty() ? "Launching" : state;
 }
 
-auto EgoEntity::getDriverModel() const-> traffic_simulator_msgs::msg::DriverModel
+auto EgoEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
 {
   traffic_simulator_msgs::msg::DriverModel model;
   /**
