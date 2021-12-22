@@ -60,7 +60,19 @@ struct Properties
 
   explicit Properties(const pugi::xml_node &, Scope &);
 
-  auto operator[](const String &) -> const Property &;
+#define BOILERPLATE(NAME)                                      \
+  template <typename... Ts>                                    \
+  auto NAME(Ts &&... xs)->decltype(auto)                       \
+  {                                                            \
+    return properties.NAME(std::forward<decltype(xs)>(xs)...); \
+  }                                                            \
+  static_assert(true)
+
+  BOILERPLATE(end);
+  BOILERPLATE(find);
+  BOILERPLATE(operator[]);
+
+#undef BOILERPLATE
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

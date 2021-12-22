@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Fix syntax `Controller` to not to overwrite `traffic_simulator`'s `DriverModel` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/649)).
 
 ## Version 0.6.0
 - Start supporting Autoware.Universe. ([link](https://github.com/tier4/scenario_simulator_v2/pull/614))
