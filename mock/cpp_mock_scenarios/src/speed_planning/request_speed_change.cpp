@@ -62,36 +62,28 @@ private:
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
-    traffic_simulator_msgs::msg::RequestSpeedChangeParameter param_ego;
-    param_ego.constraint =
-      traffic_simulator_msgs::msg::RequestSpeedChangeParameter::LATERAL_ACCELERATION;
-    param_ego.transition = traffic_simulator_msgs::msg::RequestSpeedChangeParameter::LINEAR;
-    param_ego.constraint_value = 10.0;
-    param_ego.target_speed = 10.0;
-    param_ego.continuous = true;
-    api_.requestSpeedChange("ego", param_ego);
-
+    api_.requestSpeedChange(
+      10.0, traffic_simulator::SpeedChangeTransition::LINEAR,
+      traffic_simulator::SpeedChangeConstraint(
+        traffic_simulator::SpeedChangeConstraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
+      true);
     api_.spawn("front", getVehicleParameters());
     api_.setEntityStatus(
       "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
       traffic_simulator::helper::constructActionStatus(0));
-    traffic_simulator_msgs::msg::RequestSpeedChangeParameter param_front;
-    param_front.constraint =
-      traffic_simulator_msgs::msg::RequestSpeedChangeParameter::LATERAL_ACCELERATION;
-    param_front.transition = traffic_simulator_msgs::msg::RequestSpeedChangeParameter::STEP;
-    param_front.constraint_value = 10.0;
-    param_front.target_speed = 10.0;
-    param_front.continuous = true;
-    api_.requestSpeedChange("front", param_front);
-  }
-};
+    api_.requestSpeedChange(
+      10.0, traffic_simulator::SpeedChangeTransition::STEP,
+      traffic_simulator::SpeedChangeConstraint(
+        traffic_simulator::SpeedChangeConstraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
+      true);
+  };
 
-int main(int argc, char * argv[])
-{
-  rclcpp::init(argc, argv);
-  rclcpp::NodeOptions options;
-  auto component = std::make_shared<RequestSpeedChangeScenario>(options);
-  rclcpp::spin(component);
-  rclcpp::shutdown();
-  return 0;
-}
+  int main(int argc, char * argv[])
+  {
+    rclcpp::init(argc, argv);
+    rclcpp::NodeOptions options;
+    auto component = std::make_shared<RequestSpeedChangeScenario>(options);
+    rclcpp::spin(component);
+    rclcpp::shutdown();
+    return 0;
+  }
