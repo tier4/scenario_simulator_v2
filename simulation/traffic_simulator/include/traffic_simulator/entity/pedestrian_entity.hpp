@@ -104,9 +104,6 @@ public:
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
   void requestSpeedChange(
-    const traffic_simulator_msgs::msg::RequestSpeedChangeParameter & parameter) override;
-
-  void requestSpeedChange(
     const double target_speed, const SpeedChangeTransition transition,
     const SpeedChangeConstraint constaint, const bool continuous) override;
 

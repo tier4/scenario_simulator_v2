@@ -82,12 +82,6 @@ public:
   }
 
   void requestSpeedChange(
-    const traffic_simulator_msgs::msg::RequestSpeedChangeParameter &) override
-  {
-    THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
-  }
-
-  void requestSpeedChange(
     const double, const SpeedChangeTransition, const SpeedChangeConstraint, const bool) override
   {
     THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");

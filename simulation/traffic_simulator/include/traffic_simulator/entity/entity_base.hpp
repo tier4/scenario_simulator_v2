@@ -149,9 +149,6 @@ public:
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints) = 0;
 
   virtual void requestSpeedChange(
-    const traffic_simulator_msgs::msg::RequestSpeedChangeParameter & parameter);
-
-  virtual void requestSpeedChange(
     const double target_speed, const SpeedChangeTransition transition,
     const SpeedChangeConstraint constaint, const bool continuous);
 
