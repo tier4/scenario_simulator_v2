@@ -17,9 +17,6 @@
 
 #ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 
-#include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
-#include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
-#include <autoware_api_msgs/msg/velocity_limit.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/had_map_route.hpp>
@@ -34,13 +31,15 @@
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
-#include <autoware_debug_msgs/msg/float32_stamped.hpp>
-#include <autoware_planning_msgs/msg/lane_change_command.hpp>
-#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <tier4_api_msgs/msg/awapi_autoware_status.hpp>
+#include <tier4_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <tier4_api_msgs/msg/velocity_limit.hpp>
+#include <tier4_planning_msgs/msg/lane_change_command.hpp>
+#include <tier4_system_msgs/msg/autoware_state.hpp>
 
 namespace concealer
 {
@@ -61,9 +60,9 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using CurrentVelocity = autoware_auto_vehicle_msgs::msg::VelocityReport;
   using GoalPose = geometry_msgs::msg::PoseStamped;
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
-  using LaneChangeApproval = autoware_planning_msgs::msg::LaneChangeCommand;
+  using LaneChangeApproval = tier4_planning_msgs::msg::LaneChangeCommand;
   using LocalizationOdometry = nav_msgs::msg::Odometry;
-  using VehicleVelocity = autoware_api_msgs::msg::VelocityLimit;
+  using VehicleVelocity = tier4_api_msgs::msg::VelocityLimit;
 
   DEFINE_PUBLISHER(AutowareEngage);
   DEFINE_PUBLISHER(Checkpoint);
@@ -81,12 +80,12 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_PUBLISHER(VehicleVelocity);
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
-  using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
+  using AutowareStatus = tier4_api_msgs::msg::AwapiAutowareStatus;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using HazardLightsCommand = autoware_auto_vehicle_msgs::msg::HazardLightsCommand;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
-  using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
+  using VehicleStatus = tier4_api_msgs::msg::AwapiVehicleStatus;
 
   DEFINE_SUBSCRIPTION(AckermannControlCommand);
   DEFINE_SUBSCRIPTION(AutowareStatus);
@@ -100,7 +99,7 @@ public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                                                   \
   auto is##NAME() const noexcept                                                              \
   {                                                                                           \
-    using autoware_system_msgs::msg::AutowareState;                                           \
+    using tier4_system_msgs::msg::AutowareState;                                              \
     assert(AutowareState::VALUE == #NAME);                                                    \
     return CONCEALER_CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
   }                                                                                           \
