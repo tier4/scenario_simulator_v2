@@ -10,10 +10,14 @@ repositories:
   operational-design-domains:
     type: git
     url: https://gitlab.com/autowarefoundation/operational-design-domains
-  AutowareArchitectureProposal_msgs:
+  autoware_iv_msgs:
     type: git
     url: https://github.com/tier4/AutowareArchitectureProposal_msgs.git
-    version: use-autoware-auto-msgs
+    version: main # for AutowareArchitectureProposal
+  tier4_msgs:
+    type: git
+    url: https://github.com/tier4/AutowareArchitectureProposal_msgs.git
+    version: tier4/universe # for Autoware.Unvierse (Tier IV)
   AutowareArchitectureProposal_api_msgs:
     type: git
     url: https://github.com/tier4/AutowareArchitectureProposal_api_msgs.git
