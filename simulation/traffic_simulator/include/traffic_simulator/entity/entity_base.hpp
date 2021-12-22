@@ -28,7 +28,6 @@
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
-#include <traffic_simulator_msgs/msg/request_speed_change_parameter.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
