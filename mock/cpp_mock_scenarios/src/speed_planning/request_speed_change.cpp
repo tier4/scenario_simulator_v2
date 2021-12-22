@@ -76,14 +76,15 @@ private:
       traffic_simulator::SpeedChangeConstraint(
         traffic_simulator::SpeedChangeConstraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
-  };
-
-  int main(int argc, char * argv[])
-  {
-    rclcpp::init(argc, argv);
-    rclcpp::NodeOptions options;
-    auto component = std::make_shared<RequestSpeedChangeScenario>(options);
-    rclcpp::spin(component);
-    rclcpp::shutdown();
-    return 0;
   }
+};
+
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  rclcpp::NodeOptions options;
+  auto component = std::make_shared<RequestSpeedChangeScenario>(options);
+  rclcpp::spin(component);
+  rclcpp::shutdown();
+  return 0;
+}
