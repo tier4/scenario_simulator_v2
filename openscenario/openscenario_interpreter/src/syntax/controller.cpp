@@ -33,15 +33,22 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 
 auto Controller::assign(const EntityRef & entity_ref) -> void
 {
-  const auto max_speed = properties["maxSpeed"];
+  PRINT(entity_ref);
 
+  const auto max_speed = properties["maxSpeed"];
+  PRINT(max_speed.value);
+
+  PRINT(not max_speed.value.empty());
   if (not max_speed.value.empty()) {
     setUpperBoundSpeed(entity_ref, Double(max_speed.value));
   }
 
   applyAssignControllerAction(entity_ref, [&]() {
     auto message = connection.getDriverModel(entity_ref);
-    message.see_around = not properties["isBlind"];
+    PRINT(message.see_around);
+    if (properties.properties.find("isBlind") != std::end(properties.properties)) {
+      message.see_around = not properties["isBlind"];
+    }
     return message;
   }());
 }
