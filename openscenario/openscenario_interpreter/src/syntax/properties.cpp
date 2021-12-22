@@ -32,7 +32,5 @@ Properties::Properties(const pugi::xml_node & node, Scope & scope)
     return files.emplace_back(std::forward<decltype(node)>(node), scope);
   });
 }
-
-auto Properties::operator[](const String & name) -> const Property & { return properties[name]; }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
