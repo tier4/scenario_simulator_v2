@@ -93,7 +93,7 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
 
-  virtual auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel = 0;
+  virtual auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel = 0;
 
   virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) = 0;
 

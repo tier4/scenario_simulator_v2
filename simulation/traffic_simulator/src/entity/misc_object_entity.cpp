@@ -50,7 +50,7 @@ auto MiscObjectEntity::getCurrentAction() const -> const std::string
   return "";
 }
 
-auto MiscObjectEntity::getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel
+auto MiscObjectEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
 {
   THROW_SEMANTIC_ERROR("getDriverModel function does not support in MiscObjectEntity.");
 }

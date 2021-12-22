@@ -98,7 +98,7 @@ public:
     return parameters.bounding_box;
   }
 
-  auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel;
+  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel;
 
   void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);
 
