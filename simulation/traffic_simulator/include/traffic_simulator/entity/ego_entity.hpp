@@ -47,15 +47,10 @@ namespace traffic_simulator
 namespace entity
 {
 enum class VehicleModelType {
-  IDEAL_TWIST = 0,
-  IDEAL_STEER = 1,
-  DELAY_TWIST = 2,
-  DELAY_STEER = 3,
-  CONST_ACCEL_TWIST = 4,
-  IDEAL_FORKLIFT_RLS = 5,
-  DELAY_FORKLIFT_RLS = 6,
-  IDEAL_ACCEL = 7,
-  DELAY_STEER_ACC = 8,
+  DELAY_STEER,
+  DELAY_STEER_ACC,
+  IDEAL_ACCEL,
+  IDEAL_STEER,
 };
 
 class EgoEntity : public VehicleEntity

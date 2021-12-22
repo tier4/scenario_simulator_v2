@@ -37,15 +37,10 @@ auto toString(const VehicleModelType datum) -> std::string
     return #IDENTIFIER
 
   switch (datum) {
-    BOILERPLATE(CONST_ACCEL_TWIST);
-    BOILERPLATE(DELAY_FORKLIFT_RLS);
     BOILERPLATE(DELAY_STEER);
     BOILERPLATE(DELAY_STEER_ACC);
-    BOILERPLATE(DELAY_TWIST);
     BOILERPLATE(IDEAL_ACCEL);
-    BOILERPLATE(IDEAL_FORKLIFT_RLS);
     BOILERPLATE(IDEAL_STEER);
-    BOILERPLATE(IDEAL_TWIST);
   }
 
 #undef BOILERPLATE
@@ -79,7 +74,7 @@ auto getVehicleModelType()
   } else if (vehicle_model_type == "DELAY_STEER_ACC") {
     return VehicleModelType::DELAY_STEER_ACC;
   } else {
-    THROW_SEMANTIC_ERROR("Unsupported vehicle_model_type ", vehicle_model_type, "specified");
+    THROW_SEMANTIC_ERROR("Unsupported vehicle_model_type ", vehicle_model_type, " specified");
   }
 }
 
