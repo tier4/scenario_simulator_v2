@@ -123,12 +123,12 @@ public:
   /**
    * @brief get vehicle lateral velocity
    */
-  virtual float64_t getVy() = 0;
+  virtual float64_t getVy() { return 0; }  // DIRTY HACK
 
   /**
    * @brief get vehicle longiudinal acceleration
    */
-  virtual float64_t getAx() = 0;
+  virtual float64_t getAx() { return 0; }  // DIRTY HACK
 
   /**
    * @brief get vehicle angular-velocity wz
