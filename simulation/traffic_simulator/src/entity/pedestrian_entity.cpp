@@ -117,6 +117,16 @@ void PedestrianEntity::setTargetSpeed(double target_speed, bool continuous)
   target_speed_planner_.setTargetSpeed(target_speed, continuous);
 }
 
+auto PedestrianEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
+{
+  return behavior_plugin_ptr_->getDriverModel();
+}
+
+void PedestrianEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel & driver_model)
+{
+  setDriverModel(driver_model);
+}
+
 void PedestrianEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
