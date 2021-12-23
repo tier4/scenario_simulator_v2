@@ -38,6 +38,7 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
+  behavior_plugin_ptr_->setDriverModel(traffic_simulator_msgs::msg::DriverModel());
 }
 
 void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
