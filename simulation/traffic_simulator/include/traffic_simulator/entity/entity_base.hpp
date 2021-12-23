@@ -149,7 +149,7 @@ public:
 
   virtual void requestSpeedChange(
     const double target_speed, const SpeedChangeTransition transition,
-    const SpeedChangeConstraint constaint, const bool continuous);
+    const SpeedChangeConstraint constraint, const bool continuous);
 
   virtual void requestLaneChange(const std::int64_t){};
 

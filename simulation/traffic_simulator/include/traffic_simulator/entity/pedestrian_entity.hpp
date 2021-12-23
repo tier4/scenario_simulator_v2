@@ -109,7 +109,7 @@ public:
 
   void requestSpeedChange(
     const double target_speed, const SpeedChangeTransition transition,
-    const SpeedChangeConstraint constaint, const bool continuous) override;
+    const SpeedChangeConstraint constraint, const bool continuous) override;
 
   const std::string getCurrentAction() const override
   {
