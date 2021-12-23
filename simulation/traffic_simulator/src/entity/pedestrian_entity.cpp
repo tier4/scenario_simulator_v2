@@ -117,7 +117,7 @@ auto PedestrianEntity::getDriverModel() const -> traffic_simulator_msgs::msg::Dr
 
 void PedestrianEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel & driver_model)
 {
-  setDriverModel(driver_model);
+  behavior_plugin_ptr_->setDriverModel(driver_model);
 }
 
 void PedestrianEntity::onUpdate(double current_time, double step_time)
