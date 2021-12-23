@@ -115,9 +115,9 @@ auto makeSimulationModel(
 
     case VehicleModelType::DELAY_STEER_ACC:
       return std::make_shared<SimModelDelaySteerAcc>(
-        getParameter<double>("vel_lim", 50.0),   // parameters.performance.max_speed,
-        getParameter<double>("steer_lim", 1.0),  // parameters.axles.front_axle.max_steering,
-        getParameter<double>("vel_rate", 10.0),  // parameters.performance.max_acceleration,
+        getParameter<double>("vel_lim", 50.0),      // parameters.performance.max_speed,
+        getParameter<double>("steer_lim", 1.0),     // parameters.axles.front_axle.max_steering,
+        getParameter<double>("vel_rate_lim", 7.0),  // parameters.performance.max_acceleration,
         getParameter<double>("steer_rate_lim", 5.0),
         getParameter<double>(
           "wheel_base",
@@ -130,9 +130,9 @@ auto makeSimulationModel(
 
     case VehicleModelType::DELAY_STEER_ACC_GEARED:
       return std::make_shared<SimModelDelaySteerAccGeared>(
-        getParameter<double>("vel_lim", 50.0),       // parameters.performance.max_speed,
-        getParameter<double>("steer_lim", 1.0),      // parameters.axles.front_axle.max_steering,
-        getParameter<double>("vel_rate_lim", 10.0),  // parameters.performance.max_acceleration,
+        getParameter<double>("vel_lim", 50.0),      // parameters.performance.max_speed,
+        getParameter<double>("steer_lim", 1.0),     // parameters.axles.front_axle.max_steering,
+        getParameter<double>("vel_rate_lim", 7.0),  // parameters.performance.max_acceleration,
         getParameter<double>("steer_rate_lim", 5.0),
         getParameter<double>(
           "wheel_base",
@@ -140,8 +140,8 @@ auto makeSimulationModel(
         step_time,                                                                          //
         getParameter<double>("acc_time_delay", 0.1),                                        //
         getParameter<double>("acc_time_constant", 0.1),                                     //
-        getParameter<double>("steer_time_delay", 0.3),                                      //
-        getParameter<double>("steer_time_constant", 0.3));
+        getParameter<double>("steer_time_delay", 0.24),                                     //
+        getParameter<double>("steer_time_constant", 0.27));
 
     default:
       THROW_SEMANTIC_ERROR(
@@ -210,7 +210,11 @@ EgoEntity::EgoEntity(
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
-void EgoEntity::engage() { autoware->engage(); }
+void EgoEntity::engage()
+{
+  vehicle_model_ptr_->setGear(autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE);
+  autoware->engage();
+}
 
 auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
 {
@@ -372,9 +376,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input << autoware->getAcceleration(), autoware->getSteeringAngle(), autoware->getGearSign();
-        // input << autoware->getAcceleration(), autoware->getSteeringAngle();
-        std::cout << "input = " << input << std::endl;
+        input << autoware->getGearSign() * autoware->getAcceleration(),
+          autoware->getSteeringAngle();
         vehicle_model_ptr_->setInput(input);
         break;
 
@@ -419,9 +422,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     } else {
       linear_jerk_ = 0;
     }
-
-    std::cout << "Vx = " << vehicle_model_ptr_->getVx() << std::endl;
-    std::cout << "Wz = " << vehicle_model_ptr_->getWz() << std::endl;
 
     previous_linear_velocity_ = vehicle_model_ptr_->getVx();
     previous_angular_velocity_ = vehicle_model_ptr_->getWz();
@@ -519,26 +519,25 @@ bool EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
 
 void EgoEntity::setTargetSpeed(double value, bool)
 {
+  Eigen::VectorXd v(vehicle_model_ptr_->getDimX());
+
   switch (vehicle_model_type_) {
     case VehicleModelType::DELAY_STEER_ACC:
-    case VehicleModelType::DELAY_STEER_ACC_GEARED: {
-      Eigen::VectorXd v(6);
+    case VehicleModelType::DELAY_STEER_ACC_GEARED:
       v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0, 0;
       vehicle_model_ptr_->setState(v);
-    } break;
+      break;
 
     case VehicleModelType::IDEAL_STEER_ACC:
-    case VehicleModelType::IDEAL_STEER_ACC_GEARED: {
-      Eigen::VectorXd v(4);
+    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
       v << 0, 0, 0, autoware->restrictTargetSpeed(value);
       vehicle_model_ptr_->setState(v);
-    } break;
+      break;
 
-    case VehicleModelType::IDEAL_STEER_VEL: {
-      Eigen::VectorXd v(3);
+    case VehicleModelType::IDEAL_STEER_VEL:
       v << 0, 0, 0;
       vehicle_model_ptr_->setState(v);
-    } break;
+      break;
 
       // case VehicleModelType::IDEAL_STEER: {
       //   Eigen::VectorXd v(3);
