@@ -46,8 +46,6 @@ void EntityBase::requestSpeedChange(
 {
   switch (transition) {
     case SpeedChangeTransition::LINEAR: {
-      auto status = getStatus();
-      status.action_status.twist.linear.x = target_speed;
       setAccelerationLimit(std::fabs(constraint.value));
       setDecelerationLimit(std::fabs(constraint.value));
       setTargetSpeed(target_speed, continuous);
@@ -56,6 +54,27 @@ void EntityBase::requestSpeedChange(
     case SpeedChangeTransition::STEP: {
       auto status = getStatus();
       status.action_status.twist.linear.x = target_speed;
+      setTargetSpeed(target_speed, continuous);
+      setStatus(status);
+      break;
+    }
+  }
+}
+
+void EntityBase::requestSpeedChange(
+  const RelativeTargetSpeed target_speed, const SpeedChangeTransition transition,
+  const SpeedChangeConstraint constraint, const bool continuous)
+{
+  switch (transition) {
+    case SpeedChangeTransition::LINEAR: {
+      setAccelerationLimit(std::fabs(constraint.value));
+      setDecelerationLimit(std::fabs(constraint.value));
+      setTargetSpeed(target_speed, continuous);
+      break;
+    }
+    case SpeedChangeTransition::STEP: {
+      auto status = getStatus();
+      status.action_status.twist.linear.x = target_speed.getAbsoluteValue(other_status_);
       setTargetSpeed(target_speed, continuous);
       setStatus(status);
       break;

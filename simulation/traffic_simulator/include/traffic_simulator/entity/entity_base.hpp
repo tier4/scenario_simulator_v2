@@ -153,6 +153,10 @@ public:
     const double target_speed, const SpeedChangeTransition transition,
     const SpeedChangeConstraint constraint, const bool continuous);
 
+  virtual void requestSpeedChange(
+    const RelativeTargetSpeed target_speed, const SpeedChangeTransition transition,
+    const SpeedChangeConstraint constraint, const bool continuous);
+
   virtual void requestLaneChange(const std::int64_t){};
 
   virtual void requestWalkStraight()

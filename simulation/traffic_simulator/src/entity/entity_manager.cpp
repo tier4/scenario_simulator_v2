@@ -599,6 +599,17 @@ void EntityManager::setTargetSpeed(
   return entities_.at(name)->setTargetSpeed(target_speed, continuous);
 }
 
+void EntityManager::requestSpeedChange(
+  const std::string & name, const RelativeTargetSpeed target_speed,
+  const SpeedChangeTransition transition, const SpeedChangeConstraint constraint,
+  const bool continuous)
+{
+  if (isEgo(name) && getCurrentTime() > 0) {
+    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
+  }
+  return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
+}
+
 bool EntityManager::setEntityStatus(
   const std::string & name, traffic_simulator_msgs::msg::EntityStatus status)
 {
