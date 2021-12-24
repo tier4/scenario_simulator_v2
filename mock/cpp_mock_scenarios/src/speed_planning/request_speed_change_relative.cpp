@@ -41,21 +41,16 @@ public:
 private:
   void onUpdate() override
   {
-    /*
-    if (api_.getEntityStatus("front").action_status.twist.linear.x < 10.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
     if (
       api_.getCurrentTime() <= 2.9 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x > 6.0) {
+      api_.getEntityStatus("front").action_status.twist.linear.x > 6.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       api_.getCurrentTime() >= 3.0 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x <= 6.0) {
+      api_.getEntityStatus("front").action_status.twist.linear.x <= 6.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    */
   }
 
   void onInitialize() override
@@ -64,6 +59,7 @@ private:
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(3));
+    api_.setTargetSpeed("ego", 3.0, true);
     api_.spawn("front", getVehicleParameters());
     api_.setEntityStatus(
       "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
