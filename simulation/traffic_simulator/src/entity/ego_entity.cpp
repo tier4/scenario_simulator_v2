@@ -377,30 +377,25 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::LEGACY_IDEAL_ACCEL:
         input << autoware->getAcceleration(), autoware->getSteeringAngle();
-        vehicle_model_ptr_->setInput(input);
         break;
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
         input << autoware->getGearSign() * autoware->getAcceleration(),
           autoware->getSteeringAngle();
-        vehicle_model_ptr_->setInput(input);
         break;
 
       case VehicleModelType::IDEAL_STEER_VEL:
       case VehicleModelType::LEGACY_IDEAL_STEER:
         input << autoware->getVelocity(), autoware->getSteeringAngle();
-        vehicle_model_ptr_->setInput(input);
         break;
 
       case VehicleModelType::LEGACY_DELAY_STEER:
         input << autoware->getVelocity(), autoware->getSteeringAngle();
-        vehicle_model_ptr_->setInput(input);
         break;
 
       case VehicleModelType::LEGACY_DELAY_STEER_ACC:
         input << autoware->getAcceleration(), autoware->getSteeringAngle(), autoware->getGearSign();
-        vehicle_model_ptr_->setInput(input);
         break;
 
       default:
@@ -408,6 +403,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
+    vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
 
     setStatus(getEntityStatus(current_time + step_time, step_time));
@@ -424,11 +420,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   }
 }
 
-auto EgoEntity::ready() const -> bool
-{
-  // NOTE: Autoware::ready() will notify you with an exception if Autoware has detected any anomalies at the time of the call.
-  return autoware->ready();
-}
+auto EgoEntity::ready() const -> bool { return autoware->ready(); }
 
 void EgoEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
@@ -521,37 +513,33 @@ void EgoEntity::setTargetSpeed(double value, bool)
     case VehicleModelType::DELAY_STEER_ACC:
     case VehicleModelType::DELAY_STEER_ACC_GEARED:
       v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0, 0;
-      vehicle_model_ptr_->setState(v);
       break;
 
     case VehicleModelType::IDEAL_STEER_ACC:
     case VehicleModelType::IDEAL_STEER_ACC_GEARED:
     case VehicleModelType::LEGACY_IDEAL_ACCEL:
       v << 0, 0, 0, autoware->restrictTargetSpeed(value);
-      vehicle_model_ptr_->setState(v);
       break;
 
     case VehicleModelType::IDEAL_STEER_VEL:
     case VehicleModelType::LEGACY_IDEAL_STEER:
       v << 0, 0, 0;
-      vehicle_model_ptr_->setState(v);
       break;
 
     case VehicleModelType::LEGACY_DELAY_STEER:
       v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0;
-      vehicle_model_ptr_->setState(v);
       break;
 
     case VehicleModelType::LEGACY_DELAY_STEER_ACC:
       v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0, 0;
-      vehicle_model_ptr_->setState(v);
       break;
 
     default:
       THROW_SEMANTIC_ERROR(
-        "Unsupported simulation model ",
-        getParameter<std::string>("vehicle_model_type", "IDEAL_STEER"), "specified");
+        "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
   }
+
+  vehicle_model_ptr_->setState(v);
 }
 
 auto EgoEntity::setUpperBoundSpeed(double value) -> void  //
