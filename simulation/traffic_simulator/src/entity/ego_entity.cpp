@@ -55,21 +55,12 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-  auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
 
-  std::string vehicle_model_type;
-
-  if (architecture_type == "tier4/proposal") {
-    vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
-  } else if (architecture_type == "awf/universe") {
-    vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
-  } else if (architecture_type == "awf/auto") {
-    // hard-coded for now
-    // it would require changes in https://github.com/tier4/lexus_description.iv.universe
-    vehicle_model_type = "IDEAL_STEER";
-  } else {
-    THROW_SEMANTIC_ERROR("Unsupported architecture_type ", architecture_type);
-  }
+  const auto vehicle_model_type =
+    architecture_type == "awf/auto"
+      ? "IDEAL_STEER"
+      : getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
 
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
@@ -229,7 +220,6 @@ auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::Vehicle
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
   const auto state = autoware->getAutowareStateMessage();
-
   return state.empty() ? "Launching" : state;
 }
 
