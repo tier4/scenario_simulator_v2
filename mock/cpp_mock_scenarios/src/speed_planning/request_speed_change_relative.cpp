@@ -41,6 +41,7 @@ public:
 private:
   void onUpdate() override
   {
+    /*
     if (api_.getEntityStatus("front").action_status.twist.linear.x < 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
@@ -54,6 +55,7 @@ private:
       api_.getEntityStatus("ego").action_status.twist.linear.x <= 6.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
+    */
   }
 
   void onInitialize() override

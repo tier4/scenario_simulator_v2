@@ -670,15 +670,15 @@ void EntityManager::update(const double current_time, const double step_time)
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
+  for (auto it = entities_.begin(); it != entities_.end(); it++) {
+    it->second->setOtherStatus(all_status);
+  }
   for (const auto & entity_name : entity_names) {
     if (entities_[entity_name]->statusSet()) {
       auto status = updateNpcLogic(entity_name, type_list);
       status.bounding_box = getBoundingBox(entity_name);
       all_status.emplace(entity_name, status);
     }
-  }
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    it->second->setOtherStatus(all_status);
   }
   auto entity_type_list = getEntityTypeList();
   traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
