@@ -413,7 +413,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::LEGACY_IDEAL_ACCEL:
         input << autoware->getAcceleration(), autoware->getSteeringAngle();
-        PRINT(input);
         vehicle_model_ptr_->setInput(input);
         break;
 
