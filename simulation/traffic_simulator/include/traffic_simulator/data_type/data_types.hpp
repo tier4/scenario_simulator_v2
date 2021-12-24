@@ -72,6 +72,10 @@ struct RelativeTargetSpeed
     }
     return target_speed;
   };
+  RelativeTargetSpeed operator=(RelativeTargetSpeed val)
+  {
+    return RelativeTargetSpeed(val.reference_entity_name, val.type, val.value);
+  }
   const std::string reference_entity_name;
   const Type type;
   const double value;

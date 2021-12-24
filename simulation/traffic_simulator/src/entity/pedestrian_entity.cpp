@@ -118,7 +118,10 @@ void PedestrianEntity::setTargetSpeed(double target_speed, bool continuous)
   target_speed_planner_.setTargetSpeed(target_speed, continuous);
 }
 
-void PedestrianEntity::setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous) {}
+void PedestrianEntity::setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous)
+{
+  target_speed_planner_.setTargetSpeed(target_speed, continuous);
+}
 
 auto PedestrianEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
 {
