@@ -4,6 +4,7 @@
 - Add API::requestSpeedChange function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
 - Fix syntax `Controller` to not to overwrite `traffic_simulator`'s `DriverModel` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/649)).
 - Update simulation models ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/652)).
+- Enable request relative speed. ([link](https://github.com/tier4/scenario_simulator_v2/pull/654))
 
 ## Version 0.6.0
 - Start supporting Autoware.Universe. ([link](https://github.com/tier4/scenario_simulator_v2/pull/614))
