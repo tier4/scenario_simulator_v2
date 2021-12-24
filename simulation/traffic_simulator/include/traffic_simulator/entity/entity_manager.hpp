@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
@@ -245,6 +246,10 @@ public:
   bool trafficLightsChanged();
 
   void setTargetSpeed(const std::string & name, double target_speed, bool continuous);
+
+  void requestSpeedChange(
+    const std::string & name, const double target_speed, const SpeedChangeTransition transition,
+    const SpeedChangeConstraint constraint, const bool continuous);
 
   traffic_simulator_msgs::msg::EntityStatus updateNpcLogic(
     const std::string & name,

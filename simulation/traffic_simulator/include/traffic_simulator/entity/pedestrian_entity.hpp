@@ -107,6 +107,10 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
+  void requestSpeedChange(
+    const double target_speed, const SpeedChangeTransition transition,
+    const SpeedChangeConstraint constraint, const bool continuous) override;
+
   const std::string getCurrentAction() const override
   {
     return behavior_plugin_ptr_->getCurrentAction();
