@@ -93,7 +93,7 @@ public:
 
   void setDecelerationLimit(double deceleration) override;
 
-  auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel override;
+  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
 
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
   {

@@ -20,6 +20,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -93,9 +94,9 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
 
-  virtual auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel;
+  virtual auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel = 0;
 
-  virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);
+  virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) = 0;
 
   virtual void setAccelerationLimit(double acceleration);
 
@@ -145,6 +146,10 @@ public:
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) = 0;
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints) = 0;
+
+  virtual void requestSpeedChange(
+    const double target_speed, const SpeedChangeTransition transition,
+    const SpeedChangeConstraint constraint, const bool continuous);
 
   virtual void requestLaneChange(const std::int64_t){};
 

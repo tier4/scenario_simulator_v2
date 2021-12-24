@@ -98,10 +98,18 @@ public:
     return parameters.bounding_box;
   }
 
+  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel;
+
+  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);
+
   void requestAssignRoute(
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
+
+  void requestSpeedChange(
+    const double target_speed, const SpeedChangeTransition transition,
+    const SpeedChangeConstraint constraint, const bool continuous) override;
 
   const std::string getCurrentAction() const override
   {

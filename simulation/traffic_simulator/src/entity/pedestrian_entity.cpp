@@ -38,6 +38,7 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
+  behavior_plugin_ptr_->setDriverModel(traffic_simulator_msgs::msg::DriverModel());
 }
 
 void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
@@ -98,6 +99,14 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
   }
 }
 
+void PedestrianEntity::requestSpeedChange(
+  const double, const SpeedChangeTransition, const SpeedChangeConstraint, const bool)
+{
+  THROW_SEMANTIC_ERROR(
+    "Currently, requestSpeedChange function does not works in pedestrian because users cannot "
+    "specify acceleration and deceleration in pedestrian entity.");
+}
+
 void PedestrianEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest("none");
@@ -107,6 +116,16 @@ void PedestrianEntity::cancelRequest()
 void PedestrianEntity::setTargetSpeed(double target_speed, bool continuous)
 {
   target_speed_planner_.setTargetSpeed(target_speed, continuous);
+}
+
+auto PedestrianEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
+{
+  return behavior_plugin_ptr_->getDriverModel();
+}
+
+void PedestrianEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel & driver_model)
+{
+  behavior_plugin_ptr_->setDriverModel(driver_model);
 }
 
 void PedestrianEntity::onUpdate(double current_time, double step_time)
