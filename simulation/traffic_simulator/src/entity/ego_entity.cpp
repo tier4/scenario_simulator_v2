@@ -104,85 +104,53 @@ auto makeSimulationModel(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
   -> const std::shared_ptr<SimModelInterface>
 {
+  // clang-format off
+  const auto acc_time_constant    = getParameter<double>("acc_time_constant",     0.1);
+  const auto acc_time_delay       = getParameter<double>("acc_time_delay",        0.1);
+  const auto accel_rate           = getParameter<double>("accel_rate",           10.0);
+  const auto deadzone_delta_steer = getParameter<double>("deadzone_delta_steer",  0.0);
+  const auto steer_lim            = getParameter<double>("steer_lim",            parameters.axles.front_axle.max_steering);  // 1.0
+  const auto steer_rate_lim       = getParameter<double>("steer_rate_lim",        5.0);
+  const auto steer_time_constant  = getParameter<double>("steer_time_constant",   0.27);
+  const auto steer_time_delay     = getParameter<double>("steer_time_delay",      0.24);
+  const auto vel_lim              = getParameter<double>("vel_lim",              parameters.performance.max_speed);  // 50.0
+  const auto vel_rate_lim         = getParameter<double>("vel_rate_lim",         parameters.performance.max_acceleration);  // 7.0
+  const auto vel_time_constant    = getParameter<double>("vel_time_constant",     0.1);
+  const auto vel_time_delay       = getParameter<double>("vel_time_delay",        0.1);
+  const auto wheel_base           = getParameter<double>("wheel_base",           parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
+  // clang-format on
+
   switch (vehicle_model_type) {
     case VehicleModelType::IDEAL_STEER_VEL:
     case VehicleModelType::LEGACY_IDEAL_STEER:
-      return std::make_shared<SimModelIdealSteerVel>(getParameter<double>(
-        "wheel_base",
-        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x));
+      return std::make_shared<SimModelIdealSteerVel>(wheel_base);
 
     case VehicleModelType::IDEAL_STEER_ACC:
     case VehicleModelType::LEGACY_IDEAL_ACCEL:
-      return std::make_shared<SimModelIdealSteerAcc>(getParameter<double>(
-        "wheel_base",
-        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x));
+      return std::make_shared<SimModelIdealSteerAcc>(wheel_base);
 
     case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-      return std::make_shared<SimModelIdealSteerAccGeared>(getParameter<double>(
-        "wheel_base",
-        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x));
+      return std::make_shared<SimModelIdealSteerAccGeared>(wheel_base);
 
     case VehicleModelType::DELAY_STEER_ACC:
       return std::make_shared<SimModelDelaySteerAcc>(
-        getParameter<double>("vel_lim", 50.0),      // parameters.performance.max_speed,
-        getParameter<double>("steer_lim", 1.0),     // parameters.axles.front_axle.max_steering,
-        getParameter<double>("vel_rate_lim", 7.0),  // parameters.performance.max_acceleration,
-        getParameter<double>("steer_rate_lim", 5.0),
-        getParameter<double>(
-          "wheel_base",
-          parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x),  //
-        step_time,                                                                          //
-        getParameter<double>("acc_time_delay", 0.1),                                        //
-        getParameter<double>("acc_time_constant", 0.1),                                     //
-        getParameter<double>("steer_time_delay", 0.24),                                     //
-        getParameter<double>("steer_time_constant", 0.27));
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, steer_time_delay, steer_time_constant);
 
     case VehicleModelType::DELAY_STEER_ACC_GEARED:
       return std::make_shared<SimModelDelaySteerAccGeared>(
-        getParameter<double>("vel_lim", 50.0),      // parameters.performance.max_speed,
-        getParameter<double>("steer_lim", 1.0),     // parameters.axles.front_axle.max_steering,
-        getParameter<double>("vel_rate_lim", 7.0),  // parameters.performance.max_acceleration,
-        getParameter<double>("steer_rate_lim", 5.0),
-        getParameter<double>(
-          "wheel_base",
-          parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x),  //
-        step_time,                                                                          //
-        getParameter<double>("acc_time_delay", 0.1),                                        //
-        getParameter<double>("acc_time_constant", 0.1),                                     //
-        getParameter<double>("steer_time_delay", 0.24),                                     //
-        getParameter<double>("steer_time_constant", 0.27));
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, steer_time_delay, steer_time_constant);
 
     case VehicleModelType::LEGACY_DELAY_STEER:
       return std::make_shared<SimModelTimeDelaySteer>(
-        getParameter<double>("vel_lim", 50.0),     // parameters.performance.max_speed,
-        getParameter<double>("steer_lim", 1.0),    // parameters.axles.front_axle.max_steering,
-        getParameter<double>("accel_rate", 10.0),  // parameters.performance.max_acceleration,
-        getParameter<double>("steer_rate_lim", 5.0),
-        getParameter<double>(
-          "wheel_base",
-          parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x),  //
-        step_time,                                                                          //
-        getParameter<double>("vel_time_delay", 0.1),                                        //
-        getParameter<double>("vel_time_constant", 0.1),                                     //
-        getParameter<double>("steer_time_delay", 0.3),                                      //
-        getParameter<double>("steer_time_constant", 0.3),                                   //
-        getParameter<double>("deadzone_delta_steer", 0.0));
+        vel_lim, steer_lim, accel_rate, steer_rate_lim, wheel_base, step_time, vel_time_delay,
+        vel_time_constant, steer_time_delay, steer_time_constant, deadzone_delta_steer);
 
     case VehicleModelType::LEGACY_DELAY_STEER_ACC:
       return std::make_shared<SimModelTimeDelaySteerAccel>(
-        getParameter<double>("vel_lim", 50.0),     // parameters.performance.max_speed,
-        getParameter<double>("steer_lim", 1.0),    // parameters.axles.front_axle.max_steering,
-        getParameter<double>("accel_rate", 10.0),  // parameters.performance.max_acceleration,
-        getParameter<double>("steer_rate_lim", 5.0),
-        getParameter<double>(
-          "wheel_base",
-          parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x),  //
-        step_time,                                                                          //
-        getParameter<double>("acc_time_delay", 0.1),                                        //
-        getParameter<double>("acc_time_constant", 0.1),                                     //
-        getParameter<double>("steer_time_delay", 0.3),                                      //
-        getParameter<double>("steer_time_constant", 0.3),                                   //
-        getParameter<double>("deadzone_delta_steer", 0.0));
+        vel_lim, steer_lim, accel_rate, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, steer_time_delay, steer_time_constant, deadzone_delta_steer);
 
     default:
       THROW_SEMANTIC_ERROR(
