@@ -62,7 +62,7 @@ void EntityBase::requestSpeedChange(
 }
 
 void EntityBase::requestSpeedChange(
-  const RelativeTargetSpeed target_speed, const SpeedChangeTransition transition,
+  const RelativeTargetSpeed & target_speed, const SpeedChangeTransition transition,
   const SpeedChangeConstraint constraint, const bool continuous)
 {
   switch (transition) {

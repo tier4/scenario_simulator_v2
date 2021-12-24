@@ -255,7 +255,7 @@ public:
     const std::string & name, const RelativeTargetSpeed & target_speed, bool continuous);
 
   void requestSpeedChange(
-    const std::string & name, const RelativeTargetSpeed target_speed,
+    const std::string & name, const RelativeTargetSpeed & target_speed,
     const SpeedChangeTransition transition, const SpeedChangeConstraint constraint,
     const bool continuous);
 

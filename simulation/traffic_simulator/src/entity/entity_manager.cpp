@@ -600,7 +600,7 @@ void EntityManager::setTargetSpeed(
 }
 
 void EntityManager::requestSpeedChange(
-  const std::string & name, const RelativeTargetSpeed target_speed,
+  const std::string & name, const RelativeTargetSpeed & target_speed,
   const SpeedChangeTransition transition, const SpeedChangeConstraint constraint,
   const bool continuous)
 {
