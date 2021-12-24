@@ -121,6 +121,8 @@ public:
 
   virtual void setTargetSpeed(double target_speed, bool continuous) = 0;
 
+  virtual void setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous) = 0;
+
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
   {

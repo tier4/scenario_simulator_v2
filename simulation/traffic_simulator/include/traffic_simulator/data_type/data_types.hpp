@@ -35,6 +35,19 @@ struct SpeedChangeConstraint
   const Type type;
   const double value;
 };
+
+struct RelativeTargetSpeed
+{
+  enum class Type {
+    DELTA,
+    FACTOR,
+  };
+  RelativeTargetSpeed(const std::string & reference_entity_name, Type type, double value)
+  : reference_entity_name(reference_entity_name), type(type), value(value){};
+  const std::string reference_entity_name;
+  const Type type;
+  const double value;
+};
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_
