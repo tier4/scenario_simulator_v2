@@ -251,11 +251,7 @@ EgoEntity::EgoEntity(
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
-void EgoEntity::engage()
-{
-  vehicle_model_ptr_->setGear(autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE);
-  autoware->engage();
-}
+void EgoEntity::engage() { autoware->engage(); }
 
 auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
 {
