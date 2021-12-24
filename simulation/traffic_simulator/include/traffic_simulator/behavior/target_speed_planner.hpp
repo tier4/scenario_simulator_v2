@@ -16,6 +16,9 @@
 #define BEHAVIOR_TREE_PLUGIN__TARGET_SPEED_PLANNER_HPP_
 
 #include <boost/optional.hpp>
+#include <traffic_simulator/data_type/data_types.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <unordered_map>
 
 namespace traffic_simulator
 {
@@ -25,12 +28,18 @@ class TargetSpeedPlanner
 {
 public:
   void setTargetSpeed(double target_speed, bool continuous);
-  void update(double current_speed);
+  void setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous);
+  void update(
+    double current_speed,
+    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &
+      other_status);
   boost::optional<double> getTargetSpeed() const;
 
 private:
   boost::optional<double> target_speed_;
+  boost::optional<RelativeTargetSpeed> relative_target_speed_;
   bool continuous_;
+  std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
 };
 }  // namespace behavior
 }  // namespace traffic_simulator

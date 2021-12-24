@@ -524,7 +524,7 @@ void EgoEntity::setTargetSpeed(double value, bool)
   }
 }
 
-void EgoEntity::setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous) {}
+void EgoEntity::setTargetSpeed(const RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/) {}
 
 auto EgoEntity::setUpperBoundSpeed(double value) -> void  //
 {

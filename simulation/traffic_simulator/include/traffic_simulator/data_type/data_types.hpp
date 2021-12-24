@@ -15,6 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_
 #define TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_
 
+#include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <unordered_map>
+
 namespace traffic_simulator
 {
 enum class SpeedChangeTransition {
@@ -32,6 +36,7 @@ struct SpeedChangeConstraint
     // @todo TIME,
   };
   SpeedChangeConstraint(Type type, double value) : type(type), value(value) {}
+
   const Type type;
   const double value;
 };
@@ -44,6 +49,29 @@ struct RelativeTargetSpeed
   };
   RelativeTargetSpeed(const std::string & reference_entity_name, Type type, double value)
   : reference_entity_name(reference_entity_name), type(type), value(value){};
+  double getAbsoluteValue(
+    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
+    const
+  {
+    if (other_status.find(reference_entity_name) == other_status.end()) {
+      THROW_SEMANTIC_ERROR(
+        "reference entity name : ", reference_entity_name,
+        " is invalid. Please check entity : ", reference_entity_name,
+        " exists and not a same entity you want to request changing target speed.");
+    }
+    double target_speed = 0;
+    switch (type) {
+      case Type::DELTA:
+        target_speed =
+          other_status.find(reference_entity_name)->second.action_status.twist.linear.x + value;
+        break;
+      case Type::FACTOR:
+        target_speed =
+          other_status.find(reference_entity_name)->second.action_status.twist.linear.x * value;
+        break;
+    }
+    return target_speed;
+  };
   const std::string reference_entity_name;
   const Type type;
   const double value;
