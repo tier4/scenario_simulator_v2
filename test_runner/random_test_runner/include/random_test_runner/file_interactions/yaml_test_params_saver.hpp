@@ -113,7 +113,8 @@ public:
   void write()
   {
     std::string filepath = data_directory_ + "/result.yaml";
-    // RCLCPP_INFO(logger_, fmt::format("Saving yaml: {}", filepath).c_str());
+    std::string message = fmt::format("Saving yaml: {}", filepath);
+    RCLCPP_INFO_STREAM(logger_, message);
     std::ofstream result_file(filepath);
     result_file << yaml_;
   }
@@ -121,7 +122,8 @@ public:
   std::pair<TestSuiteParameters, std::vector<TestCaseParameters>> read()
   {
     std::string filepath = data_directory_ + "/result.yaml";
-    // RCLCPP_INFO(logger_, fmt::format("Reading yaml: {}", filepath).c_str());
+    std::string message = fmt::format("Reading yaml: {}", filepath);
+    RCLCPP_INFO_STREAM(logger_, message);
     yaml_ = YAML::LoadFile(filepath);
 
     if (yaml_.size() != 1) {

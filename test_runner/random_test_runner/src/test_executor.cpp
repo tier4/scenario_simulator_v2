@@ -64,7 +64,8 @@ TestExecutor::TestExecutor(
 
 void TestExecutor::initialize()
 {
-  // RCLCPP_INFO(logger_, fmt::format("Test description: {}", test_description_).c_str());
+  std::string message = fmt::format("Test description: {}", test_description_);
+  RCLCPP_INFO_STREAM(logger_, message);
   scenario_completed_ = false;
 
   api_->initialize(1.0, 0.05);
@@ -122,10 +123,8 @@ void TestExecutor::update(double current_time)
     for (const auto & npc : test_description_.npcs_descriptions) {
       if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
         if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
-          /*
-          RCLCPP_INFO(
-            logger_, fmt::format("New collision occurred between ego and {}", npc.name).c_str());
-          */
+          std::string message = fmt::format("New collision occurred between ego and {}", npc.name);
+          RCLCPP_INFO_STREAM(logger_, message);
           error_reporter_.reportCollision(npc, current_time);
         }
       }
@@ -147,7 +146,8 @@ void TestExecutor::update(double current_time)
 
 void TestExecutor::deinitialize()
 {
-  // RCLCPP_INFO(logger_, fmt::format("Deinitialize: {}", test_description_).c_str());
+  std::string message = fmt::format("Deinitialize: {}", test_description_);
+  RCLCPP_INFO_STREAM(logger_, message);
 
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
     api_->despawn(ego_name_);
