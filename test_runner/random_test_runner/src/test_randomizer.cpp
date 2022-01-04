@@ -78,10 +78,12 @@ TestRandomizer::generateEgoRoute(
       RCLCPP_INFO(logger_, "Goal randomization: full");
       goal_pose = generateRandomPosition();
     } else if (partial_randomization) {
+      /*
       RCLCPP_INFO(
         logger_,
         fmt::format("Goal randomization: partial within distance: {}", randomization_distance)
           .c_str());
+      */
       std::vector<LaneletPart> lanelets_around_goal =
         lanelet_utils_->getLanesWithinDistance(goal_pose_from_params, 0.0, randomization_distance);
       goal_pose = generatePoseFromLanelets(lanelets_around_goal);

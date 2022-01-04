@@ -65,7 +65,7 @@ public:
 
   void write()
   {
-    RCLCPP_INFO(logger_, fmt::format("Saving results to {}", output_directory_).c_str());
+    // RCLCPP_INFO(logger_, fmt::format("Saving results to {}", output_directory_).c_str());
     results_.write_to(
       (boost::filesystem::path(output_directory_) / "result.junit.xml").c_str(), "  ");
   }
