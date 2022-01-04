@@ -135,7 +135,9 @@ const traffic_simulator_msgs::msg::EntityStatus EntityBase::getStatus() const
   if (!status_) {
     THROW_SEMANTIC_ERROR("status is not set");
   } else {
-    return this->status_.get();
+    auto status = this->status_.get();
+    status.bounding_box = getBoundingBox();
+    return status;
   }
 }
 
