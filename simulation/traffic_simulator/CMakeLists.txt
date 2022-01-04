@@ -83,6 +83,7 @@ target_link_libraries(traffic_simulator
   zmq
   stdc++fs
   Boost::filesystem
+  glog
   ${PROTOBUF_LIBRARY})
 
 install(

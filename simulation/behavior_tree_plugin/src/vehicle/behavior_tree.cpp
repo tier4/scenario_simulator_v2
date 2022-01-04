@@ -52,9 +52,9 @@ void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
     "MoveBackward");
   factory_.registerNodeType<entity_behavior::vehicle::LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
-  logging_event_ptr_ = std::make_shared<behavior_tree_plugin::LoggingEvent>(
+  logging_event_ptr_ = std::make_unique<behavior_tree_plugin::LoggingEvent>(
     std::shared_ptr<BT::TreeNode>(tree_.rootNode()), logger);
-  reset_request_event_ptr_ = std::make_shared<behavior_tree_plugin::ResetRequestEvent>(
+  reset_request_event_ptr_ = std::make_unique<behavior_tree_plugin::ResetRequestEvent>(
     std::shared_ptr<BT::TreeNode>(tree_.rootNode()), [&]() { return getRequest(); },
     [&](std::string request) { return setRequest(request); });
   setRequest("none");

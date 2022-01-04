@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__API__API_HPP_
 #define TRAFFIC_SIMULATOR__API__API_HPP_
 
+#include <glog/logging.h>
 #include <simulation_api_schema.pb.h>
 
 #include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
@@ -107,6 +108,8 @@ public:
       simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::update_traffic_lights)
   {
+    google::InitGoogleLogging("");
+    google::InstallFailureSignalHandler();
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
   }

@@ -37,6 +37,7 @@
   <depend>tinyxml2</depend>
   <depend>traffic_simulator_msgs</depend>
   <depend>visualization_msgs</depend>
+  <depend>libgoogle-glog-dev</depend>
 
   <!--<exec_depend>lexus_rx_450h_description</exec_depend> -->
 

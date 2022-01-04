@@ -36,6 +36,7 @@ target_link_libraries(cpp_scenario_node
   sodium
   zmqpp
   zmq
+  glog
 )
 
 ament_auto_add_executable(traffic_simulation_demo
