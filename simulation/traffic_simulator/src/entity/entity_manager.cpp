@@ -99,7 +99,13 @@ visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 
 bool EntityManager::despawnEntity(const std::string & name)
 {
-  return entityExists(name) && entities_.erase(name);
+  if(!entityExists(name)){
+    return true;
+  }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  const auto ret = entities_.erase(name);
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  return ret;
 }
 
 bool EntityManager::entityExists(const std::string & name)
