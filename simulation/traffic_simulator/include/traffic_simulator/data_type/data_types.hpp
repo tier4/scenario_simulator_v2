@@ -130,6 +130,10 @@ struct Parameter
   : target(target), trajectory(trajectory), constraint(constraint)
   {
   }
+  Parameter(const Parameter & other)
+  : target(other.target), trajectory(other.trajectory), constraint(other.constraint)
+  {
+  }
   Parameter operator=(const Parameter & other)
   {
     return Parameter(other.target, other.trajectory, other.constraint);
