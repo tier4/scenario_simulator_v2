@@ -92,7 +92,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 {
   behavior_plugin_ptr_->setRequest("lane_change");
-  behavior_plugin_ptr_->setToLaneletId(to_lanelet_id);
+  behavior_plugin_ptr_->setLaneChangeParameters(to_lanelet_id);
 }
 
 void VehicleEntity::cancelRequest()

@@ -128,7 +128,7 @@ struct Parameter
   const AbsoluteTarget target;
   const Trajectory trajectory;
   const Constraint constraint;
-}
+};
 
 }  // namespace lane_change
 }  // namespace traffic_simulator

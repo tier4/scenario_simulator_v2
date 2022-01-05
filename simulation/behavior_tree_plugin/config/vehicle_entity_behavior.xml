@@ -13,7 +13,7 @@
             target_speed="{target_speed}"
             other_entity_status="{other_entity_status}"
             entity_type_list="{entity_type_list}"
-            to_lanelet_id="{to_lanelet_id}"
+            lane_change_parameters="{lane_change_parameters}"
             route_lanelets="{route_lanelets}"
             obstacle="{obstacle}"
             driver_model="{driver_model}"
