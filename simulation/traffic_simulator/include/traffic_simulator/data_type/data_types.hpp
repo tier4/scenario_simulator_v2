@@ -89,6 +89,7 @@ enum class Trajectory { CUBIC = 0, LINEAR = 1, STEP = 2 };
 
 struct AbsoluteTarget
 {
+  AbsoluteTarget(std::int64_t lanelet_id) : lanelet_id(lanelet_id), offset(0) {}
   AbsoluteTarget(std::int64_t lanelet_id, double offset) : lanelet_id(lanelet_id), offset(offset) {}
   const std::int64_t lanelet_id;
   const double offset = 0;
@@ -96,10 +97,11 @@ struct AbsoluteTarget
 
 struct Constraint
 {
-  enum class Type { LATERAL_VELOCITY = 0 };
+  enum class Type { NONE = 0, LATERAL_VELOCITY = 1 };
+  Constraint() : type(Type::NONE), value(0) {}
   Constraint(const Type & type, double value) : type(type), value(value) {}
   const Type type;
-  const double value;
+  const double value = 0;
 };
 
 struct RelativeTarget
