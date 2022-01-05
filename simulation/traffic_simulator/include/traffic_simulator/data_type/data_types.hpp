@@ -89,6 +89,7 @@ enum class Trajectory { CUBIC = 0, LINEAR = 1, STEP = 2 };
 
 struct AbsoluteTarget
 {
+  AbsoluteTarget(std::int64_t lanelet_id, double offset) : lanelet_id(lanelet_id), offset(offset) {}
   const std::int64_t lanelet_id;
   const double offset = 0;
 };
@@ -96,17 +97,24 @@ struct AbsoluteTarget
 struct Constraint
 {
   enum class Type { LATERAL_VELOCITY = 0 };
+  Constraint(const Type & type, double value) : type(type), value(value) {}
   const Type type;
   const double value;
 };
 
 struct RelativeTarget
 {
+  RelativeTarget(
+    const std::string & entity_name, const Direction direction, uint8_t shift, double offset)
+  : entity_name(entity_name), direction(direction), shift(shift), offset(offset)
+  {
+  }
   const std::string entity_name;
   const Direction direction;
   const uint8_t shift = 0;
   const double offset = 0;
 };
+
 }  // namespace lane_change
 }  // namespace traffic_simulator
 
