@@ -74,8 +74,8 @@ private:
   BT::NodeStatus tickOnce(double current_time, double step_time);
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
-  std::shared_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;
-  std::shared_ptr<behavior_tree_plugin::ResetRequestEvent> reset_request_event_ptr_;
+  std::unique_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;
+  std::unique_ptr<behavior_tree_plugin::ResetRequestEvent> reset_request_event_ptr_;
 };
 }  // namespace entity_behavior
 
