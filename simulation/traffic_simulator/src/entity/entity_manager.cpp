@@ -546,18 +546,19 @@ bool EntityManager::reachPosition(
   return reachPosition(name, target_pose.pose, tolerance);
 }
 
-void EntityManager::requestLaneChange(const std::string & name, const Direction & direction)
+void EntityManager::requestLaneChange(
+  const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
   auto status = getEntityStatus(name);
 
   if (status) {
-    if (direction == Direction::LEFT) {
+    if (direction == traffic_simulator::lane_change::Direction::LEFT) {
       const auto target =
         hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "left");
       if (target) {
         requestLaneChange(name, target.get());
       }
-    } else if (direction == Direction::RIGHT) {
+    } else if (direction == traffic_simulator::lane_change::Direction::RIGHT) {
       const auto target =
         hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "right");
       if (target) {

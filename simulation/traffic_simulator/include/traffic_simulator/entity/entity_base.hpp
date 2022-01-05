@@ -38,8 +38,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
-
 class EntityBase
 {
 public:

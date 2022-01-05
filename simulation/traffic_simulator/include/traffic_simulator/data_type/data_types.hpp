@@ -80,6 +80,24 @@ struct RelativeTargetSpeed
   const Type type;
   const double value;
 };
+
+namespace lane_change
+{
+enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
+
+struct AbsoluteTarget
+{
+  const std::int64_t lanelet_id;
+  const double offset = 0;
+};
+
+struct RelativeTarget
+{
+  const std::string entity_name;
+  const int shift = 0;
+  const double offset = 0;
+};
+}  // namespace lane_change
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_

@@ -460,7 +460,7 @@ void API::requestLaneChange(const std::string & name, const std::int64_t & lanel
 }
 
 void API::requestLaneChange(
-  const std::string & name, const traffic_simulator::entity::Direction & direction)
+  const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
   entity_manager_ptr_->requestLaneChange(name, direction);
 }

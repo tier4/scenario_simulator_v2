@@ -353,7 +353,8 @@ public:
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
 
-  void requestLaneChange(const std::string & name, const Direction & direction);
+  void requestLaneChange(
+    const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
   bool setEntityStatus(const std::string & name, traffic_simulator_msgs::msg::EntityStatus status);
 
