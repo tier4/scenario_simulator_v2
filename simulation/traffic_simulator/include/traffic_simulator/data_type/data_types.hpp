@@ -115,6 +115,21 @@ struct RelativeTarget
   const double offset = 0;
 };
 
+/**
+ * @brief parameters for behavior plugin
+ */
+struct Parameter
+{
+  Parameter(
+    const AbsoluteTarget & target, const Trajectory trajectory, const Constraint & constraint)
+  : target(target), trajectory(trajectory), constraint(constraint)
+  {
+  }
+  const AbsoluteTarget target;
+  const Trajectory trajectory;
+  const Constraint constraint;
+}
+
 }  // namespace lane_change
 }  // namespace traffic_simulator
 
