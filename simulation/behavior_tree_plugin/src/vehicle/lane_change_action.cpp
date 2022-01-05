@@ -77,8 +77,9 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
 void LaneChangeAction::getBlackBoardValues()
 {
   VehicleActionNode::getBlackBoardValues();
-  std::int64_t lane_change_parameters;
-  if (!getInput<std::int64_t>("lane_change_parameters", lane_change_parameters)) {
+  traffic_simulator::lane_change::Parameter lane_change_parameters;
+  if (!getInput<traffic_simulator::lane_change::Parameter>(
+        "lane_change_parameters", lane_change_parameters)) {
     lane_change_parameters_ = boost::none;
   } else {
     lane_change_parameters_ = lane_change_parameters;

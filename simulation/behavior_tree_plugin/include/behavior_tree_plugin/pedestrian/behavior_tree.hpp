@@ -62,7 +62,7 @@ public:
   DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(StepTime, double)
   DEFINE_GETTER_SETTER(TargetSpeed, boost::optional<double>)
-  DEFINE_GETTER_SETTER(LaneChangeParameters, std::int64_t)
+  DEFINE_GETTER_SETTER(LaneChangeParameters, traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(TrafficLightManager, std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
   DEFINE_GETTER_SETTER(UpdatedStatus, traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(VehicleParameters, traffic_simulator_msgs::msg::VehicleParameters)

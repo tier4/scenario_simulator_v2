@@ -122,10 +122,17 @@ struct RelativeTarget
  */
 struct Parameter
 {
+  Parameter() : target(AbsoluteTarget(0)), trajectory(Trajectory::CUBIC), constraint(Constraint())
+  {
+  }
   Parameter(
     const AbsoluteTarget & target, const Trajectory trajectory, const Constraint & constraint)
   : target(target), trajectory(trajectory), constraint(constraint)
   {
+  }
+  Parameter operator=(const Parameter & other)
+  {
+    return Parameter(other.target, other.trajectory, other.constraint);
   }
   const AbsoluteTarget target;
   const Trajectory trajectory;
