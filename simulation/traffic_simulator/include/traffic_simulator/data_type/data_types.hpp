@@ -85,16 +85,26 @@ namespace lane_change
 {
 enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
 
+enum class Trajectory { CUBIC = 0, LINEAR = 1, STEP = 2 };
+
 struct AbsoluteTarget
 {
   const std::int64_t lanelet_id;
   const double offset = 0;
 };
 
+struct Constraint
+{
+  enum class Type { LATERAL_VELOCITY = 0 };
+  const Type type;
+  const double value;
+};
+
 struct RelativeTarget
 {
   const std::string entity_name;
-  const int shift = 0;
+  const Direction direction;
+  const uint8_t shift = 0;
   const double offset = 0;
 };
 }  // namespace lane_change
