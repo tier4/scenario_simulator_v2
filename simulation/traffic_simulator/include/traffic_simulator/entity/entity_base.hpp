@@ -157,6 +157,26 @@ public:
 
   virtual void requestLaneChange(const std::int64_t){};
 
+  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
+
+  void requestLaneChange(
+    const traffic_simulator::lane_change::AbsoluteTarget & target,
+    const traffic_simulator::lane_change::Trajectory trajectory,
+    const lane_change::Constraint & constraint)
+  {
+    auto param = traffic_simulator::lane_change::Parameter(target, trajectory, constraint);
+    requestLaneChange(param);
+  }
+
+  /*
+  void requestLaneChange(
+    const traffic_simulator::lane_change::RelativeTarget & target,
+    const traffic_simulator::lane_change::Trajectory trajectory, 
+    const lane_change::Constraint & constraint)
+  {
+  }
+*/
+
   virtual void requestWalkStraight()
   {
     THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
