@@ -496,23 +496,47 @@ double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)
   return *std::min_element(limits.begin(), limits.end());
 }
 
-boost::optional<int> HdMapUtils::getLaneChangeableLaneletId(
-  std::int64_t lanelet_id, std::string direction)
+boost::optional<int64_t> HdMapUtils::getLaneChangeableLaneletId(
+  std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, size_t shift)
 {
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  if (direction == "left") {
-    auto left_lanelet = vehicle_routing_graph_ptr_->left(lanelet);
-    if (left_lanelet) {
-      return left_lanelet->id();
-    }
-  }
-  if (direction == "right") {
-    auto right_lanelet = vehicle_routing_graph_ptr_->right(lanelet);
-    if (right_lanelet) {
-      return right_lanelet->id();
+  if (shift == 0) {
+    return getLaneChangeableLaneletId(
+      lanelet_id, traffic_simulator::lane_change::Direction::STRAIGHT);
+  } else {
+    std::int64_t reference_id = lanelet_id;
+    for (size_t i = 0; i < shift; i++) {
+      auto id = getLaneChangeableLaneletId(reference_id, direction);
+      if (!id) {
+        return boost::none;
+      } else {
+        reference_id = id.get();
+      }
     }
   }
   return boost::none;
+}
+
+boost::optional<std::int64_t> HdMapUtils::getLaneChangeableLaneletId(
+  std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction)
+{
+  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  boost::optional<std::int64_t> target = boost::none;
+  switch (direction) {
+    case traffic_simulator::lane_change::Direction::STRAIGHT:
+      target = lanelet.id();
+      break;
+    case traffic_simulator::lane_change::Direction::LEFT:
+      if (vehicle_routing_graph_ptr_->left(lanelet)) {
+        target = vehicle_routing_graph_ptr_->left(lanelet)->id();
+      }
+      break;
+    case traffic_simulator::lane_change::Direction::RIGHT:
+      if (vehicle_routing_graph_ptr_->right(lanelet)) {
+        target = vehicle_routing_graph_ptr_->right(lanelet)->id();
+      }
+      break;
+  }
+  return target;
 }
 
 std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(std::int64_t lanelet_id, double distance)

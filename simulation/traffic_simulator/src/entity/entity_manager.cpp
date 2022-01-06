@@ -552,18 +552,10 @@ void EntityManager::requestLaneChange(
   auto status = getEntityStatus(name);
 
   if (status) {
-    if (direction == traffic_simulator::lane_change::Direction::LEFT) {
-      const auto target =
-        hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "left");
-      if (target) {
-        requestLaneChange(name, target.get());
-      }
-    } else if (direction == traffic_simulator::lane_change::Direction::RIGHT) {
-      const auto target =
-        hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "right");
-      if (target) {
-        requestLaneChange(name, target.get());
-      }
+    const auto target =
+      hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, direction);
+    if (target) {
+      requestLaneChange(name, target.get());
     }
   }
 }

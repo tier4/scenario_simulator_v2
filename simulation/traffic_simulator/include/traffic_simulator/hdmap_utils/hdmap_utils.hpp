@@ -41,6 +41,7 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
@@ -87,7 +88,10 @@ public:
   std::vector<std::int64_t> getPreviousLaneletIds(
     std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getPreviousLaneletIds(std::int64_t lanelet_id) const;
-  boost::optional<int> getLaneChangeableLaneletId(std::int64_t lanelet_id, std::string direction);
+  boost::optional<int64_t> getLaneChangeableLaneletId(
+    std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction);
+  boost::optional<int64_t> getLaneChangeableLaneletId(
+    std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, size_t shift);
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
