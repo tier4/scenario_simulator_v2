@@ -163,7 +163,8 @@ public:
 private:
   traffic_simulator::math::HermiteCurve getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & to_pose, double tangent_vector_size = 100);
+    const traffic_simulator_msgs::msg::LaneletPose & to_pose,
+    const traffic_simulator::lane_change::Trajectory trajectory, double tangent_vector_size = 100);
   RouteCache route_cache_;
   CenterPointsCache center_points_cache_;
   LaneletLengthCache lanelet_length_cache_;
