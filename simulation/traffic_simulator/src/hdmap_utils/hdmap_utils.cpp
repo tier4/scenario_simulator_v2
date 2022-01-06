@@ -907,26 +907,36 @@ traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
   const traffic_simulator::lane_change::Trajectory trajectory, double tangent_vector_size)
 {
-  geometry_msgs::msg::Vector3 start_vec = getVectorFromPose(from_pose, tangent_vector_size);
+  geometry_msgs::msg::Vector3 start_vec;
+  geometry_msgs::msg::Vector3 to_vec;
+  geometry_msgs::msg::Pose goal_pose =
+    toMapPose(to_pose.lanelet_id, to_pose.s, to_pose.offset).pose;
   switch (trajectory) {
-    geometry_msgs::msg::Vector3 to_vec;
-    geometry_msgs::msg::Pose goal_pose;
     case traffic_simulator::lane_change::Trajectory::CUBIC:
-      to_vec = getTangentVector(to_pose.lanelet_id, to_pose.s);
+      start_vec = getVectorFromPose(from_pose, tangent_vector_size);
+      if (getTangentVector(to_pose.lanelet_id, to_pose.s)) {
+        to_vec = getTangentVector(to_pose.lanelet_id, to_pose.s).get();
+      } else {
+        THROW_SIMULATION_ERROR(
+          "Failed to calculate tangent vector at lanelet_id : ", to_pose.lanelet_id,
+          " s : ", to_pose.s);
+      }
       break;
     case traffic_simulator::lane_change::Trajectory::LINEAR:
+      start_vec.x = goal_pose.position.x - from_pose.position.x;
+      start_vec.y = goal_pose.position.y - from_pose.position.y;
+      start_vec.z = goal_pose.position.z - from_pose.position.z;
       to_vec = start_vec;
       break;
     case traffic_simulator::lane_change::Trajectory::STEP:
       THROW_SIMULATION_ERROR("trajectory type : STEP does not supported.");
       break;
   }
-  goal_pose = toMapPose(to_pose.lanelet_id, to_pose.s, 0);
-  geometry_msgs::msg::Vector3 goal_vec = to_vec.get();
+  geometry_msgs::msg::Vector3 goal_vec = to_vec;
   goal_vec.x = goal_vec.x * tangent_vector_size;
   goal_vec.y = goal_vec.y * tangent_vector_size;
   goal_vec.z = goal_vec.z * tangent_vector_size;
-  traffic_simulator::math::HermiteCurve curve(from_pose, goal_pose.pose, start_vec, goal_vec);
+  traffic_simulator::math::HermiteCurve curve(from_pose, goal_pose, start_vec, goal_vec);
   return curve;
 }
 
