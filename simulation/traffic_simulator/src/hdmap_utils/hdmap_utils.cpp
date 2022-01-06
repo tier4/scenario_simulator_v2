@@ -881,8 +881,10 @@ HdMapUtils::getLaneChangeTrajectory(
       std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
       std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
       std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
-    auto traj =
-      getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_distance * 0.5);
+    traffic_simulator_msgs::msg::LaneletPose to_pose;
+    to_pose.lanelet_id = to_lanelet_id;
+    to_pose.s = to_s;
+    auto traj = getLaneChangeTrajectory(from_pose, to_pose, start_to_goal_distance * 0.5);
     if (traj.getMaximum2DCurvature() < maximum_curvature_threshold) {
       double eval = std::fabs(target_trajectory_length - traj.getLength());
       evaluation.push_back(eval);
@@ -899,12 +901,12 @@ HdMapUtils::getLaneChangeTrajectory(
 }
 
 traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
-  geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id, double to_s,
-  double tangent_vector_size)
+  const geometry_msgs::msg::Pose & from_pose,
+  const traffic_simulator_msgs::msg::LaneletPose & to_pose, double tangent_vector_size)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  auto to_vec = getTangentVector(to_lanelet_id, to_s);
-  auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
+  auto to_vec = getTangentVector(to_pose.lanelet_id, to_pose.s);
+  auto goal_pose = toMapPose(to_pose.lanelet_id, to_pose.s, 0);
   geometry_msgs::msg::Vector3 start_vec = getVectorFromPose(from_pose, tangent_vector_size);
   geometry_msgs::msg::Vector3 goal_vec = to_vec.get();
   goal_vec.x = goal_vec.x * tangent_vector_size;
