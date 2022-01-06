@@ -118,7 +118,8 @@ public:
     double forward_distance = 20);
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
   boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
-    geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id,
+    const geometry_msgs::msg::Pose & from_pose,
+    const traffic_simulator::lane_change::Parameter & lane_change_parameter,
     double maximum_curvature_threshold, double target_trajectory_length,
     double forward_distance_threshold);
   boost::optional<geometry_msgs::msg::Vector3> getTangentVector(std::int64_t lanelet_id, double s);
