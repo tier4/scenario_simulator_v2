@@ -81,6 +81,16 @@ public:
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }
 
+  void requestSpeedChange(
+    const double, const SpeedChangeTransition, const SpeedChangeConstraint, const bool) override
+  {
+    THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
+  }
+
+  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
+
+  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) override;
+
 private:
   const traffic_simulator_msgs::msg::MiscObjectParameters params_;
 };

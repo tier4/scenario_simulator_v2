@@ -24,7 +24,7 @@ namespace behavior_tree_plugin
 class LoggingEvent : public TransitionEvent
 {
 public:
-  LoggingEvent(const std::shared_ptr<BT::TreeNode> & root_node, const rclcpp::Logger & logger);
+  LoggingEvent(BT::TreeNode * root_node, const rclcpp::Logger & logger);
   const std::string & getCurrentAction() const;
 
 private:

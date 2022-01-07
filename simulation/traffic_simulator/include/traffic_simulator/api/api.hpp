@@ -220,7 +220,10 @@ public:
   FORWARD_TO_ENTITY_MANAGER(ready);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
+  FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
+  FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
   FORWARD_TO_ENTITY_MANAGER(setTargetSpeed);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);

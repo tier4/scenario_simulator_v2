@@ -2,6 +2,22 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.0 (2021-12-16)
+------------------
+* Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
+* Fix `TransitionAssertion` to stop if class `Autoware` down
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Update CMakeLists to not to reference undefined variable
+* Update packages to compile with `awf/autoware_auto_msgs` if flag given
+* Update `API::attachDetectionSensor` to detect Autoware architecture
+* Update `API::attachLidarSensor` to detect Autoware architecture
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* Merge pull request `#617 <https://github.com/tier4/scenario_simulator_v2/issues/617>`_ from tier4/autoware-universe-concealer
+* fix no ground topic name for tier4/proposal
+* change no_ground pointcloud topic name
+* some changes to run psim with autoware_universe
+* Contributors: MasayaKataoka, Takayuki Murooka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.8 (2021-12-13)
 ------------------
 * Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction

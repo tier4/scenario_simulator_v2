@@ -59,12 +59,16 @@ ament_auto_add_library(traffic_simulator SHARED
   src/metrics/standstill_metric.cpp
   src/metrics/traveled_distance_metric.cpp
   src/simulation_clock/simulation_clock.cpp
-  src/traffic_lights/traffic_light_manager.cpp
-  src/traffic_lights/traffic_light_state.cpp
-  src/traffic_lights/traffic_light.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
-  src/vehicle_model/sim_model_ideal.cpp
+  src/traffic_lights/traffic_light.cpp
+  src/traffic_lights/traffic_light_manager.cpp
+  src/traffic_lights/traffic_light_state.cpp
+  src/vehicle_model/sim_model_delay_steer_acc.cpp
+  src/vehicle_model/sim_model_delay_steer_acc_geared.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
+  src/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_model/sim_model_interface.cpp
   src/vehicle_model/sim_model_time_delay.cpp
   src/vehicle_model/sim_model_util.cpp

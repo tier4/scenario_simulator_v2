@@ -21,7 +21,6 @@
 #include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/lane_change_command.hpp>
-#include <autoware_planning_msgs/msg/route.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
@@ -52,8 +51,6 @@ class AutowareArchitectureProposal : public Autoware,
 
   bool is_ready = false;
 
-  /// FROM MiscellaneousAPI ///
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /* ---- Checkpoint -----------------------------------------------------------
    *
    *  Set goal pose of Autoware.
@@ -163,8 +160,6 @@ class AutowareArchitectureProposal : public Autoware,
     }
 
     return setCurrentTurnSignal(current_turn_signal);
-
-    // return setCurrentTurnSignal(getTurnSignalCommand());
   }
 
   /* ---- CurrentTwist ---------------------------------------------------------
@@ -322,11 +317,6 @@ class AutowareArchitectureProposal : public Autoware,
   // this macro is used only once
   // however is is created to keep consistency with the previous DEFINE_SUBSCRIPTION macro usage
   DEFINE_SUBSCRIPTION_WITH_OVERRIDE(VehicleCommand);
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-public:
-  /// FROM FundamentalAPI ///
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /* ---- AutowareEngage -------------------------------------------------------
    *
@@ -345,15 +335,6 @@ public:
   {
     return setAutowareEngage(convertTo<AutowareEngage>(value));
   }
-
-  /* ---- AutowareRoute --------------------------------------------------------
-   *
-   *  Topic: /awapi/autoware/put/route
-   *
-   * ------------------------------------------------------------------------ */
-  // using AutowareRoute = autoware_planning_msgs::msg::Route;
-  //
-  // DEFINE_PUBLISHER(AutowareRoute);
 
   /* ---- LaneChangeApproval ---------------------------------------------------
    *
@@ -438,15 +419,6 @@ public:
 
   DEFINE_SUBSCRIPTION(AutowareStatus);
 
-  /* ---- TrafficLightStatus ---------------------------------------------------
-   *
-   *  Topic: /awapi/traffic_light/get/status
-   *
-   * ------------------------------------------------------------------------ */
-  // using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
-  //
-  // DEFINE_SUBSCRIPTION(TrafficLightStatus);
-
   /* ---- VehicleStatus --------------------------------------------------------
    *
    *  Topic: /awapi/vehicle/get/status
@@ -476,7 +448,6 @@ public:
   DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
 #undef DEFINE_STATE_PREDICATE
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareArchitectureProposal(Ts &&... xs)
@@ -496,15 +467,12 @@ public:
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
-    /// FundamentalAPI
     INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
-    // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
     INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
-    // INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {})
   {
     waitpid_options = 0;

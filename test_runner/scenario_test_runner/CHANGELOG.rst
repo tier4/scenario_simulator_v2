@@ -2,6 +2,19 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.0 (2021-12-16)
+------------------
+* Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
+* Fix `TransitionAssertion` to stop if class `Autoware` down
+* Fix `waitForAutowareStateToBe*` to call thunk at least one time.
+* Update `initialize_duration` to `50` from `30` (for Autoware.Universe)
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Remove `autoware_auto_msgs` from dependency
+* Set default `architecture_type` to `tier4/proposal`
+* Merge pull request `#617 <https://github.com/tier4/scenario_simulator_v2/issues/617>`_ from tier4/autoware-universe-concealer
+* some changes to run psim with autoware_universe
+* Contributors: MasayaKataoka, Takayuki Murooka, Tatsuya Yamasaki, yamacir-kit
+
 0.5.8 (2021-12-13)
 ------------------
 * Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction

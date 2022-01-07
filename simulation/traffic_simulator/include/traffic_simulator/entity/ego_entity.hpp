@@ -25,7 +25,7 @@
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
+#include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <unordered_map>
@@ -47,15 +47,15 @@ namespace traffic_simulator
 namespace entity
 {
 enum class VehicleModelType {
-  IDEAL_TWIST = 0,
-  IDEAL_STEER = 1,
-  DELAY_TWIST = 2,
-  DELAY_STEER = 3,
-  CONST_ACCEL_TWIST = 4,
-  IDEAL_FORKLIFT_RLS = 5,
-  DELAY_FORKLIFT_RLS = 6,
-  IDEAL_ACCEL = 7,
-  DELAY_STEER_ACC = 8,
+  DELAY_STEER_ACC,
+  DELAY_STEER_ACC_GEARED,
+  IDEAL_STEER_ACC,
+  IDEAL_STEER_ACC_GEARED,
+  IDEAL_STEER_VEL,
+  LEGACY_DELAY_STEER,
+  LEGACY_DELAY_STEER_ACC,
+  LEGACY_IDEAL_ACCEL,
+  LEGACY_IDEAL_STEER,
 };
 
 class EgoEntity : public VehicleEntity
@@ -92,6 +92,8 @@ public:
   auto engage() -> void override;
 
   auto getCurrentAction() const -> const std::string override;
+
+  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
 
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
