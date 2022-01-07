@@ -96,17 +96,27 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::Trajectory trajectory,
   const lane_change::Constraint & constraint)
 {
-  if (other_status_.find(target.entity_name) == other_status_.end()) {
-    THROW_SEMANTIC_ERROR(
-      "Target entity : ", target.entity_name, " does not exist. Please check ", target.entity_name,
-      " exists.");
+  std::int64_t reference_lanelet_id = 0;
+  if (target.entity_name == name) {
+    if (!getStatus().lanelet_pose_valid) {
+      THROW_SEMANTIC_ERROR(
+        "Target entity does not assigned to lanelet. Please check Target entity name : ",
+        target.entity_name, " exists on lane.");
+    }
+    reference_lanelet_id = getStatus().lanelet_pose.lanelet_id;
+  } else {
+    if (other_status_.find(target.entity_name) == other_status_.end()) {
+      THROW_SEMANTIC_ERROR(
+        "Target entity : ", target.entity_name, " does not exist. Please check ",
+        target.entity_name, " exists.");
+    }
+    if (!other_status_.at(target.entity_name).lanelet_pose_valid) {
+      THROW_SEMANTIC_ERROR(
+        "Target entity does not assigned to lanelet. Please check Target entity name : ",
+        target.entity_name, " exists on lane.");
+    }
+    reference_lanelet_id = other_status_.at(target.entity_name).lanelet_pose.lanelet_id;
   }
-  if (!other_status_.at(target.entity_name).lanelet_pose_valid) {
-    THROW_SEMANTIC_ERROR(
-      "Target entity does not assigned to lanelet. Please check Target entity name : ",
-      target.entity_name, " exists on lane.");
-  }
-  std::int64_t reference_lanelet_id = other_status_.at(target.entity_name).lanelet_pose.lanelet_id;
   const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
     reference_lanelet_id, target.direction, target.shift);
   if (lane_change_target_id) {
@@ -114,7 +124,8 @@ void EntityBase::requestLaneChange(
       traffic_simulator::lane_change::AbsoluteTarget(reference_lanelet_id, target.offset),
       trajectory, constraint);
   } else {
-    THROW_SEMANTIC_ERROR("Lanechange ");
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate absolute target lane. Please check the target lane exists.");
   }
 }
 
