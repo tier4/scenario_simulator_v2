@@ -93,7 +93,7 @@ struct AbsoluteTarget
   AbsoluteTarget(std::int64_t lanelet_id);
   AbsoluteTarget(std::int64_t lanelet_id, double offset);
   AbsoluteTarget(const AbsoluteTarget & other);
-  AbsoluteTarget operator=(const AbsoluteTarget & other);
+  AbsoluteTarget & operator=(const AbsoluteTarget & other);
   const std::int64_t lanelet_id;
   const double offset = 0;
 };
@@ -104,7 +104,7 @@ struct Constraint
   Constraint();
   Constraint(const Type & type, double value);
   Constraint(const Constraint & other);
-  Constraint operator=(const Constraint & other);
+  Constraint & operator=(const Constraint & other);
   const Type type;
   const double value = 0;
 };
@@ -128,7 +128,7 @@ struct Parameter
   Parameter(
     const AbsoluteTarget & target, const Trajectory trajectory, const Constraint & constraint);
   Parameter(const Parameter & other);
-  Parameter operator=(const Parameter & other);
+  Parameter & operator=(const Parameter & other);
   const AbsoluteTarget target;
   const Trajectory trajectory;
   const Constraint constraint;

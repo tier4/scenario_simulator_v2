@@ -30,9 +30,14 @@ AbsoluteTarget::AbsoluteTarget(const AbsoluteTarget & other)
 {
 }
 
-AbsoluteTarget AbsoluteTarget::operator=(const AbsoluteTarget & other)
+AbsoluteTarget & AbsoluteTarget::operator=(const AbsoluteTarget & other)
 {
-  return AbsoluteTarget(other.lanelet_id, other.offset);
+  if (this == &other) {
+    return *this;
+  }
+  this->~AbsoluteTarget();
+  new (this) AbsoluteTarget(other);
+  return *this;
 }
 
 Constraint::Constraint() : type(Type::NONE), value(0) {}
@@ -41,9 +46,14 @@ Constraint::Constraint(const Type & type, double value) : type(type), value(valu
 
 Constraint::Constraint(const Constraint & other) : type(other.type), value(other.value) {}
 
-Constraint Constraint::operator=(const Constraint & other)
+Constraint & Constraint::operator=(const Constraint & other)
 {
-  return Constraint(other.type, other.value);
+  if (this == &other) {
+    return *this;
+  }
+  this->~Constraint();
+  new (this) Constraint(other);
+  return *this;
 }
 
 RelativeTarget::RelativeTarget(
@@ -68,11 +78,14 @@ Parameter::Parameter(const Parameter & other)
 {
 }
 
-Parameter Parameter::operator=(const Parameter & other)
+Parameter & Parameter::operator=(const Parameter & other)
 {
-  const auto param = Parameter(other.target, other.trajectory, other.constraint);
-  std::cout << param << std::endl;
-  return param;
+  if (this == &other) {
+    return *this;
+  }
+  this->~Parameter();
+  new (this) Parameter(other);
+  return *this;
 }
 
 std::ostream & operator<<(std::ostream & stream, const Direction & value)
