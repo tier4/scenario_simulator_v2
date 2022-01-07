@@ -80,10 +80,14 @@ void LaneChangeAction::getBlackBoardValues()
   traffic_simulator::lane_change::Parameter lane_change_parameters;
   if (!getInput<traffic_simulator::lane_change::Parameter>(
         "lane_change_parameters", lane_change_parameters)) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     lane_change_parameters_ = boost::none;
   } else {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    std::cout << "target id : " << lane_change_parameters.target.lanelet_id << std::endl;
     lane_change_parameters_ = lane_change_parameters;
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
 }
 
 BT::NodeStatus LaneChangeAction::tick()

@@ -121,7 +121,7 @@ void EntityBase::requestLaneChange(
     reference_lanelet_id, target.direction, target.shift);
   if (lane_change_target_id) {
     requestLaneChange(
-      traffic_simulator::lane_change::AbsoluteTarget(reference_lanelet_id, target.offset),
+      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
       trajectory, constraint);
   } else {
     THROW_SEMANTIC_ERROR(
