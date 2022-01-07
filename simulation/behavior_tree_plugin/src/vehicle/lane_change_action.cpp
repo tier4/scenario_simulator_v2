@@ -83,8 +83,7 @@ void LaneChangeAction::getBlackBoardValues()
     std::cout << __FILE__ << "," << __LINE__ << std::endl;
     lane_change_parameters_ = boost::none;
   } else {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
-    std::cout << "target id : " << lane_change_parameters.target.lanelet_id << std::endl;
+    std::cout << lane_change_parameters << std::endl;
     lane_change_parameters_ = lane_change_parameters;
   }
   std::cout << __FILE__ << "," << __LINE__ << std::endl;
