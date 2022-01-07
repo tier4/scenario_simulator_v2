@@ -192,6 +192,19 @@ public:
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
+  void requestLaneChange(
+    const std::string & name, const traffic_simulator::lane_change::Parameter &);
+
+  void requestLaneChange(
+    const std::string & name, const traffic_simulator::lane_change::RelativeTarget & target,
+    const traffic_simulator::lane_change::Trajectory trajectory,
+    const lane_change::Constraint & constraint);
+
+  void requestLaneChange(
+    const std::string & name, const traffic_simulator::lane_change::AbsoluteTarget & target,
+    const traffic_simulator::lane_change::Trajectory trajectory,
+    const lane_change::Constraint & constraint);
+
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   template <typename... Ts>                                                \
   decltype(auto) NAME(Ts &&... xs)                                         \
