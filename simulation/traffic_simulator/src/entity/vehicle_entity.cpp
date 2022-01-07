@@ -101,7 +101,7 @@ void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter & parameter)
 {
   behavior_plugin_ptr_->setRequest("lane_change");
-  std::cout << "set parameter id : " << parameter.target.lanelet_id << std::endl;
+  std::cout << "set parameter : \n" << parameter << std::endl;
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }
 

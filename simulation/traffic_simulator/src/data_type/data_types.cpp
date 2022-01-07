@@ -18,6 +18,63 @@ namespace traffic_simulator
 {
 namespace lane_change
 {
+AbsoluteTarget::AbsoluteTarget(std::int64_t lanelet_id) : lanelet_id(lanelet_id), offset(0) {}
+
+AbsoluteTarget::AbsoluteTarget(std::int64_t lanelet_id, double offset)
+: lanelet_id(lanelet_id), offset(offset)
+{
+}
+
+AbsoluteTarget::AbsoluteTarget(const AbsoluteTarget & other)
+: lanelet_id(other.lanelet_id), offset(other.offset)
+{
+}
+
+AbsoluteTarget AbsoluteTarget::operator=(const AbsoluteTarget & other)
+{
+  return AbsoluteTarget(other.lanelet_id, other.offset);
+}
+
+Constraint::Constraint() : type(Type::NONE), value(0) {}
+
+Constraint::Constraint(const Type & type, double value) : type(type), value(value) {}
+
+Constraint::Constraint(const Constraint & other) : type(other.type), value(other.value) {}
+
+Constraint Constraint::operator=(const Constraint & other)
+{
+  return Constraint(other.type, other.value);
+}
+
+RelativeTarget::RelativeTarget(
+  const std::string & entity_name, const Direction direction, uint8_t shift, double offset)
+: entity_name(entity_name), direction(direction), shift(shift), offset(offset)
+{
+}
+
+Parameter::Parameter()
+: target(AbsoluteTarget(0)), trajectory(Trajectory::CUBIC), constraint(Constraint())
+{
+}
+
+Parameter::Parameter(
+  const AbsoluteTarget & target, const Trajectory trajectory, const Constraint & constraint)
+: target(target), trajectory(trajectory), constraint(constraint)
+{
+}
+
+Parameter::Parameter(const Parameter & other)
+: target(other.target), trajectory(other.trajectory), constraint(other.constraint)
+{
+}
+
+Parameter Parameter::operator=(const Parameter & other)
+{
+  const auto param = Parameter(other.target, other.trajectory, other.constraint);
+  std::cout << param << std::endl;
+  return param;
+}
+
 std::ostream & operator<<(std::ostream & stream, const Direction & value)
 {
   switch (value) {

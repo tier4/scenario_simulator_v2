@@ -90,37 +90,29 @@ enum class Trajectory { CUBIC = 0, LINEAR = 1, STEP = 2 };
 
 struct AbsoluteTarget
 {
-  AbsoluteTarget(std::int64_t lanelet_id) : lanelet_id(lanelet_id), offset(0) {}
-  AbsoluteTarget(std::int64_t lanelet_id, double offset) : lanelet_id(lanelet_id), offset(offset) {}
+  AbsoluteTarget(std::int64_t lanelet_id);
+  AbsoluteTarget(std::int64_t lanelet_id, double offset);
+  AbsoluteTarget(const AbsoluteTarget & other);
+  AbsoluteTarget operator=(const AbsoluteTarget & other);
   const std::int64_t lanelet_id;
   const double offset = 0;
-  AbsoluteTarget(const AbsoluteTarget & other) : lanelet_id(other.lanelet_id), offset(other.offset)
-  {
-  }
-  AbsoluteTarget operator=(const AbsoluteTarget & other)
-  {
-    return AbsoluteTarget(other.lanelet_id, other.offset);
-  }
 };
 
 struct Constraint
 {
   enum class Type { NONE = 0, LATERAL_VELOCITY = 1 };
-  Constraint() : type(Type::NONE), value(0) {}
-  Constraint(const Type & type, double value) : type(type), value(value) {}
+  Constraint();
+  Constraint(const Type & type, double value);
+  Constraint(const Constraint & other);
+  Constraint operator=(const Constraint & other);
   const Type type;
   const double value = 0;
-  Constraint(const Constraint & other) : type(other.type), value(other.value) {}
-  Constraint operator=(const Constraint & other) { return Constraint(other.type, other.value); }
 };
 
 struct RelativeTarget
 {
   RelativeTarget(
-    const std::string & entity_name, const Direction direction, uint8_t shift, double offset)
-  : entity_name(entity_name), direction(direction), shift(shift), offset(offset)
-  {
-  }
+    const std::string & entity_name, const Direction direction, uint8_t shift, double offset);
   const std::string entity_name;
   const Direction direction;
   const uint8_t shift = 0;
@@ -132,22 +124,11 @@ struct RelativeTarget
  */
 struct Parameter
 {
-  Parameter() : target(AbsoluteTarget(0)), trajectory(Trajectory::CUBIC), constraint(Constraint())
-  {
-  }
+  Parameter();
   Parameter(
-    const AbsoluteTarget & target, const Trajectory trajectory, const Constraint & constraint)
-  : target(target), trajectory(trajectory), constraint(constraint)
-  {
-  }
-  Parameter(const Parameter & other)
-  : target(other.target), trajectory(other.trajectory), constraint(other.constraint)
-  {
-  }
-  Parameter operator=(const Parameter & other)
-  {
-    return Parameter(other.target, other.trajectory, other.constraint);
-  }
+    const AbsoluteTarget & target, const Trajectory trajectory, const Constraint & constraint);
+  Parameter(const Parameter & other);
+  Parameter operator=(const Parameter & other);
   const AbsoluteTarget target;
   const Trajectory trajectory;
   const Constraint constraint;
