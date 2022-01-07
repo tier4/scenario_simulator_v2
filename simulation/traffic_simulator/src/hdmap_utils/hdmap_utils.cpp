@@ -497,14 +497,14 @@ double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)
 }
 
 boost::optional<int64_t> HdMapUtils::getLaneChangeableLaneletId(
-  std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, int64_t shift)
+  std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, uint8_t shift)
 {
   if (shift == 0) {
     return getLaneChangeableLaneletId(
       lanelet_id, traffic_simulator::lane_change::Direction::STRAIGHT);
   } else {
     std::int64_t reference_id = lanelet_id;
-    for (size_t i = 0; i < shift; i++) {
+    for (uint8_t i = 0; i < shift; i++) {
       auto id = getLaneChangeableLaneletId(reference_id, direction);
       if (!id) {
         return boost::none;

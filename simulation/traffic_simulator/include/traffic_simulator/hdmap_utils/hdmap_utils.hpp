@@ -91,7 +91,7 @@ public:
   boost::optional<int64_t> getLaneChangeableLaneletId(
     std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction);
   boost::optional<int64_t> getLaneChangeableLaneletId(
-    std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, int64_t shift);
+    std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, uint8_t shift);
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
