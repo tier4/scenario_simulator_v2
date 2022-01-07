@@ -14,72 +14,70 @@
 
 #include <traffic_simulator/data_type/data_types.hpp>
 
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Direction & value)
+namespace traffic_simulator
+{
+namespace lane_change
+{
+std::ostream & operator<<(std::ostream & stream, const Direction & value)
 {
   switch (value) {
-    case traffic_simulator::lane_change::Direction::STRAIGHT:
+    case Direction::STRAIGHT:
       stream << "direction : STRAIGHT" << std::endl;
       break;
-    case traffic_simulator::lane_change::Direction::LEFT:
+    case Direction::LEFT:
       stream << "direction : LEFT" << std::endl;
       break;
-    case traffic_simulator::lane_change::Direction::RIGHT:
+    case Direction::RIGHT:
       stream << "direction : RIGHT" << std::endl;
       break;
   }
   return stream;
 }
 
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Trajectory & value)
+std::ostream & operator<<(std::ostream & stream, const Trajectory & value)
 {
   switch (value) {
-    case traffic_simulator::lane_change::Trajectory::CUBIC:
+    case Trajectory::CUBIC:
       stream << "trajectory : CUBIC" << std::endl;
       break;
-    case traffic_simulator::lane_change::Trajectory::LINEAR:
+    case Trajectory::LINEAR:
       stream << "trajectory : LINEAR" << std::endl;
       break;
-    case traffic_simulator::lane_change::Trajectory::STEP:
+    case Trajectory::STEP:
       stream << "trajectory : STEP" << std::endl;
       break;
   }
   return stream;
 }
 
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::AbsoluteTarget & value)
+std::ostream & operator<<(std::ostream & stream, const AbsoluteTarget & value)
 {
   stream << "lanelet_id : " << value.lanelet_id << std::endl;
   stream << "offset : " << value.offset << std::endl;
   return stream;
 }
 
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Constraint::Type & value)
+std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value)
 {
   switch (value) {
-    case traffic_simulator::lane_change::Constraint::Type::NONE:
+    case Constraint::Type::NONE:
       stream << "type : NONE" << std::endl;
       break;
-    case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
+    case Constraint::Type::LATERAL_VELOCITY:
       stream << "type : LATERAL_VELOCITY" << std::endl;
       break;
   }
   return stream;
 }
 
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Constraint & value)
+std::ostream & operator<<(std::ostream & stream, const Constraint & value)
 {
   stream << value.type;
   stream << "value : " << value.value << std::endl;
   return stream;
 }
 
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::RelativeTarget & value)
+std::ostream & operator<<(std::ostream & stream, const RelativeTarget & value)
 {
   stream << "entity_name : " << value.entity_name << std::endl;
   stream << value.direction;
@@ -88,11 +86,12 @@ std::ostream & operator<<(
   return stream;
 }
 
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Parameter & value)
+std::ostream & operator<<(std::ostream & stream, const Parameter & value)
 {
   stream << value.target;
   stream << value.trajectory;
   stream << value.constraint;
   return stream;
 }
+}  // namespace lane_change
+}  // namespace traffic_simulator

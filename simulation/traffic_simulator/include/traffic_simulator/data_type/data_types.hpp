@@ -152,22 +152,15 @@ struct Parameter
   const Trajectory trajectory;
   const Constraint constraint;
 };
+
+std::ostream & operator<<(std::ostream & stream, const Direction & value);
+std::ostream & operator<<(std::ostream & stream, const Trajectory & value);
+std::ostream & operator<<(std::ostream & stream, const AbsoluteTarget & value);
+std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value);
+std::ostream & operator<<(std::ostream & stream, const Constraint & value);
+std::ostream & operator<<(std::ostream & stream, const RelativeTarget & value);
+std::ostream & operator<<(std::ostream & stream, const Parameter & value);
 }  // namespace lane_change
 }  // namespace traffic_simulator
-
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Direction & value);
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Trajectory & value);
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::AbsoluteTarget & value);
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Constraint::Type & value);
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Constraint & value);
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::RelativeTarget & value);
-std::ostream & operator<<(
-  std::ostream & stream, const traffic_simulator::lane_change::Parameter & value);
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_
