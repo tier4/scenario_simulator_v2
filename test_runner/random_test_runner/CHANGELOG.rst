@@ -2,8 +2,8 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.1 (2022-01-11)
+------------------
 * Merge pull request `#655 <https://github.com/tier4/scenario_simulator_v2/issues/655>`_ from tier4/fix/galactic_build
 * use RCLCPP_INFO_STREAM macro
 * coment out RCLCPP_INFO macro with fmt function

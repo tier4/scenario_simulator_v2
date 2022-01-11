@@ -2,8 +2,8 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.1 (2022-01-11)
+------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/get_driver_model_in_pedestrian
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_speed_change
 * Merge pull request `#647 <https://github.com/tier4/scenario_simulator_v2/issues/647>`_ from tier4/tier4/universe

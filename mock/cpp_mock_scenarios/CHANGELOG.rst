@@ -2,8 +2,8 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.1 (2022-01-11)
+------------------
 * remove glog from depends
 * add glog and use unique_ptr
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
