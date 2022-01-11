@@ -590,6 +590,26 @@ void EntityManager::requestSpeedChange(
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 
+void EntityManager::setTargetSpeed(
+  const std::string & name, const RelativeTargetSpeed & target_speed, bool continuous)
+{
+  if (isEgo(name) && getCurrentTime() > 0) {
+    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
+  }
+  return entities_.at(name)->setTargetSpeed(target_speed, continuous);
+}
+
+void EntityManager::requestSpeedChange(
+  const std::string & name, const RelativeTargetSpeed & target_speed,
+  const SpeedChangeTransition transition, const SpeedChangeConstraint constraint,
+  const bool continuous)
+{
+  if (isEgo(name) && getCurrentTime() > 0) {
+    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
+  }
+  return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
+}
+
 bool EntityManager::setEntityStatus(
   const std::string & name, traffic_simulator_msgs::msg::EntityStatus status)
 {
@@ -650,6 +670,15 @@ void EntityManager::update(const double current_time, const double step_time)
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
+  for (const auto & entity_name : entity_names) {
+    if (entities_[entity_name]->statusSet()) {
+      all_status.emplace(entity_name, entities_[entity_name]->getStatus());
+    }
+  }
+  for (auto it = entities_.begin(); it != entities_.end(); it++) {
+    it->second->setOtherStatus(all_status);
+  }
+  all_status.clear();
   for (const auto & entity_name : entity_names) {
     if (entities_[entity_name]->statusSet()) {
       auto status = updateNpcLogic(entity_name, type_list);

@@ -532,6 +532,8 @@ void EgoEntity::setTargetSpeed(double value, bool)
   vehicle_model_ptr_->setState(v);
 }
 
+void EgoEntity::setTargetSpeed(const RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/) {}
+
 auto EgoEntity::setUpperBoundSpeed(double value) -> void  //
 {
   autoware->setUpperBoundSpeed(value);

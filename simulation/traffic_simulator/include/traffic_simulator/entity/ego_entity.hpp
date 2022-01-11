@@ -126,6 +126,8 @@ public:
 
   void setTargetSpeed(double, bool) override;
 
+  void setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous) override;
+
   auto setUpperBoundSpeed(double) -> void override;
 };
 }  // namespace entity

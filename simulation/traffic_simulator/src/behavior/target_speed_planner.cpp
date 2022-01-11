@@ -23,17 +23,46 @@ void TargetSpeedPlanner::setTargetSpeed(double target_speed, bool continuous)
 {
   continuous_ = continuous;
   target_speed_ = target_speed;
+  relative_target_speed_ = boost::none;
 }
 
-void TargetSpeedPlanner::update(double current_speed)
+void TargetSpeedPlanner::setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous)
 {
+  continuous_ = continuous;
+  relative_target_speed_ = target_speed;
+  target_speed_ = boost::none;
+}
+
+void TargetSpeedPlanner::update(
+  double current_speed,
+  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
+{
+  other_status_ = other_status;
   if (!continuous_ && target_speed_) {
     if (current_speed >= target_speed_.get()) {
       target_speed_ = boost::none;
     }
   }
+  if (!continuous_ && relative_target_speed_) {
+    if (current_speed >= relative_target_speed_->getAbsoluteValue(other_status_)) {
+      relative_target_speed_ = boost::none;
+    }
+  }
 }
 
-boost::optional<double> TargetSpeedPlanner::getTargetSpeed() const { return target_speed_; }
+boost::optional<double> TargetSpeedPlanner::getTargetSpeed() const
+{
+  if (target_speed_ && relative_target_speed_) {
+    THROW_SIMULATION_ERROR(
+      "target_speed and relative_target_speed should not have value at the same time.");
+  }
+  if (target_speed_) {
+    return target_speed_.get();
+  }
+  if (relative_target_speed_) {
+    return relative_target_speed_->getAbsoluteValue(other_status_);
+  }
+  return boost::none;
+}
 }  // namespace behavior
 }  // namespace traffic_simulator

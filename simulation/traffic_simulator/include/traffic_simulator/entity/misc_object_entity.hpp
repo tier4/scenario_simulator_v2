@@ -61,6 +61,11 @@ public:
     THROW_SEMANTIC_ERROR("setTargetSpeed function cannot not use in MiscObjectEntity");
   }
 
+  void setTargetSpeed(const RelativeTargetSpeed &, bool) override
+  {
+    THROW_SEMANTIC_ERROR("setTargetSpeed function cannot not use in MiscObjectEntity");
+  }
+
   void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override
   {
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
