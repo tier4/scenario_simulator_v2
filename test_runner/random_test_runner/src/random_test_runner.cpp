@@ -34,8 +34,8 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 : Node("random_test_runner", option), error_reporter_(get_logger())
 {
   TestControlParameters test_control_parameters = collectAndValidateTestControlParameters();
-  RCLCPP_INFO(
-    get_logger(), fmt::format("test control parameters: {}", test_control_parameters).c_str());
+  std::string message = fmt::format("test control parameters: {}", test_control_parameters);
+  RCLCPP_INFO_STREAM(get_logger(), message);
 
   TestSuiteParameters test_suite_params;
   std::vector<TestCaseParameters> test_case_parameters_vector;
@@ -60,7 +60,9 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 
   std::string map_path =
     ament_index_cpp::get_package_share_directory(test_suite_params.map_name) + "/map";
-  RCLCPP_INFO(get_logger(), fmt::format("Map path found: {}", map_path).c_str());
+
+  message = fmt::format("Map path found: {}", map_path);
+  RCLCPP_INFO_STREAM(get_logger(), message);
 
   traffic_simulator::Configuration configuration(map_path);
   api_ = std::make_shared<traffic_simulator::API>(this, configuration);
@@ -68,12 +70,12 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 
   TestSuiteParameters validated_params = validateParameters(test_suite_params, lanelet_utils);
 
-  RCLCPP_INFO(get_logger(), fmt::format("Test suite parameters {}", test_suite_params).c_str());
+  message = fmt::format("Test suite parameters {}", test_suite_params);
+  RCLCPP_INFO_STREAM(get_logger(), message);
   for (size_t test_id = 0; test_id < test_case_parameters_vector.size(); test_id++) {
-    RCLCPP_INFO(
-      get_logger(),
-      fmt::format("Test case {} parameters:", test_id, test_case_parameters_vector[test_id])
-        .c_str());
+    std::string message =
+      fmt::format("Test case {} parameters:", test_id, test_case_parameters_vector[test_id]);
+    RCLCPP_INFO_STREAM(get_logger(), message);
   }
 
   error_reporter_.init(test_control_parameters.output_dir);
@@ -83,10 +85,9 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
   yaml_test_params_saver.addTestSuite(validated_params, validated_params.name);
 
   for (size_t test_id = 0; test_id < test_case_parameters_vector.size(); test_id++) {
-    RCLCPP_INFO(
-      get_logger(),
-      fmt::format("Generating test {}/{}", test_id + 1, test_case_parameters_vector.size())
-        .c_str());
+    std::string message =
+      fmt::format("Generating test {}/{}", test_id + 1, test_case_parameters_vector.size());
+    RCLCPP_INFO_STREAM(get_logger(), message);
     test_executors_.emplace_back(
       api_,
       TestRandomizer(
@@ -197,13 +198,10 @@ void RandomTestRunner::update()
       stop();
       return;
     }
-
-    RCLCPP_INFO(
-      get_logger(),
-      fmt::format(
-        "Running test {}/{}", std::distance(test_executors_.begin(), current_test_executor_) + 1,
-        test_executors_.size())
-        .c_str());
+    std::string message = fmt::format(
+      "Running test {}/{}", std::distance(test_executors_.begin(), current_test_executor_) + 1,
+      test_executors_.size());
+    RCLCPP_INFO_STREAM(get_logger(), message);
     current_test_executor_->initialize();
   }
   current_test_executor_->update(api_->getCurrentTime());
@@ -211,12 +209,10 @@ void RandomTestRunner::update()
 
 void RandomTestRunner::start()
 {
-  RCLCPP_INFO(
-    get_logger(),
-    fmt::format(
-      "Running test {}/{}", std::distance(test_executors_.begin(), current_test_executor_) + 1,
-      test_executors_.size())
-      .c_str());
+  std::string message = fmt::format(
+    "Running test {}/{}", std::distance(test_executors_.begin(), current_test_executor_) + 1,
+    test_executors_.size());
+  RCLCPP_INFO_STREAM(get_logger(), message);
   current_test_executor_->initialize();
   update_timer_ = this->create_wall_timer(
     std::chrono::milliseconds(50), std::bind(&RandomTestRunner::update, this));
