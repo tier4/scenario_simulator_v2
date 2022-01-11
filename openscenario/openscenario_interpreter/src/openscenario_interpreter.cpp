@@ -235,6 +235,7 @@ auto Interpreter::publishCurrentContext() const -> void
     nlohmann::json json;
     context.stamp = now();
     context.data = (json << script.as<OpenScenario>()).dump();
+    context.time = connection.getCurrentTime();
   }
 
   (*publisher_of_context).publish(context);
