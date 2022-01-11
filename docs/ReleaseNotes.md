@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Fix context panel to display simulation time. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
 
 ## Version 0.6.1
 - Add API::requestSpeedChange function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
@@ -22,6 +23,7 @@
 
 ## Version 0.5.7
 - Fix problem in getNormalVector function. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
+
 ## Version 0.5.6
 - Fix context panel to display conditions' status. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
 - Add NPC Behavior Plugin and Behavior-Tree Plugin for Vehicle and Pedestrian. ([link](https://github.com/tier4/scenario_simulator_v2-docs/pull/566))
