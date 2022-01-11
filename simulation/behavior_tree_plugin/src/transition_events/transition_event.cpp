@@ -18,19 +18,14 @@
 
 namespace behavior_tree_plugin
 {
-TransitionEvent::TransitionEvent(const std::shared_ptr<BT::TreeNode> & root_node)
-: root_node_(root_node)
+TransitionEvent::TransitionEvent(BT::TreeNode * root_node)
 {
   first_timestamp_ = std::chrono::high_resolution_clock::now();
   auto subscribeCallback = [this](
                              BT::TimePoint timestamp, const BT::TreeNode & node,
                              BT::NodeStatus prev, BT::NodeStatus status) {
     if (status != BT::NodeStatus::IDLE) {
-#if FOXY
       if (type_ == BT::TimestampType::absolute) {
-#else
-      if (type_ == BT::TimestampType::ABSOLUTE) {
-#endif
         this->callback(timestamp.time_since_epoch(), node, prev, status);
       } else {
         this->callback(timestamp - first_timestamp_, node, prev, status);
@@ -40,7 +35,7 @@ TransitionEvent::TransitionEvent(const std::shared_ptr<BT::TreeNode> & root_node
   auto visitor = [this, subscribeCallback](BT::TreeNode * node) {
     subscribers_.push_back(node->subscribeToStatusChange(std::move(subscribeCallback)));
   };
-  BT::applyRecursiveVisitor(root_node.get(), visitor);
+  BT::applyRecursiveVisitor(root_node, visitor);
 }
 
 void TransitionEvent::updateCurrentAction(const BT::NodeStatus & status, const BT::TreeNode & node)

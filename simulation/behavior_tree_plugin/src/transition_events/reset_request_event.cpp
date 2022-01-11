@@ -19,11 +19,9 @@
 namespace behavior_tree_plugin
 {
 ResetRequestEvent::ResetRequestEvent(
-  const std::shared_ptr<BT::TreeNode> & root_node,
-  std::function<std::string()> get_request_function,
+  BT::TreeNode * root_node, std::function<std::string()> get_request_function,
   std::function<void(const std::string &)> set_request_function)
 : TransitionEvent(root_node),
-  root_node_(root_node),
   get_request_function_(get_request_function),
   set_request_function_(set_request_function)
 {
