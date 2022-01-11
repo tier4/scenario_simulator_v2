@@ -926,10 +926,11 @@ traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
       }
       break;
     case traffic_simulator::lane_change::Trajectory::LINEAR:
-      start_vec.x = goal_pose.position.x - from_pose.position.x;
-      start_vec.y = goal_pose.position.y - from_pose.position.y;
-      start_vec.z = goal_pose.position.z - from_pose.position.z;
+      start_vec.x = (goal_pose.position.x - from_pose.position.x);
+      start_vec.y = (goal_pose.position.y - from_pose.position.y);
+      start_vec.z = (goal_pose.position.z - from_pose.position.z);
       to_vec = start_vec;
+      tangent_vector_size = 1;
       break;
     case traffic_simulator::lane_change::Trajectory::STEP:
       THROW_SIMULATION_ERROR("trajectory type : STEP does not supported.");
