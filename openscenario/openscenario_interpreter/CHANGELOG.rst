@@ -2,6 +2,35 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.1 (2022-01-11)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/get_driver_model_in_pedestrian
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_speed_change
+* Merge pull request `#649 <https://github.com/tier4/scenario_simulator_v2/issues/649>`_ from tier4/fix/interpreter/controller
+* Add some member functions to class `Properties`
+* Fix `Controller::assign` to not to overwrite parameter `see_around`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge pull request `#628 <https://github.com/tier4/scenario_simulator_v2/issues/628>`_ from tier4/feature/avoid_overwrite_acceleration
+* Merge pull request `#641 <https://github.com/tier4/scenario_simulator_v2/issues/641>`_ from tier4/feature/interpreter/expr
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* add copyright
+* fix variant
+* ament_clang_format
+* Merge branch 'master' into feature/interpreter/expr
+* remove debug messages
+* add OSC expression evaluator
+* Remove member function `Controller::defaultDriverModel`
+* Update `Controller::assign` to use `API::getDriverModel`
+* Remove cast operator `Controller::operator DriverModel`
+* Remove cast operator `ObjectController::operator DriverModel`
+* Merge branch 'feature/avoid_overwrite_acceleration' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Add new member function `Controller::makeDefaultDriverModel`
+* Merge remote-tracking branch 'origin/master' into feature/avoid_overwrite_acceleration
+* Comment-out changes
+* getDriverModel API first.
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.0 (2021-12-16)
 ------------------
 * Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
