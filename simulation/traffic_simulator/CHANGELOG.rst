@@ -2,6 +2,66 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.1 (2022-01-11)
+------------------
+* Merge pull request `#655 <https://github.com/tier4/scenario_simulator_v2/issues/655>`_ from tier4/fix/galactic_build
+* remove debug line
+* remove glog functions
+* remove glog from depends
+* add glog and use unique_ptr
+* add debug line
+* add virtual destructor
+* Merge pull request `#652 <https://github.com/tier4/scenario_simulator_v2/issues/652>`_ from tier4/feature/traffic_simulator/vehicle_model
+* Lipsticks
+* Cleanup some switch statements
+* Cleanup `EgoEntity::makeSimulationModel`
+* Remove message type `VehicleStateCommand` from VehicleModels
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Remove old VehicleModel `sim_model_ideal.[ch]pp`
+* Merge pull request `#648 <https://github.com/tier4/scenario_simulator_v2/issues/648>`_ from tier4/feature/request_speed_change
+* Merge pull request `#653 <https://github.com/tier4/scenario_simulator_v2/issues/653>`_ from tier4/fix/error_in_driver_model_from_blackboard
+* fix typo
+* remove recurrent call in setDriverModel function
+* Restore AAP's VehicleModels
+* apply reformat
+* Fix `EgoEntity` to set `GearCommand` to VehicleModel
+* add space
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/request_speed_change
+* Lipsticks
+* set default driver model in pedestrian entity class
+* Merge pull request `#650 <https://github.com/tier4/scenario_simulator_v2/issues/650>`_ from tier4/fix/get_driver_model_in_pedestrian
+* remove old header file
+* Update VehicleModels to match latest `simple_planning_simulator_node`
+* fix linter error
+* Remove unused enumerations of `VehicleModelType`
+* enable pass compile
+* add const to the function
+* fix way of calling API
+* remove old API
+* add requestSpeedChange function to the misc object and pedestrian
+* change EntityBase::setDriverModel to the pure virtual function
+* add data type
+* modify test case
+* add requestSpeedChange API
+* Merge pull request `#646 <https://github.com/tier4/scenario_simulator_v2/issues/646>`_ from tier4/feature/set_acceleration_deceleration
+* rename function
+* rename function
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge pull request `#628 <https://github.com/tier4/scenario_simulator_v2/issues/628>`_ from tier4/feature/avoid_overwrite_acceleration
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* enable pass colcon test
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* add getDriverModel function in egoEntity class
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* Merge branch 'master' into feature/interpreter/expr
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge remote-tracking branch 'origin/master' into feature/avoid_overwrite_acceleration
+* add setAcceleration/Deceleration function to the API class
+* add setAcceleration/Develeration to the vehicle entity class
+* add setAcceleration/Deceleration function to the entity manager class
+* add setAcceleration and setDeceleration to the base class
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.0 (2021-12-16)
 ------------------
 * Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs

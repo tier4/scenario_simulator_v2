@@ -2,6 +2,19 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.1 (2022-01-11)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge pull request `#641 <https://github.com/tier4/scenario_simulator_v2/issues/641>`_ from tier4/feature/interpreter/expr
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* Merge branch 'master' into feature/interpreter/expr
+* fix all-in-one scenario to verify the evaluation of the expression
+* Merge branch 'feature/avoid_overwrite_acceleration' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge remote-tracking branch 'origin/master' into feature/avoid_overwrite_acceleration
+* Comment-out changes
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.0 (2021-12-16)
 ------------------
 * Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs

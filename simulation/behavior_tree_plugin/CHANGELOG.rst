@@ -2,6 +2,21 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.1 (2022-01-11)
+------------------
+* Merge pull request `#655 <https://github.com/tier4/scenario_simulator_v2/issues/655>`_ from tier4/fix/galactic_build
+* remove shared ptr
+* remove unused member
+* add glog and use unique_ptr
+* modify TimeStampType in behavior_tree_cpp_v3
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* Merge branch 'master' into feature/interpreter/expr
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge remote-tracking branch 'origin/master' into feature/avoid_overwrite_acceleration
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.0 (2021-12-16)
 ------------------
 * Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
