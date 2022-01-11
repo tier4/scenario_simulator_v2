@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Support new vehicle_model_type `DELAY_STEER_VEL` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/660)).
 
 ## Version 0.6.1
 - Add API::requestSpeedChange function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
