@@ -39,6 +39,7 @@ auto toString(const VehicleModelType datum) -> std::string
   switch (datum) {
     BOILERPLATE(DELAY_STEER_ACC);
     BOILERPLATE(DELAY_STEER_ACC_GEARED);
+    BOILERPLATE(DELAY_STEER_VEL);
     BOILERPLATE(IDEAL_STEER_ACC);
     BOILERPLATE(IDEAL_STEER_ACC_GEARED);
     BOILERPLATE(IDEAL_STEER_VEL);
@@ -65,6 +66,7 @@ auto getVehicleModelType()
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
     {"DELAY_STEER_ACC_GEARED", VehicleModelType::DELAY_STEER_ACC_GEARED},
+    {"DELAY_STEER_VEL", VehicleModelType::DELAY_STEER_VEL},
     {"IDEAL_STEER_ACC", VehicleModelType::IDEAL_STEER_ACC},
     {"IDEAL_STEER_ACC_GEARED", VehicleModelType::IDEAL_STEER_ACC_GEARED},
     {"IDEAL_STEER_VEL", VehicleModelType::IDEAL_STEER_VEL},
@@ -132,6 +134,11 @@ auto makeSimulationModel(
       return std::make_shared<SimModelDelaySteerAccGeared>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant);
+
+    case VehicleModelType::DELAY_STEER_VEL:
+      return std::make_shared<SimModelDelaySteerVel>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, vel_time_delay,
+        vel_time_constant, steer_time_delay, steer_time_constant);
 
     case VehicleModelType::LEGACY_DELAY_STEER:
       return std::make_shared<SimModelTimeDelaySteer>(
@@ -375,6 +382,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           autoware->getSteeringAngle();
         break;
 
+      case VehicleModelType::DELAY_STEER_VEL:
       case VehicleModelType::IDEAL_STEER_VEL:
       case VehicleModelType::LEGACY_IDEAL_STEER:
         input << autoware->getVelocity(), autoware->getSteeringAngle();
@@ -516,6 +524,7 @@ void EgoEntity::setTargetSpeed(double value, bool)
       v << 0, 0, 0;
       break;
 
+    case VehicleModelType::DELAY_STEER_VEL:
     case VehicleModelType::LEGACY_DELAY_STEER:
       v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0;
       break;

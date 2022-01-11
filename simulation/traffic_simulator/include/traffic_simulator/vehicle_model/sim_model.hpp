@@ -17,6 +17,7 @@
 
 #include <traffic_simulator/vehicle_model/sim_model_delay_steer_acc.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_delay_steer_acc_geared.hpp>
+#include <traffic_simulator/vehicle_model/sim_model_delay_steer_vel.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_ideal_steer_acc.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_ideal_steer_acc_geared.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_ideal_steer_vel.hpp>
