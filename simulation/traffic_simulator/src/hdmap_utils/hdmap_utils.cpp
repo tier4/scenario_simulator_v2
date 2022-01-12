@@ -889,7 +889,7 @@ HdMapUtils::getLaneChangeTrajectory(
     to_pose.lanelet_id = lane_change_parameter.target.lanelet_id;
     to_pose.s = to_s;
     auto traj = getLaneChangeTrajectory(
-      from_pose, to_pose, lane_change_parameter.trajectory, start_to_goal_distance * 0.5);
+      from_pose, to_pose, lane_change_parameter.trajectory_shape, start_to_goal_distance * 0.5);
     if (traj.getMaximum2DCurvature() < maximum_curvature_threshold) {
       double eval = std::fabs(target_trajectory_length - traj.getLength());
       evaluation.push_back(eval);
@@ -908,14 +908,15 @@ HdMapUtils::getLaneChangeTrajectory(
 traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-  const traffic_simulator::lane_change::Trajectory trajectory, double tangent_vector_size)
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+  double tangent_vector_size)
 {
   geometry_msgs::msg::Vector3 start_vec;
   geometry_msgs::msg::Vector3 to_vec;
   geometry_msgs::msg::Pose goal_pose =
     toMapPose(to_pose.lanelet_id, to_pose.s, to_pose.offset).pose;
-  switch (trajectory) {
-    case traffic_simulator::lane_change::Trajectory::CUBIC:
+  switch (trajectory_shape) {
+    case traffic_simulator::lane_change::TrajectoryShape::CUBIC:
       start_vec = getVectorFromPose(from_pose, tangent_vector_size);
       if (getTangentVector(to_pose.lanelet_id, to_pose.s)) {
         to_vec = getTangentVector(to_pose.lanelet_id, to_pose.s).get();
@@ -925,15 +926,12 @@ traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
           " s : ", to_pose.s);
       }
       break;
-    case traffic_simulator::lane_change::Trajectory::LINEAR:
+    case traffic_simulator::lane_change::TrajectoryShape::LINEAR:
       start_vec.x = (goal_pose.position.x - from_pose.position.x);
       start_vec.y = (goal_pose.position.y - from_pose.position.y);
       start_vec.z = (goal_pose.position.z - from_pose.position.z);
       to_vec = start_vec;
       tangent_vector_size = 1;
-      break;
-    case traffic_simulator::lane_change::Trajectory::STEP:
-      THROW_SIMULATION_ERROR("trajectory type : STEP does not supported.");
       break;
   }
   geometry_msgs::msg::Vector3 goal_vec = to_vec;

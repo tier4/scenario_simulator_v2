@@ -197,12 +197,12 @@ public:
 
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::RelativeTarget & target,
-    const traffic_simulator::lane_change::Trajectory trajectory,
+    const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::AbsoluteTarget & target,
-    const traffic_simulator::lane_change::Trajectory trajectory,
+    const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
