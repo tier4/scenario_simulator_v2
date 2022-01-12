@@ -41,7 +41,7 @@ public:
           "/perception/obstacle_segmentation/pointcloud", 1)));
     } else
 #endif
-    if (configuration.architecture_type() == "awf/auto") {
+      if (configuration.architecture_type() == "awf/auto") {
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
         node.create_publisher<sensor_msgs::msg::PointCloud2>("/perception/points_nonground", 1)));
@@ -66,7 +66,7 @@ public:
         node.create_publisher<Message>("/perception/object_recognition/objects", 1)));
     } else
 #endif
-    if (configuration.architecture_type() == "awf/auto") {
+      if (configuration.architecture_type() == "awf/auto") {
       /* Autoware.Auto does not currently support object prediction however it is
          work-in-progress for Cargo ODD msgs are already implemented and
          autoware_auto_msgs::msg::PredictedObjects will probably be used here
