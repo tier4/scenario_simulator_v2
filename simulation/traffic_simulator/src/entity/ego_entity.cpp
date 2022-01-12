@@ -161,18 +161,8 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
   const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
 
   if (architecture_type == "tier4/proposal") {
-    return getParameter<bool>("launch_autoware", true)
-             ? std::make_unique<concealer::AutowareArchitectureProposal>(
-                 getParameter<std::string>("autoware_launch_package"),
-                 getParameter<std::string>("autoware_launch_file"),
-                 "map_path:=" + configuration.map_path.string(),
-                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + configuration.rviz_config_path.string(),
-                 "scenario_simulation:=true")
-             : std::make_unique<concealer::AutowareArchitectureProposal>();
+    throw common::SemanticError(
+      "Given architecture_type ", std::quoted("tier4/proposal"), " was obsoleted.");
   } else if (architecture_type == "awf/universe") {
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
@@ -200,7 +190,8 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "scenario_simulation:=true")
              : std::make_unique<concealer::AutowareAuto>();
   } else {
-    throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
+    throw common::SemanticError(
+      "Unknown architecture_type ", std::quoted(architecture_type), " was given.");
   }
 }
 
