@@ -17,6 +17,7 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 
 TEST(HdMapUtils, Construct)
 {
@@ -52,6 +53,39 @@ TEST(HdMapUtils, MatchToLane)
     EXPECT_TRUE(id);
     EXPECT_EQ(id.get(), 34411);
   }
+}
+
+TEST(HdMapUtils, AlongLaneletPose)
+{
+  std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+  geographic_msgs::msg::GeoPoint origin;
+  origin.latitude = 35.61836750154;
+  origin.longitude = 139.78066608243;
+  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  EXPECT_EQ(
+    hdmap_utils
+      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), 30)
+      .lanelet_id,
+    34513);
+  EXPECT_DOUBLE_EQ(hdmap_utils.getLaneletLength(34513), 46.40806767334827);
+  EXPECT_EQ(
+    hdmap_utils
+      .getAlongLaneletPose(
+        traffic_simulator::helper::constructLaneletPose(34513, 0, 0),
+        hdmap_utils.getLaneletLength(34513) + 10.0)
+      .lanelet_id,
+    34510);
+  EXPECT_DOUBLE_EQ(
+    hdmap_utils
+      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), 30.0)
+      .s,
+    30.0);
+  EXPECT_EQ(
+    hdmap_utils
+      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), 30.0)
+      .lanelet_id,
+    34513);
 }
 
 int main(int argc, char ** argv)

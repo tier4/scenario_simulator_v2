@@ -869,27 +869,34 @@ traffic_simulator_msgs::msg::LaneletPose HdMapUtils::getAlongLaneletPose(
 {
   traffic_simulator_msgs::msg::LaneletPose along_pose = from_pose;
   along_pose.s = along_pose.s + along;
-  while (along_pose.s < getLaneletLength(along_pose.lanelet_id)) {
+  while (along_pose.s >= getLaneletLength(along_pose.lanelet_id) || along_pose.s < 0) {
     if (along >= 0) {
-      const auto next_ids = getNextLaneletIds(along_pose.lanelet_id);
+      auto next_ids = getNextLaneletIds(along_pose.lanelet_id, "straight");
       if (next_ids.empty()) {
-        THROW_SEMANTIC_ERROR(
-          "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
-          from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        next_ids = getNextLaneletIds(along_pose.lanelet_id);
+        if (next_ids.empty()) {
+          THROW_SEMANTIC_ERROR(
+            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        }
       }
       along_pose.s = along_pose.s - getLaneletLength(along_pose.lanelet_id);
       along_pose.lanelet_id = next_ids[0];
     } else {
-      const auto previous_ids = getPreviousLaneletIds(along_pose.lanelet_id);
+      auto previous_ids = getPreviousLaneletIds(along_pose.lanelet_id, "straight");
       if (previous_ids.empty()) {
-        THROW_SEMANTIC_ERROR(
-          "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
-          from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        previous_ids = getPreviousLaneletIds(along_pose.lanelet_id);
+        if (previous_ids.empty()) {
+          THROW_SEMANTIC_ERROR(
+            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        }
       }
       along_pose.s = along_pose.s + getLaneletLength(along_pose.lanelet_id);
       along_pose.lanelet_id = previous_ids[0];
     }
   }
+  std::cout << "s:" << along_pose.s << std::endl;
   return along_pose;
 }
 
