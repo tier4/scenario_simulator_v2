@@ -93,7 +93,7 @@ void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 {
   behavior_plugin_ptr_->setRequest("lane_change");
   const auto parameter = lane_change::Parameter(
-    lane_change::AbsoluteTarget(to_lanelet_id), lane_change::Trajectory::CUBIC,
+    lane_change::AbsoluteTarget(to_lanelet_id), lane_change::TrajectoryShape::CUBIC,
     lane_change::Constraint());
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }

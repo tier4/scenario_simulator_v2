@@ -63,18 +63,19 @@ RelativeTarget::RelativeTarget(
 }
 
 Parameter::Parameter()
-: target(AbsoluteTarget(0)), trajectory(Trajectory::CUBIC), constraint(Constraint())
+: target(AbsoluteTarget(0)), trajectory_shape(TrajectoryShape::CUBIC), constraint(Constraint())
 {
 }
 
 Parameter::Parameter(
-  const AbsoluteTarget & target, const Trajectory trajectory, const Constraint & constraint)
-: target(target), trajectory(trajectory), constraint(constraint)
+  const AbsoluteTarget & target, const TrajectoryShape trajectory_shape,
+  const Constraint & constraint)
+: target(target), trajectory_shape(trajectory_shape), constraint(constraint)
 {
 }
 
 Parameter::Parameter(const Parameter & other)
-: target(other.target), trajectory(other.trajectory), constraint(other.constraint)
+: target(other.target), trajectory_shape(other.trajectory_shape), constraint(other.constraint)
 {
 }
 
@@ -104,17 +105,14 @@ std::ostream & operator<<(std::ostream & stream, const Direction & value)
   return stream;
 }
 
-std::ostream & operator<<(std::ostream & stream, const Trajectory & value)
+std::ostream & operator<<(std::ostream & stream, const TrajectoryShape & value)
 {
   switch (value) {
-    case Trajectory::CUBIC:
-      stream << "trajectory : CUBIC" << std::endl;
+    case TrajectoryShape::CUBIC:
+      stream << "trajectory shape : CUBIC" << std::endl;
       break;
-    case Trajectory::LINEAR:
-      stream << "trajectory : LINEAR" << std::endl;
-      break;
-    case Trajectory::STEP:
-      stream << "trajectory : STEP" << std::endl;
+    case TrajectoryShape::LINEAR:
+      stream << "trajectory shape : LINEAR" << std::endl;
       break;
   }
   return stream;
@@ -159,7 +157,7 @@ std::ostream & operator<<(std::ostream & stream, const RelativeTarget & value)
 std::ostream & operator<<(std::ostream & stream, const Parameter & value)
 {
   stream << value.target;
-  stream << value.trajectory;
+  stream << value.trajectory_shape;
   stream << value.constraint;
   return stream;
 }

@@ -84,16 +84,16 @@ void EntityBase::requestSpeedChange(
 
 void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::AbsoluteTarget & target,
-  const traffic_simulator::lane_change::Trajectory trajectory,
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const lane_change::Constraint & constraint)
 {
-  auto param = traffic_simulator::lane_change::Parameter(target, trajectory, constraint);
+  auto param = traffic_simulator::lane_change::Parameter(target, trajectory_shape, constraint);
   requestLaneChange(param);
 }
 
 void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::RelativeTarget & target,
-  const traffic_simulator::lane_change::Trajectory trajectory,
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const lane_change::Constraint & constraint)
 {
   std::int64_t reference_lanelet_id = 0;
@@ -122,7 +122,7 @@ void EntityBase::requestLaneChange(
   if (lane_change_target_id) {
     requestLaneChange(
       traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
-      trajectory, constraint);
+      trajectory_shape, constraint);
   } else {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate absolute target lane. Please check the target lane exists.");
