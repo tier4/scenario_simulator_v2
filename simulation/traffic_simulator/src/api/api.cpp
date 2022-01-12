@@ -468,18 +468,18 @@ void API::requestLaneChange(
 
 void API::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::RelativeTarget & target,
-  const traffic_simulator::lane_change::Trajectory trajectory,
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const lane_change::Constraint & constraint)
 {
-  entity_manager_ptr_->requestLaneChange(name, target, trajectory, constraint);
+  entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
 
 void API::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::AbsoluteTarget & target,
-  const traffic_simulator::lane_change::Trajectory trajectory,
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const lane_change::Constraint & constraint)
 {
-  entity_manager_ptr_->requestLaneChange(name, target, trajectory, constraint);
+  entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
 
 }  // namespace traffic_simulator

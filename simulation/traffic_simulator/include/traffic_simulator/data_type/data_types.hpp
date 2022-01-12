@@ -86,7 +86,7 @@ namespace lane_change
 {
 enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
 
-enum class Trajectory { CUBIC = 0, LINEAR = 1, STEP = 2 };
+enum class TrajectoryShape { CUBIC = 0, LINEAR = 1 };
 
 struct AbsoluteTarget
 {
@@ -126,16 +126,16 @@ struct Parameter
 {
   Parameter();
   Parameter(
-    const AbsoluteTarget & target, const Trajectory trajectory, const Constraint & constraint);
+    const AbsoluteTarget & target, const TrajectoryShape trajectory, const Constraint & constraint);
   Parameter(const Parameter & other);
   Parameter & operator=(const Parameter & other);
   const AbsoluteTarget target;
-  const Trajectory trajectory;
+  const TrajectoryShape trajectory_shape;
   const Constraint constraint;
 };
 
 std::ostream & operator<<(std::ostream & stream, const Direction & value);
-std::ostream & operator<<(std::ostream & stream, const Trajectory & value);
+std::ostream & operator<<(std::ostream & stream, const TrajectoryShape & value);
 std::ostream & operator<<(std::ostream & stream, const AbsoluteTarget & value);
 std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value);
 std::ostream & operator<<(std::ostream & stream, const Constraint & value);
