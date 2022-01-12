@@ -496,28 +496,15 @@ void toMsg(
   toMsg(proto.shift(), vehicle_command.shift);
 }
 
-void toProto(
-  const autoware_perception_msgs::msg::TrafficLightState & traffic_light_state,
-  simulation_api_schema::TrafficLightState & proto)
-{
-  proto.set_id(traffic_light_state.id);
-  for (const autoware_perception_msgs::msg::LampState & ls : traffic_light_state.lamp_states) {
-    simulation_api_schema::TrafficLightState::LampState lamp_state;
-    lamp_state.set_type((simulation_api_schema::TrafficLightState_LampState_State)ls.type);
-    *proto.add_lamp_states() = lamp_state;
-  }
-}
-
 #ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto)
 {
   proto.set_id(traffic_light_state.map_primitive_id);
-  for (const autoware_auto_perception_msgs::msg::TrafficLight & ls : traffic_light_state.lights) {
-    simulation_api_schema::TrafficLightState::LampState lamp_state;
+  for ([[maybe_unused]] const auto & each : traffic_light_state.lights) {
     // TODO(murooka) type is separated into color, shape, status
-    *proto.add_lamp_states() = lamp_state;
+    *proto.add_lamp_states() = simulation_api_schema::TrafficLightState::LampState();
   }
 }
 #endif

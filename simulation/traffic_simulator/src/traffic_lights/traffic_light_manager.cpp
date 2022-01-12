@@ -105,25 +105,6 @@ auto TrafficLightManagerBase::update(const double step_time) -> void
   drawMarkers();
 }
 
-template <>
-auto TrafficLightManager<
-  autoware_perception_msgs::msg::TrafficLightStateArray>::publishTrafficLightStateArray() const
-  -> void
-{
-  autoware_perception_msgs::msg::TrafficLightStateArray traffic_light_state_array;
-  {
-    traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
-    traffic_light_state_array.header.stamp = clock_ptr_->now();
-    for (const auto & each : traffic_lights_) {
-      if (each.second.getColor() != TrafficLightColor::NONE) {
-        traffic_light_state_array.states.push_back(
-          static_cast<autoware_perception_msgs::msg::TrafficLightState>(each.second));
-      }
-    }
-  }
-  traffic_light_state_array_publisher_->publish(traffic_light_state_array);
-}
-
 #ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto TrafficLightManager<
