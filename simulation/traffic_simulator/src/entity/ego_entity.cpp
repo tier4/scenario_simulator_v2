@@ -56,7 +56,7 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
   const auto vehicle_model_type =
     architecture_type == "awf/auto"
@@ -80,9 +80,7 @@ auto getVehicleModelType()
   };
 
   const auto iter =
-    (architecture_type == "tier4/proposal" or architecture_type == "awf/auto" ? legacy_table
-                                                                              : table)
-      .find(vehicle_model_type);
+    (architecture_type == "awf/auto" ? legacy_table : table).find(vehicle_model_type);
 
   if (iter != std::end(table)) {
     return iter->second;
@@ -158,12 +156,9 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
-  if (architecture_type == "tier4/proposal") {
-    throw common::SemanticError(
-      "Given architecture_type ", std::quoted("tier4/proposal"), " was obsoleted.");
-  } else if (architecture_type == "awf/universe") {
+  if (architecture_type == "awf/universe") {
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
                  getParameter<std::string>("autoware_launch_package"),
@@ -191,7 +186,7 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
              : std::make_unique<concealer::AutowareAuto>();
   } else {
     throw common::SemanticError(
-      "Unknown architecture_type ", std::quoted(architecture_type), " was given.");
+      "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
   }
 }
 

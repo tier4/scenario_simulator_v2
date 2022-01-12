@@ -302,7 +302,7 @@ bool API::attachDetectionSensor(
 bool API::attachDetectionSensor(const std::string & entity_name)
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
-    entity_name, getParameter<std::string>("architecture_type", "tier4/proposal"), 0.1));
+    entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1));
 }
 
 bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
@@ -321,7 +321,7 @@ bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & li
 bool API::attachLidarSensor(const std::string & entity_name, const helper::LidarType lidar_type)
 {
   return attachLidarSensor(helper::constructLidarConfiguration(
-    lidar_type, entity_name, getParameter<std::string>("architecture_type", "tier4/proposal")));
+    lidar_type, entity_name, getParameter<std::string>("architecture_type", "awf/universe")));
 }
 
 bool API::updateSensorFrame()
