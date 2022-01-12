@@ -41,6 +41,7 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
@@ -87,7 +88,10 @@ public:
   std::vector<std::int64_t> getPreviousLaneletIds(
     std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getPreviousLaneletIds(std::int64_t lanelet_id) const;
-  boost::optional<int> getLaneChangeableLaneletId(std::int64_t lanelet_id, std::string direction);
+  boost::optional<int64_t> getLaneChangeableLaneletId(
+    std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction);
+  boost::optional<int64_t> getLaneChangeableLaneletId(
+    std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, uint8_t shift);
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
@@ -114,12 +118,10 @@ public:
     double forward_distance = 20);
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
   boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
-    geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id,
+    const geometry_msgs::msg::Pose & from_pose,
+    const traffic_simulator::lane_change::Parameter & lane_change_parameter,
     double maximum_curvature_threshold, double target_trajectory_length,
     double forward_distance_threshold);
-  traffic_simulator::math::HermiteCurve getLaneChangeTrajectory(
-    geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id, double to_s,
-    double tangent_vector_size = 100);
   boost::optional<geometry_msgs::msg::Vector3> getTangentVector(std::int64_t lanelet_id, double s);
   std::vector<std::int64_t> getRoute(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
   std::vector<std::int64_t> getConflictingCrosswalkIds(
@@ -159,6 +161,10 @@ public:
     const std::vector<std::int64_t> & route_lanelets) const;
 
 private:
+  traffic_simulator::math::HermiteCurve getLaneChangeTrajectory(
+    const geometry_msgs::msg::Pose & from_pose,
+    const traffic_simulator_msgs::msg::LaneletPose & to_pose,
+    const traffic_simulator::lane_change::Trajectory trajectory, double tangent_vector_size = 100);
   RouteCache route_cache_;
   CenterPointsCache center_points_cache_;
   LaneletLengthCache lanelet_length_cache_;

@@ -37,7 +37,8 @@ public:
   BT::NodeStatus tick() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {BT::InputPort<std::int64_t>("to_lanelet_id")};
+    BT::PortsList ports = {
+      BT::InputPort<traffic_simulator::lane_change::Parameter>("lane_change_parameters")};
     BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
@@ -53,7 +54,7 @@ private:
   boost::optional<traffic_simulator::math::HermiteCurve> curve_;
   double current_s_;
   double target_s_;
-  boost::optional<std::int64_t> to_lanelet_id_;
+  boost::optional<traffic_simulator::lane_change::Parameter> lane_change_parameters_;
 };
 }  // namespace vehicle
 }  // namespace entity_behavior

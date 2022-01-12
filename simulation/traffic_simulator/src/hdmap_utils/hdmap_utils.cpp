@@ -496,23 +496,50 @@ double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)
   return *std::min_element(limits.begin(), limits.end());
 }
 
-boost::optional<int> HdMapUtils::getLaneChangeableLaneletId(
-  std::int64_t lanelet_id, std::string direction)
+boost::optional<int64_t> HdMapUtils::getLaneChangeableLaneletId(
+  std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, uint8_t shift)
 {
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  if (direction == "left") {
-    auto left_lanelet = vehicle_routing_graph_ptr_->left(lanelet);
-    if (left_lanelet) {
-      return left_lanelet->id();
-    }
-  }
-  if (direction == "right") {
-    auto right_lanelet = vehicle_routing_graph_ptr_->right(lanelet);
-    if (right_lanelet) {
-      return right_lanelet->id();
+  if (shift == 0) {
+    return getLaneChangeableLaneletId(
+      lanelet_id, traffic_simulator::lane_change::Direction::STRAIGHT);
+  } else {
+    std::int64_t reference_id = lanelet_id;
+    for (uint8_t i = 0; i < shift; i++) {
+      auto id = getLaneChangeableLaneletId(reference_id, direction);
+      if (!id) {
+        return boost::none;
+      } else {
+        reference_id = id.get();
+      }
+      if (i == (shift - 1)) {
+        return reference_id;
+      }
     }
   }
   return boost::none;
+}
+
+boost::optional<std::int64_t> HdMapUtils::getLaneChangeableLaneletId(
+  std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction)
+{
+  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  boost::optional<std::int64_t> target = boost::none;
+  switch (direction) {
+    case traffic_simulator::lane_change::Direction::STRAIGHT:
+      target = lanelet.id();
+      break;
+    case traffic_simulator::lane_change::Direction::LEFT:
+      if (vehicle_routing_graph_ptr_->left(lanelet)) {
+        target = vehicle_routing_graph_ptr_->left(lanelet)->id();
+      }
+      break;
+    case traffic_simulator::lane_change::Direction::RIGHT:
+      if (vehicle_routing_graph_ptr_->right(lanelet)) {
+        target = vehicle_routing_graph_ptr_->right(lanelet)->id();
+      }
+      break;
+  }
+  return target;
 }
 
 std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(std::int64_t lanelet_id, double distance)
@@ -838,16 +865,17 @@ const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulb
 
 boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
-  geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id,
+  const geometry_msgs::msg::Pose & from_pose,
+  const traffic_simulator::lane_change::Parameter & lane_change_parameter,
   double maximum_curvature_threshold, double target_trajectory_length,
   double forward_distance_threshold)
 {
-  double to_length = getLaneletLength(to_lanelet_id);
+  double to_length = getLaneletLength(lane_change_parameter.target.lanelet_id);
   std::vector<double> evaluation, target_s;
   std::vector<traffic_simulator::math::HermiteCurve> curves;
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
-    auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
+    auto goal_pose = toMapPose(lane_change_parameter.target.lanelet_id, to_s, 0);
     if (
       traffic_simulator::math::getRelativePose(from_pose, goal_pose.pose).position.x <=
       forward_distance_threshold) {
@@ -857,8 +885,11 @@ HdMapUtils::getLaneChangeTrajectory(
       std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
       std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
       std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
-    auto traj =
-      getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_distance * 0.5);
+    traffic_simulator_msgs::msg::LaneletPose to_pose;
+    to_pose.lanelet_id = lane_change_parameter.target.lanelet_id;
+    to_pose.s = to_s;
+    auto traj = getLaneChangeTrajectory(
+      from_pose, to_pose, lane_change_parameter.trajectory, start_to_goal_distance * 0.5);
     if (traj.getMaximum2DCurvature() < maximum_curvature_threshold) {
       double eval = std::fabs(target_trajectory_length - traj.getLength());
       evaluation.push_back(eval);
@@ -875,18 +906,41 @@ HdMapUtils::getLaneChangeTrajectory(
 }
 
 traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
-  geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id, double to_s,
-  double tangent_vector_size)
+  const geometry_msgs::msg::Pose & from_pose,
+  const traffic_simulator_msgs::msg::LaneletPose & to_pose,
+  const traffic_simulator::lane_change::Trajectory trajectory, double tangent_vector_size)
 {
-  std::vector<geometry_msgs::msg::Point> ret;
-  auto to_vec = getTangentVector(to_lanelet_id, to_s);
-  auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
-  geometry_msgs::msg::Vector3 start_vec = getVectorFromPose(from_pose, tangent_vector_size);
-  geometry_msgs::msg::Vector3 goal_vec = to_vec.get();
+  geometry_msgs::msg::Vector3 start_vec;
+  geometry_msgs::msg::Vector3 to_vec;
+  geometry_msgs::msg::Pose goal_pose =
+    toMapPose(to_pose.lanelet_id, to_pose.s, to_pose.offset).pose;
+  switch (trajectory) {
+    case traffic_simulator::lane_change::Trajectory::CUBIC:
+      start_vec = getVectorFromPose(from_pose, tangent_vector_size);
+      if (getTangentVector(to_pose.lanelet_id, to_pose.s)) {
+        to_vec = getTangentVector(to_pose.lanelet_id, to_pose.s).get();
+      } else {
+        THROW_SIMULATION_ERROR(
+          "Failed to calculate tangent vector at lanelet_id : ", to_pose.lanelet_id,
+          " s : ", to_pose.s);
+      }
+      break;
+    case traffic_simulator::lane_change::Trajectory::LINEAR:
+      start_vec.x = (goal_pose.position.x - from_pose.position.x);
+      start_vec.y = (goal_pose.position.y - from_pose.position.y);
+      start_vec.z = (goal_pose.position.z - from_pose.position.z);
+      to_vec = start_vec;
+      tangent_vector_size = 1;
+      break;
+    case traffic_simulator::lane_change::Trajectory::STEP:
+      THROW_SIMULATION_ERROR("trajectory type : STEP does not supported.");
+      break;
+  }
+  geometry_msgs::msg::Vector3 goal_vec = to_vec;
   goal_vec.x = goal_vec.x * tangent_vector_size;
   goal_vec.y = goal_vec.y * tangent_vector_size;
   goal_vec.z = goal_vec.z * tangent_vector_size;
-  traffic_simulator::math::HermiteCurve curve(from_pose, goal_pose.pose, start_vec, goal_vec);
+  traffic_simulator::math::HermiteCurve curve(from_pose, goal_pose, start_vec, goal_vec);
   return curve;
 }
 

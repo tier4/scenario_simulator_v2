@@ -26,10 +26,10 @@
 #include <string>
 #include <vector>
 
-class LaneChangeRightScenario : public cpp_mock_scenarios::CppScenarioNode
+class LaneChangeLeftScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit LaneChangeRightScenario(const rclcpp::NodeOptions & option)
+  explicit LaneChangeLeftScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
@@ -39,9 +39,13 @@ public:
 
 private:
   bool requested = false;
+  bool lanechange_finished = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34462, 0.1)) {
+    if (api_.isInLanelet("ego", 34513, 0.1)) {
+      lanechange_finished = true;
+    }
+    if (lanechange_finished && api_.isInLanelet("ego", 34510, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_START
@@ -54,11 +58,18 @@ private:
   {
     api_.spawn("ego", getVehicleParameters());
     api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34513, 10, 0, 0, 0, 0),
+      "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 10, true);
-    api_.requestLaneChange("ego", traffic_simulator::lane_change::Direction::RIGHT);
-    // api_.requestLaneChange("ego", 34462);
+    /*
+    api_.requestLaneChange("ego", traffic_simulator::lane_change::Direction::LEFT);
+    */
+    api_.requestLaneChange(
+      "ego",
+      traffic_simulator::lane_change::RelativeTarget(
+        "ego", traffic_simulator::lane_change::Direction::LEFT, 1, 0),
+      traffic_simulator::lane_change::Trajectory::LINEAR,
+      traffic_simulator::lane_change::Constraint());
   }
 };
 
@@ -66,7 +77,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<LaneChangeRightScenario>(options);
+  auto component = std::make_shared<LaneChangeLeftScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

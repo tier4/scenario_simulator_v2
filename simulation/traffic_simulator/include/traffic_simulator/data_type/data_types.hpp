@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_
 #define TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_
 
+#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
@@ -80,6 +81,67 @@ struct RelativeTargetSpeed
   const Type type;
   const double value;
 };
+
+namespace lane_change
+{
+enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
+
+enum class Trajectory { CUBIC = 0, LINEAR = 1, STEP = 2 };
+
+struct AbsoluteTarget
+{
+  AbsoluteTarget(std::int64_t lanelet_id);
+  AbsoluteTarget(std::int64_t lanelet_id, double offset);
+  AbsoluteTarget(const AbsoluteTarget & other);
+  AbsoluteTarget & operator=(const AbsoluteTarget & other);
+  const std::int64_t lanelet_id;
+  const double offset = 0;
+};
+
+struct Constraint
+{
+  enum class Type { NONE = 0, LATERAL_VELOCITY = 1 };
+  Constraint();
+  Constraint(const Type & type, double value);
+  Constraint(const Constraint & other);
+  Constraint & operator=(const Constraint & other);
+  const Type type;
+  const double value = 0;
+};
+
+struct RelativeTarget
+{
+  RelativeTarget(
+    const std::string & entity_name, const Direction direction, uint8_t shift, double offset);
+  const std::string entity_name;
+  const Direction direction;
+  const uint8_t shift = 0;
+  const double offset = 0;
+};
+
+/**
+ * @brief parameters for behavior plugin
+ */
+struct Parameter
+{
+  Parameter();
+  Parameter(
+    const AbsoluteTarget & target, const Trajectory trajectory, const Constraint & constraint);
+  Parameter(const Parameter & other);
+  Parameter & operator=(const Parameter & other);
+  const AbsoluteTarget target;
+  const Trajectory trajectory;
+  const Constraint constraint;
+};
+
+std::ostream & operator<<(std::ostream & stream, const Direction & value);
+std::ostream & operator<<(std::ostream & stream, const Trajectory & value);
+std::ostream & operator<<(std::ostream & stream, const AbsoluteTarget & value);
+std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value);
+std::ostream & operator<<(std::ostream & stream, const Constraint & value);
+std::ostream & operator<<(std::ostream & stream, const RelativeTarget & value);
+std::ostream & operator<<(std::ostream & stream, const Parameter & value);
+}  // namespace lane_change
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_

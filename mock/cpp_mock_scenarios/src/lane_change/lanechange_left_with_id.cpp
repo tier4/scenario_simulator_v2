@@ -58,7 +58,6 @@ private:
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 10, true);
     api_.requestLaneChange("ego", 34513);
-    // api_.requestLaneChange("ego", traffic_simulator::entity::Direction::LEFT);
   }
 };
 

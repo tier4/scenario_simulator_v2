@@ -38,8 +38,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
-
 class EntityBase
 {
 public:
@@ -158,6 +156,18 @@ public:
     const SpeedChangeConstraint constraint, const bool continuous);
 
   virtual void requestLaneChange(const std::int64_t){};
+
+  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
+
+  void requestLaneChange(
+    const traffic_simulator::lane_change::AbsoluteTarget & target,
+    const traffic_simulator::lane_change::Trajectory trajectory,
+    const lane_change::Constraint & constraint);
+
+  void requestLaneChange(
+    const traffic_simulator::lane_change::RelativeTarget & target,
+    const traffic_simulator::lane_change::Trajectory trajectory,
+    const lane_change::Constraint & constraint);
 
   virtual void requestWalkStraight()
   {
