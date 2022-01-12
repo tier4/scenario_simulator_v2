@@ -100,7 +100,7 @@ struct AbsoluteTarget
 
 struct Constraint
 {
-  enum class Type { NONE = 0, LATERAL_VELOCITY = 1 };
+  enum class Type { NONE = 0, LATERAL_VELOCITY = 1, LONGITUDINAL_DISTANCE = 2 };
   Constraint();
   Constraint(const Type & type, double value);
   Constraint(const Constraint & other);

@@ -134,6 +134,9 @@ std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value)
     case Constraint::Type::LATERAL_VELOCITY:
       stream << "type : LATERAL_VELOCITY" << std::endl;
       break;
+    case Constraint::Type::LONGITUDINAL_DISTANCE:
+      stream << "type : LONGITUDINAL_DISTANCE" << std::endl;
+      break;
   }
   return stream;
 }

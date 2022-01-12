@@ -117,6 +117,9 @@ public:
     std::int64_t lanelet_id, double s, std::vector<std::int64_t> lanelet_ids,
     double forward_distance = 20);
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
+  boost::optional<traffic_simulator::math::HermiteCurve> getLaneChangeTrajectory(
+    const traffic_simulator_msgs::msg::LaneletPose & from_pose,
+    const traffic_simulator::lane_change::Parameter & lane_change_parameter);
   boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter,
@@ -159,12 +162,14 @@ public:
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
   const std::vector<std::int64_t> getTrafficLightIdsOnPath(
     const std::vector<std::int64_t> & route_lanelets) const;
+  traffic_simulator_msgs::msg::LaneletPose getAlongLaneletPose(
+    const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along);
 
 private:
   traffic_simulator::math::HermiteCurve getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-    const traffic_simulator::lane_change::TrajectoryShape trajectory,
+    const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
     double tangent_vector_size = 100);
   RouteCache route_cache_;
   CenterPointsCache center_points_cache_;
