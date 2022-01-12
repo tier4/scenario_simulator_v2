@@ -14,7 +14,6 @@
 external/autoware_api_msgs
 external/autoware_auto_msgs
 external/autoware_control_msgs
-external/autoware_debug_msgs
 external/autoware_iv_msgs
 external/autoware_perception_msgs
 external/autoware_system_msgs

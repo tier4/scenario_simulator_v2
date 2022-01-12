@@ -15,17 +15,17 @@
 #ifndef TRAFFIC_SIMULATOR__METRICS__OUT_OF_RANGE_METRIC_HPP_
 #define TRAFFIC_SIMULATOR__METRICS__OUT_OF_RANGE_METRIC_HPP_
 
-#include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <limits>
 #include <rclcpp/qos.hpp>
 #include <string>
+#include <tier4_debug_msgs/msg/float32_stamped.hpp>
 #include <traffic_simulator/metrics/metric_base.hpp>
 
 namespace metrics
 {
 class OutOfRangeMetric : public MetricBase
 {
-  using JerkMessageType = autoware_debug_msgs::msg::Float32Stamped;
+  using JerkMessageType = tier4_debug_msgs::msg::Float32Stamped;
 
 public:
   struct Config
