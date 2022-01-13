@@ -920,6 +920,10 @@ HdMapUtils::getLaneChangeTrajectory(
     case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
       longitudinal_distance = lane_change_parameter.constraint.value;
       break;
+    case traffic_simulator::lane_change::Constraint::Type::TIME:
+      longitudinal_distance =
+        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+      break;
   }
   const auto along_pose = getAlongLaneletPose(from_pose, longitudinal_distance);
   const auto left_point =

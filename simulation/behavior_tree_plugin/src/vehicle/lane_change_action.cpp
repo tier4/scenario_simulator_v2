@@ -130,6 +130,12 @@ BT::NodeStatus LaneChangeAction::tick()
           along_pose = hdmap_utils->getAlongLaneletPose(
             entity_status.lanelet_pose, lane_change_parameters_->constraint.value);
           break;
+        case traffic_simulator::lane_change::Constraint::Type::TIME:
+          traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
+            entity_status.lanelet_pose, lane_change_parameters_.get());
+          along_pose = hdmap_utils->getAlongLaneletPose(
+            entity_status.lanelet_pose, lane_change_parameters_->constraint.value);
+          break;
       }
       if (traj_with_goal) {
         curve_ = traj_with_goal->first;
@@ -150,6 +156,9 @@ BT::NodeStatus LaneChangeAction::tick()
             break;
           case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
             lane_change_velocity_ = entity_status.action_status.twist.linear.x;
+            break;
+          case traffic_simulator::lane_change::Constraint::Type::TIME:
+            lane_change_velocity_ = curve_->getLength() / lane_change_parameters_->constraint.value;
             break;
         }
       } else {
