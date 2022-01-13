@@ -205,7 +205,9 @@ EgoEntity::EgoEntity(
 
 void EgoEntity::engage() { autoware->engage(); }
 
-auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
+auto EgoEntity::getVehicleCommand() const -> std::tuple<
+  autoware_auto_control_msgs::msg::AckermannControlCommand,
+  autoware_auto_vehicle_msgs::msg::GearCommand>
 {
   return autoware->getVehicleCommand();
 }

@@ -113,7 +113,9 @@ class AutowareAuto : public Autoware
   using Trajectory = AUTOWARE_AUTO_PLANNING_MSGS::msg::Trajectory;
   DEFINE_SUBSCRIPTION(Trajectory);
 
-  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;
+  auto getVehicleCommand() const -> std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
 public:
   template <typename... Ts>

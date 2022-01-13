@@ -166,7 +166,9 @@ public:
 
   auto getSteeringAngle() const -> double override;
 
-  auto getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand override;
+  auto getVehicleCommand() const -> std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
   auto getVelocity() const -> double override;
 
