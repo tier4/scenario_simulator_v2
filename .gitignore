@@ -16,7 +16,6 @@ external/autoware_auto_msgs
 external/autoware_control_msgs
 external/autoware_iv_msgs
 external/autoware_system_msgs
-external/autoware_vehicle_msgs
 external/AutowareArchitectureProposal_api_msgs
 external/AutowareArchitectureProposal_msgs
 external/doxybook2

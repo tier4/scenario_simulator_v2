@@ -208,11 +208,6 @@ auto AutowareUniverse::getGearSign() const -> double { return 1.0; }
 
 auto AutowareUniverse::getSteeringAngle() const -> double { return {}; }
 
-auto AutowareUniverse::getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand
-{
-  return {};
-}
-
 auto AutowareUniverse::getVelocity() const -> double { return {}; }
 
 auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray

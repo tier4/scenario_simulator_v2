@@ -23,7 +23,6 @@
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
-#include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
