@@ -89,14 +89,6 @@ void EntityBase::requestLaneChange(
 {
   auto param = traffic_simulator::lane_change::Parameter(target, trajectory_shape, constraint);
   requestLaneChange(param);
-  switch (param.constraint.type) {
-    case traffic_simulator::lane_change::Constraint::Type::NONE:
-      break;
-    case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
-      break;
-    case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
-      break;
-  }
 }
 
 void EntityBase::requestLaneChange(

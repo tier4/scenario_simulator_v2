@@ -105,27 +105,27 @@ BT::NodeStatus LaneChangeAction::tick()
             entity_status.lanelet_pose.lanelet_id, lane_change_parameters_->target.lanelet_id)) {
         return BT::NodeStatus::FAILURE;
       }
-      if (
-        lane_change_parameters_->constraint.type ==
-        traffic_simulator::lane_change::Constraint::Type::NONE) {
-        auto from_pose = hdmap_utils->toMapPose(entity_status.lanelet_pose).pose;
-        auto ret = hdmap_utils->getLaneChangeTrajectory(
-          from_pose, lane_change_parameters_.get(), 10.0, 20.0, 1.0);
-        if (ret) {
-          curve_ = ret->first;
-          target_s_ = ret->second;
-        } else {
-          return BT::NodeStatus::FAILURE;
-        }
+      boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> traj_with_goal;
+      switch (lane_change_parameters_->constraint.type) {
+        case traffic_simulator::lane_change::Constraint::Type::NONE:
+          traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
+            hdmap_utils->toMapPose(entity_status.lanelet_pose).pose, lane_change_parameters_.get(),
+            10.0, 20.0, 1.0);
+          break;
+        case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
+          traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
+            entity_status.lanelet_pose, lane_change_parameters_.get());
+          break;
+        case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
+          traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
+            entity_status.lanelet_pose, lane_change_parameters_.get());
+          break;
+      }
+      if (traj_with_goal) {
+        curve_ = traj_with_goal->first;
+        target_s_ = traj_with_goal->second;
       } else {
-        auto ret = hdmap_utils->getLaneChangeTrajectory(
-          entity_status.lanelet_pose, lane_change_parameters_.get());
-        if (ret) {
-          curve_ = ret->first;
-          target_s_ = ret->second;
-        } else {
-          return BT::NodeStatus::FAILURE;
-        }
+        return BT::NodeStatus::FAILURE;
       }
     }
   }
