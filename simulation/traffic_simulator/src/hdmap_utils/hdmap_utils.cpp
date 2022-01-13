@@ -901,7 +901,8 @@ traffic_simulator_msgs::msg::LaneletPose HdMapUtils::getAlongLaneletPose(
   return along_pose;
 }
 
-boost::optional<traffic_simulator::math::HermiteCurve> HdMapUtils::getLaneChangeTrajectory(
+boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
+HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter)
 {
@@ -919,9 +920,9 @@ boost::optional<traffic_simulator::math::HermiteCurve> HdMapUtils::getLaneChange
   }
   const auto along_pose = getAlongLaneletPose(from_pose, longitudinal_distance);
   const auto left_point =
-    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset + 3.0).pose.position;
+    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset + 5.0).pose.position;
   const auto right_point =
-    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset - 3.0).pose.position;
+    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset - 5.0).pose.position;
   const auto collision_point = getCenterPointsSpline(lane_change_parameter.target.lanelet_id)
                                  ->getCollisionPointIn2D(left_point, right_point);
   if (!collision_point) {
@@ -930,8 +931,9 @@ boost::optional<traffic_simulator::math::HermiteCurve> HdMapUtils::getLaneChange
   const auto to_pose = traffic_simulator::helper::constructLaneletPose(
     lane_change_parameter.target.lanelet_id, collision_point.get(),
     lane_change_parameter.target.offset);
-  return getLaneChangeTrajectory(
+  auto traj = getLaneChangeTrajectory(
     toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape);
+  return std::make_pair(traj, collision_point.get());
 }
 
 boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>

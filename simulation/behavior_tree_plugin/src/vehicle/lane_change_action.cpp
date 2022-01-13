@@ -105,14 +105,26 @@ BT::NodeStatus LaneChangeAction::tick()
             entity_status.lanelet_pose.lanelet_id, lane_change_parameters_->target.lanelet_id)) {
         return BT::NodeStatus::FAILURE;
       }
-      auto from_pose = hdmap_utils->toMapPose(entity_status.lanelet_pose).pose;
-      auto ret = hdmap_utils->getLaneChangeTrajectory(
-        from_pose, lane_change_parameters_.get(), 10.0, 20.0, 1.0);
-      if (ret) {
-        curve_ = ret->first;
-        target_s_ = ret->second;
+      if (
+        lane_change_parameters_.constraint.type ==
+        traffic_simulator::lane_change::Constraint::Type::NONE) {
+        auto from_pose = hdmap_utils->toMapPose(entity_status.lanelet_pose).pose;
+        auto ret = hdmap_utils->getLaneChangeTrajectory(
+          from_pose, lane_change_parameters_.get(), 10.0, 20.0, 1.0);
+        if (ret) {
+          curve_ = ret->first;
+          target_s_ = ret->second;
+        } else {
+          return BT::NodeStatus::FAILURE;
+        }
       } else {
-        return BT::NodeStatus::FAILURE;
+        auto ret = hdmap_utils->getLaneChangeTrajectory(from_pose, lane_change_parameters_.get());
+        if (ret) {
+          curve_ = ret->first;
+          target_s_ = ret->second;
+        } else {
+          return BT::NodeStatus::FAILURE;
+        }
       }
     }
   }
