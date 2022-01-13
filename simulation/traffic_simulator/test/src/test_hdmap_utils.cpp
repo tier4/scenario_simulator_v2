@@ -68,7 +68,6 @@ TEST(HdMapUtils, AlongLaneletPose)
       .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), 30)
       .lanelet_id,
     34513);
-  EXPECT_DOUBLE_EQ(hdmap_utils.getLaneletLength(34513), 46.40806767334827);
   EXPECT_EQ(
     hdmap_utils
       .getAlongLaneletPose(
@@ -86,6 +85,17 @@ TEST(HdMapUtils, AlongLaneletPose)
       .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), 30.0)
       .lanelet_id,
     34513);
+
+  EXPECT_EQ(
+    hdmap_utils
+      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), -10.0)
+      .lanelet_id,
+    34684);
+  EXPECT_DOUBLE_EQ(
+    hdmap_utils
+      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), -10.0)
+      .s,
+    hdmap_utils.getLaneletLength(34684) - 10.0);
 }
 
 int main(int argc, char ** argv)
