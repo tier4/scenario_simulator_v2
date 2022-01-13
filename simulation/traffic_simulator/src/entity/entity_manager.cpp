@@ -24,7 +24,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/math/bounding_box.hpp>
 #include <traffic_simulator/math/collision.hpp>
-#include <traffic_simulator/math/transfrom.hpp>
+#include <traffic_simulator/math/transform.hpp>
 #include <unordered_map>
 #include <vector>
 

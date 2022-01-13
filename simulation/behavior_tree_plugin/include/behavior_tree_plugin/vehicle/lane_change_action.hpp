@@ -54,6 +54,7 @@ private:
   boost::optional<traffic_simulator::math::HermiteCurve> curve_;
   double current_s_;
   double target_s_;
+  double lane_change_velocity_;
   boost::optional<traffic_simulator::lane_change::Parameter> lane_change_parameters_;
 };
 }  // namespace vehicle

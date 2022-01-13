@@ -43,7 +43,7 @@
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/math/linear_algebra.hpp>
-#include <traffic_simulator/math/transfrom.hpp>
+#include <traffic_simulator/math/transform.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
