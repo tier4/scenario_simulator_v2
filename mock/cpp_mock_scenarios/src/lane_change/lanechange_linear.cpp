@@ -71,7 +71,7 @@ private:
       traffic_simulator::lane_change::TrajectoryShape::LINEAR,
       traffic_simulator::lane_change::Constraint(
         traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE,
-        20.0
+        30.0
       ));
   }
 };
