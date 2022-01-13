@@ -87,9 +87,7 @@ int main(const int argc, char const * const * const argv)
 
   auto subscription = node->create_subscription<tier4_api_msgs::msg::AwapiAutowareStatus>(
     "/awapi/autoware/get/status", rclcpp::QoS(1).reliable(),
-    [&](const tier4_api_msgs::msg::AwapiAutowareStatus::SharedPtr message) {
-      status = *message;
-    });
+    [&](const tier4_api_msgs::msg::AwapiAutowareStatus::SharedPtr message) { status = *message; });
 
   auto publisher =
     node->create_publisher<ParameterDeclaration>("/timeout", rclcpp::QoS(1).reliable());
