@@ -906,13 +906,16 @@ HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter)
 {
-  double longitudinal_distance = 20.0;
+  double longitudinal_distance =
+    traffic_simulator::lane_change::Parameter::default_lanechange_distance;
   switch (lane_change_parameter.constraint.type) {
     case traffic_simulator::lane_change::Constraint::Type::NONE:
-      longitudinal_distance = 20.0;
+      longitudinal_distance =
+        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
       break;
     case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
-      longitudinal_distance = 20.0;
+      longitudinal_distance =
+        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
       break;
     case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
       longitudinal_distance = lane_change_parameter.constraint.value;

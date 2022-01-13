@@ -132,6 +132,7 @@ struct Parameter
   const AbsoluteTarget target;
   const TrajectoryShape trajectory_shape;
   const Constraint constraint;
+  static double default_lanechange_distance;
 };
 
 std::ostream & operator<<(std::ostream & stream, const Direction & value);

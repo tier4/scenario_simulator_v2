@@ -85,16 +85,24 @@ void EntityBase::requestSpeedChange(
 void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::AbsoluteTarget & target,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const lane_change::Constraint & constraint)
+  const traffic_simulator::lane_change::Constraint & constraint)
 {
   auto param = traffic_simulator::lane_change::Parameter(target, trajectory_shape, constraint);
   requestLaneChange(param);
+  switch (param.constraint.type) {
+    case traffic_simulator::lane_change::Constraint::Type::NONE:
+      break;
+    case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
+      break;
+    case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
+      break;
+  }
 }
 
 void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::RelativeTarget & target,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const lane_change::Constraint & constraint)
+  const traffic_simulator::lane_change::Constraint & constraint)
 {
   std::int64_t reference_lanelet_id = 0;
   if (target.entity_name == name) {

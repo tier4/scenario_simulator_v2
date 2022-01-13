@@ -62,6 +62,8 @@ RelativeTarget::RelativeTarget(
 {
 }
 
+double Parameter::default_lanechange_distance = 20.0;
+
 Parameter::Parameter()
 : target(AbsoluteTarget(0)), trajectory_shape(TrajectoryShape::CUBIC), constraint(Constraint())
 {
