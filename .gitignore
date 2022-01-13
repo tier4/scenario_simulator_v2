@@ -11,11 +11,7 @@
 *.pcd
 
 # external packages
-external/autoware_api_msgs
 external/autoware_auto_msgs
-external/autoware_system_msgs
-external/AutowareArchitectureProposal_api_msgs
-external/AutowareArchitectureProposal_msgs
 external/doxybook2
 external/lanelet2
 external/lexus_description

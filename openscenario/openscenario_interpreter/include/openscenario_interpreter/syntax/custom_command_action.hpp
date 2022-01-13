@@ -15,11 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
-#include <autoware_simulation_msgs/msg/simulation_events.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <tier4_simulation_msgs/msg/simulation_events.hpp>
 #include <vector>
 
 namespace openscenario_interpreter
@@ -68,7 +68,7 @@ struct CustomCommandAction : private Scope
 
   /*  */ auto run() -> void;
 
-  static auto publisher() -> rclcpp::Publisher<autoware_simulation_msgs::msg::SimulationEvents> &;
+  static auto publisher() -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &;
 
   static auto split(const std::string &) -> std::vector<std::string>;
 
