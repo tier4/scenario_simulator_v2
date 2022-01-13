@@ -69,7 +69,10 @@ private:
       traffic_simulator::lane_change::RelativeTarget(
         "ego", traffic_simulator::lane_change::Direction::LEFT, 1, 0),
       traffic_simulator::lane_change::TrajectoryShape::LINEAR,
-      traffic_simulator::lane_change::Constraint());
+      traffic_simulator::lane_change::Constraint(
+        traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE,
+        20.0
+      ));
   }
 };
 
