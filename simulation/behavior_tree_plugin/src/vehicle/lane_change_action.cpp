@@ -167,29 +167,44 @@ BT::NodeStatus LaneChangeAction::tick()
     }
   }
   if (curve_) {
-    double target_accel =
-      (lane_change_velocity_ - entity_status.action_status.twist.linear.x) / step_time;
-    if (entity_status.action_status.twist.linear.x > target_speed) {
-      target_accel = boost::algorithm::clamp(target_accel, driver_model.deceleration * -1, 0);
-    } else {
-      target_accel = boost::algorithm::clamp(target_accel, 0, driver_model.acceleration);
+    double target_accel = 0;
+    switch (lane_change_parameters_->constraint.policy) {
+      /**
+       * @brief Force changing speed in order to fullfill constraint.
+       */
+      case traffic_simulator::lane_change::Constraint::Policy::FORCE:
+        entity_status.action_status.twist = geometry_msgs::msg::Twist();
+        entity_status.action_status.accel = geometry_msgs::msg::Accel();
+        entity_status.action_status.twist.linear.x = lane_change_velocity_;
+        current_s_ = current_s_ + entity_status.action_status.twist.linear.x * step_time;
+        break;
+      /**
+       * @brief Changing linear speed and try to fullfill constraint.
+       */
+      case traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT:
+        target_accel =
+          (lane_change_velocity_ - entity_status.action_status.twist.linear.x) / step_time;
+        if (entity_status.action_status.twist.linear.x > target_speed) {
+          target_accel = boost::algorithm::clamp(target_accel, driver_model.deceleration * -1, 0);
+        } else {
+          target_accel = boost::algorithm::clamp(target_accel, 0, driver_model.acceleration);
+        }
+        geometry_msgs::msg::Accel accel_new;
+        accel_new.linear.x = target_accel;
+        geometry_msgs::msg::Twist twist_new;
+        twist_new.linear.x = boost::algorithm::clamp(
+          entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10,
+          vehicle_parameters.performance.max_speed);
+        twist_new.linear.y = 0.0;
+        twist_new.linear.z = 0.0;
+        twist_new.angular.x = 0.0;
+        twist_new.angular.y = 0.0;
+        twist_new.angular.z = 0.0;
+        entity_status.action_status.twist = twist_new;
+        entity_status.action_status.accel = accel_new;
+        current_s_ = current_s_ + entity_status.action_status.twist.linear.x * step_time;
+        break;
     }
-    geometry_msgs::msg::Accel accel_new;
-    accel_new.linear.x = target_accel;
-    geometry_msgs::msg::Twist twist_new;
-    twist_new.linear.x = boost::algorithm::clamp(
-      entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10,
-      vehicle_parameters.performance.max_speed);
-    twist_new.linear.y = 0.0;
-    twist_new.linear.z = 0.0;
-    twist_new.angular.x = 0.0;
-    twist_new.angular.y = 0.0;
-    twist_new.angular.z = 0.0;
-    entity_status.action_status.twist = twist_new;
-    entity_status.action_status.accel = accel_new;
-
-    double current_linear_vel = entity_status.action_status.twist.linear.x;
-    current_s_ = current_s_ + current_linear_vel * step_time;
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
       traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
