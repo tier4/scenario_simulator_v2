@@ -54,29 +54,20 @@ auto SpeedAction::start() -> void
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       connection.requestSpeedChange(
-        std::get<0>(each), speed_action_target.as<AbsoluteTargetSpeed>().value,
+        std::get<0>(each),  //
+        speed_action_target.as<AbsoluteTargetSpeed>().value,
         static_cast<traffic_simulator::SpeedChangeTransition>(
           speed_action_dynamics.dynamics_shape),  // NOTE: implicit conversion
-        traffic_simulator::SpeedChangeConstraint(
-          static_cast<traffic_simulator::SpeedChangeConstraint::Type>(
-            speed_action_dynamics.dynamics_dimension),  // NOTE: implicit conversion
-          speed_action_dynamics.value),
+        static_cast<traffic_simulator::SpeedChangeConstraint>(speed_action_dynamics),  //
         true);
     } else {
       connection.requestSpeedChange(
         std::get<0>(each),
-        traffic_simulator::RelativeTargetSpeed(
-          speed_action_target.as<RelativeTargetSpeed>().entity_ref,
-          static_cast<traffic_simulator::RelativeTargetSpeed::Type>(
-            speed_action_target.as<RelativeTargetSpeed>()
-              .speed_target_value_type),  // NOTE: implicit conversion
-          speed_action_target.as<RelativeTargetSpeed>().value),
+        static_cast<traffic_simulator::RelativeTargetSpeed>(
+          speed_action_target.as<RelativeTargetSpeed>()),
         static_cast<traffic_simulator::SpeedChangeTransition>(
           speed_action_dynamics.dynamics_shape),  // NOTE: implicit conversion
-        traffic_simulator::SpeedChangeConstraint(
-          static_cast<traffic_simulator::SpeedChangeConstraint::Type>(
-            speed_action_dynamics.dynamics_dimension),  // NOTE: implicit conversion
-          speed_action_dynamics.value),
+        static_cast<traffic_simulator::SpeedChangeConstraint>(speed_action_dynamics),
         speed_action_target.as<RelativeTargetSpeed>().continuous);
     }
   }
