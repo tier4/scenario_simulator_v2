@@ -83,6 +83,28 @@ You can send request with these parameters.
 | CUBIC  | Changing lanes with cubic spline trajectory. | :heavy_check_mark: |
 | LINEAR | Changing lanes with linear trajectory.       |                    |
 
+###### Cubic Trajectory Shape
+
+<iframe
+    src="https://user-images.githubusercontent.com/10348912/149456861-5e0e86e4-9063-4b59-94cc-bbed37c4b133.mp4"
+    title="Install Docker Engine"
+    class="embed-card embed-webcard"
+    scrolling="no"
+    frameborder="0"
+    style="display: block; width: 100%; height: 300px; max-width: 500px; margin: 10px 0px;">
+</iframe>
+
+###### Linear Trajectory Shape
+
+<iframe
+    src="https://user-images.githubusercontent.com/10348912/149457026-0d3a7538-0cfc-4245-930f-eccc80d53e1c.mp4"
+    title="Install Docker Engine"
+    class="embed-card embed-webcard"
+    scrolling="no"
+    frameborder="0"
+    style="display: block; width: 100%; height: 300px; max-width: 500px; margin: 10px 0px;">
+</iframe>
+
 ##### Constraint
 
 |         Value         |                      Meaning                      |      Default       |
