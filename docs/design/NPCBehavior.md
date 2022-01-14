@@ -44,3 +44,57 @@ graph TD
 | StopAtCrossingEntity | Stopping at crossing entity.                        | Target entity was crossed.                         |                                                                                         |
 | Yield                | Yield to right-of-way entity.                       | Right of way entity is moved.                      |                                                                                         |
 | MoveBackward         | Move backward on lane.                              | Another request and new goal point was suggested.  |                                                                                         |
+
+
+### Behavior
+#### LaneChange
+
+By using `API::requestLaneChange` function, you send lane change request to target NPC.
+You can send request with these parameters.
+
+##### Target
+
+|     Value      |                                                 Meaning                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| AbsoluteTarget | Changing lanes to the exact target lanelet. You have to specify `lanelet_id`, `offset`                  |
+| RelativeTarget | Changing lanes to the relative target lanelet. You have to specify `entity_name`, `shift`, `direction`. |
+
+###### AbsoluteTarget
+
+|   Value    |                     Meaning                      | Default |
+| ---------- | ------------------------------------------------ | ------- |
+| lanelet_id | Lanelet id, which you want to changing lanes to. |         |
+| offset     | Target offset you want to changing lanes.        | 0       |
+
+`offset` value is calculated under lane coordinate.
+
+###### RelativeTarget
+
+|    Value    |                       Meaning                       | Default |
+| ----------- | --------------------------------------------------- | ------- |
+| entity_name | Reference entity name.                              |         |
+| shift       | Number of lanes counted from reference entity name. | 0       |
+| offset      | Target offset you want to changing lanes.           | 0       |
+
+##### TrajectoryShape
+
+| Value  |                   Meaning                    |      Default       |
+| ------ | -------------------------------------------- | ------------------ |
+| CUBIC  | Changing lanes with cubic spline trajectory. | :heavy_check_mark: |
+| LINEAR | Changing lanes with linear trajectory.       |                    |
+
+##### Constraint
+
+|         Value         |                      Meaning                      |      Default       |
+| --------------------- | ------------------------------------------------- | ------------------ |
+| NONE                  | Just changing lanes if possible.                  | :heavy_check_mark: |
+| LATERAL_VELOCITY      | Changing lanes with target lateral velocity.      |                    |
+| LONGITUDINAL_DISTANCE | Changing lanes with target longitudinal distance. |                    |
+| TIME                  | Changing lanes with target duration.              |                    |
+
+##### Policy
+
+|    Value    |                                   Meaning                                   |      Default       |
+| ----------- | --------------------------------------------------------------------------- | ------------------ |
+| FORCE       | Changing lanes and fulfilling constraints ignoring dynamics.                | :heavy_check_mark: |
+| BEST_EFFORT | Changing lanes and trying to fulfill constraints without ignoring dynamics. |                    |
