@@ -119,7 +119,8 @@ public:
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
   boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-    const traffic_simulator::lane_change::Parameter & lane_change_parameter);
+    const traffic_simulator::lane_change::Parameter & lane_change_parameter,
+    double tangent_vector_size);
   boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter,

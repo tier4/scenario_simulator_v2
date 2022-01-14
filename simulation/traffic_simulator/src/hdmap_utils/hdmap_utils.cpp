@@ -904,7 +904,8 @@ traffic_simulator_msgs::msg::LaneletPose HdMapUtils::getAlongLaneletPose(
 boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-  const traffic_simulator::lane_change::Parameter & lane_change_parameter)
+  const traffic_simulator::lane_change::Parameter & lane_change_parameter,
+  double tangent_vector_size)
 {
   double longitudinal_distance =
     traffic_simulator::lane_change::Parameter::default_lanechange_distance;
@@ -939,7 +940,7 @@ HdMapUtils::getLaneChangeTrajectory(
     lane_change_parameter.target.lanelet_id, collision_point.get(),
     lane_change_parameter.target.offset);
   auto traj = getLaneChangeTrajectory(
-    toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape);
+    toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape, tangent_vector_size);
   return std::make_pair(traj, collision_point.get());
 }
 
