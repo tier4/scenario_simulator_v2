@@ -38,14 +38,19 @@ public:
   }
 
 private:
-  bool lanechange_succeed = false;
+  int lanechange_frames = 0;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34513, 0.1)) {
-      lanechange_succeed = true;
+    if (api_.getCurrentAction("ego") == "lane_change") {
+      lanechange_frames++;
     }
-    if (lanechange_succeed && api_.isInLanelet("ego", 34510, 0.1)) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+    if (api_.getCurrentAction("ego") != "lane_change" && api_.getCurrentTime() >= 2.0) {
+      double duration = static_cast<double>(lanechange_frames) * 0.05;
+      if (duration >= 3.05 && 3.1 >= duration) {
+        stop(cpp_mock_scenarios::Result::SUCCESS);
+      } else {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
     }
     // LCOV_EXCL_START
     if (api_.getCurrentTime() >= 10.0) {
