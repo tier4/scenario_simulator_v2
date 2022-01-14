@@ -45,7 +45,7 @@ private:
       lanechange_frames++;
     }
     if (api_.getCurrentAction("ego") != "lane_change" && api_.getCurrentTime() >= 10.0) {
-      if (static_cast<double>(lanechange_frames - 1) * 0.05 == 20.0) {
+      if (static_cast<double>(lanechange_frames) * 0.05 == 20.0) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);

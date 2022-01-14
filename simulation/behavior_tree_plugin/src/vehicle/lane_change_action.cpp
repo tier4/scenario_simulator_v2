@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
+#include <boost/algorithm/clamp.hpp>
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -107,6 +108,8 @@ BT::NodeStatus LaneChangeAction::tick()
         return BT::NodeStatus::FAILURE;
       }
       boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> traj_with_goal;
+      double tangent_vector_size =
+        boost::algorithm::clamp(10.0, 30.0, entity_status.action_status.twist.linear.x * 30);
       traffic_simulator_msgs::msg::LaneletPose along_pose, goal_pose;
       switch (lane_change_parameters_->constraint.type) {
         case traffic_simulator::lane_change::Constraint::Type::NONE:
@@ -119,20 +122,20 @@ BT::NodeStatus LaneChangeAction::tick()
           break;
         case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
-            entity_status.lanelet_pose, lane_change_parameters_.get());
+            entity_status.lanelet_pose, lane_change_parameters_.get(), tangent_vector_size);
           along_pose = hdmap_utils->getAlongLaneletPose(
             entity_status.lanelet_pose,
             traffic_simulator::lane_change::Parameter::default_lanechange_distance);
           break;
         case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
-            entity_status.lanelet_pose, lane_change_parameters_.get());
+            entity_status.lanelet_pose, lane_change_parameters_.get(), tangent_vector_size);
           along_pose = hdmap_utils->getAlongLaneletPose(
             entity_status.lanelet_pose, lane_change_parameters_->constraint.value);
           break;
         case traffic_simulator::lane_change::Constraint::Type::TIME:
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
-            entity_status.lanelet_pose, lane_change_parameters_.get());
+            entity_status.lanelet_pose, lane_change_parameters_.get(), tangent_vector_size);
           along_pose = hdmap_utils->getAlongLaneletPose(
             entity_status.lanelet_pose, lane_change_parameters_->constraint.value);
           break;
