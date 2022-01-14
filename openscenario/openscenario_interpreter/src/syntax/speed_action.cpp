@@ -41,25 +41,15 @@ auto SpeedAction::endsImmediately() const -> bool
          speed_action_dynamics.dynamics_shape == DynamicsShape::step;
 }
 
-auto SpeedAction::reset() -> void
+auto SpeedAction::run() -> void {}
+
+auto SpeedAction::start() -> void
 {
   accomplishments.clear();
 
   for (const auto & actor : actors) {
     accomplishments.emplace(actor, false);
   }
-}
-
-auto SpeedAction::run() -> void
-{
-  // for (auto && each : accomplishments) {
-  //   std::get<1>(each) = std::get<1>(each) or update(EntityRef(std::get<0>(each)));
-  // }
-}
-
-auto SpeedAction::start() -> void
-{
-  reset();
 
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {

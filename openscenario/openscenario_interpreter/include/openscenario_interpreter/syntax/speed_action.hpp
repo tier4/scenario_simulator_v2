@@ -52,8 +52,6 @@ struct SpeedAction : private Scope
 
   auto endsImmediately() const -> bool;
 
-  auto reset() -> void;
-
   auto run() -> void;
 
   auto start() -> void;
