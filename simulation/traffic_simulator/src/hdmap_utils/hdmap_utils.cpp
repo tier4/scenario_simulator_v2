@@ -940,7 +940,8 @@ HdMapUtils::getLaneChangeTrajectory(
     lane_change_parameter.target.lanelet_id, collision_point.get(),
     lane_change_parameter.target.offset);
   auto traj = getLaneChangeTrajectory(
-    toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape, tangent_vector_size);
+    toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape,
+    tangent_vector_size);
   return std::make_pair(traj, collision_point.get());
 }
 
