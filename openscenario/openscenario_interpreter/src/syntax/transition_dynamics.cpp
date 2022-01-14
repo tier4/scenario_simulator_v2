@@ -24,5 +24,9 @@ TransitionDynamics::TransitionDynamics(const pugi::xml_node & node, Scope & scop
   dynamics_dimension(readAttribute<DynamicsDimension>("dynamicsDimension", node, scope))
 {
 }
+
+// TransitionDynamics::operator traffic_simulator::SpeedChangeConstraint() const
+// {
+// }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

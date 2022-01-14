@@ -29,7 +29,7 @@ SpeedAction::SpeedAction(const pugi::xml_node & node, Scope & scope)
 
 auto SpeedAction::accomplished() -> bool
 {
-  return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](const auto & each) {
+  return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](auto && each) {
     return std::get<1>(each);
   });
 }
@@ -53,6 +53,36 @@ auto SpeedAction::run() -> void
 {
   for (auto && each : accomplishments) {
     std::get<1>(each) = std::get<1>(each) or update(EntityRef(std::get<0>(each)));
+
+    // auto && actor = std::get<0>(each);
+    //
+    // if (speed_action_target.is<AbsoluteTargetSpeed>()) {
+    //   connection.requestSpeedChange(
+    //     actor,
+    //     speed_action_target.as<AbsoluteTargetSpeed>().value,
+    //     static_cast<traffic_simulator::SpeedChangeTransition>(
+    //       speed_action_dynamics.dynamics_shape),  // NOTE: implicit conversion
+    //     traffic_simulator::SpeedChangeConstraint(
+    //       static_cast<traffic_simulator::SpeedChangeConstraint::Type>(
+    //         speed_action_dynamics.dynamics_dimension),  // NOTE: implicit conversion
+    //       speed_action_dynamics.value),
+    //     true);
+    // } else {
+    //   connection.requestSpeedChange(
+    //     actor,
+    //     traffic_simulator::RelativeTargetSpeed(
+    //       speed_action_target.as<RelativeTargetSpeed>().entity_ref,
+    //       static_cast<traffic_simulator::RelativeTargetSpeed::Type>(
+    //         speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type),  // NOTE: implicit conversion
+    //       speed_action_target.as<RelativeTargetSpeed>().value),
+    //     static_cast<traffic_simulator::SpeedChangeTransition>(
+    //       speed_action_dynamics.dynamics_shape),  // NOTE: implicit conversion
+    //     traffic_simulator::SpeedChangeConstraint(
+    //       static_cast<traffic_simulator::SpeedChangeConstraint::Type>(
+    //         speed_action_dynamics.dynamics_dimension),  // NOTE: implicit conversion
+    //       speed_action_dynamics.value),
+    //     speed_action_target.as<RelativeTargetSpeed>().continuous);
+    // }
   }
 }
 

@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_TARGET_VALUE_TYPE_HPP_
 
 #include <iostream>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <type_traits>
 
 namespace openscenario_interpreter
@@ -60,6 +61,16 @@ struct SpeedTargetValueType
   explicit SpeedTargetValueType() = default;
 
   constexpr operator value_type() const noexcept { return value; }
+
+  explicit constexpr operator traffic_simulator::RelativeTargetSpeed::Type() const
+  {
+    switch (value) {
+      case delta:
+        return traffic_simulator::RelativeTargetSpeed::Type::DELTA;
+      case factor:
+        return traffic_simulator::RelativeTargetSpeed::Type::FACTOR;
+    }
+  }
 };
 
 auto operator>>(std::istream &, SpeedTargetValueType &) -> std::istream &;
