@@ -44,3 +44,79 @@ graph TD
 | StopAtCrossingEntity | Stopping at crossing entity.                        | Target entity was crossed.                         |                                                                                         |
 | Yield                | Yield to right-of-way entity.                       | Right of way entity is moved.                      |                                                                                         |
 | MoveBackward         | Move backward on lane.                              | Another request and new goal point was suggested.  |                                                                                         |
+
+
+### Behavior
+#### LaneChange
+
+By using `API::requestLaneChange` function, you send lane change request to target NPC.
+You can send request with these parameters.
+
+##### Target
+
+|     Value      |                                                 Meaning                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| AbsoluteTarget | Changing lanes to the exact target lanelet. You have to specify `lanelet_id`, `offset`                  |
+| RelativeTarget | Changing lanes to the relative target lanelet. You have to specify `entity_name`, `shift`, `direction`. |
+
+###### AbsoluteTarget
+
+|   Value    |                     Meaning                      | Default |
+| ---------- | ------------------------------------------------ | ------- |
+| lanelet_id | Lanelet id, which you want to changing lanes to. |         |
+| offset     | Target offset you want to changing lanes.        | 0       |
+
+`offset` value is calculated under lane coordinate.
+
+###### RelativeTarget
+
+|    Value    |                       Meaning                       | Default |
+| ----------- | --------------------------------------------------- | ------- |
+| entity_name | Reference entity name.                              |         |
+| shift       | Number of lanes counted from reference entity name. | 0       |
+| offset      | Target offset you want to changing lanes.           | 0       |
+
+##### TrajectoryShape
+
+| Value  |                   Meaning                    |      Default       |
+| ------ | -------------------------------------------- | ------------------ |
+| CUBIC  | Changing lanes with cubic spline trajectory. | :heavy_check_mark: |
+| LINEAR | Changing lanes with linear trajectory.       |                    |
+
+###### Cubic Trajectory Shape
+
+<iframe
+    src="https://user-images.githubusercontent.com/10348912/149456861-5e0e86e4-9063-4b59-94cc-bbed37c4b133.mp4"
+    title="Install Docker Engine"
+    class="embed-card embed-webcard"
+    scrolling="no"
+    frameborder="0"
+    style="display: block; width: 100%; height: 300px; max-width: 500px; margin: 10px 0px;">
+</iframe>
+
+###### Linear Trajectory Shape
+
+<iframe
+    src="https://user-images.githubusercontent.com/10348912/149457026-0d3a7538-0cfc-4245-930f-eccc80d53e1c.mp4"
+    title="Install Docker Engine"
+    class="embed-card embed-webcard"
+    scrolling="no"
+    frameborder="0"
+    style="display: block; width: 100%; height: 300px; max-width: 500px; margin: 10px 0px;">
+</iframe>
+
+##### Constraint
+
+|         Value         |                      Meaning                      |      Default       |
+| --------------------- | ------------------------------------------------- | ------------------ |
+| NONE                  | Just changing lanes if possible.                  | :heavy_check_mark: |
+| LATERAL_VELOCITY      | Changing lanes with target lateral velocity.      |                    |
+| LONGITUDINAL_DISTANCE | Changing lanes with target longitudinal distance. |                    |
+| TIME                  | Changing lanes with target duration.              |                    |
+
+##### Policy
+
+|    Value    |                                   Meaning                                   |      Default       |
+| ----------- | --------------------------------------------------------------------------- | ------------------ |
+| FORCE       | Changing lanes and fulfilling constraints ignoring dynamics.                | :heavy_check_mark: |
+| BEST_EFFORT | Changing lanes and trying to fulfill constraints without ignoring dynamics. |                    |
