@@ -48,10 +48,6 @@ struct RelativeTargetSpeed
   const Boolean continuous;
 
   explicit RelativeTargetSpeed(const pugi::xml_node &, Scope &);
-
-  auto getCalculateAbsoluteTargetSpeed() const -> std::function<double()>;
-
-  auto getIsEnd() const -> std::function<bool(const EntityRef &)>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
