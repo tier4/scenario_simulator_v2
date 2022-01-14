@@ -121,6 +121,14 @@ public:
 
   void requestLaneChange(const std::int64_t) override;
 
+  auto requestSpeedChange(
+    const double, const SpeedChangeTransition,
+    const SpeedChangeConstraint, const bool) -> void override;
+
+  auto requestSpeedChange(
+    const RelativeTargetSpeed &, const SpeedChangeTransition,
+    const SpeedChangeConstraint, const bool) -> void override;
+
   auto setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void override;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool override;

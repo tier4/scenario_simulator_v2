@@ -69,6 +69,8 @@ struct SpeedTargetValueType
         return traffic_simulator::RelativeTargetSpeed::Type::DELTA;
       case factor:
         return traffic_simulator::RelativeTargetSpeed::Type::FACTOR;
+      default:
+        return traffic_simulator::RelativeTargetSpeed::Type();
     }
   }
 };
