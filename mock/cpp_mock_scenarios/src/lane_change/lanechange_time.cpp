@@ -38,18 +38,21 @@ public:
   }
 
 private:
-  bool requested = false;
-  bool lanechange_finished = false;
+  int lanechange_frames = 0;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34513, 0.1)) {
-      lanechange_finished = true;
+    if (api_.getCurrentAction("ego") == "lane_change") {
+      lanechange_frames++;
     }
-    if (lanechange_finished && api_.isInLanelet("ego", 34510, 0.1)) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+    if (api_.getCurrentAction("ego") != "lane_change" && api_.getCurrentTime() >= 10.0) {
+      if (static_cast<double>(lanechange_frames) * 0.05 == 20.0) {
+        stop(cpp_mock_scenarios::Result::SUCCESS);
+      } else {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
     }
     // LCOV_EXCL_START
-    if (api_.getCurrentTime() >= 10.0) {
+    if (api_.getCurrentTime() >= 30.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
@@ -65,9 +68,9 @@ private:
       "ego",
       traffic_simulator::lane_change::RelativeTarget(
         "ego", traffic_simulator::lane_change::Direction::LEFT, 1, 0),
-      traffic_simulator::lane_change::TrajectoryShape::LINEAR,
+      traffic_simulator::lane_change::TrajectoryShape::CUBIC,
       traffic_simulator::lane_change::Constraint(
-        traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE, 30.0));
+        traffic_simulator::lane_change::Constraint::Type::TIME, 20.0));
   }
 };
 

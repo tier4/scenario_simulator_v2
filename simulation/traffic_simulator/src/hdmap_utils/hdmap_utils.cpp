@@ -39,10 +39,11 @@
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/math/linear_algebra.hpp>
-#include <traffic_simulator/math/transfrom.hpp>
+#include <traffic_simulator/math/transform.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -861,6 +862,87 @@ const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulb
     }
   }
   return boost::none;
+}
+
+traffic_simulator_msgs::msg::LaneletPose HdMapUtils::getAlongLaneletPose(
+  const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along)
+{
+  traffic_simulator_msgs::msg::LaneletPose along_pose = from_pose;
+  along_pose.s = along_pose.s + along;
+  if (along_pose.s >= 0) {
+    while (along_pose.s >= getLaneletLength(along_pose.lanelet_id)) {
+      auto next_ids = getNextLaneletIds(along_pose.lanelet_id, "straight");
+      if (next_ids.empty()) {
+        next_ids = getNextLaneletIds(along_pose.lanelet_id);
+        if (next_ids.empty()) {
+          THROW_SEMANTIC_ERROR(
+            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        }
+      }
+      along_pose.s = along_pose.s - getLaneletLength(along_pose.lanelet_id);
+      along_pose.lanelet_id = next_ids[0];
+    }
+  } else {
+    while (along_pose.s < 0) {
+      auto previous_ids = getPreviousLaneletIds(along_pose.lanelet_id, "straight");
+      if (previous_ids.empty()) {
+        previous_ids = getPreviousLaneletIds(along_pose.lanelet_id);
+        if (previous_ids.empty()) {
+          THROW_SEMANTIC_ERROR(
+            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        }
+      }
+      along_pose.s = along_pose.s + getLaneletLength(previous_ids[0]);
+      along_pose.lanelet_id = previous_ids[0];
+    }
+  }
+  return along_pose;
+}
+
+boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
+HdMapUtils::getLaneChangeTrajectory(
+  const traffic_simulator_msgs::msg::LaneletPose & from_pose,
+  const traffic_simulator::lane_change::Parameter & lane_change_parameter,
+  double tangent_vector_size)
+{
+  double longitudinal_distance =
+    traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+  switch (lane_change_parameter.constraint.type) {
+    case traffic_simulator::lane_change::Constraint::Type::NONE:
+      longitudinal_distance =
+        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+      break;
+    case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
+      longitudinal_distance =
+        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+      break;
+    case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
+      longitudinal_distance = lane_change_parameter.constraint.value;
+      break;
+    case traffic_simulator::lane_change::Constraint::Type::TIME:
+      longitudinal_distance =
+        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+      break;
+  }
+  const auto along_pose = getAlongLaneletPose(from_pose, longitudinal_distance);
+  const auto left_point =
+    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset + 5.0).pose.position;
+  const auto right_point =
+    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset - 5.0).pose.position;
+  const auto collision_point = getCenterPointsSpline(lane_change_parameter.target.lanelet_id)
+                                 ->getCollisionPointIn2D(left_point, right_point);
+  if (!collision_point) {
+    return boost::none;
+  }
+  const auto to_pose = traffic_simulator::helper::constructLaneletPose(
+    lane_change_parameter.target.lanelet_id, collision_point.get(),
+    lane_change_parameter.target.offset);
+  auto traj = getLaneChangeTrajectory(
+    toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape,
+    tangent_vector_size);
+  return std::make_pair(traj, collision_point.get());
 }
 
 boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>

@@ -40,11 +40,22 @@ AbsoluteTarget & AbsoluteTarget::operator=(const AbsoluteTarget & other)
   return *this;
 }
 
-Constraint::Constraint() : type(Type::NONE), value(0) {}
+Constraint::Constraint() : type(Type::NONE), policy(Policy::FORCE), value(0) {}
 
-Constraint::Constraint(const Type & type, double value) : type(type), value(value) {}
+Constraint::Constraint(const Type & type, double value)
+: type(type), policy(Policy::FORCE), value(value)
+{
+}
 
-Constraint::Constraint(const Constraint & other) : type(other.type), value(other.value) {}
+Constraint::Constraint(const Type & type, const Policy & policy, double value)
+: type(type), policy(policy), value(value)
+{
+}
+
+Constraint::Constraint(const Constraint & other)
+: type(other.type), policy(other.policy), value(other.value)
+{
+}
 
 Constraint & Constraint::operator=(const Constraint & other)
 {
@@ -61,6 +72,8 @@ RelativeTarget::RelativeTarget(
 : entity_name(entity_name), direction(direction), shift(shift), offset(offset)
 {
 }
+
+double Parameter::default_lanechange_distance = 20.0;
 
 Parameter::Parameter()
 : target(AbsoluteTarget(0)), trajectory_shape(TrajectoryShape::CUBIC), constraint(Constraint())
@@ -125,6 +138,19 @@ std::ostream & operator<<(std::ostream & stream, const AbsoluteTarget & value)
   return stream;
 }
 
+std::ostream & operator<<(std::ostream & stream, const Constraint::Policy & value)
+{
+  switch (value) {
+    case Constraint::Policy::FORCE:
+      stream << "policy : FORCE" << std::endl;
+      break;
+    case Constraint::Policy::BEST_EFFORT:
+      stream << "policy : BEST_EFFORT" << std::endl;
+      break;
+  }
+  return stream;
+}
+
 std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value)
 {
   switch (value) {
@@ -134,6 +160,12 @@ std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value)
     case Constraint::Type::LATERAL_VELOCITY:
       stream << "type : LATERAL_VELOCITY" << std::endl;
       break;
+    case Constraint::Type::LONGITUDINAL_DISTANCE:
+      stream << "type : LONGITUDINAL_DISTANCE" << std::endl;
+      break;
+    case Constraint::Type::TIME:
+      stream << "type : TIME" << std::endl;
+      break;
   }
   return stream;
 }
@@ -141,6 +173,7 @@ std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value)
 std::ostream & operator<<(std::ostream & stream, const Constraint & value)
 {
   stream << value.type;
+  stream << value.policy;
   stream << "value : " << value.value << std::endl;
   return stream;
 }

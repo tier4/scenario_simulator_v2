@@ -100,12 +100,15 @@ struct AbsoluteTarget
 
 struct Constraint
 {
-  enum class Type { NONE = 0, LATERAL_VELOCITY = 1 };
+  enum class Type { NONE = 0, LATERAL_VELOCITY = 1, LONGITUDINAL_DISTANCE = 2, TIME = 3 };
+  enum class Policy { FORCE = 0, BEST_EFFORT = 1 };
   Constraint();
   Constraint(const Type & type, double value);
+  Constraint(const Type & type, const Policy & policy, double value);
   Constraint(const Constraint & other);
   Constraint & operator=(const Constraint & other);
   const Type type;
+  const Policy policy;
   const double value = 0;
 };
 
@@ -132,12 +135,14 @@ struct Parameter
   const AbsoluteTarget target;
   const TrajectoryShape trajectory_shape;
   const Constraint constraint;
+  static double default_lanechange_distance;
 };
 
 std::ostream & operator<<(std::ostream & stream, const Direction & value);
 std::ostream & operator<<(std::ostream & stream, const TrajectoryShape & value);
 std::ostream & operator<<(std::ostream & stream, const AbsoluteTarget & value);
 std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value);
+std::ostream & operator<<(std::ostream & stream, const Constraint::Policy & value);
 std::ostream & operator<<(std::ostream & stream, const Constraint & value);
 std::ostream & operator<<(std::ostream & stream, const RelativeTarget & value);
 std::ostream & operator<<(std::ostream & stream, const Parameter & value);
