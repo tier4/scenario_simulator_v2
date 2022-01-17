@@ -5,6 +5,7 @@
 - Fix context panel to display simulation time. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
 - Support new vehicle_model_type `DELAY_STEER_VEL` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/660)).
 - add lateral velocity and time constraint. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/664)).
+- Enable control multiple traffic lights by relation ID from lanelet2 map. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/667)).
 
 ## Version 0.6.1
 - Add API::requestSpeedChange function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
