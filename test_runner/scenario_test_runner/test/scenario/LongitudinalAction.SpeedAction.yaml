@@ -1,10 +1,8 @@
-ScenarioModifiers:
-  ScenarioModifier: []
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 0
-    date: '2021-02-01T08:31:04.600Z'
+    date: '2021-09-06T09:09:41.856Z'
     description: ''
     author: ''
   ParameterDeclarations:
@@ -13,45 +11,11 @@ OpenSCENARIO:
     CatalogLocation: []
   RoadNetwork:
     LogicFile:
-      filepath: $(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm
-    SceneGraphFile:
-      filepath: lanelet2_map.pcd
+      filepath: $(find-pkg-share kashiwanoha_map)/map
     TrafficSignals:
       TrafficSignalController: []
   Entities:
     ScenarioObject:
-      - name: ego
-        Vehicle:
-          name: ''
-          vehicleCategory: car
-          BoundingBox:
-            Center: { x: 0, y: 0, z: 0 }
-            Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
-          Performance:
-            maxSpeed: 30
-            maxAcceleration: INF
-            maxDeceleration: INF
-          Axles:
-            FrontAxle:
-              maxSteering: 3.1415
-              wheelDiameter: 0.6
-              trackWidth: 4
-              positionX: 1
-              positionZ: 0.3
-            RearAxle:
-              maxSteering: 3.1415
-              wheelDiameter: 0.6
-              trackWidth: 4
-              positionX: -1
-              positionZ: 0.3
-          Properties:
-            Property: []
-        ObjectController:
-          Controller:
-            name: ''
-            Properties:
-              Property:
-                - { name: isEgo, value: 'true' }
       - name: npc
         Vehicle:
           name: ''
@@ -60,7 +24,7 @@ OpenSCENARIO:
             Center: { x: 0, y: 0, z: 0 }
             Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
           Performance:
-            maxSpeed: 30
+            maxSpeed: INF
             maxAcceleration: INF
             maxDeceleration: INF
           Axles:
@@ -82,34 +46,6 @@ OpenSCENARIO:
     Init:
       Actions:
         Private:
-          - entityRef: ego
-            PrivateAction:
-              - TeleportAction:
-                  Position:
-                    LanePosition:
-                      roadId: ''
-                      laneId: '34513'
-                      s: 20
-                      offset: 0
-                      Orientation: { type: relative, h: 0, p: 0, r: 0 }
-              - RoutingAction:
-                  AcquirePositionAction:
-                    Position:
-                      LanePosition:
-                        roadId: ''
-                        laneId: '34507'
-                        s: 50
-                        offset: 0
-                        Orientation: { type: relative, h: 0, p: 0, r: 0 }
-              - LongitudinalAction:
-                  SpeedAction:
-                    SpeedActionDynamics:
-                      dynamicsDimension: time
-                      value: 0
-                      dynamicsShape: step
-                    SpeedActionTarget:
-                      AbsoluteTargetSpeed:
-                        value: 2.778
           - entityRef: npc
             PrivateAction:
               - TeleportAction:
@@ -117,9 +53,13 @@ OpenSCENARIO:
                     LanePosition:
                       roadId: ''
                       laneId: '34513'
-                      s: 0
+                      s: 10
                       offset: 0
-                      Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
               - LongitudinalAction:
                   SpeedAction:
                     SpeedActionDynamics:
@@ -130,6 +70,61 @@ OpenSCENARIO:
                       AbsoluteTargetSpeed:
                         value: 0
     Story:
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: npc
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+                        Action:
+                          - name: speedup
+                            PrivateAction:
+                              LongitudinalAction:
+                                # SpeedAction:
+                                #   SpeedActionDynamics:
+                                #     dynamicsDimension: time
+                                #     value: 0
+                                #     dynamicsShape: step
+                                #   SpeedActionTarget:
+                                #     AbsoluteTargetSpeed:
+                                #       value: 10
+                                SpeedAction:
+                                  SpeedActionDynamics:
+                                    dynamicsDimension: rate
+                                    value: 10
+                                    dynamicsShape: linear
+                                  SpeedActionTarget:
+                                    AbsoluteTargetSpeed:
+                                      value: 100
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
       - name: ''
         Act:
           - name: _EndCondition
@@ -144,43 +139,7 @@ OpenSCENARIO:
                   - name: ''
                     Event:
                       - name: ''
-                        priority: overwrite
-                        StartTrigger:
-                          ConditionGroup:
-                            - Condition:
-                                - name: ''
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    SimulationTimeCondition:
-                                      value: 0
-                                      rule: greaterThan
-                        Action:
-                          - name: ''
-                            PrivateAction:
-                              LongitudinalAction:
-                                SpeedAction:
-                                  SpeedActionDynamics:
-                                    dynamicsDimension: time
-                                    value: 0
-                                    dynamicsShape: step
-                                  SpeedActionTarget:
-                                    RelativeTargetSpeed:
-                                      entityRef: ego
-                                      value: 0
-                                      speedTargetValueType: delta
-                                      continuous: true
-              - maximumExecutionCount: 1
-                name: ''
-                Actors:
-                  selectTriggeringEntities: false
-                  EntityRef:
-                    - entityRef: ego
-                Maneuver:
-                  - name: ''
-                    Event:
-                      - name: ''
-                        priority: overwrite
+                        priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -191,24 +150,26 @@ OpenSCENARIO:
                                     TriggeringEntities:
                                       triggeringEntitiesRule: any
                                       EntityRef:
-                                        - entityRef: ego
+                                        - entityRef: npc
                                     EntityCondition:
-                                      ReachPositionCondition:
-                                        Position:
-                                          LanePosition:
-                                            roadId: ''
-                                            laneId: '34507'
-                                            s: 50
-                                            offset: 0
-                                            Orientation: { type: relative, h: 0, p: 0, r: 0 }
-                                        tolerance: 0.5
+                                      SpeedCondition:
+                                        rule: equalTo
+                                        value: 100
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: speedup
+                                      storyboardElementType: action
+                                      state: completeState
                         Action:
                           - name: ''
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: exitSuccess
                       - name: ''
-                        priority: overwrite
+                        priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -235,12 +196,4 @@ OpenSCENARIO:
                           value: 0
                           rule: greaterThan
     StopTrigger:
-      ConditionGroup:
-        - Condition:
-            - name: ''
-              delay: 0
-              conditionEdge: none
-              ByValueCondition:
-                SimulationTimeCondition:
-                  value: 100
-                  rule: greaterThan
+      ConditionGroup: []

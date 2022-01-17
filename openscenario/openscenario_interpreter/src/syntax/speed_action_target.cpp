@@ -29,19 +29,5 @@ SpeedActionTarget::SpeedActionTarget(const pugi::xml_node & node, Scope & scope)
 // clang-format on
 {
 }
-
-auto SpeedActionTarget::getCalculateAbsoluteTargetSpeed() const -> std::function<double()>
-{
-  return apply<std::function<double()>>(
-    [](auto && target_speed) { return target_speed.getCalculateAbsoluteTargetSpeed(); }, *this);
-}
-
-auto SpeedActionTarget::getIsEnd() const -> std::function<bool(const EntityRef &)>
-{
-  using result = std::function<bool(const EntityRef &)>;
-
-  return apply<result>(
-    [](const auto & target_speed) -> result { return target_speed.getIsEnd(); }, *this);
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

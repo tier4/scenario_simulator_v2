@@ -49,9 +49,12 @@ struct RelativeTargetSpeed
 
   explicit RelativeTargetSpeed(const pugi::xml_node &, Scope &);
 
-  auto getCalculateAbsoluteTargetSpeed() const -> std::function<double()>;
-
-  auto getIsEnd() const -> std::function<bool(const EntityRef &)>;
+  explicit operator traffic_simulator::RelativeTargetSpeed() const
+  {
+    return traffic_simulator::RelativeTargetSpeed(
+      entity_ref,
+      static_cast<traffic_simulator::RelativeTargetSpeed::Type>(speed_target_value_type), value);
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
