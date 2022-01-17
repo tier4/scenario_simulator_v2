@@ -73,7 +73,8 @@ protected:
         color_positions.emplace(TrafficLightColor::GREEN, green_position.get());
       }
       traffic_lights_.emplace(
-        std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, color_positions));
+        std::piecewise_construct, std::make_tuple(id),
+        std::make_tuple(id, hdmap->getTrafficLightRelationId(id), color_positions));
     }
   }
 
