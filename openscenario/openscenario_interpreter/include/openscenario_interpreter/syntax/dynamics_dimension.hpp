@@ -66,6 +66,20 @@ struct DynamicsDimension
         return {};
     }
   }
+
+  explicit constexpr operator traffic_simulator::lane_change::Constraint::Type() const
+  {
+    switch (value) {
+      case rate:
+        return traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY;
+      case time:
+        return traffic_simulator::lane_change::Constraint::Type::TIME;
+      case distance:
+        return traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE;
+      default:
+        return {};
+    }
+  }
 };
 
 auto operator>>(std::istream &, DynamicsDimension &) -> std::istream &;

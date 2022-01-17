@@ -98,6 +98,18 @@ struct DynamicsShape
         return {};
     }
   }
+
+  explicit constexpr operator traffic_simulator::lane_change::TrajectoryShape() const
+  {
+    switch (value) {
+      case linear:
+        return traffic_simulator::lane_change::TrajectoryShape::LINEAR;
+      case cubic:
+        return traffic_simulator::lane_change::TrajectoryShape::CUBIC;
+      default:
+        return {};
+    }
+  }
 };
 
 static_assert(std::is_standard_layout<DynamicsShape>::value, "");

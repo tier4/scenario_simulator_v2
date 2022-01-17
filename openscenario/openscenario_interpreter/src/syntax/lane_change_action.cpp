@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
+#include <openscenario_interpreter/syntax/relative_target_lane.hpp>
 
 namespace openscenario_interpreter
 {
@@ -55,14 +56,34 @@ auto LaneChangeAction::start() -> void
 {
   accomplishments.clear();
 
-  if (lane_change_target.is<AbsoluteTargetLane>()) {
-    for (const auto & actor : actors) {
-      accomplishments.emplace(actor, false);
-      applyLaneChangeAction(actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
+  for (const auto & actor : actors) {
+    accomplishments.emplace(actor, false);
+  }
+
+  for (const auto & accomplishment : accomplishments) {
+    if (lane_change_target.is<AbsoluteTargetLane>()) {
+      return connection.requestLaneChange(
+        accomplishment.first,
+        traffic_simulator::lane_change::AbsoluteTarget(
+          boost::lexical_cast<std::int64_t>(lane_change_target.as<AbsoluteTargetLane>().value),
+          target_lane_offset),
+        static_cast<traffic_simulator::lane_change::TrajectoryShape>(
+          lane_change_action_dynamics.dynamics_shape),
+        static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
+    } else {
+      return connection.requestLaneChange(
+        accomplishment.first,
+        traffic_simulator::lane_change::RelativeTarget(
+          lane_change_target.template as<RelativeTargetLane>().entity_ref,
+          0 < lane_change_target.as<RelativeTargetLane>().value
+            ? traffic_simulator::lane_change::Direction::LEFT
+            : traffic_simulator::lane_change::Direction::RIGHT,
+          std::abs(lane_change_target.as<RelativeTargetLane>().value),  //
+          target_lane_offset),
+        static_cast<traffic_simulator::lane_change::TrajectoryShape>(
+          lane_change_action_dynamics.dynamics_shape),
+        static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
     }
-  } else {
-    // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(lane_change_target.type().name());
   }
 }
 }  // namespace syntax

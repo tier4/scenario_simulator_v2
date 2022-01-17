@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
-#include <openscenario_interpreter/syntax/lane_change_target.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/relative_target_lane.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-LaneChangeTarget::LaneChangeTarget(const pugi::xml_node & node, Scope & scope)
-// clang-format off
-: ComplexType(
-    choice(node,
-      std::make_pair("RelativeTargetLane", [&](auto && node) { return make<RelativeTargetLane>(node, scope); }),
-      std::make_pair("AbsoluteTargetLane", [&](auto && node) { return make<AbsoluteTargetLane>(node, scope); })))
-// clang-format on
+RelativeTargetLane::RelativeTargetLane(const pugi::xml_node & node, Scope & scope)
+: entity_ref(readAttribute<String>("entityRef", node, scope)),
+  value(readAttribute<Integer>("value", node, scope))
 {
 }
 }  // namespace syntax
