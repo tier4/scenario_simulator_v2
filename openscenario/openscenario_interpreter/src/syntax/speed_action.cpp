@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
@@ -29,16 +30,60 @@ SpeedAction::SpeedAction(const pugi::xml_node & node, Scope & scope)
 
 auto SpeedAction::accomplished() -> bool
 {
-  // return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](auto && each) {
-  //   return std::get<1>(each);
-  // });
-  return true;  // NOTE: dummy
+  // See OpenSCENARIO 1.1 User Guide Appendix A: Action tables
+
+  auto ends_on_reaching_the_speed = [this]() {
+    return speed_action_target.is<AbsoluteTargetSpeed>() or
+           not speed_action_target.as<RelativeTargetSpeed>().continuous;
+  };
+
+  auto there_is_no_regular_ending = [this]() {
+    return speed_action_target.is<RelativeTargetSpeed>() and
+           speed_action_target.as<RelativeTargetSpeed>().continuous;
+  };
+
+  auto check = [this](auto && actor) {
+    if (speed_action_target.is<AbsoluteTargetSpeed>()) {
+      return equal_to<double>()(
+        speed_action_target.as<AbsoluteTargetSpeed>().value,
+        connection.getEntityStatus(actor).action_status.twist.linear.x);
+    } else {
+      switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
+        case SpeedTargetValueType::delta:
+          return equal_to<double>()(
+            connection.getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
+                .action_status.twist.linear.x +
+              speed_action_target.as<RelativeTargetSpeed>().value,
+            connection.getEntityStatus(actor).action_status.twist.linear.x);
+        case SpeedTargetValueType::factor:
+          return equal_to<double>()(
+            connection.getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
+                .action_status.twist.linear.x *
+              speed_action_target.as<RelativeTargetSpeed>().value,
+            connection.getEntityStatus(actor).action_status.twist.linear.x);
+        default:
+          return false;
+      }
+    }
+  };
+
+  if (endsImmediately()) {
+    return true;
+  } else if (ends_on_reaching_the_speed()) {
+    return std::all_of(
+      std::begin(accomplishments), std::end(accomplishments), [&](auto && accomplishment) {
+        return accomplishment.second = accomplishment.second or check(accomplishment.first);
+      });
+  } else if (there_is_no_regular_ending()) {
+    return false;  // no regular ending
+  } else {
+    return true;
+  }
 }
 
 auto SpeedAction::endsImmediately() const -> bool
 {
-  return speed_action_target.is<AbsoluteTargetSpeed>() and
-         speed_action_dynamics.dynamics_shape == DynamicsShape::step;
+  return speed_action_dynamics.dynamics_shape == DynamicsShape::step;
 }
 
 auto SpeedAction::run() -> void {}
@@ -54,19 +99,15 @@ auto SpeedAction::start() -> void
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       connection.requestSpeedChange(
-        std::get<0>(each),  //
-        speed_action_target.as<AbsoluteTargetSpeed>().value,
-        static_cast<traffic_simulator::SpeedChangeTransition>(
-          speed_action_dynamics.dynamics_shape),  // NOTE: implicit conversion
-        static_cast<traffic_simulator::SpeedChangeConstraint>(speed_action_dynamics),  //
-        true);
+        std::get<0>(each), speed_action_target.as<AbsoluteTargetSpeed>().value,
+        static_cast<traffic_simulator::SpeedChangeTransition>(speed_action_dynamics.dynamics_shape),
+        static_cast<traffic_simulator::SpeedChangeConstraint>(speed_action_dynamics), true);
     } else {
       connection.requestSpeedChange(
         std::get<0>(each),
         static_cast<traffic_simulator::RelativeTargetSpeed>(
           speed_action_target.as<RelativeTargetSpeed>()),
-        static_cast<traffic_simulator::SpeedChangeTransition>(
-          speed_action_dynamics.dynamics_shape),  // NOTE: implicit conversion
+        static_cast<traffic_simulator::SpeedChangeTransition>(speed_action_dynamics.dynamics_shape),
         static_cast<traffic_simulator::SpeedChangeConstraint>(speed_action_dynamics),
         speed_action_target.as<RelativeTargetSpeed>().continuous);
     }

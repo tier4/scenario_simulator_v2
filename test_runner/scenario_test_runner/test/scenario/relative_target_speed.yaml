@@ -129,7 +129,6 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 0
-
     Story:
       - name: ''
         Act:
