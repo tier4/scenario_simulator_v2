@@ -115,19 +115,27 @@ public:
 
 #undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
 
-#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                         \
-  template <typename... Ts>                                                                \
-  auto IDENTIFIER(const LaneletID lanelet_id, Ts &&... xs)->decltype(auto)                 \
-  {                                                                                        \
-    try {                                                                                  \
-      return traffic_lights_.at(lanelet_id).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-    } catch (const std::out_of_range &) {                                                  \
-      std::stringstream what;                                                              \
-      what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))               \
-           << " is not a valid traffic-light ID.";                                         \
-      THROW_SEMANTIC_ERROR(what.str());                                                    \
-    }                                                                                      \
-  }                                                                                        \
+#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                           \
+  template <typename... Ts>                                                                  \
+  auto IDENTIFIER(const LaneletID lanelet_id, Ts &&... xs)->decltype(auto)                   \
+  {                                                                                          \
+    if (isTrafficLightId(lanelet_id)) {                                                      \
+      try {                                                                                  \
+        return traffic_lights_.at(lanelet_id).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
+      } catch (const std::out_of_range &) {                                                  \
+        std::stringstream what;                                                              \
+        what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))               \
+             << " is not a valid traffic-light ID.";                                         \
+        THROW_SEMANTIC_ERROR(what.str());                                                    \
+      }                                                                                      \
+    } else {                                                                                 \
+      for (auto light : traffic_lights_) {                                                   \
+        if (light.second.relation_id == lanelet_id) {                                        \
+          light.second.IDENTIFIER(std::forward<decltype(xs)>(xs)...);                        \
+        }                                                                                    \
+      }                                                                                      \
+    }                                                                                        \
+  }                                                                                          \
   static_assert(true, "")
 
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrow);
