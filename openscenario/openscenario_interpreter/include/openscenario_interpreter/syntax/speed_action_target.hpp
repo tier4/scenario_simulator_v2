@@ -38,10 +38,6 @@ inline namespace syntax
 struct SpeedActionTarget : public ComplexType
 {
   explicit SpeedActionTarget(const pugi::xml_node &, Scope &);
-
-  auto getCalculateAbsoluteTargetSpeed() const -> std::function<double()>;
-
-  auto getIsEnd() const -> std::function<bool(const EntityRef &)>;
 };
 
 DEFINE_LAZY_VISITOR(

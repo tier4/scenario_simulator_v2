@@ -46,13 +46,9 @@ struct SpeedAction : private Scope
 
   std::unordered_map<String, Boolean> accomplishments;
 
-  std::function<bool(const EntityRef &)> update;
-
   auto accomplished() -> bool;
 
   auto endsImmediately() const -> bool;
-
-  auto reset() -> void;
 
   auto run() -> void;
 
