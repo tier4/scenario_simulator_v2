@@ -56,6 +56,7 @@ double RelativeTargetSpeed::getAbsoluteValue(
   }
   return target_speed;
 }
+
 RelativeTargetSpeed & RelativeTargetSpeed::operator=(const RelativeTargetSpeed & other)
 {
   if (this == &other) {
