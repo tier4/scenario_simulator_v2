@@ -62,15 +62,13 @@ auto LaneChangeAction::start() -> void
   for (const auto & accomplishment : accomplishments) {
     if (lane_change_target.is<AbsoluteTargetLane>()) {
       return connection.requestLaneChange(
-        accomplishment.first,  //
-        static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
+        accomplishment.first, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
         static_cast<traffic_simulator::lane_change::TrajectoryShape>(
           lane_change_action_dynamics.dynamics_shape),
         static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
     } else {
       return connection.requestLaneChange(
-        accomplishment.first,
-        static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
+        accomplishment.first, static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
         static_cast<traffic_simulator::lane_change::TrajectoryShape>(
           lane_change_action_dynamics.dynamics_shape),
         static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
