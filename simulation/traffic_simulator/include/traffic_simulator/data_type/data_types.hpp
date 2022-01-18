@@ -38,7 +38,7 @@ struct Constraint
     LONGITUDINAL_ACCELERATION,
     // @todo TIME,
   };
-  Constraint(Type type, double value);
+  Constraint(Constraint::Type type, double value);
   Constraint(const Constraint & other);
   const Type type;
   const double value;
