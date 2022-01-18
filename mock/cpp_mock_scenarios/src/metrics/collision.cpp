@@ -46,12 +46,12 @@ private:
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
-    api_.setTargetSpeed("ego", 0, true);
+    api_.requestSpeedChange("ego", 0, true);
     api_.spawn("npc1", getVehicleParameters());
     api_.setEntityStatus(
       "npc1", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
-    api_.setTargetSpeed("npc1", 0, true);
+    api_.requestSpeedChange("npc1", 0, true);
     std::vector<std::string> targets = {"npc1"};
     api_.addMetric<metrics::CollisionMetric>("ego_collision0", "ego", targets);
     api_.addMetric<metrics::CollisionMetric>("ego_collision1", "ego");

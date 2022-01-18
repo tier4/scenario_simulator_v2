@@ -91,9 +91,9 @@ public:
     behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
   }
 
-  void setTargetSpeed(double target_speed, bool continuous) override;
+  void requestSpeedChange(double target_speed, bool continuous) override;
 
-  void setTargetSpeed(
+  void requestSpeedChange(
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   const traffic_simulator_msgs::msg::BoundingBox getBoundingBox() const override
@@ -109,10 +109,6 @@ public:
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
-
-  void requestSpeedChange(
-    const double target_speed, const speed_change::Transition transition,
-    const speed_change::Constraint constraint, const bool continuous) override;
 
   const std::string getCurrentAction() const override
   {

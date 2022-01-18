@@ -117,9 +117,9 @@ public:
 
   virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool;
 
-  virtual void setTargetSpeed(double target_speed, bool continuous) = 0;
+  virtual void requestSpeedChange(double target_speed, bool continuous) = 0;
 
-  virtual void setTargetSpeed(
+  virtual void requestSpeedChange(
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) = 0;
 
   virtual void setTrafficLightManager(

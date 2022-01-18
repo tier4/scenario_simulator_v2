@@ -99,29 +99,21 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
   }
 }
 
-void PedestrianEntity::requestSpeedChange(
-  const double, const speed_change::Transition, const speed_change::Constraint, const bool)
-{
-  THROW_SEMANTIC_ERROR(
-    "Currently, requestSpeedChange function does not works in pedestrian because users cannot "
-    "specify acceleration and deceleration in pedestrian entity.");
-}
-
 void PedestrianEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest("none");
   route_planner_ptr_->cancelGoal();
 }
 
-void PedestrianEntity::setTargetSpeed(double target_speed, bool continuous)
+void PedestrianEntity::requestSpeedChange(double target_speed, bool continuous)
 {
-  target_speed_planner_.setTargetSpeed(target_speed, continuous);
+  target_speed_planner_.requestSpeedChange(target_speed, continuous);
 }
 
-void PedestrianEntity::setTargetSpeed(
+void PedestrianEntity::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
-  target_speed_planner_.setTargetSpeed(target_speed, continuous);
+  target_speed_planner_.requestSpeedChange(target_speed, continuous);
 }
 
 auto PedestrianEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel

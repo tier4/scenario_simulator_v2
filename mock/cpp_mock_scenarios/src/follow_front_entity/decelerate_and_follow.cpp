@@ -67,7 +67,7 @@ private:
     api_.setEntityStatus(
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
       traffic_simulator::helper::constructActionStatus(10));
-    api_.setTargetSpeed("npc", 10, true);
+    api_.requestSpeedChange("npc", 10, true);
   }
 };
 
