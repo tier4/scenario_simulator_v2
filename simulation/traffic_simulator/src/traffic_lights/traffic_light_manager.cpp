@@ -38,6 +38,14 @@ auto TrafficLightManagerBase::getInstance(const LaneletID lanelet_id) const -> T
   return traffic_lights_.at(lanelet_id);
 }
 
+bool TrafficLightManagerBase::isTrafficLightId(const LaneletID lanelet_id)
+{
+  if (traffic_lights_.find(lanelet_id) == traffic_lights_.end()) {
+    return false;
+  }
+  return true;
+}
+
 auto TrafficLightManagerBase::deleteAllMarkers() const -> void
 {
   visualization_msgs::msg::MarkerArray message;
