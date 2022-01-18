@@ -16,7 +16,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-#include <traffic_simulator/math/transfrom.hpp>
+#include <traffic_simulator/math/transform.hpp>
 
 namespace traffic_simulator
 {

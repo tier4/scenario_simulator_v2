@@ -463,6 +463,22 @@ void EgoEntity::requestLaneChange(const std::int64_t)
     "everything but their destination");
 }
 
+auto EgoEntity::requestSpeedChange(
+  const double target_speed, const SpeedChangeTransition, const SpeedChangeConstraint, const bool)
+  -> void
+{
+  setTargetSpeed(target_speed, false);
+}
+
+auto EgoEntity::requestSpeedChange(
+  const RelativeTargetSpeed &, const SpeedChangeTransition, const SpeedChangeConstraint, const bool)
+  -> void
+{
+  THROW_SEMANTIC_ERROR(
+    "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
+    "purposes only.");
+}
+
 auto EgoEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void  //
 {
 }

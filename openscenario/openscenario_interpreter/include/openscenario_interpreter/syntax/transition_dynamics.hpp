@@ -43,6 +43,12 @@ struct TransitionDynamics
   const DynamicsDimension dynamics_dimension;
 
   explicit TransitionDynamics(const pugi::xml_node &, Scope &);
+
+  explicit operator traffic_simulator::SpeedChangeConstraint() const
+  {
+    return traffic_simulator::SpeedChangeConstraint(
+      static_cast<traffic_simulator::SpeedChangeConstraint::Type>(dynamics_dimension), value);
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

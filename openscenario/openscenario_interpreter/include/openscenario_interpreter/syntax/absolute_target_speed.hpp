@@ -36,13 +36,6 @@ struct AbsoluteTargetSpeed
   const Double value;
 
   explicit AbsoluteTargetSpeed(const pugi::xml_node &, Scope &);
-
-  auto getCalculateAbsoluteTargetSpeed() const
-  {
-    return [target_speed = value]() { return target_speed; };
-  }
-
-  auto getIsEnd() const -> std::function<bool(const EntityRef &)>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

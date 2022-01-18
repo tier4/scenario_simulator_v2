@@ -118,6 +118,10 @@ public:
     double forward_distance = 20);
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
   boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
+    const traffic_simulator_msgs::msg::LaneletPose & from_pose,
+    const traffic_simulator::lane_change::Parameter & lane_change_parameter,
+    double tangent_vector_size);
+  boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter,
     double maximum_curvature_threshold, double target_trajectory_length,
@@ -146,6 +150,7 @@ public:
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
   const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   const std::vector<std::int64_t> getTrafficLightIds() const;
+  std::int64_t getTrafficLightRelationId(std::int64_t traffic_light_id) const;
   const boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, traffic_simulator::TrafficLightColor color) const;
   std::vector<std::int64_t> getTrafficLightStopLineIds(const std::int64_t & traffic_light_id) const;
@@ -159,12 +164,14 @@ public:
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
   const std::vector<std::int64_t> getTrafficLightIdsOnPath(
     const std::vector<std::int64_t> & route_lanelets) const;
+  traffic_simulator_msgs::msg::LaneletPose getAlongLaneletPose(
+    const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along);
 
 private:
   traffic_simulator::math::HermiteCurve getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-    const traffic_simulator::lane_change::TrajectoryShape trajectory,
+    const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
     double tangent_vector_size = 100);
   RouteCache route_cache_;
   CenterPointsCache center_points_cache_;

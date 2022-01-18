@@ -165,12 +165,12 @@ public:
   void requestLaneChange(
     const traffic_simulator::lane_change::AbsoluteTarget & target,
     const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-    const lane_change::Constraint & constraint);
+    const traffic_simulator::lane_change::Constraint & constraint);
 
   void requestLaneChange(
     const traffic_simulator::lane_change::RelativeTarget & target,
     const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-    const lane_change::Constraint & constraint);
+    const traffic_simulator::lane_change::Constraint & constraint);
 
   virtual void requestWalkStraight()
   {
