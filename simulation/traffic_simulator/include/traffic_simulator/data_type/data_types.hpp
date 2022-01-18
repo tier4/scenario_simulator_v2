@@ -38,8 +38,8 @@ struct Constraint
     LONGITUDINAL_ACCELERATION,
     // @todo TIME,
   };
-  Constraint(Type type, double value) : type(type), value(value) {}
-
+  Constraint(Type type, double value);
+  Constraint(const Constraint & other);
   const Type type;
   const double value;
 };
@@ -50,35 +50,13 @@ struct RelativeTargetSpeed
     DELTA,
     FACTOR,
   };
-  RelativeTargetSpeed(const std::string & reference_entity_name, Type type, double value)
-  : reference_entity_name(reference_entity_name), type(type), value(value){};
+  RelativeTargetSpeed(
+    const std::string & reference_entity_name, RelativeTargetSpeed::Type type, double value);
+  RelativeTargetSpeed(const RelativeTargetSpeed & other);
   double getAbsoluteValue(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
-    const
-  {
-    if (other_status.find(reference_entity_name) == other_status.end()) {
-      THROW_SEMANTIC_ERROR(
-        "reference entity name : ", reference_entity_name,
-        " is invalid. Please check entity : ", reference_entity_name,
-        " exists and not a same entity you want to request changing target speed.");
-    }
-    double target_speed = 0;
-    switch (type) {
-      case Type::DELTA:
-        target_speed =
-          other_status.find(reference_entity_name)->second.action_status.twist.linear.x + value;
-        break;
-      case Type::FACTOR:
-        target_speed =
-          other_status.find(reference_entity_name)->second.action_status.twist.linear.x * value;
-        break;
-    }
-    return target_speed;
-  };
-  RelativeTargetSpeed operator=(RelativeTargetSpeed val)
-  {
-    return RelativeTargetSpeed(val.reference_entity_name, val.type, val.value);
-  }
+    const;
+  RelativeTargetSpeed & operator=(const RelativeTargetSpeed & val);
   const std::string reference_entity_name;
   const Type type;
   const double value;
