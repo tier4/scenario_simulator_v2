@@ -73,7 +73,8 @@ protected:
         color_positions.emplace(TrafficLightColor::GREEN, green_position.get());
       }
       traffic_lights_.emplace(
-        std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, color_positions));
+        std::piecewise_construct, std::make_tuple(id),
+        std::make_tuple(id, hdmap->getTrafficLightRelationId(id), color_positions));
     }
   }
 
@@ -92,6 +93,8 @@ public:
 
   auto update(const double) -> void;
 
+  bool isTrafficLightId(const LaneletID);
+
 #define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                         \
   template <typename... Ts>                                                                \
   auto IDENTIFIER(const LaneletID lanelet_id, Ts &&... xs)->decltype(auto)                 \
@@ -109,6 +112,32 @@ public:
 
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(getArrow);
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(getColor);
+
+#undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
+
+#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                           \
+  template <typename... Ts>                                                                  \
+  auto IDENTIFIER(const LaneletID lanelet_id, Ts &&... xs)->decltype(auto)                   \
+  {                                                                                          \
+    if (isTrafficLightId(lanelet_id)) {                                                      \
+      try {                                                                                  \
+        return traffic_lights_.at(lanelet_id).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
+      } catch (const std::out_of_range &) {                                                  \
+        std::stringstream what;                                                              \
+        what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))               \
+             << " is not a valid traffic-light ID.";                                         \
+        THROW_SEMANTIC_ERROR(what.str());                                                    \
+      }                                                                                      \
+    } else {                                                                                 \
+      for (auto light : traffic_lights_) {                                                   \
+        if (light.second.relation_id == lanelet_id) {                                        \
+          light.second.IDENTIFIER(std::forward<decltype(xs)>(xs)...);                        \
+        }                                                                                    \
+      }                                                                                      \
+    }                                                                                        \
+  }                                                                                          \
+  static_assert(true, "")
+
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrow);
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrowPhase);
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setColor);
