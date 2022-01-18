@@ -47,7 +47,6 @@ public:
     }
     return ports;
   }
-  traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(
     double target_speed, const std::vector<std::int64_t> & following_lanelets);
@@ -59,6 +58,7 @@ public:
 
 protected:
   traffic_simulator_msgs::msg::DriverModel driver_model;
+  traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 };
 }  // namespace entity_behavior
 
