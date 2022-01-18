@@ -56,6 +56,8 @@ public:
   virtual const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() = 0;
   virtual const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) = 0;
+
+protected:
   traffic_simulator_msgs::msg::DriverModel driver_model;
 };
 }  // namespace entity_behavior

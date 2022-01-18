@@ -43,6 +43,9 @@ public:
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
+
+protected:
+  traffic_simulator_msgs::msg::DriverModel driver_model;
 };
 }  // namespace entity_behavior
 
