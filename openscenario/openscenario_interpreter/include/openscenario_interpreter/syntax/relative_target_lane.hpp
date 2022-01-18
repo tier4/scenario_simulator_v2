@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator/data_type/data_types.hpp>
 
 namespace openscenario_interpreter
 {
@@ -37,6 +38,8 @@ struct RelativeTargetLane
   const Integer value;
 
   explicit RelativeTargetLane(const pugi::xml_node &, Scope &);
+
+  explicit operator traffic_simulator::lane_change::Direction() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

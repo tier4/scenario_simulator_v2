@@ -24,5 +24,16 @@ RelativeTargetLane::RelativeTargetLane(const pugi::xml_node & node, Scope & scop
   value(readAttribute<Integer>("value", node, scope))
 {
 }
+
+RelativeTargetLane::operator traffic_simulator::lane_change::Direction() const
+{
+  if (value < 0) {
+    return traffic_simulator::lane_change::Direction::RIGHT;
+  } else if (value == 0) {
+    return traffic_simulator::lane_change::Direction::STRAIGHT;
+  } else {
+    return traffic_simulator::lane_change::Direction::LEFT;
+  }
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
