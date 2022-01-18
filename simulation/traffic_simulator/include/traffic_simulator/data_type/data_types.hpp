@@ -22,21 +22,23 @@
 
 namespace traffic_simulator
 {
-enum class SpeedChangeTransition {
+namespace speed_change
+{
+enum class Transition {
   // @todo CUBIC,
   LINEAR,
   // @todo SINUSOIDAL,
   STEP
 };
 
-struct SpeedChangeConstraint
+struct Constraint
 {
   enum class Type {
     // @todo DISTANCE,
     LONGITUDINAL_ACCELERATION,
     // @todo TIME,
   };
-  SpeedChangeConstraint(Type type, double value) : type(type), value(value) {}
+  Constraint(Type type, double value) : type(type), value(value) {}
 
   const Type type;
   const double value;
@@ -81,6 +83,8 @@ struct RelativeTargetSpeed
   const Type type;
   const double value;
 };
+
+}  // namespace speed_change
 
 namespace lane_change
 {

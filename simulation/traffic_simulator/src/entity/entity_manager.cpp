@@ -574,8 +574,8 @@ void EntityManager::setTargetSpeed(const std::string & name, double target_speed
 }
 
 void EntityManager::requestSpeedChange(
-  const std::string & name, const double target_speed, const SpeedChangeTransition transition,
-  const SpeedChangeConstraint constraint, const bool continuous)
+  const std::string & name, const double target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
 {
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
@@ -584,7 +584,7 @@ void EntityManager::requestSpeedChange(
 }
 
 void EntityManager::setTargetSpeed(
-  const std::string & name, const RelativeTargetSpeed & target_speed, bool continuous)
+  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
@@ -593,8 +593,8 @@ void EntityManager::setTargetSpeed(
 }
 
 void EntityManager::requestSpeedChange(
-  const std::string & name, const RelativeTargetSpeed & target_speed,
-  const SpeedChangeTransition transition, const SpeedChangeConstraint constraint,
+  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+  const speed_change::Transition transition, const speed_change::Constraint constraint,
   const bool continuous)
 {
   if (isEgo(name) && getCurrentTime() > 0) {

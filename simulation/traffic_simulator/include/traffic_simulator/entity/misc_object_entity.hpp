@@ -61,7 +61,7 @@ public:
     THROW_SEMANTIC_ERROR("setTargetSpeed function cannot not use in MiscObjectEntity");
   }
 
-  void setTargetSpeed(const RelativeTargetSpeed &, bool) override
+  void setTargetSpeed(const speed_change::RelativeTargetSpeed &, bool) override
   {
     THROW_SEMANTIC_ERROR("setTargetSpeed function cannot not use in MiscObjectEntity");
   }
@@ -87,7 +87,8 @@ public:
   }
 
   void requestSpeedChange(
-    const double, const SpeedChangeTransition, const SpeedChangeConstraint, const bool) override
+    const double, const speed_change::Transition, const speed_change::Constraint,
+    const bool) override
   {
     THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
   }

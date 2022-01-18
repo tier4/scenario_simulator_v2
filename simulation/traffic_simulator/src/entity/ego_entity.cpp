@@ -476,15 +476,15 @@ void EgoEntity::requestLaneChange(const std::int64_t)
 }
 
 auto EgoEntity::requestSpeedChange(
-  const double target_speed, const SpeedChangeTransition, const SpeedChangeConstraint, const bool)
-  -> void
+  const double target_speed, const speed_change::Transition, const speed_change::Constraint,
+  const bool) -> void
 {
   setTargetSpeed(target_speed, false);
 }
 
 auto EgoEntity::requestSpeedChange(
-  const RelativeTargetSpeed &, const SpeedChangeTransition, const SpeedChangeConstraint, const bool)
-  -> void
+  const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
+  const speed_change::Constraint, const bool) -> void
 {
   THROW_SEMANTIC_ERROR(
     "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
@@ -557,7 +557,10 @@ void EgoEntity::setTargetSpeed(double value, bool)
   vehicle_model_ptr_->setState(v);
 }
 
-void EgoEntity::setTargetSpeed(const RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/) {}
+void EgoEntity::setTargetSpeed(
+  const speed_change::RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/)
+{
+}
 
 auto EgoEntity::setUpperBoundSpeed(double value) -> void  //
 {
