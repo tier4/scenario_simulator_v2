@@ -122,12 +122,12 @@ public:
   void requestLaneChange(const std::int64_t) override;
 
   auto requestSpeedChange(
-    const double, const SpeedChangeTransition, const SpeedChangeConstraint, const bool)
+    const double, const speed_change::Transition, const speed_change::Constraint, const bool)
     -> void override;
 
   auto requestSpeedChange(
-    const RelativeTargetSpeed &, const SpeedChangeTransition, const SpeedChangeConstraint,
-    const bool) -> void override;
+    const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
+    const speed_change::Constraint, const bool) -> void override;
 
   auto setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void override;
 
@@ -135,7 +135,8 @@ public:
 
   void setTargetSpeed(double, bool) override;
 
-  void setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous) override;
+  void setTargetSpeed(
+    const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   auto setUpperBoundSpeed(double) -> void override;
 };

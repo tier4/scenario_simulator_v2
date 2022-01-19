@@ -26,7 +26,8 @@ void TargetSpeedPlanner::setTargetSpeed(double target_speed, bool continuous)
   relative_target_speed_ = boost::none;
 }
 
-void TargetSpeedPlanner::setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous)
+void TargetSpeedPlanner::setTargetSpeed(
+  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
   continuous_ = continuous;
   relative_target_speed_ = target_speed;

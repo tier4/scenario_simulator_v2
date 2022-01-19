@@ -248,15 +248,16 @@ public:
   void setTargetSpeed(const std::string & name, double target_speed, bool continuous);
 
   void requestSpeedChange(
-    const std::string & name, const double target_speed, const SpeedChangeTransition transition,
-    const SpeedChangeConstraint constraint, const bool continuous);
+    const std::string & name, const double target_speed, const speed_change::Transition transition,
+    const speed_change::Constraint constraint, const bool continuous);
 
   void setTargetSpeed(
-    const std::string & name, const RelativeTargetSpeed & target_speed, bool continuous);
+    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+    bool continuous);
 
   void requestSpeedChange(
-    const std::string & name, const RelativeTargetSpeed & target_speed,
-    const SpeedChangeTransition transition, const SpeedChangeConstraint constraint,
+    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, const speed_change::Constraint constraint,
     const bool continuous);
 
   traffic_simulator_msgs::msg::EntityStatus updateNpcLogic(

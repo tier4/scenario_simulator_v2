@@ -28,7 +28,7 @@ class TargetSpeedPlanner
 {
 public:
   void setTargetSpeed(double target_speed, bool continuous);
-  void setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous);
+  void setTargetSpeed(const speed_change::RelativeTargetSpeed & target_speed, bool continuous);
   void update(
     double current_speed,
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &
@@ -37,7 +37,7 @@ public:
 
 private:
   boost::optional<double> target_speed_;
-  boost::optional<RelativeTargetSpeed> relative_target_speed_;
+  boost::optional<speed_change::RelativeTargetSpeed> relative_target_speed_;
   bool continuous_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
 };

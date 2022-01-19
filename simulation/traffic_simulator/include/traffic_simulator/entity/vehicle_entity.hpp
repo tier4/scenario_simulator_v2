@@ -113,7 +113,8 @@ public:
 
   void setTargetSpeed(double target_speed, bool continuous) override;
 
-  void setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous) override;
+  void setTargetSpeed(
+    const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   const traffic_simulator_msgs::msg::BoundingBox getBoundingBox() const override
   {
