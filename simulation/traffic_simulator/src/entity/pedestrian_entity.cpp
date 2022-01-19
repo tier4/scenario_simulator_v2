@@ -126,6 +126,26 @@ void PedestrianEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverM
   behavior_plugin_ptr_->setDriverModel(driver_model);
 }
 
+void PedestrianEntity::setAccelerationLimit(double acceleration)
+{
+  if (acceleration <= 0.0) {
+    THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
+  }
+  auto driver_model = getDriverModel();
+  driver_model.acceleration = acceleration;
+  setDriverModel(driver_model);
+}
+
+void PedestrianEntity::setDecelerationLimit(double deceleration)
+{
+  if (deceleration <= 0.0) {
+    THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
+  }
+  auto driver_model = getDriverModel();
+  driver_model.deceleration = deceleration;
+  setDriverModel(driver_model);
+}
+
 void PedestrianEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);

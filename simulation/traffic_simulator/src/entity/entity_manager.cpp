@@ -565,7 +565,8 @@ bool EntityManager::trafficLightsChanged()
   return traffic_light_manager_ptr_->hasAnyLightChanged();
 }
 
-void EntityManager::requestSpeedChange(const std::string & name, double target_speed, bool continuous)
+void EntityManager::requestSpeedChange(
+  const std::string & name, double target_speed, bool continuous)
 {
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");

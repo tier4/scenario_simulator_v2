@@ -105,6 +105,10 @@ public:
 
   void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);
 
+  void setAccelerationLimit(double acceleration) override;
+
+  void setDecelerationLimit(double deceleration) override;
+
   void requestAssignRoute(
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) override;
 

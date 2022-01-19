@@ -207,12 +207,14 @@ void EntityBase::stopAtEndOfRoad()
 
 void EntityBase::setAccelerationLimit(double)
 {
-  THROW_SIMULATION_ERROR("setAccelerationLimit function can be used with only ego/vehicle entity.");
+  THROW_SIMULATION_ERROR(
+    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
 }
 
 void EntityBase::setDecelerationLimit(double)
 {
-  THROW_SIMULATION_ERROR("setAccelerationLimit function can be used with only ego/vehicle entity.");
+  THROW_SIMULATION_ERROR(
+    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
 }
 }  // namespace entity
 }  // namespace traffic_simulator

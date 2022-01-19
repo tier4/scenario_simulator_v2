@@ -45,7 +45,16 @@ private:
     if (api_.entityExists("bob") && api_.checkCollision("ego", "bob")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (t >= 6.15 && 6.3 >= t) {
+    std::cout << "t : " << t << ", bob vel : " << api_.getEntityStatus("bob").action_status.twist.linear.x << std::endl;
+    /*
+    if (t<=1.0) {
+      const auto vel = api_.getEntityStatus("bob").action_status.twist.linear.x;
+      if (t != vel) {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
+    }
+    */
+    if (t >= 6.15 && 6.5 >= t) {
       const auto vel = api_.getEntityStatus("ego").action_status.twist.linear.x;
       if (std::fabs(0.01) <= vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
@@ -72,9 +81,9 @@ private:
     api_.spawn("bob", getPedestrianParameters());
     api_.setEntityStatus(
       "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
-      traffic_simulator::helper::constructActionStatus(1));
+      traffic_simulator::helper::constructActionStatus(0));
     api_.requestSpeedChange(
-      "bob", 1.0, traffic_simulator::speed_change::Transition::STEP,
+      "bob", 1.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
