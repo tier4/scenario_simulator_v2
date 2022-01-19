@@ -119,7 +119,8 @@ public:
 
   virtual void setTargetSpeed(double target_speed, bool continuous) = 0;
 
-  virtual void setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous) = 0;
+  virtual void setTargetSpeed(
+    const speed_change::RelativeTargetSpeed & target_speed, bool continuous) = 0;
 
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
@@ -148,12 +149,13 @@ public:
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints) = 0;
 
   virtual void requestSpeedChange(
-    const double target_speed, const SpeedChangeTransition transition,
-    const SpeedChangeConstraint constraint, const bool continuous);
+    const double target_speed, const speed_change::Transition transition,
+    const speed_change::Constraint constraint, const bool continuous);
 
   virtual void requestSpeedChange(
-    const RelativeTargetSpeed & target_speed, const SpeedChangeTransition transition,
-    const SpeedChangeConstraint constraint, const bool continuous);
+    const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, const speed_change::Constraint constraint,
+    const bool continuous);
 
   virtual void requestLaneChange(const std::int64_t){};
 

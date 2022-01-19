@@ -44,10 +44,10 @@ struct TransitionDynamics
 
   explicit TransitionDynamics(const pugi::xml_node &, Scope &);
 
-  explicit operator traffic_simulator::SpeedChangeConstraint() const
+  explicit operator traffic_simulator::speed_change::Constraint() const
   {
-    return traffic_simulator::SpeedChangeConstraint(
-      static_cast<traffic_simulator::SpeedChangeConstraint::Type>(dynamics_dimension), value);
+    return traffic_simulator::speed_change::Constraint(
+      static_cast<traffic_simulator::speed_change::Constraint::Type>(dynamics_dimension), value);
   }
 
   explicit operator traffic_simulator::lane_change::Constraint() const

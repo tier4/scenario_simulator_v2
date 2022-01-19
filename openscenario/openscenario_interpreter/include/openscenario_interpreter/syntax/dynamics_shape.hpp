@@ -87,13 +87,13 @@ struct DynamicsShape
 
   constexpr operator value_type() const noexcept { return value; }
 
-  explicit constexpr operator traffic_simulator::SpeedChangeTransition() const
+  explicit constexpr operator traffic_simulator::speed_change::Transition() const
   {
     switch (value) {
       case linear:
-        return traffic_simulator::SpeedChangeTransition::LINEAR;
+        return traffic_simulator::speed_change::Transition::LINEAR;
       case step:
-        return traffic_simulator::SpeedChangeTransition::STEP;
+        return traffic_simulator::speed_change::Transition::STEP;
       default:
         return {};
     }

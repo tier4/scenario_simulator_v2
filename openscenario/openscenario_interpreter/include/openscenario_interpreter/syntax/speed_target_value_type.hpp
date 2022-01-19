@@ -62,15 +62,15 @@ struct SpeedTargetValueType
 
   constexpr operator value_type() const noexcept { return value; }
 
-  explicit constexpr operator traffic_simulator::RelativeTargetSpeed::Type() const
+  explicit constexpr operator traffic_simulator::speed_change::RelativeTargetSpeed::Type() const
   {
     switch (value) {
       case delta:
-        return traffic_simulator::RelativeTargetSpeed::Type::DELTA;
+        return traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA;
       case factor:
-        return traffic_simulator::RelativeTargetSpeed::Type::FACTOR;
+        return traffic_simulator::speed_change::RelativeTargetSpeed::Type::FACTOR;
       default:
-        return traffic_simulator::RelativeTargetSpeed::Type();
+        return traffic_simulator::speed_change::RelativeTargetSpeed::Type();
     }
   }
 };

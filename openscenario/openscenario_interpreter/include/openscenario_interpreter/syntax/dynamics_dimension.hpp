@@ -57,11 +57,11 @@ struct DynamicsDimension
 
   constexpr operator value_type() const noexcept { return value; }
 
-  explicit constexpr operator traffic_simulator::SpeedChangeConstraint::Type() const
+  explicit constexpr operator traffic_simulator::speed_change::Constraint::Type() const
   {
     switch (value) {
       case rate:
-        return traffic_simulator::SpeedChangeConstraint::Type::LONGITUDINAL_ACCELERATION;
+        return traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION;
       default:
         return {};
     }

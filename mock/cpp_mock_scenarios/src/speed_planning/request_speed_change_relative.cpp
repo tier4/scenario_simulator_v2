@@ -66,11 +66,11 @@ private:
       traffic_simulator::helper::constructActionStatus(3));
     api_.requestSpeedChange(
       "front",
-      traffic_simulator::RelativeTargetSpeed(
-        "ego", traffic_simulator::RelativeTargetSpeed::Type::DELTA, 2.0),
-      traffic_simulator::SpeedChangeTransition::LINEAR,
-      traffic_simulator::SpeedChangeConstraint(
-        traffic_simulator::SpeedChangeConstraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+      traffic_simulator::speed_change::RelativeTargetSpeed(
+        "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
+      traffic_simulator::speed_change::Transition::LINEAR,
+      traffic_simulator::speed_change::Constraint(
+        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
   }
 };
