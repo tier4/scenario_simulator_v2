@@ -45,19 +45,26 @@ private:
     if (api_.entityExists("bob") && api_.checkCollision("ego", "bob")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    std::cout << "t : " << t << ", bob vel : " << api_.getEntityStatus("bob").action_status.twist.linear.x << std::endl;
-    /*
-    if (t<=1.0) {
+    if (t <= 1.0) {
       const auto vel = api_.getEntityStatus("bob").action_status.twist.linear.x;
       if (t != vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
-    */
-    if (t >= 6.15 && 6.5 >= t) {
-      const auto vel = api_.getEntityStatus("ego").action_status.twist.linear.x;
-      if (std::fabs(0.01) <= vel) {
-        stop(cpp_mock_scenarios::Result::FAILURE);
+    std::cout << "t : " << t
+              << ", vel : " << api_.getEntityStatus("ego").action_status.twist.linear.x
+              << std::endl;
+    if (t >= 6.15) {
+      if (7.3 >= t) {
+        const auto vel = api_.getEntityStatus("ego").action_status.twist.linear.x;
+        if (std::fabs(0.01) <= vel) {
+          stop(cpp_mock_scenarios::Result::FAILURE);
+        }
+      } else {
+        const auto vel = api_.getEntityStatus("ego").action_status.twist.linear.x;
+        if (0.1 >= vel) {
+          stop(cpp_mock_scenarios::Result::FAILURE);
+        }
       }
     }
     // LCOV_EXCL_STOP
