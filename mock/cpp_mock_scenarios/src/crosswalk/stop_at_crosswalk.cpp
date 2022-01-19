@@ -51,9 +51,6 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
-    std::cout << "t : " << t
-              << ", vel : " << api_.getEntityStatus("ego").action_status.twist.linear.x
-              << std::endl;
     if (t >= 6.15) {
       if (7.3 >= t) {
         const auto vel = api_.getEntityStatus("ego").action_status.twist.linear.x;
