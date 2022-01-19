@@ -43,7 +43,6 @@ traffic_simulator_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityS
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
-  std::cout << "accel : " << driver_model.acceleration << std::endl;
   if (entity_status.action_status.twist.linear.x > target_speed) {
     target_accel = boost::algorithm::clamp(target_accel, driver_model.deceleration * -1, 0);
   } else {
