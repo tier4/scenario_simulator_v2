@@ -34,17 +34,12 @@ LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
 
 auto LaneChangeAction::accomplished() -> bool
 {
-  if (lane_change_target.is<AbsoluteTargetLane>()) {
-    for (auto && each : accomplishments) {
-      if (not std::get<1>(each)) {
-        std::get<1>(each) = isInLanelet(
-          std::get<0>(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value), 0.1);
-      }
-    }
-    return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
-  } else {
-    return true;  // DIRTY HACK
-  }
+  return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](auto && each) {
+    const auto is_lane_changing = [](auto &&... xs) {
+      return connection.getCurrentAction(std::forward<decltype(xs)>(xs)...) == "lane_change";
+    };
+    return each.second or (each.second = not is_lane_changing(each.first));
+  });
 }
 
 auto LaneChangeAction::endsImmediately() noexcept -> bool { return false; }
