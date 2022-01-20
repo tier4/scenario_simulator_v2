@@ -513,11 +513,71 @@ void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto)
 {
+  auto has_convertible_color = [](auto && traffic_light) {
+    switch (traffic_light.color) {
+      case autoware_auto_perception_msgs::msg::TrafficLight::RED:
+      case autoware_auto_perception_msgs::msg::TrafficLight::AMBER:
+      case autoware_auto_perception_msgs::msg::TrafficLight::GREEN:
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  auto convert_color = [](auto color) {
+    switch (color) {
+      case autoware_auto_perception_msgs::msg::TrafficLight::RED:
+        return simulation_api_schema::TrafficLightState::LampState::RED;
+      case autoware_auto_perception_msgs::msg::TrafficLight::AMBER:
+        return simulation_api_schema::TrafficLightState::LampState::YELLOW;
+      case autoware_auto_perception_msgs::msg::TrafficLight::GREEN:
+        return simulation_api_schema::TrafficLightState::LampState::GREEN;
+      default:
+        return simulation_api_schema::TrafficLightState::LampState::UNKNOWN;
+    }
+  };
+
+  auto has_convertible_shape = [](auto && traffic_light) {
+    switch (traffic_light.shape) {
+      case autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW:
+      case autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW:
+      case autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW:
+      case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW:
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  auto convert_shape = [](auto shape) {
+    switch (shape) {
+      case autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW:
+        return simulation_api_schema::TrafficLightState::LampState::LEFT;
+      case autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW:
+        return simulation_api_schema::TrafficLightState::LampState::RIGHT;
+      case autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW:
+        return simulation_api_schema::TrafficLightState::LampState::UP;
+      case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW:
+        return simulation_api_schema::TrafficLightState::LampState::DOWN;
+      default:
+        return simulation_api_schema::TrafficLightState::LampState::UNKNOWN;
+    }
+  };
+
   proto.set_id(traffic_light_state.map_primitive_id);
-  for (const autoware_auto_perception_msgs::msg::TrafficLight & ls : traffic_light_state.lights) {
-    simulation_api_schema::TrafficLightState::LampState lamp_state;
-    // TODO(murooka) type is separated into color, shape, status
-    *proto.add_lamp_states() = lamp_state;
+
+  for (const autoware_auto_perception_msgs::msg::TrafficLight & traffic_light : traffic_light_state.lights) {
+    if (has_convertible_color(traffic_light)) {
+      simulation_api_schema::TrafficLightState::LampState lamp_state;
+      lamp_state.set_confidence(1.0);
+      lamp_state.set_type(convert_color(traffic_light.color));
+      *proto.add_lamp_states() = lamp_state;
+    } else if (has_convertible_shape(traffic_light)) {
+      simulation_api_schema::TrafficLightState::LampState lamp_state;
+      lamp_state.set_confidence(1.0);
+      lamp_state.set_type(convert_shape(traffic_light.shape));
+      *proto.add_lamp_states() = lamp_state;
+    }
   }
 }
 #endif
