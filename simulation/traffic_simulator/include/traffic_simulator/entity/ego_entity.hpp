@@ -135,9 +135,9 @@ public:
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool override;
 
-  void setTargetSpeed(double, bool) override;
+  void requestSpeedChange(double, bool) override;
 
-  void setTargetSpeed(
+  void requestSpeedChange(
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   auto setUpperBoundSpeed(double) -> void override;

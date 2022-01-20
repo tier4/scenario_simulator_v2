@@ -62,7 +62,7 @@ private:
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34606, 20.0),
       traffic_simulator::helper::constructActionStatus(10));
-    api_.setTargetSpeed("ego", 10, true);
+    api_.requestSpeedChange("ego", 10, true);
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop", "ego", -10, 10, 120635,
       metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE, 30, 1, 0.05);

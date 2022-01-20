@@ -48,13 +48,13 @@ void EntityBase::requestSpeedChange(
     case speed_change::Transition::LINEAR: {
       setAccelerationLimit(std::fabs(constraint.value));
       setDecelerationLimit(std::fabs(constraint.value));
-      setTargetSpeed(target_speed, continuous);
+      requestSpeedChange(target_speed, continuous);
       break;
     }
     case speed_change::Transition::STEP: {
       auto status = getStatus();
       status.action_status.twist.linear.x = target_speed;
-      setTargetSpeed(target_speed, continuous);
+      requestSpeedChange(target_speed, continuous);
       setStatus(status);
       break;
     }
@@ -69,13 +69,13 @@ void EntityBase::requestSpeedChange(
     case speed_change::Transition::LINEAR: {
       setAccelerationLimit(std::fabs(constraint.value));
       setDecelerationLimit(std::fabs(constraint.value));
-      setTargetSpeed(target_speed, continuous);
+      requestSpeedChange(target_speed, continuous);
       break;
     }
     case speed_change::Transition::STEP: {
       auto status = getStatus();
       status.action_status.twist.linear.x = target_speed.getAbsoluteValue(other_status_);
-      setTargetSpeed(target_speed, continuous);
+      requestSpeedChange(target_speed, continuous);
       setStatus(status);
       break;
     }
@@ -207,12 +207,14 @@ void EntityBase::stopAtEndOfRoad()
 
 void EntityBase::setAccelerationLimit(double)
 {
-  THROW_SIMULATION_ERROR("setAccelerationLimit function can be used with only ego/vehicle entity.");
+  THROW_SIMULATION_ERROR(
+    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
 }
 
 void EntityBase::setDecelerationLimit(double)
 {
-  THROW_SIMULATION_ERROR("setAccelerationLimit function can be used with only ego/vehicle entity.");
+  THROW_SIMULATION_ERROR(
+    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
 }
 }  // namespace entity
 }  // namespace traffic_simulator

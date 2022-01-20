@@ -27,8 +27,8 @@ namespace behavior
 class TargetSpeedPlanner
 {
 public:
-  void setTargetSpeed(double target_speed, bool continuous);
-  void setTargetSpeed(const speed_change::RelativeTargetSpeed & target_speed, bool continuous);
+  void requestSpeedChange(double target_speed, bool continuous);
+  void requestSpeedChange(const speed_change::RelativeTargetSpeed & target_speed, bool continuous);
   void update(
     double current_speed,
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &

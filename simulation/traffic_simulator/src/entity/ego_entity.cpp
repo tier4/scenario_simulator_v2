@@ -487,7 +487,7 @@ auto EgoEntity::requestSpeedChange(
   const double target_speed, const speed_change::Transition, const speed_change::Constraint,
   const bool) -> void
 {
-  setTargetSpeed(target_speed, false);
+  requestSpeedChange(target_speed, false);
 }
 
 auto EgoEntity::requestSpeedChange(
@@ -527,7 +527,7 @@ bool EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
   return success;
 }
 
-void EgoEntity::setTargetSpeed(double value, bool)
+void EgoEntity::requestSpeedChange(double value, bool)
 {
   Eigen::VectorXd v(vehicle_model_ptr_->getDimX());
 
@@ -565,7 +565,7 @@ void EgoEntity::setTargetSpeed(double value, bool)
   vehicle_model_ptr_->setState(v);
 }
 
-void EgoEntity::setTargetSpeed(
+void EgoEntity::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/)
 {
 }

@@ -110,15 +110,15 @@ void VehicleEntity::cancelRequest()
   route_planner_ptr_->cancelGoal();
 }
 
-void VehicleEntity::setTargetSpeed(double target_speed, bool continuous)
+void VehicleEntity::requestSpeedChange(double target_speed, bool continuous)
 {
-  target_speed_planner_.setTargetSpeed(target_speed, continuous);
+  target_speed_planner_.requestSpeedChange(target_speed, continuous);
 }
 
-void VehicleEntity::setTargetSpeed(
+void VehicleEntity::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
-  target_speed_planner_.setTargetSpeed(target_speed, continuous);
+  target_speed_planner_.requestSpeedChange(target_speed, continuous);
 }
 
 auto VehicleEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
