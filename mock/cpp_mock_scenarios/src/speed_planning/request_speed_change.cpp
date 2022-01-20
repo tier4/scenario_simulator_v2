@@ -63,18 +63,18 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.requestSpeedChange(
-      "ego", 10.0, traffic_simulator::SpeedChangeTransition::LINEAR,
-      traffic_simulator::SpeedChangeConstraint(
-        traffic_simulator::SpeedChangeConstraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
+      "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      traffic_simulator::speed_change::Constraint(
+        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
     api_.spawn("front", getVehicleParameters());
     api_.setEntityStatus(
       "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.requestSpeedChange(
-      "front", 10.0, traffic_simulator::SpeedChangeTransition::STEP,
-      traffic_simulator::SpeedChangeConstraint(
-        traffic_simulator::SpeedChangeConstraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
+      "front", 10.0, traffic_simulator::speed_change::Transition::STEP,
+      traffic_simulator::speed_change::Constraint(
+        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
   }
 };

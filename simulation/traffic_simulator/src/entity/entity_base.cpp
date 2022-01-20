@@ -41,17 +41,17 @@ void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
 void EntityBase::requestSpeedChange(
-  const double target_speed, const SpeedChangeTransition transition,
-  const SpeedChangeConstraint constraint, const bool continuous)
+  const double target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
 {
   switch (transition) {
-    case SpeedChangeTransition::LINEAR: {
+    case speed_change::Transition::LINEAR: {
       setAccelerationLimit(std::fabs(constraint.value));
       setDecelerationLimit(std::fabs(constraint.value));
       setTargetSpeed(target_speed, continuous);
       break;
     }
-    case SpeedChangeTransition::STEP: {
+    case speed_change::Transition::STEP: {
       auto status = getStatus();
       status.action_status.twist.linear.x = target_speed;
       setTargetSpeed(target_speed, continuous);
@@ -62,17 +62,17 @@ void EntityBase::requestSpeedChange(
 }
 
 void EntityBase::requestSpeedChange(
-  const RelativeTargetSpeed & target_speed, const SpeedChangeTransition transition,
-  const SpeedChangeConstraint constraint, const bool continuous)
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
 {
   switch (transition) {
-    case SpeedChangeTransition::LINEAR: {
+    case speed_change::Transition::LINEAR: {
       setAccelerationLimit(std::fabs(constraint.value));
       setDecelerationLimit(std::fabs(constraint.value));
       setTargetSpeed(target_speed, continuous);
       break;
     }
-    case SpeedChangeTransition::STEP: {
+    case speed_change::Transition::STEP: {
       auto status = getStatus();
       status.action_status.twist.linear.x = target_speed.getAbsoluteValue(other_status_);
       setTargetSpeed(target_speed, continuous);

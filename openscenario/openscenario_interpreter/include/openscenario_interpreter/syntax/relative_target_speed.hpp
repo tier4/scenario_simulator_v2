@@ -49,11 +49,13 @@ struct RelativeTargetSpeed
 
   explicit RelativeTargetSpeed(const pugi::xml_node &, Scope &);
 
-  explicit operator traffic_simulator::RelativeTargetSpeed() const
+  explicit operator traffic_simulator::speed_change::RelativeTargetSpeed() const
   {
-    return traffic_simulator::RelativeTargetSpeed(
+    return traffic_simulator::speed_change::RelativeTargetSpeed(
       entity_ref,
-      static_cast<traffic_simulator::RelativeTargetSpeed::Type>(speed_target_value_type), value);
+      static_cast<traffic_simulator::speed_change::RelativeTargetSpeed::Type>(
+        speed_target_value_type),
+      value);
   }
 };
 }  // namespace syntax

@@ -26,7 +26,7 @@ struct Double : public std_msgs::msg::Float64
 {
   using value_type = decltype(std_msgs::msg::Float64::data);
 
-  explicit Double() = default;
+  Double() = default;
 
   Double(value_type);
 
