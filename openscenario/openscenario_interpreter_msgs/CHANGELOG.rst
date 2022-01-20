@@ -2,6 +2,24 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Merge pull request `#581 <https://github.com/tier4/scenario_simulator_v2/issues/581>`_ from Utaro-M/matsuura/feature/add-time-to-panel
+* Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* Merge branch 'master' into matsuura/feature/add-time-to-panel
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Merge pull request `#659 <https://github.com/tier4/scenario_simulator_v2/issues/659>`_ from tier4/release-0.6.1
+* merge fix/galactic_build
+* pull master
+* fix
+* merge master
+* Merge tier4:master
+* add simulation time to panel
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
 0.6.1 (2022-01-11)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration

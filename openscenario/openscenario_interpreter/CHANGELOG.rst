@@ -2,6 +2,49 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/lane_change_trajectory_shape
+* Merge pull request `#670 <https://github.com/tier4/scenario_simulator_v2/issues/670>`_ from tier4/feature/request_speed_change_in_pedestrian
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_speed_change_in_pedestrian
+* Merge branch 'master' into feature/request_speed_change_in_pedestrian
+* Merge pull request `#668 <https://github.com/tier4/scenario_simulator_v2/issues/668>`_ from tier4/feature/interpreter/lane-change-action
+* Update member function `LaneChangeAction::accomplished`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/lane-change-action
+* Merge pull request `#669 <https://github.com/tier4/scenario_simulator_v2/issues/669>`_ from tier4/refactor/add_speed_change_namespace
+* remove old API
+* add speed_change namespace
+* Fix syntax `Orientation` to be default constructible
+* Lipsticks
+* Add new test scenario `LateralAction.LaneChangeAction`
+* Update some syntaxes to support conversion operator
+* Update syntax `LaneChangeAction` to use `API::requestLaneChange` (experimental)
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/control_from_relation_id
+* Merge pull request `#665 <https://github.com/tier4/scenario_simulator_v2/issues/665>`_ from tier4/feature/interpreter/speed-action
+* Update member function `SpeedAction::accomplished`
+* Update some structures to support cast operator
+* Lipsticks
+* Remove obsoleted code
+* Remove member function `SpeedAction::reset`
+* Update syntax `SpeedAction` to use new API `requestSpeedChange`
+* Update `EgoEntity` to override `EntityBase::requestSpeedChange`
+* Add conversion operators to some OSC structures
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Merge pull request `#581 <https://github.com/tier4/scenario_simulator_v2/issues/581>`_ from Utaro-M/matsuura/feature/add-time-to-panel
+* Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* Merge branch 'master' into matsuura/feature/add-time-to-panel
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Merge pull request `#659 <https://github.com/tier4/scenario_simulator_v2/issues/659>`_ from tier4/release-0.6.1
+* merge fix/galactic_build
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into matsuura/feature/add-time-to-panel
+* pull master
+* merge master
+* Merge tier4:master
+* add simulation time to panel
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
 0.6.1 (2022-01-11)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/get_driver_model_in_pedestrian

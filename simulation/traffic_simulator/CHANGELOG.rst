@@ -2,6 +2,105 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#671 <https://github.com/tier4/scenario_simulator_v2/issues/671>`_ from tier4/fix/lane_change_trajectory_shape
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/lane_change_trajectory_shape
+* Merge pull request `#670 <https://github.com/tier4/scenario_simulator_v2/issues/670>`_ from tier4/feature/request_speed_change_in_pedestrian
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_speed_change_in_pedestrian
+* Merge branch 'master' into feature/request_speed_change_in_pedestrian
+* Merge pull request `#668 <https://github.com/tier4/scenario_simulator_v2/issues/668>`_ from tier4/feature/interpreter/lane-change-action
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/lane-change-action
+* modify trajectory tangent size
+* fix problem in passing driver model in pedestrian behavior plugin
+* Merge pull request `#669 <https://github.com/tier4/scenario_simulator_v2/issues/669>`_ from tier4/refactor/add_speed_change_namespace
+* rename functions
+* add whitespace
+* specify class
+* fix compile error
+* add speed_change namespace
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/lane-change-action
+* Update some syntaxes to support conversion operator
+* Merge pull request `#667 <https://github.com/tier4/scenario_simulator_v2/issues/667>`_ from tier4/feature/control_from_relation_id
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/control_from_relation_id
+* remove const
+* Merge pull request `#665 <https://github.com/tier4/scenario_simulator_v2/issues/665>`_ from tier4/feature/interpreter/speed-action
+* add relation id
+* apply reformat
+* Update some structures to support cast operator
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/speed-action
+* Merge pull request `#664 <https://github.com/tier4/scenario_simulator_v2/issues/664>`_ from tier4/feature/lateral_velocity_constraint
+* Update `EgoEntity` to override `EntityBase::requestSpeedChange`
+* apply reformat
+* add new test scenario
+* modify scenario
+* add TIME constraint
+* fix typo
+* use switch
+* add default value
+* split NPC logic by using constraint type
+* fix logic in calculating along pose
+* add test case
+* add new API
+* Merge pull request `#662 <https://github.com/tier4/scenario_simulator_v2/issues/662>`_ from tier4/fix/rename_trajectory
+* rename data field and remove unused field
+* Merge pull request `#661 <https://github.com/tier4/scenario_simulator_v2/issues/661>`_ from tier4/feature/lane_change_trajectory_shape
+* Merge pull request `#660 <https://github.com/tier4/scenario_simulator_v2/issues/660>`_ from tier4/feature/traffic_simulator/vehicle_model
+* Merge pull request `#654 <https://github.com/tier4/scenario_simulator_v2/issues/654>`_ from tier4/feature/request_relative_speed_change
+* apply reformat
+* remove debug line and modify scenario
+* Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
+* Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* Merge branch 'master' into matsuura/feature/add-time-to-panel
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Merge pull request `#659 <https://github.com/tier4/scenario_simulator_v2/issues/659>`_ from tier4/release-0.6.1
+* Add new VehicleModelType `DELAY_STEER_VEL`
+* enable change lane
+* add debug line
+* add namespace
+* move to .cpp
+* add << operator override
+* change size_t to uint8_t
+* fix problems in always return boost::none
+* enable use self entity as reference
+* add linear lanechange scenario
+* merge fix/galactic_build
+* fix compile error
+* enable generate linear trajectory
+* modify argument type
+* change argument type
+* change to private
+* fix compile error
+* add void requestLaneChange(const traffic_simulator::lane_change::Parameter &)
+* add copy constructor
+* add copy constructor
+* add constructor
+* rename to_lanelet_id to lane_change_parameters
+* add Parameter struct
+* add constructor
+* add data types for constraint and trajectory
+* add Lane change data types
+* Merge branch 'fix/galactic_build' of https://github.com/tier4/scenario_simulator.auto into feature/request_relative_speed_change
+* remove glog functions
+* Merge branch 'fix/galactic_build' of https://github.com/tier4/scenario_simulator.auto into feature/request_relative_speed_change
+* update bounding box size while get status
+* Merge branch 'fix/galactic_build' of https://github.com/tier4/scenario_simulator.auto into feature/request_relative_speed_change
+* remove debug lines
+* set other status first
+* update requestSpeedChange logic
+* add new test case
+* enable calculate relative target speed
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* add getAbsoluteValue function in RelativeTargetSpeed class
+* add setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous) function to the each entity
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into matsuura/feature/add-time-to-panel
+* pull master
+* merge master
+* Merge tier4:master
+* fix to build
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
 0.6.1 (2022-01-11)
 ------------------
 * Merge pull request `#655 <https://github.com/tier4/scenario_simulator_v2/issues/655>`_ from tier4/fix/galactic_build
