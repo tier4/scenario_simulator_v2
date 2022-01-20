@@ -37,7 +37,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Orientation
 {
-  const ReferenceContext type;
+  const ReferenceContext type{};
 
   const Double h, p, r;
 

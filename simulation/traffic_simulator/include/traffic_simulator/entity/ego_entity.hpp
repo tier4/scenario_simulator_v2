@@ -121,6 +121,8 @@ public:
 
   void requestLaneChange(const std::int64_t) override;
 
+  auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
+
   auto requestSpeedChange(
     const double, const speed_change::Transition, const speed_change::Constraint, const bool)
     -> void override;
