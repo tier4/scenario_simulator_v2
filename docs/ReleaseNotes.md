@@ -8,6 +8,7 @@
 - Update syntax `SpeedAction` to use `API::requestSpeedChange` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/665)).
 - Enable control multiple traffic lights by relation ID from lanelet2 map. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/667)).
 - Start supporting requestSpeedChange API in pedestrian. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/670)).
+- Update syntax `LaneChangeAction` to use `API::requestLaneChange` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/668)).
 
 ## Version 0.6.1
 - Add API::requestSpeedChange function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
