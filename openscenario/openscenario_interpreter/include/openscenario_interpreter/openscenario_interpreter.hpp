@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/utility/execution_timer.hpp>
 #include <openscenario_interpreter/utility/visibility.hpp>
 #include <openscenario_interpreter_msgs/msg/context.hpp>
@@ -58,7 +59,11 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   String output_directory;
 
-  Object script;
+  std::shared_ptr<OpenScenario> script;
+
+  std::list<std::shared_ptr<ScenarioDefinition>> scenarios;
+
+  std::shared_ptr<ScenarioDefinition> current_scenario;
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 

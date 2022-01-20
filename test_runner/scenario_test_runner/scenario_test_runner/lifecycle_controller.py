@@ -138,10 +138,11 @@ class LifecycleController(Node):
         self.get_logger().info("\x1b[33mConfigure interpreter.\x1b[0m")
         state_expects = "unconfigured"
         if self.get_lifecycle_state() == state_expects:
-            self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
+            success = self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
             self.get_logger().info(
                 "\x1b[33mInterpreter is " + self.get_lifecycle_state() + " now.\x1b[0m"
             )
+            return success
         else:
             self.get_logger().error(
                 "\x1b[1;31mInterpreter is "
@@ -150,66 +151,71 @@ class LifecycleController(Node):
                 + state_expects
                 + " expected.\x1b[0m"
             )
+            return False
 
     def activate_node(self):
         """Activate node to change state from inactive to activate."""
         self.get_logger().info("\x1b[33mActivate interpreter.\x1b[0m")
         state_expects = "inactive"
         if self.get_lifecycle_state() == state_expects:
-            self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
+            return self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
         else:
             self.get_logger().error(
                 "\x1b[1;31mInterpreter is "
                 + self.get_lifecycle_state()
                 + " now, but "
                 + state_expects
-                + ".\x1b[0m"
+                + " expected.\x1b[0m"
             )
+            return False
 
     def deactivate_node(self):
         """Deactivate node to change state from active to inactive."""
         self.get_logger().info("\x1b[33mDeactivate interpreter.\x1b[0m")
         state_expects = "active"
         if self.get_lifecycle_state() == state_expects:
-            self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
+            return self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
         else:
             self.get_logger().error(
                 "\x1b[1;31mInterpreter is "
                 + self.get_lifecycle_state()
                 + " now, but "
                 + state_expects
-                + ".\x1b[0m"
+                + " expected.\x1b[0m"
             )
+            return False
 
     def cleanup_node(self):
         """Cleanup node to change state from inactive to unconfigure."""
         self.get_logger().info("\x1b[33mCleanup interpreter.\x1b[0m")
         state_expects = "inactive"
         if self.get_lifecycle_state() == state_expects:
-            self.set_lifecycle_state(Transition.TRANSITION_CLEANUP)
+            return self.set_lifecycle_state(Transition.TRANSITION_CLEANUP)
         else:
             self.get_logger().error(
                 "\x1b[1;31mInterpreter is "
                 + self.get_lifecycle_state()
                 + " now, but "
                 + state_expects
-                + ".\x1b[0m"
+                + " expected.\x1b[0m"
             )
+            return False
 
     def shutdown(self):
         """Shutdown lifecycle controller."""
         self.get_logger().info("\x1b[33mShutdown interpreter.\x1b[0m")
         state_expects = "unconfigured"
         if self.get_lifecycle_state() == state_expects:
-            self.set_lifecycle_state(Transition.TRANSITION_UNCONFIGURED_SHUTDOWN)
+            return self.set_lifecycle_state(Transition.TRANSITION_UNCONFIGURED_SHUTDOWN)
         else:
             self.get_logger().error(
                 "\x1b[1;31mInterpreter is "
                 + self.get_lifecycle_state()
                 + " now, but "
                 + state_expects
-                + ".\x1b[0m"
+                + " expected.\x1b[0m"
             )
+            return False
 
     def set_lifecycle_state(self, transition_id):
         """
