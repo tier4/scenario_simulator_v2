@@ -475,6 +475,14 @@ void EgoEntity::requestLaneChange(const std::int64_t)
     "everything but their destination");
 }
 
+auto EgoEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void
+{
+  THROW_SEMANTIC_ERROR(
+    "From scenario, a lane change was requested to Ego type entity ", std::quoted(name),
+    " In general, such a request is an error, since Ego cars make autonomous decisions about "
+    "everything but their destination");
+}
+
 auto EgoEntity::requestSpeedChange(
   const double target_speed, const speed_change::Transition, const speed_change::Constraint,
   const bool) -> void

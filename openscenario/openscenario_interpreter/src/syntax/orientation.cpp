@@ -19,6 +19,10 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+static_assert(std::is_default_constructible<ReferenceContext>::value);
+static_assert(std::is_default_constructible<Double>::value);
+static_assert(std::is_default_constructible<Orientation>::value);
+
 Orientation::Orientation(const pugi::xml_node & node, Scope & scope)
 : type(readAttribute<ReferenceContext>("type", node, scope, ReferenceContext())),
   h(readAttribute<Double>("h", node, scope, Double())),
