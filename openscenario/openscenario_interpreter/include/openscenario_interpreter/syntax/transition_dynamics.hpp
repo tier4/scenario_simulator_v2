@@ -49,6 +49,12 @@ struct TransitionDynamics
     return traffic_simulator::speed_change::Constraint(
       static_cast<traffic_simulator::speed_change::Constraint::Type>(dynamics_dimension), value);
   }
+
+  explicit operator traffic_simulator::lane_change::Constraint() const
+  {
+    return traffic_simulator::lane_change::Constraint(
+      static_cast<traffic_simulator::lane_change::Constraint::Type>(dynamics_dimension), value);
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
