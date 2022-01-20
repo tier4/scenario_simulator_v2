@@ -28,6 +28,11 @@ ament_auto_add_executable(lanechange_linear_time
 )
 target_link_libraries(lanechange_linear_time cpp_scenario_node)
 
+ament_auto_add_executable(lanechange_longitudinal_distance
+  lanechange_longitudinal_distance.cpp
+)
+target_link_libraries(lanechange_longitudinal_distance cpp_scenario_node)
+
 ament_auto_add_executable(lanechange_linear_lateral_velocity
   lanechange_linear_lateral_velocity.cpp
 )
@@ -44,6 +49,7 @@ install(TARGETS
   lanechange_linear
   lanechange_linear_lateral_velocity
   lanechange_linear_time
+  lanechange_longitudinal_distance
   lanechange_right
   lanechange_right_with_id
   lanechange_time
@@ -57,6 +63,7 @@ if(BUILD_TESTING)
   add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_linear_lateral_velocity" "15.0")
   add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_linear_time" "30.0")
   add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_linear" "15.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_longitudinal_distance" "15.0")
   add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_right_with_id" "15.0")
   add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_right" "15.0")
   add_cpp_mock_scenario_test(${PROJECT_NAME} "lanechange_time" "30.0")
