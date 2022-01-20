@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.2 (2022-01-20)
+------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
 * Merge pull request `#581 <https://github.com/tier4/scenario_simulator_v2/issues/581>`_ from Utaro-M/matsuura/feature/add-time-to-panel
