@@ -19,14 +19,14 @@ namespace traffic_simulator
 {
 namespace behavior
 {
-void TargetSpeedPlanner::setTargetSpeed(double target_speed, bool continuous)
+void TargetSpeedPlanner::requestSpeedChange(double target_speed, bool continuous)
 {
   continuous_ = continuous;
   target_speed_ = target_speed;
   relative_target_speed_ = boost::none;
 }
 
-void TargetSpeedPlanner::setTargetSpeed(
+void TargetSpeedPlanner::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
   continuous_ = continuous;

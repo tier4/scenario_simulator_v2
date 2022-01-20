@@ -98,7 +98,7 @@ void TestExecutor::initialize()
     api_->setEntityStatus(
       npc_descr.name, npc_descr.start_position,
       traffic_simulator::helper::constructActionStatus(npc_descr.speed));
-    api_->setTargetSpeed(npc_descr.name, npc_descr.speed, true);
+    api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
   }
 }
 
