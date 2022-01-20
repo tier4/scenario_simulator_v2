@@ -23,6 +23,8 @@
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
+#include <algorithm>
+
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
 
@@ -184,9 +186,10 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 
   (*publisher_of_context).on_deactivate();
 
-  connection.~API();  // Deactivate traffic_simulator
+  disconnect();  // Deactivate traffic_simulator
 
-  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
+  // INFO_STREAM.
   boost::apply_visitor(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
@@ -235,7 +238,7 @@ auto Interpreter::publishCurrentContext() const -> void
     nlohmann::json json;
     context.stamp = now();
     context.data = (json << script.as<OpenScenario>()).dump();
-    context.time = connection.getCurrentTime();
+    context.time = getCurrentTime();
   }
 
   (*publisher_of_context).publish(context);

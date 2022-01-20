@@ -40,7 +40,7 @@ auto Controller::assign(const EntityRef & entity_ref) -> void
   }
 
   applyAssignControllerAction(entity_ref, [&]() {
-    auto message = connection.getDriverModel(entity_ref);
+    auto message = getDriverModel(entity_ref);
     if (properties.find("isBlind") != std::end(properties)) {
       message.see_around = not properties["isBlind"];
     }

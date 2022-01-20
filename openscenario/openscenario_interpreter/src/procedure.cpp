@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <memory>
 #include <openscenario_interpreter/procedure.hpp>
+
+#include <memory>
 
 namespace openscenario_interpreter
 {
-static typename std::aligned_storage<
-  sizeof(traffic_simulator::API), alignof(traffic_simulator::API)>::type memory;
-
-traffic_simulator::API & connection = reinterpret_cast<traffic_simulator::API &>(memory);
+std::unique_ptr<traffic_simulator::API> connection = nullptr;
 
 auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
-  decltype(connection.toLaneletPose(std::declval<decltype(pose)>(), false).get())>::type
+  decltype(connection->toLaneletPose(std::declval<decltype(pose)>(), false).get())>::type
 {
-  const auto result = connection.toLaneletPose(pose, false);
+  const auto result = connection->toLaneletPose(pose, false);
 
   if (result) {
     return result.get();
