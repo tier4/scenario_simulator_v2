@@ -15,13 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 
+#include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
 #include <pugixml.hpp>
-
-#include <boost/filesystem.hpp>
 
 namespace openscenario_interpreter
 {

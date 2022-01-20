@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
-
 #include <memory>
+#include <openscenario_interpreter/procedure.hpp>
 
 namespace openscenario_interpreter
 {

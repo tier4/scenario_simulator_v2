@@ -15,11 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
 #define OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
 
-#include <openscenario_interpreter/error.hpp>
-#include <traffic_simulator/api/api.hpp>
-
 #include <limits>
 #include <memory>
+#include <openscenario_interpreter/error.hpp>
+#include <traffic_simulator/api/api.hpp>
 #include <utility>
 
 namespace openscenario_interpreter

@@ -23,8 +23,6 @@
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
-#include <algorithm>
-
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
 
@@ -61,8 +59,7 @@ auto Interpreter::isSuccessIntended() const -> bool { return intended_result == 
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
-  const auto logic_file =
-    current_scenario->road_network.logic_file;
+  const auto logic_file = current_scenario->road_network.logic_file;
 
   auto configuration = traffic_simulator::Configuration(
     logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
