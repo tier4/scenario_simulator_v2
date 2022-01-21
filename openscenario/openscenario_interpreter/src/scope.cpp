@@ -68,17 +68,6 @@ auto EnvironmentFrame::find(const Prefixed<Name> & prefixed_name) const -> Objec
   }
 }
 
-auto EnvironmentFrame::findObject(const Prefixed<Name> & prefixed_name) const -> Object
-{
-  if (prefixed_name.absolute) {
-    return outermostFrame().find(prefixed_name);
-  } else if (prefixed_name.prefixes.empty()) {
-    return find(prefixed_name.name);
-  } else {
-    return lookupFrame(prefixed_name.prefixes.front())->find(prefixed_name.strip<1>());
-  }
-}
-
 auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
 {
   std::vector<const EnvironmentFrame *> same_level{this};
