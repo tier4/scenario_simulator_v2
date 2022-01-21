@@ -147,26 +147,22 @@ class ScenarioTestRunner(LifecycleController):
     def spin(self):
         """Run scenario."""
         time.sleep(self.SLEEP_RATE)
-        self.activate_node()
-        start = time.time()
 
-        while (
-            (time.time() - start) < self.global_timeout
-            if self.global_timeout is not None
-            else True
-        ):
-
-            if self.get_lifecycle_state() == "inactive":
-                self.get_logger().info(
-                    "Simulator normally transitioned to the inactive state."
-                )
-                return
-            else:
-                time.sleep(self.SLEEP_RATE)
-
-        self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
-
-        self.deactivate_node()
+        while self.activate_node():
+            start = time.time()
+            while True:
+                if self.get_lifecycle_state() == "inactive":
+                    self.get_logger().info(
+                        "Simulator normally transitioned to the inactive state."
+                    )
+                    break
+                elif ((time.time() - start) > self.global_timeout
+                        if self.global_timeout is not None else False):
+                    self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
+                    self.deactivate_node()
+                    break
+                else:
+                    time.sleep(self.SLEEP_RATE)
 
     def run_scenario(self, scenario: Scenario):
         converted_scenarios = convert_scenarios([scenario], self.output_directory)
@@ -219,7 +215,8 @@ class ScenarioTestRunner(LifecycleController):
 
             else:
                 self.spin()
-                self.cleanup_node()
+
+            self.cleanup_node()
 
         self.shutdown()
 

@@ -46,21 +46,21 @@ auto SpeedAction::accomplished() -> bool
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       return equal_to<double>()(
         speed_action_target.as<AbsoluteTargetSpeed>().value,
-        connection.getEntityStatus(actor).action_status.twist.linear.x);
+        getEntityStatus(actor).action_status.twist.linear.x);
     } else {
       switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
         case SpeedTargetValueType::delta:
           return equal_to<double>()(
-            connection.getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
+            getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
                 .action_status.twist.linear.x +
               speed_action_target.as<RelativeTargetSpeed>().value,
-            connection.getEntityStatus(actor).action_status.twist.linear.x);
+            getEntityStatus(actor).action_status.twist.linear.x);
         case SpeedTargetValueType::factor:
           return equal_to<double>()(
-            connection.getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
+            getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
                 .action_status.twist.linear.x *
               speed_action_target.as<RelativeTargetSpeed>().value,
-            connection.getEntityStatus(actor).action_status.twist.linear.x);
+            getEntityStatus(actor).action_status.twist.linear.x);
         default:
           return false;
       }
@@ -98,13 +98,13 @@ auto SpeedAction::start() -> void
 
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      connection.requestSpeedChange(
+      requestSpeedChange(
         std::get<0>(each), speed_action_target.as<AbsoluteTargetSpeed>().value,
         static_cast<traffic_simulator::speed_change::Transition>(
           speed_action_dynamics.dynamics_shape),
         static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics), true);
     } else {
-      connection.requestSpeedChange(
+      requestSpeedChange(
         std::get<0>(each),
         static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
           speed_action_target.as<RelativeTargetSpeed>()),

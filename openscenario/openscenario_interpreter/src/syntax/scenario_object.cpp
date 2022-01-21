@@ -62,7 +62,7 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
     }
   }
 
-  connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);
+  addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);
 
   return true;
 }
