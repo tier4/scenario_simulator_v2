@@ -56,14 +56,14 @@ public:
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
 
-  void setTargetSpeed(double, bool) override
+  void requestSpeedChange(double, bool) override
   {
-    THROW_SEMANTIC_ERROR("setTargetSpeed function cannot not use in MiscObjectEntity");
+    THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
   }
 
-  void setTargetSpeed(const speed_change::RelativeTargetSpeed &, bool) override
+  void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool) override
   {
-    THROW_SEMANTIC_ERROR("setTargetSpeed function cannot not use in MiscObjectEntity");
+    THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
   }
 
   void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override

@@ -38,39 +38,28 @@ public:
   }
 
 private:
-  int lanechange_frames = 0;
+  bool requested = false;
+  bool lanechange_finished = false;
   void onUpdate() override
   {
-    if (api_.getCurrentAction("ego") == "lane_change") {
-      lanechange_frames++;
+    if (api_.isInLanelet("ego", 34513, 0.1)) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    if (api_.getCurrentAction("ego") != "lane_change" && api_.getCurrentTime() >= 10.0) {
-      if (static_cast<double>(lanechange_frames - 1) * 0.05 == 20.0) {
-        stop(cpp_mock_scenarios::Result::SUCCESS);
-      } else {
-        stop(cpp_mock_scenarios::Result::FAILURE);
-      }
-    }
-    // LCOV_EXCL_START
-    if (api_.getCurrentTime() >= 30.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    // LCOV_EXCL_STOP
   }
   void onInitialize() override
   {
     api_.spawn("ego", getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
-      traffic_simulator::helper::constructActionStatus(10));
-    api_.requestSpeedChange("ego", 10, true);
+      traffic_simulator::helper::constructActionStatus(1));
+    api_.requestSpeedChange("ego", 1, true);
     api_.requestLaneChange(
       "ego",
       traffic_simulator::lane_change::RelativeTarget(
         "ego", traffic_simulator::lane_change::Direction::LEFT, 1, 0),
-      traffic_simulator::lane_change::TrajectoryShape::LINEAR,
+      traffic_simulator::lane_change::TrajectoryShape::CUBIC,
       traffic_simulator::lane_change::Constraint(
-        traffic_simulator::lane_change::Constraint::Type::TIME, 20.0));
+        traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE, 3.0));
   }
 };
 

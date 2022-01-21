@@ -466,6 +466,65 @@ TEST(Conversion, LaneletPose)
   EXPECT_LANELET_POSE_EQ(pose, proto);
 }
 
+TEST(Conversion, TrafficSignal)
+{
+  auto color = [](auto value) {
+    autoware_auto_perception_msgs::msg::TrafficLight traffic_light;
+    traffic_light.color = value;
+    EXPECT_EQ(traffic_light.color, value);
+    EXPECT_EQ(traffic_light.shape, 0);
+    EXPECT_EQ(traffic_light.status, 0);
+    return traffic_light;
+  };
+
+  auto shape = [](auto value) {
+    autoware_auto_perception_msgs::msg::TrafficLight traffic_light;
+    traffic_light.shape = value;
+    EXPECT_EQ(traffic_light.color, 0);
+    EXPECT_EQ(traffic_light.shape, value);
+    EXPECT_EQ(traffic_light.status, 0);
+    return traffic_light;
+  };
+
+  auto status = [](auto value) {
+    autoware_auto_perception_msgs::msg::TrafficLight traffic_light;
+    traffic_light.status = value;
+    EXPECT_EQ(traffic_light.color, 0);
+    EXPECT_EQ(traffic_light.shape, 0);
+    EXPECT_EQ(traffic_light.status, value);
+    return traffic_light;
+  };
+
+  autoware_auto_perception_msgs::msg::TrafficSignal message;
+  message.map_primitive_id = 123;
+  message.lights = {
+    status(autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN),
+    color(autoware_auto_perception_msgs::msg::TrafficLight::RED),
+    color(autoware_auto_perception_msgs::msg::TrafficLight::GREEN),
+    color(autoware_auto_perception_msgs::msg::TrafficLight::AMBER),
+    shape(autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW),
+    shape(autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW),
+    shape(autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW),
+    shape(autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW),
+  };
+
+  simulation_api_schema::TrafficLightState proto;
+
+  using LampState = simulation_api_schema::TrafficLightState::LampState;
+
+  EXPECT_NO_THROW(simulation_interface::toProto(message, proto));
+  EXPECT_EQ(proto.id(), 123);
+  EXPECT_NE(proto.lamp_states()[0].confidence(), 1.0);
+  EXPECT_EQ(proto.lamp_states()[0].type(), LampState::UNKNOWN);
+  EXPECT_EQ(proto.lamp_states()[1].type(), LampState::RED);
+  EXPECT_EQ(proto.lamp_states()[2].type(), LampState::GREEN);
+  EXPECT_EQ(proto.lamp_states()[3].type(), LampState::YELLOW);
+  EXPECT_EQ(proto.lamp_states()[4].type(), LampState::LEFT);
+  EXPECT_EQ(proto.lamp_states()[5].type(), LampState::RIGHT);
+  EXPECT_EQ(proto.lamp_states()[6].type(), LampState::UP);
+  EXPECT_EQ(proto.lamp_states()[7].type(), LampState::DOWN);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

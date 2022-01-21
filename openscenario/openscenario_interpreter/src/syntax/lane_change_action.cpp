@@ -36,7 +36,7 @@ auto LaneChangeAction::accomplished() -> bool
 {
   return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](auto && each) {
     const auto is_lane_changing = [](auto &&... xs) {
-      return connection.getCurrentAction(std::forward<decltype(xs)>(xs)...) == "lane_change";
+      return getCurrentAction(std::forward<decltype(xs)>(xs)...) == "lane_change";
     };
     return each.second or (each.second = not is_lane_changing(each.first));
   });
@@ -56,13 +56,13 @@ auto LaneChangeAction::start() -> void
 
   for (const auto & accomplishment : accomplishments) {
     if (lane_change_target.is<AbsoluteTargetLane>()) {
-      return connection.requestLaneChange(
+      return requestLaneChange(
         accomplishment.first, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
         static_cast<traffic_simulator::lane_change::TrajectoryShape>(
           lane_change_action_dynamics.dynamics_shape),
         static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
     } else {
-      return connection.requestLaneChange(
+      return requestLaneChange(
         accomplishment.first, static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
         static_cast<traffic_simulator::lane_change::TrajectoryShape>(
           lane_change_action_dynamics.dynamics_shape),

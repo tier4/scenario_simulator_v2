@@ -17,7 +17,6 @@
 
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>

@@ -51,6 +51,11 @@ auto Interpreter::currentLocalFrameRate() const -> std::chrono::milliseconds
   return std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000));
 }
 
+auto Interpreter::currentScenarioDefinition() const -> const std::shared_ptr<ScenarioDefinition> &
+{
+  return scenarios.front();
+}
+
 auto Interpreter::isAnErrorIntended() const -> bool { return intended_result == "error"; }
 
 auto Interpreter::isFailureIntended() const -> bool { return intended_result == "failure"; }
@@ -59,8 +64,7 @@ auto Interpreter::isSuccessIntended() const -> bool { return intended_result == 
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
-  const auto logic_file =
-    script.as<OpenScenario>().category.as<ScenarioDefinition>().road_network.logic_file;
+  const auto logic_file = currentScenarioDefinition()->road_network.logic_file;
 
   auto configuration = traffic_simulator::Configuration(
     logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
@@ -111,15 +115,13 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
 
-      if (getParameter<bool>("record", true)) {
-        record::start("-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+      script = std::make_shared<OpenScenario>(osc_path);
+
+      if (script->category.is<ScenarioDefinition>()) {
+        scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
+      } else {
+        throw SyntaxError("ParameterValueDistributionDefinition is not yet supported.");
       }
-
-      script.rebind<OpenScenario>(osc_path);
-
-      connect(shared_from_this(), makeCurrentConfiguration());
-
-      initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
 
       return Interpreter::Result::SUCCESS;  // => Inactive
     });
@@ -129,51 +131,64 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
   INTERPRETER_INFO_STREAM("Activating.");
 
-  execution_timer.clear();
+  if (scenarios.empty()) {
+    INTERPRETER_INFO_STREAM("There are no more scenarios to run.");
+    return Result::FAILURE;
+  } else {
+    if (getParameter<bool>("record", true)) {
+      record::start("-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+    }
 
-  (*publisher_of_context).on_activate();
+    connect(shared_from_this(), makeCurrentConfiguration());
 
-  assert((*publisher_of_context).is_activated());
+    initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
 
-  timer = create_wall_timer(currentLocalFrameRate(), [this]() {
-    withExceptionHandler(
-      [this](auto &&...) { deactivate(); },
-      [this]() -> void {
-        if (script) {
-          if (not script.as<OpenScenario>().complete()) {
-            const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
-              script.as<OpenScenario>().evaluate();
-              publishCurrentContext();
-              return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
-            });
+    execution_timer.clear();
 
-            if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
-              using namespace std::chrono;
-              const auto time_ms = duration_cast<milliseconds>(evaluate_time).count();
-              const auto & time_statistics = execution_timer.getStatistics("evaluate");
-              RCLCPP_WARN_STREAM(
-                get_logger(),
-                "The execution time of evaluate() ("
-                  << time_ms << " ms) is not in time. The current local frame rate ("
-                  << local_frame_rate << " Hz) (period = " << currentLocalFrameRate().count()
-                  << " ms) is too high. If the frame rate is less than "
-                  << static_cast<unsigned int>(1.0 / time_ms * 1e3)
-                  << " Hz, you will make it. (Statistics: count = " << time_statistics.count()
-                  << ", mean = " << duration_cast<milliseconds>(time_statistics.mean()).count()
-                  << " ms, max = " << duration_cast<milliseconds>(time_statistics.max()).count()
-                  << " ms, standard deviation = "
-                  << duration_cast<microseconds>(time_statistics.standardDeviation()).count() /
-                       1000.0
-                  << " ms)");
+    publisher_of_context->on_activate();
+
+    assert(publisher_of_context->is_activated());
+
+    timer = create_wall_timer(currentLocalFrameRate(), [this]() {
+      withExceptionHandler(
+        [this](auto &&...) { deactivate(); },
+        [this]() -> void {
+          if (currentScenarioDefinition()) {
+            if (not currentScenarioDefinition()->complete()) {
+              const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
+                currentScenarioDefinition()->evaluate();
+                publishCurrentContext();
+                return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
+              });
+
+              if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
+                using namespace std::chrono;
+                const auto time_ms = duration_cast<milliseconds>(evaluate_time).count();
+                const auto & time_statistics = execution_timer.getStatistics("evaluate");
+                RCLCPP_WARN_STREAM(
+                  get_logger(),
+                  "The execution time of evaluate() ("
+                    << time_ms << " ms) is not in time. The current local frame rate ("
+                    << local_frame_rate << " Hz) (period = " << currentLocalFrameRate().count()
+                    << " ms) is too high. If the frame rate is less than "
+                    << static_cast<unsigned int>(1.0 / time_ms * 1e3)
+                    << " Hz, you will make it. (Statistics: count = " << time_statistics.count()
+                    << ", mean = " << duration_cast<milliseconds>(time_statistics.mean()).count()
+                    << " ms, max = " << duration_cast<milliseconds>(time_statistics.max()).count()
+                    << " ms, standard deviation = "
+                    << duration_cast<microseconds>(time_statistics.standardDeviation()).count() /
+                         1000.0
+                    << " ms)");
+              }
             }
+          } else {
+            throw Error("No script evaluable");
           }
-        } else {
-          throw Error("No script evaluable");
-        }
-      });
-  });
+        });
+    });
 
-  return Interpreter::Result::SUCCESS;  // => Active
+    return Interpreter::Result::SUCCESS;  // => Active
+  }
 }
 
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
@@ -182,11 +197,14 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 
   timer.reset();  // Deactivate scenario evaluation
 
-  (*publisher_of_context).on_deactivate();
+  publisher_of_context->on_deactivate();
 
-  connection.~API();  // Deactivate traffic_simulator
+  disconnect();  // Deactivate traffic_simulator
 
-  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+  scenarios.pop_front();
+
+  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
+  // INFO_STREAM.
   boost::apply_visitor(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
@@ -204,8 +222,6 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
 {
   INTERPRETER_INFO_STREAM("CleaningUp.");
-
-  script.reset();
 
   return Interpreter::Result::SUCCESS;  // => Unconfigured
 }
@@ -234,11 +250,11 @@ auto Interpreter::publishCurrentContext() const -> void
   {
     nlohmann::json json;
     context.stamp = now();
-    context.data = (json << script.as<OpenScenario>()).dump();
-    context.time = connection.getCurrentTime();
+    context.data = (json << *currentScenarioDefinition()).dump();
+    context.time = getCurrentTime();
   }
 
-  (*publisher_of_context).publish(context);
+  publisher_of_context->publish(context);
 }
 }  // namespace openscenario_interpreter
 

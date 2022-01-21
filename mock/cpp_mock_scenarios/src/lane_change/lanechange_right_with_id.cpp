@@ -56,7 +56,7 @@ private:
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34513, 10, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
-    api_.setTargetSpeed("ego", 10, true);
+    api_.requestSpeedChange("ego", 10, true);
     api_.requestLaneChange("ego", 34462);
   }
 };

@@ -922,8 +922,7 @@ traffic_simulator_msgs::msg::LaneletPose HdMapUtils::getAlongLaneletPose(
 boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-  const traffic_simulator::lane_change::Parameter & lane_change_parameter,
-  double tangent_vector_size)
+  const traffic_simulator::lane_change::Parameter & lane_change_parameter)
 {
   double longitudinal_distance =
     traffic_simulator::lane_change::Parameter::default_lanechange_distance;
@@ -957,9 +956,16 @@ HdMapUtils::getLaneChangeTrajectory(
   const auto to_pose = traffic_simulator::helper::constructLaneletPose(
     lane_change_parameter.target.lanelet_id, collision_point.get(),
     lane_change_parameter.target.offset);
+  const auto goal_pose_in_map = toMapPose(to_pose).pose;
+  const auto from_pose_in_map = toMapPose(from_pose).pose;
+  double start_to_goal_distance = std::sqrt(
+    std::pow(from_pose_in_map.position.x - goal_pose_in_map.position.x, 2) +
+    std::pow(from_pose_in_map.position.y - goal_pose_in_map.position.y, 2) +
+    std::pow(from_pose_in_map.position.z - goal_pose_in_map.position.z, 2));
+
   auto traj = getLaneChangeTrajectory(
     toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape,
-    tangent_vector_size);
+    start_to_goal_distance * 0.5);
   return std::make_pair(traj, collision_point.get());
 }
 

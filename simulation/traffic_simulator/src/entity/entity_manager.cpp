@@ -565,12 +565,13 @@ bool EntityManager::trafficLightsChanged()
   return traffic_light_manager_ptr_->hasAnyLightChanged();
 }
 
-void EntityManager::setTargetSpeed(const std::string & name, double target_speed, bool continuous)
+void EntityManager::requestSpeedChange(
+  const std::string & name, double target_speed, bool continuous)
 {
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
-  return entities_.at(name)->setTargetSpeed(target_speed, continuous);
+  return entities_.at(name)->requestSpeedChange(target_speed, continuous);
 }
 
 void EntityManager::requestSpeedChange(
@@ -583,13 +584,13 @@ void EntityManager::requestSpeedChange(
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 
-void EntityManager::setTargetSpeed(
+void EntityManager::requestSpeedChange(
   const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
-  return entities_.at(name)->setTargetSpeed(target_speed, continuous);
+  return entities_.at(name)->requestSpeedChange(target_speed, continuous);
 }
 
 void EntityManager::requestSpeedChange(

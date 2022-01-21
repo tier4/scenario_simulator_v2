@@ -2,6 +2,50 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.2 (2022-01-20)
+------------------
+* Merge pull request `#671 <https://github.com/tier4/scenario_simulator_v2/issues/671>`_ from tier4/fix/lane_change_trajectory_shape
+* Merge pull request `#670 <https://github.com/tier4/scenario_simulator_v2/issues/670>`_ from tier4/feature/request_speed_change_in_pedestrian
+* Merge branch 'feature/request_speed_change_in_pedestrian' of https://github.com/tier4/scenario_simulator_v2 into fix/lane_change_trajectory_shape
+* enable set acceleration while walk straight state
+* modify trajectory tangent size
+* change speed linear in walk straight scenario
+* fix problem in passing driver model in pedestrian behavior plugin
+* add protected params
+* add protected parameters
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/speed-action
+* Merge pull request `#664 <https://github.com/tier4/scenario_simulator_v2/issues/664>`_ from tier4/feature/lateral_velocity_constraint
+* enable change adaptive parameters
+* modify scenario
+* add TIME constraint
+* fix typo
+* use switch
+* modify test scenario
+* split NPC logic by using constraint type
+* Merge pull request `#661 <https://github.com/tier4/scenario_simulator_v2/issues/661>`_ from tier4/feature/lane_change_trajectory_shape
+* remove debug line
+* Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* Merge branch 'master' into matsuura/feature/add-time-to-panel
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Merge pull request `#659 <https://github.com/tier4/scenario_simulator_v2/issues/659>`_ from tier4/release-0.6.1
+* sort lines
+* add debug line
+* move to .cpp
+* add << operator override
+* merge fix/galactic_build
+* modify argument type
+* add copy constructor
+* add constructor
+* rename to_lanelet_id to lane_change_parameters
+* Merge branch 'fix/galactic_build' of https://github.com/tier4/scenario_simulator.auto into feature/request_relative_speed_change
+* Merge branch 'fix/galactic_build' of https://github.com/tier4/scenario_simulator.auto into feature/request_relative_speed_change
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into matsuura/feature/add-time-to-panel
+* pull master
+* merge master
+* Merge tier4:master
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
 0.6.1 (2022-01-11)
 ------------------
 * Merge pull request `#655 <https://github.com/tier4/scenario_simulator_v2/issues/655>`_ from tier4/fix/galactic_build
