@@ -49,19 +49,48 @@ public:
 
   auto define(const Name &, const Object &) -> void;
 
-  auto find(const Name &) const -> Object;
+  template <typename T>
+  auto find(const Name & name) const -> Object
+  {
+    for (auto frame = this; frame; frame = frame->outer_frame) {
+      auto object = frame->lookdown(name);
+      if (object) {
+        return object;
+      }
+    }
 
-  auto find(const Prefixed<Name> &) const -> Object;
+    return Object();  // TODO SYNTAX_ERROR
+  }
+
+  template <typename T>
+  auto find(const Prefixed<Name> & prefixed_name) const -> Object
+  {
+    if (not prefixed_name.prefixes.empty()) {
+      auto found = frames(prefixed_name.prefixes.front());
+      switch (found.size()) {
+        case 0:
+          return Object();  // TODO SYNTAX_ERROR
+        case 1:
+          return found.front()->find<T>(prefixed_name.strip<1>());
+        default:
+          throw SyntaxError(
+            "Ambiguous reference to ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)),
+            ".");
+      }
+    } else {
+      return lookdown(prefixed_name.name);
+    }
+  }
 
   template <typename T>
   auto ref(const Prefixed<Name> & prefixed_name) const -> Object
   {
     if (prefixed_name.absolute) {
-      return outermostFrame().find(prefixed_name);
+      return outermostFrame().find<T>(prefixed_name);
     } else if (prefixed_name.prefixes.empty()) {
-      return find(prefixed_name.name);
+      return find<T>(prefixed_name.name);
     } else {
-      return lookupFrame(prefixed_name.prefixes.front())->find(prefixed_name.strip<1>());
+      return lookupFrame(prefixed_name.prefixes.front())->find<T>(prefixed_name.strip<1>());
     }
   }
 

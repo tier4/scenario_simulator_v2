@@ -37,37 +37,6 @@ auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
   variables.emplace(name, object);
 }
 
-auto EnvironmentFrame::find(const Name & name) const -> Object
-{
-  for (auto frame = this; frame; frame = frame->outer_frame) {
-    auto object = frame->lookdown(name);
-    if (object) {
-      return object;
-    }
-  }
-
-  return Object();  // TODO SYNTAX_ERROR
-}
-
-auto EnvironmentFrame::find(const Prefixed<Name> & prefixed_name) const -> Object
-{
-  if (not prefixed_name.prefixes.empty()) {
-    auto found = frames(prefixed_name.prefixes.front());
-    switch (found.size()) {
-      case 0:
-        return Object();  // TODO SYNTAX_ERROR
-      case 1:
-        return found.front()->find(prefixed_name.strip<1>());
-      default:
-        throw SyntaxError(
-          "Ambiguous reference to ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)),
-          ".");
-    }
-  } else {
-    return lookdown(prefixed_name.name);
-  }
-}
-
 auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
 {
   std::vector<const EnvironmentFrame *> same_level{this};
