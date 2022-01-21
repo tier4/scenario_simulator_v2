@@ -189,9 +189,17 @@ auto Scope::findObject(const std::string & name_) const -> Object
   return frame->findObject(name_);
 }
 
-auto Scope::global() const -> const GlobalEnvironment & { return *global_environment; }
+auto Scope::global() const -> const GlobalEnvironment &
+{
+  assert(global_environment);
+  return *global_environment;
+}
 
-auto Scope::global() -> GlobalEnvironment & { return *global_environment; }
+auto Scope::global() -> GlobalEnvironment &
+{
+  assert(global_environment);
+  return *global_environment;
+}
 
 auto Scope::local() const noexcept -> const Scope & { return *this; }
 
