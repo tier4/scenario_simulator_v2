@@ -63,8 +63,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   std::list<std::shared_ptr<ScenarioDefinition>> scenarios;
 
-  std::shared_ptr<ScenarioDefinition> current_scenario;
-
   std::shared_ptr<rclcpp::TimerBase> timer;
 
   common::JUnit5 results;
@@ -80,6 +78,8 @@ public:
   explicit Interpreter(const rclcpp::NodeOptions &);
 
   auto currentLocalFrameRate() const -> std::chrono::milliseconds;
+
+  auto currentScenarioDefinition() const -> const std::shared_ptr<ScenarioDefinition> &;
 
   auto isAnErrorIntended() const -> bool;
 
