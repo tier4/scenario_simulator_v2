@@ -126,66 +126,66 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
   INTERPRETER_INFO_STREAM("Activating.");
 
   if (scenarios.empty()) {
-    std::cout << "scnearios is empty" << std::endl;
+    INTERPRETER_INFO_STREAM("There are no more scenarios to run.");
     return Result::FAILURE;
-  }
+  } else {
+    current_scenario = std::move(scenarios.front());
+    scenarios.pop_front();
 
-  current_scenario = std::move(scenarios.front());
-  scenarios.pop_front();
+    if (getParameter<bool>("record", true)) {
+      record::start("-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+    }
 
-  if (getParameter<bool>("record", true)) {
-    record::start("-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
-  }
+    connect(shared_from_this(), makeCurrentConfiguration());
 
-  connect(shared_from_this(), makeCurrentConfiguration());
+    initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
 
-  initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
+    execution_timer.clear();
 
-  execution_timer.clear();
+    publisher_of_context->on_activate();
 
-  publisher_of_context->on_activate();
+    assert(publisher_of_context->is_activated());
 
-  assert(publisher_of_context->is_activated());
+    timer = create_wall_timer(currentLocalFrameRate(), [this]() {
+      withExceptionHandler(
+        [this](auto &&...) { deactivate(); },
+        [this]() -> void {
+          if (current_scenario) {
+            if (not current_scenario->complete()) {
+              const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
+                current_scenario->evaluate();
+                publishCurrentContext();
+                return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
+              });
 
-  timer = create_wall_timer(currentLocalFrameRate(), [this]() {
-    withExceptionHandler(
-      [this](auto &&...) { deactivate(); },
-      [this]() -> void {
-        if (current_scenario) {
-          if (not current_scenario->complete()) {
-            const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
-              current_scenario->evaluate();
-              publishCurrentContext();
-              return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
-            });
-
-            if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
-              using namespace std::chrono;
-              const auto time_ms = duration_cast<milliseconds>(evaluate_time).count();
-              const auto & time_statistics = execution_timer.getStatistics("evaluate");
-              RCLCPP_WARN_STREAM(
-                get_logger(),
-                "The execution time of evaluate() ("
-                  << time_ms << " ms) is not in time. The current local frame rate ("
-                  << local_frame_rate << " Hz) (period = " << currentLocalFrameRate().count()
-                  << " ms) is too high. If the frame rate is less than "
-                  << static_cast<unsigned int>(1.0 / time_ms * 1e3)
-                  << " Hz, you will make it. (Statistics: count = " << time_statistics.count()
-                  << ", mean = " << duration_cast<milliseconds>(time_statistics.mean()).count()
-                  << " ms, max = " << duration_cast<milliseconds>(time_statistics.max()).count()
-                  << " ms, standard deviation = "
-                  << duration_cast<microseconds>(time_statistics.standardDeviation()).count() /
-                       1000.0
-                  << " ms)");
+              if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
+                using namespace std::chrono;
+                const auto time_ms = duration_cast<milliseconds>(evaluate_time).count();
+                const auto & time_statistics = execution_timer.getStatistics("evaluate");
+                RCLCPP_WARN_STREAM(
+                  get_logger(),
+                  "The execution time of evaluate() ("
+                    << time_ms << " ms) is not in time. The current local frame rate ("
+                    << local_frame_rate << " Hz) (period = " << currentLocalFrameRate().count()
+                    << " ms) is too high. If the frame rate is less than "
+                    << static_cast<unsigned int>(1.0 / time_ms * 1e3)
+                    << " Hz, you will make it. (Statistics: count = " << time_statistics.count()
+                    << ", mean = " << duration_cast<milliseconds>(time_statistics.mean()).count()
+                    << " ms, max = " << duration_cast<milliseconds>(time_statistics.max()).count()
+                    << " ms, standard deviation = "
+                    << duration_cast<microseconds>(time_statistics.standardDeviation()).count() /
+                         1000.0
+                    << " ms)");
+              }
             }
+          } else {
+            throw Error("No script evaluable");
           }
-        } else {
-          throw Error("No script evaluable");
-        }
-      });
-  });
+        });
+    });
 
-  return Interpreter::Result::SUCCESS;  // => Active
+    return Interpreter::Result::SUCCESS;  // => Active
+  }
 }
 
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
