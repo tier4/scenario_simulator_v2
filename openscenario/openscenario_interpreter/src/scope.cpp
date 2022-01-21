@@ -125,16 +125,7 @@ auto EnvironmentFrame::frames(const Name & name) const -> std::list<const Enviro
 
 auto EnvironmentFrame::outermostFrame() const noexcept -> const EnvironmentFrame &
 {
-  auto frame = this;
-
-  while (not frame->isOutermost()) {
-    frame = frame->outer_frame;
-  }
-
-  assert(frame);
-  assert(frame->isOutermost());
-
-  return *frame;
+  return isOutermost() ? *this : outer_frame->outermostFrame();
 }
 
 auto EnvironmentFrame::lookupFrame(const Name & name) const -> const EnvironmentFrame *
