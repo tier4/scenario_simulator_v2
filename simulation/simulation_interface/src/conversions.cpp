@@ -564,18 +564,36 @@ void toProto(
     }
   };
 
+  auto has_convertible_status = [](auto && traffic_light) {
+    switch (traffic_light.status) {
+      case autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN:
+        return true;
+      default:
+        return false;
+    }
+  };
+
   proto.set_id(traffic_light_state.map_primitive_id);
 
-  for (const autoware_auto_perception_msgs::msg::TrafficLight & traffic_light : traffic_light_state.lights) {
-    if (has_convertible_color(traffic_light)) {
+  for (const auto & traffic_light : traffic_light_state.lights) {
+    if (traffic_light.color and has_convertible_color(traffic_light)) {
       simulation_api_schema::TrafficLightState::LampState lamp_state;
-      lamp_state.set_confidence(1.0);
+      lamp_state.set_confidence(traffic_light.confidence);
       lamp_state.set_type(convert_color(traffic_light.color));
       *proto.add_lamp_states() = lamp_state;
-    } else if (has_convertible_shape(traffic_light)) {
+    }
+
+    if (traffic_light.shape and has_convertible_shape(traffic_light)) {
       simulation_api_schema::TrafficLightState::LampState lamp_state;
-      lamp_state.set_confidence(1.0);
+      lamp_state.set_confidence(traffic_light.confidence);
       lamp_state.set_type(convert_shape(traffic_light.shape));
+      *proto.add_lamp_states() = lamp_state;
+    }
+
+    if (traffic_light.status and has_convertible_status(traffic_light)) {
+      simulation_api_schema::TrafficLightState::LampState lamp_state;
+      lamp_state.set_confidence(traffic_light.confidence);
+      lamp_state.set_type(simulation_api_schema::TrafficLightState::LampState::UNKNOWN);
       *proto.add_lamp_states() = lamp_state;
     }
   }
