@@ -53,8 +53,8 @@ public:
 
   auto find(const Prefixed<Name> &) const -> Object;
 
-  template <typename T = Object>
-  auto findObject(const Prefixed<Name> & prefixed_name) const -> Object
+  template <typename T>
+  auto ref(const Prefixed<Name> & prefixed_name) const -> Object
   {
     if (prefixed_name.absolute) {
       return outermostFrame().find(prefixed_name);
@@ -113,7 +113,11 @@ public:
 
   explicit Scope(const boost::filesystem::path &);
 
-  auto findObject(const std::string &) const -> Object;
+  template <typename... Ts>
+  auto ref(Ts &&... xs) const -> decltype(auto)
+  {
+    return frame->ref<Object>(std::forward<decltype(xs)>(xs)...);
+  }
 
   auto global() const -> const GlobalEnvironment &;
 

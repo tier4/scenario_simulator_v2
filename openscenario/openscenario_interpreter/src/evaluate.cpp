@@ -203,7 +203,7 @@ struct Grammar : qi::grammar<Iter, Value(), ascii::space_type>
 
   static auto toValue(const std::string & key, const Scope & scope) -> Value
   {
-    auto found = scope.findObject(key);
+    auto found = scope.ref(key);
     if (not found) {
       THROW_SYNTAX_ERROR(std::quoted(key), "is not declared in this scope");
     }

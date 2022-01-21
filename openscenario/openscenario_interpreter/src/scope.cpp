@@ -173,11 +173,6 @@ Scope::Scope(const std::string & name, const Scope & outer)
 {
 }
 
-auto Scope::findObject(const std::string & name_) const -> Object
-{
-  return frame->findObject(name_);
-}
-
 auto Scope::global() const -> const GlobalEnvironment &
 {
   assert(global_environment);

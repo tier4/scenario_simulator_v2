@@ -42,7 +42,7 @@ auto TrafficSignalControllerCondition::description() const -> String
 
 auto TrafficSignalControllerCondition::evaluate() -> Object
 {
-  const auto & found = scope.findObject(traffic_signal_controller_ref);
+  const auto & found = scope.ref(traffic_signal_controller_ref);
   if (found and found.is<TrafficSignalController>()) {
     const auto & controller = found.as<TrafficSignalController>();
     current_phase_name = controller.currentPhaseName();
