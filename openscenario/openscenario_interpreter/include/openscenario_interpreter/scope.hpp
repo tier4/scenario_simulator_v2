@@ -17,6 +17,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/range/algorithm.hpp>
 #include <memory>
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
@@ -67,14 +68,37 @@ public:
   template <typename T>
   auto find(const Name & name) const -> Object
   {
-    for (auto frame = this; frame; frame = frame->outer_frame) {
-      const auto object = frame->lookdown(name);
-      if (object) {
-        return object;
+    for (std::vector<const EnvironmentFrame *> frames{this}; not frames.empty();) {
+      const auto objects = [&]() {
+        std::vector<Object> result;
+        for (auto && frame : frames) {
+          boost::range::for_each(frame->variables.equal_range(name), [&](auto && name_and_value) {
+            return result.push_back(name_and_value.second);
+          });
+        }
+        return result;
+      }();
+
+      switch (objects.size()) {
+        case 0:
+          frames = [&]() {
+            std::vector<const EnvironmentFrame *> result;
+            for (auto && current_frame : frames) {
+              std::copy(
+                std::cbegin(current_frame->unnamed_inner_frames),
+                std::cend(current_frame->unnamed_inner_frames), std::back_inserter(result));
+            }
+            return result;
+          }();
+          break;
+        case 1:
+          return objects.front();
+        default:
+          throw AmbiguousReferenceTo(name);
       }
     }
 
-    throw NoSuchVariableNamed(name);
+    return isOutermost() ? throw NoSuchVariableNamed(name) : outer_frame->find<T>(name);
   }
 
   template <typename T>
@@ -112,7 +136,7 @@ public:
 private:
   auto resolveFrontPrefix(const Prefixed<Name> &) const -> std::list<const EnvironmentFrame *>;
 
-  auto lookdown(const Name &) const -> Object;
+  // auto lookdown(const Name &) const -> Object;
 
   auto lookupFrame(const Prefixed<Name> &) const -> const EnvironmentFrame *;
 

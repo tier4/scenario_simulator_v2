@@ -14,7 +14,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/range/algorithm.hpp>
 #include <cassert>
 #include <iterator>
 #include <openscenario_interpreter/scope.hpp>
@@ -36,43 +35,6 @@ EnvironmentFrame::EnvironmentFrame(EnvironmentFrame & outer_frame, const std::st
 auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
 {
   variables.emplace(name, object);
-}
-
-auto EnvironmentFrame::lookdown(const Name & name) const -> Object
-{
-  auto pass_through = [&](const auto & current_frames) {
-    std::vector<const EnvironmentFrame *> result;
-
-    for (auto && current_frame : current_frames) {
-      std::copy(
-        std::cbegin(current_frame->unnamed_inner_frames),
-        std::cend(current_frame->unnamed_inner_frames), std::back_inserter(result));
-    }
-
-    return result;
-  };
-
-  for (std::vector<const EnvironmentFrame *> frames{this}; not frames.empty();) {
-    std::vector<Object> result;
-
-    for (auto && frame : frames) {
-      boost::range::for_each(frame->variables.equal_range(name), [&](auto && name_and_value) {
-        return result.push_back(name_and_value.second);
-      });
-    }
-
-    switch (result.size()) {
-      case 0:
-        frames = pass_through(frames);
-        break;
-      case 1:
-        return result.front();
-      default:
-        throw AmbiguousReferenceTo(name);
-    }
-  }
-
-  return Object();
 }
 
 auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
