@@ -31,13 +31,27 @@ class EnvironmentFrame
 {
   friend struct Scope;
 
-  std::unordered_multimap<std::string, Object> variables;
+  std::multimap<std::string, Object> variables;  // NOTE: must be ordered.
 
   EnvironmentFrame * const outer_frame = nullptr;
 
-  std::unordered_multimap<std::string, EnvironmentFrame *> inner_frames;
+  std::multimap<std::string, EnvironmentFrame *> inner_frames;  // NOTE: must be ordered.
 
   std::vector<EnvironmentFrame *> unnamed_inner_frames;
+
+#define DEFINE_SYNTAX_ERROR(TYPENAME, ...)                 \
+  struct TYPENAME : public SyntaxError                     \
+  {                                                        \
+    explicit TYPENAME(const std::string & variable)        \
+    : SyntaxError(__VA_ARGS__, std::quoted(variable), ".") \
+    {                                                      \
+    }                                                      \
+  }
+
+  DEFINE_SYNTAX_ERROR(AmbiguousReferenceTo, "Ambiguous reference to ");
+  DEFINE_SYNTAX_ERROR(NoSuchVariableNamed, "No such variable named ");
+
+#undef DEFINE_SYNTAX_ERROR
 
   explicit EnvironmentFrame() = default;
 
@@ -54,13 +68,13 @@ public:
   auto find(const Name & name) const -> Object
   {
     for (auto frame = this; frame; frame = frame->outer_frame) {
-      auto object = frame->lookdown(name);
+      const auto object = frame->lookdown(name);
       if (object) {
         return object;
       }
     }
 
-    throw SyntaxError("No such variable ", std::quoted(name));
+    throw NoSuchVariableNamed(name);
   }
 
   template <typename T>
@@ -70,17 +84,14 @@ public:
       auto found = resolveFrontPrefix(prefixed_name);
       switch (found.size()) {
         case 0:
-          throw SyntaxError(
-            "No such variable ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)), ".");
+          throw NoSuchVariableNamed(boost::lexical_cast<std::string>(prefixed_name));
         case 1:
           return found.front()->find<T>(prefixed_name.strip<1>());
         default:
-          throw SyntaxError(
-            "Ambiguous reference to ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)),
-            ".");
+          throw AmbiguousReferenceTo(boost::lexical_cast<std::string>(prefixed_name));
       }
     } else {
-      return lookdown(prefixed_name.name);
+      return find<T>(prefixed_name.name);
     }
   }
 
@@ -101,7 +112,7 @@ public:
 private:
   auto resolveFrontPrefix(const Prefixed<Name> &) const -> std::list<const EnvironmentFrame *>;
 
-  auto lookdown(const std::string &) const -> Object;
+  auto lookdown(const Name &) const -> Object;
 
   auto lookupFrame(const Prefixed<Name> &) const -> const EnvironmentFrame *;
 

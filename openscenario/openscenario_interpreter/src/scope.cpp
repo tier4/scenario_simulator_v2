@@ -38,7 +38,7 @@ auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
   variables.emplace(name, object);
 }
 
-auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
+auto EnvironmentFrame::lookdown(const Name & name) const -> Object
 {
   auto pass_through = [&](const auto & current_frames) {
     std::vector<const EnvironmentFrame *> result;
@@ -68,7 +68,7 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
       case 1:
         return result.front();
       default:
-        throw SyntaxError("Ambiguous reference to ", std::quoted(name));
+        throw AmbiguousReferenceTo(name);
     }
   }
 
@@ -82,13 +82,12 @@ auto EnvironmentFrame::resolveFrontPrefix(const Prefixed<Name> & prefixed_name) 
 {
   std::list<const EnvironmentFrame *> result;
 
-  auto range = inner_frames.equal_range(prefixed_name.prefixes.front());
-
-  for (auto it = range.first; it != range.second; ++it) {
-    result.push_back(it->second);
-  }
+  boost::range::for_each(
+    inner_frames.equal_range(prefixed_name.prefixes.front()),
+    [&](auto && name_and_frame) { result.push_back(name_and_frame.second); });
 
   if (result.empty()) {
+    // BUG: must be breadth first search
     for (auto & child : unnamed_inner_frames) {
       result.merge(child->resolveFrontPrefix(prefixed_name));
     }
