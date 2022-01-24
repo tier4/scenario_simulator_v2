@@ -64,7 +64,7 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
       case 1:
         return result.front();
       default:
-        throw SyntaxError("ambiguous reference to ", std::quoted(name));
+        throw SyntaxError("Ambiguous reference to ", std::quoted(name));
     }
   }
 
@@ -73,11 +73,12 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
 
 auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
 
-auto EnvironmentFrame::frames(const Name & name) const -> std::list<const EnvironmentFrame *>
+auto EnvironmentFrame::frames(const Prefixed<Name> & prefixed_name) const
+  -> std::list<const EnvironmentFrame *>
 {
   std::list<const EnvironmentFrame *> result;
 
-  auto range = inner_frames.equal_range(name);
+  auto range = inner_frames.equal_range(prefixed_name.prefixes.front());
 
   for (auto it = range.first; it != range.second; ++it) {
     result.push_back(it->second);
@@ -85,7 +86,7 @@ auto EnvironmentFrame::frames(const Name & name) const -> std::list<const Enviro
 
   if (result.empty()) {
     for (auto & child : unnamed_inner_frames) {
-      result.merge(child->frames(name));
+      result.merge(child->frames(prefixed_name));
     }
   }
 
@@ -97,25 +98,26 @@ auto EnvironmentFrame::outermostFrame() const noexcept -> const EnvironmentFrame
   return isOutermost() ? *this : outer_frame->outermostFrame();
 }
 
-auto EnvironmentFrame::lookupFrame(const Name & name) const -> const EnvironmentFrame *
+auto EnvironmentFrame::lookupFrame(const Prefixed<Name> & prefixed_name) const
+  -> const EnvironmentFrame *
 {
-  assert(not name.empty());
+  assert(not prefixed_name.prefixes.empty());
 
   if (isOutermost()) {
     return this;
   } else {
-    auto sibling_scope = outer_frame->frames(name);
+    auto sibling_scope = outer_frame->frames(prefixed_name);
     switch (sibling_scope.size()) {
       case 0:
         assert(outer_frame);
-        return outer_frame->lookupFrame(name);
+        return outer_frame->lookupFrame(prefixed_name);
       case 1:
         assert(sibling_scope.front());
         return sibling_scope.front();
       default:
         throw SyntaxError(
           "There are multiple StoryboardElements that can be referenced by the name ",
-          std::quoted(name), ".");
+          std::quoted(boost::lexical_cast<std::string>(prefixed_name)), ".");
     }
   }
 }

@@ -47,6 +47,10 @@ struct Prefixed  // NOTE: 1.4.5. Naming conventions for OpenSCENARIO references
 
   Prefixed() = delete;
 
+  Prefixed(Prefixed &&) = default;
+
+  Prefixed(const Prefixed &) = delete;
+
   explicit Prefixed(bool absolute, const std::list<std::string> & prefixes, const Name & name)
   : absolute(absolute), prefixes(prefixes), name(name)
   {

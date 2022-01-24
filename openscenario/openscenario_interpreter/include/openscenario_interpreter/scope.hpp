@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include <memory>
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
@@ -59,17 +60,18 @@ public:
       }
     }
 
-    return Object();  // TODO SYNTAX_ERROR
+    throw SyntaxError("No such variable ", std::quoted(name));
   }
 
   template <typename T>
   auto find(const Prefixed<Name> & prefixed_name) const -> Object
   {
     if (not prefixed_name.prefixes.empty()) {
-      auto found = frames(prefixed_name.prefixes.front());
+      auto found = frames(prefixed_name);
       switch (found.size()) {
         case 0:
-          return Object();  // TODO SYNTAX_ERROR
+          throw SyntaxError(
+            "No such variable ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)), ".");
         case 1:
           return found.front()->find<T>(prefixed_name.strip<1>());
         default:
@@ -90,18 +92,18 @@ public:
     } else if (prefixed_name.prefixes.empty()) {
       return find<T>(prefixed_name.name);
     } else {
-      return lookupFrame(prefixed_name.prefixes.front())->find<T>(prefixed_name.strip<1>());
+      return lookupFrame(prefixed_name)->find<T>(prefixed_name.strip<1>());
     }
   }
 
   auto isOutermost() const noexcept -> bool;
 
 private:
-  auto frames(const Name &) const -> std::list<const EnvironmentFrame *>;
+  auto frames(const Prefixed<Name> &) const -> std::list<const EnvironmentFrame *>;
 
   auto lookdown(const std::string &) const -> Object;
 
-  auto lookupFrame(const Name &) const -> const EnvironmentFrame *;
+  auto lookupFrame(const Prefixed<Name> &) const -> const EnvironmentFrame *;
 
   auto outermostFrame() const noexcept -> const EnvironmentFrame &;
 };
