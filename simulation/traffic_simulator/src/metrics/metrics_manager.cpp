@@ -76,10 +76,8 @@ void MetricsManager::calculate()
     if (metrics_[name]->getLifecycle() == MetricLifecycle::FAILURE) {
       metrics_[name]->throwException();
     }
-    // metrics_.erase(name);
   }
   log_[std::to_string(entity_manager_ptr_->getCurrentTime())] = log;
-  // file_ << log_;
 }
 
 void MetricsManager::setEntityManager(
