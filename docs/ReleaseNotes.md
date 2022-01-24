@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
 
 ## Version 0.6.2
 - Start supporting linear trajectory shape while changing lane. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/661))
