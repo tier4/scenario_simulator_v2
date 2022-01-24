@@ -67,7 +67,7 @@ public:
   auto find(const Prefixed<Name> & prefixed_name) const -> Object
   {
     if (not prefixed_name.prefixes.empty()) {
-      auto found = frames(prefixed_name);
+      auto found = resolveFrontPrefix(prefixed_name);
       switch (found.size()) {
         case 0:
           throw SyntaxError(
@@ -99,7 +99,7 @@ public:
   auto isOutermost() const noexcept -> bool;
 
 private:
-  auto frames(const Prefixed<Name> &) const -> std::list<const EnvironmentFrame *>;
+  auto resolveFrontPrefix(const Prefixed<Name> &) const -> std::list<const EnvironmentFrame *>;
 
   auto lookdown(const std::string &) const -> Object;
 

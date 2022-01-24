@@ -73,7 +73,7 @@ auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
 
 auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
 
-auto EnvironmentFrame::frames(const Prefixed<Name> & prefixed_name) const
+auto EnvironmentFrame::resolveFrontPrefix(const Prefixed<Name> & prefixed_name) const
   -> std::list<const EnvironmentFrame *>
 {
   std::list<const EnvironmentFrame *> result;
@@ -86,7 +86,7 @@ auto EnvironmentFrame::frames(const Prefixed<Name> & prefixed_name) const
 
   if (result.empty()) {
     for (auto & child : unnamed_inner_frames) {
-      result.merge(child->frames(prefixed_name));
+      result.merge(child->resolveFrontPrefix(prefixed_name));
     }
   }
 
@@ -106,7 +106,7 @@ auto EnvironmentFrame::lookupFrame(const Prefixed<Name> & prefixed_name) const
   if (isOutermost()) {
     return this;
   } else {
-    auto sibling_scope = outer_frame->frames(prefixed_name);
+    auto sibling_scope = outer_frame->resolveFrontPrefix(prefixed_name);
     switch (sibling_scope.size()) {
       case 0:
         assert(outer_frame);
