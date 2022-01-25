@@ -28,6 +28,30 @@
 
 namespace openscenario_interpreter
 {
+template <typename T>
+struct is
+{
+  auto operator()(const Object & object) const { return object.is<T>(); }
+};
+
+template <>
+struct is<Object>
+{
+  auto operator()(const Object &) const noexcept { return true; }
+};
+
+template <typename T>
+auto as(const Object & object) -> decltype(auto)
+{
+  return object.as<T>();
+}
+
+template <>
+constexpr auto as<Object>(const Object & object) -> decltype(auto)
+{
+  return object;
+}
+
 class EnvironmentFrame
 {
   friend struct Scope;
@@ -66,10 +90,10 @@ public:
   auto define(const Name &, const Object &) -> void;
 
   template <typename T>
-  auto find(const Name & name) const -> Object
+  auto find(const Name & name) const -> T
   {
     for (std::vector<const EnvironmentFrame *> frames{this}; not frames.empty();) {
-      const auto objects = [&]() {
+      auto objects = [&]() {
         std::vector<Object> result;
         for (auto && frame : frames) {
           boost::range::for_each(frame->variables.equal_range(name), [&](auto && name_and_value) {
@@ -79,20 +103,18 @@ public:
         return result;
       }();
 
-      switch (objects.size()) {
+      switch (boost::range::count_if(objects, is<T>())) {
         case 0:
           frames = [&]() {
             std::vector<const EnvironmentFrame *> result;
             for (auto && current_frame : frames) {
-              std::copy(
-                std::cbegin(current_frame->unnamed_inner_frames),
-                std::cend(current_frame->unnamed_inner_frames), std::back_inserter(result));
+              boost::range::copy(current_frame->unnamed_inner_frames, std::back_inserter(result));
             }
             return result;
           }();
           break;
         case 1:
-          return objects.front();
+          return as<T>(*boost::range::find_if(objects, is<T>()));
         default:
           throw AmbiguousReferenceTo(name);
       }
@@ -102,10 +124,10 @@ public:
   }
 
   template <typename T>
-  auto find(const Prefixed<Name> & prefixed_name) const -> Object
+  auto find(const Prefixed<Name> & prefixed_name) const -> T
   {
     if (not prefixed_name.prefixes.empty()) {
-      auto found = resolveFrontPrefix(prefixed_name);
+      const auto found = resolveFrontPrefix(prefixed_name);
       switch (found.size()) {
         case 0:
           throw NoSuchVariableNamed(boost::lexical_cast<std::string>(prefixed_name));
@@ -120,7 +142,7 @@ public:
   }
 
   template <typename T>
-  auto ref(const Prefixed<Name> & prefixed_name) const -> Object
+  auto ref(const Prefixed<Name> & prefixed_name) const -> T
   {
     if (prefixed_name.absolute) {
       return outermostFrame().find<T>(prefixed_name);
@@ -135,8 +157,6 @@ public:
 
 private:
   auto resolveFrontPrefix(const Prefixed<Name> &) const -> std::list<const EnvironmentFrame *>;
-
-  // auto lookdown(const Name &) const -> Object;
 
   auto lookupFrame(const Prefixed<Name> &) const -> const EnvironmentFrame *;
 
