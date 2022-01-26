@@ -40,18 +40,6 @@ struct is<Object>
   auto operator()(const Object &) const noexcept { return true; }
 };
 
-template <typename T>
-auto as(const Object & object) -> decltype(auto)
-{
-  return object.as<T>();
-}
-
-template <>
-constexpr auto as<Object>(const Object & object) -> decltype(auto)
-{
-  return object;
-}
-
 class EnvironmentFrame
 {
   friend struct Scope;
@@ -78,11 +66,6 @@ class EnvironmentFrame
 
 #undef DEFINE_SYNTAX_ERROR
 
-  template <typename T>
-  using reference = typename std::conditional<
-    std::is_same<Object, typename std::decay<T>::type>::value,
-    typename std::remove_reference<T>::type, typename std::add_lvalue_reference<T>::type>::type;
-
   explicit EnvironmentFrame() = default;
 
   explicit EnvironmentFrame(EnvironmentFrame &, const std::string &);
@@ -95,7 +78,7 @@ public:
   auto define(const Name &, const Object &) -> void;
 
   template <typename T>
-  auto find(const Name & name) const -> reference<T>
+  auto find(const Name & name) const -> Object
   {
     // NOTE: breadth first search
     for (std::vector<const EnvironmentFrame *> frames{this}; not frames.empty();) {
@@ -120,7 +103,7 @@ public:
           }();
           break;
         case 1:
-          return as<T>(*boost::range::find_if(objects, is<T>()));
+          return *boost::range::find_if(objects, is<T>());
         default:
           throw AmbiguousReferenceTo(name);
       }
@@ -130,7 +113,7 @@ public:
   }
 
   template <typename T>
-  auto find(const Prefixed<Name> & prefixed_name) const -> reference<T>
+  auto find(const Prefixed<Name> & prefixed_name) const -> Object
   {
     if (not prefixed_name.prefixes.empty()) {
       const auto found = resolveFrontPrefix(prefixed_name);
@@ -148,7 +131,7 @@ public:
   }
 
   template <typename T>
-  auto ref(const Prefixed<Name> & prefixed_name) const -> reference<T>
+  auto ref(const Prefixed<Name> & prefixed_name) const -> Object
   {
     if (prefixed_name.absolute) {
       return outermostFrame().find<T>(prefixed_name);
@@ -205,10 +188,16 @@ public:
 
   explicit Scope(const boost::filesystem::path &);
 
+  template <typename... Ts>
+  auto ref(Ts &&... xs) const -> decltype(auto)
+  {
+    return frame->ref<Object>(std::forward<decltype(xs)>(xs)...);
+  }
+
   template <typename T, typename... Ts>
   auto ref(Ts &&... xs) const -> decltype(auto)
   {
-    return frame->ref<T>(std::forward<decltype(xs)>(xs)...);
+    return frame->ref<T>(std::forward<decltype(xs)>(xs)...).template as<T>();
   }
 
   auto global() const -> const GlobalEnvironment &;

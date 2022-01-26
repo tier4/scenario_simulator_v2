@@ -32,7 +32,7 @@ auto ParameterModifyAction::accomplished() noexcept -> bool { return true; }
 auto ParameterModifyAction::run() -> void
 {
   try {
-    const auto target = local().ref<Object>(parameter_ref);
+    const auto target = local().ref(parameter_ref);
     if (rule.is<ParameterAddValueRule>()) {
       rule.as<ParameterAddValueRule>()(target);
     } else {
