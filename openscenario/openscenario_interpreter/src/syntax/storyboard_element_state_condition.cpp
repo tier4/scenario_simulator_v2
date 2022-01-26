@@ -43,7 +43,8 @@ auto StoryboardElementStateCondition::description() const -> String
 auto StoryboardElementStateCondition::evaluate() -> Object
 {
   try {
-    result = local().ref(storyboard_element_ref).currentState().as<StoryboardElementState>();
+    result =
+      local().ref<Object>(storyboard_element_ref).currentState().as<StoryboardElementState>();
     return asBoolean(result == state);
   } catch (const std::out_of_range &) {
     return false_v;

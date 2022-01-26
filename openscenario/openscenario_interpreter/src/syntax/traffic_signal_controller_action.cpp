@@ -34,7 +34,7 @@ auto TrafficSignalControllerAction::endsImmediately() noexcept -> bool { return 
 
 auto TrafficSignalControllerAction::run() -> void
 {
-  auto found = local().ref(traffic_signal_controller_ref);
+  const auto found = local().ref<Object>(traffic_signal_controller_ref);
   if (found and found.is<TrafficSignalController>()) {
     found.as<TrafficSignalController>().changePhaseTo(phase);
   } else {

@@ -78,6 +78,11 @@ class EnvironmentFrame
 
 #undef DEFINE_SYNTAX_ERROR
 
+  template <typename T>
+  using reference = typename std::conditional<
+    std::is_same<Object, typename std::decay<T>::type>::value,
+    typename std::remove_reference<T>::type, typename std::add_lvalue_reference<T>::type>::type;
+
   explicit EnvironmentFrame() = default;
 
   explicit EnvironmentFrame(EnvironmentFrame &, const std::string &);
@@ -90,8 +95,9 @@ public:
   auto define(const Name &, const Object &) -> void;
 
   template <typename T>
-  auto find(const Name & name) const -> T
+  auto find(const Name & name) const -> reference<T>
   {
+    // NOTE: breadth first search
     for (std::vector<const EnvironmentFrame *> frames{this}; not frames.empty();) {
       auto objects = [&]() {
         std::vector<Object> result;
@@ -124,7 +130,7 @@ public:
   }
 
   template <typename T>
-  auto find(const Prefixed<Name> & prefixed_name) const -> T
+  auto find(const Prefixed<Name> & prefixed_name) const -> reference<T>
   {
     if (not prefixed_name.prefixes.empty()) {
       const auto found = resolveFrontPrefix(prefixed_name);
@@ -142,7 +148,7 @@ public:
   }
 
   template <typename T>
-  auto ref(const Prefixed<Name> & prefixed_name) const -> T
+  auto ref(const Prefixed<Name> & prefixed_name) const -> reference<T>
   {
     if (prefixed_name.absolute) {
       return outermostFrame().find<T>(prefixed_name);
@@ -199,10 +205,10 @@ public:
 
   explicit Scope(const boost::filesystem::path &);
 
-  template <typename... Ts>
+  template <typename T, typename... Ts>
   auto ref(Ts &&... xs) const -> decltype(auto)
   {
-    return frame->ref<Object>(std::forward<decltype(xs)>(xs)...);
+    return frame->ref<T>(std::forward<decltype(xs)>(xs)...);
   }
 
   auto global() const -> const GlobalEnvironment &;
