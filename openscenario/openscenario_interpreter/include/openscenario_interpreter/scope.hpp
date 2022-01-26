@@ -104,7 +104,7 @@ public:
   auto find(const Prefixed<Name> & prefixed_name) const -> Object
   {
     if (not prefixed_name.prefixes.empty()) {
-      const auto found = resolveFrontPrefix(prefixed_name);
+      const auto found = resolvePrefix(prefixed_name);
       switch (found.size()) {
         case 0:
           throw NoSuchVariableNamed(boost::lexical_cast<std::string>(prefixed_name));
@@ -133,7 +133,7 @@ public:
   auto isOutermost() const noexcept -> bool;
 
 private:
-  auto resolveFrontPrefix(const Prefixed<Name> &) const -> std::list<const EnvironmentFrame *>;
+  auto resolvePrefix(const Prefixed<Name> &) const -> std::list<const EnvironmentFrame *>;
 
   auto lookupFrame(const Prefixed<Name> &) const -> const EnvironmentFrame *;
 

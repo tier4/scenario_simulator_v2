@@ -39,7 +39,7 @@ auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
 
 auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
 
-auto EnvironmentFrame::resolveFrontPrefix(const Prefixed<Name> & prefixed_name) const
+auto EnvironmentFrame::resolvePrefix(const Prefixed<Name> & prefixed_name) const
   -> std::list<const EnvironmentFrame *>
 {
   std::list<const EnvironmentFrame *> result;
@@ -51,7 +51,7 @@ auto EnvironmentFrame::resolveFrontPrefix(const Prefixed<Name> & prefixed_name) 
   if (result.empty()) {
     // BUG: must be breadth first search
     for (auto & child : unnamed_inner_frames) {
-      result.merge(child->resolveFrontPrefix(prefixed_name));
+      result.merge(child->resolvePrefix(prefixed_name));
     }
   }
 
@@ -71,7 +71,7 @@ auto EnvironmentFrame::lookupFrame(const Prefixed<Name> & prefixed_name) const
   if (isOutermost()) {
     return this;
   } else {
-    auto sibling_scope = outer_frame->resolveFrontPrefix(prefixed_name);
+    auto sibling_scope = outer_frame->resolvePrefix(prefixed_name);
     switch (sibling_scope.size()) {
       case 0:
         assert(outer_frame);
