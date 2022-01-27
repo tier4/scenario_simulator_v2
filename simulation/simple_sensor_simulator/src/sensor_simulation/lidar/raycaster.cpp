@@ -40,7 +40,7 @@ Raycaster::~Raycaster() { rtcReleaseDevice(device_); }
 
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
-  double horizontal_resolution, std::vector<double> vertical_angles, double horizontal_angle_start,
+  double horizontal_resolution, const std::vector<double>& vertical_angles, double horizontal_angle_start,
   double horizontal_angle_end, double max_distance, double min_distance)
 {
   std::vector<geometry_msgs::msg::Quaternion> directions;
@@ -56,14 +56,18 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
       directions.emplace_back(quat);
     }
   }
-  return raycast(frame_id, stamp, origin, directions, max_distance, min_distance);
+  return raycast(std::move(frame_id), stamp, origin, directions, max_distance, min_distance);
 }
 
 const std::vector<std::string> & Raycaster::getDetectedObject() const { return detected_objects_; }
 
+inline constexpr std::size_t RayPacketSize = 4;
+using RTCRayHitType = RTCRayHit4;
+constexpr auto rtcIntersects = rtcIntersect4;
+
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
-  std::vector<geometry_msgs::msg::Quaternion> directions, double max_distance, double min_distance)
+  const std::vector<geometry_msgs::msg::Quaternion>& directions, double max_distance, double min_distance)
 {
   detected_objects_ = {};
   std::vector<unsigned int> detected_ids = {};
@@ -76,45 +80,60 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   rtcCommitScene(scene_);
   RTCIntersectContext context;
   rtcInitIntersectContext(&context);
-  for (const auto & direction : directions) {
-    RTCRayHit rayhit;
-    rayhit.ray.org_x = origin.position.x;
-    rayhit.ray.org_y = origin.position.y;
-    rayhit.ray.org_z = origin.position.z;
-    rayhit.ray.tfar = max_distance;
-    rayhit.ray.tnear = min_distance;
-    rayhit.ray.flags = false;
-    const auto ray_direction = origin.orientation * direction;
-    const auto rotation_mat = quaternion_operation::getRotationMatrix(ray_direction);
-    const Eigen::Vector3d rotated_direction = rotation_mat * Eigen::Vector3d(1.0, 0.0, 0.0);
-    rayhit.ray.dir_x = rotated_direction[0];
-    rayhit.ray.dir_y = rotated_direction[1];
-    rayhit.ray.dir_z = rotated_direction[2];
-    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
-    rtcIntersect1(scene_, &context, &rayhit);
-    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
-      double distance = rayhit.ray.tfar;
-      const Eigen::Vector3d vector = quaternion_operation::getRotationMatrix(direction) *
-                                     Eigen::Vector3d(1.0, 0.0, 0.0) * distance;
-      pcl::PointXYZI p;
-      {
-        p.x = vector[0];
-        p.y = vector[1];
-        p.z = vector[2];
-      }
-      cloud->emplace_back(p);
-      if (std::count(detected_ids.begin(), detected_ids.end(), rayhit.hit.geomID) == 0) {
-        detected_ids.emplace_back(rayhit.hit.geomID);
+
+  for (auto i = 0u; i < directions.size(); i += RayPacketSize) {
+    std::array<int, RayPacketSize> valid = {};
+    valid.fill(0);
+    RTCRayHitType rayhits;
+
+    for(auto j = 0u; j < RayPacketSize && i + j < directions.size(); ++j){
+      const auto& direction = directions[i + j];
+      rayhits.ray.org_x[j] = origin.position.x;
+      rayhits.ray.org_y[j] = origin.position.y;
+      rayhits.ray.org_z[j] = origin.position.z;
+      rayhits.ray.tfar[j] = static_cast<float>(max_distance);
+      rayhits.ray.tnear[j] = static_cast<float>(min_distance);
+      rayhits.ray.flags[j] = false;
+      const auto ray_direction = origin.orientation * direction;
+      const auto rotation_mat = quaternion_operation::getRotationMatrix(ray_direction);
+      const Eigen::Vector3d rotated_direction = rotation_mat * Eigen::Vector3d(1.0, 0.0, 0.0);
+      rayhits.ray.dir_x[j] = static_cast<float>(rotated_direction[0]);
+      rayhits.ray.dir_y[j] = static_cast<float>(rotated_direction[1]);
+      rayhits.ray.dir_z[j] = static_cast<float>(rotated_direction[2]);
+      rayhits.hit.geomID[j] = RTC_INVALID_GEOMETRY_ID;
+
+      valid[j] = -1;
+    }
+
+    rtcIntersects(valid.data(), scene_, &context, &rayhits);
+
+    for(auto j = 0u; j < RayPacketSize && i + j < directions.size(); ++j){
+      if (rayhits.hit.geomID[j] != RTC_INVALID_GEOMETRY_ID) {
+        const auto& direction = directions[i + j];
+        double distance = rayhits.ray.tfar[j];
+        const Eigen::Vector3d vector = quaternion_operation::getRotationMatrix(direction) *
+                                       Eigen::Vector3d(1.0, 0.0, 0.0) * distance;
+        pcl::PointXYZI p;
+        {
+          p.x = vector[0];
+          p.y = vector[1];
+          p.z = vector[2];
+        }
+        cloud->emplace_back(p);
+        if (std::count(detected_ids.begin(), detected_ids.end(), rayhits.hit.geomID[j]) == 0) {
+          detected_ids.emplace_back(rayhits.hit.geomID[j]);
+        }
       }
     }
   }
+
   for (const auto & id : detected_ids) {
     detected_objects_.emplace_back(geometry_ids_[id]);
   }
   sensor_msgs::msg::PointCloud2 pointcloud_msg;
   pcl::toROSMsg(*cloud, pointcloud_msg);
   rtcReleaseScene(scene_);
-  pointcloud_msg.header.frame_id = frame_id;
+  pointcloud_msg.header.frame_id = std::move(frame_id);
   pointcloud_msg.header.stamp = stamp;
   return pointcloud_msg;
 }

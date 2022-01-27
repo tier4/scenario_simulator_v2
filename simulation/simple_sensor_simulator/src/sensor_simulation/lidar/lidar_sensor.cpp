@@ -30,7 +30,8 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
   -> sensor_msgs::msg::PointCloud2
 {
-  Raycaster raycaster;
+  raycaster.clearPrimitives();
+
   boost::optional<geometry_msgs::msg::Pose> ego_pose;
   for (const auto & s : status) {
     if (configuration_.entity() == s.name()) {

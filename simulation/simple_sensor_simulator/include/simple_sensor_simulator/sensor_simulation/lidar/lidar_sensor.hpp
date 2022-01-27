@@ -52,6 +52,7 @@ template <typename T>
 class LidarSensor : public LidarSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
+  Raycaster raycaster;
 
   auto raycast(const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
     -> T;
@@ -60,7 +61,7 @@ public:
   explicit LidarSensor(
     const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
-  : LidarSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr)
+  : LidarSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr), raycaster()
   {
   }
 
