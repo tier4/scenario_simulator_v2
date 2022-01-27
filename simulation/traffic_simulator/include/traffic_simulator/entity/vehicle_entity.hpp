@@ -59,6 +59,8 @@ public:
     const traffic_simulator_msgs::msg::VehicleParameters &,  //
     const std::string & = BuiltinBehavior::defaultBehavior());
 
+  virtual VehicleEntity() = default;
+
   const traffic_simulator_msgs::msg::VehicleParameters parameters;
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;

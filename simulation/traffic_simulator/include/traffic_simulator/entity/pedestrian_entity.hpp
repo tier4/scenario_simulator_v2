@@ -56,6 +56,8 @@ public:
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
     const std::string & = BuiltinBehavior::defaultBehavior());
 
+  virtual ~PedestrianEntity() = default;
+
   const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
