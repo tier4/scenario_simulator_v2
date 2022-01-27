@@ -38,7 +38,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ManeuverGroup : public Scope, public StoryboardElement<ManeuverGroup>, public Elements
+struct ManeuverGroup : public Scope, public StoryboardElement, public Elements
 {
   const Actors actors;
 
@@ -46,17 +46,17 @@ struct ManeuverGroup : public Scope, public StoryboardElement<ManeuverGroup>, pu
 
   using StoryboardElement::evaluate;
 
-  /*  */ auto accomplished() const -> bool;
+  auto accomplished() const -> bool override;
 
-  static auto ready() noexcept -> bool;
+  auto ready() noexcept -> bool override;
 
-  /*  */ auto run() -> void;
+  auto run() -> void override;
 
-  /*  */ auto start() -> void;
+  auto start() -> void override;
 
-  /*  */ auto stop() -> void;
+  auto stop() -> void override;
 
-  static auto stopTriggered() noexcept -> bool;
+  auto stopTriggered() noexcept -> bool override;
 };
 
 auto operator<<(nlohmann::json &, const ManeuverGroup &) -> nlohmann::json &;

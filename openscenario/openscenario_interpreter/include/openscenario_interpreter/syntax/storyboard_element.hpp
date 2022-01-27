@@ -34,7 +34,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-template <typename T>
 class StoryboardElement
 {
 public:
@@ -44,17 +43,17 @@ public:
 
   Object current_state;
 
-  explicit constexpr StoryboardElement(const std::size_t maximum_execution_count = 0)
+  explicit StoryboardElement(const std::size_t maximum_execution_count = 0)
   : maximum_execution_count(maximum_execution_count),
     current_execution_count(0),
     current_state(standby_state)
   {
   }
 
-  const auto & currentState() const { return current_state; }
+  auto currentState() const -> const auto & { return current_state; }
 
 #define BOILERPLATE(NAME, STATE)                                                                  \
-  constexpr auto NAME() const noexcept                                                            \
+  auto NAME() const noexcept                                                                      \
   {                                                                                               \
     return currentState().template as<StoryboardElementState>() == StoryboardElementState::STATE; \
   }                                                                                               \
@@ -80,22 +79,17 @@ public:
   }
 
 private:
-#define DEFINE_PERFECT_FORWARD(IDENTIFIER, CONST)                                       \
-  template <typename... Ts>                                                             \
-  auto IDENTIFIER(Ts &&... xs) CONST->decltype(auto)                                    \
-  {                                                                                     \
-    return static_cast<CONST T &>(*this).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                     \
-  static_assert(true, "")
+  virtual auto accomplished() const -> bool = 0;
 
-  DEFINE_PERFECT_FORWARD(accomplished, const);
-  DEFINE_PERFECT_FORWARD(ready, );
-  DEFINE_PERFECT_FORWARD(run, );
-  DEFINE_PERFECT_FORWARD(start, );
-  DEFINE_PERFECT_FORWARD(stop, );
-  DEFINE_PERFECT_FORWARD(stopTriggered, );
+  virtual auto ready() -> bool = 0;
 
-#undef DEFINE_PERFECT_FORWARD
+  virtual auto run() -> void = 0;
+
+  virtual auto start() -> void = 0;
+
+  virtual auto stop() -> void = 0;
+
+  virtual auto stopTriggered() -> bool = 0;
 
 protected:
   auto rename(const std::string & name) const

@@ -38,7 +38,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Action : public Scope, public ComplexType, public StoryboardElement<Action>
+struct Action : public Scope, public ComplexType, public StoryboardElement
 {
   bool overridden = false;
 
@@ -57,19 +57,19 @@ struct Action : public Scope, public ComplexType, public StoryboardElement<Actio
    *  complete in order to reach the completeState of the Action.
    *
    * ---------------------------------------------------------------------- */
-  using ComplexType::accomplished;
+  /*  */ auto accomplished() const -> bool override;
 
   using StoryboardElement::evaluate;
 
-  /*  */ auto ready() const -> bool;
+  auto ready() -> bool override;
 
-  /*  */ auto run() -> void;
+  auto run() -> void override;
 
-  /*  */ auto start() -> void;
+  auto start() -> void override;
 
-  /*  */ auto stop() -> void;
+  auto stop() -> void override;
 
-  static auto stopTriggered() noexcept -> bool;
+  auto stopTriggered() noexcept -> bool override;
 };
 
 auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;

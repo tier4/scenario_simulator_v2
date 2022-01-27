@@ -37,7 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Act : public Scope, public StoryboardElement<Act>, public Elements
+struct Act : public Scope, public StoryboardElement, public Elements
 {
   Trigger start_trigger;
 
@@ -47,17 +47,17 @@ struct Act : public Scope, public StoryboardElement<Act>, public Elements
 
   using StoryboardElement::evaluate;
 
-  /*  */ auto accomplished() const -> bool;
+  auto accomplished() const -> bool override;
 
-  static auto start() noexcept -> void;
+  auto start() noexcept -> void override;
 
-  /*  */ auto stop() -> void;
+  auto stop() -> void override;
 
-  /*  */ auto stopTriggered() const -> bool;
+  auto stopTriggered() -> bool override;
 
-  /*  */ auto ready() -> bool;
+  auto ready() -> bool override;
 
-  /*  */ auto run() -> void;
+  auto run() -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;

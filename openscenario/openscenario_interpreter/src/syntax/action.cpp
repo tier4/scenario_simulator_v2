@@ -32,7 +32,9 @@ Action::Action(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto Action::ready() const -> bool { return static_cast<bool>(*this); }
+auto Action::accomplished() const -> bool { return ComplexType::accomplished(); }
+
+auto Action::ready() -> bool { return static_cast<bool>(*this); }
 
 auto Action::run() -> void
 {

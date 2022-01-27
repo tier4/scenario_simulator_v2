@@ -36,7 +36,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Maneuver : public Scope, public StoryboardElement<Maneuver>, public Elements
+struct Maneuver : public Scope, public StoryboardElement, public Elements
 {
   const ParameterDeclarations parameter_declarations;
 
@@ -44,17 +44,17 @@ struct Maneuver : public Scope, public StoryboardElement<Maneuver>, public Eleme
 
   using StoryboardElement::evaluate;
 
-  /*  */ auto accomplished() const -> bool;
+  auto accomplished() const -> bool override;
 
-  static auto ready() noexcept -> bool;
+  auto ready() noexcept -> bool override;
 
-  /*  */ auto run() -> void;
+  auto run() -> void override;
 
-  static auto start() noexcept -> void;
+  auto start() noexcept -> void override;
 
-  /*  */ auto stop() -> void;
+  auto stop() -> void override;
 
-  static auto stopTriggered() noexcept -> bool;
+  auto stopTriggered() noexcept -> bool override;
 };
 
 auto operator<<(nlohmann::json &, const Maneuver &) -> nlohmann::json &;

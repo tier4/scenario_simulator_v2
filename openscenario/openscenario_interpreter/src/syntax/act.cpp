@@ -59,10 +59,7 @@ auto Act::stop() -> void
   }
 }
 
-auto Act::stopTriggered() const -> bool
-{
-  return stop_trigger and stop_trigger.evaluate().as<Boolean>();
-}
+auto Act::stopTriggered() -> bool { return stop_trigger and stop_trigger.evaluate().as<Boolean>(); }
 
 auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &
 {
