@@ -57,6 +57,29 @@
 #include <traffic_simulator_msgs/msg/performance.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
+#include <zmqpp/zmqpp.hpp>
+
+namespace zeromq
+{
+template <typename Proto>
+zmqpp::message toZMQ(const Proto & proto)
+{
+  zmqpp::message msg;
+  std::string serialized_str = "";
+  proto.SerializeToString(&serialized_str);
+  msg << serialized_str;
+  return msg;
+}
+
+template <typename Proto>
+Proto toProto(const zmqpp::message & msg)
+{
+  std::string serialized_str = msg.get(0);
+  Proto proto;
+  proto.ParseFromString(serialized_str);
+  return proto;
+}
+}  // namespace zeromq
 
 namespace simulation_interface
 {
