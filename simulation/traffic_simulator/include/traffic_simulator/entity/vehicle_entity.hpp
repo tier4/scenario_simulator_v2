@@ -59,7 +59,7 @@ public:
     const traffic_simulator_msgs::msg::VehicleParameters &,  //
     const std::string & = BuiltinBehavior::defaultBehavior());
 
-  virtual VehicleEntity() = default;
+  virtual ~VehicleEntity() = default;
 
   const traffic_simulator_msgs::msg::VehicleParameters parameters;
 
