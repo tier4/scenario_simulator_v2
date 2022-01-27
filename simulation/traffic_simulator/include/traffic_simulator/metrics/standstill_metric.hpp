@@ -33,7 +33,7 @@ public:
   explicit StandstillMetric(
     std::string target_entity,
     double allow_standstill_duration = std::numeric_limits<double>::max());
-  ~StandstillMetric() override = default;
+  virtual ~StandstillMetric() = default;
   void update() override;
   nlohmann::json toJson();
   bool activateTrigger() override;

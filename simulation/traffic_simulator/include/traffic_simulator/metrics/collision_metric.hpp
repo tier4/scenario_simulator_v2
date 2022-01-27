@@ -39,7 +39,7 @@ public:
    */
   explicit CollisionMetric(
     std::string target_entity, const std::vector<std::string> & check_targets);
-  ~CollisionMetric() override = default;
+  virtual ~CollisionMetric() = default;
   void update() override;
   nlohmann::json toJson();
   bool activateTrigger() override;
