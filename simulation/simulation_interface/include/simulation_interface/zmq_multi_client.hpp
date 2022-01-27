@@ -34,44 +34,8 @@ class MultiClient
 public:
   explicit MultiClient(
     const simulation_interface::TransportProtocol & protocol,
-    const simulation_interface::HostName & hostname)
-  : context_(zmqpp::context()),
-    type_(zmqpp::socket_type::request),
-    socket_initialize_(context_, type_),
-    socket_update_frame_(context_, type_),
-    socket_update_sensor_frame_(context_, type_),
-    socket_spawn_vehicle_entity_(context_, type_),
-    socket_spawn_pedestrian_entity_(context_, type_),
-    socket_spawn_misc_object_entity_(context_, type_),
-    socket_despawn_entity_(context_, type_),
-    socket_update_entity_status_(context_, type_),
-    socket_attach_lidar_sensor_(context_, type_),
-    socket_attach_detection_sensor_(context_, type_),
-    socket_update_traffic_lights_(context_, type_)
-  {
-    socket_initialize_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::initialize));
-    socket_update_frame_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::update_frame));
-    socket_update_sensor_frame_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::update_sensor_frame));
-    socket_spawn_vehicle_entity_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::spawn_vehicle_entity));
-    socket_spawn_pedestrian_entity_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::spawn_pedestrian_entity));
-    socket_spawn_misc_object_entity_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::spawn_misc_object_entity));
-    socket_despawn_entity_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::despawn_entity));
-    socket_update_entity_status_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::update_entity_status));
-    socket_attach_lidar_sensor_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::attach_lidar_sensor));
-    socket_attach_detection_sensor_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::attach_detection_sensor));
-    socket_update_traffic_lights_.connect(simulation_interface::getEndPoint(
-      protocol, hostname, simulation_interface::ports::update_traffic_lights));
-  }
+    const simulation_interface::HostName & hostname);
+  ~MultiClient();
 
   void call(
     const simulation_api_schema::InitializeRequest & req,
@@ -107,8 +71,11 @@ public:
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);
 
+  const simulation_interface::TransportProtocol protocol;
+  const simulation_interface::HostName hostname;
+
 private:
-  const zmqpp::context context_;
+  zmqpp::context context_;
   const zmqpp::socket_type type_;
   zmqpp::socket socket_initialize_;
   zmqpp::socket socket_update_frame_;
