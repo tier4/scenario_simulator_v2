@@ -70,29 +70,6 @@ public:
 
 #undef BOILERPLATE
 
-  template <typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
-  auto changeStateIf(
-    Boolean && test, const Object & consequent_state, const Object & alternate_state)
-  {
-    if (test) {
-      return current_state = consequent_state;
-    } else {
-      return current_state = alternate_state;
-    }
-  }
-
-  template <typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
-  auto changeStateIf(Boolean && test, const Object & consequent_state) -> decltype(auto)
-  {
-    return changeStateIf(test, consequent_state, current_state);
-  }
-
-  template <typename Predicate, typename... Ts, REQUIRES(std::is_function<Predicate>)>
-  auto changeStateIf(Predicate && predicate, Ts &&... xs) -> decltype(auto)
-  {
-    return changeStateIf(predicate(), std::forward<decltype(xs)>(xs)...);
-  }
-
   auto override()
   {
     if (not complete() and not stopping()) {
@@ -186,7 +163,7 @@ public:
         *  Story element instantaneously transitions into the runningState.
         *
         * ------------------------------------------------------------------- */
-        return changeStateIf(ready(), start_transition);
+        return current_state = (ready() ? start_transition : current_state);
 
       case StoryboardElementState::startTransition: /* -------------------------
         *
@@ -196,8 +173,9 @@ public:
         *
         * ------------------------------------------------------------------- */
         start();
+        // TODO SET CHILD ELEMENTS STATE TO STANDBY_STATE.
         ++current_execution_count;
-        return changeStateIf(std::true_type(), running_state);
+        return current_state = running_state;
 
       case StoryboardElementState::runningState: /* ----------------------------
         *
@@ -241,7 +219,7 @@ public:
         if (0 <= getCurrentTime()) {
           run();
         }
-        return changeStateIf(accomplished(), end_transition);
+        return current_state = (accomplished() ? end_transition : current_state);
 
       case StoryboardElementState::endTransition: /* ---------------------------
         *
@@ -253,8 +231,9 @@ public:
         *  be used in conditions to trigger based on this transition.
         *
         * -------------------------------------------------------------------- */
-        return changeStateIf(
-          current_execution_count < maximum_execution_count, standby_state, complete_state);
+        return current_state =
+                 (current_execution_count < maximum_execution_count ? standby_state
+                                                                    : complete_state);
 
       case StoryboardElementState::completeState: /* ---------------------------
         *

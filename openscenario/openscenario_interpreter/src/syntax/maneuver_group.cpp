@@ -55,7 +55,7 @@ auto ManeuverGroup::run() -> void
 auto ManeuverGroup::start() -> void
 {
   for (auto && each : *this) {
-    each.as<Maneuver>().changeStateIf(true, standby_state);
+    each.as<Maneuver>().current_state = standby_state;
   }
 }
 

@@ -52,7 +52,7 @@ auto Event::run() -> void
 auto Event::start() -> void
 {
   for (auto && each : actions) {
-    each.as<Action>().changeStateIf(true, standby_state);
+    each.as<Action>().current_state = standby_state;
   }
 }
 
