@@ -20,6 +20,7 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
 #include <vector>
 

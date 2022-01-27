@@ -66,6 +66,7 @@ auto calcIntersects(
   RTCScene scene, RTCIntersectContext & context, const geometry_msgs::msg::Pose & origin,
   const std::vector<geometry_msgs::msg::Quaternion> & directions, double max_distance,
   double min_distance)
+  -> std::tuple<std::vector<unsigned int>, pcl::PointCloud<pcl::PointXYZI>::Ptr>
 {
   constexpr std::size_t RayPacketSize = RaycastTraits::RayPacketSize;
   using RTCRayHitType = typename RaycastTraits::RTCRayHitType;
