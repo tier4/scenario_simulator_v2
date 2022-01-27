@@ -118,10 +118,6 @@ auto CustomCommandAction::publisher()
 
 auto CustomCommandAction::run() -> void
 {
-  if (type == ":") {
-    return;
-  }
-
   static const std::unordered_map<
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
     commands{
@@ -148,7 +144,10 @@ auto CustomCommandAction::run() -> void
 
   std::smatch result{};
 
-  if (std::regex_match(type, result, pattern) and commands.find(result[1]) != std::end(commands)) {
+  if (type == ":") {
+    return;
+  } else if (
+    std::regex_match(type, result, pattern) and commands.find(result[1]) != std::end(commands)) {
     commands.at(result[1])(split(result[3]), local());
   } else {
     fork_exec(type, content);
