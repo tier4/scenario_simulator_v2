@@ -118,6 +118,10 @@ auto CustomCommandAction::publisher()
 
 auto CustomCommandAction::run() -> void
 {
+  if (type == ":") {
+    return;
+  }
+
   static const std::unordered_map<
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
     commands{
