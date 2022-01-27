@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
-#include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
-
 #include <embree3/rtcore_device.h>
 #include <embree3/rtcore_geometry.h>
 #include <embree3/rtcore_ray.h>
@@ -24,6 +21,8 @@
 #include <chrono>
 #include <iostream>
 #include <numeric>
+#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
