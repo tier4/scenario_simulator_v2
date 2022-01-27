@@ -28,7 +28,7 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   stop_trigger(readElement<Trigger>("StopTrigger", node, local()))
 {
   callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Story>(node, local()));
+    return stories.push_back(readStoryboardElement<Story>(node, local()));
   });
 
   if (not init.endsImmediately()) {
@@ -38,17 +38,19 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 
 auto Storyboard::accomplished() const -> bool
 {
-  return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+  return std::all_of(std::begin(stories), std::end(stories), [](auto && each) {
     return each.template as<Story>().complete();
   });
 }
+
+auto Storyboard::elements() -> Elements & { return stories; }
 
 auto Storyboard::ready() noexcept -> bool { return true; }
 
 auto Storyboard::run() -> void
 {
   if (engaged) {
-    for (auto && story : *this) {
+    for (auto && story : stories) {
       story.evaluate();
     }
   } else if (std::all_of(  // XXX DIRTY HACK!!!
@@ -77,9 +79,9 @@ auto Storyboard::start() -> void
 
 auto Storyboard::stop() -> void
 {
-  for (auto && each : *this) {
-    each.as<Story>().override();
-    each.evaluate();
+  for (auto && story : stories) {
+    story.as<Story>().override();
+    story.evaluate();
   }
 }
 
@@ -93,10 +95,10 @@ auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::js
 
   json["Story"] = nlohmann::json::array();
 
-  for (const auto & each : datum) {
-    nlohmann::json story;
-    story << each.as<Story>();
-    json["Story"].push_back(story);
+  for (const auto & story : datum.stories) {
+    nlohmann::json each;
+    each << story.as<Story>();
+    json["Story"].push_back(each);
   }
 
   return json;

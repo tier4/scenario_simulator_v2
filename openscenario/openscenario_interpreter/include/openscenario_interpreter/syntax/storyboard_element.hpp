@@ -81,6 +81,8 @@ public:
 private:
   virtual auto accomplished() const -> bool = 0;
 
+  virtual auto elements() -> Elements & = 0;
+
   virtual auto ready() -> bool = 0;
 
   virtual auto run() -> void = 0;
@@ -135,16 +137,13 @@ protected:
   }
 
 public:
-  /* ---- States and Transitions of StoryboardElements -------------------------
-   *
-   *  See https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
-   *
-   * ------------------------------------------------------------------------ */
   auto evaluate()
   {
     if (stopTriggered()) {
       override();
     }
+
+    // NOTE: https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
 
     switch (currentState().template as<StoryboardElementState>()) {
       case StoryboardElementState::standbyState: /* ----------------------------

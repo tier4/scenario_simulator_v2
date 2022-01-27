@@ -25,24 +25,26 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
   parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
   callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Event>(node, local()));
+    return events.push_back(readStoryboardElement<Event>(node, local()));
   });
 }
 
 auto Maneuver::accomplished() const -> bool
 {
   // NOTE: A Maneuver's goal is accomplished when all its Events are in the completeState.
-  return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
-    return each.template as<Event>().complete();
+  return std::all_of(std::begin(events), std::end(events), [](auto && event) {
+    return event.template as<Event>().complete();
   });
 }
+
+auto Maneuver::elements() -> Elements & { return events; }
 
 auto Maneuver::ready() noexcept -> bool { return true; }
 
 auto Maneuver::run() -> void
 {
-  for (auto && each : *this) {
-    each.evaluate();
+  for (auto && event : events) {
+    event.evaluate();
   }
 }
 
@@ -50,26 +52,26 @@ auto Maneuver::start() noexcept -> void {}
 
 auto Maneuver::stop() -> void
 {
-  for (auto && each : *this) {
-    each.as<Event>().override();
-    each.evaluate();
+  for (auto && event : events) {
+    event.as<Event>().override();
+    event.evaluate();
   }
 }
 
 auto Maneuver::stopTriggered() noexcept -> bool { return false; }
 
-auto operator<<(nlohmann::json & json, const Maneuver & datum) -> nlohmann::json &
+auto operator<<(nlohmann::json & json, const Maneuver & maneuver) -> nlohmann::json &
 {
-  json["name"] = datum.name;
+  json["name"] = maneuver.name;
 
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(maneuver.currentState());
 
   json["Event"] = nlohmann::json::array();
 
-  for (const auto & each : datum) {
-    nlohmann::json event;
-    event << each.as<Event>();
-    json["Event"].push_back(event);
+  for (const auto & event : maneuver.events) {
+    nlohmann::json json_event;
+    json_event << event.as<Event>();
+    json["Event"].push_back(json_event);
   }
 
   return json;

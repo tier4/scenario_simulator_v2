@@ -37,17 +37,19 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Act : public Scope, public StoryboardElement, public Elements
+struct Act : public Scope, public StoryboardElement
 {
+  Elements maneuver_groups;
+
   Trigger start_trigger;
 
   Object stop_trigger;
 
   explicit Act(const pugi::xml_node &, Scope &);
 
-  using StoryboardElement::evaluate;
-
   auto accomplished() const -> bool override;
+
+  auto elements() -> Elements & override;
 
   auto start() noexcept -> void override;
 

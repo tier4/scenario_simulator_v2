@@ -37,9 +37,11 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Storyboard : public Scope, public StoryboardElement, public Elements
+struct Storyboard : public Scope, public StoryboardElement
 {
   Init init;
+
+  Elements stories;
 
   Trigger stop_trigger;
 
@@ -48,6 +50,8 @@ struct Storyboard : public Scope, public StoryboardElement, public Elements
   explicit Storyboard(const pugi::xml_node &, Scope &);
 
   auto accomplished() const -> bool override;
+
+  auto elements() -> Elements & override;
 
   auto ready() noexcept -> bool override;
 

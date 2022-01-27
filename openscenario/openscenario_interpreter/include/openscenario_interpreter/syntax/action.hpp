@@ -46,6 +46,8 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
 
   using StoryboardElement::currentState;
 
+  using StoryboardElement::evaluate;
+
   /* -------------------------------------------------------------------------
    *
    *  An Action's goal is a function of the Action type and cannot be
@@ -57,9 +59,9 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
    *  complete in order to reach the completeState of the Action.
    *
    * ---------------------------------------------------------------------- */
-  /*  */ auto accomplished() const -> bool override;
+  auto accomplished() const -> bool override;
 
-  using StoryboardElement::evaluate;
+  auto elements() -> Elements & override;
 
   auto ready() -> bool override;
 
