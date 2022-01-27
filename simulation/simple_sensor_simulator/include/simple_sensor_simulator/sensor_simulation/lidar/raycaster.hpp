@@ -67,6 +67,12 @@ private:
     double min_distance = 0);
   std::vector<std::string> detected_objects_;
   std::unordered_map<unsigned int, std::string> geometry_ids_;
+
+  std::function<std::tuple<std::vector<unsigned int>, pcl::PointCloud<pcl::PointXYZI>::Ptr>(
+    RTCScene scene, RTCIntersectContext & context, const geometry_msgs::msg::Pose & origin,
+    const std::vector<geometry_msgs::msg::Quaternion> & directions, double max_distance,
+    double min_distance)>
+    calc_intersects;
 };
 }  // namespace simple_sensor_simulator
 
