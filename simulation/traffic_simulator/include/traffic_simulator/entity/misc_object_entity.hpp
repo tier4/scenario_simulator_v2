@@ -36,6 +36,8 @@ public:
     return result;
   }
 
+  ~MiscObjectEntity() override = default;
+
   std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override
   {
     return {};
