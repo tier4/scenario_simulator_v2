@@ -56,7 +56,7 @@ public:
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
     const std::string & = BuiltinBehavior::defaultBehavior());
 
-  virtual ~PedestrianEntity() = default;
+  ~PedestrianEntity() override = default;
 
   const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 

@@ -84,7 +84,7 @@ public:
 
   explicit EgoEntity(const EgoEntity &) = delete;
 
-  virtual ~EgoEntity() = default;
+  ~EgoEntity() override = default;
 
   auto operator=(EgoEntity &&) -> EgoEntity & = delete;
 
