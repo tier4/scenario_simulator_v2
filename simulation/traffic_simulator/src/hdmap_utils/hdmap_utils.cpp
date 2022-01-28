@@ -414,7 +414,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   auto pose_on_centerline = spline->getPose(s.get());
   auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
     quaternion_operation::getRotation(pose_on_centerline.orientation, pose.orientation));
-  double offset = spline->getSquaredDistanceIn2D(pose.position, s.get());
+  double offset = std::sqrt(spline->getSquaredDistanceIn2D(pose.position, s.get()));
   double innter_prod = traffic_simulator::math::innterProduct(
     spline->getNormalVector(s.get()), spline->getSquaredDistanceVector(pose.position, s.get()));
   if (innter_prod < 0) {
