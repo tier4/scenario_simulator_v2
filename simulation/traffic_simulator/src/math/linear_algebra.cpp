@@ -18,6 +18,11 @@ namespace traffic_simulator
 {
 namespace math
 {
+double innterProduct(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
+{
+  return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
+}
+
 geometry_msgs::msg::Vector3 vector3(double x, double y, double z)
 {
   geometry_msgs::msg::Vector3 vec;

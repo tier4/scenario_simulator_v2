@@ -29,6 +29,7 @@ EntityBase::EntityBase(const std::string & type, const std::string & name)
 : type(type), name(name), status_(boost::none), verbose_(true), visibility_(true)
 {
   status_ = boost::none;
+  std::cout << "spawn entity : " << name << std::endl;
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
