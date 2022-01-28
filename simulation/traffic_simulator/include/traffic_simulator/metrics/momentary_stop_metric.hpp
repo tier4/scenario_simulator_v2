@@ -57,7 +57,7 @@ public:
   {
   }
 
-  virtual ~MomentaryStopMetric() = default;
+  ~MomentaryStopMetric() override = default;
   void update() override;
   bool activateTrigger() override;
   const std::string target_entity;

@@ -29,7 +29,7 @@ public:
    * @param target_entity name of the target entity
    */
   explicit TraveledDistanceMetric(std::string target_entity);
-  virtual ~TraveledDistanceMetric() = default;
+  ~TraveledDistanceMetric() override = default;
   void update() override;
   nlohmann::json toJson();
   bool activateTrigger() override;
