@@ -30,23 +30,25 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
   });
 
   callWithElements(node, "Act", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Act>(node, local()));
+    return acts.push_back(readStoryboardElement<Act>(node, local()));
   });
 }
 
 auto Story::accomplished() const -> bool
 {
   // NOTE: A Story's goal is accomplished when all its Acts are in the completeState.
-  return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
-    return each.template as<Act>().complete();
+  return std::all_of(std::begin(acts), std::end(acts), [](auto && act) {
+    return act.template as<Act>().complete();
   });
 }
+
+auto Story::elements() -> Elements & { return acts; }
 
 auto Story::ready() noexcept -> bool { return true; }
 
 auto Story::run() -> void
 {
-  for (auto && act : *this) {
+  for (auto && act : acts) {
     act.evaluate();
   }
 }
@@ -55,26 +57,26 @@ auto Story::start() noexcept -> void {}
 
 auto Story::stop() -> void
 {
-  for (auto && each : *this) {
-    each.as<Act>().override();
-    each.evaluate();
+  for (auto && act : acts) {
+    act.as<Act>().override();
+    act.evaluate();
   }
 }
 
 auto Story::stopTriggered() noexcept -> bool { return false; }
 
-auto operator<<(nlohmann::json & json, const Story & datum) -> nlohmann::json &
+auto operator<<(nlohmann::json & json, const Story & story) -> nlohmann::json &
 {
-  json["name"] = datum.name;
+  json["name"] = story.name;
 
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(story.currentState());
 
   json["Act"] = nlohmann::json::array();
 
-  for (const auto & each : datum) {
-    nlohmann::json act;
-    act << each.as<Act>();
-    json["Act"].push_back(act);
+  for (auto && act : story.acts) {
+    nlohmann::json json_act;
+    json_act << act.as<Act>();
+    json["Act"].push_back(json_act);
   }
 
   return json;
