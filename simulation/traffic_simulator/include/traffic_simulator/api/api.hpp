@@ -24,7 +24,7 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
-#include <simulation_interface/zmq_client.hpp>
+#include <simulation_interface/zmq_multi_client.hpp>
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
@@ -74,39 +74,7 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    initialize_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::initialize),
-    update_frame_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::update_frame),
-    update_sensor_frame_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::update_sensor_frame),
-    spawn_vehicle_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::spawn_vehicle_entity),
-    spawn_pedestrian_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::spawn_pedestrian_entity),
-    spawn_misc_object_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::spawn_misc_object_entity),
-    despawn_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::despawn_entity),
-    update_entity_status_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::update_entity_status),
-    attach_lidar_sensor_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::attach_lidar_sensor),
-    attach_detection_sensor_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::attach_detection_sensor),
-    update_traffic_lights_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::update_traffic_lights)
+    zeromq_client_(simulation_interface::protocol, simulation_interface::HostName::LOCALHOST)
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
@@ -278,47 +246,7 @@ private:
 
   traffic_simulator::SimulationClock clock_;
 
-  zeromq::Client<
-    simulation_api_schema::InitializeRequest, simulation_api_schema::InitializeResponse>
-    initialize_client_;
-  zeromq::Client<
-    simulation_api_schema::UpdateFrameRequest, simulation_api_schema::UpdateFrameResponse>
-    update_frame_client_;
-  zeromq::Client<
-    simulation_api_schema::UpdateSensorFrameRequest,
-    simulation_api_schema::UpdateSensorFrameResponse>
-    update_sensor_frame_client_;
-  zeromq::Client<
-    simulation_api_schema::SpawnVehicleEntityRequest,
-    simulation_api_schema::SpawnVehicleEntityResponse>
-    spawn_vehicle_entity_client_;
-  zeromq::Client<
-    simulation_api_schema::SpawnPedestrianEntityRequest,
-    simulation_api_schema::SpawnPedestrianEntityResponse>
-    spawn_pedestrian_entity_client_;
-  zeromq::Client<
-    simulation_api_schema::SpawnMiscObjectEntityRequest,
-    simulation_api_schema::SpawnMiscObjectEntityResponse>
-    spawn_misc_object_entity_client_;
-  zeromq::Client<
-    simulation_api_schema::DespawnEntityRequest, simulation_api_schema::DespawnEntityResponse>
-    despawn_entity_client_;
-  zeromq::Client<
-    simulation_api_schema::UpdateEntityStatusRequest,
-    simulation_api_schema::UpdateEntityStatusResponse>
-    update_entity_status_client_;
-  zeromq::Client<
-    simulation_api_schema::AttachLidarSensorRequest,
-    simulation_api_schema::AttachLidarSensorResponse>
-    attach_lidar_sensor_client_;
-  zeromq::Client<
-    simulation_api_schema::AttachDetectionSensorRequest,
-    simulation_api_schema::AttachDetectionSensorResponse>
-    attach_detection_sensor_client_;
-  zeromq::Client<
-    simulation_api_schema::UpdateTrafficLightsRequest,
-    simulation_api_schema::UpdateTrafficLightsResponse>
-    update_traffic_lights_client_;
+  zeromq::MultiClient zeromq_client_;
 };
 }  // namespace traffic_simulator
 

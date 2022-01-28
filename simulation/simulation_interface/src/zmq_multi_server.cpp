@@ -12,30 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
 #include <string>
 
 namespace zeromq
 {
-template <typename Proto>
-zmqpp::message toZMQ(const Proto & proto)
-{
-  zmqpp::message msg;
-  std::string serialized_str = "";
-  proto.SerializeToString(&serialized_str);
-  msg << serialized_str;
-  return msg;
-}
-
-template <typename Proto>
-Proto toProto(const zmqpp::message & msg)
-{
-  std::string serialized_str = msg.get(0);
-  Proto proto;
-  proto.ParseFromString(serialized_str);
-  return proto;
-}
-
 MultiServer::MultiServer(
   const simulation_interface::TransportProtocol & protocol,
   const simulation_interface::HostName & hostname,
