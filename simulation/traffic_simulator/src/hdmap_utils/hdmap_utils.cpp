@@ -796,11 +796,11 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
 
 std::int64_t HdMapUtils::getTrafficLightRelationId(std::int64_t traffic_light_id) const
 {
-  std::vector<std::int64_t> ret;
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
-  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
+  const auto autoware_traffic_lights =
+    lanelet::utils::query::autowareTrafficLights(
+      lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
+  for (auto && light : autoware_traffic_lights) {
+    for (auto && light_string : light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
         if (id && id.get() == traffic_light_id) {
