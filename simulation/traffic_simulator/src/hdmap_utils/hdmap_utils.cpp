@@ -51,10 +51,8 @@
 namespace hdmap_utils
 {
 HdMapUtils::HdMapUtils(
-  const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint & origin)
+  const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint &)
 {
-  (void)origin;
-
   lanelet::projection::MGRSProjector projector;
 
   lanelet::ErrorMessages errors;
@@ -796,9 +794,8 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
 
 std::int64_t HdMapUtils::getTrafficLightRelationId(std::int64_t traffic_light_id) const
 {
-  const auto autoware_traffic_lights =
-    lanelet::utils::query::autowareTrafficLights(
-      lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
+  const auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(
+    lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
   for (auto && light : autoware_traffic_lights) {
     for (auto && light_string : light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
@@ -812,7 +809,7 @@ std::int64_t HdMapUtils::getTrafficLightRelationId(std::int64_t traffic_light_id
   THROW_SEMANTIC_ERROR("traffic_light_id : ", traffic_light_id, " does not match to relation.");
 }
 
-const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
+std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 {
   std::vector<std::int64_t> ret;
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);

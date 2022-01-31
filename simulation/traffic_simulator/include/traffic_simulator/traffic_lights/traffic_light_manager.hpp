@@ -93,7 +93,7 @@ public:
 
   auto update(const double) -> void;
 
-  bool isTrafficLightId(const LaneletID);
+  auto isTrafficLightId(const LaneletID) -> bool;
 
 #define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                         \
   template <typename... Ts>                                                                \

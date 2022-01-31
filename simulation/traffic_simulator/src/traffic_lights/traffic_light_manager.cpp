@@ -38,12 +38,9 @@ auto TrafficLightManagerBase::getInstance(const LaneletID lanelet_id) const -> T
   return traffic_lights_.at(lanelet_id);
 }
 
-bool TrafficLightManagerBase::isTrafficLightId(const LaneletID lanelet_id)
+auto TrafficLightManagerBase::isTrafficLightId(const LaneletID lanelet_id) -> bool
 {
-  if (traffic_lights_.find(lanelet_id) == traffic_lights_.end()) {
-    return false;
-  }
-  return true;
+  return traffic_lights_.find(lanelet_id) != std::end(traffic_lights_);
 }
 
 auto TrafficLightManagerBase::deleteAllMarkers() const -> void
@@ -91,10 +88,9 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
 auto TrafficLightManagerBase::hasAnyLightChanged() -> bool
 {
   return std::any_of(
-    std::begin(traffic_lights_), std::end(traffic_lights_), [](const auto & id_and_traffic_light) {
-      return (
-        std::get<1>(id_and_traffic_light).colorChanged() ||
-        std::get<1>(id_and_traffic_light).arrowChanged());
+    std::begin(traffic_lights_), std::end(traffic_lights_), [](auto && id_and_traffic_light) {
+      return id_and_traffic_light.second.colorChanged() or
+             id_and_traffic_light.second.arrowChanged();
     });
 }
 
