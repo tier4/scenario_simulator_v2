@@ -31,6 +31,8 @@ double getSize(geometry_msgs::msg::Vector3 vec);
 geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec);
 double innterProduct(
   const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
+double getInternalAngle(
+  const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
 }  // namespace math
 }  // namespace traffic_simulator
 

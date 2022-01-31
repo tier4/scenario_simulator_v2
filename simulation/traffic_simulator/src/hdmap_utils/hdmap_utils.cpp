@@ -407,7 +407,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
-  const auto s = spline->getSValue(pose);
+  const auto s = spline->getSValue(pose, 1.0);
   if (!s) {
     return boost::none;
   }
@@ -418,7 +418,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   /**
    * @note Hard coded parameter
    */
-  if (offset > 0.5) {
+  if (std::fabs(rpy.z) > M_PI * 0.25) {
     return boost::none;
   }
   double innter_prod = traffic_simulator::math::innterProduct(
