@@ -43,9 +43,11 @@ std::string enumToString(const HostName & hostname)
   switch (hostname) {
     case HostName::LOCALHOST:
       return "localhost";
+    case HostName::SIMULATION:
+      return "simulation_host";
     case HostName::ANY:
       return "*";
   }
-  THROW_SIMULATION_ERROR("Hostname protocol should be LOCALHOST or ANY.");  // LCOV_EXCL_LINE
+  THROW_SIMULATION_ERROR("Hostname protocol should be LOCALHOST, SIMULATION or ANY.");  // LCOV_EXCL_LINE
 }
 }  // namespace simulation_interface

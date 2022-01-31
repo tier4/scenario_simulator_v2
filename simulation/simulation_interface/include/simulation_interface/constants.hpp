@@ -23,7 +23,7 @@ enum class TransportProtocol { TCP /*, UDP*/ };
 
 std::string enumToString(const TransportProtocol & protocol);
 
-enum class HostName { LOCALHOST, ANY };
+enum class HostName { LOCALHOST, SIMULATION, ANY };
 
 std::string enumToString(const HostName & hostname);
 

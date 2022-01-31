@@ -74,7 +74,7 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    zeromq_client_(simulation_interface::protocol, simulation_interface::HostName::LOCALHOST)
+    zeromq_client_(simulation_interface::protocol, simulation_interface::HostName::SIMULATION)
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
