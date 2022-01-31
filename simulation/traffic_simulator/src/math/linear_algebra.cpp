@@ -19,7 +19,7 @@ namespace traffic_simulator
 {
 namespace math
 {
-double innterProduct(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
+double innerProduct(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
 {
   return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
 }
@@ -27,7 +27,7 @@ double innterProduct(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs
 double getInternalAngle(
   const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
 {
-  const auto val = innterProduct(v0, v1) / (getSize(v0) * getSize(v1));
+  const auto val = innerProduct(v0, v1) / (getSize(v0) * getSize(v1));
   if (-1 <= val && val <= 1) {
     return std::acos(val);
   }

@@ -421,9 +421,9 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   if (std::fabs(rpy.z) > M_PI * 0.25) {
     return boost::none;
   }
-  double innter_prod = traffic_simulator::math::innterProduct(
+  double inner_prod = traffic_simulator::math::innerProduct(
     spline->getNormalVector(s.get()), spline->getSquaredDistanceVector(pose.position, s.get()));
-  if (innter_prod < 0) {
+  if (inner_prod < 0) {
     offset = offset * -1;
   }
   traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
