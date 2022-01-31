@@ -50,3 +50,11 @@ rosdep install -iry --from-paths src/scenario_simulator_v2 --rosdistro foxy
 ```bash
 colcon build --symlink-install
 ```
+
+## Before run
+
+Before you run the simulation it is requred to define `simulator` host.
+
+```
+sudo echo "<SIMULATOR_IP> simulator" | sudo tee -a /etc/hosts
+```
