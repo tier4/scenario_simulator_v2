@@ -53,8 +53,14 @@ colcon build --symlink-install
 
 ## Before run
 
-Before you run the simulation it is requred to define `simulator` host.
+Before you run the simulation it is required to define `simulator` host. You can do this by adding a proper host to `etc/hosts` file.
 
 ```
 sudo echo "<SIMULATOR_IP> simulator" | sudo tee -a /etc/hosts
+```
+
+If you run the simulator locally (e.g. simple sensor simulator) you can set `simulator` IP `127.0.0.1`.
+
+```
+sudo echo "127.0.0.1 simulator" | sudo tee -a /etc/hosts
 ```
