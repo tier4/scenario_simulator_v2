@@ -16,6 +16,7 @@
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/helper/helper.hpp>
 
 namespace entity_behavior
 {

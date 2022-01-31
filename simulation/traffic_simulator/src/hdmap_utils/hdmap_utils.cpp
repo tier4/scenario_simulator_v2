@@ -390,7 +390,7 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, bool include_crosswalk)
 {
-  const auto lanelet_ids = getNearbyLaneletIds(pose.position, 3.0, include_crosswalk);
+  const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
   if (lanelet_ids.empty()) {
     return boost::none;
   }
@@ -415,6 +415,12 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
     quaternion_operation::getRotation(pose_on_centerline.orientation, pose.orientation));
   double offset = std::sqrt(spline->getSquaredDistanceIn2D(pose.position, s.get()));
+  /**
+   * @note Hard coded parameter
+   */
+  if (offset > 0.5) {
+    return boost::none;
+  }
   double innter_prod = traffic_simulator::math::innterProduct(
     spline->getNormalVector(s.get()), spline->getSquaredDistanceVector(pose.position, s.get()));
   if (innter_prod < 0) {
