@@ -165,6 +165,7 @@ public:
     const std::vector<std::int64_t> & route_lanelets) const;
   traffic_simulator_msgs::msg::LaneletPose getAlongLaneletPose(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along);
+  auto isTrafficRelationId(const std::int64_t) const -> bool;
 
 private:
   traffic_simulator::math::HermiteCurve getLaneChangeTrajectory(

@@ -1635,4 +1635,11 @@ std::vector<std::int64_t> HdMapUtils::getLaneletIds(
   }
   return ids;
 }
+
+auto HdMapUtils::isTrafficRelationId(const std::int64_t lanelet_id) const -> bool
+{
+  return lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
+         std::dynamic_pointer_cast<lanelet::TrafficLight>(
+           lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+}
 }  // namespace hdmap_utils

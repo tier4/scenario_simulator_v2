@@ -45,6 +45,8 @@ protected:
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
+
   const std::string map_frame_;
 
   template <typename NodePointer>
@@ -54,6 +56,7 @@ protected:
   : marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "traffic_light/marker", rclcpp::QoS(1).transient_local())),
     clock_ptr_(node->get_clock()),
+    hdmap_(hdmap),
     map_frame_(map_frame)
   {
     for (const auto id : hdmap->getTrafficLightIds()) {
@@ -94,6 +97,8 @@ public:
   auto update(const double) -> void;
 
   auto isTrafficLightId(const LaneletID) -> bool;
+
+  auto isTrafficRelationId(const LaneletID) -> bool;
 
 #define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                         \
   template <typename... Ts>                                                                \
