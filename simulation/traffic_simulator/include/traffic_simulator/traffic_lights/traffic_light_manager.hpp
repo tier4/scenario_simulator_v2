@@ -76,8 +76,7 @@ protected:
         color_positions.emplace(TrafficLightColor::GREEN, green_position.get());
       }
       traffic_lights_.emplace(
-        std::piecewise_construct, std::make_tuple(id),
-        std::make_tuple(id, hdmap->getTrafficLightRelationId(id), color_positions));
+        std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, color_positions));
     }
   }
 
@@ -88,16 +87,10 @@ protected:
   template <typename F>
   auto forEachTrafficLights(const LaneletID lanelet_id, F && f) -> void
   {
-    std::cout << __func__ << " received lanelet id is " << lanelet_id << std::endl;
     if (isTrafficLightId(lanelet_id)) {
-      std::cout << __func__ << " received lanelet id " << lanelet_id << " is traffic light id"
-                << std::endl;
       f(traffic_lights_.at(lanelet_id));
     } else if (isTrafficRelationId(lanelet_id)) {
-      std::cout << __func__ << " received lanelet id " << lanelet_id
-                << " is traffic light relation id" << std::endl;
       for (auto && traffic_light : hdmap_->getTrafficLight(lanelet_id)->trafficLights()) {
-        std::cout << __func__ << " case " << traffic_light.id() << std::endl;
         f(traffic_lights_.at(traffic_light.id()));
       }
     } else {
@@ -147,7 +140,6 @@ public:
   template <typename T>                                                    \
   auto IDENTIFIER(const LaneletID lanelet_id, const T & x)->decltype(auto) \
   {                                                                        \
-    std::cout << __func__ << std::endl;                                    \
     forEachTrafficLights(lanelet_id, [&](auto && traffic_light) {          \
       return traffic_light.IDENTIFIER(std::forward<decltype(x)>(x));       \
     });                                                                    \

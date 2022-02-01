@@ -792,23 +792,6 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
   return ret;
 }
 
-std::int64_t HdMapUtils::getTrafficLightRelationId(std::int64_t traffic_light_id) const
-{
-  const auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(
-    lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
-  for (auto && light : autoware_traffic_lights) {
-    for (auto && light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id && id.get() == traffic_light_id) {
-          return light->id();
-        }
-      }
-    }
-  }
-  THROW_SEMANTIC_ERROR("traffic_light_id : ", traffic_light_id, " does not match to relation.");
-}
-
 std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 {
   std::vector<std::int64_t> ret;

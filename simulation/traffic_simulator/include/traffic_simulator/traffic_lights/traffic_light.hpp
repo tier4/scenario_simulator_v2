@@ -38,10 +38,9 @@ class TrafficLight
 
 public:
   const std::int64_t id;
-  const std::int64_t relation_id;
 
   explicit TrafficLight(
-    std::int64_t id, std::int64_t relation_id,
+    std::int64_t id,
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
 
