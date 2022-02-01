@@ -1642,4 +1642,11 @@ auto HdMapUtils::isTrafficRelationId(const std::int64_t lanelet_id) const -> boo
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
            lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
+
+auto HdMapUtils::getTrafficLight(const std::int64_t lanelet_id) const -> lanelet::TrafficLight::Ptr
+{
+  assert(isTrafficRelationId(lanelet_id));
+  return std::dynamic_pointer_cast<lanelet::TrafficLight>(
+    lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+}
 }  // namespace hdmap_utils

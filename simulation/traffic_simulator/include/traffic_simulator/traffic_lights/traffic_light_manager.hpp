@@ -85,6 +85,29 @@ protected:
 
   auto drawMarkers() const -> void;
 
+  template <typename F>
+  auto forEachTrafficLights(const LaneletID lanelet_id, F && f) -> void
+  {
+    std::cout << __func__ << " received lanelet id is " << lanelet_id << std::endl;
+    if (isTrafficLightId(lanelet_id)) {
+      std::cout << __func__ << " received lanelet id " << lanelet_id << " is traffic light id"
+                << std::endl;
+      f(traffic_lights_.at(lanelet_id));
+    } else if (isTrafficRelationId(lanelet_id)) {
+      std::cout << __func__ << " received lanelet id " << lanelet_id
+                << " is traffic light relation id" << std::endl;
+      for (auto && traffic_light : hdmap_->getTrafficLight(lanelet_id)->trafficLights()) {
+        std::cout << __func__ << " case " << traffic_light.id() << std::endl;
+        f(traffic_lights_.at(traffic_light.id()));
+      }
+    } else {
+      std::stringstream what;
+      what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))
+           << " is neither a traffic light ID not a traffc light relation ID.";
+      THROW_SEMANTIC_ERROR(what.str());
+    }
+  }
+
   virtual auto publishTrafficLightStateArray() const -> void = 0;
 
 public:
@@ -120,27 +143,15 @@ public:
 
 #undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
 
-#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                           \
-  template <typename... Ts>                                                                  \
-  auto IDENTIFIER(const LaneletID lanelet_id, Ts &&... xs)->decltype(auto)                   \
-  {                                                                                          \
-    if (isTrafficLightId(lanelet_id)) {                                                      \
-      try {                                                                                  \
-        return traffic_lights_.at(lanelet_id).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-      } catch (const std::out_of_range &) {                                                  \
-        std::stringstream what;                                                              \
-        what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))               \
-             << " is not a valid traffic-light ID.";                                         \
-        THROW_SEMANTIC_ERROR(what.str());                                                    \
-      }                                                                                      \
-    } else {                                                                                 \
-      for (auto light : traffic_lights_) {                                                   \
-        if (light.second.relation_id == lanelet_id) {                                        \
-          light.second.IDENTIFIER(std::forward<decltype(xs)>(xs)...);                        \
-        }                                                                                    \
-      }                                                                                      \
-    }                                                                                        \
-  }                                                                                          \
+#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                         \
+  template <typename T>                                                    \
+  auto IDENTIFIER(const LaneletID lanelet_id, const T & x)->decltype(auto) \
+  {                                                                        \
+    std::cout << __func__ << std::endl;                                    \
+    forEachTrafficLights(lanelet_id, [&](auto && traffic_light) {          \
+      return traffic_light.IDENTIFIER(std::forward<decltype(x)>(x));       \
+    });                                                                    \
+  }                                                                        \
   static_assert(true, "")
 
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrow);
