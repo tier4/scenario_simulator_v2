@@ -42,8 +42,7 @@ FollowFrontEntityAction::calculateObstacle(
   if (distance_to_front_entity_.get() < 0) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
-  if (distance_to_front_entity_.get() > spline.getLength()) {
+  if (distance_to_front_entity_.get() > common_spline->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
