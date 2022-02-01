@@ -110,6 +110,8 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
       ret.emplace_back(p);
       s = s - resolution;
     }
+    auto p = getPoint(end_s);
+    ret.emplace_back(p);
     return ret;
   } else {
     std::vector<geometry_msgs::msg::Point> ret;
@@ -120,6 +122,8 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
       ret.emplace_back(p);
       s = s + resolution;
     }
+    auto p = getPoint(end_s);
+    ret.emplace_back(p);
     return ret;
   }
 }
@@ -129,16 +133,94 @@ CatmullRomSpline CatmullRomSpline::getSubspline(double start_s, double end_s) co
   const auto start_index_and_s = getCurveIndexAndS(start_s);
   const auto end_index_and_s = getCurveIndexAndS(end_s);
 
-  std::vector<HermiteCurve> subspline_curves;
-  if (start_index_and_s.first < end_index_and_s.first) {
-    subspline_curves.assign(curves_.begin() + start_index_and_s.first,
-                            curves_.begin() + end_index_and_s.first);
-  } else {
-    subspline_curves.assign(curves_.begin() + end_index_and_s.first,
-                            curves_.begin() + start_index_and_s.first);
+  // std::cout << "start_s (global): " << start_s << ", (local): " << start_index_and_s.second << ", end_s (global): " << end_s << ", (local): " << end_index_and_s.second << std::endl;
+
+  // never saw this happening but just in case
+  if (start_index_and_s.first > end_index_and_s.first) {
+    THROW_SEMANTIC_ERROR(
+      "Start index ", start_index_and_s.first, " for start s ", start_s,
+      " should not be greater than end index ", end_index_and_s.first, "for end s ", end_s, ".");
   }
 
-  return CatmullRomSpline(subspline_curves);
+  std::vector<HermiteCurve> subspline_curves;
+  // auto start_point = getPoint(start_s);
+  // auto end_point = getPoint(end_s);
+
+  auto staring_curve_length = length_list_[start_index_and_s.first] - start_index_and_s.second;
+  auto ending_curve_length = end_index_and_s.second;
+
+  // TODO: check the indexes for starting and ending curves
+
+  // // calculate starting curve
+  // {
+  //   double ax = 0;
+  //   double bx = start_point.x - 2 * control_points[start_index_and_s.first + 1].x + control_points[start_index_and_s.first + 2].x;
+  //   double cx = -3 * start_point.x + 4 * control_points[start_index_and_s.first + 1].x - control_points[start_index_and_s.first + 2].x;
+  //   double dx = 2 * start_point.x;
+  //   double ay = 0;
+  //   double by = start_point.y - 2 * control_points[start_index_and_s.first + 1].y + control_points[start_index_and_s.first + 2].y;
+  //   double cy = -3 * start_point.y + 4 * control_points[start_index_and_s.first + 1].y - control_points[start_index_and_s.first + 2].y;
+  //   double dy = 2 * start_point.y;
+  //   double az = 0;
+  //   double bz = start_point.z - 2 * control_points[start_index_and_s.first + 1].z + control_points[start_index_and_s.first + 2].z;
+  //   double cz = -3 * start_point.z + 4 * control_points[start_index_and_s.first + 1].z - control_points[start_index_and_s.first + 2].z;
+  //   double dz = 2 * start_point.z;
+
+  //   ax = ax * 0.5;
+  //   bx = bx * 0.5;
+  //   cx = cx * 0.5;
+  //   dx = dx * 0.5;
+  //   ay = ay * 0.5;
+  //   by = by * 0.5;
+  //   cy = cy * 0.5;
+  //   dy = dy * 0.5;
+  //   az = az * 0.5;
+  //   bz = bz * 0.5;
+  //   cz = cz * 0.5;
+  //   dz = dz * 0.5;
+
+  //   // push_back() ???
+  //   subspline_curves.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+  // }
+
+  // copy the middle curves
+  subspline_curves.insert(
+    subspline_curves.end(), curves_.begin() + start_index_and_s.first,
+    curves_.begin() + end_index_and_s.first + 1);
+
+  // // calculate the ending curve
+  // {
+  //   double ax = 0;
+  //   double bx = control_points[end_index_and_s.first - 1].x - 2 * end_point.x + control_points[end_index_and_s.first + 1].x;
+  //   double cx = -1 * control_points[end_index_and_s.first - 1].x + control_points[end_index_and_s.first + 1].x;
+  //   double dx = 2 * end_point.x;
+  //   double ay = 0;
+  //   double by = control_points[end_index_and_s.first - 1].y - 2 * end_point.y + control_points[end_index_and_s.first + 1].y;
+  //   double cy = -1 * control_points[end_index_and_s.first - 1].y + control_points[end_index_and_s.first + 1].y;
+  //   double dy = 2 * end_point.y;
+  //   double az = 0;
+  //   double bz = control_points[end_index_and_s.first - 1].z - 2 * end_point.z + control_points[end_index_and_s.first + 1].z;
+  //   double cz = -1 * control_points[end_index_and_s.first - 1].z + control_points[end_index_and_s.first + 1].z;
+  //   double dz = 2 * end_point.z;
+
+  //   ax = ax * 0.5;
+  //   bx = bx * 0.5;
+  //   cx = cx * 0.5;
+  //   dx = dx * 0.5;
+  //   ay = ay * 0.5;
+  //   by = by * 0.5;
+  //   cy = cy * 0.5;
+  //   dy = dy * 0.5;
+  //   az = az * 0.5;
+  //   bz = bz * 0.5;
+  //   cz = cz * 0.5;
+  //   dz = dz * 0.5;
+
+  //   // push_back() ???
+  //   subspline_curves.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+  // }
+
+  return CatmullRomSpline(subspline_curves, staring_curve_length, ending_curve_length);
 }
 
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
@@ -148,7 +230,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   if (control_points.size() <= 2) {
     THROW_SEMANTIC_ERROR(
       control_points.size(),
-      " control points are only exists. At minimum, 2 control points are required");
+      " control points are only exists. At minimum, 3 control points are required");
   }
   for (size_t i = 0; i < n; i++) {
     if (i == 0) {
@@ -164,6 +246,8 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
       double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
       double dz = 2 * control_points[0].z;
+      // it would be better to merge these, sometimes we make calculations like 0*0.5
+      // however, this should not affect the performence much
       ax = ax * 0.5;
       bx = bx * 0.5;
       cx = cx * 0.5;
@@ -176,6 +260,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       bz = bz * 0.5;
       cz = cz * 0.5;
       dz = dz * 0.5;
+      // push_back() ???
       curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
     } else if (i == (n - 1)) {
       double ax = 0;
@@ -242,13 +327,26 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
     maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
   }
   total_length_ = 0;
+  // std::cout << "New spline length (";
   for (const auto & length : length_list_) {
     total_length_ = total_length_ + length;
+    // std::cout << length << ", ";
   }
+  // std::cout << "), total: " << total_length_ << std::endl;
+
+  // std::cout << "Points(";
+  // for (const auto & curve : curves_)
+  // {
+  //   auto p = curve.getPoint(0);
+  //   std::cout << "\n\tx: " << p.x << ", y: " << p.y << ", z:" << p.z;
+  // }
+  // std::cout << ");" << std::endl;
+
   checkConnection();
 }
 
-CatmullRomSpline::CatmullRomSpline(const std::vector<HermiteCurve> & curves)
+CatmullRomSpline::CatmullRomSpline(
+  const std::vector<HermiteCurve> & curves, double staring_curve_length, double ending_curve_length)
 {
   curves_ = curves;
 
@@ -257,10 +355,25 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<HermiteCurve> & curves)
     maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
   }
 
-  total_length_ = 0;
+  length_list_.front() = staring_curve_length;
+  curves_.front().setLength(staring_curve_length);
+  length_list_.back() = ending_curve_length;
+  curves_.back().setLength(ending_curve_length);
+
+  // std::cout << "Subspline length (";
   for (const auto & length : length_list_) {
     total_length_ = total_length_ + length;
+    // std::cout << length << ", ";
   }
+  // std::cout << "), total: " << total_length_ << std::endl;
+
+  // std::cout << "Points(";
+  // for (const auto & curve : curves_)
+  // {
+  //   auto p = curve.getPoint(0);
+  //   std::cout << "\n\tx: " << p.x << ", y: " << p.y << ", z:" << p.z;
+  // }
+  // std::cout << ");" << std::endl;
 
   // TODO: make sure that control_points are correct
   // checkConnection();
@@ -317,6 +430,7 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
     for (size_t i = 0; i < n; i++) {
       auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward, close_start_end);
       if (s) {
+        // std::cout << "i: " << i << ", s:" << s.get() << std::endl;
         return getSInSplineCurve(i, s.get());
       }
     }

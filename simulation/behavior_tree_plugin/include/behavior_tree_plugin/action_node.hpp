@@ -51,7 +51,7 @@ public:
     const std::vector<geometry_msgs::msg::Point> & waypoints);
   boost::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
-    const std::vector<geometry_msgs::msg::Point> & waypoints);
+    const traffic_simulator::math::CatmullRomSpline & spline);
   std::vector<traffic_simulator_msgs::msg::EntityStatus> getRightOfWayEntities();
   std::vector<traffic_simulator_msgs::msg::EntityStatus> getRightOfWayEntities(
     const std::vector<std::int64_t> & following_lanelets);

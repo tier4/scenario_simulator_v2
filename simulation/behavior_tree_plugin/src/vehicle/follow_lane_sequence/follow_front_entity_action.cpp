@@ -41,12 +41,13 @@ FollowFrontEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::Wa
   if (distance_to_front_entity_.get() < 0) {
     return boost::none;
   }
-  if (distance_to_front_entity_.get() > reference_trajectory->getLength()) {
+  if (distance_to_front_entity_.get() > subspline->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
   obstacle.type = obstacle.ENTITY;
   obstacle.s = distance_to_front_entity_.get();
+  // std::cout << "obstacle.s" << obstacle.s << std::endl;
   return obstacle;
 }
 
@@ -62,6 +63,9 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
+    subspline = std::make_unique<traffic_simulator::math::CatmullRomSpline>(
+      reference_trajectory->getSubspline(
+        entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon));
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -84,15 +88,24 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  auto distance_to_stopline =
-    hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
-  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, spline);
-  const auto front_entity_name = getFrontEntityName(spline);
+  auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *subspline);
+  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *subspline);
+  const auto front_entity_name = getFrontEntityName(*subspline);
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
+
+  // THIS WORKS
+  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
+  // std::cout << "spline calc!" << std::endl;
   distance_to_front_entity_ = getDistanceToTargetEntityPolygon(spline, front_entity_name.get());
+  // std::cout << "distance_to_front_entity_" << distance_to_front_entity_.get() << std::endl;
+
+  // // THIS DOES NOT WORK
+  // std::cout << "subspline calc!" << std::endl;
+  // distance_to_front_entity_ = getDistanceToTargetEntityPolygon(*subspline, front_entity_name.get());
+  // std::cout << "distance_to_front_entity_" << distance_to_front_entity_.get() << std::endl;
+
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }

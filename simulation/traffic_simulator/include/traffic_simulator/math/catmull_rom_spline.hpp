@@ -29,8 +29,11 @@ class CatmullRomSpline
 {
 public:
   CatmullRomSpline() = default;
+  CatmullRomSpline(const CatmullRomSpline &) = default;
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
-  explicit CatmullRomSpline(const std::vector<HermiteCurve> & curves);
+  explicit CatmullRomSpline(
+    const std::vector<HermiteCurve> & curves, double staring_curve_length,
+    double ending_curve_length);
   double getLength() const { return total_length_; }
   double getMaximum2DCurvature() const;
   const geometry_msgs::msg::Point getPoint(double s) const;

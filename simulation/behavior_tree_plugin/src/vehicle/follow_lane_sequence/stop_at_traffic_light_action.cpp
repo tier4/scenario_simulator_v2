@@ -41,7 +41,7 @@ StopAtTrafficLightAction::calculateObstacle(const traffic_simulator_msgs::msg::W
   if (distance_to_stop_target_.get() < 0) {
     return boost::none;
   }
-  if (distance_to_stop_target_.get() > reference_trajectory->getLength()) {
+  if (distance_to_stop_target_.get() > subspline->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -60,6 +60,9 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtTrafficLightAction::calc
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
       entity_status.lanelet_pose.offset);
+    subspline = std::make_unique<traffic_simulator::math::CatmullRomSpline>(
+      reference_trajectory->getSubspline(
+        entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon()));
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -102,13 +105,13 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
   const auto distance_to_traffic_stop_line =
-    hdmap_utils->getDistanceToTrafficLightStopLine(route_lanelets, waypoints.waypoints);
+    hdmap_utils->getDistanceToTrafficLightStopLine(route_lanelets, *subspline);
   if (!distance_to_traffic_stop_line) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_stop_target_ = getDistanceToTrafficLightStopLine(route_lanelets, waypoints.waypoints);
+  // calculating the distance for the second time???
+  distance_to_stop_target_ = getDistanceToTrafficLightStopLine(route_lanelets, *subspline);
   boost::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
     if (distance_to_stop_target_.get() > getHorizon()) {
