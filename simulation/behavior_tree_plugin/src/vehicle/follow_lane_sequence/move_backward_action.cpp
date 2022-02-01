@@ -41,6 +41,7 @@ const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateW
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
   const auto ids = hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id);
+  // DIFFERENT SPLINE - recalculation needed
   traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ids));
   double s_in_spline = 0;
   for (const auto id : ids) {

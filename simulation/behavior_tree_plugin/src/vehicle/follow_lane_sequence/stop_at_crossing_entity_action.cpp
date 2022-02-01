@@ -60,8 +60,7 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::ca
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
-    waypoints.waypoints = spline.getTrajectory(
+    waypoints.waypoints = common_spline->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0);
     return waypoints;
   } else {
