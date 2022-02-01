@@ -173,13 +173,14 @@ public:
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
     const std::string & map_frame = "map")
   : TrafficLightManagerBase(node, hdmap, map_frame),
-    traffic_light_state_array_publisher_(rclcpp::create_publisher<Message>(
-      node, "/perception/traffic_light_recognition/traffic_light_states",
-      rclcpp::QoS(10).transient_local()))
+    traffic_light_state_array_publisher_(
+      rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
   {
   }
 
 private:
+  static auto name() -> const char *;
+
   auto publishTrafficLightStateArray() const -> void override;
 };
 
@@ -188,11 +189,19 @@ auto TrafficLightManager<
   autoware_perception_msgs::msg::TrafficLightStateArray>::publishTrafficLightStateArray() const
   -> void;
 
+template <>
+auto TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>::name() -> const
+  char *;
+
 #ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto TrafficLightManager<
   autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
   -> void;
+
+template <>
+auto TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name() -> const
+  char *;
 #endif
 }  // namespace traffic_simulator
 
