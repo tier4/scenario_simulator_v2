@@ -309,9 +309,16 @@ const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale)
     s = s / getLength();
   }
   geometry_msgs::msg::Point p;
-  p.x = ax_ * std::pow(s, 3) + bx_ * std::pow(s, 2) + cx_ * s + dx_;
-  p.y = ay_ * std::pow(s, 3) + by_ * std::pow(s, 2) + cy_ * s + dy_;
-  p.z = az_ * std::pow(s, 3) + bz_ * std::pow(s, 2) + cz_ * s + dz_;
+
+  // optimization
+  auto s2 = s * s;
+  auto s3 = s2 * s;
+
+  p.x = ax_ * s3 + bx_ * s2 + cx_ * s + dx_;
+  p.y = ay_ * s3 + by_ * s2 + cy_ * s + dy_;
+  p.z = az_ * s3 + bz_ * s2 + cz_ * s + dz_;
+  // optimization
+
   return p;
 }
 }  // namespace math
