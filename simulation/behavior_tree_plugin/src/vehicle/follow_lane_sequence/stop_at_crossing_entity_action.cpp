@@ -43,7 +43,7 @@ StopAtCrossingEntityAction::calculateObstacle(
   if (distance_to_stop_target_.get() < 0) {
     return boost::none;
   }
-  if (distance_to_stop_target_.get() > common_spline->getLength()) {
+  if (distance_to_stop_target_.get() > subspline->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -61,6 +61,10 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::ca
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     waypoints.waypoints = common_spline->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0);
+    subspline = 
+      std::make_unique<traffic_simulator::math::CatmullRomSpline>(
+        common_spline->getSubspline(entity_status.lanelet_pose.s,
+                                    entity_status.lanelet_pose.s + getHorizon()));
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -107,11 +111,10 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
-  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, spline);
+  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, *subspline);
   auto distance_to_stopline =
-    hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-  const auto distance_to_front_entity = getDistanceToFrontEntity(spline);
+    hdmap_utils->getDistanceToStopLine(route_lanelets, *subspline);
+  const auto distance_to_front_entity = getDistanceToFrontEntity(*subspline);
   if (!distance_to_stop_target_) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;

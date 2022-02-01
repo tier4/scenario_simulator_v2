@@ -128,6 +128,8 @@ CatmullRomSpline CatmullRomSpline::getSubspline(double start_s, double end_s) co
   const auto start_index_and_s = getCurveIndexAndS(start_s);
   const auto end_index_and_s = getCurveIndexAndS(end_s);
 
+  // TODO: improve boundary condition
+  // recalculate the first and the last hermite curve with the correct point
   std::vector<HermiteCurve> subspline_curves;
   if (start_index_and_s.first < end_index_and_s.first) {
     subspline_curves.assign(curves_.begin() + start_index_and_s.first,
@@ -147,7 +149,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   if (control_points.size() <= 2) {
     THROW_SEMANTIC_ERROR(
       control_points.size(),
-      " control points are only exists. At minimum, 2 control points are required");
+      " control points are only exists. At minimum, 3 control points are required");
   }
   for (size_t i = 0; i < n; i++) {
     if (i == 0) {
@@ -163,6 +165,8 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
       double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
       double dz = 2 * control_points[0].z;
+      // it would be better to merge these, sometimes we make calculations like 0*0.5
+      // however, this should not affect the performence much
       ax = ax * 0.5;
       bx = bx * 0.5;
       cx = cx * 0.5;
