@@ -33,7 +33,7 @@ YieldAction::YieldAction(const std::string & name, const BT::NodeConfiguration &
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle> YieldAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+  const traffic_simulator_msgs::msg::WaypointsArray & /*waypoints*/)
 {
   if (!distance_to_stop_target_) {
     return boost::none;
@@ -62,9 +62,8 @@ const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoint
     waypoints.waypoints = common_spline->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0);
     subspline =
-      std::make_unique<traffic_simulator::math::CatmullRomSpline>(
-        common_spline->getSubspline(entity_status.lanelet_pose.s,
-                                    entity_status.lanelet_pose.s + horizon));
+      std::make_unique<traffic_simulator::math::CatmullRomSpline>(common_spline->getSubspline(
+        entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon));
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();

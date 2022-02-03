@@ -47,9 +47,8 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWay
     waypoints.waypoints = common_spline->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0);
     subspline =
-      std::make_unique<traffic_simulator::math::CatmullRomSpline>(
-        common_spline->getSubspline(entity_status.lanelet_pose.s,
-                                    entity_status.lanelet_pose.s + getHorizon()));
+      std::make_unique<traffic_simulator::math::CatmullRomSpline>(common_spline->getSubspline(
+        entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon()));
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -101,9 +100,9 @@ BT::NodeStatus FollowLaneAction::tick()
         return BT::NodeStatus::FAILURE;
       }
     }
-    auto distance_to_stopline =
-      hdmap_utils->getDistanceToStopLine(route_lanelets, *subspline);
-    auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *subspline);
+    auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *subspline);
+    auto distance_to_conflicting_entity =
+      getDistanceToConflictingEntity(route_lanelets, *subspline);
     if (distance_to_stopline) {
       if (
         distance_to_stopline.get() <=

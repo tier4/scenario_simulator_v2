@@ -132,11 +132,11 @@ CatmullRomSpline CatmullRomSpline::getSubspline(double start_s, double end_s) co
   // recalculate the first and the last hermite curve with the correct point
   std::vector<HermiteCurve> subspline_curves;
   if (start_index_and_s.first < end_index_and_s.first) {
-    subspline_curves.assign(curves_.begin() + start_index_and_s.first,
-                            curves_.begin() + end_index_and_s.first);
+    subspline_curves.assign(
+      curves_.begin() + start_index_and_s.first, curves_.begin() + end_index_and_s.first);
   } else {
-    subspline_curves.assign(curves_.begin() + end_index_and_s.first,
-                            curves_.begin() + start_index_and_s.first);
+    subspline_curves.assign(
+      curves_.begin() + end_index_and_s.first, curves_.begin() + start_index_and_s.first);
   }
 
   return CatmullRomSpline(subspline_curves);

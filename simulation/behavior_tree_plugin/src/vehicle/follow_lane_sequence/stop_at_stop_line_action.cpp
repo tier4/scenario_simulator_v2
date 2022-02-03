@@ -64,9 +64,8 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculat
     waypoints.waypoints = common_spline->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0);
     subspline =
-      std::make_unique<traffic_simulator::math::CatmullRomSpline>(
-        common_spline->getSubspline(entity_status.lanelet_pose.s,
-                                    entity_status.lanelet_pose.s + horizon));
+      std::make_unique<traffic_simulator::math::CatmullRomSpline>(common_spline->getSubspline(
+        entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon));
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();

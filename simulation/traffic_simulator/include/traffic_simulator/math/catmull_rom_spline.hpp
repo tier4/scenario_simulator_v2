@@ -29,7 +29,7 @@ class CatmullRomSpline
 {
 public:
   CatmullRomSpline() = default;
-  CatmullRomSpline(const CatmullRomSpline&) = default;
+  CatmullRomSpline(const CatmullRomSpline &) = default;
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
   explicit CatmullRomSpline(const std::vector<HermiteCurve> & curves);
   double getLength() const { return total_length_; }
