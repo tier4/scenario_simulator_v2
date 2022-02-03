@@ -38,7 +38,9 @@ auto TeleportAction::evaluate() const -> Object
   return unspecified;
 }
 
-auto TeleportAction::run() const -> void
+auto TeleportAction::run() noexcept -> void {}
+
+auto TeleportAction::start() const -> void
 {
   for (const auto & actor : actors) {
     if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
@@ -47,11 +49,6 @@ auto TeleportAction::run() const -> void
       return teleport(actor, position);
     }
   }
-}
-
-auto TeleportAction::start() noexcept -> void  //
-{
-  // NO OPERATION
 }
 
 auto TeleportAction::teleport(const EntityRef & entity_ref, const Position & position) -> void
