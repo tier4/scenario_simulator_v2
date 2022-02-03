@@ -67,7 +67,7 @@ auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;
 
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(datum.state());
 
   json["ManeuverGroup"] = nlohmann::json::array();
 

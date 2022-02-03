@@ -72,7 +72,7 @@ auto operator<<(nlohmann::json & json, const Event & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;
 
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(datum.state());
 
   json["currentExecutionCount"] = datum.current_execution_count;
   json["maximumExecutionCount"] = datum.maximum_execution_count;

@@ -46,7 +46,7 @@ auto StoryboardElementStateCondition::evaluate() -> Object
   try {
     result = local()
                .ref<StoryboardElement>(storyboard_element_ref)
-               .currentState()
+               .state()
                .template as<StoryboardElementState>();
     return asBoolean(result == state);
   } catch (const std::out_of_range &) {
