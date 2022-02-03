@@ -28,8 +28,10 @@ namespace math
 class CatmullRomSpline
 {
 public:
-  CatmullRomSpline() = delete;
+  CatmullRomSpline() = default;
+  CatmullRomSpline(const CatmullRomSpline&) = default;
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
+  explicit CatmullRomSpline(const std::vector<HermiteCurve> & curves);
   double getLength() const { return total_length_; }
   double getMaximum2DCurvature() const;
   const geometry_msgs::msg::Point getPoint(double s) const;
@@ -55,6 +57,7 @@ public:
     double width, double s, double z_offset = 0) const;
   const std::vector<geometry_msgs::msg::Point> getPolygon(
     double width, size_t num_points = 30, double z_offset = 0);
+  CatmullRomSpline getSubspline(double start_s, double end_s) const;
 
 private:
   const std::vector<geometry_msgs::msg::Point> getRightBounds(
@@ -65,11 +68,14 @@ private:
   std::pair<size_t, double> getCurveIndexAndS(double s) const;
   bool checkConnection() const;
   bool equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const;
+
+  // internal state //
   std::vector<HermiteCurve> curves_;
   std::vector<double> length_list_;
   std::vector<double> maximum_2d_curvatures_;
   double total_length_;
   const std::vector<geometry_msgs::msg::Point> control_points;
+  ////////////////////
 };
 }  // namespace math
 }  // namespace traffic_simulator

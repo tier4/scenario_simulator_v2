@@ -41,8 +41,7 @@ const boost::optional<traffic_simulator_msgs::msg::Obstacle> YieldAction::calcul
   if (distance_to_stop_target_.get() < 0) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
-  if (distance_to_stop_target_.get() > spline.getLength()) {
+  if (distance_to_stop_target_.get() > subspline->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -60,9 +59,12 @@ const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoint
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
-    traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
-    waypoints.waypoints = spline.getTrajectory(
+    waypoints.waypoints = common_spline->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0);
+    subspline =
+      std::make_unique<traffic_simulator::math::CatmullRomSpline>(
+        common_spline->getSubspline(entity_status.lanelet_pose.s,
+                                    entity_status.lanelet_pose.s + horizon));
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();

@@ -160,7 +160,7 @@ std::vector<traffic_simulator_msgs::msg::EntityStatus> ActionNode::getRightOfWay
 
 boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const std::vector<geometry_msgs::msg::Point> & waypoints)
+  const traffic_simulator::math::CatmullRomSpline & spline)
 {
   const auto traffic_light_ids = hdmap_utils->getTrafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.empty()) {
@@ -172,7 +172,7 @@ boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
     if (
       color == traffic_simulator::TrafficLightColor::RED ||
       color == traffic_simulator::TrafficLightColor::YELLOW) {
-      const auto collision_point = hdmap_utils->getDistanceToTrafficLightStopLine(waypoints, id);
+      const auto collision_point = hdmap_utils->getDistanceToTrafficLightStopLine(spline, id);
       if (collision_point) {
         collision_points.insert(collision_point.get());
       }

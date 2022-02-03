@@ -36,6 +36,9 @@ void VehicleActionNode::getBlackBoardValues()
         "vehicle_parameters", vehicle_parameters)) {
     THROW_SIMULATION_ERROR("failed to get input vehicle_parameters in VehicleActionNode");
   }
+  if (!getInput<std::shared_ptr<traffic_simulator::math::CatmullRomSpline>>("common_spline", common_spline)) {
+    THROW_SIMULATION_ERROR("failed to get input common_spline in VehicleActionNode");
+  }
 }
 
 traffic_simulator_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(

@@ -123,6 +123,25 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
   }
 }
 
+CatmullRomSpline CatmullRomSpline::getSubspline(double start_s, double end_s) const
+{
+  const auto start_index_and_s = getCurveIndexAndS(start_s);
+  const auto end_index_and_s = getCurveIndexAndS(end_s);
+
+  // TODO: improve boundary condition
+  // recalculate the first and the last hermite curve with the correct point
+  std::vector<HermiteCurve> subspline_curves;
+  if (start_index_and_s.first < end_index_and_s.first) {
+    subspline_curves.assign(curves_.begin() + start_index_and_s.first,
+                            curves_.begin() + end_index_and_s.first);
+  } else {
+    subspline_curves.assign(curves_.begin() + end_index_and_s.first,
+                            curves_.begin() + start_index_and_s.first);
+  }
+
+  return CatmullRomSpline(subspline_curves);
+}
+
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
 : control_points(control_points)
 {
@@ -130,7 +149,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   if (control_points.size() <= 2) {
     THROW_SEMANTIC_ERROR(
       control_points.size(),
-      " control points are only exists. At minimum, 2 control points are required");
+      " control points are only exists. At minimum, 3 control points are required");
   }
   for (size_t i = 0; i < n; i++) {
     if (i == 0) {
@@ -146,6 +165,8 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
       double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
       double dz = 2 * control_points[0].z;
+      // it would be better to merge these, sometimes we make calculations like 0*0.5
+      // however, this should not affect the performence much
       ax = ax * 0.5;
       bx = bx * 0.5;
       cx = cx * 0.5;
@@ -228,6 +249,24 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
     total_length_ = total_length_ + length;
   }
   checkConnection();
+}
+
+CatmullRomSpline::CatmullRomSpline(const std::vector<HermiteCurve> & curves)
+{
+  curves_ = curves;
+
+  for (const auto & curve : curves_) {
+    length_list_.emplace_back(curve.getLength());
+    maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
+  }
+
+  total_length_ = 0;
+  for (const auto & length : length_list_) {
+    total_length_ = total_length_ + length;
+  }
+
+  // TODO: make sure that control_points are correct
+  // checkConnection();
 }
 
 std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
