@@ -40,9 +40,9 @@ struct AcquirePositionAction : private Scope
 
   static constexpr auto accomplished() -> bool { return true; }
 
-  static constexpr auto endsImmediately() -> bool { return true; };
+  static constexpr auto endsImmediately() -> bool { return true; }
 
-  static constexpr auto run() noexcept -> void{};
+  static constexpr auto run() noexcept -> void {}
 
   auto start() -> void;
 };
