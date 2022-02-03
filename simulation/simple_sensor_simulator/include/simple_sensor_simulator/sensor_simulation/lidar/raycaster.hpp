@@ -36,7 +36,7 @@ class Raycaster
 {
 public:
   Raycaster();
-  explicit Raycaster(std::string embree_config);
+  explicit Raycaster(const std::string & embree_config);
   ~Raycaster();
   template <typename T, typename... Ts>
   void addPrimitive(std::string name, Ts &&... xs)
@@ -48,7 +48,7 @@ public:
     primitive_ptrs_.emplace(name, std::move(primitive_ptr));
   }
   void clearPrimitives() { primitive_ptrs_.clear(); }
-  const sensor_msgs::msg::PointCloud2 raycast(
+  sensor_msgs::msg::PointCloud2 raycast(
     std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
     double horizontal_resolution, const std::vector<double> & vertical_angles,
     double horizontal_angle_start = 0, double horizontal_angle_end = 2 * M_PI,
@@ -61,17 +61,16 @@ private:
   RTCScene scene_;
   std::random_device seed_gen_;
   std::default_random_engine engine_;
-  const sensor_msgs::msg::PointCloud2 raycast(
+  sensor_msgs::msg::PointCloud2 raycast(
     std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
     const std::vector<geometry_msgs::msg::Quaternion> & directions, double max_distance = 100,
     double min_distance = 0);
   std::vector<std::string> detected_objects_;
   std::unordered_map<unsigned int, std::string> geometry_ids_;
 
-  std::function<std::tuple<std::vector<unsigned int>, pcl::PointCloud<pcl::PointXYZI>::Ptr>(
-    RTCScene scene, RTCIntersectContext & context, const geometry_msgs::msg::Pose & origin,
-    const std::vector<geometry_msgs::msg::Quaternion> & directions, double max_distance,
-    double min_distance)>
+  std::function<std::tuple<std::unordered_set<unsigned int>, pcl::PointCloud<pcl::PointXYZI>::Ptr>(
+    RTCScene, RTCIntersectContext &, const geometry_msgs::msg::Pose &,
+    const std::vector<geometry_msgs::msg::Quaternion> &, double, double)>
     calc_intersects;
 };
 }  // namespace simple_sensor_simulator

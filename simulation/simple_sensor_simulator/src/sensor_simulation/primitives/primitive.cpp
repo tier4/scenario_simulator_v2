@@ -24,7 +24,10 @@ namespace simple_sensor_simulator
 {
 namespace primitives
 {
-Primitive::Primitive(std::string type, geometry_msgs::msg::Pose pose) : type(type), pose(pose) {}
+Primitive::Primitive(std::string type, geometry_msgs::msg::Pose pose)
+: type(std::move(type)), pose(pose)
+{
+}
 
 Vertex Primitive::transform(Vertex v) const
 {
@@ -47,27 +50,24 @@ Vertex Primitive::transform(Vertex v) const
 std::vector<Vertex> Primitive::transform() const
 {
   std::vector<Vertex> ret;
+  ret.reserve(vertices_.size());
   for (auto & v : vertices_) {
     ret.emplace_back(transform(v));
   }
   return ret;
 }
 
-std::vector<Vertex> Primitive::getVertex() const { return transform(); }
-
-std::vector<Triangle> Primitive::getTriangles() const { return triangles_; }
-
 unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
 {
   RTCGeometry mesh = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
   const auto transformed_vertices = transform();
-  Vertex * vertices = static_cast<Vertex *>(rtcSetNewGeometryBuffer(
+  auto vertices = static_cast<Vertex *>(rtcSetNewGeometryBuffer(
     mesh, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(Vertex),
     transformed_vertices.size()));
   for (size_t i = 0; i < transformed_vertices.size(); i++) {
     vertices[i] = transformed_vertices[i];
   }
-  Triangle * triangles = static_cast<Triangle *>(rtcSetNewGeometryBuffer(
+  auto triangles = static_cast<Triangle *>(rtcSetNewGeometryBuffer(
     mesh, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(Triangle), triangles_.size()));
   for (size_t i = 0; i < triangles_.size(); i++) {
     triangles[i] = triangles_[i];

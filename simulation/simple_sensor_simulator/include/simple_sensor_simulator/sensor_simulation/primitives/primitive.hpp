@@ -44,12 +44,18 @@ class Primitive
 {
 public:
   Primitive(std::string type, geometry_msgs::msg::Pose pose);
+
   virtual ~Primitive() = default;
-  const std::string type;
-  const geometry_msgs::msg::Pose pose;
+
   unsigned int addToScene(RTCDevice device, RTCScene scene);
-  std::vector<Vertex> getVertex() const;
-  std::vector<Triangle> getTriangles() const;
+
+  std::vector<Vertex> getVertex() const { return transform(); }
+
+  const std::vector<Triangle> & getTriangles() const { return triangles_; }
+
+  const std::string type;
+
+  const geometry_msgs::msg::Pose pose;
 
 protected:
   std::vector<Vertex> transform() const;

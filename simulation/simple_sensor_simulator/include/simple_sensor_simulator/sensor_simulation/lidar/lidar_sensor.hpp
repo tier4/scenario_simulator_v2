@@ -31,7 +31,7 @@ class LidarSensorBase
 protected:
   double last_update_stamp_;
 
-  simulation_api_schema::LidarConfiguration configuration_;
+  const simulation_api_schema::LidarConfiguration configuration_;
 
   std::vector<std::string> detected_objects_;
 
