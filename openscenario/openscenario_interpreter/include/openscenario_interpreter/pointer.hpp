@@ -61,11 +61,6 @@ class Pointer : public std::shared_ptr<T>
       return IfHasMemberFunctionEvaluate<Bound>::invoke(static_cast<Bound &>(*this), else_);
     }
 
-    auto currentState() const -> const Pointer & override
-    {
-      return IfHasMemberFunctionCurrentState<Bound>::template invoke<Pointer>(*this);
-    }
-
     auto write(std::ostream & os) const -> std::ostream & override
     {
       return IfHasStreamOutputOperator<Bound>::invoke(os, *this);
@@ -132,12 +127,6 @@ public:
   decltype(auto) accomplished(Ts &&... xs) const
   {
     return binding().accomplished(std::forward<decltype(xs)>(xs)...);
-  }
-
-  template <typename... Ts>
-  decltype(auto) currentState(Ts &&... xs) const
-  {
-    return binding().currentState(std::forward<decltype(xs)>(xs)...);
   }
 
   template <typename... Ts>
