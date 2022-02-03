@@ -25,6 +25,18 @@ namespace openscenario_interpreter
 {
 using Object = Pointer<Expression>;
 
+template <typename T>
+struct is
+{
+  auto operator()(const Object & object) const { return object.is<T>(); }
+};
+
+template <>
+struct is<Object>
+{
+  auto operator()(const Object &) const noexcept { return true; }
+};
+
 using ComplexType = Object;
 
 using Group = Object;

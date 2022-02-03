@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__POINTER_HPP_
 #define OPENSCENARIO_INTERPRETER__POINTER_HPP_
 
+#include <cstddef>
 #include <memory>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_accomplished.hpp>
@@ -72,10 +73,7 @@ class Pointer : public std::shared_ptr<T>
   };
 
 public:
-  template <typename... Ts>
-  explicit constexpr Pointer(Ts &&... xs) : std::shared_ptr<T>{std::forward<decltype(xs)>(xs)...}
-  {
-  }
+  using std::shared_ptr<T>::shared_ptr;
 
   template <typename U, typename... Ts>
   static Pointer bind(Ts &&... xs)
@@ -100,7 +98,7 @@ public:
     }
   }
 
-  decltype(auto) type() const { return binding().type(); }
+  auto type() const -> const std::type_info & { return *this ? binding().type() : typeid(nullptr); }
 
   template <typename U>
   auto is() const -> bool

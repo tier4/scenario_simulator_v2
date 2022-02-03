@@ -45,6 +45,8 @@ protected:
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
+
   const std::string map_frame_;
 
   template <typename NodePointer>
@@ -54,6 +56,7 @@ protected:
   : marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "traffic_light/marker", rclcpp::QoS(1).transient_local())),
     clock_ptr_(node->get_clock()),
+    hdmap_(hdmap),
     map_frame_(map_frame)
   {
     for (const auto id : hdmap->getTrafficLightIds()) {
@@ -73,14 +76,30 @@ protected:
         color_positions.emplace(TrafficLightColor::GREEN, green_position.get());
       }
       traffic_lights_.emplace(
-        std::piecewise_construct, std::make_tuple(id),
-        std::make_tuple(id, hdmap->getTrafficLightRelationId(id), color_positions));
+        std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, color_positions));
     }
   }
 
   auto deleteAllMarkers() const -> void;
 
   auto drawMarkers() const -> void;
+
+  template <typename F>
+  auto forEachTrafficLights(const LaneletID lanelet_id, F && f) -> void
+  {
+    if (isTrafficLightId(lanelet_id)) {
+      f(traffic_lights_.at(lanelet_id));
+    } else if (isTrafficRelationId(lanelet_id)) {
+      for (auto && traffic_light : hdmap_->getTrafficLight(lanelet_id)->trafficLights()) {
+        f(traffic_lights_.at(traffic_light.id()));
+      }
+    } else {
+      std::stringstream what;
+      what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))
+           << " is neither a traffic light ID not a traffc light relation ID.";
+      THROW_SEMANTIC_ERROR(what.str());
+    }
+  }
 
   virtual auto publishTrafficLightStateArray() const -> void = 0;
 
@@ -93,7 +112,9 @@ public:
 
   auto update(const double) -> void;
 
-  bool isTrafficLightId(const LaneletID);
+  auto isTrafficLightId(const LaneletID) -> bool;
+
+  auto isTrafficRelationId(const LaneletID) -> bool;
 
 #define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                         \
   template <typename... Ts>                                                                \
@@ -115,27 +136,14 @@ public:
 
 #undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
 
-#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                           \
-  template <typename... Ts>                                                                  \
-  auto IDENTIFIER(const LaneletID lanelet_id, Ts &&... xs)->decltype(auto)                   \
-  {                                                                                          \
-    if (isTrafficLightId(lanelet_id)) {                                                      \
-      try {                                                                                  \
-        return traffic_lights_.at(lanelet_id).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-      } catch (const std::out_of_range &) {                                                  \
-        std::stringstream what;                                                              \
-        what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))               \
-             << " is not a valid traffic-light ID.";                                         \
-        THROW_SEMANTIC_ERROR(what.str());                                                    \
-      }                                                                                      \
-    } else {                                                                                 \
-      for (auto light : traffic_lights_) {                                                   \
-        if (light.second.relation_id == lanelet_id) {                                        \
-          light.second.IDENTIFIER(std::forward<decltype(xs)>(xs)...);                        \
-        }                                                                                    \
-      }                                                                                      \
-    }                                                                                        \
-  }                                                                                          \
+#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                         \
+  template <typename T>                                                    \
+  auto IDENTIFIER(const LaneletID lanelet_id, const T & x)->decltype(auto) \
+  {                                                                        \
+    forEachTrafficLights(lanelet_id, [&](auto && traffic_light) {          \
+      return traffic_light.IDENTIFIER(std::forward<decltype(x)>(x));       \
+    });                                                                    \
+  }                                                                        \
   static_assert(true, "")
 
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrow);
@@ -157,13 +165,14 @@ public:
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
     const std::string & map_frame = "map")
   : TrafficLightManagerBase(node, hdmap, map_frame),
-    traffic_light_state_array_publisher_(rclcpp::create_publisher<Message>(
-      node, "/perception/traffic_light_recognition/traffic_light_states",
-      rclcpp::QoS(10).transient_local()))
+    traffic_light_state_array_publisher_(
+      rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
   {
   }
 
 private:
+  static auto name() -> const char *;
+
   auto publishTrafficLightStateArray() const -> void override;
 };
 
@@ -172,11 +181,19 @@ auto TrafficLightManager<
   autoware_perception_msgs::msg::TrafficLightStateArray>::publishTrafficLightStateArray() const
   -> void;
 
+template <>
+auto TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>::name() -> const
+  char *;
+
 #ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto TrafficLightManager<
   autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
   -> void;
+
+template <>
+auto TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name() -> const
+  char *;
 #endif
 }  // namespace traffic_simulator
 

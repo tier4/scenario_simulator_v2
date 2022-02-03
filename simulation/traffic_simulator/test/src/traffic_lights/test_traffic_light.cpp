@@ -31,7 +31,7 @@ geometry_msgs::msg::Point getPoint(double val)
 
 TEST(TrafficLights, getPositionError)
 {
-  traffic_simulator::TrafficLight light(0, 1);
+  traffic_simulator::TrafficLight light(0);
   EXPECT_THROW(
     light.getPosition(traffic_simulator::TrafficLightColor::NONE), common::SemanticError);
   EXPECT_THROW(
@@ -48,7 +48,6 @@ TEST(TrafficLights, getPositionError)
   EXPECT_THROW(
     light.getPosition(traffic_simulator::TrafficLightArrow::STRAIGHT), common::SemanticError);
   EXPECT_EQ(light.id, static_cast<std::int64_t>(0));
-  EXPECT_EQ(light.relation_id, static_cast<std::int64_t>(1));
 }
 
 TEST(TrafficLights, getColorPosition)
@@ -58,7 +57,7 @@ TEST(TrafficLights, getColorPosition)
   color_positions[traffic_simulator::TrafficLightColor::GREEN] = getPoint(0);
   color_positions[traffic_simulator::TrafficLightColor::YELLOW] = getPoint(1);
   color_positions[traffic_simulator::TrafficLightColor::RED] = getPoint(2);
-  traffic_simulator::TrafficLight light(0, 1, color_positions);
+  traffic_simulator::TrafficLight light(0, color_positions);
   EXPECT_THROW(
     light.getPosition(traffic_simulator::TrafficLightColor::NONE), common::SemanticError);
   EXPECT_POINT_EQ(light.getPosition(traffic_simulator::TrafficLightColor::GREEN), getPoint(0));
@@ -73,7 +72,6 @@ TEST(TrafficLights, getColorPosition)
   EXPECT_THROW(
     light.getPosition(traffic_simulator::TrafficLightArrow::STRAIGHT), common::SemanticError);
   EXPECT_EQ(light.id, static_cast<std::int64_t>(0));
-  EXPECT_EQ(light.relation_id, static_cast<std::int64_t>(1));
 }
 
 TEST(TrafficLights, getArrowPosition)
@@ -83,7 +81,7 @@ TEST(TrafficLights, getArrowPosition)
   arrow_positions[traffic_simulator::TrafficLightArrow::STRAIGHT] = getPoint(0);
   arrow_positions[traffic_simulator::TrafficLightArrow::LEFT] = getPoint(1);
   arrow_positions[traffic_simulator::TrafficLightArrow::RIGHT] = getPoint(2);
-  traffic_simulator::TrafficLight light(1, 2, {}, arrow_positions);
+  traffic_simulator::TrafficLight light(1, {}, arrow_positions);
   EXPECT_THROW(
     light.getPosition(traffic_simulator::TrafficLightArrow::NONE), common::SemanticError);
   EXPECT_POINT_EQ(light.getPosition(traffic_simulator::TrafficLightArrow::STRAIGHT), getPoint(0));
@@ -97,7 +95,6 @@ TEST(TrafficLights, getArrowPosition)
     light.getPosition(traffic_simulator::TrafficLightColor::YELLOW), common::SemanticError);
   EXPECT_THROW(light.getPosition(traffic_simulator::TrafficLightColor::RED), common::SemanticError);
   EXPECT_EQ(light.id, static_cast<std::int64_t>(1));
-  EXPECT_EQ(light.relation_id, static_cast<std::int64_t>(2));
 }
 
 TEST(TrafficLights, getColorAndArrowPosition)
@@ -112,7 +109,7 @@ TEST(TrafficLights, getColorAndArrowPosition)
   arrow_positions[traffic_simulator::TrafficLightArrow::STRAIGHT] = getPoint(3);
   arrow_positions[traffic_simulator::TrafficLightArrow::LEFT] = getPoint(4);
   arrow_positions[traffic_simulator::TrafficLightArrow::RIGHT] = getPoint(5);
-  traffic_simulator::TrafficLight light(0, 1, color_positions, arrow_positions);
+  traffic_simulator::TrafficLight light(0, color_positions, arrow_positions);
   EXPECT_THROW(
     light.getPosition(traffic_simulator::TrafficLightArrow::NONE), common::SemanticError);
   EXPECT_POINT_EQ(light.getPosition(traffic_simulator::TrafficLightArrow::STRAIGHT), getPoint(3));
@@ -124,7 +121,6 @@ TEST(TrafficLights, getColorAndArrowPosition)
   EXPECT_POINT_EQ(light.getPosition(traffic_simulator::TrafficLightColor::YELLOW), getPoint(1));
   EXPECT_POINT_EQ(light.getPosition(traffic_simulator::TrafficLightColor::RED), getPoint(2));
   EXPECT_EQ(light.id, static_cast<std::int64_t>(0));
-  EXPECT_EQ(light.relation_id, static_cast<std::int64_t>(1));
 }
 
 TEST(TrafficLights, setColorPhase)
@@ -139,7 +135,7 @@ TEST(TrafficLights, setColorPhase)
   arrow_positions[traffic_simulator::TrafficLightArrow::STRAIGHT] = getPoint(3);
   arrow_positions[traffic_simulator::TrafficLightArrow::LEFT] = getPoint(4);
   arrow_positions[traffic_simulator::TrafficLightArrow::RIGHT] = getPoint(5);
-  traffic_simulator::TrafficLight light(302120, 0, color_positions, arrow_positions);
+  traffic_simulator::TrafficLight light(302120, color_positions, arrow_positions);
   std::vector<std::pair<double, traffic_simulator::TrafficLightColor> > color_phases;
   color_phases.emplace_back(std::make_pair<double, traffic_simulator::TrafficLightColor>(
     10, traffic_simulator::TrafficLightColor::RED));
@@ -185,7 +181,7 @@ TEST(TrafficLights, setColorAndArrowPhase)
   arrow_positions[traffic_simulator::TrafficLightArrow::STRAIGHT] = getPoint(3);
   arrow_positions[traffic_simulator::TrafficLightArrow::LEFT] = getPoint(4);
   arrow_positions[traffic_simulator::TrafficLightArrow::RIGHT] = getPoint(5);
-  traffic_simulator::TrafficLight light(302120, 0, color_positions, arrow_positions);
+  traffic_simulator::TrafficLight light(302120, color_positions, arrow_positions);
   std::vector<std::pair<double, traffic_simulator::TrafficLightColor> > color_phases;
   color_phases.emplace_back(std::make_pair<double, traffic_simulator::TrafficLightColor>(
     10, traffic_simulator::TrafficLightColor::RED));

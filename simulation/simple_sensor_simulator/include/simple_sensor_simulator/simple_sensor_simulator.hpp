@@ -27,7 +27,6 @@
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
-#include <simulation_interface/zmq_server.hpp>
 #include <string>
 #include <thread>
 #include <vector>

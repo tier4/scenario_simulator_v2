@@ -53,7 +53,7 @@ auto ParameterSetAction::set(
       // clang-format on
     };
 
-  const auto parameter = scope.findObject(parameter_ref);
+  const auto parameter = scope.ref(parameter_ref);
 
   overloads.at(parameter.type())(parameter, value);
 }

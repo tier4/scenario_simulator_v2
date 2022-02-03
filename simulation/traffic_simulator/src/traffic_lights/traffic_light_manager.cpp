@@ -38,12 +38,15 @@ auto TrafficLightManagerBase::getInstance(const LaneletID lanelet_id) const -> T
   return traffic_lights_.at(lanelet_id);
 }
 
-bool TrafficLightManagerBase::isTrafficLightId(const LaneletID lanelet_id)
+auto TrafficLightManagerBase::isTrafficLightId(const LaneletID lanelet_id) -> bool
 {
-  if (traffic_lights_.find(lanelet_id) == traffic_lights_.end()) {
-    return false;
-  }
-  return true;
+  return traffic_lights_.find(lanelet_id) != std::end(traffic_lights_);
+}
+
+auto TrafficLightManagerBase::isTrafficRelationId(const LaneletID lanelet_id) -> bool
+{
+  assert(hdmap_);
+  return hdmap_->isTrafficRelationId(lanelet_id);
 }
 
 auto TrafficLightManagerBase::deleteAllMarkers() const -> void
@@ -91,10 +94,9 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
 auto TrafficLightManagerBase::hasAnyLightChanged() -> bool
 {
   return std::any_of(
-    std::begin(traffic_lights_), std::end(traffic_lights_), [](const auto & id_and_traffic_light) {
-      return (
-        std::get<1>(id_and_traffic_light).colorChanged() ||
-        std::get<1>(id_and_traffic_light).arrowChanged());
+    std::begin(traffic_lights_), std::end(traffic_lights_), [](auto && id_and_traffic_light) {
+      return id_and_traffic_light.second.colorChanged() or
+             id_and_traffic_light.second.arrowChanged();
     });
 }
 
@@ -132,6 +134,13 @@ auto TrafficLightManager<
   traffic_light_state_array_publisher_->publish(traffic_light_state_array);
 }
 
+template <>
+auto TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>::name() -> const
+  char *
+{
+  return "/perception/traffic_light_recognition/traffic_light_states";
+}
+
 #ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto TrafficLightManager<
@@ -150,6 +159,13 @@ auto TrafficLightManager<
     }
   }
   traffic_light_state_array_publisher_->publish(traffic_light_state_array);
+}
+
+template <>
+auto TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name() -> const
+  char *
+{
+  return "/perception/traffic_light_recognition/traffic_signals";
 }
 #endif
 }  // namespace traffic_simulator

@@ -34,14 +34,7 @@ auto TrafficSignalControllerAction::endsImmediately() noexcept -> bool { return 
 
 auto TrafficSignalControllerAction::run() -> void
 {
-  auto found = local().findObject(traffic_signal_controller_ref);
-  if (found and found.is<TrafficSignalController>()) {
-    found.as<TrafficSignalController>().changePhaseTo(phase);
-  } else {
-    THROW_SYNTAX_ERROR(
-      "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
-      " is not declared in this scope");
-  }
+  local().ref<TrafficSignalController>(traffic_signal_controller_ref).changePhaseTo(phase);
 }
 
 auto TrafficSignalControllerAction::start() noexcept -> void {}

@@ -47,7 +47,7 @@ auto TrafficSignals::resolve_reference(Scope & scope) -> void
   for (auto & each : traffic_signal_controllers) {
     if (not each->reference.empty()) {
       try {
-        auto & reference = scope.findObject(each->reference).as<TrafficSignalController>();
+        auto & reference = scope.ref<TrafficSignalController>(each->reference);
         if (each->cycleTime() != reference.cycleTime()) {
           THROW_SEMANTIC_ERROR(
             "The cycle time of ", each->name, "(", each->cycleTime(), " sec) and ", each->reference,

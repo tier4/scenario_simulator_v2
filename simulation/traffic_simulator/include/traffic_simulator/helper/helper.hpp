@@ -20,6 +20,7 @@
 #include <cmath>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <iostream>
 #include <string>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
@@ -101,5 +102,13 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 
 std::ostream & operator<<(
   std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose);
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point);
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Vector3 & vector);
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternion & quat);
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose);
 
 #endif  // TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_

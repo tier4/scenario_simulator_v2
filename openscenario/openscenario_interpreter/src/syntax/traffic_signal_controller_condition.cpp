@@ -42,17 +42,10 @@ auto TrafficSignalControllerCondition::description() const -> String
 
 auto TrafficSignalControllerCondition::evaluate() -> Object
 {
-  const auto & found = scope.findObject(traffic_signal_controller_ref);
-  if (found and found.is<TrafficSignalController>()) {
-    const auto & controller = found.as<TrafficSignalController>();
-    current_phase_name = controller.currentPhaseName();
-    current_phase_since = controller.currentPhaseSince();
-    return asBoolean(current_phase_name == phase);
-  } else {
-    THROW_SYNTAX_ERROR(
-      "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
-      " is not declared in this scope");
-  }
+  const auto & controller = scope.ref<TrafficSignalController>(traffic_signal_controller_ref);
+  current_phase_name = controller.currentPhaseName();
+  current_phase_since = controller.currentPhaseSince();
+  return asBoolean(current_phase_name == phase);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

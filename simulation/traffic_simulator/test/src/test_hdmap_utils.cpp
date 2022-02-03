@@ -98,17 +98,6 @@ TEST(HdMapUtils, AlongLaneletPose)
     hdmap_utils.getLaneletLength(34684) - 10.0);
 }
 
-TEST(HdMapUtils, getTrafficLightRelationId)
-{
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
-  EXPECT_EQ(hdmap_utils.getTrafficLightRelationId(34836), 34806);
-}
-
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

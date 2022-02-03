@@ -46,6 +46,7 @@ include_directories(
 
 ament_auto_add_library(simulation_interface SHARED
   src/zmq_multi_server.cpp
+  src/zmq_multi_client.cpp
   src/conversions.cpp
   src/constants.cpp
   ${PROTO_SRCS}
