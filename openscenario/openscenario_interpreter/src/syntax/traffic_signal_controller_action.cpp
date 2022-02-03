@@ -32,11 +32,11 @@ auto TrafficSignalControllerAction::accomplished() noexcept -> bool { return tru
 
 auto TrafficSignalControllerAction::endsImmediately() noexcept -> bool { return true; }
 
-auto TrafficSignalControllerAction::run() -> void
+auto TrafficSignalControllerAction::run() noexcept -> void {}
+
+auto TrafficSignalControllerAction::start() -> void
 {
   local().ref<TrafficSignalController>(traffic_signal_controller_ref).changePhaseTo(phase);
 }
-
-auto TrafficSignalControllerAction::start() noexcept -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

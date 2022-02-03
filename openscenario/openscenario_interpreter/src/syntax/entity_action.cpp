@@ -35,11 +35,11 @@ auto EntityAction::accomplished() noexcept -> bool { return endsImmediately(); }
 
 auto EntityAction::endsImmediately() noexcept -> bool { return true; }
 
-auto EntityAction::run() const -> void
+auto EntityAction::run() noexcept -> void {}
+
+auto EntityAction::start() const -> void
 {
   return apply<void>([this](auto && action) { return action(entity_ref); }, *this);
 }
-
-auto EntityAction::start() noexcept -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
