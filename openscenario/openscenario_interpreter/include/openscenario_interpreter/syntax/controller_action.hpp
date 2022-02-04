@@ -51,9 +51,9 @@ struct ControllerAction : private Scope
 
   static auto endsImmediately() noexcept -> bool;
 
-  /*  */ auto run() const -> void;
+  static auto run() noexcept -> void;
 
-  static auto start() noexcept -> void;
+  /*  */ auto start() const -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

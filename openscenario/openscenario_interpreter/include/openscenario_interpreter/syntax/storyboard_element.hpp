@@ -83,7 +83,8 @@ private:
 
   virtual auto elements() -> Elements & = 0;
 
-  virtual auto ready() -> bool = 0;
+  virtual auto ready()
+    -> bool = 0;  // NOTE: This cannot be const because of the trigger evaluation.
 
   virtual auto run() -> void = 0;
 

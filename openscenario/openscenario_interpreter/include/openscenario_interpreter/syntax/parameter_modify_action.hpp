@@ -42,9 +42,9 @@ struct ParameterModifyAction : Scope
 
   static auto accomplished() noexcept -> bool;
 
-  /*  */ auto run() -> void;
+  static auto run() noexcept -> void;
 
-  static auto start() noexcept -> void;
+  /*  */ auto start() const -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -46,9 +46,9 @@ struct EntityAction : public ComplexType
 
   static auto endsImmediately() noexcept -> bool;
 
-  /*  */ auto run() const -> void;
+  static auto run() noexcept -> void;
 
-  static auto start() noexcept -> void;
+  /*  */ auto start() const -> void;
 };
 
 DEFINE_LAZY_VISITOR(
