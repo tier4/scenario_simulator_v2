@@ -23,7 +23,6 @@ We use Request/Reply sockets in order to run the simulators synchronously.
 ## Sequence diagram
 
 The traffic simulator has a ZeroMQ client and the simple sensor simulator has a ZeroMQ server.
-Traffic simulator connects to `simulator` host (make sure that you have `simulator` host configured in `/etc/hosts` or the host name is resolvable in your environment).
 We use [Protocol Buffers](https://developers.google.com/protocol-buffers) (protobuf) in order to serialize data.
 
 ```mermaid

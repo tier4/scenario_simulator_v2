@@ -46,6 +46,9 @@ const unsigned int update_traffic_lights = 5565;
 
 std::string getEndPoint(
   const TransportProtocol & protocol, const HostName & hostname, const unsigned int & port);
+
+std::string getEndPoint(
+  const TransportProtocol & protocol, const std::string & hostname, const unsigned int & port);
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONSTANTS_HPP_
