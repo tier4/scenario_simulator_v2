@@ -89,7 +89,7 @@ auto Storyboard::stopTriggered() -> bool { return stop_trigger.evaluate().as<Boo
 
 auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::json &
 {
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(datum.state());
 
   json["Init"] << datum.init;
 

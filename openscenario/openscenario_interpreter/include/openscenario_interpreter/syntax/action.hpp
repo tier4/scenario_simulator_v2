@@ -44,8 +44,6 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
 
   explicit Action(const pugi::xml_node &, Scope &);
 
-  using StoryboardElement::currentState;
-
   using StoryboardElement::evaluate;
 
   /* -------------------------------------------------------------------------

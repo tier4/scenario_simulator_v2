@@ -250,7 +250,7 @@ auto Interpreter::publishCurrentContext() const -> void
   {
     nlohmann::json json;
     context.stamp = now();
-    context.data = (json << *currentScenarioDefinition()).dump();
+    context.data = (json << *script).dump();
     context.time = getCurrentTime();
   }
 

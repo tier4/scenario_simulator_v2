@@ -30,11 +30,6 @@ struct Expression  // NOTE: Member functions are lexicographically sorted.
     throw SemanticError("No viable evaluation for class ", type().name());
   }
 
-  virtual auto currentState() const -> const Pointer<Expression> &
-  {
-    throw SemanticError("Class ", type().name(), " is not a StoryboardElementType");
-  }
-
   virtual auto type() const noexcept -> const std::type_info & { return typeid(Expression); }
 
   virtual auto write(std::ostream & os) const -> std::ostream &
