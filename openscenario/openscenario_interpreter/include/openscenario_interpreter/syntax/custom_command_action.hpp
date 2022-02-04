@@ -66,13 +66,13 @@ struct CustomCommandAction : private Scope
 
   static auto node() -> rclcpp::Node &;
 
-  /*  */ auto run() -> void;
+  static auto run() noexcept -> void;
 
   static auto publisher() -> rclcpp::Publisher<autoware_simulation_msgs::msg::SimulationEvents> &;
 
   static auto split(const std::string &) -> std::vector<std::string>;
 
-  static auto start() noexcept -> void;
+  /*  */ auto start() const -> void;
 
   static auto test(const std::vector<std::string> &, const Scope &) -> int;
 };

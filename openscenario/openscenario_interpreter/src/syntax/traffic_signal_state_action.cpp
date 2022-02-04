@@ -32,7 +32,9 @@ auto TrafficSignalStateAction::accomplished() noexcept -> bool { return true; }
 
 auto TrafficSignalStateAction::endsImmediately() noexcept -> bool { return true; }
 
-auto TrafficSignalStateAction::run() const -> void
+auto TrafficSignalStateAction::run() noexcept -> void {}
+
+auto TrafficSignalStateAction::start() const -> void
 {
   const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
   if (color_opt.has_value()) {
@@ -46,8 +48,6 @@ auto TrafficSignalStateAction::run() const -> void
 
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
 }
-
-auto TrafficSignalStateAction::start() noexcept -> void {}
 
 auto TrafficSignalStateAction::id() const -> std::int64_t
 {

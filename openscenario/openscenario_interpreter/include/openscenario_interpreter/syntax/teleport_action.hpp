@@ -44,9 +44,9 @@ struct TeleportAction : private Scope
 
   /*  */ auto evaluate() const -> Object;
 
-  /*  */ auto run() const -> void;
+  static auto run() noexcept -> void;
 
-  static auto start() noexcept -> void;
+  /*  */ auto start() const -> void;
 
   static auto teleport(const EntityRef &, const Position &) -> void;
 };
