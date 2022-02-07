@@ -14,8 +14,6 @@
 
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <iostream>
-#include <chrono>
-
 
 namespace cpp_mock_scenarios
 {
@@ -36,8 +34,6 @@ CppScenarioNode::CppScenarioNode(
 
 void CppScenarioNode::update()
 {
-    auto start = std::chrono::high_resolution_clock::now();
-
   onUpdate();
   try {
     api_.updateFrame();
@@ -52,12 +48,6 @@ void CppScenarioNode::update()
       stop(Result::FAILURE);
     }
   }
-
-  auto end = std::chrono::high_resolution_clock::now();
-
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-
-  RCLCPP_INFO_STREAM(get_logger(), "CppScenarioNode::update() update time: " << duration << " [micro seconds]");
 }
 
 void CppScenarioNode::start()
