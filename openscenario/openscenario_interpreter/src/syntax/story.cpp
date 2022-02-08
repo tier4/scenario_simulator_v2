@@ -69,7 +69,7 @@ auto operator<<(nlohmann::json & json, const Story & story) -> nlohmann::json &
 {
   json["name"] = story.name;
 
-  json["currentState"] = boost::lexical_cast<std::string>(story.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(story.state());
 
   json["Act"] = nlohmann::json::array();
 

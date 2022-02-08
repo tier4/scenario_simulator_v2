@@ -75,7 +75,7 @@ auto operator<<(nlohmann::json & json, const ManeuverGroup & maneuver_group) -> 
 {
   json["name"] = maneuver_group.name;
 
-  json["currentState"] = boost::lexical_cast<std::string>(maneuver_group.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(maneuver_group.state());
 
   json["currentExecutionCount"] = maneuver_group.current_execution_count;
   json["maximumExecutionCount"] = maneuver_group.maximum_execution_count;
