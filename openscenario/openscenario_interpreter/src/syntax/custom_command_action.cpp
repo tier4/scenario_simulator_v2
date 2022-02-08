@@ -116,7 +116,22 @@ auto CustomCommandAction::publisher()
   return *publisher;
 }
 
-auto CustomCommandAction::run() -> void
+auto CustomCommandAction::run() noexcept -> void {}
+
+auto CustomCommandAction::split(const std::string & s) -> std::vector<std::string>
+{
+  static const std::regex pattern{R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"};
+
+  std::vector<std::string> args{};
+
+  for (std::sregex_iterator iter{std::begin(s), std::end(s), pattern}, end; iter != end; ++iter) {
+    args.emplace_back((*iter)[1]);
+  }
+
+  return args;
+}
+
+auto CustomCommandAction::start() const -> void
 {
   static const std::unordered_map<
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
@@ -144,27 +159,15 @@ auto CustomCommandAction::run() -> void
 
   std::smatch result{};
 
-  if (std::regex_match(type, result, pattern) and commands.find(result[1]) != std::end(commands)) {
+  if (type == ":") {
+    return;
+  } else if (
+    std::regex_match(type, result, pattern) and commands.find(result[1]) != std::end(commands)) {
     commands.at(result[1])(split(result[3]), local());
   } else {
     fork_exec(type, content);
   }
 }
-
-auto CustomCommandAction::split(const std::string & s) -> std::vector<std::string>
-{
-  static const std::regex pattern{R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"};
-
-  std::vector<std::string> args{};
-
-  for (std::sregex_iterator iter{std::begin(s), std::end(s), pattern}, end; iter != end; ++iter) {
-    args.emplace_back((*iter)[1]);
-  }
-
-  return args;
-}
-
-auto CustomCommandAction::start() noexcept -> void {}
 
 auto CustomCommandAction::test(const std::vector<std::string> & args, const Scope &) -> int
 {

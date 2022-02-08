@@ -38,15 +38,13 @@ auto ControllerAction::endsImmediately() noexcept -> bool  //
   return true;
 }
 
-auto ControllerAction::run() const -> void  //
+auto ControllerAction::run() noexcept -> void {}
+
+auto ControllerAction::start() const -> void
 {
   for (const auto & actor : actors) {
     assign_controller_action(actor);
   }
-}
-
-auto ControllerAction::start() noexcept -> void  //
-{
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

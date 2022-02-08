@@ -388,7 +388,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.text = status.action_status.current_action;
   if (status.lanelet_pose_valid) {
     text_action.text = text_action.text + "\nid:" + std::to_string(status.lanelet_pose.lanelet_id) +
-                       "\ns:" + std::to_string(status.lanelet_pose.s);
+                       "\ns:" + std::to_string(status.lanelet_pose.s) +
+                       "\noffset:" + std::to_string(status.lanelet_pose.offset);
   }
   text_action.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text_action);

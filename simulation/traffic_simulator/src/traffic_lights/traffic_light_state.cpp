@@ -107,6 +107,7 @@ auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLigh
   autoware_auto_perception_msgs::msg::TrafficLight lamp_state;
   {
     lamp_state.confidence = 1.0;
+    lamp_state.status = autoware_auto_perception_msgs::msg::TrafficLight::SOLID_ON;
 
     switch (datum) {
       case TrafficLightArrow::STRAIGHT:
@@ -144,6 +145,7 @@ auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLigh
   autoware_auto_perception_msgs::msg::TrafficLight lamp_state;
   {
     lamp_state.confidence = 1.0;
+    lamp_state.status = autoware_auto_perception_msgs::msg::TrafficLight::SOLID_ON;
 
     switch (datum) {
       case TrafficLightColor::RED:

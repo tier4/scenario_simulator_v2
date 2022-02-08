@@ -38,7 +38,9 @@ auto AssignRouteAction::accomplished() noexcept -> bool { return true; }
 
 auto AssignRouteAction::endsImmediately() noexcept -> bool { return true; }
 
-auto AssignRouteAction::run() -> void
+auto AssignRouteAction::run() -> void {}
+
+auto AssignRouteAction::start() -> void
 {
   for (const auto & actor : actors) {
     applyAssignRouteAction(
@@ -46,7 +48,5 @@ auto AssignRouteAction::run() -> void
       static_cast<std::vector<traffic_simulator_msgs::msg::LaneletPose>>(route.as<const Route>()));
   }
 }
-
-auto AssignRouteAction::start() -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -62,15 +62,13 @@ auto TrafficSignalController::changePhaseTo(const String & phase_name) -> Object
 
 auto TrafficSignalController::changePhaseTo(std::list<Phase>::iterator next) -> Object
 {
-  const auto current_time = getCurrentTime();
-
   if (next == std::begin(phases)) {
     for (auto & observer : observers) {
       observer->notifyBegin();
     }
   }
 
-  current_phase_started_at = current_time;
+  current_phase_started_at = getCurrentTime();
   current_phase = next;
 
   return current_phase != std::end(phases) ? (*current_phase).evaluate() : unspecified;

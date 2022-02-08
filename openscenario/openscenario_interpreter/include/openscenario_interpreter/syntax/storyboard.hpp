@@ -37,9 +37,11 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public Elements
+struct Storyboard : public Scope, public StoryboardElement
 {
   Init init;
+
+  Elements stories;
 
   Trigger stop_trigger;
 
@@ -47,17 +49,19 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
 
   explicit Storyboard(const pugi::xml_node &, Scope &);
 
-  /*  */ auto accomplished() const -> bool;
+  auto accomplished() const -> bool override;
 
-  static auto ready() noexcept -> bool;
+  auto elements() -> Elements & override;
 
-  /*  */ auto run() -> void;
+  auto ready() noexcept -> bool override;
 
-  /*  */ auto start() -> void;
+  auto run() -> void override;
 
-  /*  */ auto stop() -> void;
+  auto start() -> void override;
 
-  /*  */ auto stopTriggered() -> bool;
+  auto stop() -> void override;
+
+  auto stopTriggered() -> bool override;
 };
 
 auto operator<<(nlohmann::json &, const Storyboard &) -> nlohmann::json &;

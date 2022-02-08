@@ -63,7 +63,7 @@ auto ParameterCondition::description() const -> String
   std::stringstream description;
 
   description << "The value of parameter " << std::quoted(parameter_ref) << " = "
-              << local().findObject(parameter_ref) << " " << rule << " " << value << "?";
+              << local().ref(parameter_ref) << " " << rule << " " << value << "?";
 
   return description.str();
 }
@@ -71,7 +71,7 @@ auto ParameterCondition::description() const -> String
 auto ParameterCondition::evaluate() const -> Object
 {
   try {
-    const auto & parameter = local().findObject(parameter_ref);
+    const auto parameter = local().ref(parameter_ref);
     if (not parameter) {
       THROW_SYNTAX_ERROR(parameter_ref, " cannot be found from this scope");
     } else {

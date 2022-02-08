@@ -37,97 +37,21 @@ auto EnvironmentFrame::define(const Name & name, const Object & object) -> void
   variables.emplace(name, object);
 }
 
-auto EnvironmentFrame::find(const Name & name) const -> Object
-{
-  for (auto frame = this; frame; frame = frame->outer_frame) {
-    auto object = frame->lookdown(name);
-    if (object) {
-      return object;
-    }
-  }
-
-  return Object();  // TODO SYNTAX_ERROR
-}
-
-auto EnvironmentFrame::find(const Prefixed<Name> & prefixed_name) const -> Object
-{
-  if (not prefixed_name.prefixes.empty()) {
-    auto found = frames(prefixed_name.prefixes.front());
-    switch (found.size()) {
-      case 0:
-        return Object();  // TODO SYNTAX_ERROR
-      case 1:
-        return found.front()->find(prefixed_name.strip<1>());
-      default:
-        throw SyntaxError(
-          "Ambiguous reference to ", std::quoted(boost::lexical_cast<std::string>(prefixed_name)),
-          ".");
-    }
-  } else {
-    return lookdown(prefixed_name.name);
-  }
-}
-
-auto EnvironmentFrame::findObject(const Prefixed<Name> & prefixed_name) const -> Object
-{
-  if (prefixed_name.absolute) {
-    return outermostFrame().find(prefixed_name);
-  } else if (prefixed_name.prefixes.empty()) {
-    return find(prefixed_name.name);
-  } else {
-    return lookupFrame(prefixed_name.prefixes.front())->find(prefixed_name.strip<1>());
-  }
-}
-
-auto EnvironmentFrame::lookdown(const std::string & name) const -> Object
-{
-  std::vector<const EnvironmentFrame *> same_level{this};
-
-  while (not same_level.empty()) {
-    std::vector<const EnvironmentFrame *> next_level;
-
-    std::vector<Object> result;
-
-    for (auto * frame : same_level) {
-      auto range = frame->variables.equal_range(name);
-      for (auto it = range.first; it != range.second; ++it) {
-        result.push_back(it->second);
-      }
-
-      for (auto * f : frame->unnamed_inner_frames) {
-        next_level.push_back(f);
-      }
-    }
-
-    switch (result.size()) {
-      case 0:
-        same_level = std::move(next_level);
-        break;
-      case 1:
-        return result.front();
-      default:
-        throw SyntaxError("ambiguous reference to ", std::quoted(name));
-    }
-  }
-
-  return Object();
-}
-
 auto EnvironmentFrame::isOutermost() const noexcept -> bool { return outer_frame == nullptr; }
 
-auto EnvironmentFrame::frames(const Name & name) const -> std::list<const EnvironmentFrame *>
+auto EnvironmentFrame::resolvePrefix(const Prefixed<Name> & prefixed_name) const
+  -> std::list<const EnvironmentFrame *>
 {
   std::list<const EnvironmentFrame *> result;
 
-  auto range = inner_frames.equal_range(name);
-
-  for (auto it = range.first; it != range.second; ++it) {
-    result.push_back(it->second);
-  }
+  boost::range::for_each(
+    inner_frames.equal_range(prefixed_name.prefixes.front()),
+    [&](auto && name_and_frame) { result.push_back(name_and_frame.second); });
 
   if (result.empty()) {
+    // BUG: must be breadth first search
     for (auto & child : unnamed_inner_frames) {
-      result.merge(child->frames(name));
+      result.merge(child->resolvePrefix(prefixed_name));
     }
   }
 
@@ -136,37 +60,29 @@ auto EnvironmentFrame::frames(const Name & name) const -> std::list<const Enviro
 
 auto EnvironmentFrame::outermostFrame() const noexcept -> const EnvironmentFrame &
 {
-  auto frame = this;
-
-  while (not frame->isOutermost()) {
-    frame = frame->outer_frame;
-  }
-
-  assert(frame);
-  assert(frame->isOutermost());
-
-  return *frame;
+  return isOutermost() ? *this : outer_frame->outermostFrame();
 }
 
-auto EnvironmentFrame::lookupFrame(const Name & name) const -> const EnvironmentFrame *
+auto EnvironmentFrame::lookupFrame(const Prefixed<Name> & prefixed_name) const
+  -> const EnvironmentFrame *
 {
-  assert(not name.empty());
+  assert(not prefixed_name.prefixes.empty());
 
   if (isOutermost()) {
     return this;
   } else {
-    auto sibling_scope = outer_frame->frames(name);
+    auto sibling_scope = outer_frame->resolvePrefix(prefixed_name);
     switch (sibling_scope.size()) {
       case 0:
         assert(outer_frame);
-        return outer_frame->lookupFrame(name);
+        return outer_frame->lookupFrame(prefixed_name);
       case 1:
         assert(sibling_scope.front());
         return sibling_scope.front();
       default:
         throw SyntaxError(
           "There are multiple StoryboardElements that can be referenced by the name ",
-          std::quoted(name), ".");
+          std::quoted(boost::lexical_cast<std::string>(prefixed_name)), ".");
     }
   }
 }
@@ -184,14 +100,17 @@ Scope::Scope(const std::string & name, const Scope & outer)
 {
 }
 
-auto Scope::findObject(const std::string & name_) const -> Object
+auto Scope::global() const -> const GlobalEnvironment &
 {
-  return frame->findObject(name_);
+  assert(global_environment);
+  return *global_environment;
 }
 
-auto Scope::global() const -> const GlobalEnvironment & { return *global_environment; }
-
-auto Scope::global() -> GlobalEnvironment & { return *global_environment; }
+auto Scope::global() -> GlobalEnvironment &
+{
+  assert(global_environment);
+  return *global_environment;
+}
 
 auto Scope::local() const noexcept -> const Scope & { return *this; }
 

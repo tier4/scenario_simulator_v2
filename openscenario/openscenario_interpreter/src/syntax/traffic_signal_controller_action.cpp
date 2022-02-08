@@ -32,18 +32,11 @@ auto TrafficSignalControllerAction::accomplished() noexcept -> bool { return tru
 
 auto TrafficSignalControllerAction::endsImmediately() noexcept -> bool { return true; }
 
-auto TrafficSignalControllerAction::run() -> void
-{
-  auto found = local().findObject(traffic_signal_controller_ref);
-  if (found and found.is<TrafficSignalController>()) {
-    found.as<TrafficSignalController>().changePhaseTo(phase);
-  } else {
-    THROW_SYNTAX_ERROR(
-      "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
-      " is not declared in this scope");
-  }
-}
+auto TrafficSignalControllerAction::run() noexcept -> void {}
 
-auto TrafficSignalControllerAction::start() noexcept -> void {}
+auto TrafficSignalControllerAction::start() -> void
+{
+  local().ref<TrafficSignalController>(traffic_signal_controller_ref).changePhaseTo(phase);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

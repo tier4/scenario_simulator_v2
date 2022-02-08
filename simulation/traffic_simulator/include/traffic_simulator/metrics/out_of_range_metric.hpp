@@ -74,6 +74,8 @@ public:
   {
   }
 
+  ~OutOfRangeMetric() override = default;
+
   void setEntityManager(
     std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr) override;
   void update() override;

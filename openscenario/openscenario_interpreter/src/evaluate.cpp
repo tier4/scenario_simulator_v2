@@ -37,18 +37,27 @@ struct Value
 
   struct Numeric;
 
+  Value() : data(0) {}
+
   Value(const Value &) = default;
+
   Value(Value &&) = default;
-  Value & operator=(const Value &) = default;
-  Value & operator=(Value &&) = default;
+
+  explicit Value(int v) : data(v) {}
+
+  explicit Value(unsigned int v) : data(v) {}
+
+  explicit Value(unsigned short v) : data(v) {}
+
+  explicit Value(double v) : data(v) {}
+
+  explicit Value(bool v) : data(v) {}
+
   ~Value() = default;
 
-  Value() : data(0) {}
-  explicit Value(int v) : data(v) {}
-  explicit Value(unsigned int v) : data(v) {}
-  explicit Value(unsigned short v) : data(v) {}
-  explicit Value(double v) : data(v) {}
-  explicit Value(bool v) : data(v) {}
+  auto operator=(const Value &) -> Value & = default;
+
+  auto operator=(Value &&) -> Value & = default;
 
   auto type_name() const
   {
@@ -140,7 +149,7 @@ struct Value
 };
 
 template <typename T>
-Value Value::cast() const
+auto Value::cast() const -> Value
 {
   if (same_as<double>() and std::is_integral<T>::value)
     throw std::runtime_error{"double cannot convert to integer implicitly."};
@@ -148,17 +157,15 @@ Value Value::cast() const
 }
 
 template <>
-Value Value::cast<Value::Numeric>() const
+auto Value::cast<Value::Numeric>() const -> Value
 {
-  if (same_as<bool>()) throw std::runtime_error{"boolean cannot convert to numeric."};
-  return *this;
+  return same_as<bool>() ? throw std::runtime_error("boolean cannot convert to numeric.") : *this;
 }
 
 template <>
 Value Value::cast<bool>() const
 {
-  if (not same_as<bool>()) throw std::runtime_error{"numeric cannot convert to boolean."};
-  return *this;
+  return same_as<bool>() ? *this : throw std::runtime_error("numeric cannot convert to boolean.");
 }
 
 namespace qi = boost::spirit::qi;
@@ -203,7 +210,7 @@ struct Grammar : qi::grammar<Iter, Value(), ascii::space_type>
 
   static auto toValue(const std::string & key, const Scope & scope) -> Value
   {
-    auto found = scope.findObject(key);
+    auto found = scope.ref(key);
     if (not found) {
       THROW_SYNTAX_ERROR(std::quoted(key), "is not declared in this scope");
     }
