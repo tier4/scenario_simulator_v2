@@ -19,10 +19,10 @@
 
 #include <sys/wait.h>
 
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
-#include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
@@ -174,7 +174,9 @@ public:
 
   virtual auto getSteeringAngle() const -> double = 0;
 
-  virtual auto getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand = 0;
+  virtual auto getVehicleCommand() const -> std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
   virtual auto getVelocity() const -> double = 0;
 

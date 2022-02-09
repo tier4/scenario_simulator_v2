@@ -25,68 +25,6 @@
 
 namespace simple_sensor_simulator
 {
-template <>
-void DetectionSensor<autoware_perception_msgs::msg::DynamicObjectArray>::update(
-  const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-  const rclcpp::Time & stamp, const std::vector<std::string> & detected_objects)
-{
-  if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
-    autoware_perception_msgs::msg::DynamicObjectArray msg;
-    msg.header.stamp = stamp;
-    msg.header.frame_id = "map";
-    last_update_stamp_ = current_time;
-    for (const auto & s : status) {
-      auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
-      if (result != detected_objects.end()) {
-        autoware_perception_msgs::msg::DynamicObject object;
-        bool is_ego = false;
-        switch (s.type()) {
-          case traffic_simulator_msgs::EntityType::EGO:
-            is_ego = true;
-            break;
-          case traffic_simulator_msgs::EntityType::VEHICLE:
-            object.semantic.type = object.semantic.CAR;
-            object.semantic.confidence = 1;
-            break;
-          case traffic_simulator_msgs::EntityType::PEDESTRIAN:
-            object.semantic.type = object.semantic.PEDESTRIAN;
-            object.semantic.confidence = 1;
-            break;
-          case traffic_simulator_msgs::EntityType::MISC_OBJECT:
-            break;
-          default:
-            throw SimulationRuntimeError("unsupported entity type!");
-            break;
-        }
-        if (!is_ego) {
-          boost::uuids::uuid base =
-            boost::uuids::string_generator()("0123456789abcdef0123456789abcdef");
-          boost::uuids::name_generator gen(base);
-          boost::uuids::uuid uuid = gen(s.name());
-          std::copy(uuid.begin(), uuid.end(), object.id.uuid.begin());
-          simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
-          geometry_msgs::msg::Pose pose;
-          simulation_interface::toMsg(s.pose(), pose);
-          object.state.pose_covariance.pose = pose;
-          object.state.pose_covariance.covariance = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-                                                     0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-                                                     0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
-          object.shape.type = object.shape.BOUNDING_BOX;
-          object.state.orientation_reliable = true;
-          simulation_interface::toMsg(
-            s.action_status().twist(), object.state.twist_covariance.twist);
-          object.state.twist_reliable = true;
-          simulation_interface::toMsg(
-            s.action_status().accel(), object.state.acceleration_covariance.accel);
-          object.state.acceleration_reliable = true;
-          msg.objects.emplace_back(object);
-        }
-      }
-    }
-    publisher_ptr_->publish(msg);
-  }
-}
-
 #ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
