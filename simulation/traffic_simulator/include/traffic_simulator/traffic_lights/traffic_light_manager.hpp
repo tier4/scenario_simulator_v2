@@ -19,7 +19,6 @@
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #endif
 
-#include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -175,15 +174,6 @@ private:
 
   auto publishTrafficLightStateArray() const -> void override;
 };
-
-template <>
-auto TrafficLightManager<
-  autoware_perception_msgs::msg::TrafficLightStateArray>::publishTrafficLightStateArray() const
-  -> void;
-
-template <>
-auto TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>::name() -> const
-  char *;
 
 #ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>

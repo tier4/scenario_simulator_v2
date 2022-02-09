@@ -15,8 +15,6 @@
 #ifndef SIMULATION_INTERFACE__CONVERSIONS_HPP_
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
-#include <autoware_control_msgs.pb.h>
-#include <autoware_vehicle_msgs.pb.h>
 #include <builtin_interfaces.pb.h>
 #include <geometry_msgs.pb.h>
 #include <rosgraph_msgs.pb.h>
@@ -28,10 +26,8 @@
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
 #endif
 
-#include <autoware_control_msgs/msg/control_command.hpp>
-#include <autoware_perception_msgs/msg/traffic_light_state.hpp>
-#include <autoware_vehicle_msgs/msg/shift.hpp>
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -162,23 +158,24 @@ void toProto(const rosgraph_msgs::msg::Clock & time, rosgraph_msgs::Clock & prot
 void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & time);
 void toProto(const std_msgs::msg::Header & header, std_msgs::Header & proto);
 void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header);
-void toProto(
-  const autoware_control_msgs::msg::ControlCommand & control_command,
-  autoware_control_msgs::ControlCommand & proto);
-void toMsg(
-  const autoware_control_msgs::ControlCommand & proto,
-  autoware_control_msgs::msg::ControlCommand & control_command);
-void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto);
-void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift);
-void toProto(
-  const autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command,
-  autoware_vehicle_msgs::VehicleCommand & proto);
-void toMsg(
-  const autoware_vehicle_msgs::VehicleCommand & proto,
-  autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command);
-void toProto(
-  const autoware_perception_msgs::msg::TrafficLightState & traffic_light_state,
-  simulation_api_schema::TrafficLightState & proto);
+
+#define DEFINE_CONVERSION(PACKAGE, TYPENAME)                               \
+  auto toProto(const PACKAGE::msg::TYPENAME &, PACKAGE::TYPENAME &)->void; \
+  auto toMsg(const PACKAGE::TYPENAME &, PACKAGE::msg::TYPENAME &)->void
+
+DEFINE_CONVERSION(autoware_auto_control_msgs, AckermannLateralCommand);
+DEFINE_CONVERSION(autoware_auto_control_msgs, LongitudinalCommand);
+DEFINE_CONVERSION(autoware_auto_control_msgs, AckermannControlCommand);
+DEFINE_CONVERSION(autoware_auto_vehicle_msgs, GearCommand);
+
+#undef DEFINE_CONVERSION
+
+auto toProto(
+  const std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> &,
+  traffic_simulator_msgs::VehicleCommand &) -> void;
+
 #ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
