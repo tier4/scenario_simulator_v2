@@ -21,8 +21,8 @@
 #include "random_test_runner/file_interactions/junit_xml_reporter.hpp"
 #include "random_test_runner/file_interactions/yaml_test_params_saver.hpp"
 
-const double test_timeout = 60.0;
-const bool attach_sensors = false;
+const double test_timeout = 600.0;
+const bool attach_sensors = true;
 
 traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
 {
@@ -79,7 +79,10 @@ void TestExecutor::initialize()
 
     if (attach_sensors) {
       api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-        traffic_simulator::helper::LidarType::VLP16, ego_name_, "/perception/points_nonground"));
+        traffic_simulator::helper::LidarType::VLP16, ego_name_, "awf/universe"));
+
+      api_->attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
+        ego_name_, "awf/universe", 0.1));
     }
 
     // XXX dirty hack: wait for autoware system to launch, ugly but helps for
@@ -89,6 +92,13 @@ void TestExecutor::initialize()
     api_->requestAssignRoute(
       ego_name_,
       std::vector<traffic_simulator_msgs::msg::LaneletPose>{test_description_.ego_goal_position});
+
+    std::this_thread::sleep_for(std::chrono::milliseconds{5000});
+
+    api_->requestAssignRoute(
+      ego_name_,
+      std::vector<traffic_simulator_msgs::msg::LaneletPose>{test_description_.ego_goal_position});
+
     goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
   }
 

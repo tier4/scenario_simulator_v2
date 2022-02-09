@@ -32,17 +32,36 @@ from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
+
+def architecture_types():
+    return ["awf/auto", "awf/universe", "tier4/proposal"]
+
+
 def default_autoware_launch_package_of(architecture_type):
+    if architecture_type not in architecture_types():
+        raise KeyError(
+            f"architecture_type:={architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+        )
+
     return {
         "awf/auto": "scenario_simulator_launch",
+        "awf/universe": "autoware_launch",
         "tier4/proposal": "autoware_launch",
     }[architecture_type]
 
+
 def default_autoware_launch_file_of(architecture_type):
+    if architecture_type not in architecture_types():
+        raise KeyError(
+            f"architecture_type:={architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+        )
+
     return {
         "awf/auto": "autoware_auto.launch.py",
+        "awf/universe": "planning_simulator.launch.xml",
         "tier4/proposal": "planning_simulator.launch.xml",
     }[architecture_type]
+
 
 class RandomTestRunnerLaunch(object):
     def __init__(self):
@@ -51,7 +70,7 @@ class RandomTestRunnerLaunch(object):
 
         self.autoware_launch_arguments = {
             # autoware arguments #
-            "architecture_type": {"default": "awf/auto", "description": "Autoware architecture type", "values": ["awf/auto", "tier4/proposal"]},
+            "architecture_type": {"default": "awf/auto", "description": "Autoware architecture type", "values": architecture_types()},
             "sensor_model": {"default": "aip_xx1", "description": "Ego sensor model"},
             "vehicle_model": {"default": "lexus", "description": "Ego vehicle model"},
         }
@@ -162,6 +181,18 @@ class RandomTestRunnerLaunch(object):
             print("Parameters file supplied: {}. "
                   "Parameters passed there override passed via arguments".format(test_param_file_path))
             parameters.append(test_param_file_path)
+
+        if self.autoware_launch_configuration["vehicle_model"].perform(context):
+            vehicle_info_param_file_path = get_package_share_directory(self.autoware_launch_configuration["vehicle_model"].perform(context) + "_description") + "/config/vehicle_info.param.yaml"
+            simulator_model_param_file_path = get_package_share_directory(self.autoware_launch_configuration["vehicle_model"].perform(context) + "_description") + "/config/simulator_model.param.yaml"
+            print("Vehicle info parameters file supplied: {}. "
+                  "Parameters passed there override passed via arguments".format(vehicle_info_param_file_path))
+            print("Simulator model parameters file supplied: {}. "
+                  "Parameters passed there override passed via arguments".format(simulator_model_param_file_path))
+            parameters.append(vehicle_info_param_file_path)
+            parameters.append(simulator_model_param_file_path)
+
+        print(parameters)
 
         scenario_node = Node(
             package="random_test_runner",
