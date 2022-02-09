@@ -182,19 +182,21 @@ class RandomTestRunnerLaunch(object):
                   "Parameters passed there override passed via arguments".format(test_param_file_path))
             parameters.append(test_param_file_path)
 
-        vehicle_model = self.autoware_launch_configuration["vehicle_model"].perform(context)
-        if vehicle_model:
-            vehicle_model_description_dir = get_package_share_directory(vehicle_model + "_description")
+        # not tested for other architectures bu required for "awf/universe"
+        if autoware_architecture == "awf/universe":
+            vehicle_model = self.autoware_launch_configuration["vehicle_model"].perform(context)
+            if vehicle_model:
+                vehicle_model_description_dir = get_package_share_directory(vehicle_model + "_description")
 
-            vehicle_info_param_file_path = os.path.join(vehicle_model_description_dir, "config/vehicle_info.param.yaml")
-            simulator_model_param_file_path = os.path.join(vehicle_model_description_dir, "config/simulator_model.param.yaml")
+                vehicle_info_param_file_path = os.path.join(vehicle_model_description_dir, "config/vehicle_info.param.yaml")
+                simulator_model_param_file_path = os.path.join(vehicle_model_description_dir, "config/simulator_model.param.yaml")
 
-            print("Vehicle info parameters file supplied: '{}'. "
-                  "Parameters passed there override passed via arguments".format(vehicle_info_param_file_path))
-            print("Simulator model parameters file supplied: '{}'. "
-                  "Parameters passed there override passed via arguments".format(simulator_model_param_file_path))
-            parameters.append(vehicle_info_param_file_path)
-            parameters.append(simulator_model_param_file_path)
+                print("Vehicle info parameters file supplied: '{}'. "
+                    "Parameters passed there override passed via arguments".format(vehicle_info_param_file_path))
+                print("Simulator model parameters file supplied: '{}'. "
+                    "Parameters passed there override passed via arguments".format(simulator_model_param_file_path))
+                parameters.append(vehicle_info_param_file_path)
+                parameters.append(simulator_model_param_file_path)
 
         scenario_node = Node(
             package="random_test_runner",
