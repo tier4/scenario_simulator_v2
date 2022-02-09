@@ -50,10 +50,6 @@ enum class VehicleModelType {
   IDEAL_STEER_ACC,
   IDEAL_STEER_ACC_GEARED,
   IDEAL_STEER_VEL,
-  LEGACY_DELAY_STEER,
-  LEGACY_DELAY_STEER_ACC,
-  LEGACY_IDEAL_ACCEL,
-  LEGACY_IDEAL_STEER,
 };
 
 class EgoEntity : public VehicleEntity
