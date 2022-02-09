@@ -80,15 +80,12 @@ void TestExecutor::initialize()
 
     if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
       api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-        traffic_simulator::helper::LidarType::VLP16,
-        ego_name_,
+        traffic_simulator::helper::LidarType::VLP16, ego_name_,
         stringFromArchitectureType(architecture_type_)));
 
       double constexpr detection_update_duration = 0.1;
       api_->attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-        ego_name_,
-        stringFromArchitectureType(architecture_type_),
-        detection_update_duration));
+        ego_name_, stringFromArchitectureType(architecture_type_), detection_update_duration));
     }
 
     // XXX dirty hack: wait for autoware system to launch

@@ -14,9 +14,7 @@
 //
 // Co-developed by Tier IV, Inc. and Robotec.AI sp. z o.o.
 
-
 #include "random_test_runner/data_types.hpp"
-
 
 SimulatorType simulatorTypeFromString(const std::string & simulator_type_str)
 {
@@ -29,7 +27,8 @@ SimulatorType simulatorTypeFromString(const std::string & simulator_type_str)
     fmt::format("Failed to convert {} to simulation type", simulator_type_str));
 }
 
-ArchitectureType architectureTypeFromString(const std::string & architecture_type_str) {
+ArchitectureType architectureTypeFromString(const std::string & architecture_type_str)
+{
   if (architecture_type_str == "awf/auto") {
     return ArchitectureType::AWF_AUTO;
   } else if (architecture_type_str == "awf/universe") {
@@ -41,7 +40,8 @@ ArchitectureType architectureTypeFromString(const std::string & architecture_typ
     fmt::format("Failed to convert {} to architecture type", architecture_type_str));
 }
 
-std::string stringFromArchitectureType(const ArchitectureType architecture_type) {
+std::string stringFromArchitectureType(const ArchitectureType architecture_type)
+{
   switch (architecture_type) {
     case ArchitectureType::AWF_AUTO:
       return "awf/auto";
@@ -50,7 +50,6 @@ std::string stringFromArchitectureType(const ArchitectureType architecture_type)
     case ArchitectureType::TIER4_PROPOSAL:
       return "tier4/proposal";
     default:
-      throw std::runtime_error(
-        fmt::format("Unknown ArchitectureType {}.", architecture_type));
+      throw std::runtime_error(fmt::format("Unknown ArchitectureType {}.", architecture_type));
   }
 }
