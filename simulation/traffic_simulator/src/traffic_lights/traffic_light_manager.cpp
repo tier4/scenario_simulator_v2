@@ -141,7 +141,6 @@ auto TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>:
   return "/perception/traffic_light_recognition/traffic_light_states";
 }
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto TrafficLightManager<
   autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
@@ -167,5 +166,4 @@ auto TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
 {
   return "/perception/traffic_light_recognition/traffic_signals";
 }
-#endif
 }  // namespace traffic_simulator

@@ -87,7 +87,6 @@ void DetectionSensor<autoware_perception_msgs::msg::DynamicObjectArray>::update(
   }
 }
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
@@ -149,5 +148,4 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
     publisher_ptr_->publish(msg);
   }
 }
-#endif
 }  // namespace simple_sensor_simulator

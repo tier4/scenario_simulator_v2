@@ -24,10 +24,7 @@
 #include <std_msgs.pb.h>
 #include <traffic_simulator_msgs.pb.h>
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
-#endif
-
 #include <autoware_control_msgs/msg/control_command.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state.hpp>
 #include <autoware_vehicle_msgs/msg/shift.hpp>
@@ -179,11 +176,9 @@ void toMsg(
 void toProto(
   const autoware_perception_msgs::msg::TrafficLightState & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto);
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto);
-#endif
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_

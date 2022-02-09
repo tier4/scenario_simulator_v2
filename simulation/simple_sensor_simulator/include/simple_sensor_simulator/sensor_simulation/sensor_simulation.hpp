@@ -38,16 +38,12 @@ public:
         current_simulation_time, configuration,
         node.create_publisher<sensor_msgs::msg::PointCloud2>(
           "/sensing/lidar/no_ground/pointcloud", 1)));
-    }
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-    else if (configuration.architecture_type() == "awf/universe") {
+    } else if (configuration.architecture_type() == "awf/universe") {
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
         node.create_publisher<sensor_msgs::msg::PointCloud2>(
           "/perception/obstacle_segmentation/pointcloud", 1)));
-    }
-#endif
-    else if (configuration.architecture_type() == "awf/auto") {
+    } else if (configuration.architecture_type() == "awf/auto") {
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
         node.create_publisher<sensor_msgs::msg::PointCloud2>("/perception/points_nonground", 1)));
@@ -69,16 +65,12 @@ public:
       detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
         node.create_publisher<Message>("/perception/object_recognition/objects", 1)));
-    }
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-    else if (configuration.architecture_type() == "awf/universe") {
+    } else if (configuration.architecture_type() == "awf/universe") {
       using Message = autoware_auto_perception_msgs::msg::PredictedObjects;
       detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
         node.create_publisher<Message>("/perception/object_recognition/objects", 1)));
-    }
-#endif
-    else if (configuration.architecture_type() == "awf/auto") {
+    } else if (configuration.architecture_type() == "awf/auto") {
       /* Autoware.Auto does not currently support object prediction however it is
          work-in-progress for Cargo ODD msgs are already implemented and
          autoware_auto_msgs::msg::PredictedObjects will probably be used here

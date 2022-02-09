@@ -120,13 +120,11 @@ public:
   {
     const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
     if (architecture_type == "awf/universe") {
       return std::make_shared<
         TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
     } else
-#endif
       // NOTE: This broken indent is due to ament_clang_format.
       if (architecture_type == "tier4/proposal" or architecture_type == "awf/auto") {
       return std::make_shared<

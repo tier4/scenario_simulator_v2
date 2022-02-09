@@ -349,12 +349,7 @@ bool API::updateTrafficLightsInSim()
       simulation_api_schema::TrafficLightState state;
       auto traffic_light = entity_manager_ptr_->getTrafficLightInstance(id);
       simulation_interface::toProto(
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light),
-#else
-        static_cast<autoware_perception_msgs::msg::TrafficLightState>(traffic_light),
-#endif
-        state);
+        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
       *req.add_states() = state;
     }
     zeromq_client_.call(req, res);

@@ -15,10 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 #include <autoware_auto_perception_msgs/msg/traffic_light.hpp>
-#endif
-
 #include <autoware_perception_msgs/msg/lamp_state.hpp>
 #include <iostream>
 #include <stdexcept>
@@ -44,11 +41,9 @@ template <>
 auto convert<autoware_perception_msgs::msg::LampState>(const TrafficLightArrow &)
   -> autoware_perception_msgs::msg::LampState;
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLightArrow &)
   -> autoware_auto_perception_msgs::msg::TrafficLight;
-#endif
 
 template <typename T>
 auto convert(const TrafficLightColor &) -> T;
@@ -57,11 +52,9 @@ template <>
 auto convert<autoware_perception_msgs::msg::LampState>(const TrafficLightColor &)
   -> autoware_perception_msgs::msg::LampState;
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLightColor &)
   -> autoware_auto_perception_msgs::msg::TrafficLight;
-#endif
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
