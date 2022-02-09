@@ -59,9 +59,7 @@ auto getVehicleModelType()
   const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
   const auto vehicle_model_type =
-    architecture_type == "awf/auto"
-      ? "IDEAL_STEER"
-      : getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
+    getParameter<std::string>("vehicle_model_type", "IDEAL_STEER_VEL");
 
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
@@ -79,8 +77,7 @@ auto getVehicleModelType()
     {"IDEAL_STEER", VehicleModelType::LEGACY_IDEAL_STEER},
   };
 
-  const auto iter =
-    (architecture_type == "awf/auto" ? legacy_table : table).find(vehicle_model_type);
+  const auto iter = table.find(vehicle_model_type);
 
   if (iter != std::end(table)) {
     return iter->second;

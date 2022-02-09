@@ -31,7 +31,7 @@ from pathlib import Path
 
 
 def architecture_types():
-    return ["awf/auto", "awf/universe"]
+    return ["awf/universe"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -40,7 +40,6 @@ def default_autoware_launch_package_of(architecture_type):
             f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/auto": "scenario_simulator_launch",
         "awf/universe": "autoware_launch",
     }[architecture_type]
 
@@ -51,7 +50,6 @@ def default_autoware_launch_file_of(architecture_type):
             f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/auto": "autoware_auto.launch.py",
         "awf/universe": "planning_simulator.launch.xml",
     }[architecture_type]
 
