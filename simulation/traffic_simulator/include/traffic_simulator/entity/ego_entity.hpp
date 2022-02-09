@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <concealer/autoware_auto.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <string>

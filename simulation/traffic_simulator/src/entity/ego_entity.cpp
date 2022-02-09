@@ -171,19 +171,6 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "rviz_config:=" + configuration.rviz_config_path.string(),
                  "scenario_simulation:=true")
              : std::make_unique<concealer::AutowareUniverse>();
-  } else if (architecture_type == "awf/auto") {
-    return getParameter<bool>("launch_autoware", true)
-             ? std::make_unique<concealer::AutowareAuto>(
-                 getParameter<std::string>("autoware_launch_package"),
-                 getParameter<std::string>("autoware_launch_file"),
-                 "map_path:=" + configuration.map_path.string(),
-                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + configuration.rviz_config_path.string(),
-                 "scenario_simulation:=true")
-             : std::make_unique<concealer::AutowareAuto>();
   } else {
     throw common::SemanticError(
       "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
