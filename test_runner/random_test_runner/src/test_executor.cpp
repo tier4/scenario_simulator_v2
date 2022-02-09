@@ -21,7 +21,7 @@
 #include "random_test_runner/file_interactions/junit_xml_reporter.hpp"
 #include "random_test_runner/file_interactions/yaml_test_params_saver.hpp"
 
-const double test_timeout = 600.0;
+const double test_timeout = 60.0;
 const bool attach_sensors = true;
 
 traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
@@ -93,11 +93,7 @@ void TestExecutor::initialize()
       ego_name_,
       std::vector<traffic_simulator_msgs::msg::LaneletPose>{test_description_.ego_goal_position});
 
-    std::this_thread::sleep_for(std::chrono::milliseconds{5000});
-
-    api_->requestAssignRoute(
-      ego_name_,
-      std::vector<traffic_simulator_msgs::msg::LaneletPose>{test_description_.ego_goal_position});
+    api_->engage(ego_name_);
 
     goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
   }

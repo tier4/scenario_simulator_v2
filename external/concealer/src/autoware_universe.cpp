@@ -23,8 +23,6 @@ AutowareUniverse::~AutowareUniverse() { shutdownAutoware(); }
 
 auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
-  std::cout << "!!! initialize() called !!!" << std::endl;
-
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       set(initial_pose);
@@ -46,10 +44,8 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
 {
   assert(not route.empty());
 
-  std::cout << "!!! plan() called !!!" << std::endl;
-
   task_queue.delay([this, route] {
-    // waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
+    waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
     setGoalPose(route.back());
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
       setCheckpoint(each);
