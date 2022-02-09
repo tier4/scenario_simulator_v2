@@ -53,7 +53,7 @@ public:
 
 private:
   const double linear_velocity_threshold_ = 0.01;
-  const double almost_standstill_timeout_ = 100.0;
+  const double almost_standstill_timeout_ = 10.0;  // this should be parameter
 
   const double last_data_timeout_ = 2.0;
 

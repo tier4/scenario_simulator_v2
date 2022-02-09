@@ -165,10 +165,10 @@ class RandomTestRunnerLaunch(object):
 
     def launch_setup(self, context, *args, **kwargs):
         test_param_file = self.random_test_runner_launch_configuration["test_parameters_filename"].perform(context)
-        print("Test param file", test_param_file)
+        print("Test param file '{}'".format(test_param_file))
 
         autoware_architecture = self.autoware_launch_configuration["architecture_type"].perform(context)
-        print("Autoware architecture", autoware_architecture)
+        print("Autoware architecture '{}'".format(autoware_architecture))
 
         parameters = [self.autoware_launch_configuration,
                       {"autoware_launch_package": default_autoware_launch_package_of(autoware_architecture),
@@ -178,21 +178,23 @@ class RandomTestRunnerLaunch(object):
         if test_param_file:
             test_param_file_path = os.path.join(get_package_share_directory("random_test_runner"), "param",
                                                 test_param_file)
-            print("Parameters file supplied: {}. "
+            print("Parameters file supplied: '{}'. "
                   "Parameters passed there override passed via arguments".format(test_param_file_path))
             parameters.append(test_param_file_path)
 
-        if self.autoware_launch_configuration["vehicle_model"].perform(context):
-            vehicle_info_param_file_path = get_package_share_directory(self.autoware_launch_configuration["vehicle_model"].perform(context) + "_description") + "/config/vehicle_info.param.yaml"
-            simulator_model_param_file_path = get_package_share_directory(self.autoware_launch_configuration["vehicle_model"].perform(context) + "_description") + "/config/simulator_model.param.yaml"
-            print("Vehicle info parameters file supplied: {}. "
+        vehicle_model = self.autoware_launch_configuration["vehicle_model"].perform(context)
+        if vehicle_model:
+            vehicle_model_description_dir = get_package_share_directory(vehicle_model + "_description")
+
+            vehicle_info_param_file_path = os.path.join(vehicle_model_description_dir, "config/vehicle_info.param.yaml")
+            simulator_model_param_file_path = os.path.join(vehicle_model_description_dir, "config/simulator_model.param.yaml")
+
+            print("Vehicle info parameters file supplied: '{}'. "
                   "Parameters passed there override passed via arguments".format(vehicle_info_param_file_path))
-            print("Simulator model parameters file supplied: {}. "
+            print("Simulator model parameters file supplied: '{}'. "
                   "Parameters passed there override passed via arguments".format(simulator_model_param_file_path))
             parameters.append(vehicle_info_param_file_path)
             parameters.append(simulator_model_param_file_path)
-
-        print(parameters)
 
         scenario_node = Node(
             package="random_test_runner",
