@@ -182,7 +182,7 @@ class RandomTestRunnerLaunch(object):
                   "Parameters passed there override passed via arguments".format(test_param_file_path))
             parameters.append(test_param_file_path)
 
-        # not tested for other architectures bu required for "awf/universe"
+        # not tested for other architectures but required for "awf/universe"
         if autoware_architecture == "awf/universe":
             vehicle_model = self.autoware_launch_configuration["vehicle_model"].perform(context)
             if vehicle_model:
