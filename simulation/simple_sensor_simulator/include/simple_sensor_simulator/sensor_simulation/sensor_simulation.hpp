@@ -33,12 +33,7 @@ public:
     const double current_simulation_time,
     const simulation_api_schema::LidarConfiguration & configuration, rclcpp::Node & node) -> void
   {
-    if (configuration.architecture_type() == "tier4/proposal") {
-      lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
-        current_simulation_time, configuration,
-        node.create_publisher<sensor_msgs::msg::PointCloud2>(
-          "/sensing/lidar/no_ground/pointcloud", 1)));
-    } else if (configuration.architecture_type() == "awf/universe") {
+    if (configuration.architecture_type() == "awf/universe") {
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
         node.create_publisher<sensor_msgs::msg::PointCloud2>(
@@ -60,12 +55,7 @@ public:
     const simulation_api_schema::DetectionSensorConfiguration & configuration, rclcpp::Node & node)
     -> void
   {
-    if (configuration.architecture_type() == "tier4/proposal") {
-      using Message = autoware_perception_msgs::msg::DynamicObjectArray;
-      detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
-        current_simulation_time, configuration,
-        node.create_publisher<Message>("/perception/object_recognition/objects", 1)));
-    } else if (configuration.architecture_type() == "awf/universe") {
+    if (configuration.architecture_type() == "awf/universe") {
       using Message = autoware_auto_perception_msgs::msg::PredictedObjects;
       detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,

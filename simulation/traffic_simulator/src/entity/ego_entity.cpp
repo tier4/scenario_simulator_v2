@@ -56,7 +56,7 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
   const auto vehicle_model_type =
     architecture_type == "awf/auto"
@@ -80,9 +80,7 @@ auto getVehicleModelType()
   };
 
   const auto iter =
-    (architecture_type == "tier4/proposal" or architecture_type == "awf/auto" ? legacy_table
-                                                                              : table)
-      .find(vehicle_model_type);
+    (architecture_type == "awf/auto" ? legacy_table : table).find(vehicle_model_type);
 
   if (iter != std::end(table)) {
     return iter->second;
@@ -158,22 +156,9 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
-  if (architecture_type == "tier4/proposal") {
-    return getParameter<bool>("launch_autoware", true)
-             ? std::make_unique<concealer::AutowareArchitectureProposal>(
-                 getParameter<std::string>("autoware_launch_package"),
-                 getParameter<std::string>("autoware_launch_file"),
-                 "map_path:=" + configuration.map_path.string(),
-                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + configuration.rviz_config_path.string(),
-                 "scenario_simulation:=true")
-             : std::make_unique<concealer::AutowareArchitectureProposal>();
-  } else if (architecture_type == "awf/universe") {
+  if (architecture_type == "awf/universe") {
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
                  getParameter<std::string>("autoware_launch_package"),
@@ -200,7 +185,8 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "scenario_simulation:=true")
              : std::make_unique<concealer::AutowareAuto>();
   } else {
-    throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
+    throw common::SemanticError(
+      "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
   }
 }
 
@@ -219,7 +205,9 @@ EgoEntity::EgoEntity(
 
 void EgoEntity::engage() { autoware->engage(); }
 
-auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
+auto EgoEntity::getVehicleCommand() const -> std::tuple<
+  autoware_auto_control_msgs::msg::AckermannControlCommand,
+  autoware_auto_vehicle_msgs::msg::GearCommand>
 {
   return autoware->getVehicleCommand();
 }

@@ -16,7 +16,6 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
 
 #include <autoware_auto_perception_msgs/msg/traffic_light.hpp>
-#include <autoware_perception_msgs/msg/lamp_state.hpp>
 #include <iostream>
 #include <stdexcept>
 
@@ -38,19 +37,11 @@ template <typename T>
 auto convert(const TrafficLightArrow &) -> T;
 
 template <>
-auto convert<autoware_perception_msgs::msg::LampState>(const TrafficLightArrow &)
-  -> autoware_perception_msgs::msg::LampState;
-
-template <>
 auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLightArrow &)
   -> autoware_auto_perception_msgs::msg::TrafficLight;
 
 template <typename T>
 auto convert(const TrafficLightColor &) -> T;
-
-template <>
-auto convert<autoware_perception_msgs::msg::LampState>(const TrafficLightColor &)
-  -> autoware_perception_msgs::msg::LampState;
 
 template <>
 auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLightColor &)

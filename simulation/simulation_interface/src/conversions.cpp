@@ -401,111 +401,117 @@ void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header)
 }
 
 void toProto(
-  const autoware_control_msgs::msg::ControlCommand & control_command,
-  autoware_control_msgs::ControlCommand & proto)
+  const autoware_auto_control_msgs::msg::AckermannLateralCommand & message,
+  autoware_auto_control_msgs::AckermannLateralCommand & proto)
 {
-  proto.set_velocity(control_command.velocity);
-  proto.set_acceleration(control_command.acceleration);
-  proto.set_steering_angle(control_command.steering_angle);
-  proto.set_steering_angle_velocity(control_command.steering_angle_velocity);
+  toProto(message.stamp, *proto.mutable_stamp());
+  proto.set_steering_tire_angle(message.steering_tire_angle);
+  proto.set_steering_tire_rotation_rate(message.steering_tire_rotation_rate);
 }
 
 void toMsg(
-  const autoware_control_msgs::ControlCommand & proto,
-  autoware_control_msgs::msg::ControlCommand & control_command)
+  const autoware_auto_control_msgs::AckermannLateralCommand & proto,
+  autoware_auto_control_msgs::msg::AckermannLateralCommand & message)
 {
-  control_command.velocity = proto.velocity();
-  control_command.acceleration = proto.acceleration();
-  control_command.steering_angle = proto.steering_angle();
-  control_command.steering_angle_velocity = proto.steering_angle_velocity();
-}
-
-void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto)
-{
-  switch (shift.data) {
-    case autoware_vehicle_msgs::msg::Shift::NONE:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::NONE);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::PARKING:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::REVERSE:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::REVERSE);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::NEUTRAL:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::NEUTRAL);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::DRIVE:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::DRIVE);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::LOW:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::LOW);
-      break;
-    default:
-      THROW_SIMULATION_ERROR(
-        "shift position is invalid while converting ROS2 message to proto, shit position is ",
-        proto.data());
-  }
-}
-
-void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift)
-{
-  switch (proto.data()) {
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::NONE:
-      shift.data = autoware_vehicle_msgs::msg::Shift::NONE;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING:
-      shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::REVERSE:
-      shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::NEUTRAL:
-      shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::DRIVE:
-      shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::LOW:
-      shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
-      break;
-    default:
-      THROW_SIMULATION_ERROR(
-        "shift position is invalid while converting proto to ROS2 message, shit position is ",
-        proto.data());
-  }
+  toMsg(proto.stamp(), message.stamp);
+  message.steering_tire_angle = proto.steering_tire_angle();
+  message.steering_tire_rotation_rate = proto.steering_tire_rotation_rate();
 }
 
 void toProto(
-  const autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command,
-  autoware_vehicle_msgs::VehicleCommand & proto)
+  const autoware_auto_control_msgs::msg::LongitudinalCommand & message,
+  autoware_auto_control_msgs::LongitudinalCommand & proto)
 {
-  toProto(vehicle_command.control, *proto.mutable_control());
-  proto.set_emergency(vehicle_command.emergency);
-  toProto(vehicle_command.header, *proto.mutable_header());
-  toProto(vehicle_command.shift, *proto.mutable_shift());
+  toProto(message.stamp, *proto.mutable_stamp());
+  proto.set_speed(message.speed);
+  proto.set_acceleration(message.acceleration);
+  proto.set_jerk(message.jerk);
 }
 
 void toMsg(
-  const autoware_vehicle_msgs::VehicleCommand & proto,
-  autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command)
+  const autoware_auto_control_msgs::LongitudinalCommand & proto,
+  autoware_auto_control_msgs::msg::LongitudinalCommand & message)
 {
-  toMsg(proto.control(), vehicle_command.control);
-  vehicle_command.emergency = proto.emergency();
-  toMsg(proto.header(), vehicle_command.header);
-  toMsg(proto.shift(), vehicle_command.shift);
+  toMsg(proto.stamp(), message.stamp);
+  message.speed = proto.speed();
+  message.acceleration = proto.acceleration();
+  message.jerk = proto.jerk();
 }
 
 void toProto(
-  const autoware_perception_msgs::msg::TrafficLightState & traffic_light_state,
-  simulation_api_schema::TrafficLightState & proto)
+  const autoware_auto_control_msgs::msg::AckermannControlCommand & message,
+  autoware_auto_control_msgs::AckermannControlCommand & proto)
 {
-  proto.set_id(traffic_light_state.id);
-  for (const autoware_perception_msgs::msg::LampState & ls : traffic_light_state.lamp_states) {
-    simulation_api_schema::TrafficLightState::LampState lamp_state;
-    lamp_state.set_type((simulation_api_schema::TrafficLightState_LampState_State)ls.type);
-    *proto.add_lamp_states() = lamp_state;
+  toProto(message.stamp, *proto.mutable_stamp());
+  toProto(message.lateral, *proto.mutable_lateral());
+  toProto(message.longitudinal, *proto.mutable_longitudinal());
+}
+
+void toMsg(
+  const autoware_auto_control_msgs::AckermannControlCommand & proto,
+  autoware_auto_control_msgs::msg::AckermannControlCommand & message)
+{
+  toMsg(proto.stamp(), message.stamp);
+  toMsg(proto.lateral(), message.lateral);
+  toMsg(proto.longitudinal(), message.longitudinal);
+}
+
+auto toProto(
+  const autoware_auto_vehicle_msgs::msg::GearCommand & message,
+  autoware_auto_vehicle_msgs::GearCommand & proto) -> void
+{
+  toProto(message.stamp, *proto.mutable_stamp());
+
+#define CASE(NAME)                                                              \
+  case autoware_auto_vehicle_msgs::msg::GearCommand::NAME:                      \
+    proto.set_command(autoware_auto_vehicle_msgs::GearCommand_Constants::NAME); \
+    break
+
+  switch (message.command) {
+    CASE(NONE);
+    CASE(NEUTRAL);
+    CASE(DRIVE);
+    CASE(DRIVE_2);
+    CASE(DRIVE_3);
+    CASE(DRIVE_4);
+    CASE(DRIVE_5);
+    CASE(DRIVE_6);
+    CASE(DRIVE_7);
+    CASE(DRIVE_8);
+    CASE(DRIVE_9);
+    CASE(DRIVE_10);
+    CASE(DRIVE_11);
+    CASE(DRIVE_12);
+    CASE(DRIVE_13);
+    CASE(DRIVE_14);
+    CASE(DRIVE_15);
+    CASE(DRIVE_16);
+    CASE(DRIVE_17);
+    CASE(DRIVE_18);
+    CASE(REVERSE);
+    CASE(REVERSE_2);
+    CASE(PARK);
+    CASE(LOW);
+    CASE(LOW_2);
   }
+}
+
+auto toMsg(
+  const autoware_auto_vehicle_msgs::GearCommand & proto,
+  autoware_auto_vehicle_msgs::msg::GearCommand & message) -> void
+{
+  toMsg(proto.stamp(), message.stamp);
+  message.command = proto.command();
+}
+
+auto toProto(
+  const std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> & message,
+  traffic_simulator_msgs::VehicleCommand & proto) -> void
+{
+  toProto(std::get<0>(message), *proto.mutable_ackermann_control_command());
+  toProto(std::get<1>(message), *proto.mutable_gear_command());
 }
 
 void toProto(

@@ -129,7 +129,9 @@ void EntityBase::requestLaneChange(
   }
 }
 
-const autoware_vehicle_msgs::msg::VehicleCommand EntityBase::getVehicleCommand()
+auto EntityBase::getVehicleCommand() const -> std::tuple<
+  autoware_auto_control_msgs::msg::AckermannControlCommand,
+  autoware_auto_vehicle_msgs::msg::GearCommand>
 {
   THROW_SIMULATION_ERROR("get vehicle command does not support in ", type, " entity type");
 }
