@@ -514,7 +514,6 @@ auto toProto(
   toProto(std::get<1>(message), *proto.mutable_gear_command());
 }
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto)
@@ -604,5 +603,4 @@ void toProto(
     }
   }
 }
-#endif
 }  // namespace simulation_interface

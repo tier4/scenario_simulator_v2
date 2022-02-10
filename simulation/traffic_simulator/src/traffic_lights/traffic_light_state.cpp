@@ -99,7 +99,6 @@ std::ostream & operator<<(std::ostream & os, const TrafficLightArrow & datum)
   // clang-format on
 }
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLightArrow & datum)
   -> autoware_auto_perception_msgs::msg::TrafficLight
@@ -135,9 +134,7 @@ auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLigh
 
   return lamp_state;
 }
-#endif
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 template <>
 auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLightColor & datum)
   -> autoware_auto_perception_msgs::msg::TrafficLight
@@ -170,5 +167,4 @@ auto convert<autoware_auto_perception_msgs::msg::TrafficLight>(const TrafficLigh
 
   return lamp_state;
 }
-#endif
 }  // namespace traffic_simulator

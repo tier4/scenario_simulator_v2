@@ -183,8 +183,6 @@ docker pull tier4/scenario_simulator_v2:galactic
 rocker --x11 tier4/scenario_simulator_v2:galactic ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
 ```
 
-If you want to use docker with ROS2 Foxy, please replace galactic to foxy.
-
 <video
   class="c-video__embed"
   src="https://user-images.githubusercontent.com/10348912/115502051-44ab8500-a2af-11eb-9244-4a1d0f2a2b2a.mp4"
