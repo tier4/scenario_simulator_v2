@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware_universe.hpp>
 
@@ -189,41 +187,3 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
 }  // namespace concealer
-
-#else  // ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-
-#include <concealer/autoware_universe.hpp>
-
-namespace concealer
-{
-AutowareUniverse::~AutowareUniverse() { shutdownAutoware(); }
-
-auto AutowareUniverse::engage() -> void {}
-
-auto AutowareUniverse::getAcceleration() const -> double { return {}; }
-
-auto AutowareUniverse::getAutowareStateMessage() const -> std::string { return {}; }
-
-auto AutowareUniverse::getGearSign() const -> double { return 1.0; }
-
-auto AutowareUniverse::getSteeringAngle() const -> double { return {}; }
-
-auto AutowareUniverse::getVelocity() const -> double { return {}; }
-
-auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
-{
-  return {};
-}
-
-auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose &) -> void {}
-
-auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void {}
-
-auto AutowareUniverse::update() -> void {}
-
-auto AutowareUniverse::restrictTargetSpeed(double value) const -> double { return value; }
-
-auto AutowareUniverse::sendSIGINT() -> void { ::kill(process_id, SIGINT); }
-}  // namespace concealer
-
-#endif  // SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO

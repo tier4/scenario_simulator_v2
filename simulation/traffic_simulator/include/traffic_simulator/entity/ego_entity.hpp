@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <concealer/autoware_auto.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <string>
@@ -51,10 +50,6 @@ enum class VehicleModelType {
   IDEAL_STEER_ACC,
   IDEAL_STEER_ACC_GEARED,
   IDEAL_STEER_VEL,
-  LEGACY_DELAY_STEER,
-  LEGACY_DELAY_STEER_ACC,
-  LEGACY_IDEAL_ACCEL,
-  LEGACY_IDEAL_STEER,
 };
 
 class EgoEntity : public VehicleEntity

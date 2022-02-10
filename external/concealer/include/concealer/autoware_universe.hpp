@@ -15,8 +15,6 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/had_map_route.hpp>
@@ -186,49 +184,5 @@ public:
   auto update() -> void override;
 };
 }  // namespace concealer
-
-#else  // ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-
-#include <concealer/autoware.hpp>
-
-namespace concealer
-{
-struct AutowareUniverse : public Autoware
-{
-  template <typename... Ts>
-  CONCEALER_PUBLIC explicit AutowareUniverse(Ts &&... xs)
-  : Autoware(std::forward<decltype(xs)>(xs)...)
-  {
-  }
-
-  virtual ~AutowareUniverse();
-
-  auto engage() -> void override;
-
-  auto getAcceleration() const -> double override;
-
-  auto getAutowareStateMessage() const -> std::string override;
-
-  auto getGearSign() const -> double override;
-
-  auto getSteeringAngle() const -> double override;
-
-  auto getVelocity() const -> double override;
-
-  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
-
-  auto initialize(const geometry_msgs::msg::Pose &) -> void override;
-
-  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
-
-  auto restrictTargetSpeed(double) const -> double override;
-
-  auto sendSIGINT() -> void override;
-
-  auto update() -> void override;
-};
-}  // namespace concealer
-
-#endif  // SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_

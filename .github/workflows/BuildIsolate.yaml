@@ -41,7 +41,7 @@ jobs:
             traffic_simulator,
             user_defined_value_condition_example,
           ]
-        rosdistro: [foxy, galactic]
+        rosdistro: [galactic]
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:
