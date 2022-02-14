@@ -173,7 +173,7 @@ auto EgoEntity::getVehicleCommand() const -> std::tuple<
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  const auto state = autoware->getAutowareStateMessage();
+  const auto state = autoware->getAutowareStateString();
   return state.empty() ? "Launching" : state;
 }
 

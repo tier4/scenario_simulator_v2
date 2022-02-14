@@ -24,7 +24,7 @@ auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       set(initial_pose);
-      waitForAutowareStateToBeInitializingVehicle();
+      waitForAutowareStateToBeInitializing();
       waitForAutowareStateToBeWaitingForRoute([&]() {
         InitialPose initial_pose;
         {
@@ -158,9 +158,25 @@ auto AutowareUniverse::restrictTargetSpeed(double value) const -> double
   return value;
 }
 
-auto AutowareUniverse::getAutowareStateMessage() const -> std::string
+auto AutowareUniverse::getAutowareStateString() const -> std::string
 {
-  return getAutowareStatus().autoware_state;
+  using autoware_auto_system_msgs::msg::AutowareState;
+
+#define CASE(IDENTIFIER)          \
+  case AutowareState::IDENTIFIER: \
+    return #IDENTIFIER
+
+  switch (getAutowareState().state) {
+    CASE(INITIALIZING);
+    CASE(WAITING_FOR_ROUTE);
+    CASE(PLANNING);
+    CASE(WAITING_FOR_ENGAGE);
+    CASE(DRIVING);
+    CASE(ARRIVED_GOAL);
+    CASE(FINALIZING);
+  }
+
+#undef CASE
 }
 
 auto AutowareUniverse::sendSIGINT() -> void  //
@@ -175,9 +191,10 @@ auto AutowareUniverse::isReady() noexcept -> bool
 
 auto AutowareUniverse::checkAutowareState() -> void
 {
-  if (isReady() and isEmergency()) {
-    // throw common::AutowareError("Autoware is in emergency state now");
-  }
+  // TODO(yamacir-kit): IMPLEMENT THIS!
+  // if (isReady() and isEmergency()) {
+  //   throw common::AutowareError("Autoware is in emergency state now");
+  // }
 }
 
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<

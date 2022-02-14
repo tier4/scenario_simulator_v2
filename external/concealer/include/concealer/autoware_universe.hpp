@@ -19,6 +19,7 @@
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/had_map_route.hpp>
 #include <autoware_auto_planning_msgs/msg/trajectory.hpp>
+#include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/engage.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
@@ -32,7 +33,6 @@
 #include <concealer/autoware.hpp>
 #include <concealer/define_macro.hpp>
 #include <nav_msgs/msg/odometry.hpp>
-#include <tier4_api_msgs/msg/awapi_autoware_status.hpp>
 #include <tier4_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <tier4_api_msgs/msg/velocity_limit.hpp>
 #include <tier4_planning_msgs/msg/lane_change_command.hpp>
@@ -77,7 +77,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_PUBLISHER(VehicleVelocity);
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
-  using AutowareStatus = tier4_api_msgs::msg::AwapiAutowareStatus;
+  using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using HazardLightsCommand = autoware_auto_vehicle_msgs::msg::HazardLightsCommand;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
@@ -85,7 +85,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using VehicleStatus = tier4_api_msgs::msg::AwapiVehicleStatus;
 
   DEFINE_SUBSCRIPTION(AckermannControlCommand);
-  DEFINE_SUBSCRIPTION(AutowareStatus);
+  DEFINE_SUBSCRIPTION(AutowareState);
   DEFINE_SUBSCRIPTION(GearCommand);
   DEFINE_SUBSCRIPTION(HazardLightsCommand);
   DEFINE_SUBSCRIPTION(Trajectory);
@@ -93,23 +93,22 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
 public:
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                                   \
-  auto is##NAME() const noexcept                                                              \
-  {                                                                                           \
-    using tier4_system_msgs::msg::AutowareState;                                              \
-    assert(AutowareState::VALUE == #NAME);                                                    \
-    return CONCEALER_CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
-  }                                                                                           \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                         \
+  auto is##NAME() const noexcept                                                    \
+  {                                                                                 \
+    using autoware_auto_system_msgs::msg::AutowareState;                            \
+    assert(AutowareState::VALUE == #NAME);                                          \
+    return CONCEALER_CURRENT_VALUE_OF(AutowareState).state == AutowareState::VALUE; \
+  }                                                                                 \
   static_assert(true, "")
 
-  DEFINE_STATE_PREDICATE(InitializingVehicle, INITIALIZING_VEHICLE);
-  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
-  DEFINE_STATE_PREDICATE(Planning, PLANNING);
-  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
-  DEFINE_STATE_PREDICATE(Driving, DRIVING);
-  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
-  DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
-  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
+  DEFINE_STATE_PREDICATE(Initializing, INITIALIZING);            // 1
+  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);    // 2
+  DEFINE_STATE_PREDICATE(Planning, PLANNING);                    // 3
+  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);  // 4
+  DEFINE_STATE_PREDICATE(Driving, DRIVING);                      // 5
+  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVED_GOAL);             // 6
+  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);                // 7
 
 #undef DEFINE_STATE_PREDICATE
 
@@ -130,7 +129,7 @@ public:
     INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd", []() {}),
-    INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
+    INIT_SUBSCRIPTION(AutowareState, "/autoware/state", checkAutowareState),
     INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd", []() {}),
     INIT_SUBSCRIPTION(HazardLightsCommand, "/control/command/hazard_lights_cmd", []() {}),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
@@ -157,7 +156,7 @@ public:
 
   auto getAcceleration() const -> double override;
 
-  auto getAutowareStateMessage() const -> std::string override;
+  auto getAutowareStateString() const -> std::string override;
 
   auto getGearSign() const -> double override;
 

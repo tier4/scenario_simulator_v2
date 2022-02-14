@@ -167,7 +167,7 @@ public:
 
   virtual auto getAcceleration() const -> double = 0;
 
-  virtual auto getAutowareStateMessage() const -> std::string = 0;
+  virtual auto getAutowareStateString() const -> std::string = 0;
 
   // returns -1.0 when gear is reverse and 1.0 otherwise
   virtual auto getGearSign() const -> double = 0;
