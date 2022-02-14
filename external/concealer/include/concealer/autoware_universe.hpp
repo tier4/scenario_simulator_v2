@@ -36,7 +36,6 @@
 #include <tier4_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <tier4_api_msgs/msg/velocity_limit.hpp>
 #include <tier4_planning_msgs/msg/lane_change_command.hpp>
-#include <tier4_system_msgs/msg/autoware_state.hpp>
 
 namespace concealer
 {

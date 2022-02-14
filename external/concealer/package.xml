@@ -20,7 +20,6 @@
   <!-- Tier IV Autoware.Universe -->
   <depend>tier4_api_msgs</depend>
   <depend>tier4_planning_msgs</depend>
-  <depend>tier4_system_msgs</depend>
 
   <!-- Common -->
   <depend>geometry_msgs</depend>
