@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <memory>
@@ -208,8 +210,13 @@ boost::optional<std::string> ActionNode::getFrontEntityName(
   std::vector<std::string> entities;
   for (const auto & each : other_entity_status) {
     const auto distance = getDistanceToTargetEntityPolygon(spline, each.first);
-    if (distance) {
-      if (distance.get() < 40) {
+    const auto quat = quaternion_operation::getRotation(
+      entity_status.pose.orientation, other_entity_status.at(each.first).pose.orientation);
+    /**
+     * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
+     */
+    if (std::fabs(quaternion_operation::convertQuaternionToEulerAngle(quat).z) <= 1.5708) {
+      if (distance && distance.get() < 40) {
         entities.emplace_back(each.first);
         distances.emplace_back(distance.get());
       }
