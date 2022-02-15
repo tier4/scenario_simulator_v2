@@ -33,8 +33,8 @@
 #include <concealer/define_macro.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_api_msgs/msg/awapi_vehicle_status.hpp>
-#include <tier4_api_msgs/msg/velocity_limit.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
+#include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_planning_msgs/msg/lane_change_command.hpp>
 
 namespace concealer
@@ -57,7 +57,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
   using LaneChangeApproval = tier4_planning_msgs::msg::LaneChangeCommand;
   using LocalizationOdometry = nav_msgs::msg::Odometry;
-  using VehicleVelocity = tier4_api_msgs::msg::VelocityLimit;
 
   DEFINE_PUBLISHER(Checkpoint);
   DEFINE_PUBLISHER(CurrentControlMode);
@@ -71,7 +70,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_PUBLISHER(InitialPose);
   DEFINE_PUBLISHER(LaneChangeApproval);
   DEFINE_PUBLISHER(LocalizationOdometry);
-  DEFINE_PUBLISHER(VehicleVelocity);
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
@@ -90,8 +88,10 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
   using Engage = tier4_external_api_msgs::srv::Engage;
+  using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
 
   CONCEALER_DEFINE_CLIENT(Engage);
+  CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                                         \
@@ -126,7 +126,6 @@ public:
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
-    INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd", []() {}),
     INIT_SUBSCRIPTION(AutowareState, "/autoware/state", checkAutowareState),
     INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd", []() {}),
@@ -134,7 +133,8 @@ public:
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {}),
-    CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage")
+    CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage"),
+    CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")
   {
     waitpid_options = 0;
 
@@ -179,6 +179,8 @@ public:
   auto restrictTargetSpeed(double) const -> double override;
 
   auto sendSIGINT() -> void override;
+
+  auto setUpperBoundSpeed(double) -> void override;
 
   auto update() -> void override;
 };

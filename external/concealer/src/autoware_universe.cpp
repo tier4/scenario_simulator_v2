@@ -57,7 +57,7 @@ auto AutowareUniverse::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
-      auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
+      auto request = std::make_shared<Engage::Request>();
       request->engage = true;
       requestEngage(request);
     });
@@ -106,13 +106,6 @@ auto AutowareUniverse::update() -> void
     localization_odometry.twist.twist = current_twist;
   }
   setLocalizationOdometry(localization_odometry);
-
-  VehicleVelocity vehicle_velocity;
-  {
-    vehicle_velocity.stamp = get_clock()->now();
-    vehicle_velocity.max_velocity = current_upper_bound_speed;
-  }
-  setVehicleVelocity(vehicle_velocity);
 
   setTransform(current_pose);
 }
@@ -182,6 +175,13 @@ auto AutowareUniverse::getAutowareStateString() const -> std::string
 auto AutowareUniverse::sendSIGINT() -> void  //
 {
   ::kill(process_id, SIGINT);
+}
+
+auto AutowareUniverse::setUpperBoundSpeed(double velocity_limit) -> void
+{
+  auto request = std::make_shared<SetVelocityLimit::Request>();
+  request->velocity = velocity_limit;
+  requestSetVelocityLimit(request);
 }
 
 auto AutowareUniverse::isReady() noexcept -> bool

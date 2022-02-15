@@ -82,8 +82,6 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
-  double current_upper_bound_speed = std::numeric_limits<double>::max();
-
   auto currentFuture() -> auto & { return future; }
 
   // this method is purely virtual because different Autoware types are killed differently
@@ -197,7 +195,7 @@ public:
 
   /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
 
-  /*   */ auto setUpperBoundSpeed(double) -> double;
+  virtual auto setUpperBoundSpeed(double) -> void = 0;
 };
 }  // namespace concealer
 
