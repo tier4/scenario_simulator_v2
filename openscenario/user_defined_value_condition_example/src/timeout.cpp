@@ -86,7 +86,9 @@ int main(const int argc, char const * const * const argv)
 
   auto subscription = node->create_subscription<autoware_auto_system_msgs::msg::AutowareState>(
     "/autoware/status", rclcpp::QoS(1).reliable(),
-    [&](const autoware_auto_system_msgs::msg::AutowareState::SharedPtr message) { status = *message; });
+    [&](const autoware_auto_system_msgs::msg::AutowareState::SharedPtr message) {
+      status = *message;
+    });
 
   auto publisher =
     node->create_publisher<ParameterDeclaration>("/timeout", rclcpp::QoS(1).reliable());

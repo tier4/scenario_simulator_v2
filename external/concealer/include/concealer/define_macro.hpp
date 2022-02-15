@@ -20,6 +20,33 @@
 
 #define CONCEALER_CURRENT_VALUE_OF(TYPE) current_value_of_##TYPE
 
+#define CONCEALER_DEFINE_CLIENT(TYPE)                                                            \
+private:                                                                                         \
+  rclcpp::Client<TYPE>::SharedPtr client_of_##TYPE;                                              \
+                                                                                                 \
+public:                                                                                          \
+  auto request##TYPE(const TYPE::Request::SharedPtr & request)->void                             \
+  {                                                                                              \
+    if (not client_of_##TYPE->service_is_ready()) {                                              \
+      RCLCPP_INFO_STREAM(                                                                        \
+        static_cast<Autoware &>(*this).get_logger(), #TYPE " service is not ready.");            \
+    } else {                                                                                     \
+      auto future = client_of_##TYPE->async_send_request(request);                               \
+      if (future.wait_for(std::chrono::seconds(1)) != std::future_status::ready) {               \
+        RCLCPP_INFO_STREAM(                                                                      \
+          static_cast<Autoware &>(*this).get_logger(), #TYPE " service request has timed out."); \
+      } else {                                                                                   \
+        RCLCPP_INFO_STREAM(                                                                      \
+          static_cast<Autoware &>(*this).get_logger(),                                           \
+          #TYPE " service request has been accepted"                                             \
+            << (future.get()->status.message.empty()                                             \
+                  ? "."                                                                          \
+                  : " (" + future.get()->status.message + ")."));                                \
+      }                                                                                          \
+    }                                                                                            \
+  }                                                                                              \
+  static_assert(true, "")
+
 #define DEFINE_SUBSCRIPTION(TYPE)                                  \
 private:                                                           \
   TYPE CONCEALER_CURRENT_VALUE_OF(TYPE);                           \

@@ -89,28 +89,9 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
-private:
-  rclcpp::Client<tier4_external_api_msgs::srv::Engage>::SharedPtr client_of_Engage;
+  using Engage = tier4_external_api_msgs::srv::Engage;
 
-public:
-  auto requestEngage(const tier4_external_api_msgs::srv::Engage::Request::SharedPtr & request)
-    -> void
-  {
-    if (not client_of_Engage->service_is_ready()) {
-      RCLCPP_INFO_STREAM(static_cast<Autoware &>(*this).get_logger(), "Service is not ready.");
-    }
-
-    auto future = client_of_Engage->async_send_request(request);
-
-    if (future.wait_for(std::chrono::seconds(1)) != std::future_status::ready) {
-      RCLCPP_INFO_STREAM(
-        static_cast<Autoware &>(*this).get_logger(), "Service request has timed out.");
-    }
-
-    if (not future.get()->status.message.empty()) {
-      RCLCPP_INFO_STREAM(static_cast<Autoware &>(*this).get_logger(), future.get()->status.message);
-    }
-  }
+  CONCEALER_DEFINE_CLIENT(Engage);
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                                         \

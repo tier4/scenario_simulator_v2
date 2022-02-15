@@ -171,6 +171,9 @@ auto AutowareUniverse::getAutowareStateString() const -> std::string
     CASE(DRIVING);
     CASE(ARRIVED_GOAL);
     CASE(FINALIZING);
+
+    default:
+      return "";
   }
 
 #undef CASE
