@@ -215,7 +215,9 @@ boost::optional<std::string> ActionNode::getFrontEntityName(
     /**
      * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
      */
-    if (std::fabs(quaternion_operation::convertQuaternionToEulerAngle(quat).z) <= 1.5708) {
+    if (
+      std::fabs(quaternion_operation::convertQuaternionToEulerAngle(quat).z) <=
+      boost::math::constants::half_pi<double>()) {
       if (distance && distance.get() < 40) {
         entities.emplace_back(each.first);
         distances.emplace_back(distance.get());
