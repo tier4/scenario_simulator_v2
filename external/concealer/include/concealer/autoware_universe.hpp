@@ -134,11 +134,7 @@ public:
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {}),
-
-    client_of_Engage(
-      static_cast<Autoware &>(*this).template create_client<tier4_external_api_msgs::srv::Engage>(
-        "/api/autoware/set/engage", rmw_qos_profile_default))
-
+    CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage")
   {
     waitpid_options = 0;
 

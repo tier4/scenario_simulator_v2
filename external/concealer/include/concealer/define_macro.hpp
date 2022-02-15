@@ -71,6 +71,10 @@ public:                                                              \
   }                                                                  \
   static_assert(true, "")
 
+#define CONCEALER_INIT_CLIENT(TYPE, SERVICE_NAME)                               \
+  client_of_##TYPE(static_cast<Autoware &>(*this).template create_client<TYPE>( \
+    SERVICE_NAME, rmw_qos_profile_default))
+
 #define INIT_SUBSCRIPTION(TYPE, TOPIC, ERROR_CHECK)                                         \
   subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
     TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
