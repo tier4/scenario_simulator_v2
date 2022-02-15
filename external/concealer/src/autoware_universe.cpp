@@ -57,12 +57,9 @@ auto AutowareUniverse::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
-      AutowareEngage message;
-      {
-        message.stamp = get_clock()->now();
-        message.engage = true;
-      }
-      return setAutowareEngage(message);
+      auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
+      request->engage = true;
+      requestEngage(request);
     });
   });
 }

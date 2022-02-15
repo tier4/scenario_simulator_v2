@@ -21,7 +21,6 @@
 #include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/engage.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/hazard_lights_command.hpp>
@@ -35,6 +34,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <tier4_api_msgs/msg/velocity_limit.hpp>
+#include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_planning_msgs/msg/lane_change_command.hpp>
 
 namespace concealer
@@ -45,7 +45,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   bool is_ready = false;
 
-  using AutowareEngage = autoware_auto_vehicle_msgs::msg::Engage;
   using Checkpoint = geometry_msgs::msg::PoseStamped;
   using CurrentControlMode = autoware_auto_vehicle_msgs::msg::ControlModeReport;
   using CurrentHazardLights = autoware_auto_vehicle_msgs::msg::HazardLightsReport;
@@ -60,7 +59,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using LocalizationOdometry = nav_msgs::msg::Odometry;
   using VehicleVelocity = tier4_api_msgs::msg::VelocityLimit;
 
-  DEFINE_PUBLISHER(AutowareEngage);
   DEFINE_PUBLISHER(Checkpoint);
   DEFINE_PUBLISHER(CurrentControlMode);
   DEFINE_PUBLISHER(CurrentHazardLights);
@@ -91,12 +89,34 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
+private:
+  rclcpp::Client<tier4_external_api_msgs::srv::Engage>::SharedPtr client_of_Engage;
+
+public:
+  auto requestEngage(const tier4_external_api_msgs::srv::Engage::Request::SharedPtr & request)
+    -> void
+  {
+    if (not client_of_Engage->service_is_ready()) {
+      RCLCPP_INFO_STREAM(static_cast<Autoware &>(*this).get_logger(), "Service is not ready.");
+    }
+
+    auto future = client_of_Engage->async_send_request(request);
+
+    if (future.wait_for(std::chrono::seconds(1)) != std::future_status::ready) {
+      RCLCPP_INFO_STREAM(
+        static_cast<Autoware &>(*this).get_logger(), "Service request has timed out.");
+    }
+
+    if (not future.get()->status.message.empty()) {
+      RCLCPP_INFO_STREAM(static_cast<Autoware &>(*this).get_logger(), future.get()->status.message);
+    }
+  }
+
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                                         \
   auto is##NAME() const noexcept                                                    \
   {                                                                                 \
     using autoware_auto_system_msgs::msg::AutowareState;                            \
-    assert(AutowareState::VALUE == #NAME);                                          \
     return CONCEALER_CURRENT_VALUE_OF(AutowareState).state == AutowareState::VALUE; \
   }                                                                                 \
   static_assert(true, "")
@@ -114,7 +134,6 @@ public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareUniverse(Ts &&... xs)
   : Autoware(std::forward<decltype(xs)>(xs)...),
-    INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
     INIT_PUBLISHER(CurrentHazardLights, "/vehicle/status/hazard_lights_status"),
@@ -133,7 +152,12 @@ public:
     INIT_SUBSCRIPTION(HazardLightsCommand, "/control/command/hazard_lights_cmd", []() {}),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd", []() {}),
-    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {})
+    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {}),
+
+    client_of_Engage(
+      static_cast<Autoware &>(*this).template create_client<tier4_external_api_msgs::srv::Engage>(
+        "/api/autoware/set/engage", rmw_qos_profile_default))
+
   {
     waitpid_options = 0;
 
