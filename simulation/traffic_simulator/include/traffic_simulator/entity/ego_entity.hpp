@@ -135,7 +135,7 @@ public:
   void requestSpeedChange(
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
-  auto setUpperBoundSpeed(double) -> void override;
+  auto setVelocityLimit(double) -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

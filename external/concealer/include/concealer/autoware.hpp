@@ -195,7 +195,7 @@ public:
 
   /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
 
-  virtual auto setUpperBoundSpeed(double) -> void = 0;
+  virtual auto setVelocityLimit(double) -> void = 0;
 };
 }  // namespace concealer
 

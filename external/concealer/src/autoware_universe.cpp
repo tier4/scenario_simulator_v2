@@ -186,7 +186,7 @@ auto AutowareUniverse::sendSIGINT() -> void  //
   ::kill(process_id, SIGINT);
 }
 
-auto AutowareUniverse::setUpperBoundSpeed(double velocity_limit) -> void
+auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
 {
   auto request = std::make_shared<SetVelocityLimit::Request>();
   request->velocity = velocity_limit;

@@ -500,9 +500,9 @@ void EgoEntity::requestSpeedChange(
 {
 }
 
-auto EgoEntity::setUpperBoundSpeed(double value) -> void  //
+auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
-  autoware->setUpperBoundSpeed(value);
+  autoware->setVelocityLimit(value);
 }
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -161,7 +161,7 @@ public:
 
   auto sendSIGINT() -> void override;
 
-  auto setUpperBoundSpeed(double) -> void override;
+  auto setVelocityLimit(double) -> void override;
 
   auto update() -> void override;
 };
