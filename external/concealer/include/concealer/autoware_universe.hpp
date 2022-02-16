@@ -34,7 +34,6 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
-#include <tier4_planning_msgs/msg/lane_change_command.hpp>
 
 namespace concealer
 {
@@ -54,7 +53,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using CurrentVelocity = autoware_auto_vehicle_msgs::msg::VelocityReport;
   using GoalPose = geometry_msgs::msg::PoseStamped;
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
-  using LaneChangeApproval = tier4_planning_msgs::msg::LaneChangeCommand;
   using LocalizationOdometry = nav_msgs::msg::Odometry;
 
   DEFINE_PUBLISHER(Checkpoint);
@@ -67,7 +65,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_PUBLISHER(CurrentVelocity);
   DEFINE_PUBLISHER(GoalPose);
   DEFINE_PUBLISHER(InitialPose);
-  DEFINE_PUBLISHER(LaneChangeApproval);
   DEFINE_PUBLISHER(LocalizationOdometry);
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
@@ -121,7 +118,6 @@ public:
     INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity_status"),
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
-    INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
     INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd", []() {}),
     INIT_SUBSCRIPTION(AutowareState, "/autoware/state", checkAutowareState),
@@ -135,13 +131,6 @@ public:
     waitpid_options = 0;
 
     resetTimerCallback();
-
-    LaneChangeApproval lane_change_approval;
-    {
-      lane_change_approval.stamp = get_clock()->now();
-      lane_change_approval.command = true;
-    }
-    setLaneChangeApproval(lane_change_approval);
   }
 
   virtual ~AutowareUniverse();
