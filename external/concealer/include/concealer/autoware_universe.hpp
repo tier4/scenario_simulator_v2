@@ -32,7 +32,6 @@
 #include <concealer/autoware.hpp>
 #include <concealer/define_macro.hpp>
 #include <nav_msgs/msg/odometry.hpp>
-#include <tier4_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_planning_msgs/msg/lane_change_command.hpp>
@@ -77,7 +76,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using HazardLightsCommand = autoware_auto_vehicle_msgs::msg::HazardLightsCommand;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
-  using VehicleStatus = tier4_api_msgs::msg::AwapiVehicleStatus;
 
   DEFINE_SUBSCRIPTION(AckermannControlCommand);
   DEFINE_SUBSCRIPTION(AutowareState);
@@ -85,7 +83,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   DEFINE_SUBSCRIPTION(HazardLightsCommand);
   DEFINE_SUBSCRIPTION(Trajectory);
   DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
-  DEFINE_SUBSCRIPTION(VehicleStatus);
 
   using Engage = tier4_external_api_msgs::srv::Engage;
   using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
@@ -132,7 +129,6 @@ public:
     INIT_SUBSCRIPTION(HazardLightsCommand, "/control/command/hazard_lights_cmd", []() {}),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd", []() {}),
-    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {}),
     CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage"),
     CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")
   {

@@ -46,7 +46,7 @@ public:                                                                         
     } else {                                                                                       \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(),                                               \
-        #TYPE " service request was accepted, but the content was not accepted.");                 \
+        #TYPE " service request was accepted, but ineffective => Retry!");                         \
       rclcpp::WallRate(std::chrono::seconds(1)).sleep();                                           \
       return request##TYPE(request);                                                               \
     }                                                                                              \
