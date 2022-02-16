@@ -115,11 +115,11 @@ public:
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
-    INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd", []() {}),
-    INIT_SUBSCRIPTION(AutowareState, "/autoware/state", checkAutowareState),
-    INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd", []() {}),
-    INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
-    INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd", []() {}),
+    INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
+    INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
+    INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
+    INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
+    INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
     CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage"),
     // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
     CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")
@@ -130,8 +130,6 @@ public:
   }
 
   virtual ~AutowareUniverse();
-
-  auto checkAutowareState() -> void;
 
   auto engage() -> void override;
 

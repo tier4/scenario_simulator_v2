@@ -198,14 +198,6 @@ auto AutowareUniverse::isReady() noexcept -> bool
   return is_ready or (is_ready = isWaitingForRoute());
 }
 
-auto AutowareUniverse::checkAutowareState() -> void
-{
-  // TODO(yamacir-kit): IMPLEMENT THIS!
-  // if (isReady() and isEmergency()) {
-  //   throw common::AutowareError("Autoware is in emergency state now");
-  // }
-}
-
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
   autoware_auto_control_msgs::msg::AckermannControlCommand,
   autoware_auto_vehicle_msgs::msg::GearCommand>

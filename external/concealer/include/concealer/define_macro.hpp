@@ -83,12 +83,11 @@ public:                                                              \
   client_of_##TYPE(static_cast<Autoware &>(*this).template create_client<TYPE>( \
     SERVICE_NAME, rmw_qos_profile_default))
 
-#define INIT_SUBSCRIPTION(TYPE, TOPIC, ERROR_CHECK)                                         \
+#define INIT_SUBSCRIPTION(TYPE, TOPIC)                                                      \
   subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
     TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
       const auto lock = static_cast<Autoware &>(*this).lock();                              \
       CONCEALER_CURRENT_VALUE_OF(TYPE) = *message;                                          \
-      ERROR_CHECK();                                                                        \
     }))
 
 #define INIT_PUBLISHER(TYPE, TOPIC) \
