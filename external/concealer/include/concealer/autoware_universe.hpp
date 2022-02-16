@@ -23,8 +23,6 @@
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/hazard_lights_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/hazard_lights_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
@@ -33,6 +31,7 @@
 #include <concealer/define_macro.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
+// TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 
 namespace concealer
@@ -45,7 +44,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   using Checkpoint = geometry_msgs::msg::PoseStamped;
   using CurrentControlMode = autoware_auto_vehicle_msgs::msg::ControlModeReport;
-  using CurrentHazardLights = autoware_auto_vehicle_msgs::msg::HazardLightsReport;
   using CurrentShift = autoware_auto_vehicle_msgs::msg::GearReport;
   using CurrentSteering = autoware_auto_vehicle_msgs::msg::SteeringReport;
   using CurrentTurnIndicators = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
@@ -57,7 +55,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   DEFINE_PUBLISHER(Checkpoint);
   DEFINE_PUBLISHER(CurrentControlMode);
-  DEFINE_PUBLISHER(CurrentHazardLights);
   DEFINE_PUBLISHER(CurrentShift);
   DEFINE_PUBLISHER(CurrentSteering);
   DEFINE_PUBLISHER(CurrentTurnIndicators);
@@ -70,21 +67,21 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
-  using HazardLightsCommand = autoware_auto_vehicle_msgs::msg::HazardLightsCommand;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   DEFINE_SUBSCRIPTION(AckermannControlCommand);
   DEFINE_SUBSCRIPTION(AutowareState);
   DEFINE_SUBSCRIPTION(GearCommand);
-  DEFINE_SUBSCRIPTION(HazardLightsCommand);
   DEFINE_SUBSCRIPTION(Trajectory);
   DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
 
   using Engage = tier4_external_api_msgs::srv::Engage;
+  // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
   using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
 
   CONCEALER_DEFINE_CLIENT(Engage);
+  // TODO CONCEALER_DEFINE_CLIENT(InitializePose);
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
 public:
@@ -111,7 +108,6 @@ public:
   : Autoware(std::forward<decltype(xs)>(xs)...),
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    INIT_PUBLISHER(CurrentHazardLights, "/vehicle/status/hazard_lights_status"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/gear_status"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering_status"),
     INIT_PUBLISHER(CurrentTurnIndicators, "/vehicle/status/turn_indicators_status"),
@@ -122,10 +118,10 @@ public:
     INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd", []() {}),
     INIT_SUBSCRIPTION(AutowareState, "/autoware/state", checkAutowareState),
     INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd", []() {}),
-    INIT_SUBSCRIPTION(HazardLightsCommand, "/control/command/hazard_lights_cmd", []() {}),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd", []() {}),
     CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage"),
+    // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
     CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")
   {
     waitpid_options = 0;

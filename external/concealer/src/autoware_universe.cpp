@@ -34,6 +34,15 @@ auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
         }
         return setInitialPose(initial_pose);
       });
+
+      // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
+      // waitForAutowareStateToBeWaitingForRoute([&]() {
+      //   auto request = std::make_shared<InitializePose::Request>();
+      //   request->pose.header.stamp = get_clock()->now();
+      //   request->pose.header.frame_id = "map";
+      //   request->pose.pose.pose = initial_pose;
+      //   requestInitializePose(request);
+      // });
     });
   }
 }

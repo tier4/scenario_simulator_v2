@@ -46,7 +46,9 @@ public:                                                                         
     } else {                                                                                       \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(),                                               \
-        #TYPE " service request was accepted, but ineffective => Retry!");                         \
+        #TYPE " service request was accepted, but ineffective => Retry!"                           \
+          << (future.get()->status.message.empty() ? ""                                            \
+                                                   : " (" + future.get()->status.message + ")"));  \
       rclcpp::WallRate(std::chrono::seconds(1)).sleep();                                           \
       return request##TYPE(request);                                                               \
     }                                                                                              \
