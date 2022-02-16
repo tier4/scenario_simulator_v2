@@ -271,7 +271,10 @@ bool API::setEntityStatus(
 
 bool API::initialize(double realtime_factor, double step_time)
 {
-  clock_.initialize(-1 * configuration.initialize_duration, step_time);
+  const auto initial_simulation_time =
+    getParameter<bool>("launch_autoware", true) ? (-1 * configuration.initialize_duration) : 0.0;
+
+  clock_.initialize(initial_simulation_time, step_time);
 
   if (configuration.standalone_mode) {
     return true;
