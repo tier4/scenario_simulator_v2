@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__DEFINE_MACRO_HPP_
-#define CONCEALER__DEFINE_MACRO_HPP_
+#ifndef CONCEALER__DIRTY_HACK_HPP_
+#define CONCEALER__DIRTY_HACK_HPP_
 
 #include <utility>
-
-#define CONCEALER_CURRENT_VALUE_OF(TYPE) current_value_of_##TYPE
 
 #define CONCEALER_DEFINE_CLIENT(TYPE)                                                              \
 private:                                                                                           \
@@ -56,14 +54,14 @@ public:                                                                         
 
 #define CONCEALER_DEFINE_SUBSCRIPTION(TYPE)                        \
 private:                                                           \
-  TYPE CONCEALER_CURRENT_VALUE_OF(TYPE);                           \
+  TYPE current_value_of_##TYPE;                                    \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;    \
                                                                    \
 public:                                                            \
   auto get##TYPE() const->const auto &                             \
   {                                                                \
     const auto lock = static_cast<const Autoware &>(*this).lock(); \
-    return CONCEALER_CURRENT_VALUE_OF(TYPE);                       \
+    return current_value_of_##TYPE;                                \
   }                                                                \
   static_assert(true, "")
 
@@ -86,11 +84,11 @@ public:                                                              \
   subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
     TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
       const auto lock = static_cast<Autoware &>(*this).lock();                              \
-      CONCEALER_CURRENT_VALUE_OF(TYPE) = *message;                                          \
+      current_value_of_##TYPE = *message;                                                   \
     }))
 
 #define CONCEALER_INIT_PUBLISHER(TYPE, TOPIC) \
   publisher_of_##TYPE(                        \
     static_cast<Node &>(*this).template create_publisher<TYPE>(TOPIC, rclcpp::QoS(1).reliable()))
 
-#endif  // CONCEALER__DEFINE_MACRO_HPP_
+#endif  // CONCEALER__DIRTY_HACK_HPP_

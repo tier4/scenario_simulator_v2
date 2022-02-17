@@ -28,7 +28,7 @@
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <concealer/autoware.hpp>
-#include <concealer/define_macro.hpp>
+#include <concealer/dirty_hack.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
@@ -85,12 +85,12 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
 public:
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                         \
-  auto is##NAME() const noexcept                                                    \
-  {                                                                                 \
-    using autoware_auto_system_msgs::msg::AutowareState;                            \
-    return CONCEALER_CURRENT_VALUE_OF(AutowareState).state == AutowareState::VALUE; \
-  }                                                                                 \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                              \
+  auto is##NAME() const noexcept                                         \
+  {                                                                      \
+    using autoware_auto_system_msgs::msg::AutowareState;                 \
+    return current_value_of_AutowareState.state == AutowareState::VALUE; \
+  }                                                                      \
   static_assert(true, "")
 
   DEFINE_STATE_PREDICATE(Initializing, INITIALIZING);            // 1
