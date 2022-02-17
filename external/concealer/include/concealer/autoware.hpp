@@ -199,6 +199,4 @@ public:
 };
 }  // namespace concealer
 
-#include <concealer/undefine_macro.hpp>
-
 #endif  // CONCEALER__AUTOWARE_HPP_
