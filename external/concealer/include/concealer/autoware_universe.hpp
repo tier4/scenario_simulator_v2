@@ -53,16 +53,16 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
   using LocalizationOdometry = nav_msgs::msg::Odometry;
 
-  DEFINE_PUBLISHER(Checkpoint);
-  DEFINE_PUBLISHER(CurrentControlMode);
-  DEFINE_PUBLISHER(CurrentShift);
-  DEFINE_PUBLISHER(CurrentSteering);
-  DEFINE_PUBLISHER(CurrentTurnIndicators);
-  DEFINE_PUBLISHER(CurrentTwist);
-  DEFINE_PUBLISHER(CurrentVelocity);
-  DEFINE_PUBLISHER(GoalPose);
-  DEFINE_PUBLISHER(InitialPose);
-  DEFINE_PUBLISHER(LocalizationOdometry);
+  CONCEALER_DEFINE_PUBLISHER(Checkpoint);
+  CONCEALER_DEFINE_PUBLISHER(CurrentControlMode);
+  CONCEALER_DEFINE_PUBLISHER(CurrentShift);
+  CONCEALER_DEFINE_PUBLISHER(CurrentSteering);
+  CONCEALER_DEFINE_PUBLISHER(CurrentTurnIndicators);
+  CONCEALER_DEFINE_PUBLISHER(CurrentTwist);
+  CONCEALER_DEFINE_PUBLISHER(CurrentVelocity);
+  CONCEALER_DEFINE_PUBLISHER(GoalPose);
+  CONCEALER_DEFINE_PUBLISHER(InitialPose);
+  CONCEALER_DEFINE_PUBLISHER(LocalizationOdometry);
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
@@ -70,11 +70,11 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  DEFINE_SUBSCRIPTION(AckermannControlCommand);
-  DEFINE_SUBSCRIPTION(AutowareState);
-  DEFINE_SUBSCRIPTION(GearCommand);
-  DEFINE_SUBSCRIPTION(Trajectory);
-  DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
+  CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
+  CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
+  CONCEALER_DEFINE_SUBSCRIPTION(GearCommand);
+  CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
+  CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
 
   using Engage = tier4_external_api_msgs::srv::Engage;
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
@@ -106,20 +106,20 @@ public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareUniverse(Ts &&... xs)
   : Autoware(std::forward<decltype(xs)>(xs)...),
-    INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
-    INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    INIT_PUBLISHER(CurrentShift, "/vehicle/status/gear_status"),
-    INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering_status"),
-    INIT_PUBLISHER(CurrentTurnIndicators, "/vehicle/status/turn_indicators_status"),
-    INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity_status"),
-    INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
-    INIT_PUBLISHER(InitialPose, "/initialpose"),
-    INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
-    INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
-    INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
-    INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
-    INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
-    INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
+    CONCEALER_INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
+    CONCEALER_INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
+    CONCEALER_INIT_PUBLISHER(CurrentShift, "/vehicle/status/gear_status"),
+    CONCEALER_INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering_status"),
+    CONCEALER_INIT_PUBLISHER(CurrentTurnIndicators, "/vehicle/status/turn_indicators_status"),
+    CONCEALER_INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity_status"),
+    CONCEALER_INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
+    CONCEALER_INIT_PUBLISHER(InitialPose, "/initialpose"),
+    CONCEALER_INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
+    CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
+    CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
+    CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
+    CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
+    CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
     CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage"),
     // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
     CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")

@@ -15,7 +15,6 @@
 #ifndef CONCEALER__DEFINE_MACRO_HPP_
 #define CONCEALER__DEFINE_MACRO_HPP_
 
-#include <mutex>
 #include <utility>
 
 #define CONCEALER_CURRENT_VALUE_OF(TYPE) current_value_of_##TYPE
@@ -55,7 +54,7 @@ public:                                                                         
   }                                                                                                \
   static_assert(true, "")
 
-#define DEFINE_SUBSCRIPTION(TYPE)                                  \
+#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE)                        \
 private:                                                           \
   TYPE CONCEALER_CURRENT_VALUE_OF(TYPE);                           \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;    \
@@ -68,7 +67,7 @@ public:                                                            \
   }                                                                \
   static_assert(true, "")
 
-#define DEFINE_PUBLISHER(TYPE)                                       \
+#define CONCEALER_DEFINE_PUBLISHER(TYPE)                             \
 private:                                                             \
   rclcpp::Publisher<TYPE>::SharedPtr publisher_of_##TYPE;            \
                                                                      \
@@ -83,15 +82,15 @@ public:                                                              \
   client_of_##TYPE(static_cast<Autoware &>(*this).template create_client<TYPE>( \
     SERVICE_NAME, rmw_qos_profile_default))
 
-#define INIT_SUBSCRIPTION(TYPE, TOPIC)                                                      \
+#define CONCEALER_INIT_SUBSCRIPTION(TYPE, TOPIC)                                            \
   subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
     TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
       const auto lock = static_cast<Autoware &>(*this).lock();                              \
       CONCEALER_CURRENT_VALUE_OF(TYPE) = *message;                                          \
     }))
 
-#define INIT_PUBLISHER(TYPE, TOPIC) \
-  publisher_of_##TYPE(              \
+#define CONCEALER_INIT_PUBLISHER(TYPE, TOPIC) \
+  publisher_of_##TYPE(                        \
     static_cast<Node &>(*this).template create_publisher<TYPE>(TOPIC, rclcpp::QoS(1).reliable()))
 
 #endif  // CONCEALER__DEFINE_MACRO_HPP_
