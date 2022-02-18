@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <boost/lexical_cast.hpp>
 #include <openscenario_msgs/msg/parameter_declaration.hpp>
 #include <openscenario_msgs/msg/parameter_type.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <tier4_api_msgs/msg/awapi_autoware_status.hpp>
-#include <tier4_system_msgs/msg/autoware_state.hpp>
 
 int main(const int argc, char const * const * const argv)
 {
@@ -83,11 +82,13 @@ int main(const int argc, char const * const * const argv)
 
   auto node = std::make_shared<rclcpp::Node>("count_up");
 
-  tier4_api_msgs::msg::AwapiAutowareStatus status;
+  autoware_auto_system_msgs::msg::AutowareState status;
 
-  auto subscription = node->create_subscription<tier4_api_msgs::msg::AwapiAutowareStatus>(
-    "/awapi/autoware/get/status", rclcpp::QoS(1).reliable(),
-    [&](const tier4_api_msgs::msg::AwapiAutowareStatus::SharedPtr message) { status = *message; });
+  auto subscription = node->create_subscription<autoware_auto_system_msgs::msg::AutowareState>(
+    "/autoware/status", rclcpp::QoS(1).reliable(),
+    [&](const autoware_auto_system_msgs::msg::AutowareState::SharedPtr message) {
+      status = *message;
+    });
 
   auto publisher =
     node->create_publisher<ParameterDeclaration>("/timeout", rclcpp::QoS(1).reliable());
@@ -96,7 +97,7 @@ int main(const int argc, char const * const * const argv)
   {
     static auto duration_since_autoware_engaged = std::chrono::high_resolution_clock::now();
 
-    if (status.autoware_state != tier4_system_msgs::msg::AutowareState::DRIVING) {
+    if (status.state != autoware_auto_system_msgs::msg::AutowareState::DRIVING) {
       duration_since_autoware_engaged = std::chrono::high_resolution_clock::now();
     }
 

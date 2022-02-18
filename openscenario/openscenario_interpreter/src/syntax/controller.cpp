@@ -36,7 +36,7 @@ auto Controller::assign(const EntityRef & entity_ref) -> void
   const auto max_speed = properties["maxSpeed"];
 
   if (not max_speed.value.empty()) {
-    setUpperBoundSpeed(entity_ref, Double(max_speed.value));
+    setVelocityLimit(entity_ref, Double(max_speed.value));
   }
 
   applyAssignControllerAction(entity_ref, [&]() {

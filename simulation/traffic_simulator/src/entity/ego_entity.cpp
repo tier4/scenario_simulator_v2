@@ -173,7 +173,7 @@ auto EgoEntity::getVehicleCommand() const -> std::tuple<
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  const auto state = autoware->getAutowareStateMessage();
+  const auto state = autoware->getAutowareStateString();
   return state.empty() ? "Launching" : state;
 }
 
@@ -500,9 +500,9 @@ void EgoEntity::requestSpeedChange(
 {
 }
 
-auto EgoEntity::setUpperBoundSpeed(double value) -> void  //
+auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
-  autoware->setUpperBoundSpeed(value);
+  autoware->setVelocityLimit(value);
 }
 }  // namespace entity
 }  // namespace traffic_simulator
