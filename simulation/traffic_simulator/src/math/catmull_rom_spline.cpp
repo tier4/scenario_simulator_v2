@@ -18,6 +18,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
+#include <traffic_simulator/math/linear_algebra.hpp>
 #include <utility>
 #include <vector>
 
@@ -98,14 +99,14 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
 }
 
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
-  double start_s, double end_s, double resolution) const
+  double start_s, double end_s, double resolution, double offset) const
 {
   if (start_s > end_s) {
     std::vector<geometry_msgs::msg::Point> ret;
     resolution = std::fabs(resolution);
     double s = start_s;
     while (s >= end_s) {
-      auto p = getPoint(s);
+      auto p = getPoint(s, offset);
       ret.emplace_back(p);
       s = s - resolution;
     }
@@ -115,7 +116,7 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
     resolution = std::fabs(resolution);
     double s = start_s;
     while (s <= end_s) {
-      auto p = getPoint(s);
+      auto p = getPoint(s, offset);
       ret.emplace_back(p);
       s = s + resolution;
     }
@@ -347,6 +348,14 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
   return curves_[index_and_s.first].getPoint(index_and_s.second, true);
+}
+
+const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s, double offset) const
+{
+  const auto index_and_s = getCurveIndexAndS(s);
+  return curves_[index_and_s.first].getPoint(index_and_s.second, true) +
+         offset *
+           math::normalize(curves_[index_and_s.first].getNormalVector(index_and_s.second, true));
 }
 
 double CatmullRomSpline::getMaximum2DCurvature() const
