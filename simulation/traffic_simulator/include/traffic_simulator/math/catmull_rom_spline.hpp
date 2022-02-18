@@ -40,7 +40,9 @@ public:
     double start_s, double end_s, double resolution) const;
   boost::optional<double> getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0);
-  double getSquaredDistanceIn2D(geometry_msgs::msg::Point point, double s) const;
+  double getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, double s) const;
+  geometry_msgs::msg::Vector3 getSquaredDistanceVector(
+    const geometry_msgs::msg::Point & point, double s) const;
   boost::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     bool search_backward = false) const;

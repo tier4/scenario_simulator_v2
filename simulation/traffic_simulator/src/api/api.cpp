@@ -48,7 +48,7 @@ bool API::despawn(const std::string & name)
     simulation_api_schema::DespawnEntityRequest req;
     simulation_api_schema::DespawnEntityResponse res;
     req.set_name(name);
-    despawn_entity_client_.call(req, res);
+    zeromq_client_.call(req, res);
     return res.result().success();
   }
   return true;
@@ -80,7 +80,7 @@ bool API::spawn(
       simulation_interface::toProto(parameters, *req.mutable_parameters());
       req.mutable_parameters()->set_name(name);
       req.set_is_ego(behavior == VehicleBehavior::autoware());
-      spawn_vehicle_entity_client_.call(req, res);
+      zeromq_client_.call(req, res);
       return res.result().success();
     }
   };
@@ -106,7 +106,7 @@ bool API::spawn(
       simulation_api_schema::SpawnPedestrianEntityResponse res;
       simulation_interface::toProto(parameters, *req.mutable_parameters());
       req.mutable_parameters()->set_name(name);
-      spawn_pedestrian_entity_client_.call(req, res);
+      zeromq_client_.call(req, res);
       return res.result().success();
     }
   };
@@ -131,7 +131,7 @@ bool API::spawn(
       simulation_api_schema::SpawnMiscObjectEntityResponse res;
       simulation_interface::toProto(parameters, *req.mutable_parameters());
       req.mutable_parameters()->set_name(name);
-      spawn_misc_object_entity_client_.call(req, res);
+      zeromq_client_.call(req, res);
       return res.result().success();
     }
   };
@@ -280,7 +280,7 @@ bool API::initialize(double realtime_factor, double step_time)
     req.set_step_time(step_time);
     req.set_realtime_factor(realtime_factor);
     simulation_api_schema::InitializeResponse res;
-    initialize_client_.call(req, res);
+    zeromq_client_.call(req, res);
     return res.result().success();
   }
 }
@@ -294,7 +294,7 @@ bool API::attachDetectionSensor(
     simulation_api_schema::AttachDetectionSensorRequest req;
     simulation_api_schema::AttachDetectionSensorResponse res;
     *req.mutable_configuration() = sensor_configuration;
-    attach_detection_sensor_client_.call(req, res);
+    zeromq_client_.call(req, res);
     return res.result().success();
   }
 }
@@ -302,7 +302,7 @@ bool API::attachDetectionSensor(
 bool API::attachDetectionSensor(const std::string & entity_name)
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
-    entity_name, getParameter<std::string>("architecture_type", "tier4/proposal"), 0.1));
+    entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1));
 }
 
 bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
@@ -313,7 +313,7 @@ bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & li
     simulation_api_schema::AttachLidarSensorRequest req;
     simulation_api_schema::AttachLidarSensorResponse res;
     *req.mutable_configuration() = lidar_configuration;
-    attach_lidar_sensor_client_.call(req, res);
+    zeromq_client_.call(req, res);
     return res.result().success();
   }
 }
@@ -321,7 +321,7 @@ bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & li
 bool API::attachLidarSensor(const std::string & entity_name, const helper::LidarType lidar_type)
 {
   return attachLidarSensor(helper::constructLidarConfiguration(
-    lidar_type, entity_name, getParameter<std::string>("architecture_type", "tier4/proposal")));
+    lidar_type, entity_name, getParameter<std::string>("architecture_type", "awf/universe")));
 }
 
 bool API::updateSensorFrame()
@@ -334,7 +334,7 @@ bool API::updateSensorFrame()
     simulation_interface::toProto(
       clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
     simulation_api_schema::UpdateSensorFrameResponse res;
-    update_sensor_frame_client_.call(req, res);
+    zeromq_client_.call(req, res);
     return res.result().success();
   }
 }
@@ -349,15 +349,10 @@ bool API::updateTrafficLightsInSim()
       simulation_api_schema::TrafficLightState state;
       auto traffic_light = entity_manager_ptr_->getTrafficLightInstance(id);
       simulation_interface::toProto(
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light),
-#else
-        static_cast<autoware_perception_msgs::msg::TrafficLightState>(traffic_light),
-#endif
-        state);
+        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
       *req.add_states() = state;
     }
-    update_traffic_lights_client_.call(req, res);
+    zeromq_client_.call(req, res);
   }
   // TODO handle response
   return res.result().success();
@@ -391,7 +386,7 @@ bool API::updateEntityStatusInSim()
     }
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
-  update_entity_status_client_.call(req, res);
+  zeromq_client_.call(req, res);
   for (const auto status : res.status()) {
     auto entity_status = entity_manager_ptr_->getEntityStatus(status.name());
     if (!entity_status) {
@@ -430,7 +425,7 @@ bool API::updateFrame()
     simulation_interface::toProto(
       clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
     simulation_api_schema::UpdateFrameResponse res;
-    update_frame_client_.call(req, res);
+    zeromq_client_.call(req, res);
     if (!res.result().success()) {
       return false;
     }

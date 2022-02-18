@@ -29,8 +29,8 @@ Phase::Phase(const pugi::xml_node & node, Scope & scope)
 
 auto Phase::evaluate() const -> Object
 {
-  for (const auto & state : traffic_signal_states) {
-    state.evaluate();
+  for (auto && traffic_signal_state : traffic_signal_states) {
+    traffic_signal_state.evaluate();
   }
 
   return unspecified;

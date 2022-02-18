@@ -15,11 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
-#endif
-
-#include <autoware_perception_msgs/msg/traffic_light_state.hpp>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -38,10 +34,9 @@ class TrafficLight
 
 public:
   const std::int64_t id;
-  const std::int64_t relation_id;
 
   explicit TrafficLight(
-    std::int64_t id, std::int64_t relation_id,
+    std::int64_t id,
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
 
@@ -80,30 +75,6 @@ public:
   auto colorChanged() const { return color_changed_; }
   auto arrowChanged() const { return arrow_changed_; }
 
-  explicit operator autoware_perception_msgs::msg::TrafficLightState() const
-  {
-    autoware_perception_msgs::msg::TrafficLightState traffic_light_state;
-    {
-      traffic_light_state.id = id;
-
-      try {
-        traffic_light_state.lamp_states.push_back(
-          convert<autoware_perception_msgs::msg::LampState>(getArrow()));
-      } catch (const std::out_of_range &) {
-        // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
-      }
-
-      try {
-        traffic_light_state.lamp_states.push_back(
-          convert<autoware_perception_msgs::msg::LampState>(getColor()));
-      } catch (const std::out_of_range &) {
-        // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
-      }
-    }
-    return traffic_light_state;
-  }
-
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
   explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const
   {
     autoware_auto_perception_msgs::msg::TrafficSignal traffic_light_state;
@@ -127,7 +98,6 @@ public:
 
     return traffic_light_state;
   }
-#endif
 
 private:
   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;

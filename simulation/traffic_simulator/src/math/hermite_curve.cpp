@@ -66,12 +66,23 @@ HermiteCurve::HermiteCurve(
 }
 
 double HermiteCurve::getSquaredDistanceIn2D(
-  geometry_msgs::msg::Point point, double s, bool autoscale) const
+  const geometry_msgs::msg::Point & point, double s, bool autoscale) const
 {
   const auto point_on_curve = getPoint(s, autoscale);
   double x_term = std::pow(point.x - point_on_curve.x, 2);
   double y_term = std::pow(point.y - point_on_curve.y, 2);
   double ret = x_term + y_term;
+  return ret;
+}
+
+geometry_msgs::msg::Vector3 HermiteCurve::getSquaredDistanceVector(
+  const geometry_msgs::msg::Point & point, double s, bool autoscale) const
+{
+  const auto point_on_curve = getPoint(s, autoscale);
+  geometry_msgs::msg::Vector3 ret;
+  ret.x = point.x - point_on_curve.x;
+  ret.y = point.y - point_on_curve.y;
+  ret.z = point.z - point_on_curve.z;
   return ret;
 }
 
@@ -205,7 +216,7 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_po
 {
   std::vector<geometry_msgs::msg::Point> ret;
   for (size_t i = 0; i <= num_points; i++) {
-    double t = static_cast<double>(i) / 100.0;
+    double t = static_cast<double>(i) / static_cast<double>(num_points);
     ret.emplace_back(getPoint(t, false));
   }
   return ret;

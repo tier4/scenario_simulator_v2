@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "autoware_auto_control_msgs.proto";
+import "autoware_auto_vehicle_msgs.proto";
 import "geometry_msgs.proto";
 
 package traffic_simulator_msgs;
@@ -120,4 +122,9 @@ message MiscObjectParameters {
  **/
 message Waypoints {
   repeated geometry_msgs.Point waypoints = 1; // Waypoints of the entity.
+}
+
+message VehicleCommand {
+  autoware_auto_control_msgs.AckermannControlCommand ackermann_control_command = 1;
+  autoware_auto_vehicle_msgs.GearCommand gear_command = 2;
 }

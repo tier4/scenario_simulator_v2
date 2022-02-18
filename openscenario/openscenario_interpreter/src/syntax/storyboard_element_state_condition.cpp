@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state_condition.hpp>
 
 namespace openscenario_interpreter
@@ -43,7 +44,10 @@ auto StoryboardElementStateCondition::description() const -> String
 auto StoryboardElementStateCondition::evaluate() -> Object
 {
   try {
-    result = local().ref(storyboard_element_ref).currentState().as<StoryboardElementState>();
+    result = local()
+               .ref<StoryboardElement>(storyboard_element_ref)
+               .state()
+               .template as<StoryboardElementState>();
     return asBoolean(result == state);
   } catch (const std::out_of_range &) {
     return false_v;

@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/utility/demangle.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -40,13 +41,14 @@ class EnvironmentFrame
 
   std::vector<EnvironmentFrame *> unnamed_inner_frames;
 
-#define DEFINE_SYNTAX_ERROR(TYPENAME, ...)                 \
-  struct TYPENAME : public SyntaxError                     \
-  {                                                        \
-    explicit TYPENAME(const std::string & variable)        \
-    : SyntaxError(__VA_ARGS__, std::quoted(variable), ".") \
-    {                                                      \
-    }                                                      \
+#define DEFINE_SYNTAX_ERROR(TYPENAME, ...)                                                       \
+  template <typename T>                                                                          \
+  struct TYPENAME : public SyntaxError                                                           \
+  {                                                                                              \
+    explicit TYPENAME(const std::string & variable)                                              \
+    : SyntaxError(__VA_ARGS__, std::quoted(variable), " of type ", makeTypename(typeid(T)), ".") \
+    {                                                                                            \
+    }                                                                                            \
   }
 
   DEFINE_SYNTAX_ERROR(AmbiguousReferenceTo, "Ambiguous reference to ");
@@ -80,7 +82,7 @@ public:
         return result;
       }();
 
-      switch (boost::range::count_if(objects, is<T>())) {
+      switch (boost::range::count_if(objects, is_also<T>())) {
         case 0:
           frames = [&]() {
             std::vector<const EnvironmentFrame *> result;
@@ -91,13 +93,13 @@ public:
           }();
           break;
         case 1:
-          return *boost::range::find_if(objects, is<T>());
+          return *boost::range::find_if(objects, is_also<T>());
         default:
-          throw AmbiguousReferenceTo(name);
+          throw AmbiguousReferenceTo<T>(name);
       }
     }
 
-    return isOutermost() ? throw NoSuchVariableNamed(name) : outer_frame->find<T>(name);
+    return isOutermost() ? throw NoSuchVariableNamed<T>(name) : outer_frame->find<T>(name);
   }
 
   template <typename T>
@@ -107,11 +109,11 @@ public:
       const auto found = resolvePrefix(prefixed_name);
       switch (found.size()) {
         case 0:
-          throw NoSuchVariableNamed(boost::lexical_cast<std::string>(prefixed_name));
+          throw NoSuchVariableNamed<T>(boost::lexical_cast<std::string>(prefixed_name));
         case 1:
           return found.front()->find<T>(prefixed_name.strip<1>());
         default:
-          throw AmbiguousReferenceTo(boost::lexical_cast<std::string>(prefixed_name));
+          throw AmbiguousReferenceTo<T>(boost::lexical_cast<std::string>(prefixed_name));
       }
     } else {
       return find<T>(prefixed_name.name);

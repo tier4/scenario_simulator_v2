@@ -37,6 +37,18 @@ struct is<Object>
   auto operator()(const Object &) const noexcept { return true; }
 };
 
+template <typename T>
+struct is_also
+{
+  auto operator()(const Object & object) const { return object.is_also<T>(); }
+};
+
+template <>
+struct is_also<Object>
+{
+  auto operator()(const Object &) const noexcept { return true; }
+};
+
 using ComplexType = Object;
 
 using Group = Object;

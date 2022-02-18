@@ -40,9 +40,9 @@ auto CustomCommandAction::applyFaultInjectionAction(
   const auto now = node().now();
 
   auto makeFaultInjectionEvent = [](const auto & name) {
-    autoware_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
+    tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
     {
-      fault_injection_event.level = autoware_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+      fault_injection_event.level = tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
       fault_injection_event.name = name;
     }
 
@@ -50,7 +50,7 @@ auto CustomCommandAction::applyFaultInjectionAction(
   };
 
   auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
-    autoware_simulation_msgs::msg::SimulationEvents simulation_events;
+    tier4_simulation_msgs::msg::SimulationEvents simulation_events;
     {
       simulation_events.stamp = now;
 
@@ -109,14 +109,29 @@ auto CustomCommandAction::node() -> rclcpp::Node &
 }
 
 auto CustomCommandAction::publisher()
-  -> rclcpp::Publisher<autoware_simulation_msgs::msg::SimulationEvents> &
+  -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &
 {
-  static auto publisher = node().create_publisher<autoware_simulation_msgs::msg::SimulationEvents>(
+  static auto publisher = node().create_publisher<tier4_simulation_msgs::msg::SimulationEvents>(
     "/simulation/events", rclcpp::QoS(1).reliable());
   return *publisher;
 }
 
-auto CustomCommandAction::run() -> void
+auto CustomCommandAction::run() noexcept -> void {}
+
+auto CustomCommandAction::split(const std::string & s) -> std::vector<std::string>
+{
+  static const std::regex pattern{R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"};
+
+  std::vector<std::string> args{};
+
+  for (std::sregex_iterator iter{std::begin(s), std::end(s), pattern}, end; iter != end; ++iter) {
+    args.emplace_back((*iter)[1]);
+  }
+
+  return args;
+}
+
+auto CustomCommandAction::start() const -> void
 {
   static const std::unordered_map<
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
@@ -153,21 +168,6 @@ auto CustomCommandAction::run() -> void
     fork_exec(type, content);
   }
 }
-
-auto CustomCommandAction::split(const std::string & s) -> std::vector<std::string>
-{
-  static const std::regex pattern{R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"};
-
-  std::vector<std::string> args{};
-
-  for (std::sregex_iterator iter{std::begin(s), std::end(s), pattern}, end; iter != end; ++iter) {
-    args.emplace_back((*iter)[1]);
-  }
-
-  return args;
-}
-
-auto CustomCommandAction::start() noexcept -> void {}
 
 auto CustomCommandAction::test(const std::vector<std::string> & args, const Scope &) -> int
 {
