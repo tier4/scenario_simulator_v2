@@ -101,6 +101,16 @@ geometry_msgs::msg::Vector3 operator+(
   return ret;
 }
 
+geometry_msgs::msg::Point operator+(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1)
+{
+  geometry_msgs::msg::Point ret;
+  ret.x = v0.x + v1.x;
+  ret.y = v0.y + v1.y;
+  ret.z = v0.z + v1.z;
+  return ret;
+}
+
 geometry_msgs::msg::Point operator-(
   const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Vector3 & v1)
 {
@@ -115,6 +125,16 @@ geometry_msgs::msg::Vector3 operator-(
   const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
 {
   geometry_msgs::msg::Vector3 ret;
+  ret.x = v0.x - v1.x;
+  ret.y = v0.y - v1.y;
+  ret.z = v0.z - v1.z;
+  return ret;
+}
+
+geometry_msgs::msg::Point operator-(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1)
+{
+  geometry_msgs::msg::Point ret;
   ret.x = v0.x - v1.x;
   ret.y = v0.y - v1.y;
   ret.z = v0.z - v1.z;

@@ -41,9 +41,13 @@ geometry_msgs::msg::Point operator+(
   const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Vector3 & v1);
 geometry_msgs::msg::Vector3 operator+(
   const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
+geometry_msgs::msg::Point operator+(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1);
 geometry_msgs::msg::Point operator-(
   const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Vector3 & v1);
 geometry_msgs::msg::Vector3 operator-(
   const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
+geometry_msgs::msg::Point operator-(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1);
 
 #endif  // TRAFFIC_SIMULATOR__MATH__LINEAR_ALGEBRA_HPP_

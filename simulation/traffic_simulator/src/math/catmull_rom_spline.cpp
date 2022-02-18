@@ -352,7 +352,13 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 
 const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s, double offset) const
 {
-  return getPoint(s) + offset * math::normalize(getNormalVector(s));
+  geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+  double theta = std::atan2(vec.y, vec.x);
+  geometry_msgs::msg::Point p = getPoint(s);
+  geometry_msgs::msg::Point point;
+  point.x = p.x + offset * std::cos(theta);
+  point.y = p.y + offset * std::sin(theta);
+  return point;
 }
 
 double CatmullRomSpline::getMaximum2DCurvature() const
