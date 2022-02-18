@@ -228,7 +228,7 @@ public:
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDriverModel, );
-  FORWARD_TO_ENTITY(setUpperBoundSpeed, );
+  FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
 

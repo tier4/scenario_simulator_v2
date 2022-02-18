@@ -131,7 +131,7 @@ public:
     traffic_light_manager_ = ptr;
   }
 
-  virtual auto setUpperBoundSpeed(double) -> void {}
+  virtual auto setVelocityLimit(double) -> void {}
 
   /*   */ void setVerbose(bool verbose) { verbose_ = verbose; }
 

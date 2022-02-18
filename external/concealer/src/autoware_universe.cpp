@@ -24,7 +24,7 @@ auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       set(initial_pose);
-      waitForAutowareStateToBeInitializingVehicle();
+      waitForAutowareStateToBeInitializing();
       waitForAutowareStateToBeWaitingForRoute([&]() {
         InitialPose initial_pose;
         {
@@ -34,6 +34,15 @@ auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
         }
         return setInitialPose(initial_pose);
       });
+
+      // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
+      // waitForAutowareStateToBeWaitingForRoute([&]() {
+      //   auto request = std::make_shared<InitializePose::Request>();
+      //   request->pose.header.stamp = get_clock()->now();
+      //   request->pose.header.frame_id = "map";
+      //   request->pose.pose.pose = initial_pose;
+      //   requestInitializePose(request);
+      // });
     });
   }
 }
@@ -57,12 +66,9 @@ auto AutowareUniverse::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
-      AutowareEngage message;
-      {
-        message.stamp = get_clock()->now();
-        message.engage = true;
-      }
-      return setAutowareEngage(message);
+      auto request = std::make_shared<Engage::Request>();
+      request->engage = true;
+      requestEngage(request);
     });
   });
 }
@@ -110,13 +116,6 @@ auto AutowareUniverse::update() -> void
   }
   setLocalizationOdometry(localization_odometry);
 
-  VehicleVelocity vehicle_velocity;
-  {
-    vehicle_velocity.stamp = get_clock()->now();
-    vehicle_velocity.max_velocity = current_upper_bound_speed;
-  }
-  setVehicleVelocity(vehicle_velocity);
-
   setTransform(current_pose);
 }
 
@@ -158,9 +157,28 @@ auto AutowareUniverse::restrictTargetSpeed(double value) const -> double
   return value;
 }
 
-auto AutowareUniverse::getAutowareStateMessage() const -> std::string
+auto AutowareUniverse::getAutowareStateString() const -> std::string
 {
-  return getAutowareStatus().autoware_state;
+  using autoware_auto_system_msgs::msg::AutowareState;
+
+#define CASE(IDENTIFIER)          \
+  case AutowareState::IDENTIFIER: \
+    return #IDENTIFIER
+
+  switch (getAutowareState().state) {
+    CASE(INITIALIZING);
+    CASE(WAITING_FOR_ROUTE);
+    CASE(PLANNING);
+    CASE(WAITING_FOR_ENGAGE);
+    CASE(DRIVING);
+    CASE(ARRIVED_GOAL);
+    CASE(FINALIZING);
+
+    default:
+      return "";
+  }
+
+#undef CASE
 }
 
 auto AutowareUniverse::sendSIGINT() -> void  //
@@ -168,16 +186,16 @@ auto AutowareUniverse::sendSIGINT() -> void  //
   ::kill(process_id, SIGINT);
 }
 
+auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
+{
+  auto request = std::make_shared<SetVelocityLimit::Request>();
+  request->velocity = velocity_limit;
+  requestSetVelocityLimit(request);
+}
+
 auto AutowareUniverse::isReady() noexcept -> bool
 {
   return is_ready or (is_ready = isWaitingForRoute());
-}
-
-auto AutowareUniverse::checkAutowareState() -> void
-{
-  if (isReady() and isEmergency()) {
-    // throw common::AutowareError("Autoware is in emergency state now");
-  }
 }
 
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
