@@ -352,10 +352,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 
 const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s, double offset) const
 {
-  const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getPoint(index_and_s.second, true) +
-         offset *
-           math::normalize(curves_[index_and_s.first].getNormalVector(index_and_s.second, true));
+  return getPoint(s) + offset * math::normalize(getNormalVector(s));
 }
 
 double CatmullRomSpline::getMaximum2DCurvature() const
