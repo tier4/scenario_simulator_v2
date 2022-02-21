@@ -15,7 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <boost/optional.hpp>
 #include <memory>
 #include <queue>
@@ -80,7 +81,9 @@ public:
 
   /*   */ auto getVisibility() { return visibility_; }
 
-  virtual auto getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand;
+  virtual auto getVehicleCommand() const -> std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand>;
 
   /*   */ auto getVehicleParameters() const
     -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
@@ -128,7 +131,7 @@ public:
     traffic_light_manager_ = ptr;
   }
 
-  virtual auto setUpperBoundSpeed(double) -> void {}
+  virtual auto setVelocityLimit(double) -> void {}
 
   /*   */ void setVerbose(bool verbose) { verbose_ = verbose; }
 

@@ -9,7 +9,6 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>autoware_simulation_msgs</depend>
   <depend>concealer</depend>
   <depend>geometry_msgs</depend>
   <depend>libgoogle-glog-dev</depend>
@@ -24,6 +23,7 @@
   <depend>scenario_simulator_exception</depend>
   <depend>simple_junit</depend>
   <depend>std_msgs</depend>
+  <depend>tier4_simulation_msgs</depend>
   <depend>traffic_simulator</depend>
   <depend>traffic_simulator_msgs</depend>
 

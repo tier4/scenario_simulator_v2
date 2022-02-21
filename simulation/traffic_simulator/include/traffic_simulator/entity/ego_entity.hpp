@@ -18,8 +18,6 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <concealer/autoware_architecture_proposal.hpp>
-#include <concealer/autoware_auto.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <string>
@@ -28,7 +26,6 @@
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
-#include <unordered_map>
 #include <vector>
 
 template <typename T>
@@ -53,10 +50,6 @@ enum class VehicleModelType {
   IDEAL_STEER_ACC,
   IDEAL_STEER_ACC_GEARED,
   IDEAL_STEER_VEL,
-  LEGACY_DELAY_STEER,
-  LEGACY_DELAY_STEER_ACC,
-  LEGACY_IDEAL_ACCEL,
-  LEGACY_IDEAL_STEER,
 };
 
 class EgoEntity : public VehicleEntity
@@ -103,7 +96,9 @@ public:
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand override;
+  auto getVehicleCommand() const -> std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
@@ -140,7 +135,7 @@ public:
   void requestSpeedChange(
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
-  auto setUpperBoundSpeed(double) -> void override;
+  auto setVelocityLimit(double) -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -118,24 +118,15 @@ public:
   template <typename... Ts>
   auto makeTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
   {
-    const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+    const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
     if (architecture_type == "awf/universe") {
       return std::make_shared<
         TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
-    } else
-#endif
-      // NOTE: This broken indent is due to ament_clang_format.
-      if (architecture_type == "tier4/proposal" or architecture_type == "awf/auto") {
-      return std::make_shared<
-        TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>>(
-        std::forward<decltype(xs)>(xs)...);
     } else {
-      std::stringstream what;
-      what << "Unexpected architecture_type " << std::quoted(architecture_type) << " given.";
-      throw std::invalid_argument(what.str());
+      throw common::SemanticError(
+        "Unexpected architecture_type ", std::quoted(architecture_type), " given.");
     }
   }
 
@@ -237,7 +228,7 @@ public:
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDriverModel, );
-  FORWARD_TO_ENTITY(setUpperBoundSpeed, );
+  FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
 
