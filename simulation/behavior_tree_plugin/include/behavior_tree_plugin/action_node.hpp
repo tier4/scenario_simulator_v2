@@ -102,7 +102,9 @@ public:
   std::vector<std::int64_t> route_lanelets;
   traffic_simulator_msgs::msg::EntityStatus getEntityStatus(const std::string target_name) const;
   boost::optional<double> getDistanceToTargetEntityPolygon(
-    const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name);
+    const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name,
+    double width_extension_right = 0.0, double width_extension_left = 0.0,
+    double length_extension_front = 0.0, double length_extension_rear = 0.0);
 
 private:
   boost::optional<double> getDistanceToTargetEntityOnCrosswalk(
@@ -110,7 +112,9 @@ private:
     const traffic_simulator_msgs::msg::EntityStatus & status);
   boost::optional<double> getDistanceToTargetEntityPolygon(
     const traffic_simulator::math::CatmullRomSpline & spline,
-    const traffic_simulator_msgs::msg::EntityStatus & status);
+    const traffic_simulator_msgs::msg::EntityStatus & status, double width_extension_right = 0.0,
+    double width_extension_left = 0.0, double length_extension_front = 0.0,
+    double length_extension_rear = 0.0);
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> getConflictingEntityStatus(
     const std::vector<std::int64_t> & following_lanelets) const;
   std::vector<traffic_simulator_msgs::msg::EntityStatus> getConflictingEntityStatusOnCrossWalk(
