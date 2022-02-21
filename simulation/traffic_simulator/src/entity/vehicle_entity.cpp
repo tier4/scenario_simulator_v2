@@ -150,8 +150,13 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     // recalculate spline only when input data changes
     if (previous_route_lanelets_ != route_lanelets) {
       previous_route_lanelets_ = route_lanelets;
-      spline_ = std::make_shared<traffic_simulator::math::CatmullRomSpline>(
-        hdmap_utils_ptr_->getCenterPoints(route_lanelets));
+      try {
+        spline_ = std::make_shared<traffic_simulator::math::CatmullRomSpline>(
+          hdmap_utils_ptr_->getCenterPoints(route_lanelets));
+      } catch (const common::scenario_simulator_exception::SemanticError & error) {
+        // reset the ptr when spline cannot be calculated
+        spline_.reset();
+      }
     }
     behavior_plugin_ptr_->setCommonSpline(spline_);
 
