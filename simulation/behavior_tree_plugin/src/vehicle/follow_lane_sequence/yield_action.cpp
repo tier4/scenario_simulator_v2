@@ -33,7 +33,7 @@ YieldAction::YieldAction(const std::string & name, const BT::NodeConfiguration &
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle> YieldAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+  const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stop_target_) {
     return boost::none;

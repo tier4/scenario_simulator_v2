@@ -34,8 +34,7 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle>
-StopAtCrossingEntityAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+StopAtCrossingEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stop_target_) {
     return boost::none;

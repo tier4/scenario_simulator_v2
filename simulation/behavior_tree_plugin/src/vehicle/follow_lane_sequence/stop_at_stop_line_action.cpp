@@ -34,8 +34,7 @@ StopAtStopLineAction::StopAtStopLineAction(
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle>
-StopAtStopLineAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+StopAtStopLineAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stopline_) {
     return boost::none;

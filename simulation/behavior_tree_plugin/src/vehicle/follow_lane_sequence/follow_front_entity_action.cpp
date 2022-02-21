@@ -33,8 +33,7 @@ FollowFrontEntityAction::FollowFrontEntityAction(
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle>
-FollowFrontEntityAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+FollowFrontEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_front_entity_) {
     return boost::none;
