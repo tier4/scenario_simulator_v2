@@ -107,6 +107,26 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   distance_to_stopline_ = hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
+  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
+  const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets, spline);
+  const auto distance_to_front_entity = getDistanceToFrontEntity(spline);
+  if (!distance_to_stopline_) {
+    stopped_ = false;
+    return BT::NodeStatus::FAILURE;
+  }
+  if (distance_to_front_entity) {
+    if (distance_to_front_entity.get() <= distance_to_stopline_.get()) {
+      stopped_ = false;
+      return BT::NodeStatus::FAILURE;
+    }
+  }
+  if (distance_to_stop_target) {
+    if (distance_to_stop_target.get() <= distance_to_stopline_.get()) {
+      stopped_ = false;
+      return BT::NodeStatus::FAILURE;
+    }
+  }
+
   if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
     if (distance_to_stopline_) {
       if (distance_to_stopline_.get() <= vehicle_parameters.bounding_box.dimensions.x + 5) {
