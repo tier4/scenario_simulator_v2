@@ -58,23 +58,6 @@ public:
     return current_state.as<StoryboardElementState>() == State;
   }
 
-#define BOILERPLATE(NAME, STATE)                                                           \
-  auto NAME() const noexcept                                                               \
-  {                                                                                        \
-    return state().template as<StoryboardElementState>() == StoryboardElementState::STATE; \
-  }                                                                                        \
-  static_assert(true, "")
-
-  // BOILERPLATE(standby, standbyState);
-  // BOILERPLATE(starting, startTransition);
-  // BOILERPLATE(running, runningState);
-  // BOILERPLATE(ending, endTransition);
-  // BOILERPLATE(complete, completeState);
-  // BOILERPLATE(stopping, stopTransition);
-  // BOILERPLATE(skipping, skipTransition);
-
-#undef BOILERPLATE
-
   auto override()
   {
     if (
