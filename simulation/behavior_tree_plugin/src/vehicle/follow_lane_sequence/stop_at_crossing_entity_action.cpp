@@ -62,7 +62,8 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::ca
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
-      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0);
+      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
+      entity_status.lanelet_pose.offset);
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
