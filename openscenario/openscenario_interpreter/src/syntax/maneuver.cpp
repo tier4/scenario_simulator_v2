@@ -33,7 +33,9 @@ auto Maneuver::accomplished() const -> bool
 {
   // NOTE: A Maneuver's goal is accomplished when all its Events are in the completeState.
   return std::all_of(std::begin(events), std::end(events), [](auto && event) {
-    return event.template as<Event>().complete();
+    assert(event.template is<Event>());
+    return event.template as<StoryboardElement>()
+      .template is<StoryboardElementState::completeState>();
   });
 }
 

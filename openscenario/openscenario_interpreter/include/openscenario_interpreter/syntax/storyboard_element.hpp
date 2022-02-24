@@ -52,6 +52,12 @@ public:
 
   auto state() const -> const auto & { return current_state; }
 
+  template <StoryboardElementState::value_type State>
+  auto is() const
+  {
+    return current_state.as<StoryboardElementState>() == State;
+  }
+
 #define BOILERPLATE(NAME, STATE)                                                           \
   auto NAME() const noexcept                                                               \
   {                                                                                        \
@@ -59,19 +65,21 @@ public:
   }                                                                                        \
   static_assert(true, "")
 
-  BOILERPLATE(standby, standbyState);
-  BOILERPLATE(starting, startTransition);
-  BOILERPLATE(running, runningState);
-  BOILERPLATE(ending, endTransition);
-  BOILERPLATE(complete, completeState);
-  BOILERPLATE(stopping, stopTransition);
-  BOILERPLATE(skipping, skipTransition);
+  // BOILERPLATE(standby, standbyState);
+  // BOILERPLATE(starting, startTransition);
+  // BOILERPLATE(running, runningState);
+  // BOILERPLATE(ending, endTransition);
+  // BOILERPLATE(complete, completeState);
+  // BOILERPLATE(stopping, stopTransition);
+  // BOILERPLATE(skipping, skipTransition);
 
 #undef BOILERPLATE
 
   auto override()
   {
-    if (not complete() and not stopping()) {
+    if (
+      not is<StoryboardElementState::standbyState>() and
+      not is<StoryboardElementState::stopTransition>()) {
       return current_state = stop_transition;
     } else {
       return current_state;

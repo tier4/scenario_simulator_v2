@@ -38,7 +38,9 @@ auto Story::accomplished() const -> bool
 {
   // NOTE: A Story's goal is accomplished when all its Acts are in the completeState.
   return std::all_of(std::begin(acts), std::end(acts), [](auto && act) {
-    return act.template as<Act>().complete();
+    assert(act.template is<Act>());
+    return act.template as<StoryboardElement>()
+      .template is<StoryboardElementState::completeState>();
   });
 }
 

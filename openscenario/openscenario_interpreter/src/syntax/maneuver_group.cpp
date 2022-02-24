@@ -39,7 +39,9 @@ auto ManeuverGroup::accomplished() const -> bool
 {
   // A ManeuverGroup's goal is accomplished when all its Maneuvers are in the completeState.
   return std::all_of(std::begin(maneuvers), std::end(maneuvers), [&](auto && maneuver) {
-    return maneuver.template as<Maneuver>().complete();
+    assert(maneuver.template is<Maneuver>());
+    return maneuver.template as<StoryboardElement>()
+      .template is<StoryboardElementState::completeState>();
   });
 }
 

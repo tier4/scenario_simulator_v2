@@ -36,8 +36,11 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
 auto Act::accomplished() const -> bool
 {
   return std::all_of(
-    std::begin(maneuver_groups), std::end(maneuver_groups),
-    [&](const Object & each) { return each.as<ManeuverGroup>().complete(); });
+    std::begin(maneuver_groups), std::end(maneuver_groups), [](auto && maneuver_group) {
+      assert(maneuver_group.template is<ManeuverGroup>());
+      return maneuver_group.template as<StoryboardElement>()
+        .template is<StoryboardElementState::completeState>();
+    });
 }
 
 auto Act::elements() -> Elements & { return maneuver_groups; }

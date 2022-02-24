@@ -36,7 +36,9 @@ auto Event::accomplished() const -> bool
 {
   // An Event's goal is accomplished when all its Actions are in the completeState.
   return std::all_of(std::begin(actions), std::end(actions), [](auto && action) {
-    return action.template as<Action>().complete();
+    assert(action.template is<Action>());
+    return action.template as<StoryboardElement>()
+      .template is<StoryboardElementState::completeState>();
   });
 }
 
