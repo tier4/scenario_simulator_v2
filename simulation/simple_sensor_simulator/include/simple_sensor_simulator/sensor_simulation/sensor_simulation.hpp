@@ -55,7 +55,7 @@ public:
       using Message = autoware_auto_perception_msgs::msg::DetectedObjects;
       detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
-        node.create_publisher<Message>("/perception/detection/objects", 1)));
+        node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1)));
     } else {
       std::stringstream ss;
       ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
