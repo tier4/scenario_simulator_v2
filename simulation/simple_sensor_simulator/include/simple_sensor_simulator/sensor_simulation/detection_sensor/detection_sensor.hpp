@@ -17,7 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <autoware_auto_perception_msgs/msg/predicted_objects.hpp>
+#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -65,7 +65,7 @@ public:
 };
 
 template <>
-void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
+void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
   const std::vector<std::string> &);
 }  // namespace simple_sensor_simulator
