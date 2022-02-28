@@ -386,14 +386,14 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, bool include_crosswalk)
+  geometry_msgs::msg::Pose pose, bool include_crosswalk, double matching_distance)
 {
   const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
   if (lanelet_ids.empty()) {
     return boost::none;
   }
   for (const auto & id : lanelet_ids) {
-    const auto lanelet_pose = toLaneletPose(pose, id);
+    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
     if (lanelet_pose) {
       return lanelet_pose;
     }
@@ -402,10 +402,10 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
+  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance)
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
-  const auto s = spline->getSValue(pose, 1.0);
+  const auto s = spline->getSValue(pose, matching_distance);
   if (!s) {
     return boost::none;
   }
@@ -434,26 +434,26 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  bool include_crosswalk)
+  bool include_crosswalk, double matching_distance)
 {
   const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
   if (!lanelet_id) {
-    return toLaneletPose(pose, include_crosswalk);
+    return toLaneletPose(pose, include_crosswalk, matching_distance);
   }
-  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.get());
+  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.get(), matching_distance);
   if (pose_in_target_lanelet) {
     return pose_in_target_lanelet;
   }
   const auto previous = getPreviousLaneletIds(lanelet_id.get());
   for (const auto id : previous) {
-    const auto pose_in_previous = toLaneletPose(pose, id);
+    const auto pose_in_previous = toLaneletPose(pose, id, matching_distance);
     if (pose_in_previous) {
       return pose_in_previous;
     }
   }
   const auto next = getNextLaneletIds(lanelet_id.get());
   for (const auto id : previous) {
-    const auto pose_in_next = toLaneletPose(pose, id);
+    const auto pose_in_next = toLaneletPose(pose, id, matching_distance);
     if (pose_in_next) {
       return pose_in_next;
     }

@@ -250,7 +250,9 @@ auto EntityManager::getLongitudinalDistance(
   } else if (backward_distance) {
     return -backward_distance.get();
   }
-  return boost::none;
+  return getLongitudinalDistance(
+    hdmap_utils_ptr_->toMapPose(from).pose, hdmap_utils_ptr_->toMapPose(to).pose, 3.0,
+    max_distance);
 }
 
 auto EntityManager::getLongitudinalDistance(
@@ -258,7 +260,8 @@ auto EntityManager::getLongitudinalDistance(
   -> boost::optional<double>
 {
   if (!laneMatchingSucceed(to)) {
-    return boost::none;
+    return getLongitudinalDistance(
+      hdmap_utils_ptr_->toMapPose(from).pose, getMapPose(to), 3.0, max_distance);
   }
   if (entityStatusSet(to)) {
     if (const auto status = getEntityStatus(to)) {
@@ -274,7 +277,8 @@ auto EntityManager::getLongitudinalDistance(
   -> boost::optional<double>
 {
   if (!laneMatchingSucceed(from)) {
-    return boost::none;
+    return getLongitudinalDistance(
+      getMapPose(from), hdmap_utils_ptr_->toMapPose(to).pose, 3.0, max_distance);
   }
   if (entityStatusSet(from)) {
     if (const auto status = getEntityStatus(from)) {
@@ -290,10 +294,10 @@ auto EntityManager::getLongitudinalDistance(
   -> boost::optional<double>
 {
   if (!laneMatchingSucceed(from)) {
-    return boost::none;
+    return getLongitudinalDistance(getMapPose(from), getMapPose(to), 3.0, max_distance);
   }
   if (!laneMatchingSucceed(to)) {
-    return boost::none;
+    return getLongitudinalDistance(getMapPose(from), getMapPose(to), 3.0, max_distance);
   }
   if (entityStatusSet(from)) {
     if (const auto status = getEntityStatus(from)) {
@@ -301,6 +305,18 @@ auto EntityManager::getLongitudinalDistance(
     }
   }
 
+  return boost::none;
+}
+
+auto EntityManager::getLongitudinalDistance(
+  const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to,
+  const double matching_distance, const double max_distance) -> boost::optional<double>
+{
+  const auto from_pose = hdmap_utils_ptr_->toLaneletPose(from, false, matching_distance);
+  const auto to_pose = hdmap_utils_ptr_->toLaneletPose(to, false, matching_distance);
+  if (from_pose && to_pose) {
+    return getLongitudinalDistance(from_pose.get(), to_pose.get(), max_distance);
+  }
   return boost::none;
 }
 
