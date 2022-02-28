@@ -27,45 +27,43 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
   actors(readElement<Actors>("Actors", node, local()))
 {
   callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
-    return maneuvers.push_back(readCatalogedStoryboardElement<Maneuver>(node, local()));
+    return elements.push_back(readCatalogedStoryboardElement<Maneuver>(node, local()));
   });
 
   callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
-    return maneuvers.push_back(readStoryboardElement<Maneuver>(node, local()));
+    return elements.push_back(readStoryboardElement<Maneuver>(node, local()));
   });
 }
 
 auto ManeuverGroup::accomplished() const -> bool
 {
   // A ManeuverGroup's goal is accomplished when all its Maneuvers are in the completeState.
-  return std::all_of(std::begin(maneuvers), std::end(maneuvers), [&](auto && maneuver) {
+  return std::all_of(std::begin(elements), std::end(elements), [&](auto && maneuver) {
     assert(maneuver.template is<Maneuver>());
     return maneuver.template as<StoryboardElement>()
       .template is<StoryboardElementState::completeState>();
   });
 }
 
-auto ManeuverGroup::elements() -> Elements & { return maneuvers; }
-
 auto ManeuverGroup::ready() noexcept -> bool { return true; }
 
 auto ManeuverGroup::run() -> void
 {
-  for (auto && maneuver : maneuvers) {
+  for (auto && maneuver : elements) {
     maneuver.evaluate();
   }
 }
 
 auto ManeuverGroup::start() -> void
 {
-  for (auto && maneuver : maneuvers) {
+  for (auto && maneuver : elements) {
     maneuver.as<Maneuver>().current_state = standby_state;
   }
 }
 
 auto ManeuverGroup::stop() -> void
 {
-  for (auto && maneuver : maneuvers) {
+  for (auto && maneuver : elements) {
     maneuver.as<Maneuver>().override();
     maneuver.evaluate();
   }
@@ -84,7 +82,7 @@ auto operator<<(nlohmann::json & json, const ManeuverGroup & maneuver_group) -> 
 
   json["Maneuver"] = nlohmann::json::array();
 
-  for (auto && maneuver : maneuver_group.maneuvers) {
+  for (auto && maneuver : maneuver_group.elements) {
     nlohmann::json json_maneuver;
     json_maneuver << maneuver.as<Maneuver>();
     json["Maneuver"].push_back(json_maneuver);

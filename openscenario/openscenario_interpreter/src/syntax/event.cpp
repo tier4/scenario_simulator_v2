@@ -28,41 +28,39 @@ Event::Event(const pugi::xml_node & node, Scope & scope)
   start_trigger(readElement<Trigger>("StartTrigger", node, local()))
 {
   callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
-    return actions.push_back(readStoryboardElement<Action>(node, local()));
+    return elements.push_back(readStoryboardElement<Action>(node, local()));
   });
 }
 
 auto Event::accomplished() const -> bool
 {
   // An Event's goal is accomplished when all its Actions are in the completeState.
-  return std::all_of(std::begin(actions), std::end(actions), [](auto && action) {
+  return std::all_of(std::begin(elements), std::end(elements), [](auto && action) {
     assert(action.template is<Action>());
     return action.template as<StoryboardElement>()
       .template is<StoryboardElementState::completeState>();
   });
 }
 
-auto Event::elements() -> Elements & { return actions; }
-
 auto Event::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
 
 auto Event::run() -> void
 {
-  for (auto && action : actions) {
+  for (auto && action : elements) {
     action.evaluate();
   }
 }
 
 auto Event::start() -> void
 {
-  for (auto && each : actions) {
+  for (auto && each : elements) {
     each.as<Action>().current_state = standby_state;
   }
 }
 
 auto Event::stop() -> void
 {
-  for (auto && each : actions) {
+  for (auto && each : elements) {
     each.as<Action>().override();
     each.evaluate();
   }
@@ -81,7 +79,7 @@ auto operator<<(nlohmann::json & json, const Event & datum) -> nlohmann::json &
 
   json["Action"] = nlohmann::json::array();
 
-  for (const auto & each : datum.actions) {
+  for (const auto & each : datum.elements) {
     nlohmann::json action;
     action << each.as<Action>();
     json["Action"].push_back(action);

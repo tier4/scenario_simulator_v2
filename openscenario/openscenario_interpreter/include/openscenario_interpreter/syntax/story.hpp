@@ -37,13 +37,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Story : public Scope, public StoryboardElement
 {
-  Elements acts;
-
   explicit Story(const pugi::xml_node &, Scope &);
 
   auto accomplished() const -> bool override;
-
-  auto elements() -> Elements & override;
 
   auto ready() noexcept -> bool override;
 

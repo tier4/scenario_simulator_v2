@@ -25,27 +25,25 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
   parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
   callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
-    return events.push_back(readStoryboardElement<Event>(node, local()));
+    return elements.push_back(readStoryboardElement<Event>(node, local()));
   });
 }
 
 auto Maneuver::accomplished() const -> bool
 {
   // NOTE: A Maneuver's goal is accomplished when all its Events are in the completeState.
-  return std::all_of(std::begin(events), std::end(events), [](auto && event) {
+  return std::all_of(std::begin(elements), std::end(elements), [](auto && event) {
     assert(event.template is<Event>());
     return event.template as<StoryboardElement>()
       .template is<StoryboardElementState::completeState>();
   });
 }
 
-auto Maneuver::elements() -> Elements & { return events; }
-
 auto Maneuver::ready() noexcept -> bool { return true; }
 
 auto Maneuver::run() -> void
 {
-  for (auto && event : events) {
+  for (auto && event : elements) {
     event.evaluate();
   }
 }
@@ -54,7 +52,7 @@ auto Maneuver::start() noexcept -> void {}
 
 auto Maneuver::stop() -> void
 {
-  for (auto && event : events) {
+  for (auto && event : elements) {
     event.as<Event>().override();
     event.evaluate();
   }
@@ -70,7 +68,7 @@ auto operator<<(nlohmann::json & json, const Maneuver & maneuver) -> nlohmann::j
 
   json["Event"] = nlohmann::json::array();
 
-  for (const auto & event : maneuver.events) {
+  for (const auto & event : maneuver.elements) {
     nlohmann::json json_event;
     json_event << event.as<Event>();
     json["Event"].push_back(json_event);

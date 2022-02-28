@@ -43,6 +43,8 @@ public:
 
   Object current_state;
 
+  Elements elements;
+
   explicit StoryboardElement(const std::size_t maximum_execution_count = 0)
   : maximum_execution_count(maximum_execution_count),
     current_execution_count(0),
@@ -71,8 +73,6 @@ public:
 
 private:
   virtual auto accomplished() const -> bool = 0;
-
-  virtual auto elements() -> Elements & = 0;
 
   virtual auto ready()
     -> bool = 0;  // NOTE: This cannot be const because of the trigger evaluation.

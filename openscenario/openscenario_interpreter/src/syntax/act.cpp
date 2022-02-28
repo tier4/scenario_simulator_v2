@@ -25,7 +25,7 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
   start_trigger(readElement<Trigger>("StartTrigger", node, local()))
 {
   callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
-    return maneuver_groups.push_back(readStoryboardElement<ManeuverGroup>(node, local()));
+    return elements.push_back(readStoryboardElement<ManeuverGroup>(node, local()));
   });
 
   callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
@@ -35,21 +35,18 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
 
 auto Act::accomplished() const -> bool
 {
-  return std::all_of(
-    std::begin(maneuver_groups), std::end(maneuver_groups), [](auto && maneuver_group) {
-      assert(maneuver_group.template is<ManeuverGroup>());
-      return maneuver_group.template as<StoryboardElement>()
-        .template is<StoryboardElementState::completeState>();
-    });
+  return std::all_of(std::begin(elements), std::end(elements), [](auto && maneuver_group) {
+    assert(maneuver_group.template is<ManeuverGroup>());
+    return maneuver_group.template as<StoryboardElement>()
+      .template is<StoryboardElementState::completeState>();
+  });
 }
-
-auto Act::elements() -> Elements & { return maneuver_groups; }
 
 auto Act::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
 
 auto Act::run() -> void
 {
-  for (auto && maneuver_group : maneuver_groups) {
+  for (auto && maneuver_group : elements) {
     maneuver_group.evaluate();
   }
 }
@@ -58,7 +55,7 @@ auto Act::start() noexcept -> void {}
 
 auto Act::stop() -> void
 {
-  for (auto && maneuver_group : maneuver_groups) {
+  for (auto && maneuver_group : elements) {
     maneuver_group.as<ManeuverGroup>().override();
     maneuver_group.evaluate();
   }
@@ -74,7 +71,7 @@ auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &
 
   json["ManeuverGroup"] = nlohmann::json::array();
 
-  for (auto && maneuver_group : datum.maneuver_groups) {
+  for (auto && maneuver_group : datum.elements) {
     nlohmann::json act;
     act << maneuver_group.as<ManeuverGroup>();
     json["ManeuverGroup"].push_back(act);

@@ -30,27 +30,25 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
   });
 
   callWithElements(node, "Act", 1, unbounded, [&](auto && node) {
-    return acts.push_back(readStoryboardElement<Act>(node, local()));
+    return elements.push_back(readStoryboardElement<Act>(node, local()));
   });
 }
 
 auto Story::accomplished() const -> bool
 {
   // NOTE: A Story's goal is accomplished when all its Acts are in the completeState.
-  return std::all_of(std::begin(acts), std::end(acts), [](auto && act) {
+  return std::all_of(std::begin(elements), std::end(elements), [](auto && act) {
     assert(act.template is<Act>());
     return act.template as<StoryboardElement>()
       .template is<StoryboardElementState::completeState>();
   });
 }
 
-auto Story::elements() -> Elements & { return acts; }
-
 auto Story::ready() noexcept -> bool { return true; }
 
 auto Story::run() -> void
 {
-  for (auto && act : acts) {
+  for (auto && act : elements) {
     act.evaluate();
   }
 }
@@ -59,7 +57,7 @@ auto Story::start() noexcept -> void {}
 
 auto Story::stop() -> void
 {
-  for (auto && act : acts) {
+  for (auto && act : elements) {
     act.as<Act>().override();
     act.evaluate();
   }
@@ -75,7 +73,7 @@ auto operator<<(nlohmann::json & json, const Story & story) -> nlohmann::json &
 
   json["Act"] = nlohmann::json::array();
 
-  for (auto && act : story.acts) {
+  for (auto && act : story.elements) {
     nlohmann::json json_act;
     json_act << act.as<Act>();
     json["Act"].push_back(json_act);

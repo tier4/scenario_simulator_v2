@@ -46,15 +46,11 @@ struct Event : private Scope, public StoryboardElement
 
   const Priority priority;  // Priority of each event.
 
-  Elements actions;
-
   Trigger start_trigger;
 
   explicit Event(const pugi::xml_node &, Scope &);
 
   auto accomplished() const -> bool override;
-
-  auto elements() -> Elements & override;
 
   auto ready() -> bool override;
 

@@ -39,8 +39,6 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Act : public Scope, public StoryboardElement
 {
-  Elements maneuver_groups;
-
   Trigger start_trigger;
 
   Object stop_trigger;
@@ -48,8 +46,6 @@ struct Act : public Scope, public StoryboardElement
   explicit Act(const pugi::xml_node &, Scope &);
 
   auto accomplished() const -> bool override;
-
-  auto elements() -> Elements & override;
 
   auto start() noexcept -> void override;
 
