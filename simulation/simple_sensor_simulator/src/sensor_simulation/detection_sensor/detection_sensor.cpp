@@ -73,9 +73,9 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
           geometry_msgs::msg::Pose pose;
           simulation_interface::toMsg(s.pose(), pose);
           object.kinematics.pose_with_covariance.pose = pose;
-          object.kinematics.pose_with_covariance.covariance = {
-            1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
-            0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
+          object.kinematics.pose_with_covariance.covariance = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+                                                               0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+                                                               0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
           simulation_interface::toMsg(
             s.action_status().twist(), object.kinematics.twist_with_covariance.twist);
           object.shape.type = object.shape.BOUNDING_BOX;
