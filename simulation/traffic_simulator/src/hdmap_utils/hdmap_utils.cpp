@@ -700,6 +700,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
     std::vector<geometry_msgs::msg::Point> center_points = getCenterPoints(lanelet_id);
     std::copy(center_points.begin(), center_points.end(), std::back_inserter(ret));
   }
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
   return ret;
 }
 
