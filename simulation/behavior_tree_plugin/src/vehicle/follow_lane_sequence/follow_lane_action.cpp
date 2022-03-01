@@ -45,7 +45,8 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWay
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     waypoints.waypoints = common_spline->getTrajectory(
-      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0);
+      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
+      entity_status.lanelet_pose.offset);
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();

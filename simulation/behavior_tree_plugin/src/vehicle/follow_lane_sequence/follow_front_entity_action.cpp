@@ -60,7 +60,8 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
     waypoints.waypoints = common_spline->getTrajectory(
-      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0);
+      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
+      entity_status.lanelet_pose.offset);
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();

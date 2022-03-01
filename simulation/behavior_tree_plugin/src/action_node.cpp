@@ -256,22 +256,29 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::getEntityStatus(
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
-  const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name)
+  const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name,
+  double width_extension_right, double width_extension_left, double length_extension_front,
+  double length_extension_rear)
 {
   const auto status = getEntityStatus(target_name);
   if (status.lanelet_pose_valid == true) {
-    return getDistanceToTargetEntityPolygon(spline, status);
+    return getDistanceToTargetEntityPolygon(
+      spline, status, width_extension_right, width_extension_left, length_extension_front,
+      length_extension_rear);
   }
   return boost::none;
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
   const traffic_simulator::math::CatmullRomSpline & spline,
-  const traffic_simulator_msgs::msg::EntityStatus & status)
+  const traffic_simulator_msgs::msg::EntityStatus & status, double width_extension_right,
+  double width_extension_left, double length_extension_front, double length_extension_rear)
 {
   if (status.lanelet_pose_valid) {
     const auto polygon = traffic_simulator::math::transformPoints(
-      status.pose, traffic_simulator::math::getPointsFromBbox(status.bounding_box));
+      status.pose, traffic_simulator::math::getPointsFromBbox(
+                     status.bounding_box, width_extension_right, width_extension_left,
+                     length_extension_front, length_extension_rear));
     return spline.getCollisionPointIn2D(polygon, false, true);
   }
   return boost::none;
@@ -291,7 +298,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     }
   }
   for (const auto & status : lane_entity_status) {
-    const auto s = getDistanceToTargetEntityPolygon(spline, status);
+    const auto s = getDistanceToTargetEntityPolygon(spline, status, 0.0, 0.0, 0.0, 1.0);
     if (s) {
       distances.insert(s.get());
     }
