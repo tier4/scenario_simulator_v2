@@ -100,19 +100,6 @@ auto readElements(const std::string & name, const pugi::xml_node & node, Ts &&..
   return elements;
 }
 
-template <typename T, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, typename... Ts>
-auto readElementsAsElement(
-  const std::string & name, const pugi::xml_node & node, Ts &&... xs)  // XXX UGLY NAME!!!
-{
-  std::list<Object> elements;
-
-  traverse<MinOccurs, MaxOccurs>(node, name, [&](auto && x) {
-    elements.emplace_back(make<T>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...));
-  });
-
-  return elements;
-}
-
 template <typename... Ts>
 auto choice(const pugi::xml_node & node, Ts &&... xs) -> decltype(auto)
 {
