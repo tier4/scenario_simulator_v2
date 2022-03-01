@@ -42,36 +42,31 @@ using Cardinality =
 
 constexpr auto unbounded = std::numeric_limits<Cardinality>::max();
 
-template <typename Callee>
-void callWithElements(
-  const pugi::xml_node & parent,  //
-  const std::string & name,       //
-  const Cardinality min_occurs,   //
-  const Cardinality max_occurs,   //
-  Callee && call_with)
+template <Cardinality MinOccurs, Cardinality MaxOccurs, typename F>
+void callWithElements(const pugi::xml_node & parent, const std::string & name, F && f)
 {
   const auto children = parent.children(name.c_str());
 
   if (const auto size = iterator::size(children)) {
-    if (min_occurs != 0 and size < min_occurs) {
+    if (MinOccurs != 0 and size < MinOccurs) {
       throw SyntaxError(
-        parent.name(), " requires class ", name, " at least ", min_occurs, " element",
-        (1 < min_occurs ? "s" : ""), ", but ", size, " element", (1 < size ? "s" : ""),
+        parent.name(), " requires class ", name, " at least ", MinOccurs, " element",
+        (1 < MinOccurs ? "s" : ""), ", but ", size, " element", (1 < size ? "s" : ""),
         " specified");
-    } else if (max_occurs < size) {
+    } else if (MaxOccurs < size) {
       throw SyntaxError(
-        parent.name(), " requires class ", name, " at most ", max_occurs, " element",
-        (1 < max_occurs ? "s" : ""), ", but ", size, " element", (1 < size ? "s" : ""),
+        parent.name(), " requires class ", name, " at most ", MaxOccurs, " element",
+        (1 < MaxOccurs ? "s" : ""), ", but ", size, " element", (1 < size ? "s" : ""),
         " specified");
     } else {
       for (const auto & child : children) {
-        call_with(child);
+        f(child);
       }
     }
-  } else if (min_occurs != 0) {
+  } else if (MinOccurs != 0) {
     throw SyntaxError(
-      parent.name(), " requires class ", name, " at least ", min_occurs, " element",
-      (1 < min_occurs ? "s" : ""), ", but there is no specification");
+      parent.name(), " requires class ", name, " at least ", MinOccurs, " element",
+      (1 < MinOccurs ? "s" : ""), ", but there is no specification");
   }
 }
 
@@ -98,7 +93,7 @@ auto readElements(const std::string & name, const pugi::xml_node & node, Ts &&..
 {
   std::list<T> elements;
 
-  callWithElements(node, name, MinOccurs, MaxOccurs, [&](auto && x) {
+  callWithElements<MinOccurs, MaxOccurs>(node, name, [&](auto && x) {
     elements.emplace_back(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...);
   });
 
@@ -111,7 +106,7 @@ auto readElementsAsElement(
 {
   std::list<Object> elements;
 
-  callWithElements(node, name, MinOccurs, MaxOccurs, [&](auto && x) {
+  callWithElements<MinOccurs, MaxOccurs>(node, name, [&](auto && x) {
     elements.emplace_back(make<T>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...));
   });
 

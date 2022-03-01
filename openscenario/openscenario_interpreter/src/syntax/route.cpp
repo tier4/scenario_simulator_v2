@@ -25,9 +25,8 @@ Route::Route(const pugi::xml_node & node, Scope & scope)
   closed(readAttribute<Boolean>("closed", node, local(), Boolean())),
   parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
-  callWithElements(node, "Waypoint", 2, unbounded, [&](auto && node) {
-    return waypoints.emplace_back(node, local());
-  });
+  callWithElements<2, unbounded>(
+    node, "Waypoint", [&](auto && node) { return waypoints.emplace_back(node, local()); });
 }
 
 Route::operator std::vector<traffic_simulator_msgs::msg::LaneletPose>() const

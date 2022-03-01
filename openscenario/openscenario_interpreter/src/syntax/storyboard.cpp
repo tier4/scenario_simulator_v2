@@ -27,7 +27,7 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   init(readElement<Init>("Init", node, local())),
   stop_trigger(readElement<Trigger>("StopTrigger", node, local()))
 {
-  callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
+  callWithElements<1, unbounded>(node, "Story", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Story>(node, local()));
   });
 

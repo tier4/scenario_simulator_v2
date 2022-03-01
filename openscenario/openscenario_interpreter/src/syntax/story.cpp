@@ -25,11 +25,11 @@ inline namespace syntax
 Story::Story(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope)
 {
-  callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
+  callWithElements<0, 1>(node, "ParameterDeclarations", [&](auto && node) {
     return make<ParameterDeclarations>(node, local());
   });
 
-  callWithElements(node, "Act", 1, unbounded, [&](auto && node) {
+  callWithElements<1, unbounded>(node, "Act", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Act>(node, local()));
   });
 }

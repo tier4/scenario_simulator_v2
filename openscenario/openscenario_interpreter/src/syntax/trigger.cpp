@@ -21,8 +21,8 @@ inline namespace syntax
 {
 Trigger::Trigger(const pugi::xml_node & node, Scope & scope) : current_value()
 {
-  callWithElements(
-    node, "ConditionGroup", 0, unbounded, [&](auto && node) { emplace_back(node, scope); });
+  callWithElements<0, unbounded>(
+    node, "ConditionGroup", [&](auto && node) { emplace_back(node, scope); });
 }
 
 auto Trigger::evaluate() -> Object

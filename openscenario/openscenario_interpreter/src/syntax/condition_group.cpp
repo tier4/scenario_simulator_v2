@@ -21,8 +21,8 @@ inline namespace syntax
 {
 ConditionGroup::ConditionGroup(const pugi::xml_node & node, Scope & scope) : current_value(false)
 {
-  callWithElements(
-    node, "Condition", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
+  callWithElements<1, unbounded>(
+    node, "Condition", [&](auto && node) { emplace_back(node, scope); });
 }
 
 auto ConditionGroup::evaluate() -> Object

@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 #define ELEMENT(TYPE)                                                                              \
-  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {                                \
+  callWithElements<0, 1>(node, #TYPE "Catalog", [&](auto && node) {                                \
     return emplace(                                                                                \
       std::piecewise_construct, std::forward_as_tuple(#TYPE), std::forward_as_tuple(node, scope)); \
   })
