@@ -417,7 +417,6 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
    * @note Hard coded parameter
    */
   if (M_PI * 0.25 < std::fabs(rpy.z) && std::fabs(rpy.z) < M_PI * 0.75) {
-    std::cout << rpy.z << std::endl;
     return boost::none;
   }
   double inner_prod = traffic_simulator::math::innerProduct(
