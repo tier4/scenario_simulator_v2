@@ -22,21 +22,19 @@ inline namespace syntax
 {
 Act::Act(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
-  start_trigger(readElement<Trigger>("StartTrigger", node, local()))
+  start_trigger(readElement<Trigger>("StartTrigger", node, local())),
+  stop_trigger(readElement<Trigger>("StopTrigger", node, local()))  // NOTE: Optional element
 {
   traverse<1, unbounded>(node, "ManeuverGroup", [&](auto && node) {
     return elements.push_back(readStoryboardElement<ManeuverGroup>(node, local()));
   });
-
-  traverse<0, 1>(
-    node, "StopTrigger", [&](auto && node) { return stop_trigger.rebind<Trigger>(node, local()); });
 }
 
 auto Act::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
 
 auto Act::start() noexcept -> void {}
 
-auto Act::stopTriggered() -> bool { return stop_trigger and stop_trigger.evaluate().as<Boolean>(); }
+auto Act::stopTriggered() -> bool { return stop_trigger.evaluate().as<Boolean>(); }
 
 auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &
 {
