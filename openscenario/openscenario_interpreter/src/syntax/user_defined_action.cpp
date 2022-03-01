@@ -21,7 +21,7 @@ inline namespace syntax
 {
 UserDefinedAction::UserDefinedAction(const pugi::xml_node & node, Scope & scope)
 {
-  callWithElements<1, 1>(node, "CustomCommandAction", [&](auto && node) {
+  traverse<1, 1>(node, "CustomCommandAction", [&](auto && node) {
     return rebind<CustomCommandAction>(node, scope);
   });
 }

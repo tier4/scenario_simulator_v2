@@ -43,7 +43,7 @@ using Cardinality =
 constexpr auto unbounded = std::numeric_limits<Cardinality>::max();
 
 template <Cardinality MinOccurs, Cardinality MaxOccurs, typename F>
-void callWithElements(const pugi::xml_node & parent, const std::string & name, F && f)
+auto traverse(const pugi::xml_node & parent, const std::string & name, F && f) -> void
 {
   const auto children = parent.children(name.c_str());
 
@@ -93,7 +93,7 @@ auto readElements(const std::string & name, const pugi::xml_node & node, Ts &&..
 {
   std::list<T> elements;
 
-  callWithElements<MinOccurs, MaxOccurs>(node, name, [&](auto && x) {
+  traverse<MinOccurs, MaxOccurs>(node, name, [&](auto && x) {
     elements.emplace_back(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...);
   });
 
@@ -106,7 +106,7 @@ auto readElementsAsElement(
 {
   std::list<Object> elements;
 
-  callWithElements<MinOccurs, MaxOccurs>(node, name, [&](auto && x) {
+  traverse<MinOccurs, MaxOccurs>(node, name, [&](auto && x) {
     elements.emplace_back(make<T>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...));
   });
 

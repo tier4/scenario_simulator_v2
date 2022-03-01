@@ -25,7 +25,7 @@ Route::Route(const pugi::xml_node & node, Scope & scope)
   closed(readAttribute<Boolean>("closed", node, local(), Boolean())),
   parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
-  callWithElements<2, unbounded>(
+  traverse<2, unbounded>(
     node, "Waypoint", [&](auto && node) { return waypoints.emplace_back(node, local()); });
 }
 

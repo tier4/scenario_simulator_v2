@@ -24,7 +24,7 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
   parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
-  callWithElements<1, unbounded>(node, "Event", [&](auto && node) {
+  traverse<1, unbounded>(node, "Event", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Event>(node, local()));
   });
 }

@@ -26,11 +26,11 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
     readAttribute<UnsignedInteger>("maximumExecutionCount", node, local(), UnsignedInteger())),
   actors(readElement<Actors>("Actors", node, local()))
 {
-  callWithElements<0, unbounded>(node, "CatalogReference", [&](auto && node) {
+  traverse<0, unbounded>(node, "CatalogReference", [&](auto && node) {
     return elements.push_back(readCatalogedStoryboardElement<Maneuver>(node, local()));
   });
 
-  callWithElements<0, unbounded>(node, "Maneuver", [&](auto && node) {
+  traverse<0, unbounded>(node, "Maneuver", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Maneuver>(node, local()));
   });
 }

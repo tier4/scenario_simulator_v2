@@ -23,14 +23,14 @@ inline namespace syntax
 {
 Entities::Entities(const pugi::xml_node & node, Scope & scope)
 {
-  callWithElements<0, unbounded>(node, "ScenarioObject", [&](auto && node) {
+  traverse<0, unbounded>(node, "ScenarioObject", [&](auto && node) {
     auto name = readAttribute<std::string>("name", node, scope);
     auto element = make<ScenarioObject>(node, scope);
     scope.global().entities.emplace(name, element);
     // scope.insert(name, element);
   });
 
-  callWithElements<0, unbounded>(node, "EntitySelection", [&](auto && node) {
+  traverse<0, unbounded>(node, "EntitySelection", [&](auto && node) {
     throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
     return unspecified;
   });

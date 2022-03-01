@@ -27,7 +27,7 @@ Event::Event(const pugi::xml_node & node, Scope & scope)
   priority(readAttribute<Priority>("priority", node, local())),
   start_trigger(readElement<Trigger>("StartTrigger", node, local()))
 {
-  callWithElements<1, unbounded>(node, "Action", [&](auto && node) {
+  traverse<1, unbounded>(node, "Action", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Action>(node, local()));
   });
 }

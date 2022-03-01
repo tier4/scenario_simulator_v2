@@ -24,11 +24,11 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
   start_trigger(readElement<Trigger>("StartTrigger", node, local()))
 {
-  callWithElements<1, unbounded>(node, "ManeuverGroup", [&](auto && node) {
+  traverse<1, unbounded>(node, "ManeuverGroup", [&](auto && node) {
     return elements.push_back(readStoryboardElement<ManeuverGroup>(node, local()));
   });
 
-  callWithElements<0, 1>(
+  traverse<0, 1>(
     node, "StopTrigger", [&](auto && node) { return stop_trigger.rebind<Trigger>(node, local()); });
 }
 

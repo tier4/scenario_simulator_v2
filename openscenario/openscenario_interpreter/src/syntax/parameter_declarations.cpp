@@ -21,7 +21,7 @@ inline namespace syntax
 {
 ParameterDeclarations::ParameterDeclarations(const pugi::xml_node & node, Scope & scope)
 {
-  callWithElements<0, unbounded>(
+  traverse<0, unbounded>(
     node, "ParameterDeclaration", [&](auto && each) { return emplace_back(each, scope); });
 }
 }  // namespace syntax
