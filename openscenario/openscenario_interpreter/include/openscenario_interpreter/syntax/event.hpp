@@ -54,8 +54,6 @@ struct Event : private Scope, public StoryboardElement
 
   auto start() -> void override;
 
-  auto stop() -> void override;
-
   auto stopTriggered() noexcept -> bool override;
 };
 

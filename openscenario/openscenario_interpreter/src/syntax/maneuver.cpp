@@ -33,14 +33,6 @@ auto Maneuver::ready() noexcept -> bool { return true; }
 
 auto Maneuver::start() noexcept -> void {}
 
-auto Maneuver::stop() -> void
-{
-  for (auto && event : elements) {
-    event.as<Event>().override();
-    event.evaluate();
-  }
-}
-
 auto Maneuver::stopTriggered() noexcept -> bool { return false; }
 
 auto operator<<(nlohmann::json & json, const Maneuver & maneuver) -> nlohmann::json &

@@ -36,14 +36,6 @@ auto Act::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
 
 auto Act::start() noexcept -> void {}
 
-auto Act::stop() -> void
-{
-  for (auto && maneuver_group : elements) {
-    maneuver_group.as<ManeuverGroup>().override();
-    maneuver_group.evaluate();
-  }
-}
-
 auto Act::stopTriggered() -> bool { return stop_trigger and stop_trigger.evaluate().as<Boolean>(); }
 
 auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &

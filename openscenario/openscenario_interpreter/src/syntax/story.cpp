@@ -38,14 +38,6 @@ auto Story::ready() noexcept -> bool { return true; }
 
 auto Story::start() noexcept -> void {}
 
-auto Story::stop() -> void
-{
-  for (auto && act : elements) {
-    act.as<Act>().override();
-    act.evaluate();
-  }
-}
-
 auto Story::stopTriggered() noexcept -> bool { return false; }
 
 auto operator<<(nlohmann::json & json, const Story & story) -> nlohmann::json &

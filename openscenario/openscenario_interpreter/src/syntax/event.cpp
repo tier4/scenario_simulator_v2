@@ -41,14 +41,6 @@ auto Event::start() -> void
   }
 }
 
-auto Event::stop() -> void
-{
-  for (auto && each : elements) {
-    each.as<Action>().override();
-    each.evaluate();
-  }
-}
-
 auto Event::stopTriggered() noexcept -> bool { return false; }
 
 auto operator<<(nlohmann::json & json, const Event & datum) -> nlohmann::json &

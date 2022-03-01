@@ -44,14 +44,6 @@ auto ManeuverGroup::start() -> void
   }
 }
 
-auto ManeuverGroup::stop() -> void
-{
-  for (auto && maneuver : elements) {
-    maneuver.as<Maneuver>().override();
-    maneuver.evaluate();
-  }
-}
-
 auto ManeuverGroup::stopTriggered() noexcept -> bool { return false; }
 
 auto operator<<(nlohmann::json & json, const ManeuverGroup & maneuver_group) -> nlohmann::json &

@@ -46,8 +46,6 @@ struct Maneuver : public Scope, public StoryboardElement
 
   auto start() noexcept -> void override;
 
-  auto stop() -> void override;
-
   auto stopTriggered() noexcept -> bool override;
 };
 

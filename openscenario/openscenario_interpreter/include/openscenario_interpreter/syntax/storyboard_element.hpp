@@ -94,7 +94,14 @@ private:
 
   virtual auto start() -> void = 0;
 
-  virtual auto stop() -> void = 0;
+  virtual auto stop() -> void
+  {
+    for (auto && element : elements) {
+      assert(element.is<StoryboardElement>());
+      element.as<StoryboardElement>().override();
+      element.evaluate();
+    }
+  }
 
   virtual auto stopTriggered() -> bool = 0;
 
