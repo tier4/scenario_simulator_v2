@@ -55,8 +55,6 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
   auto start() -> void override;
 
   auto stop() -> void override;
-
-  auto stopTriggered() noexcept -> bool override;
 };
 
 auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;

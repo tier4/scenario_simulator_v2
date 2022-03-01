@@ -37,6 +37,7 @@ struct Trigger : public std::list<ConditionGroup>
 {
   bool current_value;
 
+  // NOTE: Default constructed Trigger must be return false.
   Trigger() = default;
 
   explicit Trigger(const pugi::xml_node &, Scope &);
@@ -47,6 +48,8 @@ struct Trigger : public std::list<ConditionGroup>
 auto operator<<(nlohmann::json &, const Trigger &) -> nlohmann::json &;
 
 static_assert(std::is_default_constructible<Trigger>::value);
+
+static_assert(std::is_nothrow_default_constructible<Trigger>::value);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

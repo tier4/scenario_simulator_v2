@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 
-#include <boost/mpl/and.hpp>
 #include <cstddef>
 #include <limits>
 #include <openscenario_interpreter/procedure.hpp>
@@ -23,6 +22,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
+#include <openscenario_interpreter/syntax/trigger.hpp>
 #include <string>
 #include <type_traits>
 #include <unordered_set>
@@ -36,19 +36,25 @@ inline namespace syntax
 {
 class StoryboardElement
 {
+  // NOTE: Default constructed Trigger's evaluate must be return false.
+  Trigger stop_trigger;
+
 public:
-  const std::size_t maximum_execution_count;
+  const std::size_t maximum_execution_count = 1;
 
-  std::size_t current_execution_count;
+  std::size_t current_execution_count = 0;
 
-  Object current_state;
+  Object current_state = standby_state;
 
   Elements elements;
 
-  explicit StoryboardElement(const std::size_t maximum_execution_count = 0)
-  : maximum_execution_count(maximum_execution_count),
-    current_execution_count(0),
-    current_state(standby_state)
+  explicit StoryboardElement(const Trigger & stop_trigger)  // Act
+  : stop_trigger(stop_trigger)
+  {
+  }
+
+  explicit StoryboardElement(const std::size_t maximum_execution_count = 1)
+  : maximum_execution_count(maximum_execution_count)
   {
   }
 
@@ -103,8 +109,6 @@ private:
     }
   }
 
-  virtual auto stopTriggered() -> bool = 0;
-
 protected:
   auto rename(const std::string & name) const
   {
@@ -151,7 +155,7 @@ protected:
 public:
   auto evaluate()
   {
-    if (stopTriggered()) {
+    if (stop_trigger.evaluate().as<Boolean>()) {
       override();
     }
 

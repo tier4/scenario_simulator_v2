@@ -24,8 +24,8 @@ inline namespace syntax
 {
 Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 : Scope("Storyboard", scope),  // FIXME DIRTY HACK
-  init(readElement<Init>("Init", node, local())),
-  stop_trigger(readElement<Trigger>("StopTrigger", node, local()))
+  StoryboardElement(readElement<Trigger>("StopTrigger", node, local())),
+  init(readElement<Init>("Init", node, local()))
 {
   traverse<1, unbounded>(node, "Story", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Story>(node, local()));
@@ -75,8 +75,6 @@ auto Storyboard::stop() -> void
     story.evaluate();
   }
 }
-
-auto Storyboard::stopTriggered() -> bool { return stop_trigger.evaluate().as<Boolean>(); }
 
 auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::json &
 {

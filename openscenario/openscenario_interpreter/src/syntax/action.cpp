@@ -55,8 +55,6 @@ auto Action::stop() -> void
   }
 }
 
-auto Action::stopTriggered() noexcept -> bool { return false; }
-
 auto operator<<(nlohmann::json & json, const Action & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;

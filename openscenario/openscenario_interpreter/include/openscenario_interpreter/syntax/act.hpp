@@ -45,8 +45,6 @@ struct Act : public Scope, public StoryboardElement
 
   auto start() noexcept -> void override;
 
-  auto stopTriggered() -> bool override;
-
   auto ready() -> bool override;
 };
 

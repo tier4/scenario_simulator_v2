@@ -47,8 +47,6 @@ struct ManeuverGroup : public Scope, public StoryboardElement
   auto ready() noexcept -> bool override;
 
   auto start() -> void override;
-
-  auto stopTriggered() noexcept -> bool override;
 };
 
 auto operator<<(nlohmann::json &, const ManeuverGroup &) -> nlohmann::json &;

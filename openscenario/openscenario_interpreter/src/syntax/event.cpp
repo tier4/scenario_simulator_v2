@@ -41,8 +41,6 @@ auto Event::start() -> void
   }
 }
 
-auto Event::stopTriggered() noexcept -> bool { return false; }
-
 auto operator<<(nlohmann::json & json, const Event & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;

@@ -38,8 +38,6 @@ auto Story::ready() noexcept -> bool { return true; }
 
 auto Story::start() noexcept -> void {}
 
-auto Story::stopTriggered() noexcept -> bool { return false; }
-
 auto operator<<(nlohmann::json & json, const Story & story) -> nlohmann::json &
 {
   json["name"] = story.name;

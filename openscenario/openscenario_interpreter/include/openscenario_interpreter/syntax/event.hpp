@@ -53,8 +53,6 @@ struct Event : private Scope, public StoryboardElement
   auto ready() -> bool override;
 
   auto start() -> void override;
-
-  auto stopTriggered() noexcept -> bool override;
 };
 
 auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;

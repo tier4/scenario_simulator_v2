@@ -44,8 +44,6 @@ auto ManeuverGroup::start() -> void
   }
 }
 
-auto ManeuverGroup::stopTriggered() noexcept -> bool { return false; }
-
 auto operator<<(nlohmann::json & json, const ManeuverGroup & maneuver_group) -> nlohmann::json &
 {
   json["name"] = maneuver_group.name;
