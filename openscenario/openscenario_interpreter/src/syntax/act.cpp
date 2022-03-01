@@ -32,15 +32,6 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
     node, "StopTrigger", [&](auto && node) { return stop_trigger.rebind<Trigger>(node, local()); });
 }
 
-auto Act::accomplished() const -> bool
-{
-  return std::all_of(std::begin(elements), std::end(elements), [](auto && maneuver_group) {
-    assert(maneuver_group.template is<ManeuverGroup>());
-    return maneuver_group.template as<StoryboardElement>()
-      .template is<StoryboardElementState::completeState>();
-  });
-}
-
 auto Act::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
 
 auto Act::run() -> void

@@ -32,16 +32,6 @@ Event::Event(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto Event::accomplished() const -> bool
-{
-  // An Event's goal is accomplished when all its Actions are in the completeState.
-  return std::all_of(std::begin(elements), std::end(elements), [](auto && action) {
-    assert(action.template is<Action>());
-    return action.template as<StoryboardElement>()
-      .template is<StoryboardElementState::completeState>();
-  });
-}
-
 auto Event::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
 
 auto Event::run() -> void

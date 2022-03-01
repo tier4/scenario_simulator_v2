@@ -50,8 +50,6 @@ struct Event : private Scope, public StoryboardElement
 
   explicit Event(const pugi::xml_node &, Scope &);
 
-  auto accomplished() const -> bool override;
-
   auto ready() -> bool override;
 
   auto run() -> void override;

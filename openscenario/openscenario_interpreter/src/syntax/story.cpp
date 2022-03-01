@@ -34,16 +34,6 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto Story::accomplished() const -> bool
-{
-  // NOTE: A Story's goal is accomplished when all its Acts are in the completeState.
-  return std::all_of(std::begin(elements), std::end(elements), [](auto && act) {
-    assert(act.template is<Act>());
-    return act.template as<StoryboardElement>()
-      .template is<StoryboardElementState::completeState>();
-  });
-}
-
 auto Story::ready() noexcept -> bool { return true; }
 
 auto Story::run() -> void

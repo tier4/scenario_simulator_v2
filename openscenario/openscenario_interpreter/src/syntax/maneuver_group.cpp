@@ -35,16 +35,6 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto ManeuverGroup::accomplished() const -> bool
-{
-  // A ManeuverGroup's goal is accomplished when all its Maneuvers are in the completeState.
-  return std::all_of(std::begin(elements), std::end(elements), [&](auto && maneuver) {
-    assert(maneuver.template is<Maneuver>());
-    return maneuver.template as<StoryboardElement>()
-      .template is<StoryboardElementState::completeState>();
-  });
-}
-
 auto ManeuverGroup::ready() noexcept -> bool { return true; }
 
 auto ManeuverGroup::run() -> void

@@ -72,10 +72,16 @@ public:
   }
 
 private:
-  virtual auto accomplished() const -> bool = 0;
+  virtual auto accomplished() const -> bool
+  {
+    return std::all_of(std::begin(elements), std::end(elements), [](auto && element) {
+      return element.template as<StoryboardElement>()
+        .template is<StoryboardElementState::completeState>();
+    });
+  }
 
-  virtual auto ready()
-    -> bool = 0;  // NOTE: This cannot be const because of the trigger evaluation.
+  // NOTE: This cannot be const because of the trigger evaluation.
+  virtual auto ready() -> bool = 0;
 
   virtual auto run() -> void = 0;
 

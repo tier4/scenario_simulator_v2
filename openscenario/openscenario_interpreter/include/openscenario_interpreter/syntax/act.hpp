@@ -45,8 +45,6 @@ struct Act : public Scope, public StoryboardElement
 
   explicit Act(const pugi::xml_node &, Scope &);
 
-  auto accomplished() const -> bool override;
-
   auto start() noexcept -> void override;
 
   auto stop() -> void override;

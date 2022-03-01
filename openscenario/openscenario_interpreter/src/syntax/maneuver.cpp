@@ -29,16 +29,6 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto Maneuver::accomplished() const -> bool
-{
-  // NOTE: A Maneuver's goal is accomplished when all its Events are in the completeState.
-  return std::all_of(std::begin(elements), std::end(elements), [](auto && event) {
-    assert(event.template is<Event>());
-    return event.template as<StoryboardElement>()
-      .template is<StoryboardElementState::completeState>();
-  });
-}
-
 auto Maneuver::ready() noexcept -> bool { return true; }
 
 auto Maneuver::run() -> void
