@@ -42,7 +42,7 @@ StopAtStopLineAction::calculateObstacle(const traffic_simulator_msgs::msg::Waypo
   if (distance_to_stopline_.get() < 0) {
     return boost::none;
   }
-  if (distance_to_stopline_.get() > common_spline->getLength()) {
+  if (distance_to_stopline_.get() > reference_trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -60,7 +60,7 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculat
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
-    waypoints.waypoints = common_spline->getTrajectory(
+    waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
     return waypoints;

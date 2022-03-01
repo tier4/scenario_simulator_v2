@@ -158,7 +158,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         spline_.reset();
       }
     }
-    behavior_plugin_ptr_->setCommonSpline(spline_);
+    behavior_plugin_ptr_->setReferenceTrajectory(spline_);
 
     behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
