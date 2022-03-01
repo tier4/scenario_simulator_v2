@@ -50,8 +50,6 @@ struct Storyboard : public Scope, public StoryboardElement
   auto run() -> void override;
 
   auto start() -> void override;
-
-  auto stop() -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Storyboard &) -> nlohmann::json &;
