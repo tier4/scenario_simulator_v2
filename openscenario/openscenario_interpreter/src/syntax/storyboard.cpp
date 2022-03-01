@@ -36,15 +36,6 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto Storyboard::accomplished() const -> bool
-{
-  return std::all_of(std::begin(elements), std::end(elements), [](auto && story) {
-    assert(story.template is<Story>());
-    return story.template as<StoryboardElement>()
-      .template is<StoryboardElementState::completeState>();
-  });
-}
-
 auto Storyboard::ready() noexcept -> bool { return true; }
 
 auto Storyboard::run() -> void

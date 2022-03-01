@@ -52,8 +52,6 @@ struct Act : public Scope, public StoryboardElement
   auto stopTriggered() -> bool override;
 
   auto ready() -> bool override;
-
-  auto run() -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;

@@ -41,8 +41,6 @@ struct Story : public Scope, public StoryboardElement
 
   auto ready() noexcept -> bool override;
 
-  auto run() -> void override;
-
   auto start() noexcept -> void override;
 
   auto stop() -> void override;

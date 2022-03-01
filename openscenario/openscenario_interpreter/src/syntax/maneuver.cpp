@@ -31,13 +31,6 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
 
 auto Maneuver::ready() noexcept -> bool { return true; }
 
-auto Maneuver::run() -> void
-{
-  for (auto && event : elements) {
-    event.evaluate();
-  }
-}
-
 auto Maneuver::start() noexcept -> void {}
 
 auto Maneuver::stop() -> void

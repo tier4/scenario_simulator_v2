@@ -52,8 +52,6 @@ struct Event : private Scope, public StoryboardElement
 
   auto ready() -> bool override;
 
-  auto run() -> void override;
-
   auto start() -> void override;
 
   auto stop() -> void override;

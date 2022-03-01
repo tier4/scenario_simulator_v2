@@ -34,13 +34,6 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
 
 auto Act::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
 
-auto Act::run() -> void
-{
-  for (auto && maneuver_group : elements) {
-    maneuver_group.evaluate();
-  }
-}
-
 auto Act::start() noexcept -> void {}
 
 auto Act::stop() -> void

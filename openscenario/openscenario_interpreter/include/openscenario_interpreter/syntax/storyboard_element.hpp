@@ -75,6 +75,7 @@ private:
   virtual auto accomplished() const -> bool
   {
     return std::all_of(std::begin(elements), std::end(elements), [](auto && element) {
+      assert(element.template is<StoryboardElement>());
       return element.template as<StoryboardElement>()
         .template is<StoryboardElementState::completeState>();
     });
@@ -83,7 +84,13 @@ private:
   // NOTE: This cannot be const because of the trigger evaluation.
   virtual auto ready() -> bool = 0;
 
-  virtual auto run() -> void = 0;
+  virtual auto run() -> void
+  {
+    for (auto && element : elements) {
+      assert(element.template is<StoryboardElement>());
+      element.evaluate();
+    }
+  }
 
   virtual auto start() -> void = 0;
 

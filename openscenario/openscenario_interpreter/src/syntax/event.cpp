@@ -34,13 +34,6 @@ Event::Event(const pugi::xml_node & node, Scope & scope)
 
 auto Event::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
 
-auto Event::run() -> void
-{
-  for (auto && action : elements) {
-    action.evaluate();
-  }
-}
-
 auto Event::start() -> void
 {
   for (auto && each : elements) {

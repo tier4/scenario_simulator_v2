@@ -37,13 +37,6 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
 
 auto ManeuverGroup::ready() noexcept -> bool { return true; }
 
-auto ManeuverGroup::run() -> void
-{
-  for (auto && maneuver : elements) {
-    maneuver.evaluate();
-  }
-}
-
 auto ManeuverGroup::start() -> void
 {
   for (auto && maneuver : elements) {

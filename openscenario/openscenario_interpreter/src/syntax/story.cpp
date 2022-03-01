@@ -36,13 +36,6 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
 
 auto Story::ready() noexcept -> bool { return true; }
 
-auto Story::run() -> void
-{
-  for (auto && act : elements) {
-    act.evaluate();
-  }
-}
-
 auto Story::start() noexcept -> void {}
 
 auto Story::stop() -> void
