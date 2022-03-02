@@ -100,8 +100,6 @@ private:
     });
   }
 
-  virtual auto ready() -> bool { return start_trigger.evaluate().as<Boolean>(); };
-
   virtual auto run() -> void
   {
     for (auto && element : elements) {
@@ -184,7 +182,8 @@ public:
         *  Story element instantaneously transitions into the runningState.
         *
         * ------------------------------------------------------------------- */
-        return current_state = (ready() ? start_transition : current_state);
+        return current_state =
+                 (start_trigger.evaluate().as<Boolean>() ? start_transition : current_state);
 
       case StoryboardElementState::startTransition: /* -------------------------
         *
