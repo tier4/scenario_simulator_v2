@@ -39,8 +39,6 @@ struct Story : public Scope, public StoryboardElement
 {
   explicit Story(const pugi::xml_node &, Scope &);
 
-  auto ready() noexcept -> bool override;
-
   auto start() noexcept -> void override;
 };
 

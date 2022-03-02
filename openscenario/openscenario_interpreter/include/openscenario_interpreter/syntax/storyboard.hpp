@@ -45,8 +45,6 @@ struct Storyboard : public Scope, public StoryboardElement
 
   explicit Storyboard(const pugi::xml_node &, Scope &);
 
-  auto ready() noexcept -> bool override;
-
   auto run() -> void override;
 
   auto start() -> void override;

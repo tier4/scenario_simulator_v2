@@ -28,15 +28,12 @@
 #include <unordered_set>
 #include <utility>
 
-#define REQUIRES(...) typename = typename std::enable_if<__VA_ARGS__::value>::type
-
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
 class StoryboardElement
 {
-  // NOTE: Default constructed Trigger's evaluate must be return false.
   Trigger stop_trigger;
 
 public:
@@ -48,8 +45,24 @@ public:
 
   Elements elements;
 
-  explicit StoryboardElement(const Trigger & stop_trigger)  // Act
+  Trigger start_trigger{{ConditionGroup()}};
+
+  // Storyboard
+  explicit StoryboardElement(const Trigger & stop_trigger)  //
   : stop_trigger(stop_trigger)
+  {
+  }
+
+  // Act
+  explicit StoryboardElement(const Trigger & start_trigger, const Trigger & stop_trigger)
+  : stop_trigger(stop_trigger), start_trigger(start_trigger)
+  {
+  }
+
+  // Event
+  explicit StoryboardElement(
+    const std::size_t maximum_execution_count, const Trigger & start_trigger)
+  : maximum_execution_count(maximum_execution_count), start_trigger(start_trigger)
   {
   }
 
@@ -87,13 +100,12 @@ private:
     });
   }
 
-  // NOTE: This cannot be const because of the trigger evaluation.
-  virtual auto ready() -> bool = 0;
+  virtual auto ready() -> bool { return start_trigger.evaluate().as<Boolean>(); };
 
   virtual auto run() -> void
   {
     for (auto && element : elements) {
-      assert(element.template is<StoryboardElement>());
+      assert(element.is<StoryboardElement>());
       element.evaluate();
     }
   }
@@ -161,7 +173,7 @@ public:
 
     // NOTE: https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
 
-    switch (state().template as<StoryboardElementState>()) {
+    switch (state().as<StoryboardElementState>()) {
       case StoryboardElementState::standbyState: /* ----------------------------
         *
         *  This is the default initialization state of a StoryboardElement.

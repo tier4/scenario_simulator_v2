@@ -29,8 +29,6 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto Maneuver::ready() noexcept -> bool { return true; }
-
 auto Maneuver::start() noexcept -> void {}
 
 auto operator<<(nlohmann::json & json, const Maneuver & maneuver) -> nlohmann::json &

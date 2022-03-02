@@ -19,7 +19,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Trigger::Trigger(const pugi::xml_node & node, Scope & scope) : current_value()
+Trigger::Trigger(const pugi::xml_node & node, Scope & scope)
 {
   traverse<0, unbounded>(node, "ConditionGroup", [&](auto && node) { emplace_back(node, scope); });
 }

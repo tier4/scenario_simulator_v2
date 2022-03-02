@@ -36,8 +36,6 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto Storyboard::ready() noexcept -> bool { return true; }
-
 auto Storyboard::run() -> void
 {
   if (engaged) {

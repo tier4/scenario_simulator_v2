@@ -22,15 +22,14 @@ inline namespace syntax
 {
 Act::Act(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
-  StoryboardElement(readElement<Trigger>("StopTrigger", node, local())),  // NOTE: Optional element
-  start_trigger(readElement<Trigger>("StartTrigger", node, local()))
+  StoryboardElement(
+    readElement<Trigger>("StartTrigger", node, local()),
+    readElement<Trigger>("StopTrigger", node, local()))  // NOTE: Optional element
 {
   traverse<1, unbounded>(node, "ManeuverGroup", [&](auto && node) {
     return elements.push_back(readStoryboardElement<ManeuverGroup>(node, local()));
   });
 }
-
-auto Act::ready() -> bool { return start_trigger.evaluate().as<Boolean>(); }
 
 auto Act::start() noexcept -> void {}
 

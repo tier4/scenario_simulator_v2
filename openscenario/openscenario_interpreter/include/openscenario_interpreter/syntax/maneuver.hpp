@@ -42,8 +42,6 @@ struct Maneuver : public Scope, public StoryboardElement
 
   explicit Maneuver(const pugi::xml_node &, Scope &);
 
-  auto ready() noexcept -> bool override;
-
   auto start() noexcept -> void override;
 };
 

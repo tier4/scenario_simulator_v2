@@ -34,8 +34,6 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto Story::ready() noexcept -> bool { return true; }
-
 auto Story::start() noexcept -> void {}
 
 auto operator<<(nlohmann::json & json, const Story & story) -> nlohmann::json &

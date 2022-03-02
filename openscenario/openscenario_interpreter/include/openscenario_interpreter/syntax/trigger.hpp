@@ -37,10 +37,15 @@ struct Trigger : public std::list<ConditionGroup>
 {
   bool current_value;
 
-  // NOTE: Default constructed Trigger must be return false.
+  // NOTE: Default constructed Trigger must be return FALSE.
   Trigger() = default;
 
   explicit Trigger(const pugi::xml_node &, Scope &);
+
+  explicit Trigger(const std::list<ConditionGroup> & condition_groups)
+  : std::list<ConditionGroup>(condition_groups)
+  {
+  }
 
   auto evaluate() -> Object;
 };
