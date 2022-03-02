@@ -301,9 +301,6 @@ public:
   auto getLongitudinalDistance(const std::string &, const LaneletPose &, const double = 100) -> boost::optional<double>;
   auto getLongitudinalDistance(const std::string &, const std::string &, const double = 100) -> boost::optional<double>;
   // clang-format on
-  auto getLongitudinalDistance(
-    const geometry_msgs::msg::Pose &, const geometry_msgs::msg::Pose &, const double,
-    const double = 100) -> boost::optional<double>;
 
   auto getMapPose(const std::string & entity_name) -> geometry_msgs::msg::Pose;
   auto getMapPose(
