@@ -52,7 +52,8 @@ const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateW
     }
   }
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
-  waypoints.waypoints = spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0);
+  waypoints.waypoints =
+    spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0, entity_status.lanelet_pose.offset);
   return waypoints;
 }
 
