@@ -416,8 +416,8 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   /**
    * @note Hard coded parameter
    */
-  double yaw_threashold = 0.25;
-  if (M_PI * yaw_threashold < std::fabs(rpy.z) && std::fabs(rpy.z) < M_PI * (1 - yaw_threashold)) {
+  double yaw_threshold = 0.25;
+  if (M_PI * yaw_threshold < std::fabs(rpy.z) && std::fabs(rpy.z) < M_PI * (1 - yaw_threshold)) {
     return boost::none;
   }
   double inner_prod = traffic_simulator::math::innerProduct(
