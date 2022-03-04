@@ -2,15 +2,15 @@ ScenarioModifiers:
   ScenarioModifier:
     - name: DUMMY
       start: 0
-      step: 2
-      stop: 5
+      step: 1
+      stop: 2
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 0
-    date: '2021-09-06T09:09:41.856Z'
-    description: ''
-    author: ''
+    date: '2022-03-04T18:06:53+09:00'
+    description: 'Sample scenario (with Autoware)'
+    author: 'Tatsuya Yamasaki'
   ParameterDeclarations:
     ParameterDeclaration: []
   CatalogLocations:
