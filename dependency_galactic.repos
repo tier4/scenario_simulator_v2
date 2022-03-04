@@ -14,10 +14,6 @@ repositories:
     type: git
     url: https://github.com/tier4/AutowareArchitectureProposal_msgs.git
     version: tier4/universe # for Autoware.Unvierse (Tier IV)
-  lexus_description:
-    type: git
-    url: https://github.com/tier4/lexus_description.iv.universe.git
-    version: ros2
   ouxt_common:
     type: git
     url: https://github.com/OUXT-Polaris/ouxt_common.git
