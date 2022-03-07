@@ -2,18 +2,18 @@ ScenarioModifiers:
   ScenarioModifier: []
 OpenSCENARIO:
   FileHeader:
+    author: Tatsuya Yamasaki
+    date: '1970-01-01T09:00:00+09:00'
+    description: Minimal scenario
     revMajor: 0
     revMinor: 0
-    date: "2020-03-20T12:00:00"
-    author: "yamacir-kit"
-    description: "Minimal scenario"
   ParameterDeclarations:
     ParameterDeclaration: []
   CatalogLocations:
     CatalogLocation: []
   RoadNetwork:
     LogicFile:
-      filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"
+      filepath: $(find-pkg-share kashiwanoha_map)/map
     TrafficSignals:
       TrafficSignalController: []
   Entities:
@@ -21,36 +21,46 @@ OpenSCENARIO:
     Init:
       Actions:
     Story:
-      - name: "story"
+      - name: ''
         Act:
-          - name: "act"
-            StartTrigger:
+          - name: ''
             ManeuverGroup:
-              - name: "maneuver-group"
+              - name: ''
                 maximumExecutionCount: 1
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
-                    - entityRef: ""
+                    - entityRef: ''
                 Maneuver:
-                  - name: "maneuver"
+                  - name: ''
                     Event:
-                      - name: "event"
-                        priority: overwrite
+                      - name: ''
+                        priority: parallel
                         maximumExecutionCount: 1
-                        StartTrigger:
                         Action:
-                          - name: "action"
+                          - name: ''
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: ":"
+                                type: exitSuccess
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
     StopTrigger:
-      ConditionGroup:
-        - Condition:
-          - name: "condition"
-            delay: 0
-            conditionEdge: none
-            ByValueCondition:
-              SimulationTimeCondition:
-                rule: greaterThan
-                value: 3.0
+      ConditionGroup: []
