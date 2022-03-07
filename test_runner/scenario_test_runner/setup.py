@@ -12,7 +12,7 @@ setup(
     data_files=[
         ("share/" + package_name + "/config", glob("config/*")),
         ("share/" + package_name + "/launch", glob("launch/*.launch.*")),
-        ("share/" + package_name + "/test/scenario", list(filter(lambda p : os.path.isfile(p), glob("test/scenario/*")))),
+        ("share/" + package_name + "/scenario", list(filter(lambda p : os.path.isfile(p), glob("scenario/*")))),
         ("share/" + package_name, ["package.xml"]),
         ("share/ament_index/resource_index/packages", glob("resource/*")),
     ] + [
