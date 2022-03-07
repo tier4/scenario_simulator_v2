@@ -1,9 +1,7 @@
 ScenarioModifiers:
   ScenarioModifier:
-    - name: DUMMY
-      start: 0
-      step: 1
-      stop: 2
+    - name: LANE_ID
+      list: [34513, 34510, 34564]
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
@@ -75,7 +73,7 @@ OpenSCENARIO:
                   Position:
                     LanePosition:
                       roadId: ''
-                      laneId: '34513'
+                      laneId: LANE_ID
                       s: 1
                       offset: 0
                       Orientation:
