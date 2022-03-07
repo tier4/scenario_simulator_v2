@@ -17,7 +17,7 @@ setup(
         ("share/ament_index/resource_index/packages", glob("resource/*")),
     ] + [
         ("share/" + package_name + "/" + catalog_dir, [fname for fname in glob(catalog_dir + "/*") if os.path.isfile(fname)])
-        for catalog_dir in glob("test/scenario/catalog/*") if os.path.isdir(catalog_dir)
+        for catalog_dir in glob("scenario/catalog/*") if os.path.isdir(catalog_dir)
     ],
     install_requires=["setuptools"],
     zip_safe=True,
