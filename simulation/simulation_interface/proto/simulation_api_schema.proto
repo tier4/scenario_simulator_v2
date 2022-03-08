@@ -31,7 +31,8 @@ message LidarConfiguration {
 message DetectionSensorConfiguration {
   string entity = 1;             // Name of the entity which you want to attach detection sensor.
   double update_duration = 2;    // Update duration of the detection sensor.
-  string architecture_type = 3;  // Autoware architecture type.
+  double range = 3;              // Sensor detection range.
+  string architecture_type = 4;  // Autoware architecture type.
 }
 
 /**

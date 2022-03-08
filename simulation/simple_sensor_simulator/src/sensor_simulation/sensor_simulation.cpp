@@ -26,15 +26,9 @@ void SensorSimulation::updateSensorFrame(
   std::vector<std::string> detected_objects = {};
   for (auto & sensor : lidar_sensors_) {
     sensor->update(current_time, status, current_ros_time);
-    const auto objects = sensor->getDetectedObjects();
-    for (const auto & obj : objects) {
-      if (std::count(detected_objects.begin(), detected_objects.end(), obj) == 0) {
-        detected_objects.push_back(obj);
-      }
-    }
   }
   for (auto & sensor : detection_sensors_) {
-    sensor->update(current_time, status, current_ros_time, detected_objects);
+    sensor->update(current_time, status, current_ros_time);
   }
 }
 }  // namespace simple_sensor_simulator
