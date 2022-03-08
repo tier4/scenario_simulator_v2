@@ -35,37 +35,59 @@ class ExecutionTimer
 
     std::int64_t ns_sum = 0;
 
-    std::int64_t ns_sq_sum = 0;
+    std::int64_t ns_square_sum = 0;
 
-    int count_ = 0;
+    int count = 0;
 
   public:
     template <typename Duration>
     auto add(Duration diff) -> void
     {
       std::int64_t diff_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(diff).count();
-      count_++;
+      count++;
       ns_max = std::max(ns_max, diff_ns);
       ns_min = std::min(ns_max, diff_ns);
       ns_sum += diff_ns;
-      ns_sq_sum += diff_ns * diff_ns;
+      ns_square_sum += std::pow(diff_ns, 2);
     }
 
-    auto count() const { return count_; }
+    template <typename T>
+    auto max() const
+    {
+      return std::chrono::duration_cast<T>(std::chrono::nanoseconds(ns_max));
+    }
 
-    auto max() const { return std::chrono::nanoseconds(ns_max); }
+    template <typename T>
+    auto min() const
+    {
+      return std::chrono::duration_cast<T>(std::chrono::nanoseconds(ns_min));
+    }
 
-    auto min() const { return std::chrono::nanoseconds(ns_min); }
+    template <typename T>
+    auto mean() const
+    {
+      return std::chrono::duration_cast<T>(std::chrono::nanoseconds(ns_sum / count));
+    }
 
-    auto mean() const { return std::chrono::nanoseconds(ns_sum / count_); }
-
+    template <typename T>
     auto standardDeviation() const
     {
-      std::int64_t mean_of_sq = ns_sq_sum / count_;
-      std::int64_t sq_of_mean = std::pow(ns_sum / count_, 2);
-      std::int64_t var = mean_of_sq - sq_of_mean;
+      std::int64_t mean_of_square = ns_square_sum / count;
+      std::int64_t square_of_mean = std::pow(ns_sum / count, 2);
+      std::int64_t var = mean_of_square - square_of_mean;
       double standard_deviation = std::sqrt(var);
-      return std::chrono::nanoseconds(static_cast<std::int64_t>(standard_deviation));
+      return std::chrono::duration_cast<T>(
+        std::chrono::nanoseconds(static_cast<std::int64_t>(standard_deviation)));
+    }
+
+    friend auto operator<<(std::ostream & os, const Statistics & statistics) -> std::ostream &
+    {
+      using namespace std::chrono;
+
+      return os << "mean = " << statistics.template mean<milliseconds>().count() << " ms, "
+                << "max = " << statistics.template max<milliseconds>().count() << " ms, "
+                << "standard deviation = "
+                << statistics.template standardDeviation<milliseconds>().count() / 1000.0 << " ms";
     }
   };
 
