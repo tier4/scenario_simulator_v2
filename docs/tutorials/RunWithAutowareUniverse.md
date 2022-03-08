@@ -71,3 +71,5 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
 ### Expected behavior
 
 ![Scenario execution with AWF Autoware](../image/awf_universe.png)
+
+### Troubleshooting
