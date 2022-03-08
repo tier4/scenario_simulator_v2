@@ -72,14 +72,14 @@ class ExecutionTimer
   std::unordered_map<std::string, Statistics> statistics_map;
 
 public:
-  template <typename F, typename... Ts>
-  auto invoke(const std::string & tag, F && f, Ts &&... xs) -> typename std::enable_if<
-    std::is_same<typename std::result_of<F(Ts...)>::type, void>::value,
+  template <typename Thunk, typename... Ts>
+  auto invoke(const std::string & tag, Thunk && thunk) -> typename std::enable_if<
+    std::is_same<typename std::result_of<Thunk()>::type, void>::value,
     typename Clock::duration>::type
   {
     const auto begin = Clock::now();
 
-    std::forward<F>(f)(std::forward<Ts>(xs)...);  // Use std::invoke (C++17)
+    thunk();
 
     const auto end = Clock::now();
 
@@ -88,14 +88,14 @@ public:
     return end - begin;
   }
 
-  template <typename F, typename... Ts>
-  auto invoke(const std::string & tag, F && f, Ts &&... xs) -> typename std::enable_if<
-    std::is_same<typename std::result_of<F(Ts...)>::type, bool>::value,
+  template <typename Thunk, typename... Ts>
+  auto invoke(const std::string & tag, Thunk && thunk) -> typename std::enable_if<
+    std::is_same<typename std::result_of<Thunk()>::type, bool>::value,
     typename Clock::duration>::type
   {
     const auto begin = Clock::now();
 
-    const auto result = std::forward<F>(f)(std::forward<Ts>(xs)...);  // Use std::invoke (C++17)
+    const auto result = thunk();
 
     const auto end = Clock::now();
 
