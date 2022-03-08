@@ -54,7 +54,7 @@ struct ScenarioDefinition
 
   explicit ScenarioDefinition(const pugi::xml_node &, Scope &);
 
-  auto complete() -> bool;
+  // auto complete() -> bool;
 
   auto evaluate() -> Object;
 };

@@ -154,25 +154,23 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         [this](auto &&...) { deactivate(); },
         [this]() -> void {
           if (currentScenarioDefinition()) {
-            if (not currentScenarioDefinition()->complete()) {
-              const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
-                currentScenarioDefinition()->evaluate();
-                publishCurrentContext();
-                return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
-              });
+            const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
+              currentScenarioDefinition()->evaluate();
+              publishCurrentContext();
+              return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
+            });
 
-              if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
-                RCLCPP_WARN_STREAM(
-                  get_logger(),
-                  "Your machine is not powerful enough to run the scenario at the specified frame "
-                  "rate ("
-                    << currentLocalFrameRate().count()
-                    << " Hz). We recommend that you reduce the frame rate to "
-                    << 1000.0 / execution_timer.getStatistics("evaluate")
-                                  .max<std::chrono::milliseconds>()
-                                  .count()
-                    << " or less.");
-              }
+            if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
+              RCLCPP_WARN_STREAM(
+                get_logger(),
+                "Your machine is not powerful enough to run the scenario at the specified frame "
+                "rate ("
+                  << currentLocalFrameRate().count()
+                  << " Hz). We recommend that you reduce the frame rate to "
+                  << 1000.0 / execution_timer.getStatistics("evaluate")
+                                .max<std::chrono::milliseconds>()
+                                .count()
+                  << " or less.");
             }
           } else {
             throw Error("No script evaluable");

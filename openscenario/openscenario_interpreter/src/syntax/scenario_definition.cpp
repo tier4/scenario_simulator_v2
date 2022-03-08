@@ -28,7 +28,7 @@ ScenarioDefinition::ScenarioDefinition(const pugi::xml_node & node, Scope & scop
 {
 }
 
-auto ScenarioDefinition::complete() -> bool { return storyboard.complete(); }
+// auto ScenarioDefinition::complete() -> bool { return storyboard.complete(); }
 
 auto ScenarioDefinition::evaluate() -> Object
 {
