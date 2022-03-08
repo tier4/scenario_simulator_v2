@@ -52,7 +52,22 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
 
 ## How to run
 
+1. Move to project directory, where the project is build.
+
+2. Source the workspace setup script
+   ```bash
+   source install/setup.bash
+   ```
+3. Run scenario
+   ```bash
+   ros2 launch scenario_test_runner scenario_test_runner.launch.py \
+   architecture_type:=awf/universe \
+   record:=false \
+   scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
+   sensor_model:=sample_sensor_kit \
+   vehicle_model:=sample_vehicle
+   ``` 
 
 ### Expected behavior
 
-
+![Scenario execution with AWF Autoware](../image/awf_universe.png)
