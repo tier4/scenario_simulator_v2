@@ -24,13 +24,24 @@ namespace openscenario_interpreter
 {
 inline namespace utility
 {
-template <typename ClockType = std::chrono::system_clock>
-struct ExecutionTimer
+template <typename Clock = std::chrono::system_clock>
+class ExecutionTimer
 {
-  struct Statistics
+  class Statistics
   {
+    std::int64_t ns_max = 0;
+
+    std::int64_t ns_min = std::numeric_limits<std::int64_t>::max();
+
+    std::int64_t ns_sum = 0;
+
+    std::int64_t ns_sq_sum = 0;
+
+    int count_ = 0;
+
+  public:
     template <typename Duration>
-    void add(Duration diff)
+    auto add(Duration diff) -> void
     {
       std::int64_t diff_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(diff).count();
       count_++;
@@ -40,11 +51,15 @@ struct ExecutionTimer
       ns_sq_sum += diff_ns * diff_ns;
     }
 
-    int count() const { return count_; }
-    std::chrono::nanoseconds max() const { return std::chrono::nanoseconds(ns_max); }
-    std::chrono::nanoseconds min() const { return std::chrono::nanoseconds(ns_min); }
-    std::chrono::nanoseconds mean() const { return std::chrono::nanoseconds(ns_sum / count_); }
-    std::chrono::nanoseconds standardDeviation() const
+    auto count() const { return count_; }
+
+    auto max() const { return std::chrono::nanoseconds(ns_max); }
+
+    auto min() const { return std::chrono::nanoseconds(ns_min); }
+
+    auto mean() const { return std::chrono::nanoseconds(ns_sum / count_); }
+
+    auto standardDeviation() const
     {
       std::int64_t mean_of_sq = ns_sq_sum / count_;
       std::int64_t sq_of_mean = std::pow(ns_sum / count_, 2);
@@ -52,49 +67,52 @@ struct ExecutionTimer
       double standard_deviation = std::sqrt(var);
       return std::chrono::nanoseconds(static_cast<std::int64_t>(standard_deviation));
     }
-
-  private:
-    std::int64_t ns_max = 0;
-    std::int64_t ns_min = std::numeric_limits<std::int64_t>::max();
-    std::int64_t ns_sum = 0;
-    std::int64_t ns_sq_sum = 0;
-    int count_ = 0;
   };
 
-  template <typename F, typename... Args>
-  auto invoke(const std::string & tag, F && func, Args &&... args) -> std::enable_if_t<
-    std::is_same<typename std::result_of<F(Args...)>::type, void>::value,
-    typename ClockType::duration>
-  {
-    auto start = ClockType::now();
-    std::forward<F>(func)(std::forward<Args>(args)...);  // use std::invoke (c++17)
-    auto end = ClockType::now();
-    statistics_map[tag].add(end - start);
-    return end - start;
-  }
-
-  template <typename F, typename... Args>
-  auto invoke(const std::string & tag, F && func, Args &&... args) -> std::enable_if_t<
-    std::is_same<typename std::result_of<F(Args...)>::type, bool>::value,
-    typename ClockType::duration>
-  {
-    auto start = ClockType::now();
-    bool flag = std::forward<F>(func)(std::forward<Args>(args)...);  // use std::invoke (c++17)
-    auto end = ClockType::now();
-    if (flag) {
-      statistics_map[tag].add(end - start);
-    }
-    return end - start;
-  }
-
-  void clear() { statistics_map.clear(); }
-
-  const Statistics & getStatistics(const std::string & tag) { return statistics_map[tag]; }
-  auto begin() const { return statistics_map.begin(); }
-  auto end() const { return statistics_map.end(); }
-
-private:
   std::unordered_map<std::string, Statistics> statistics_map;
+
+public:
+  template <typename F, typename... Ts>
+  auto invoke(const std::string & tag, F && f, Ts &&... xs) -> typename std::enable_if<
+    std::is_same<typename std::result_of<F(Ts...)>::type, void>::value,
+    typename Clock::duration>::type
+  {
+    const auto begin = Clock::now();
+
+    std::forward<F>(f)(std::forward<Ts>(xs)...);  // Use std::invoke (C++17)
+
+    const auto end = Clock::now();
+
+    statistics_map[tag].add(end - begin);
+
+    return end - begin;
+  }
+
+  template <typename F, typename... Ts>
+  auto invoke(const std::string & tag, F && f, Ts &&... xs) -> typename std::enable_if<
+    std::is_same<typename std::result_of<F(Ts...)>::type, bool>::value,
+    typename Clock::duration>::type
+  {
+    const auto begin = Clock::now();
+
+    const auto result = std::forward<F>(f)(std::forward<Ts>(xs)...);  // Use std::invoke (C++17)
+
+    const auto end = Clock::now();
+
+    if (result) {
+      statistics_map[tag].add(end - begin);
+    }
+
+    return end - begin;
+  }
+
+  auto clear() { statistics_map.clear(); }
+
+  auto getStatistics(const std::string & tag) -> const auto & { return statistics_map[tag]; }
+
+  auto begin() const { return statistics_map.begin(); }
+
+  auto end() const { return statistics_map.end(); }
 };
 }  // namespace utility
 }  // namespace openscenario_interpreter
