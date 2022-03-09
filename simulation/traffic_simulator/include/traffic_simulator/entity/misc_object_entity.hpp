@@ -25,8 +25,18 @@ namespace entity
 class MiscObjectEntity : public EntityBase
 {
 public:
+  struct Semantics
+  {
+    static auto defaultSemantics() noexcept -> const traffic_simulator_msgs::msg::EntitySemantics
+    {
+      traffic_simulator_msgs::msg::EntitySemantics semantics;
+      semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::UNKNOWN;
+      return semantics;
+    }
+  };
   MiscObjectEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params);
+    const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params,
+    const traffic_simulator_msgs::msg::EntitySemantics & = Semantics::defaultSemantics());
   void onUpdate(double, double) override;
   auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox override;
   auto getCurrentAction() const -> const std::string override;

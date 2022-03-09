@@ -51,7 +51,19 @@ struct VehicleBehavior : public entity::VehicleEntity::BuiltinBehavior
   }
 };
 
+struct VehicleSemantics : public entity::VehicleEntity::Semantics
+{
+};
+
 struct PedestrianBehavior : public entity::PedestrianEntity::BuiltinBehavior
+{
+};
+
+struct PedestrianSemantics : public entity::PedestrianEntity::Semantics
+{
+};
+
+struct MiscObjectSemantics : public entity::MiscObjectEntity::Semantics
 {
 };
 
@@ -93,16 +105,21 @@ public:
   void setVerbose(const bool verbose);
 
   bool spawn(
-    const std::string & name,                                //
-    const traffic_simulator_msgs::msg::VehicleParameters &,  //
+    const std::string & name,                                                                     //
+    const traffic_simulator_msgs::msg::VehicleParameters &,                                       //
+    const traffic_simulator_msgs::msg::EntitySemantics & = VehicleSemantics::defaultSemantics(),  //
     const std::string & = VehicleBehavior::defaultBehavior());
 
   bool spawn(
     const std::string & name,                                   //
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
+    const traffic_simulator_msgs::msg::EntitySemantics & =
+      PedestrianSemantics::defaultSemantics(),  //
     const std::string & = PedestrianBehavior::defaultBehavior());
 
-  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
+  bool spawn(
+    const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &,
+    const traffic_simulator_msgs::msg::EntitySemantics & = MiscObjectSemantics::defaultSemantics());
 
   bool despawn(const std::string & name);
 
@@ -223,14 +240,18 @@ private:
   bool updateEntityStatusInSim();
   bool updateTrafficLightsInSim();
 
+  /*
   template <typename Parameters>
   bool spawn(
     const bool is_ego, const Parameters & parameters,
     const traffic_simulator_msgs::msg::EntityStatus & status,
+    const traffic_simulator_msgs::msg::EntitySemantics & semantics =
+      PedestrianSemantics::defaultSemantics(),
     const std::string & behavior = PedestrianBehavior::defaultBehavior())
   {
     return spawn(is_ego, parameters.toXml(), status, behavior);
   }
+*/
 
   const Configuration configuration;
 

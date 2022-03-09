@@ -28,7 +28,12 @@ namespace entity
 EntityBase::EntityBase(
   const std::string & type, const std::string & name,
   const traffic_simulator_msgs::msg::EntitySemantics & semantics)
-: type(type), name(name), status_(boost::none), verbose_(true), visibility_(true)
+: type(type),
+  name(name),
+  status_(boost::none),
+  verbose_(true),
+  visibility_(true),
+  entity_semantics_(semantics)
 {
   status_ = boost::none;
 }

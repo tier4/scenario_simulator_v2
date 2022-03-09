@@ -64,6 +64,16 @@ class EgoEntity : public VehicleEntity
 
   boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 
+  struct Semantics
+  {
+    static auto defaultSemantics() noexcept -> const traffic_simulator_msgs::msg::EntitySemantics
+    {
+      traffic_simulator_msgs::msg::EntitySemantics semantics;
+      semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::CAR;
+      return semantics;
+    }
+  };
+
 public:
   explicit EgoEntity() = delete;
 
@@ -71,7 +81,8 @@ public:
     const std::string & name,             //
     const Configuration & configuration,  //
     const double step_time,               //
-    const traffic_simulator_msgs::msg::VehicleParameters & parameters);
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+    const traffic_simulator_msgs::msg::EntitySemantics & = Semantics::defaultSemantics());
 
   explicit EgoEntity(EgoEntity &&) = delete;
 
