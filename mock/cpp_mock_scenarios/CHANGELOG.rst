@@ -2,6 +2,19 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.3 (2022-03-09)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge branch 'master' into fix/interpreter/lifecycle
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge pull request `#671 <https://github.com/tier4/scenario_simulator_v2/issues/671>`_ from tier4/fix/lane_change_trajectory_shape

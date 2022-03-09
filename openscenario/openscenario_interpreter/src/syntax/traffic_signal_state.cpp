@@ -40,16 +40,18 @@ auto TrafficSignalState::evaluate() const -> Object
   const auto color = boost::lexical_cast<boost::optional<Color>>(state);
   if (color.has_value()) {
     setTrafficSignalColor(id(), color.value());
-    return unspecified;
   }
 
   const auto arrow = boost::lexical_cast<boost::optional<Arrow>>(state);
   if (arrow.has_value()) {
     setTrafficSignalArrow(id(), arrow.value());
-    return unspecified;
   }
 
-  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
+  if (not color.has_value() and not arrow.has_value()) {
+    throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
+  } else {
+    return unspecified;
+  }
 }
 
 auto TrafficSignalState::id() const -> LaneletId

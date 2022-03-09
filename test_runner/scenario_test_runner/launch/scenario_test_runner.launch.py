@@ -37,7 +37,7 @@ def architecture_types():
 def default_autoware_launch_package_of(architecture_type):
     if architecture_type not in architecture_types():
         raise KeyError(
-            f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+            f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
         "awf/universe": "autoware_launch",
@@ -47,7 +47,7 @@ def default_autoware_launch_package_of(architecture_type):
 def default_autoware_launch_file_of(architecture_type):
     if architecture_type not in architecture_types():
         raise KeyError(
-            f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+            f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
         "awf/universe": "planning_simulator.launch.xml",

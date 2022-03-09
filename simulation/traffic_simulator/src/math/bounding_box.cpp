@@ -68,27 +68,28 @@ const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<doubl
 }
 
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
-  traffic_simulator_msgs::msg::BoundingBox bbox)
+  traffic_simulator_msgs::msg::BoundingBox bbox, double width_extension_right,
+  double width_extension_left, double length_extension_front, double length_extension_rear)
 {
   std::vector<geometry_msgs::msg::Point> points;
   geometry_msgs::msg::Point p0;
-  p0.x = bbox.center.x + bbox.dimensions.x * 0.5;
-  p0.y = bbox.center.y + bbox.dimensions.y * 0.5;
+  p0.x = bbox.center.x + bbox.dimensions.x * 0.5 + length_extension_front;
+  p0.y = bbox.center.y + bbox.dimensions.y * 0.5 + width_extension_left;
   p0.z = bbox.center.z + bbox.dimensions.z * 0.5;
   points.emplace_back(p0);
   geometry_msgs::msg::Point p1;
-  p1.x = bbox.center.x - bbox.dimensions.x * 0.5;
-  p1.y = bbox.center.y + bbox.dimensions.y * 0.5;
+  p1.x = bbox.center.x - bbox.dimensions.x * 0.5 - length_extension_rear;
+  p1.y = bbox.center.y + bbox.dimensions.y * 0.5 + width_extension_left;
   p1.z = bbox.center.z + bbox.dimensions.z * 0.5;
   points.emplace_back(p1);
   geometry_msgs::msg::Point p2;
-  p2.x = bbox.center.x - bbox.dimensions.x * 0.5;
-  p2.y = bbox.center.y - bbox.dimensions.y * 0.5;
+  p2.x = bbox.center.x - bbox.dimensions.x * 0.5 - length_extension_rear;
+  p2.y = bbox.center.y - bbox.dimensions.y * 0.5 - width_extension_right;
   p2.z = bbox.center.z + bbox.dimensions.z * 0.5;
   points.emplace_back(p2);
   geometry_msgs::msg::Point p3;
-  p3.x = bbox.center.x + bbox.dimensions.x * 0.5;
-  p3.y = bbox.center.y - bbox.dimensions.y * 0.5;
+  p3.x = bbox.center.x + bbox.dimensions.x * 0.5 + length_extension_front;
+  p3.y = bbox.center.y - bbox.dimensions.y * 0.5 - width_extension_right;
   p3.z = bbox.center.z + bbox.dimensions.z * 0.5;
   points.emplace_back(p3);
   return points;

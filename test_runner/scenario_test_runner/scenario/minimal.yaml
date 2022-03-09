@@ -1,0 +1,66 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader:
+    author: Tatsuya Yamasaki
+    date: '1970-01-01T09:00:00+09:00'
+    description: Minimal scenario
+    revMajor: 0
+    revMinor: 0
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+  Storyboard:
+    Init:
+      Actions:
+    Story:
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ''
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
