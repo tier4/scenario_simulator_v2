@@ -1,4 +1,5 @@
 traffic_simulator_msgs/EntityType type
+traffic_simulator_msgs/EntitySemantics semantics
 
 float64 time 0
 
