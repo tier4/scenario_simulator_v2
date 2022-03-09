@@ -44,6 +44,20 @@ enum EntityType {
 }
 
 /**
+ * Protobuf definition of traffic_simulator_msgs/msg/EntitySemantics type in ROS2.
+ **/
+enum EntityType {
+  UNKNOWN = 0;    // The entity is unkown object
+  CAR = 1;        // The entity is car like a passenger vehicle
+  TRUCK = 2;      // The entity is truck
+  BUS = 3;        // The entity is bus
+  TRAILER = 4;    // The entity is trailer 
+  MOTORCYCLE = 5; // The entity is motorcycle
+  BICYCLE = 6;    // THe entity is bicycle
+  PEDESTRIAN = 7; // The entity is pedestrian
+}
+
+/**
  * Protobuf definition of traffic_simulator_msgs/msg/EntityStatus type in ROS2.
  **/
 message EntityStatus {
