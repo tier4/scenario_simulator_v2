@@ -2,8 +2,8 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.3 (2022-03-09)
+------------------
 * Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
 * Merge pull request `#686 <https://github.com/tier4/scenario_simulator_v2/issues/686>`_ from tier4/fix/warp_problem
   Fix/warp problem

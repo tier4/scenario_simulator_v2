@@ -2,8 +2,8 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.3 (2022-03-09)
+------------------
 * Merge pull request `#717 <https://github.com/tier4/scenario_simulator_v2/issues/717>`_ from tier4/improvement/sample-scenario
   Improvement/sample scenario
 * Fix some paths `test/scenario` to `scenario`

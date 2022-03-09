@@ -2,8 +2,8 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.3 (2022-03-09)
+------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
 * Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
   Feature/autoware external api

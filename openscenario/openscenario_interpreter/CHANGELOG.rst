@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.3 (2022-03-09)
+------------------
 * Merge pull request `#713 <https://github.com/tier4/scenario_simulator_v2/issues/713>`_ from tier4/fix/interpreter/traffic-signal-state-action
   Fix/interpreter/traffic signal state action
 * Update syntax `TrafficSignalState` to reset both of color and arrow if `none` specified

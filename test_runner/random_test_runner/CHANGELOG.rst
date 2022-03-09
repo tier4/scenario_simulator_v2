@@ -2,8 +2,8 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.3 (2022-03-09)
+------------------
 * Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
 * Merge branch 'master' into fix/interpreter/lifecycle
 * Contributors: kyabe2718, yamacir-kit

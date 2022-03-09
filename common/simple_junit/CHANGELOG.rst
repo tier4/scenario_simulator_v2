@@ -2,8 +2,8 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.3 (2022-03-09)
+------------------
 * Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
 * Contributors: yamacir-kit
 

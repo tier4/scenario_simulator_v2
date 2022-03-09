@@ -2,8 +2,8 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.3 (2022-03-09)
+------------------
 * Merge https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
 * Merge pull request `#699 <https://github.com/tier4/scenario_simulator_v2/issues/699>`_ from tier4/dependabot/pip/openscenario/openscenario_utility/numpy-1.21.0
