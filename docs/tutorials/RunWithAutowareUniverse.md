@@ -58,7 +58,10 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
    ```bash
    source install/setup.bash
    ```
-3. Run scenario
+3. Run 
+
+   a) scenario_test_runner
+   
    ```bash
    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
    architecture_type:=awf/universe \
@@ -67,9 +70,16 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
    sensor_model:=sample_sensor_kit \
    vehicle_model:=sample_vehicle
    ``` 
-
-### Expected behavior
-
-![Scenario execution with AWF Autoware](../image/awf_universe.png)
+   
+   b) random_test_runner
+   
+   ```bash
+   ros2 launch random_test_runner random_test.launch.py \
+   architecture_type:=awf/universe \
+   sensor_model:=sample_sensor_kit \
+   vehicle_model:=sample_vehicle
+   ``` 
+   
+   To modify paramewters of random testing, please check documentation of ![random_test_runner](../../test_runner/random_test_runner/Readme.md)
 
 ### Troubleshooting
