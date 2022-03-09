@@ -240,19 +240,6 @@ private:
   bool updateEntityStatusInSim();
   bool updateTrafficLightsInSim();
 
-  /*
-  template <typename Parameters>
-  bool spawn(
-    const bool is_ego, const Parameters & parameters,
-    const traffic_simulator_msgs::msg::EntityStatus & status,
-    const traffic_simulator_msgs::msg::EntitySemantics & semantics =
-      PedestrianSemantics::defaultSemantics(),
-    const std::string & behavior = PedestrianBehavior::defaultBehavior())
-  {
-    return spawn(is_ego, parameters.toXml(), status, behavior);
-  }
-*/
-
   const Configuration configuration;
 
   const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
