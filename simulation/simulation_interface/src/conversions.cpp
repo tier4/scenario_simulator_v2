@@ -322,6 +322,97 @@ void toMsg(
 }
 
 void toProto(
+  const traffic_simulator_msgs::msg::EntitySemantics & semantics,
+  traffic_simulator_msgs::EntitySemantics & proto)
+{
+  if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::UNKNOWN) {
+    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_UNKNOWN);
+    return;
+  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::CAR) {
+    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_CAR);
+    return;
+  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::TRUCK) {
+    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_TRUCK);
+    return;
+  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::BUS) {
+    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_BUS);
+    return;
+  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::TRAILER) {
+    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_TRAILER);
+    return;
+  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::MOTORCYCLE) {
+    proto.set_semantics(
+      traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_MOTORCYCLE);
+    return;
+  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::BICYCLE) {
+    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_BICYCLE);
+    return;
+  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::PEDESTRIAN) {
+    proto.set_semantics(
+      traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_PEDESTRIAN);
+    return;
+  }
+  // LCOV_EXCL_START
+  std::string message =
+    "semantics of the Entity Type is invalid!\nsemantics is " + std::to_string(semantics.semantics);
+  THROW_SIMULATION_ERROR(message);
+  // LCOV_EXCL_STOP
+}
+
+void toMsg(
+  const traffic_simulator_msgs::EntitySemantics & proto,
+  traffic_simulator_msgs::msg::EntitySemantics & semantics)
+{
+  if (
+    proto.semantics() ==
+    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_UNKNOWN) {
+    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::UNKNOWN;
+    return;
+  }
+  if (proto.semantics() == traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_CAR) {
+    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::CAR;
+    return;
+  }
+  if (
+    proto.semantics() == traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_TRUCK) {
+    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::TRUCK;
+    return;
+  }
+  if (proto.semantics() == traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_BUS) {
+    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::BUS;
+    return;
+  }
+  if (
+    proto.semantics() ==
+    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_TRAILER) {
+    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::TRAILER;
+    return;
+  }
+  if (
+    proto.semantics() ==
+    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_MOTORCYCLE) {
+    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::MOTORCYCLE;
+    return;
+  }
+  if (
+    proto.semantics() ==
+    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_BICYCLE) {
+    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::BICYCLE;
+    return;
+  }
+  if (
+    proto.semantics() ==
+    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_PEDESTRIAN) {
+    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::PEDESTRIAN;
+    return;
+  }
+  // LCOV_EXCL_START
+  std::string message = "type of the Entity Semantics is invalid!";
+  THROW_SIMULATION_ERROR(message);
+  // LCOV_EXCL_STOP
+}
+
+void toProto(
   const traffic_simulator_msgs::msg::EntityStatus & status,
   traffic_simulator_msgs::EntityStatus & proto)
 {
