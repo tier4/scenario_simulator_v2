@@ -2,6 +2,25 @@
 
 ## Difference between the latest release and master
 
+Major Changes :race_car: :red_car: :blue_car:
+
+| description | detail | category | pull-request | contributor | JIRA Ticket(optional) |
+| ----------- | ------ | -------- | ------------ | ----------- | --------------------- |
+|             |        |          |              |             |                       |
+
+
+Bug Fixes:bug:
+
+| description | detail | category | pull-request | contributor | JIRA Ticket(optional) |
+| ----------- | ------ | -------- | ------------ | ----------- | --------------------- |
+|             |        |          |              |             |                       |
+
+Minor Tweaks :oncoming_police_car:
+
+| description | detail | category | pull-request | contributor | JIRA Ticket(optional) |
+| ----------- | ------ | -------- | ------------ | ----------- | --------------------- |
+|             |        |          |              |             |                       |
+
 ## Version 0.6.3
 - Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
 - Fix problem in warping NPCs spawned in world coordinate. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/686))
