@@ -51,18 +51,18 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
         autoware_auto_perception_msgs::msg::PredictedObject object;
         bool is_ego = false;
         switch (s.type()) {
-          case traffic_simulator_msgs::EntityType::EGO:
+          case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO:
             is_ego = true;
             break;
-          case traffic_simulator_msgs::EntityType::VEHICLE:
+          case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_VEHICLE:
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::CAR));
             break;
-          case traffic_simulator_msgs::EntityType::PEDESTRIAN:
+          case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_PEDESTRIAN:
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
             break;
-          case traffic_simulator_msgs::EntityType::MISC_OBJECT:
+          case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_MISC_OBJECT:
             break;
           default:
             throw SimulationRuntimeError("unsupported entity type!");

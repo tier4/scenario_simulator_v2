@@ -278,16 +278,16 @@ void toProto(
   const traffic_simulator_msgs::msg::EntityType & type, traffic_simulator_msgs::EntityType & proto)
 {
   if (type.type == traffic_simulator_msgs::msg::EntityType::EGO) {
-    proto = traffic_simulator_msgs::EntityType::EGO;
+    proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO);
     return;
   } else if (type.type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    proto = traffic_simulator_msgs::EntityType::VEHICLE;
+    proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_VEHICLE);
     return;
   } else if (type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN) {
-    proto = traffic_simulator_msgs::EntityType::PEDESTRIAN;
+    proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_PEDESTRIAN);
     return;
   } else if (type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT) {
-    proto = traffic_simulator_msgs::EntityType::MISC_OBJECT;
+    proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_MISC_OBJECT);
     return;
   }
   // LCOV_EXCL_START
@@ -299,19 +299,19 @@ void toProto(
 void toMsg(
   const traffic_simulator_msgs::EntityType & proto, traffic_simulator_msgs::msg::EntityType & type)
 {
-  if (proto == traffic_simulator_msgs::EntityType::EGO) {
+  if (proto.type() == traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
     type.type = traffic_simulator_msgs::msg::EntityType::EGO;
     return;
   }
-  if (proto == traffic_simulator_msgs::EntityType::VEHICLE) {
+  if (proto.type() == traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_VEHICLE) {
     type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
     return;
   }
-  if (proto == traffic_simulator_msgs::EntityType::PEDESTRIAN) {
+  if (proto.type() == traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_PEDESTRIAN) {
     type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
     return;
   }
-  if (proto == traffic_simulator_msgs::EntityType::MISC_OBJECT) {
+  if (proto.type() == traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_MISC_OBJECT) {
     type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
     return;
   }
@@ -325,9 +325,7 @@ void toProto(
   const traffic_simulator_msgs::msg::EntityStatus & status,
   traffic_simulator_msgs::EntityStatus & proto)
 {
-  traffic_simulator_msgs::EntityType type;
-  toProto(status.type, type);
-  proto.set_type(type);
+  toProto(status.type, *proto.mutable_type());
   proto.set_time(status.time);
   proto.set_name(status.name);
   toProto(status.bounding_box, *proto.mutable_bounding_box());
