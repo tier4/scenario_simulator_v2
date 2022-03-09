@@ -417,6 +417,7 @@ void toProto(
   traffic_simulator_msgs::EntityStatus & proto)
 {
   toProto(status.type, *proto.mutable_type());
+  toProto(status.semantics, *proto.mutable_semantics());
   proto.set_time(status.time);
   proto.set_name(status.name);
   toProto(status.bounding_box, *proto.mutable_bounding_box());
@@ -430,9 +431,8 @@ void toMsg(
   const traffic_simulator_msgs::EntityStatus & proto,
   traffic_simulator_msgs::msg::EntityStatus & status)
 {
-  traffic_simulator_msgs::msg::EntityType type;
-  toMsg(proto.type(), type);
-  status.type = type;
+  toMsg(proto.type(), status.type);
+  toMsg(proto.semantics(), status.semantics);
   status.time = proto.time();
   status.name = proto.name();
   toMsg(proto.bounding_box(), status.bounding_box);

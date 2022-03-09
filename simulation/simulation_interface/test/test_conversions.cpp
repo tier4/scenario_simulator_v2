@@ -449,6 +449,36 @@ TEST(Conversion, EntityType)
   EXPECT_EQ(msg.type, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT);
 }
 
+TEST(Conversion, EntitySemantics)
+{
+  traffic_simulator_msgs::EntitySemantics proto;
+  traffic_simulator_msgs::msg::EntitySemantics msg;
+  msg.semantics = msg.CAR;
+  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+  EXPECT_EQ(
+    proto.semantics(), traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_CAR);
+  msg.semantics = msg.UNKNOWN;
+  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+  EXPECT_EQ(
+    proto.semantics(), traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_UNKNOWN);
+  proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_CAR);
+  msg.semantics = msg.UNKNOWN;
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.semantics, traffic_simulator_msgs::msg::EntitySemantics::CAR);
+  msg.semantics = msg.CAR;
+  proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_CAR);
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.semantics, traffic_simulator_msgs::msg::EntitySemantics::CAR);
+  msg.semantics = msg.CAR;
+  proto.set_semantics(
+    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_PEDESTRIAN);
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.semantics, traffic_simulator_msgs::msg::EntitySemantics::PEDESTRIAN);
+  proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_UNKNOWN);
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.semantics, traffic_simulator_msgs::msg::EntitySemantics::UNKNOWN);
+}
+
 TEST(Conversion, LaneletPose)
 {
   traffic_simulator_msgs::msg::LaneletPose pose;
