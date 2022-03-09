@@ -2,6 +2,45 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
+  Feature/autoware external api
+* Remove macro `CONCEALER_CURRENT_VALUE_OF`
+* Remove header `undefine_macro.hpp`
+* Add `CONCEALER\_` prefix to `concealer`'s macros
+* Remove member function `AutowareUniverse::checkAutowareState`
+* Rename member function `setUpperBoundSpeed` to `setVelocityLimit`
+* Remove `HazardLightsReport` and `HazardLightsCommand` from dependency
+* Remove member function `AutowareUniverse::setLaneChangeApproval`
+* Remove member function `getVehicleStatus`
+* Fix macro `CONCEALER_DEFINE_CLIENT` to check status code of response
+* Add new macro `CONCEALER_INIT_CLIENT`
+* Add new macro `CONCEALER_DEFINE_CLIENT`
+* Add missing package dependency
+* Replace engagement API with new ROS2 service version
+* Remove macro `DEFINE_SUBSCRIPTION_WITH_OVERRIDE`
+* Remove `tier4_system_msgs` from dependency
+* Replace `AwapiAutowareStatus` with `autoware_auto_system_msgs::msg::AutowareState`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Remove class `AutowareAuto`
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Remove package `autoware_control_msgs` from dependency
+* Remove package `autoware_vehicle_msgs` from dependency
+* Replace `VehicleCommand` with `AckermannControlCommand` and `GearCommand`
+* Remove package `autoware_perception_msgs`
+* Replace `autoware_debug_msgs` with `tier4_debug_msgs`
+* Remove some unused dependencies
+* Remove class `AutowareArchitectureProposal`
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape

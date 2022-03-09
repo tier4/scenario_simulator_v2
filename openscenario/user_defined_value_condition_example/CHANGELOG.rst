@@ -2,6 +2,21 @@
 Changelog for package user_defined_value_condition_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
+  Feature/autoware external api
+* Add new macro `CONCEALER_DEFINE_CLIENT`
+* Remove `tier4_system_msgs` from dependency
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Lipsticks
+* Remove package `autoware_api_msgs` from dependency
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape

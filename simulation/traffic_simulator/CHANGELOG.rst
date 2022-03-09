@@ -2,6 +2,102 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#716 <https://github.com/tier4/scenario_simulator_v2/issues/716>`_ from tier4/dependency/remove-lexus-description
+  Remove `lexus_description` from dependency
+* Cleanup
+* Merge pull request `#714 <https://github.com/tier4/scenario_simulator_v2/issues/714>`_ from tier4/fix/get_longitudinal_distance
+  Fix/get longitudinal distance
+* fix typo
+* remove unused lines
+* change hard coded parameter
+* remove debug line
+* configure parameter
+* add getLongitudinalDistance function in world frame
+* Merge pull request `#709 <https://github.com/tier4/scenario_simulator_v2/issues/709>`_ from tier4/feature/waypoint_offset
+  Feature/waypoint offset
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* remove debug line
+* erase not unique waypoint
+* Merge pull request `#706 <https://github.com/tier4/scenario_simulator_v2/issues/706>`_ from tier4/fix/hard_coded_parameter
+  fix hard coded parameter in hermite curve class
+* Merge pull request `#707 <https://github.com/tier4/scenario_simulator_v2/issues/707>`_ from tier4/fix/sim_model_delay_steer_acc_geared
+  fix sim_model_delay_steer_acc_geard model
+* modify getPoint function
+* add offset
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* add white line at the EOF
+* fix typo and add new line at EOF
+* add offset in waypoint calculation
+* Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
+  Feature/autoware external api
+* fix sim_model_delay_steer_acc_geard model
+* fix hard coded parameter in hermite curve class
+* Rename member function `setUpperBoundSpeed` to `setVelocityLimit`
+* Replace `AwapiAutowareStatus` with `autoware_auto_system_msgs::msg::AutowareState`
+* Merge pull request `#698 <https://github.com/tier4/scenario_simulator_v2/issues/698>`_ from tier4/fix/idead_steer_acc_geard
+  fix sim model ideal steer acc geard
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* fix sim model ideal steer acc geard
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Remove legacy vehicle model types
+* Remove architecture_type `awf/auto`
+* Remove class `AutowareAuto`
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#688 <https://github.com/tier4/scenario_simulator_v2/issues/688>`_ from tier4/fix/traffic_simulator/traffic_light_manager
+  Fix/traffic simulator/traffic light manager
+* Cleanup
+* Merge pull request `#686 <https://github.com/tier4/scenario_simulator_v2/issues/686>`_ from tier4/fix/warp_problem
+  Fix/warp problem
+* Fix traffic signal topic name (for Autoware.Universe)
+* Update `TrafficLightManager::set*` to be traffic relation ID acceptable
+* Merge pull request `#689 <https://github.com/tier4/scenario_simulator_v2/issues/689>`_ from tier4/feature/add-occlusion-spot-no-stopping-area-marker
+  feat(behavior_velocity): add occlusion spot no stopping area marker
+* fix typo
+* remove debug line
+* fix compile errors
+* lane matching fails when the offset overs 1
+* Add new member function `HdMapUtils::isTrafficRelationId`
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into fix/traffic_simulator/traffic_light_manager
+* Lipsticks
+* feat(behavior_velocity): add occlusion spot no stopping area marker
+* add std::sqrt function in offset calculation
+* enable get - offset value
+* Merge pull request `#684 <https://github.com/tier4/scenario_simulator_v2/issues/684>`_ from tier4/fix/virtual_destructor
+  Fix/virtual destructor
+* use override in entity class
+* use override in metrics
+* Merge pull request `#683 <https://github.com/tier4/scenario_simulator_v2/issues/683>`_ from tier4/feature/zeromq_multi_client
+  Feature/zeromq multi client
+* add virtual destructor to the metric class
+* modify destructor
+* add virtual destructor to the entity class
+* use multi client class
+* Merge pull request `#680 <https://github.com/tier4/scenario_simulator_v2/issues/680>`_ from tier4/feature/speed_up_metrics_manager
+  Feature/speed up metrics manager
+* remove unused lines
+* remove log output step in every update frame
+* remove output to file step
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge branch 'master' into fix/interpreter/lifecycle
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Replace `VehicleCommand` with `AckermannControlCommand` and `GearCommand`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Remove package `autoware_perception_msgs`
+* Replace `autoware_debug_msgs` with `tier4_debug_msgs`
+* Remove architecture_type `tier4/proposal`
+* Remove class `AutowareArchitectureProposal`
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, tanaka3, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge pull request `#671 <https://github.com/tier4/scenario_simulator_v2/issues/671>`_ from tier4/fix/lane_change_trajectory_shape
