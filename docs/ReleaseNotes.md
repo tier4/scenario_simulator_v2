@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Enable publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/726))
 
 ## Version 0.6.3
 - Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
