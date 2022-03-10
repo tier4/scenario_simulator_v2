@@ -37,8 +37,10 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
 
 auto ManeuverGroup::start() -> void
 {
-  for (auto && maneuver : elements) {
-    maneuver.as<Maneuver>().current_state = standby_state;
+  for (auto && element : elements) {
+    assert(element.template is<Maneuver>());
+    assert(element.template is_also<StoryboardElement>());
+    element.template as<StoryboardElement>().current_state = start_transition;
   }
 }
 

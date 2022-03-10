@@ -31,8 +31,6 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto Act::start() noexcept -> void {}
-
 auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;

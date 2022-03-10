@@ -41,8 +41,6 @@ struct Maneuver : public Scope, public StoryboardElement
   const ParameterDeclarations parameter_declarations;
 
   explicit Maneuver(const pugi::xml_node &, Scope &);
-
-  auto start() noexcept -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Maneuver &) -> nlohmann::json &;

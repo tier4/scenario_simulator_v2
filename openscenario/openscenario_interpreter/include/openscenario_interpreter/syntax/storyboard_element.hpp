@@ -108,7 +108,7 @@ private:
     }
   }
 
-  virtual auto start() -> void = 0;
+  virtual auto start() -> void {}
 
   virtual auto stop() -> void
   {
@@ -193,7 +193,6 @@ public:
         *
         * ------------------------------------------------------------------- */
         start();
-        // TODO SET CHILD ELEMENTS STATE TO STANDBY_STATE.
         ++current_execution_count;
         return current_state = running_state;
 

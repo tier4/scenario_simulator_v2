@@ -40,8 +40,6 @@ inline namespace syntax
 struct Act : public Scope, public StoryboardElement
 {
   explicit Act(const pugi::xml_node &, Scope &);
-
-  auto start() noexcept -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;

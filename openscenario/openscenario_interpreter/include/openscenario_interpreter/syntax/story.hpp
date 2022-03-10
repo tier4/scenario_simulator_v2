@@ -38,8 +38,6 @@ inline namespace syntax
 struct Story : public Scope, public StoryboardElement
 {
   explicit Story(const pugi::xml_node &, Scope &);
-
-  auto start() noexcept -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Story &) -> nlohmann::json &;
