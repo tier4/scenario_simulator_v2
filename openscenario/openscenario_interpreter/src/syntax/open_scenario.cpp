@@ -30,8 +30,6 @@ OpenScenario::OpenScenario(const boost::filesystem::path & pathname)
 {
 }
 
-auto OpenScenario::complete() const -> bool { return category.as<ScenarioDefinition>().complete(); }
-
 auto OpenScenario::evaluate() -> Object
 {
   ++frame;
