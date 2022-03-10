@@ -16,8 +16,6 @@ OpenSCENARIO:
   RoadNetwork:
     LogicFile:
       filepath: $(find-pkg-share kashiwanoha_map)/map
-    TrafficSignals:
-      TrafficSignalController: []
   Entities:
     ScenarioObject:
       - name: ego

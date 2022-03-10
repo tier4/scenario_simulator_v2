@@ -2,6 +2,12 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.3 (2022-03-09)
+------------------
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge branch 'master' into fix/interpreter/lifecycle
+* Contributors: kyabe2718, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge pull request `#670 <https://github.com/tier4/scenario_simulator_v2/issues/670>`_ from tier4/feature/request_speed_change_in_pedestrian
