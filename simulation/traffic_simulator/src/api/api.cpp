@@ -59,12 +59,6 @@ bool API::spawn(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,  //
   const traffic_simulator_msgs::msg::EntitySemantics & semantics, const std::string & behavior)
 {
-  std::cout << "semantics : " << semantics.semantics << std::endl;
-  if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::CAR) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
-  } else {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
-  }
   auto register_to_entity_manager = [&]() {
     if (behavior == VehicleBehavior::autoware()) {
       using traffic_simulator::entity::EgoEntity;
@@ -99,7 +93,6 @@ bool API::spawn(
   const traffic_simulator_msgs::msg::PedestrianParameters & parameters,  //
   const traffic_simulator_msgs::msg::EntitySemantics & semantics, const std::string & behavior)
 {
-  std::cout << "semantics : " << semantics.semantics << std::endl;
   auto register_to_entity_manager = [&]() {
     using traffic_simulator::entity::PedestrianEntity;
     return entity_manager_ptr_->spawnEntity<PedestrianEntity>(
@@ -127,7 +120,6 @@ bool API::spawn(
   const traffic_simulator_msgs::msg::MiscObjectParameters & parameters,
   const traffic_simulator_msgs::msg::EntitySemantics & semantics)
 {
-  std::cout << "semantics : " << semantics.semantics << std::endl;
   auto register_to_entity_manager = [&]() {
     using traffic_simulator::entity::MiscObjectEntity;
     return entity_manager_ptr_->spawnEntity<MiscObjectEntity>(name, parameters, semantics);
