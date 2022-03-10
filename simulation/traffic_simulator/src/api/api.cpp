@@ -60,12 +60,9 @@ bool API::spawn(
   const traffic_simulator_msgs::msg::EntitySemantics & semantics, const std::string & behavior)
 {
   std::cout << "semantics : " << semantics.semantics << std::endl;
-  if(semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::CAR)
-  {
+  if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::CAR) {
     std::cout << __FILE__ << "," << __LINE__ << std::endl;
-  }
-  else
-  {
+  } else {
     std::cout << __FILE__ << "," << __LINE__ << std::endl;
   }
   auto register_to_entity_manager = [&]() {
