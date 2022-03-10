@@ -68,6 +68,7 @@ class EgoEntity : public VehicleEntity
   {
     static auto defaultSemantics() noexcept -> const traffic_simulator_msgs::msg::EntitySemantics
     {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       traffic_simulator_msgs::msg::EntitySemantics semantics;
       semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::CAR;
       return semantics;

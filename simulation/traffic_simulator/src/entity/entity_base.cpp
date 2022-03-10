@@ -193,6 +193,8 @@ const traffic_simulator_msgs::msg::EntityStatus EntityBase::getStatus() const
   } else {
     auto status = this->status_.get();
     status.bounding_box = getBoundingBox();
+    status.semantics = entity_semantics_;
+    status.type = entity_type_;
     return status;
   }
 }

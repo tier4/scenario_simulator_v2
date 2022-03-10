@@ -425,6 +425,7 @@ void toProto(
   toProto(status.pose, *proto.mutable_pose());
   toProto(status.lanelet_pose, *proto.mutable_lanelet_pose());
   proto.set_lanelet_pose_valid(status.lanelet_pose_valid);
+  // proto.PrintDebugString();
 }
 
 void toMsg(
