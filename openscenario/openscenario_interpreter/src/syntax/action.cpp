@@ -34,14 +34,6 @@ Action::Action(const pugi::xml_node & node, Scope & scope)
 
 auto Action::accomplished() const -> bool { return ComplexType::accomplished(); }
 
-auto Action::elements() -> Elements &
-{
-  static Elements elements;  // NOTE DUMMY
-  return elements;
-}
-
-auto Action::ready() -> bool { return static_cast<bool>(*this); }
-
 auto Action::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
@@ -60,8 +52,6 @@ auto Action::stop() -> void
     overridden = true;
   }
 }
-
-auto Action::stopTriggered() noexcept -> bool { return false; }
 
 auto operator<<(nlohmann::json & json, const Action & datum) -> nlohmann::json &
 {

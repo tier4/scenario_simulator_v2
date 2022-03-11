@@ -3,6 +3,24 @@
 ## Difference between the latest release and master
 - Enable publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/726))
 
+Major Changes :race_car: :red_car: :blue_car:
+
+| feature | brief summary | category | pull-request | contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+Bug Fixes:bug:
+
+| feature | brief summary | category | pull-request | contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| feature                                  | brief summary                                                                     | category    | pull-request                                                            | contributor                                   |
+| ---------------------------------------- | --------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------- | --------------------------------------------- |
+| Avoid stopping main loop of interpreter. | Update interpreter's main loop to not to stop even if `Storyboard` was completed. | interpreter | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/720) | [yamacir-kit](https://github.com/yamacir-kit) |
+
 ## Version 0.6.3
 - Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
 - Fix problem in warping NPCs spawned in world coordinate. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/686))
@@ -11,7 +29,6 @@
 - Fix problem in getFrontEntityName function, consider yaw difference while stopping at crossing entity. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/703))
 - Fix problem in delay steer acc geard dynamics model. Vehicle was pulled back very slowly even if the vehicle is stopped. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/707))
 - Start considering offset in collision detection in crossing entity. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/709))
-- Update interpreter's main loop to not to stop even if `Storyboard` was completed ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/720)).
 
 ## Version 0.6.2
 - Start supporting linear trajectory shape while changing lane. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/661))
