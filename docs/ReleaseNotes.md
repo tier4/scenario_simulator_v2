@@ -4,19 +4,19 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| feature name | supplemental explanation | category | pull-request | contributor |
-| ------------ | ------------------------ | -------- | ------------ | ----------- |
-|              |                          |          |              |             |
+| feature | brief summary | category | pull-request | contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
 
 Bug Fixes:bug:
 
-| feature name | supplemental explanation | category | pull-request | contributor |
-| ------------ | ------------------------ | -------- | ------------ | ----------- |
-|              |                          |          |              |             |
+| feature | brief summary | category | pull-request | contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
 
 Minor Tweaks :oncoming_police_car:
 
-| feature name                             | supplemental explanation                                                          | category    | pull-request                                                            | contributor                                   |
+| feature                                  | brief summary                                                                     | category    | pull-request                                                            | contributor                                   |
 | ---------------------------------------- | --------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------- | --------------------------------------------- |
 | Avoid stopping main loop of interpreter. | Update interpreter's main loop to not to stop even if `Storyboard` was completed. | interpreter | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/720) | [yamacir-kit](https://github.com/yamacir-kit) |
 
