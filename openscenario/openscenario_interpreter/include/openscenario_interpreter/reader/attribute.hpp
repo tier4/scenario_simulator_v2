@@ -15,9 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 
-#include "scenario_simulator_exception/exception.hpp"
-#define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <functional>
 #include <openscenario_interpreter/reader/evaluate.hpp>
@@ -25,6 +22,7 @@
 #include <openscenario_interpreter/utility/highlighter.hpp>
 #include <pugixml.hpp>
 #include <regex>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <unordered_map>
 
@@ -32,16 +30,9 @@ namespace openscenario_interpreter
 {
 inline namespace reader
 {
-/* ---- Dynamic Configuration --------------------------------------------------
- *
- *  See https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
- *
- * -------------------------------------------------------------------------- */
 template <typename Scope>
 auto substitute(std::string attribute, Scope & scope)
 {
-  static const std::regex substitution_syntax{R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))"};
-
   auto find_pkg_share = [](auto && package_name, auto &&) {
     return ament_index_cpp::get_package_share_directory(package_name);
   };
@@ -58,15 +49,18 @@ auto substitute(std::string attribute, Scope & scope)
     return scope.global().pathname.parent_path().string();
   };
 
+  // NOTE: https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
   static const std::unordered_map<
     std::string, std::function<std::string(const std::string &, Scope &)> >
     substitutions{{"find-pkg-share", find_pkg_share}, {"var", var}, {"dirname", dirname}};
 
-  for (std::smatch match; std::regex_match(attribute, match, substitution_syntax);) {
-    if (const auto iter = substitutions.find(match.str(3)); iter != std::end(substitutions)) {
-      attribute = match.str(1) + std::get<1>(*iter)(match.str(4), scope) + match.str(5);
+  static const auto pattern = std::regex(R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))");
+
+  for (std::smatch result; std::regex_match(attribute, result, pattern);) {
+    if (const auto iter = substitutions.find(result.str(3)); iter != std::end(substitutions)) {
+      attribute = result.str(1) + std::get<1>(*iter)(result.str(4), scope) + result.str(5);
     } else {
-      throw SyntaxError("Unknown substitution ", std::quoted(match.str(3)), " specified");
+      throw SyntaxError("Unknown substitution ", std::quoted(result.str(3)), " specified");
     }
   }
 
@@ -76,25 +70,14 @@ auto substitute(std::string attribute, Scope & scope)
 template <typename T, typename Node, typename Scope>
 auto readAttribute(const std::string & name, const Node & node, const Scope & scope) -> T
 {
-  if (const auto & attribute{node.attribute(name.c_str())}) {
-    std::string value{substitute(attribute.value(), scope)};
-
-    if (value.empty()) {
-#ifndef OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
-      throw SyntaxError(
-        "Blank is not allowed for the value of attribute ", std::quoted(name), " of class ",
-        std::quoted(node.name()));
-#else
+  if (const auto & attribute = node.attribute(name.c_str())) {
+    if (std::string value = substitute(attribute.value(), scope); value.empty()) {
       return T();
-#endif
-    }
-    if (value.substr(0, 2) == "${" and value.back() == '}') {
+    } else if (value.substr(0, 2) == "${" and value.back() == '}') {
       return boost::lexical_cast<T>(
         evaluate(std::string(value.begin() + 2, value.end() - 1), scope));
-    }
-    if (value.front() == '$') {
-      const auto found = scope.ref(value.substr(1));
-      if (found) {
+    } else if (value.front() == '$') {
+      if (const auto found = scope.ref(value.substr(1)); found) {
         return boost::lexical_cast<T>(boost::lexical_cast<String>(found));
       } else {
         throw SyntaxError(
