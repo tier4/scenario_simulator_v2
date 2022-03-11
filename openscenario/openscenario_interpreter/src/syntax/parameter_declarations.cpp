@@ -21,9 +21,8 @@ inline namespace syntax
 {
 ParameterDeclarations::ParameterDeclarations(const pugi::xml_node & node, Scope & scope)
 {
-  callWithElements(node, "ParameterDeclaration", 0, unbounded, [&](auto && each) {
-    return emplace_back(each, scope);
-  });
+  traverse<0, unbounded>(
+    node, "ParameterDeclaration", [&](auto && each) { return emplace_back(each, scope); });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

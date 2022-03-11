@@ -26,7 +26,7 @@ Private::Private(const pugi::xml_node & node, Scope & scope)
 {
   actors.emplace_back(entity_ref);
 
-  callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
+  traverse<1, unbounded>(node, "PrivateAction", [&](auto && node) {
     return private_actions.emplace_back(node, local());
   });
 }

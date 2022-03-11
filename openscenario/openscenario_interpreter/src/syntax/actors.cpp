@@ -23,8 +23,8 @@ Actors::Actors(const pugi::xml_node & node, Scope & scope)
 : select_triggering_entities(
     readAttribute<Boolean>("selectTriggeringEntities", node, scope, Boolean()))
 {
-  callWithElements(
-    node, "EntityRef", 0, unbounded, [&](auto && node) { scope.actors.emplace_back(node, scope); });
+  traverse<0, unbounded>(
+    node, "EntityRef", [&](auto && node) { scope.actors.emplace_back(node, scope); });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
