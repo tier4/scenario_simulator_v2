@@ -204,16 +204,18 @@ class LifecycleController(Node):
     def shutdown(self):
         """Shutdown lifecycle controller."""
         self.get_logger().info("\x1b[33mShutdown interpreter.\x1b[0m")
-        state_expects = "unconfigured"
-        if self.get_lifecycle_state() == state_expects:
+        current_state = self.get_lifecycle_state()
+        if current_state == "unconfigured":
             return self.set_lifecycle_state(Transition.TRANSITION_UNCONFIGURED_SHUTDOWN)
+        elif current_state == "inactive":
+            return self.set_lifecycle_state(Transition.TRANSITION_INACTIVE_SHUTDOWN)
+        elif current_state == "active":
+            return self.set_lifecycle_state(Transition.TRANSITION_ACTIVE_SHUTDOWN)
         else:
             self.get_logger().error(
                 "\x1b[1;31mInterpreter is "
                 + self.get_lifecycle_state()
-                + " now, but "
-                + state_expects
-                + " expected.\x1b[0m"
+                + " now, and it cannot transition to shuting down.\x1b[0m"
             )
             return False
 

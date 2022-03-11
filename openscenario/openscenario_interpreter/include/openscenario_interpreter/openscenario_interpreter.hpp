@@ -77,6 +77,8 @@ public:
   OPENSCENARIO_INTERPRETER_PUBLIC
   explicit Interpreter(const rclcpp::NodeOptions &);
 
+  ~Interpreter() override;
+
   auto currentLocalFrameRate() const -> std::chrono::milliseconds;
 
   auto currentScenarioDefinition() const -> const std::shared_ptr<ScenarioDefinition> &;

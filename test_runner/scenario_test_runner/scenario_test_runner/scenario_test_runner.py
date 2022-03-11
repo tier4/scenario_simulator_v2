@@ -188,37 +188,41 @@ class ScenarioTestRunner(LifecycleController):
         None
 
         """
-        length = len(scenarios)
+        try:
+            length = len(scenarios)
 
-        for index, each in enumerate(scenarios):
+            for index, each in enumerate(scenarios):
 
-            self.get_logger().info(
-                "Run "
-                + str(each.path.name)
-                + " ("
-                + str(index + 1)
-                + " of "
-                + str(length)
-                + ")"
-            )
+                self.get_logger().info(
+                    "Run "
+                    + str(each.path.name)
+                    + " ("
+                    + str(index + 1)
+                    + " of "
+                    + str(length)
+                    + ")"
+                )
 
-            self.configure_node(
-                expect=each.expect,
-                frame_rate=each.frame_rate,
-                output_directory=self.output_directory,
-                real_time_factor=self.global_real_time_factor,
-                scenario=each.path,
-            )
+                self.configure_node(
+                    expect=each.expect,
+                    frame_rate=each.frame_rate,
+                    output_directory=self.output_directory,
+                    real_time_factor=self.global_real_time_factor,
+                    scenario=each.path,
+                )
 
-            if self.get_lifecycle_state() == "unconfigured":
-                self.get_logger().error("Failed to configure interpreter")
+                if self.get_lifecycle_state() == "unconfigured":
+                    self.get_logger().error("Failed to configure interpreter")
 
-            else:
-                self.spin()
+                else:
+                    self.spin()
 
-            self.cleanup_node()
+                self.cleanup_node()
 
-        self.shutdown()
+            self.shutdown()
+
+        except KeyboardInterrupt:
+            self.get_logger().warn("Scenario runner receives keyboard interrupt signal")
 
     # def __del__(self):
     #     pass

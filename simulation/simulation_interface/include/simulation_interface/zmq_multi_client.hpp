@@ -88,6 +88,8 @@ private:
   zmqpp::socket socket_attach_lidar_sensor_;
   zmqpp::socket socket_attach_detection_sensor_;
   zmqpp::socket socket_update_traffic_lights_;
+
+  bool shutdown_flag = false;
 };
 }  // namespace zeromq
 
