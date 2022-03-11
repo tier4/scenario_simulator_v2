@@ -26,50 +26,23 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
     readAttribute<UnsignedInteger>("maximumExecutionCount", node, local(), UnsignedInteger())),
   actors(readElement<Actors>("Actors", node, local()))
 {
-  callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
-    return maneuvers.push_back(readCatalogedStoryboardElement<Maneuver>(node, local()));
+  traverse<0, unbounded>(node, "CatalogReference", [&](auto && node) {
+    return elements.push_back(readCatalogedStoryboardElement<Maneuver>(node, local()));
   });
 
-  callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
-    return maneuvers.push_back(readStoryboardElement<Maneuver>(node, local()));
+  traverse<0, unbounded>(node, "Maneuver", [&](auto && node) {
+    return elements.push_back(readStoryboardElement<Maneuver>(node, local()));
   });
-}
-
-auto ManeuverGroup::accomplished() const -> bool
-{
-  // A ManeuverGroup's goal is accomplished when all its Maneuvers are in the completeState.
-  return std::all_of(std::begin(maneuvers), std::end(maneuvers), [&](auto && maneuver) {
-    return maneuver.template as<Maneuver>().complete();
-  });
-}
-
-auto ManeuverGroup::elements() -> Elements & { return maneuvers; }
-
-auto ManeuverGroup::ready() noexcept -> bool { return true; }
-
-auto ManeuverGroup::run() -> void
-{
-  for (auto && maneuver : maneuvers) {
-    maneuver.evaluate();
-  }
 }
 
 auto ManeuverGroup::start() -> void
 {
-  for (auto && maneuver : maneuvers) {
-    maneuver.as<Maneuver>().current_state = standby_state;
+  for (auto && element : elements) {
+    assert(element.template is<Maneuver>());
+    assert(element.template is_also<StoryboardElement>());
+    element.template as<StoryboardElement>().current_state = start_transition;
   }
 }
-
-auto ManeuverGroup::stop() -> void
-{
-  for (auto && maneuver : maneuvers) {
-    maneuver.as<Maneuver>().override();
-    maneuver.evaluate();
-  }
-}
-
-auto ManeuverGroup::stopTriggered() noexcept -> bool { return false; }
 
 auto operator<<(nlohmann::json & json, const ManeuverGroup & maneuver_group) -> nlohmann::json &
 {
@@ -82,7 +55,7 @@ auto operator<<(nlohmann::json & json, const ManeuverGroup & maneuver_group) -> 
 
   json["Maneuver"] = nlohmann::json::array();
 
-  for (auto && maneuver : maneuver_group.maneuvers) {
+  for (auto && maneuver : maneuver_group.elements) {
     nlohmann::json json_maneuver;
     json_maneuver << maneuver.as<Maneuver>();
     json["Maneuver"].push_back(json_maneuver);

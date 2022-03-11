@@ -24,11 +24,11 @@ inline namespace syntax
 {
 Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 : Scope("Storyboard", scope),  // FIXME DIRTY HACK
-  init(readElement<Init>("Init", node, local())),
-  stop_trigger(readElement<Trigger>("StopTrigger", node, local()))
+  StoryboardElement(readElement<Trigger>("StopTrigger", node, local())),
+  init(readElement<Init>("Init", node, local()))
 {
-  callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
-    return stories.push_back(readStoryboardElement<Story>(node, local()));
+  traverse<1, unbounded>(node, "Story", [&](auto && node) {
+    return elements.push_back(readStoryboardElement<Story>(node, local()));
   });
 
   if (not init.endsImmediately()) {
@@ -36,21 +36,10 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto Storyboard::accomplished() const -> bool
-{
-  return std::all_of(std::begin(stories), std::end(stories), [](auto && each) {
-    return each.template as<Story>().complete();
-  });
-}
-
-auto Storyboard::elements() -> Elements & { return stories; }
-
-auto Storyboard::ready() noexcept -> bool { return true; }
-
 auto Storyboard::run() -> void
 {
   if (engaged) {
-    for (auto && story : stories) {
+    for (auto && story : elements) {
       story.evaluate();
     }
   } else if (std::all_of(  // XXX DIRTY HACK!!!
@@ -77,16 +66,6 @@ auto Storyboard::start() -> void
   init.evaluate();  // NOTE RENAME TO 'start'?
 }
 
-auto Storyboard::stop() -> void
-{
-  for (auto && story : stories) {
-    story.as<Story>().override();
-    story.evaluate();
-  }
-}
-
-auto Storyboard::stopTriggered() -> bool { return stop_trigger.evaluate().as<Boolean>(); }
-
 auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::json &
 {
   json["currentState"] = boost::lexical_cast<std::string>(datum.state());
@@ -95,7 +74,7 @@ auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::js
 
   json["Story"] = nlohmann::json::array();
 
-  for (const auto & story : datum.stories) {
+  for (const auto & story : datum.elements) {
     nlohmann::json each;
     each << story.as<Story>();
     json["Story"].push_back(each);

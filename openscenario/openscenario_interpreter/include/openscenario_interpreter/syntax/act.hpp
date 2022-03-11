@@ -39,27 +39,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Act : public Scope, public StoryboardElement
 {
-  Elements maneuver_groups;
-
-  Trigger start_trigger;
-
-  Object stop_trigger;
-
   explicit Act(const pugi::xml_node &, Scope &);
-
-  auto accomplished() const -> bool override;
-
-  auto elements() -> Elements & override;
-
-  auto start() noexcept -> void override;
-
-  auto stop() -> void override;
-
-  auto stopTriggered() -> bool override;
-
-  auto ready() -> bool override;
-
-  auto run() -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;
