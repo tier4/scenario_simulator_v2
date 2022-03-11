@@ -41,31 +41,29 @@ template <typename Scope>
 auto substitute(std::string attribute, Scope & scope)
 {
   static const std::regex substitution_syntax{R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))"};
+
+  auto find_pkg_share = [](auto && package_name, auto &&) {
+    return ament_index_cpp::get_package_share_directory(package_name);
+  };
+
+  auto var = [](auto && name, auto && scope) -> String {
+    if (const auto found = scope.ref(name); found) {
+      return boost::lexical_cast<String>(found);
+    } else {
+      return "";
+    }
+  };
+
+  auto dirname = [](auto &&, auto && scope) {
+    return scope.global().pathname.parent_path().string();
+  };
+
   static const std::unordered_map<
     std::string, std::function<std::string(const std::string &, Scope &)> >
-    substitutions{
-      {"find-pkg-share",
-       [](auto && package_name, auto &&) {
-         return ament_index_cpp::get_package_share_directory(package_name);
-       }},
+    substitutions{{"find-pkg-share", find_pkg_share}, {"var", var}, {"dirname", dirname}};
 
-      {"var",
-       [](auto && name, auto && scope) -> String {
-         const auto found = scope.ref(name);
-         if (found) {
-           return boost::lexical_cast<String>(found);
-         } else {
-           return "";
-         }
-       }},
-      {"dirname",
-       [](auto &&, auto && scope) { return scope.global().pathname.parent_path().string(); }}};
-
-  std::smatch match{};
-  while (std::regex_match(attribute, match, substitution_syntax)) {
-    const auto iter{substitutions.find(match.str(3))};
-
-    if (iter != std::end(substitutions)) {
+  for (std::smatch match; std::regex_match(attribute, match, substitution_syntax);) {
+    if (const auto iter = substitutions.find(match.str(3)); iter != std::end(substitutions)) {
       attribute = match.str(1) + std::get<1>(*iter)(match.str(4), scope) + match.str(5);
     } else {
       throw SyntaxError("Unknown substitution ", std::quoted(match.str(3)), " specified");
@@ -120,7 +118,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
 }
 
 template <typename T, typename Node, typename Scope>
-T readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
+auto readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
 {
   if (node.attribute(name.c_str())) {
     return readAttribute<T>(name, node, scope);
