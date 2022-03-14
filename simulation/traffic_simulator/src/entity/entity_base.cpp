@@ -26,8 +26,8 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name, const traffic_simulator_msgs::msg::EntitySemantics & semantics)
-: name(name), status_(boost::none), verbose_(true), visibility_(true), entity_semantics_(semantics)
+  const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
+: name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
 {
   status_ = boost::none;
 }
@@ -188,7 +188,7 @@ const traffic_simulator_msgs::msg::EntityStatus EntityBase::getStatus() const
   } else {
     auto status = this->status_.get();
     status.bounding_box = getBoundingBox();
-    status.semantics = entity_semantics_;
+    status.subtype = entity_subtype_;
     status.type = entity_type_;
     return status;
   }

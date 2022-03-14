@@ -316,92 +316,81 @@ void toMsg(
 }
 
 void toProto(
-  const traffic_simulator_msgs::msg::EntitySemantics & semantics,
-  traffic_simulator_msgs::EntitySemantics & proto)
+  const traffic_simulator_msgs::msg::EntitySubtype & subtype,
+  traffic_simulator_msgs::EntitySubtype & proto)
 {
-  if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::UNKNOWN) {
-    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_UNKNOWN);
+  if (subtype.subtype == traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN) {
+    proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
     return;
-  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::CAR) {
-    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_CAR);
+  } else if (subtype.subtype == traffic_simulator_msgs::msg::EntitySubtype::CAR) {
+    proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
     return;
-  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::TRUCK) {
-    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_TRUCK);
+  } else if (subtype.subtype == traffic_simulator_msgs::msg::EntitySubtype::TRUCK) {
+    proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK);
     return;
-  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::BUS) {
-    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_BUS);
+  } else if (subtype.subtype == traffic_simulator_msgs::msg::EntitySubtype::BUS) {
+    proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS);
     return;
-  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::TRAILER) {
-    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_TRAILER);
+  } else if (subtype.subtype == traffic_simulator_msgs::msg::EntitySubtype::TRAILER) {
+    proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER);
     return;
-  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::MOTORCYCLE) {
-    proto.set_semantics(
-      traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_MOTORCYCLE);
+  } else if (subtype.subtype == traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE) {
+    proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE);
     return;
-  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::BICYCLE) {
-    proto.set_semantics(traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_BICYCLE);
+  } else if (subtype.subtype == traffic_simulator_msgs::msg::EntitySubtype::BICYCLE) {
+    proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE);
     return;
-  } else if (semantics.semantics == traffic_simulator_msgs::msg::EntitySemantics::PEDESTRIAN) {
-    proto.set_semantics(
-      traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_PEDESTRIAN);
+  } else if (subtype.subtype == traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN) {
+    proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN);
     return;
   }
   // LCOV_EXCL_START
   std::string message =
-    "semantics of the Entity Type is invalid!\nsemantics is " + std::to_string(semantics.semantics);
+    "subtype of the Entity Type is invalid!\nsubtype is " + std::to_string(subtype.subtype);
   THROW_SIMULATION_ERROR(message);
   // LCOV_EXCL_STOP
 }
 
 void toMsg(
-  const traffic_simulator_msgs::EntitySemantics & proto,
-  traffic_simulator_msgs::msg::EntitySemantics & semantics)
+  const traffic_simulator_msgs::EntitySubtype & proto,
+  traffic_simulator_msgs::msg::EntitySubtype & subtype)
 {
-  if (
-    proto.semantics() ==
-    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_UNKNOWN) {
-    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::UNKNOWN;
+  if (proto.subtype() == traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN) {
+    subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
     return;
   }
-  if (proto.semantics() == traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_CAR) {
-    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::CAR;
+  if (proto.subtype() == traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR) {
+    subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::CAR;
     return;
   }
-  if (
-    proto.semantics() == traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_TRUCK) {
-    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::TRUCK;
+  if (proto.subtype() == traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK) {
+    subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::TRUCK;
     return;
   }
-  if (proto.semantics() == traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_BUS) {
-    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::BUS;
+  if (proto.subtype() == traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS) {
+    subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::BUS;
     return;
   }
-  if (
-    proto.semantics() ==
-    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_TRAILER) {
-    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::TRAILER;
+  if (proto.subtype() == traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER) {
+    subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::TRAILER;
     return;
   }
   if (
-    proto.semantics() ==
-    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_MOTORCYCLE) {
-    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::MOTORCYCLE;
+    proto.subtype() == traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE) {
+    subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE;
+    return;
+  }
+  if (proto.subtype() == traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE) {
+    subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::BICYCLE;
     return;
   }
   if (
-    proto.semantics() ==
-    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_BICYCLE) {
-    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::BICYCLE;
-    return;
-  }
-  if (
-    proto.semantics() ==
-    traffic_simulator_msgs::EntitySemantics_Enum::EntitySemantics_Enum_PEDESTRIAN) {
-    semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::PEDESTRIAN;
+    proto.subtype() == traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN) {
+    subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
     return;
   }
   // LCOV_EXCL_START
-  std::string message = "type of the Entity Semantics is invalid!";
+  std::string message = "type of the Entity subtype is invalid!";
   THROW_SIMULATION_ERROR(message);
   // LCOV_EXCL_STOP
 }
@@ -411,7 +400,7 @@ void toProto(
   traffic_simulator_msgs::EntityStatus & proto)
 {
   toProto(status.type, *proto.mutable_type());
-  toProto(status.semantics, *proto.mutable_semantics());
+  toProto(status.subtype, *proto.mutable_subtype());
   proto.set_time(status.time);
   proto.set_name(status.name);
   toProto(status.bounding_box, *proto.mutable_bounding_box());
@@ -427,7 +416,7 @@ void toMsg(
   traffic_simulator_msgs::msg::EntityStatus & status)
 {
   toMsg(proto.type(), status.type);
-  toMsg(proto.semantics(), status.semantics);
+  toMsg(proto.subtype(), status.subtype);
   status.time = proto.time();
   status.name = proto.name();
   toMsg(proto.bounding_box(), status.bounding_box);

@@ -51,19 +51,7 @@ struct VehicleBehavior : public entity::VehicleEntity::BuiltinBehavior
   }
 };
 
-struct VehicleSemantics : public entity::VehicleEntity::Semantics
-{
-};
-
 struct PedestrianBehavior : public entity::PedestrianEntity::BuiltinBehavior
-{
-};
-
-struct PedestrianSemantics : public entity::PedestrianEntity::Semantics
-{
-};
-
-struct MiscObjectSemantics : public entity::MiscObjectEntity::Semantics
 {
 };
 
@@ -105,21 +93,16 @@ public:
   void setVerbose(const bool verbose);
 
   bool spawn(
-    const std::string & name,                                                                     //
-    const traffic_simulator_msgs::msg::VehicleParameters &,                                       //
-    const traffic_simulator_msgs::msg::EntitySemantics & = VehicleSemantics::defaultSemantics(),  //
+    const std::string & name,                                //
+    const traffic_simulator_msgs::msg::VehicleParameters &,  //
     const std::string & = VehicleBehavior::defaultBehavior());
 
   bool spawn(
     const std::string & name,                                   //
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
-    const traffic_simulator_msgs::msg::EntitySemantics & =
-      PedestrianSemantics::defaultSemantics(),  //
     const std::string & = PedestrianBehavior::defaultBehavior());
 
-  bool spawn(
-    const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &,
-    const traffic_simulator_msgs::msg::EntitySemantics & = MiscObjectSemantics::defaultSemantics());
+  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
   bool despawn(const std::string & name);
 

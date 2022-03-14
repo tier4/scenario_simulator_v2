@@ -24,7 +24,7 @@ auto getVehicleParameters() -> traffic_simulator_msgs::msg::VehicleParameters
 {
   traffic_simulator_msgs::msg::VehicleParameters parameters;
   parameters.name = "vehicle.volkswagen.t";
-  parameters.vehicle_category = "car";
+  parameters.subtype = traffic_simulator_msgs::msg::EntitySubtype::CAR;
   parameters.performance.max_speed = 69.444;
   parameters.performance.max_acceleration = 200;
   parameters.performance.max_deceleration = 10.0;
@@ -51,7 +51,7 @@ auto getPedestrianParameters() -> traffic_simulator_msgs::msg::PedestrianParamet
 {
   traffic_simulator_msgs::msg::PedestrianParameters parameters;
   parameters.name = "pedestrian";
-  parameters.pedestrian_category = "pedestrian";
+  parameters.subtype = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
   parameters.bounding_box.center.x = 0.0;
   parameters.bounding_box.center.y = 0.0;
   parameters.bounding_box.center.z = 0.5;
@@ -67,7 +67,7 @@ auto getMiscObjectParameters() -> traffic_simulator_msgs::msg::MiscObjectParamet
   misc_object_param.bounding_box.dimensions.x = 1.0;
   misc_object_param.bounding_box.dimensions.y = 1.0;
   misc_object_param.bounding_box.dimensions.z = 1.0;
-  misc_object_param.misc_object_category = "obstacle";
+  misc_object_param.subtype = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
   misc_object_param.name = "obstacle";
   return misc_object_param;
 }

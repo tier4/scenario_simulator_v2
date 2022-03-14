@@ -19,9 +19,8 @@ namespace traffic_simulator
 namespace entity
 {
 MiscObjectEntity::MiscObjectEntity(
-  const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params,
-  const traffic_simulator_msgs::msg::EntitySemantics & semantics)
-: EntityBase(name, semantics), params_(params)
+  const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params)
+: EntityBase(name, params.subtype), params_(params)
 {
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
 }

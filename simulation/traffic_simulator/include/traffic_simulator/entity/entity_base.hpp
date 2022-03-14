@@ -46,8 +46,7 @@ public:
 
   const std::string name;
 
-  EntityBase(
-    const std::string & name, const traffic_simulator_msgs::msg::EntitySemantics & semantics);
+  EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype);
 
   virtual ~EntityBase() = default;
 
@@ -214,7 +213,7 @@ protected:
 
   visualization_msgs::msg::MarkerArray current_marker_;
   traffic_simulator_msgs::msg::EntityType entity_type_;
-  const traffic_simulator_msgs::msg::EntitySemantics entity_semantics_;
+  const traffic_simulator_msgs::msg::EntitySubtype entity_subtype_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

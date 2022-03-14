@@ -57,17 +57,17 @@ bool API::despawn(const std::string & name)
 bool API::spawn(
   const std::string & name,                                           //
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,  //
-  const traffic_simulator_msgs::msg::EntitySemantics & semantics, const std::string & behavior)
+  const std::string & behavior)
 {
   auto register_to_entity_manager = [&]() {
     if (behavior == VehicleBehavior::autoware()) {
       using traffic_simulator::entity::EgoEntity;
       return entity_manager_ptr_->entityExists(name) or
              entity_manager_ptr_->spawnEntity<EgoEntity>(
-               name, configuration, clock_.getStepTime(), parameters, semantics);
+               name, configuration, clock_.getStepTime(), parameters);
     } else {
       using traffic_simulator::entity::VehicleEntity;
-      return entity_manager_ptr_->spawnEntity<VehicleEntity>(name, parameters, semantics, behavior);
+      return entity_manager_ptr_->spawnEntity<VehicleEntity>(name, parameters, behavior);
     }
   };
 
@@ -91,12 +91,11 @@ bool API::spawn(
 bool API::spawn(
   const std::string & name,                                              //
   const traffic_simulator_msgs::msg::PedestrianParameters & parameters,  //
-  const traffic_simulator_msgs::msg::EntitySemantics & semantics, const std::string & behavior)
+  const std::string & behavior)
 {
   auto register_to_entity_manager = [&]() {
     using traffic_simulator::entity::PedestrianEntity;
-    return entity_manager_ptr_->spawnEntity<PedestrianEntity>(
-      name, parameters, semantics, behavior);
+    return entity_manager_ptr_->spawnEntity<PedestrianEntity>(name, parameters, behavior);
   };
 
   auto register_to_environment_simulator = [&]() {
@@ -117,12 +116,11 @@ bool API::spawn(
 
 bool API::spawn(
   const std::string & name,  //
-  const traffic_simulator_msgs::msg::MiscObjectParameters & parameters,
-  const traffic_simulator_msgs::msg::EntitySemantics & semantics)
+  const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
 {
   auto register_to_entity_manager = [&]() {
     using traffic_simulator::entity::MiscObjectEntity;
-    return entity_manager_ptr_->spawnEntity<MiscObjectEntity>(name, parameters, semantics);
+    return entity_manager_ptr_->spawnEntity<MiscObjectEntity>(name, parameters);
   };
 
   auto register_to_environment_simulator = [&]() {

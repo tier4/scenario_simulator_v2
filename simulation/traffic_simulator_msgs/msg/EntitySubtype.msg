@@ -6,4 +6,4 @@ uint8 TRAILER = 4
 uint8 MOTORCYCLE = 5
 uint8 BICYCLE = 6
 uint8 PEDESTRIAN = 7
-uint8 semantics
+uint8 subtype 0

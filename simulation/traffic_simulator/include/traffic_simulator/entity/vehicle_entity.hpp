@@ -54,20 +54,9 @@ public:
     static auto defaultBehavior() noexcept -> const std::string & { return behaviorTree(); }
   };
 
-  struct Semantics
-  {
-    static auto defaultSemantics() noexcept -> const traffic_simulator_msgs::msg::EntitySemantics
-    {
-      traffic_simulator_msgs::msg::EntitySemantics semantics;
-      semantics.semantics = traffic_simulator_msgs::msg::EntitySemantics::CAR;
-      return semantics;
-    }
-  };
-
   explicit VehicleEntity(
     const std::string & name,                                //
     const traffic_simulator_msgs::msg::VehicleParameters &,  //
-    const traffic_simulator_msgs::msg::EntitySemantics & = Semantics::defaultSemantics(),
     const std::string & = BuiltinBehavior::defaultBehavior());
 
   ~VehicleEntity() override = default;
