@@ -70,28 +70,49 @@ auto substitute(std::string attribute, Scope & scope)
 template <typename T, typename Node, typename Scope>
 auto readAttribute(const std::string & name, const Node & node, const Scope & scope) -> T
 {
+  auto is_openscenario_standard_expression = [](const auto & s) {
+    return s.substr(0, 2) == "${" and s.back() == '}';
+  };
+
+  auto read_openscenario_standard_expression = [&](const auto & s) {
+    return boost::lexical_cast<T>(evaluate(std::string(std::begin(s) + 2, std::end(s) - 1), scope));
+  };
+
+  auto is_openscenario_standard_parameter_reference = [](const auto & s) {
+    return s.front() == '$';
+  };
+
+  auto read_openscenario_standard_parameter_reference = [&](const auto & s) {
+    if (auto && object = scope.ref(s.substr(1)); object) {
+      return boost::lexical_cast<T>(boost::lexical_cast<String>(object));
+    } else {
+      throw SyntaxError(
+        "There is no parameter named ", std::quoted(s.substr(1)), " (Attribute ", std::quoted(name),
+        " of class ", std::quoted(node.name()), " references this parameter)");
+    }
+  };
+
+  auto read_openscenario_standard_literal = [&](const auto & s) {
+    try {
+      return boost::lexical_cast<T>(s);
+    } catch (const boost::bad_lexical_cast &) {
+      throw SyntaxError(
+        "Value ", std::quoted(s), " specified for attribute ", std::quoted(name),
+        " is invalid (Is not value of type ", typeid(T).name(), ")");
+    }
+  };
+
+  // NOTE: https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
+
   if (const auto & attribute = node.attribute(name.c_str())) {
     if (std::string value = substitute(attribute.value(), scope); value.empty()) {
       return T();
-    } else if (value.substr(0, 2) == "${" and value.back() == '}') {
-      return boost::lexical_cast<T>(
-        evaluate(std::string(value.begin() + 2, value.end() - 1), scope));
-    } else if (value.front() == '$') {
-      if (const auto found = scope.ref(value.substr(1)); found) {
-        return boost::lexical_cast<T>(boost::lexical_cast<String>(found));
-      } else {
-        throw SyntaxError(
-          "There is no parameter named ", std::quoted(value.substr(1)), " (Attribute ",
-          std::quoted(name), " of class ", std::quoted(node.name()), " references this parameter)");
-      }
+    } else if (is_openscenario_standard_expression(value)) {
+      return read_openscenario_standard_expression(value);
+    } else if (is_openscenario_standard_parameter_reference(value)) {
+      return read_openscenario_standard_parameter_reference(value);
     } else {
-      try {
-        return boost::lexical_cast<T>(value);
-      } catch (const boost::bad_lexical_cast &) {
-        throw SyntaxError(
-          "Value ", std::quoted(value), " specified for attribute ", std::quoted(name),
-          " is invalid (Is not value of type ", typeid(T).name(), ")");
-      }
+      return read_openscenario_standard_literal(value);
     }
   } else {
     throw SyntaxError(
