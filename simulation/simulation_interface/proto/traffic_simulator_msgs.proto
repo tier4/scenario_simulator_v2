@@ -52,7 +52,7 @@ message EntityType {
  **/
 message EntitySemantics {
   enum Enum {
-    UNKNOWN = 0;    // The entity is unkown object
+    UNKNOWN = 0;    // The entity is unknown object
     CAR = 1;        // The entity is car like a passenger vehicle
     TRUCK = 2;      // The entity is truck
     BUS = 3;        // The entity is bus
