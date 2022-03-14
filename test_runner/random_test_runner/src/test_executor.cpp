@@ -28,7 +28,7 @@ traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
 {
   traffic_simulator_msgs::msg::VehicleParameters parameters;
   parameters.name = "vehicle.volkswagen.t";
-  parameters.vehicle_category = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+  parameters.subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::CAR;
   parameters.performance.max_speed = 69.444;
   parameters.performance.max_acceleration = 200;
   parameters.performance.max_deceleration = 10.0;
@@ -72,13 +72,10 @@ void TestExecutor::initialize()
   api_->updateFrame();
 
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-    api_->spawn(
-      ego_name_, getVehicleParameters(), traffic_simulator_msgs::msg::EntitySubtype::CAR,
-      traffic_simulator::VehicleBehavior::autoware());
+    api_->spawn(ego_name_, getVehicleParameters(), traffic_simulator::VehicleBehavior::autoware());
     api_->setEntityStatus(
       ego_name_, test_description_.ego_start_position,
       traffic_simulator::helper::constructActionStatus());
-
     if (attach_sensors) {
       api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
         traffic_simulator::helper::LidarType::VLP16, ego_name_, "/perception/points_nonground"));
