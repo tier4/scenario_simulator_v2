@@ -37,7 +37,10 @@ Pedestrian::operator traffic_simulator_msgs::msg::PedestrianParameters() const
   traffic_simulator_msgs::msg::PedestrianParameters parameter;
   {
     parameter.name = name;
-    parameter.pedestrian_category = boost::lexical_cast<String>(pedestrian_category);
+    /**
+     * @todo Currently, I use default value for pedestrian
+     */
+    parameter.subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
     parameter.bounding_box = static_cast<traffic_simulator_msgs::msg::BoundingBox>(bounding_box);
   }
 

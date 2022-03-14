@@ -52,7 +52,6 @@ try {
       if (applyAddEntityAction(
             entity_ref,                                                            //
             static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),  //
-            traffic_simulator::VehicleSemantics::defaultSemantics(),
             entity.as<ScenarioObject>().object_controller.isUserDefinedController()
               ? traffic_simulator::VehicleBehavior::autoware()
               : traffic_simulator::VehicleBehavior::defaultBehavior())) {
@@ -64,14 +63,12 @@ try {
     },
     [&](const Pedestrian & pedestrian) {
       applyAddEntityAction(
-        entity_ref, static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian),
-        traffic_simulator::PedestrianSemantics::defaultSemantics());
+        entity_ref, static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
       TeleportAction::teleport(entity_ref, position);
     },
     [&](const MiscObject & misc_object) {
       applyAddEntityAction(
-        entity_ref, static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object),
-        traffic_simulator::MiscObjectSemantics::defaultSemantics());
+        entity_ref, static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
       TeleportAction::teleport(entity_ref, position);
     });
 
