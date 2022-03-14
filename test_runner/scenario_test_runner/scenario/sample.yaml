@@ -15,7 +15,7 @@ OpenSCENARIO:
     CatalogLocation: []
   RoadNetwork:
     LogicFile:
-      filepath: $(find-pkg-share kashiwanoha_map)/map
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
   Entities:
     ScenarioObject:
       - name: ego

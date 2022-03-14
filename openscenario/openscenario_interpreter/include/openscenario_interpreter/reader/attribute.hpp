@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <concealer/execute.hpp>
 #include <functional>
 #include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
@@ -41,12 +43,32 @@ auto substitute(std::string attribute, Scope & scope)
     return ament_index_cpp::get_package_share_directory(package_name);
   };
 
-  // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
-  auto var = [](auto && name, auto && scope) -> String {
+  auto ros2 = [](auto && arguments, auto &&) {
+    auto remove_trailing_newline = [](auto && s) {
+      while (s.back() == '\n') {
+        s.pop_back();
+      }
+      return s;
+    };
+    if (auto && result = remove_trailing_newline(concealer::dollar("ros2 " + arguments));
+        result.find('\n') != std::string::npos) {
+      throw SyntaxError(
+        "The substitution result by `$(ros2 ...)` must not contain a newline character. "
+        "You gave `$(ros2 ",
+        arguments, ")` and the result was ",
+        std::quoted(boost::replace_all_copy(result, "\n", "\\n")),
+        ", which is unacceptable for the reasons stated above.");
+    } else {
+      return result;
+    }
+  };
+
+  auto var = [](auto && name, auto && scope) {
+    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
     if (const auto found = scope.ref(name); found) {
       return boost::lexical_cast<String>(found);
     } else {
-      return "";
+      return String();
     }
   };
 
@@ -61,6 +83,7 @@ auto substitute(std::string attribute, Scope & scope)
       // TODO {"find-exec", find_exec},
       // TODO {"find-pkg-prefix", find_pkg_prefix},
       {"find-pkg-share", find_pkg_share},
+      {"ros2", ros2},  // NOTE: TIER IV extension (Not included in the ROS2 Launch XML Substitution)
       {"var", var},
     };
 
