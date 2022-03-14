@@ -54,49 +54,49 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
           is_ego = true;
         } else {
           if (
-            s.semantics().semantics() ==
+            s.subtype().subtype() ==
             traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN) {
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
           }
           if (
-            s.semantics().semantics() ==
+            s.subtype().subtype() ==
             traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR) {
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::CAR));
           }
           if (
-            s.semantics().semantics() ==
+            s.subtype().subtype() ==
             traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK) {
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::TRUCK));
           }
           if (
-            s.semantics().semantics() ==
+            s.subtype().subtype() ==
             traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS) {
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::BUS));
           }
           if (
-            s.semantics().semantics() ==
+            s.subtype().subtype() ==
             traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER) {
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::TRAILER));
           }
           if (
-            s.semantics().semantics() ==
+            s.subtype().subtype() ==
             traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE) {
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::MOTORCYCLE));
           }
           if (
-            s.semantics().semantics() ==
+            s.subtype().subtype() ==
             traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE) {
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::BICYCLE));
           }
           if (
-            s.semantics().semantics() ==
+            s.subtype().subtype() ==
             traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN) {
             object.classification.push_back(makeObjectClassification(
               autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
