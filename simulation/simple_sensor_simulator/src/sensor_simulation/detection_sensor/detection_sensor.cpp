@@ -57,37 +57,37 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
-              return;
+              break;
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::CAR));
-              return;
+              break;
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::TRUCK));
-              return;
+              break;
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::BUS));
-              return;
+              break;
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::TRAILER));
-              return;
+              break;
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::MOTORCYCLE));
-              return;
+              break;
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::BICYCLE));
-              return;
+              break;
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
-              return;
+              break;
             default:
-              return;
+              break;
           }
         }
         if (not is_ego) {
