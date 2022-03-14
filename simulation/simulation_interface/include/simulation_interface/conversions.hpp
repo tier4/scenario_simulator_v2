@@ -140,11 +140,11 @@ void toProto(
 void toMsg(
   const traffic_simulator_msgs::EntityType & proto, traffic_simulator_msgs::msg::EntityType & type);
 void toProto(
-  const traffic_simulator_msgs::msg::EntitySubtype & semantics,
+  const traffic_simulator_msgs::msg::EntitySubtype & subtype,
   traffic_simulator_msgs::EntitySubtype & proto);
 void toMsg(
   const traffic_simulator_msgs::EntitySubtype & proto,
-  traffic_simulator_msgs::msg::EntitySubtype & semantics);
+  traffic_simulator_msgs::msg::EntitySubtype & subtype);
 void toProto(
   const traffic_simulator_msgs::msg::EntityStatus & status,
   traffic_simulator_msgs::EntityStatus & proto);
