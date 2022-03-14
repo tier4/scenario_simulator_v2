@@ -26,14 +26,8 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & type, const std::string & name,
-  const traffic_simulator_msgs::msg::EntitySemantics & semantics)
-: type(type),
-  name(name),
-  status_(boost::none),
-  verbose_(true),
-  visibility_(true),
-  entity_semantics_(semantics)
+  const std::string & name, const traffic_simulator_msgs::msg::EntitySemantics & semantics)
+: name(name), status_(boost::none), verbose_(true), visibility_(true), entity_semantics_(semantics)
 {
   status_ = boost::none;
 }
@@ -140,7 +134,8 @@ auto EntityBase::getVehicleCommand() const -> std::tuple<
   autoware_auto_control_msgs::msg::AckermannControlCommand,
   autoware_auto_vehicle_msgs::msg::GearCommand>
 {
-  THROW_SIMULATION_ERROR("get vehicle command does not support in ", type, " entity type");
+  THROW_SIMULATION_ERROR(
+    "get vehicle command does not support in ", getEntityTypename(), " entity type");
 }
 
 void EntityBase::updateStandStillDuration(const double step_time)

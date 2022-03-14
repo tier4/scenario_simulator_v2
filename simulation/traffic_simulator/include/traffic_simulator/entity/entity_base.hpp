@@ -47,8 +47,7 @@ public:
   const std::string name;
 
   EntityBase(
-    const std::string & type, const std::string & name,
-    const traffic_simulator_msgs::msg::EntitySemantics & semantics);
+    const std::string & name, const traffic_simulator_msgs::msg::EntitySemantics & semantics);
 
   virtual ~EntityBase() = default;
 

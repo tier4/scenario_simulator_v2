@@ -117,11 +117,10 @@ message Property {}
  **/
 message VehicleParameters {
   string name = 1;              // Name of the vehicle entity
-  string vehicle_category = 2;  // Category of the vehicle entity.
-  Performance performance = 3;  // Performance parameter of vehicle entity.
-  BoundingBox bounding_box = 4; // Bounding box of the vehicle entity.
-  Axles axles = 5;              // Axles of the vehicle entity.
-  Property property = 6;        // Other parameters of the vehicle entity.
+  Performance performance = 2;  // Performance parameter of vehicle entity.
+  BoundingBox bounding_box = 3; // Bounding box of the vehicle entity.
+  Axles axles = 4;              // Axles of the vehicle entity.
+  Property property = 5;        // Other parameters of the vehicle entity.
 }
 
 /**
@@ -129,14 +128,12 @@ message VehicleParameters {
  **/
 message PedestrianParameters {
   string name = 1;                // Name of the pedestrian entity.
-  string pedestrian_category = 2; // Category of pedestrian entity.
-  BoundingBox bounding_box = 3;   // Bounding box of the pedestrian entity.
+  BoundingBox bounding_box = 2;   // Bounding box of the pedestrian entity.
 }
 
 message MiscObjectParameters {
   string name = 1;                 // Name of the pedestrian entity.
-  string misc_object_category = 2; // Category of pedestrian entity.
-  BoundingBox bounding_box = 3;    // Bounding box of the pedestrian entity.
+  BoundingBox bounding_box = 2;    // Bounding box of the pedestrian entity.
 }
 
 /**

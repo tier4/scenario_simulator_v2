@@ -187,7 +187,6 @@ void toProto(
   toProto(p.performance, *proto.mutable_performance());
   // toProto(p.property, *proto.mutable_property());
   proto.set_name(p.name);
-  proto.set_vehicle_category(p.vehicle_category);
 }
 
 void toMsg(
@@ -199,7 +198,6 @@ void toMsg(
   toMsg(proto.performance(), p.performance);
   // toMsg(proto.property(), p.property);
   p.name = proto.name();
-  p.vehicle_category = proto.vehicle_category();
 }
 
 void toProto(
@@ -208,7 +206,6 @@ void toProto(
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   proto.set_name(p.name);
-  proto.set_pedestrian_category(p.pedestrian_category);
 }
 
 void toMsg(
@@ -216,7 +213,6 @@ void toMsg(
   traffic_simulator_msgs::msg::PedestrianParameters & p)
 {
   p.name = proto.name();
-  p.pedestrian_category = proto.pedestrian_category();
   toMsg(proto.bounding_box(), p.bounding_box);
 }
 
@@ -226,7 +222,6 @@ void toProto(
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   proto.set_name(p.name);
-  proto.set_misc_object_category(p.misc_object_category);
 }
 
 void toMsg(
@@ -234,7 +229,6 @@ void toMsg(
   traffic_simulator_msgs::msg::MiscObjectParameters & p)
 {
   p.name = proto.name();
-  p.misc_object_category = proto.misc_object_category();
   toMsg(proto.bounding_box(), p.bounding_box);
 }
 

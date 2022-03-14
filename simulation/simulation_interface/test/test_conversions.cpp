@@ -194,7 +194,6 @@ TEST(Conversion, VehicleParameters)
   traffic_simulator_msgs::VehicleParameters proto;
   traffic_simulator_msgs::msg::VehicleParameters p;
   p.name = "foo";
-  p.vehicle_category = "bar";
   traffic_simulator_msgs::msg::BoundingBox box;
   box.center.x = 1.0;
   box.center.y = 1.23;
@@ -228,7 +227,6 @@ TEST(Conversion, PedestrianParameters)
   traffic_simulator_msgs::PedestrianParameters proto;
   traffic_simulator_msgs::msg::PedestrianParameters p;
   p.name = "foo";
-  p.pedestrian_category = "bar";
   traffic_simulator_msgs::msg::BoundingBox box;
   box.center.x = 1.0;
   box.center.y = 1.23;
@@ -257,12 +255,9 @@ TEST(Conversion, MiscObjectParameters)
   box.dimensions.y = 3.9;
   box.dimensions.z = 4.0;
   p.bounding_box = box;
-  p.misc_object_category = "obstacle";
   EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
   EXPECT_MISC_OBJECT_PARAMETERS_EQ(p, proto);
-  p.misc_object_category = "";
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
-  EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
   EXPECT_MISC_OBJECT_PARAMETERS_EQ(p, proto);
 }
 
