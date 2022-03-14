@@ -33,10 +33,15 @@ inline namespace reader
 template <typename Scope>
 auto substitute(std::string attribute, Scope & scope)
 {
+  auto dirname = [](auto &&, auto && scope) {
+    return scope.global().pathname.parent_path().string();
+  };
+
   auto find_pkg_share = [](auto && package_name, auto &&) {
     return ament_index_cpp::get_package_share_directory(package_name);
   };
 
+  // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
   auto var = [](auto && name, auto && scope) -> String {
     if (const auto found = scope.ref(name); found) {
       return boost::lexical_cast<String>(found);
@@ -45,14 +50,19 @@ auto substitute(std::string attribute, Scope & scope)
     }
   };
 
-  auto dirname = [](auto &&, auto && scope) {
-    return scope.global().pathname.parent_path().string();
-  };
-
   // NOTE: https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
   static const std::unordered_map<
     std::string, std::function<std::string(const std::string &, Scope &)> >
-    substitutions{{"find-pkg-share", find_pkg_share}, {"var", var}, {"dirname", dirname}};
+    substitutions{
+      {"dirname", dirname},
+      // TODO {"env", env},
+      // TODO {"eval", eval},
+      // TODO {"exec-in-package", exec_in_package},
+      // TODO {"find-exec", find_exec},
+      // TODO {"find-pkg-prefix", find_pkg_prefix},
+      {"find-pkg-share", find_pkg_share},
+      {"var", var},
+    };
 
   static const auto pattern = std::regex(R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))");
 
@@ -83,6 +93,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
   };
 
   auto read_openscenario_standard_parameter_reference = [&](const auto & s) {
+    // TODO Use `return scope.template ref<T>(s.substr(1));`
     if (auto && object = scope.ref(s.substr(1)); object) {
       return boost::lexical_cast<T>(boost::lexical_cast<String>(object));
     } else {
@@ -105,6 +116,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
   // NOTE: https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
 
   if (const auto & attribute = node.attribute(name.c_str())) {
+    // NOTE: `substitute` is TIER IV extension (Non-OpenSCENARIO standard)
     if (std::string value = substitute(attribute.value(), scope); value.empty()) {
       return T();
     } else if (is_openscenario_standard_expression(value)) {
