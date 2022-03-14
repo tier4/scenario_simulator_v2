@@ -10,7 +10,8 @@ OpenSCENARIO:
     revMajor: 1
     revMinor: 0
   ParameterDeclarations:
-    ParameterDeclaration: []
+    ParameterDeclaration:
+      - { name: random_offset, parameterType: double, value: $(ros2 run openscenario_interpreter_example uniform_distribution -1.0 1.0) }
   CatalogLocations:
     CatalogLocation: []
   RoadNetwork:
@@ -86,7 +87,7 @@ OpenSCENARIO:
                       roadId: ''
                       laneId: LANE_ID
                       s: 1
-                      offset: 0
+                      offset: $random_offset
                       Orientation:
                         type: relative
                         h: 0
