@@ -87,6 +87,8 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
                 autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
               break;
             default:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
               break;
           }
         }
