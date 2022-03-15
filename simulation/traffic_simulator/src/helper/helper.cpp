@@ -77,13 +77,14 @@ geometry_msgs::msg::Pose constructPose(
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
   const std::string & entity, const std::string & architecture_type, const double update_duration,
-  const double range)
+  const double range, bool filter_by_lidar_detection)
 {
   simulation_api_schema::DetectionSensorConfiguration configuration;
   configuration.set_entity(entity);
   configuration.set_architecture_type(architecture_type);
   configuration.set_update_duration(update_duration);
   configuration.set_range(range);
+  configuration.set_filter_by_lidar_detection(filter_by_lidar_detection);
   return configuration;
 }
 
