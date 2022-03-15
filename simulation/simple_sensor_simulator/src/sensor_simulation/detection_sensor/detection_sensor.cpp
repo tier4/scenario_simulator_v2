@@ -56,7 +56,7 @@ geometry_msgs::Pose DetectionSensorBase::getSensorPose(
 template <>
 void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-  const rclcpp::Time & stamp)
+  const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity)
 {
   auto makeObjectClassification = [](const auto & label) {
     autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
@@ -67,7 +67,12 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
 
     return object_classification;
   };
-  const auto detected_objects = getDetectedObjects(status);
+  std::vector<std::string> detected_objects;
+  if (configuration.filter_by_range()) {
+    detected_objects = getDetectedObjects(status);
+  } else {
+    detected_objects = lidar_detected_entity;
+  }
   if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
     autoware_auto_perception_msgs::msg::PredictedObjects msg;
     msg.header.stamp = stamp;

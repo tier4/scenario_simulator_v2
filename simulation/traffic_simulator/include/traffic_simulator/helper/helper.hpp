@@ -97,7 +97,7 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
   const std::string & entity, const std::string & architecture_type, const double update_duration,
-  const double range = 300.0, bool filter_by_lidar_detection = true);
+  const double range = 300.0, bool filter_by_range = false);
 }  // namespace helper
 }  // namespace traffic_simulator
 
