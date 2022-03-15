@@ -23,12 +23,18 @@ void SensorSimulation::updateSensorFrame(
   double current_time, const rclcpp::Time & current_ros_time,
   const std::vector<traffic_simulator_msgs::EntityStatus> & status)
 {
-  std::vector<std::string> detected_objects = {};
+  std::vector<std::string> lidar_detected_objects = {};
   for (auto & sensor : lidar_sensors_) {
     sensor->update(current_time, status, current_ros_time);
+    const auto objects = sensor->getDetectedObjects();
+    for (const auto & obj : objects) {
+      if (std::count(lidar_detected_objects.begin(), lidar_detected_objects.end(), obj) == 0) {
+        lidar_detected_objects.push_back(obj);
+      }
+    }
   }
   for (auto & sensor : detection_sensors_) {
-    sensor->update(current_time, status, current_ros_time);
+    sensor->update(current_time, status, current_ros_time, lidar_detected_objects);
   }
 }
 }  // namespace simple_sensor_simulator

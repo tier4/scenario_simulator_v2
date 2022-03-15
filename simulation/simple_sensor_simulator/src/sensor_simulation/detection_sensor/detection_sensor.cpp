@@ -68,7 +68,7 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
     return object_classification;
   };
   std::vector<std::string> detected_objects;
-  if (configuration.filter_by_range()) {
+  if (configuration_.filter_by_range()) {
     detected_objects = getDetectedObjects(status);
   } else {
     detected_objects = lidar_detected_entity;
