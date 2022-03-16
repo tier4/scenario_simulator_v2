@@ -4,9 +4,9 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| feature | brief summary | category | pull-request | contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| feature                | brief summary                                                                             | category   | pull-request                                                            | contributor                                   |
+| ---------------------- | ----------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------- | --------------------------------------------- |
+| Entity label publisher | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`. | simulation | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
 

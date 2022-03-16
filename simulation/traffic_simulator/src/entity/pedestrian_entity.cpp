@@ -27,7 +27,7 @@ namespace entity
 PedestrianEntity::PedestrianEntity(
   const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & params,
   const std::string & plugin_name)
-: EntityBase(params.pedestrian_category, name),
+: EntityBase(name, params.subtype),
   parameters(params),
   plugin_name(plugin_name),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(

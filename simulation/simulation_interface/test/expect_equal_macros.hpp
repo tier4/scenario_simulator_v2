@@ -109,21 +109,18 @@
   EXPECT_POINT_EQ(MSG.center, PROTO.center()); \
   EXPECT_VECTOR3_EQ(MSG.dimensions, PROTO.dimensions());
 
-#define EXPECT_VEHICLE_PARAMETERS_EQ(MSG, PROTO)                                \
-  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());                         \
-  EXPECT_STREQ(MSG.vehicle_category.c_str(), PROTO.vehicle_category().c_str()); \
-  EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box());               \
-  EXPECT_PERFORMANCE_EQ(MSG.performance, PROTO.performance());                  \
+#define EXPECT_VEHICLE_PARAMETERS_EQ(MSG, PROTO)                  \
+  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());           \
+  EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box()); \
+  EXPECT_PERFORMANCE_EQ(MSG.performance, PROTO.performance());    \
   EXPECT_AXLES_EQ(MSG.axles, PROTO.axles());
 
-#define EXPECT_PEDESTRIAN_PARAMETERS_EQ(MSG, PROTO)                                   \
-  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());                               \
-  EXPECT_STREQ(MSG.pedestrian_category.c_str(), PROTO.pedestrian_category().c_str()); \
+#define EXPECT_PEDESTRIAN_PARAMETERS_EQ(MSG, PROTO)     \
+  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str()); \
   EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box());
 
-#define EXPECT_MISC_OBJECT_PARAMETERS_EQ(MSG, PROTO)                                    \
-  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());                                 \
-  EXPECT_STREQ(MSG.misc_object_category.c_str(), PROTO.misc_object_category().c_str()); \
+#define EXPECT_MISC_OBJECT_PARAMETERS_EQ(MSG, PROTO)    \
+  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str()); \
   EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box());
 
 #define EXPECT_ACTION_STATUS_EQ(MSG, PROTO)                                 \

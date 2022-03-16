@@ -1,3 +1,3 @@
 string name
-string pedestrian_category
+traffic_simulator_msgs/EntitySubtype subtype
 traffic_simulator_msgs/BoundingBox bounding_box
