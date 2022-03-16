@@ -28,7 +28,7 @@ namespace entity
 VehicleEntity::VehicleEntity(
   const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & params,
   const std::string & plugin_name)
-: EntityBase(params.vehicle_category, name),
+: EntityBase(name, params.subtype),
   parameters(params),
   plugin_name(plugin_name),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
