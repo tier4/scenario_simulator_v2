@@ -37,9 +37,6 @@ Vehicle::operator traffic_simulator_msgs::msg::VehicleParameters() const
   traffic_simulator_msgs::msg::VehicleParameters parameter;
   {
     parameter.name = name;
-    /**
-     * @todo Currently, I use default value for vehicle.
-     */
     parameter.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
     parameter.bounding_box = static_cast<traffic_simulator_msgs::msg::BoundingBox>(bounding_box);
     parameter.performance = static_cast<traffic_simulator_msgs::msg::Performance>(performance);
