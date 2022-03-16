@@ -135,7 +135,7 @@ auto EntityBase::getVehicleCommand() const -> std::tuple<
   autoware_auto_vehicle_msgs::msg::GearCommand>
 {
   THROW_SIMULATION_ERROR(
-    "get vehicle command does not support in ", getEntityTypename(), " entity type");
+    "`getVehicleCommand` is not provided for ", getEntityTypename(), " type entity.");
 }
 
 void EntityBase::updateStandStillDuration(const double step_time)

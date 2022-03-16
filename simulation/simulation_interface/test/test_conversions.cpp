@@ -448,27 +448,27 @@ TEST(Conversion, EntitySubtype)
 {
   traffic_simulator_msgs::EntitySubtype proto;
   traffic_simulator_msgs::msg::EntitySubtype msg;
-  msg.subtype = msg.CAR;
+  msg.value = msg.CAR;
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
   EXPECT_EQ(proto.value(), traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
-  msg.subtype = msg.UNKNOWN;
+  msg.value = msg.UNKNOWN;
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
   EXPECT_EQ(proto.value(), traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
-  proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
-  msg.subtype = msg.UNKNOWN;
+  proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
+  msg.value = msg.UNKNOWN;
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
-  EXPECT_EQ(msg.subtype, traffic_simulator_msgs::msg::EntitySubtype::CAR);
-  msg.subtype = msg.CAR;
-  proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
+  EXPECT_EQ(msg.value, traffic_simulator_msgs::msg::EntitySubtype::CAR);
+  msg.value = msg.CAR;
+  proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
-  EXPECT_EQ(msg.subtype, traffic_simulator_msgs::msg::EntitySubtype::CAR);
-  msg.subtype = msg.CAR;
-  proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN);
+  EXPECT_EQ(msg.value, traffic_simulator_msgs::msg::EntitySubtype::CAR);
+  msg.value = msg.CAR;
+  proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
-  EXPECT_EQ(msg.subtype, traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN);
-  proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
+  EXPECT_EQ(msg.value, traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN);
+  proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
-  EXPECT_EQ(msg.subtype, traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN);
+  EXPECT_EQ(msg.value, traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN);
 }
 
 TEST(Conversion, LaneletPose)

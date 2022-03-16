@@ -325,28 +325,28 @@ void toProto(
 {
   switch (subtype.value) {
     case traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN:
-      proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
       break;
     case traffic_simulator_msgs::msg::EntitySubtype::CAR:
-      proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
       break;
     case traffic_simulator_msgs::msg::EntitySubtype::TRUCK:
-      proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK);
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK);
       break;
     case traffic_simulator_msgs::msg::EntitySubtype::BUS:
-      proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS);
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS);
       break;
     case traffic_simulator_msgs::msg::EntitySubtype::TRAILER:
-      proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER);
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER);
       break;
     case traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE:
-      proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE);
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE);
       break;
     case traffic_simulator_msgs::msg::EntitySubtype::BICYCLE:
-      proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE);
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE);
       break;
     case traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN:
-      proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN);
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN);
       break;
     default:
       // LCOV_EXCL_START
