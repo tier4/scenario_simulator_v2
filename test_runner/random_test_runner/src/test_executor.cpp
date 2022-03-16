@@ -28,7 +28,7 @@ traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
 {
   traffic_simulator_msgs::msg::VehicleParameters parameters;
   parameters.name = "vehicle.volkswagen.t";
-  parameters.subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+  parameters.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
   parameters.performance.max_speed = 69.444;
   parameters.performance.max_acceleration = 200;
   parameters.performance.max_deceleration = 10.0;

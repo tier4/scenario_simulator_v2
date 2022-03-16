@@ -450,11 +450,10 @@ TEST(Conversion, EntitySubtype)
   traffic_simulator_msgs::msg::EntitySubtype msg;
   msg.subtype = msg.CAR;
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
-  EXPECT_EQ(proto.subtype(), traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
+  EXPECT_EQ(proto.value(), traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
   msg.subtype = msg.UNKNOWN;
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
-  EXPECT_EQ(
-    proto.subtype(), traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
+  EXPECT_EQ(proto.value(), traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
   proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
   msg.subtype = msg.UNKNOWN;
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));

@@ -323,7 +323,7 @@ void toProto(
   const traffic_simulator_msgs::msg::EntitySubtype & subtype,
   traffic_simulator_msgs::EntitySubtype & proto)
 {
-  switch (subtype.subtype) {
+  switch (subtype.value) {
     case traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN:
       proto.set_subtype(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
       break;
@@ -351,7 +351,7 @@ void toProto(
     default:
       // LCOV_EXCL_START
       std::string message =
-        "subtype of the Entity Type is invalid!\nsubtype is " + std::to_string(subtype.subtype);
+        "subtype of the Entity Type is invalid!\nsubtype is " + std::to_string(subtype.value);
       THROW_SIMULATION_ERROR(message);
       // LCOV_EXCL_STOP
       break;
@@ -362,30 +362,30 @@ void toMsg(
   const traffic_simulator_msgs::EntitySubtype & proto,
   traffic_simulator_msgs::msg::EntitySubtype & subtype)
 {
-  switch (proto.subtype()) {
+  switch (proto.value()) {
     case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
-      subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
       break;
     case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
-      subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
       break;
     case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
-      subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::TRUCK;
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::TRUCK;
       break;
     case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS:
-      subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::BUS;
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::BUS;
       break;
     case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER:
-      subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::TRAILER;
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::TRAILER;
       break;
     case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
-      subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE;
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE;
       break;
     case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
-      subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::BICYCLE;
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::BICYCLE;
       break;
     case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
-      subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
       break;
     default:
       // LCOV_EXCL_START

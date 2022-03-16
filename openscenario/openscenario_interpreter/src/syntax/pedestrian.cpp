@@ -40,7 +40,7 @@ Pedestrian::operator traffic_simulator_msgs::msg::PedestrianParameters() const
     /**
      * @todo Currently, I use default value for pedestrian
      */
-    parameter.subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
+    parameter.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
     parameter.bounding_box = static_cast<traffic_simulator_msgs::msg::BoundingBox>(bounding_box);
   }
 

@@ -61,7 +61,7 @@ message EntitySubtype {
     BICYCLE = 6;    // THe entity is bicycle
     PEDESTRIAN = 7; // The entity is pedestrian
   }
-  Enum subtype = 1;
+  Enum value = 1;
 }
 
 /**

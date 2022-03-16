@@ -53,7 +53,7 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
         if (s.type().type() == traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
           is_ego = true;
         } else {
-          switch (s.subtype().subtype()) {
+          switch (s.subtype().value()) {
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));

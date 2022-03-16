@@ -39,7 +39,7 @@ MiscObject::operator traffic_simulator_msgs::msg::MiscObjectParameters() const
     /**
      * @todo Currently, I use default value for misc object.
      */
-    misc_object_parameters.subtype.subtype = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
+    misc_object_parameters.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
     misc_object_parameters.bounding_box =
       static_cast<const traffic_simulator_msgs::msg::BoundingBox>(bounding_box);
   }
