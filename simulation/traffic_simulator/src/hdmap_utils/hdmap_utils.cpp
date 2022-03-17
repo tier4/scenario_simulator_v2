@@ -355,7 +355,7 @@ lanelet::BasicPoint2d HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & po
 
 boost::optional<std::int64_t> HdMapUtils::matchToLane(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  bool include_crosswalk, double reduction_ratio) const
+  bool include_crosswalk, double reduction_ratio)
 {
   boost::optional<std::int64_t> id;
   lanelet::matching::Object2d obj;
@@ -379,10 +379,27 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(
   if (matches.empty()) {
     return boost::none;
   }
-  std::sort(matches.begin(), matches.end(), [](auto const & lhs, auto const & rhs) {
-    return lhs.distance < rhs.distance;
+  std::vector<std::pair<std::int64_t, double>> id_and_distance;
+  for (const auto & match : matches) {
+    /**
+     * @brief Hard codeed parameter. Matching threashold for lanelet.
+     */
+    if (match.distance <= 1.0) {
+      auto lanelet_pose = toLaneletPose(pose, match.lanelet.id());
+      if (lanelet_pose) {
+        id_and_distance.emplace_back(std::make_pair<std::int64_t, double>(
+          static_cast<std::int64_t>(lanelet_pose->lanelet_id),
+          static_cast<double>(lanelet_pose->offset)));
+      }
+    }
+  }
+  if (id_and_distance.empty()) {
+    return boost::none;
+  }
+  std::sort(id_and_distance.begin(), id_and_distance.end(), [](auto const & lhs, auto const & rhs) {
+    return lhs.second < rhs.second;
   });
-  return matches[0].lanelet.id();
+  return id_and_distance[0].first;
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
