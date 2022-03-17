@@ -187,7 +187,6 @@ void toProto(
   toProto(p.performance, *proto.mutable_performance());
   // toProto(p.property, *proto.mutable_property());
   proto.set_name(p.name);
-  proto.set_vehicle_category(p.vehicle_category);
 }
 
 void toMsg(
@@ -199,7 +198,6 @@ void toMsg(
   toMsg(proto.performance(), p.performance);
   // toMsg(proto.property(), p.property);
   p.name = proto.name();
-  p.vehicle_category = proto.vehicle_category();
 }
 
 void toProto(
@@ -208,7 +206,6 @@ void toProto(
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   proto.set_name(p.name);
-  proto.set_pedestrian_category(p.pedestrian_category);
 }
 
 void toMsg(
@@ -216,7 +213,6 @@ void toMsg(
   traffic_simulator_msgs::msg::PedestrianParameters & p)
 {
   p.name = proto.name();
-  p.pedestrian_category = proto.pedestrian_category();
   toMsg(proto.bounding_box(), p.bounding_box);
 }
 
@@ -226,7 +222,6 @@ void toProto(
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   proto.set_name(p.name);
-  proto.set_misc_object_category(p.misc_object_category);
 }
 
 void toMsg(
@@ -234,7 +229,6 @@ void toMsg(
   traffic_simulator_msgs::msg::MiscObjectParameters & p)
 {
   p.name = proto.name();
-  p.misc_object_category = proto.misc_object_category();
   toMsg(proto.bounding_box(), p.bounding_box);
 }
 
@@ -277,57 +271,137 @@ void toMsg(
 void toProto(
   const traffic_simulator_msgs::msg::EntityType & type, traffic_simulator_msgs::EntityType & proto)
 {
-  if (type.type == traffic_simulator_msgs::msg::EntityType::EGO) {
-    proto = traffic_simulator_msgs::EntityType::EGO;
-    return;
-  } else if (type.type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    proto = traffic_simulator_msgs::EntityType::VEHICLE;
-    return;
-  } else if (type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN) {
-    proto = traffic_simulator_msgs::EntityType::PEDESTRIAN;
-    return;
-  } else if (type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT) {
-    proto = traffic_simulator_msgs::EntityType::MISC_OBJECT;
-    return;
+  switch (type.type) {
+    case traffic_simulator_msgs::msg::EntityType::EGO:
+      proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO);
+      break;
+    case traffic_simulator_msgs::msg::EntityType::VEHICLE:
+      proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_VEHICLE);
+      break;
+    case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
+      proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_PEDESTRIAN);
+      break;
+    case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
+      proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_MISC_OBJECT);
+      break;
+    default:
+      // LCOV_EXCL_START
+      std::string message =
+        "type of the Entity Type is invalid!\ntype is " + std::to_string(type.type);
+      THROW_SIMULATION_ERROR(message);
+      // LCOV_EXCL_STOP
+      break;
   }
-  // LCOV_EXCL_START
-  std::string message = "type of the Entity Type is invalid!\ntype is " + std::to_string(type.type);
-  THROW_SIMULATION_ERROR(message);
-  // LCOV_EXCL_STOP
 }
 
 void toMsg(
   const traffic_simulator_msgs::EntityType & proto, traffic_simulator_msgs::msg::EntityType & type)
 {
-  if (proto == traffic_simulator_msgs::EntityType::EGO) {
-    type.type = traffic_simulator_msgs::msg::EntityType::EGO;
-    return;
+  switch (proto.type()) {
+    case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO:
+      type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+      break;
+    case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_VEHICLE:
+      type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+      break;
+    case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_PEDESTRIAN:
+      type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+      break;
+    case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_MISC_OBJECT:
+      type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
+      break;
+    default:
+      // LCOV_EXCL_START
+      std::string message = "type of the Entity Type is invalid!";
+      THROW_SIMULATION_ERROR(message);
+      // LCOV_EXCL_STOP
+      break;
   }
-  if (proto == traffic_simulator_msgs::EntityType::VEHICLE) {
-    type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-    return;
+}
+
+void toProto(
+  const traffic_simulator_msgs::msg::EntitySubtype & subtype,
+  traffic_simulator_msgs::EntitySubtype & proto)
+{
+  switch (subtype.value) {
+    case traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::CAR:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::TRUCK:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::BUS:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::TRAILER:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::BICYCLE:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN);
+      break;
+    default:
+      // LCOV_EXCL_START
+      std::string message =
+        "subtype of the Entity Type is invalid!\nsubtype is " + std::to_string(subtype.value);
+      THROW_SIMULATION_ERROR(message);
+      // LCOV_EXCL_STOP
+      break;
   }
-  if (proto == traffic_simulator_msgs::EntityType::PEDESTRIAN) {
-    type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-    return;
+}
+
+void toMsg(
+  const traffic_simulator_msgs::EntitySubtype & proto,
+  traffic_simulator_msgs::msg::EntitySubtype & subtype)
+{
+  switch (proto.value()) {
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::TRUCK;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::BUS;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::TRAILER;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::BICYCLE;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
+      break;
+    default:
+      // LCOV_EXCL_START
+      std::string message = "type of the Entity subtype is invalid!";
+      THROW_SIMULATION_ERROR(message);
+      // LCOV_EXCL_STOP
+      break;
   }
-  if (proto == traffic_simulator_msgs::EntityType::MISC_OBJECT) {
-    type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
-    return;
-  }
-  // LCOV_EXCL_START
-  std::string message = "type of the Entity Type is invalid!";
-  THROW_SIMULATION_ERROR(message);
-  // LCOV_EXCL_STOP
 }
 
 void toProto(
   const traffic_simulator_msgs::msg::EntityStatus & status,
   traffic_simulator_msgs::EntityStatus & proto)
 {
-  traffic_simulator_msgs::EntityType type;
-  toProto(status.type, type);
-  proto.set_type(type);
+  toProto(status.type, *proto.mutable_type());
+  toProto(status.subtype, *proto.mutable_subtype());
   proto.set_time(status.time);
   proto.set_name(status.name);
   toProto(status.bounding_box, *proto.mutable_bounding_box());
@@ -335,15 +409,15 @@ void toProto(
   toProto(status.pose, *proto.mutable_pose());
   toProto(status.lanelet_pose, *proto.mutable_lanelet_pose());
   proto.set_lanelet_pose_valid(status.lanelet_pose_valid);
+  // proto.PrintDebugString();
 }
 
 void toMsg(
   const traffic_simulator_msgs::EntityStatus & proto,
   traffic_simulator_msgs::msg::EntityStatus & status)
 {
-  traffic_simulator_msgs::msg::EntityType type;
-  toMsg(proto.type(), type);
-  status.type = type;
+  toMsg(proto.type(), status.type);
+  toMsg(proto.subtype(), status.subtype);
   status.time = proto.time();
   status.name = proto.name();
   toMsg(proto.bounding_box(), status.bounding_box);

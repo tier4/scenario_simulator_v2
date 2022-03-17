@@ -1,3 +1,3 @@
 string name
-string misc_object_category
+traffic_simulator_msgs/EntitySubtype subtype
 traffic_simulator_msgs/BoundingBox bounding_box

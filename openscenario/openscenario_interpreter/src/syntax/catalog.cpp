@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <openscenario_interpreter/reader/element.hpp>
@@ -31,32 +30,22 @@ inline namespace syntax
 Catalog::Catalog(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<std::string>("name", node, scope))
 {
-  auto already_found = false;
+#define READ_CATEGORY(TYPE)                                  \
+  traverse<0, 1>(node, #TYPE, [&](auto && each) {            \
+    const auto element = make<TYPE>(each, scope);            \
+    scope.insert(element.template as<TYPE>().name, element); \
+  })
 
-#define FIND_CATEGORY_ELEMENT(TYPE)                                                   \
-  do {                                                                                \
-    auto elements = readElementsAsElement<TYPE, 0>(#TYPE, node, scope);               \
-    if (not elements.empty()) {                                                       \
-      if (already_found) {                                                            \
-        THROW_SYNTAX_ERROR("Only one type can be defined in a single category file"); \
-      }                                                                               \
-      already_found = true;                                                           \
-      for (const auto & element : elements) {                                         \
-        scope.insert(element.template as<TYPE>().name, element);                      \
-      }                                                                               \
-    }                                                                                 \
-  } while (false)
+  READ_CATEGORY(Vehicle);
+  READ_CATEGORY(Controller);
+  READ_CATEGORY(Pedestrian);
+  READ_CATEGORY(MiscObject);
+  // READ_CATEGORY(Environment);
+  READ_CATEGORY(Maneuver);
+  // READ_CATEGORY(Trajectory);
+  READ_CATEGORY(Route);
 
-  FIND_CATEGORY_ELEMENT(Vehicle);
-  FIND_CATEGORY_ELEMENT(Controller);
-  FIND_CATEGORY_ELEMENT(Pedestrian);
-  FIND_CATEGORY_ELEMENT(MiscObject);
-  // FIND_CATEGORY_ELEMENT(Environment);
-  FIND_CATEGORY_ELEMENT(Maneuver);
-  // FIND_CATEGORY_ELEMENT(Trajectory);
-  FIND_CATEGORY_ELEMENT(Route);
-
-#undef FIND_CATEGORY_ELEMENT
+#undef READ_CATEGORY
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
