@@ -46,7 +46,7 @@ geometry_msgs::Pose DetectionSensorBase::getSensorPose(
 {
   for (const auto & s : status) {
     if (
-      s.type() == traffic_simulator_msgs::EntityType::EGO && s.name() == configuration_.entity()) {
+      s.type().type() == traffic_simulator_msgs::EntityType::EGO && s.name() == configuration_.entity()) {
       return s.pose();
     }
   }
