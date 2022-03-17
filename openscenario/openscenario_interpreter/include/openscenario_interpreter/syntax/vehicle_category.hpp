@@ -15,10 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_CATEGORY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_CATEGORY_HPP_
 
-#include <openscenario_interpreter/object.hpp>
-#include <string>
+#include <iostream>
 #include <traffic_simulator_msgs/msg/entity_subtype.hpp>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -52,9 +50,11 @@ inline namespace syntax
 struct VehicleCategory
 {
   enum value_type {
+    car,  // NOTE: This is the default value and should not be included in the sort.
+
+    // NOTE: Sorted by lexicographic order.
     bicycle,
     bus,
-    car,
     motorbike,
     semitrailer,
     trailer,
@@ -72,7 +72,7 @@ struct VehicleCategory
   {
     traffic_simulator_msgs::msg::EntitySubtype result;
     {
-      switch (value) {
+      switch (value) {  // NOTE: Sorted by lexicographic order.
         case bicycle:
           result.value = traffic_simulator_msgs::msg::EntitySubtype::BICYCLE;
           break;
