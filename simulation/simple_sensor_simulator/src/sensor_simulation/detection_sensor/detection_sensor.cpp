@@ -50,23 +50,47 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
       if (result != detected_objects.end()) {
         autoware_auto_perception_msgs::msg::PredictedObject object;
         bool is_ego = false;
-        switch (s.type()) {
-          case traffic_simulator_msgs::EntityType::EGO:
-            is_ego = true;
-            break;
-          case traffic_simulator_msgs::EntityType::VEHICLE:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::CAR));
-            break;
-          case traffic_simulator_msgs::EntityType::PEDESTRIAN:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
-            break;
-          case traffic_simulator_msgs::EntityType::MISC_OBJECT:
-            break;
-          default:
-            throw SimulationRuntimeError("unsupported entity type!");
-            break;
+        if (s.type().type() == traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
+          is_ego = true;
+        } else {
+          switch (s.subtype().value()) {
+            case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
+              break;
+            case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::CAR));
+              break;
+            case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::TRUCK));
+              break;
+            case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::BUS));
+              break;
+            case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::TRAILER));
+              break;
+            case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::MOTORCYCLE));
+              break;
+            case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::BICYCLE));
+              break;
+            case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
+              break;
+            default:
+              object.classification.push_back(makeObjectClassification(
+                autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
+              break;
+          }
         }
         if (not is_ego) {
           simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);

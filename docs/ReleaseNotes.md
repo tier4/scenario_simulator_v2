@@ -1,6 +1,27 @@
 # Release Notes
 
 ## Difference between the latest release and master
+
+Major Changes :race_car: :red_car: :blue_car:
+
+| feature                                  | brief summary                                                                             | category                 | pull-request                                                            | contributor                                   |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------- | --------------------------------------------- |
+| Entity label publisher                   | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`. | simulation               | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
+| ROS2 Launch XML-like substitution syntax | Add new substitution syntax `$(ros2 <argument>...)`.                                      | OpenSCENARIO Interpreter | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
+
+Bug Fixes:bug:
+
+| feature | brief summary | category | pull-request | contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| feature                   | brief summary                                                                     | category                 | pull-request                                                            | contributor                                   |
+| ------------------------- | --------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `Storyboard` | Update interpreter's main loop to not to stop even if `Storyboard` was completed. | OpenSCENARIO Interpreter | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/720) | [yamacir-kit](https://github.com/yamacir-kit) |
+
+## Version 0.6.3
 - Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
 - Fix problem in warping NPCs spawned in world coordinate. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/686))
 - End of support for ROS2 Foxy and Autoware.Auto ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/696)).

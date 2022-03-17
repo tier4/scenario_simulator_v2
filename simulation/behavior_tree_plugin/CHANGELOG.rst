@@ -2,6 +2,36 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.3 (2022-03-09)
+------------------
+* Merge pull request `#714 <https://github.com/tier4/scenario_simulator_v2/issues/714>`_ from tier4/fix/get_longitudinal_distance
+  Fix/get longitudinal distance
+* change hard coded parameter
+* configure parameter
+* Merge pull request `#709 <https://github.com/tier4/scenario_simulator_v2/issues/709>`_ from tier4/feature/waypoint_offset
+  Feature/waypoint offset
+* Merge branch 'feature/waypoint_offset' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* configure state machine
+* remove debug line
+* add offset in waypoint calculation
+* Merge pull request `#703 <https://github.com/tier4/scenario_simulator_v2/issues/703>`_ from tier4/fix/front_entity_detection
+  check yaw difference
+* use boost::math::constants::half_pi<double>()
+* check yaw difference
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Remove `foxy` from GitHub workflows
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#686 <https://github.com/tier4/scenario_simulator_v2/issues/686>`_ from tier4/fix/warp_problem
+  Fix/warp problem
+* lane matching fails when the offset overs 1
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge branch 'master' into fix/interpreter/lifecycle
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge pull request `#671 <https://github.com/tier4/scenario_simulator_v2/issues/671>`_ from tier4/fix/lane_change_trajectory_shape

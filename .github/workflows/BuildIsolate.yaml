@@ -25,8 +25,9 @@ jobs:
             kashiwanoha_map,
             lanelet2_extension_psim,
             lanelet2_matching,
-            openscenario_interpreter_msgs,
             openscenario_interpreter,
+            openscenario_interpreter_example,
+            openscenario_interpreter_msgs,
             openscenario_msgs,
             openscenario_utility,
             openscenario_visualization,
@@ -37,8 +38,8 @@ jobs:
             simple_junit,
             simple_sensor_simulator,
             simulation_interface,
-            traffic_simulator_msgs,
             traffic_simulator,
+            traffic_simulator_msgs,
             user_defined_value_condition_example,
           ]
         rosdistro: [galactic]

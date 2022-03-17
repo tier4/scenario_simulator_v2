@@ -103,18 +103,9 @@ Optional
 
 ```
 Scenario:
-  - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/simple.xosc
-    }
-  - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/failure.yaml,
-      expect: failure
-    }
-  - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/success.yaml,
-      expect: success,
-      frame-rate: 30
-    }
+  - { path: $(find-pkg-share scenario_test_runner)/scenario/simple.xosc }
+  - { path: $(find-pkg-share scenario_test_runner)/scenario/failure.yaml, expect: failure }
+  - { path: $(find-pkg-share scenario_test_runner)/scenario/success.yaml, expect: success, frame-rate: 30 }
 ```
 
 ### TierIV Scenario Format version 2.0 -> OpenSCENARIO Format Separator

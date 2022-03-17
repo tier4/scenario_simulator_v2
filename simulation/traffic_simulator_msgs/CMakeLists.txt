@@ -14,6 +14,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/EntityStatus.msg
   msg/EntityStatusWithTrajectory.msg
   msg/EntityStatusWithTrajectoryArray.msg
+  msg/EntitySubtype.msg
   msg/EntityType.msg
   msg/LaneletPose.msg
   msg/LaneletPoseAndStatus.msg

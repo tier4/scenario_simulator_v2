@@ -194,7 +194,6 @@ TEST(Conversion, VehicleParameters)
   traffic_simulator_msgs::VehicleParameters proto;
   traffic_simulator_msgs::msg::VehicleParameters p;
   p.name = "foo";
-  p.vehicle_category = "bar";
   traffic_simulator_msgs::msg::BoundingBox box;
   box.center.x = 1.0;
   box.center.y = 1.23;
@@ -228,7 +227,6 @@ TEST(Conversion, PedestrianParameters)
   traffic_simulator_msgs::PedestrianParameters proto;
   traffic_simulator_msgs::msg::PedestrianParameters p;
   p.name = "foo";
-  p.pedestrian_category = "bar";
   traffic_simulator_msgs::msg::BoundingBox box;
   box.center.x = 1.0;
   box.center.y = 1.23;
@@ -257,12 +255,9 @@ TEST(Conversion, MiscObjectParameters)
   box.dimensions.y = 3.9;
   box.dimensions.z = 4.0;
   p.bounding_box = box;
-  p.misc_object_category = "obstacle";
   EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
   EXPECT_MISC_OBJECT_PARAMETERS_EQ(p, proto);
-  p.misc_object_category = "";
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
-  EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
   EXPECT_MISC_OBJECT_PARAMETERS_EQ(p, proto);
 }
 
@@ -428,25 +423,52 @@ TEST(Conversion, EntityType)
   traffic_simulator_msgs::msg::EntityType msg;
   msg.type = msg.VEHICLE;
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
-  EXPECT_EQ(proto, traffic_simulator_msgs::EntityType::VEHICLE);
+  EXPECT_EQ(proto.type(), traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_VEHICLE);
   msg.type = msg.MISC_OBJECT;
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
-  EXPECT_EQ(proto, traffic_simulator_msgs::EntityType::MISC_OBJECT);
-  proto = traffic_simulator_msgs::EntityType::VEHICLE;
+  EXPECT_EQ(proto.type(), traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_MISC_OBJECT);
+  proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_VEHICLE);
   msg.type = msg.EGO;
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
   EXPECT_EQ(msg.type, traffic_simulator_msgs::msg::EntityType::VEHICLE);
   msg.type = msg.VEHICLE;
-  proto = traffic_simulator_msgs::EntityType::EGO;
+  proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
   EXPECT_EQ(msg.type, traffic_simulator_msgs::msg::EntityType::EGO);
   msg.type = msg.VEHICLE;
-  proto = traffic_simulator_msgs::EntityType::PEDESTRIAN;
+  proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_PEDESTRIAN);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
   EXPECT_EQ(msg.type, traffic_simulator_msgs::msg::EntityType::PEDESTRIAN);
-  proto = traffic_simulator_msgs::EntityType::MISC_OBJECT;
+  proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_MISC_OBJECT);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
   EXPECT_EQ(msg.type, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT);
+}
+
+TEST(Conversion, EntitySubtype)
+{
+  traffic_simulator_msgs::EntitySubtype proto;
+  traffic_simulator_msgs::msg::EntitySubtype msg;
+  msg.value = msg.CAR;
+  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+  EXPECT_EQ(proto.value(), traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
+  msg.value = msg.UNKNOWN;
+  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+  EXPECT_EQ(proto.value(), traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
+  proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
+  msg.value = msg.UNKNOWN;
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.value, traffic_simulator_msgs::msg::EntitySubtype::CAR);
+  msg.value = msg.CAR;
+  proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.value, traffic_simulator_msgs::msg::EntitySubtype::CAR);
+  msg.value = msg.CAR;
+  proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN);
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.value, traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN);
+  proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.value, traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN);
 }
 
 TEST(Conversion, LaneletPose)
