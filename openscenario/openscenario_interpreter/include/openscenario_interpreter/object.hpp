@@ -15,11 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 
+#include <boost/mpl/and.hpp>
 #include <list>
 #include <openscenario_interpreter/expression.hpp>
 #include <type_traits>
 #include <typeindex>
 #include <utility>
+
+#define REQUIRES(...) typename = typename std::enable_if<boost::mpl::and_<__VA_ARGS__>::value>::type
 
 namespace openscenario_interpreter
 {

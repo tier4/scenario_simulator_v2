@@ -2,6 +2,32 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.3 (2022-03-09)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#683 <https://github.com/tier4/scenario_simulator_v2/issues/683>`_ from tier4/feature/zeromq_multi_client
+  Feature/zeromq multi client
+* add EOL white line
+* remove unused files
+* use close function
+* use multi client class
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#673 <https://github.com/tier4/scenario_simulator_v2/issues/673>`_ from tier4/fix/universe/traffic-signal
+  Fix `toProto` for `autoware_auto_perception_msgs::msg::TrafficSignal`
+* Add unit test for conversion TrafficSignal => TrafficLightState
+* Fix `toProto` for `autoware_auto_perception_msgs::msg::TrafficSignal`
+* Add missing new protobuf files
+* Replace `VehicleCommand` with `AckermannControlCommand` and `GearCommand`
+* Remove package `autoware_perception_msgs`
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
