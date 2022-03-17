@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__MISC_OBJECT_CATEGORY_HPP_
 
 #include <iostream>
+#include <traffic_simulator_msgs/msg/entity_subtype.hpp>
 
 namespace openscenario_interpreter
 {
@@ -61,11 +62,13 @@ inline namespace syntax
 struct MiscObjectCategory
 {
   enum value_type {
+    none,  // NOTE: This is the default value and should not be included in the sort.
+
+    // NOTE: Sorted by lexicographic order.
     barrier,
     building,
     crosswalk,
     gantry,
-    none,
     obstacle,
     parkingSpace,
     patch,
@@ -83,6 +86,20 @@ struct MiscObjectCategory
   explicit MiscObjectCategory() = default;
 
   constexpr operator value_type() const noexcept { return value; }
+
+  explicit operator traffic_simulator_msgs::msg::EntitySubtype() const
+  {
+    traffic_simulator_msgs::msg::EntitySubtype result;
+    {
+      switch (value) {  // NOTE: Sorted by lexicographic order.
+        default:
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
+          break;
+      }
+    }
+
+    return result;
+  }
 };
 
 auto operator>>(std::istream &, MiscObjectCategory &) -> std::istream &;
