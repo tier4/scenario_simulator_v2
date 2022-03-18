@@ -39,10 +39,16 @@ protected:
   {
   }
 
+  const std::vector<std::string> getDetectedObjects(
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+
+  geometry_msgs::Pose getSensorPose(
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+
 public:
   virtual void update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    const std::vector<std::string> &) = 0;
+    const std::vector<std::string> & lidar_detected_entity) = 0;
 };
 
 template <typename T>
@@ -61,13 +67,13 @@ public:
 
   auto update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    const std::vector<std::string> &) -> void override;
+    const std::vector<std::string> & lidar_detected_entity) -> void override;
 };
 
 template <>
 void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
   const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-  const std::vector<std::string> &);
+  const std::vector<std::string> & lidar_detected_entity);
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
