@@ -40,21 +40,11 @@ auto Private::endsImmediately() const -> bool
 
 auto Private::evaluate() -> Object
 {
+  assert(endsImmediately());
   for (auto && private_action : private_actions) {
-    // NOTE: standbyState -> startTransition (if ready)
-    // private_action.ready();
-
-    // NOTE: startTransition -> runningState (unconditionally)
     private_action.start();
-
-    // NOTE: runningState -> endTransition (if accomplished)
-    do {
-      private_action.run();
-    } while (not private_action.accomplished());
-
-    // NOTE: endTransition -> completeState (Init.Actions only once executed)
+    private_action.run();
   }
-
   return unspecified;
 }
 
