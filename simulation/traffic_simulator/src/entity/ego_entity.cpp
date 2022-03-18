@@ -241,20 +241,17 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     status.pose.position.y = v(1) + initial_pose_.get().position.y;
     status.pose.position.z = v(2) + initial_pose_.get().position.z;
 
-    const auto closest_lanelet_id = hdmap_utils_ptr_->getClosestLaneletId(status.pose);
-    if (!closest_lanelet_id) {
-      THROW_SEMANTIC_ERROR("failed to find the closest lane, lane is too far away.");
-    }
-
-    traffic_simulator::math::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(closest_lanelet_id.get()));
-    if (const auto s_value = spline.getSValue(status.pose)) {
-      status.pose.position.z = spline.getPoint(s_value.get()).z;
-    }
-
     status.pose.orientation = initial_pose_.get().orientation * pose.orientation;
 
     const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getRouteLanelets(), 1.0);
+
+    if (lanelet_pose) {
+      traffic_simulator::math::CatmullRomSpline spline(
+        hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+      if (const auto s_value = spline.getSValue(status.pose)) {
+        status.pose.position.z = spline.getPoint(s_value.get()).z;
+      }
+    }
 
     status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
     if (status.lanelet_pose_valid) {
