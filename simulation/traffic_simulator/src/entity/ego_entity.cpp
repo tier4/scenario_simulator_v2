@@ -254,8 +254,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
 
     status.pose.orientation = initial_pose_.get().orientation * pose.orientation;
 
-    const auto lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, getRouteLanelets(), false);
+    const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getRouteLanelets(), 1.0);
 
     status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
     if (status.lanelet_pose_valid) {
@@ -279,7 +278,7 @@ auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Ob
 
 auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 {
-  return {}; /*autoware->getRouteLanelets();*/
+  return autoware->getRouteLanelets();
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray

@@ -456,7 +456,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   for (const auto id : lanelet_ids) {
     const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
     if (lanelet_pose) {
-      return lanelet_pose;
+      return lanelet_pose.get();
     }
   }
   return boost::none;
