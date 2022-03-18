@@ -74,6 +74,9 @@ public:
     bool include_crosswalk, double matching_distance = 1.0);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance = 1.0);
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose, std::vector<std::int64_t> lanelet_ids,
+    double matching_distance = 1.0);
   boost::optional<std::int64_t> matchToLane(
     const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
     bool include_crosswalk, double reduction_ratio = 0.8);

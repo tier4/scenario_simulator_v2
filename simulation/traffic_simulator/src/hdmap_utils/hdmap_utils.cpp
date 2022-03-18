@@ -451,6 +451,18 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
+  geometry_msgs::msg::Pose pose, std::vector<std::int64_t> lanelet_ids, double matching_distance)
+{
+  for (const auto id : lanelet_ids) {
+    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
+    if (lanelet_pose) {
+      return lanelet_pose;
+    }
+  }
+  return boost::none;
+}
+
+boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
   bool include_crosswalk, double matching_distance)
 {

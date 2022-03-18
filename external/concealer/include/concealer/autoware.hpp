@@ -169,6 +169,8 @@ public:
   // returns -1.0 when gear is reverse and 1.0 otherwise
   virtual auto getGearSign() const -> double = 0;
 
+  virtual auto getRouteLanelets() const -> std::vector<std::int64_t> = 0;
+
   virtual auto getSteeringAngle() const -> double = 0;
 
   virtual auto getVehicleCommand() const -> std::tuple<
