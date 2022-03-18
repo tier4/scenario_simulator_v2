@@ -40,7 +40,7 @@ auto Private::endsImmediately() const -> bool
 
 auto Private::evaluate() -> Object
 {
-  assert(endsImmediately());
+  assert(endsImmediately());  // NOTE: Called from `InitActions::evaluate`
   for (auto && private_action : private_actions) {
     private_action.start();
     private_action.run();

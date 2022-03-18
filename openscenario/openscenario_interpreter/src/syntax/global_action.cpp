@@ -39,7 +39,7 @@ auto GlobalAction::endsImmediately() const -> bool
 
 auto GlobalAction::evaluate() -> Object
 {
-  assert(endsImmediately());
+  assert(endsImmediately());  // NOTE: Called from `InitActions::evaluate`
   apply<void>([](auto && action) { return action.start(); }, *this);
   apply<void>([](auto && action) { return action.run(); }, *this);
   return unspecified;
