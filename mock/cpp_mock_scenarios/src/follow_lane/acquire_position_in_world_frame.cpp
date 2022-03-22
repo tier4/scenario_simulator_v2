@@ -53,7 +53,7 @@ private:
       traffic_simulator::helper::constructActionStatus(10));
     api_.requestSpeedChange("ego", 10, true);
     const geometry_msgs::msg::Pose goal_pose =
-      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 0, 0, 0, 0, 0));
+      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 1.0, 0, 0, 0, 0));
     api_.requestAcquirePosition("ego", goal_pose);
   }
 };
