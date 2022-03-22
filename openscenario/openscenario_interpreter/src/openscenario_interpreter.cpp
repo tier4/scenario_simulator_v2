@@ -87,8 +87,6 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("Configuring.");
-
   return withExceptionHandler(
     [](auto &&...) {
       return Interpreter::Result::FAILURE;  // => Unconfigured
@@ -129,8 +127,6 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("Activating.");
-
   auto evaluateStoryboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) { deactivate(); },
@@ -161,7 +157,6 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
   };
 
   if (scenarios.empty()) {
-    INTERPRETER_INFO_STREAM("There are no more scenarios to run.");
     return Result::FAILURE;
   } else {
     return withExceptionHandler(
@@ -191,8 +186,6 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("Deactivating.");
-
   timer.reset();  // Stop scenario evaluation
 
   publisher_of_context->on_deactivate();
@@ -218,15 +211,11 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("CleaningUp.");
-
   return Interpreter::Result::SUCCESS;  // => Unconfigured
 }
 
 auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("ErrorProcessing.");
-
   deactivate();  // DIRTY HACK!!!
 
   return Interpreter::Result::SUCCESS;  // => Unconfigured
@@ -234,8 +223,6 @@ auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("ShuttingDown.");
-
   timer.reset();
 
   return Interpreter::Result::SUCCESS;  // => Finalized
