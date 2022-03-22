@@ -4,17 +4,17 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| feature                                  | brief summary                                                                             | category                 | pull-request                                                            | contributor                                   |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------- | --------------------------------------------- |
-| Entity label publisher                   | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`. | simulation               | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
-| ROS2 Launch XML-like substitution syntax | Add new substitution syntax `$(ros2 <argument>...)`.                                      | OpenSCENARIO Interpreter | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
-| `Filter by range` option | Add `filter by range` option for detection sensor. If false, simulate detection result by lidar detection. If true, simulate detection result by range. | simulation | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/729) | [hakuturu583](https://github.com/hakuturu583) |
+| feature                                  | brief summary                                                                                                                                           | category                        | pull-request                                                            | contributor                                   |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------- |
+| Entity label publisher                   | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`.                                                               | `traffic_simulator`             | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
+| ROS2 Launch XML-like substitution syntax | Add new substitution syntax `$(ros2 <argument>...)`.                                                                                                    | `openscenario_interpreter_node` | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
+| `Filter by range` option                 | Add `filter by range` option for detection sensor. If false, simulate detection result by lidar detection. If true, simulate detection result by range. | `traffic_simulator`             | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/729) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
 
-| feature | brief summary | category | pull-request | contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| feature                                | brief summary                                                                | category                 | pull-request                                                            | contributor                                   |
+| -------------------------------------- | ---------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `Storyboard.Init.Actions` | Fix `Init.Actions.GlobalAction` and `Init.Actions.UserDefinedAction` to work | OpenSCENARIO Interpreter | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/734) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 Minor Tweaks :oncoming_police_car:
 
