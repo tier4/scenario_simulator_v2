@@ -144,8 +144,8 @@ auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ids;
   const auto points = getPathWithLaneId().points;
-  for(const auto point : points) {
-    std::copy(point.lane_ids.begin(),point.lane_ids.end(),std::back_inserter(ids));
+  for (const auto point : points) {
+    std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
   }
   auto result = std::unique(ids.begin(), ids.end());
   ids.erase(result, ids.end());
