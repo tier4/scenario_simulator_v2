@@ -4,24 +4,25 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| feature                                  | brief summary                                                                             | category                 | pull-request                                                            | contributor                                   |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------- | --------------------------------------------- |
-| Entity label publisher                   | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`. | simulation               | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
-| ROS2 Launch XML-like substitution syntax | Add new substitution syntax `$(ros2 <argument>...)`.                                      | OpenSCENARIO Interpreter | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
-| `Filter by range` option | Add `filter by range` option for detection sensor. If false, simulate detection result by lidar detection. If true, simulate detection result by range. | simulation | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/729) | [hakuturu583](https://github.com/hakuturu583) |
-| Lane matching improvement for EgoEntity | Subscribe route information from Autoware (topic : `/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id`) and try matching to on route lanelet. | simulation | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/733) | [hakuturu583](https://github.com/hakuturu583) |
+|                 feature                  |                                                                              brief summary                                                                               |         category         |                          pull-request                           |                  contributor                  |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ | --------------------------------------------------------------- | --------------------------------------------- |
+| Entity label publisher                   | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`.                                                                                | simulation               | [#726](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
+| ROS2 Launch XML-like substitution syntax | Add new substitution syntax `$(ros2 <argument>...)`.                                                                                                                     | OpenSCENARIO Interpreter | [#727](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
+| `Filter by range` option                 | Add `filter by range` option for detection sensor. If false, simulate detection result by lidar detection. If true, simulate detection result by range.                  | simulation               | [#729](https://github.com/tier4/scenario_simulator_v2/pull/729) | [hakuturu583](https://github.com/hakuturu583) |
+| `Filter by range` option                 | Add `filter by range` option for detection sensor. If false, simulate detection result by lidar detection. If true, simulate detection result by range.                  | `traffic_simulator`      | [#729](https://github.com/tier4/scenario_simulator_v2/pull/729) | [hakuturu583](https://github.com/hakuturu583) |
+| Lane matching improvement for EgoEntity  | Subscribe route information from Autoware (topic : `/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id`) and try matching to on route lanelet. | simulation               | [#733](https://github.com/tier4/scenario_simulator_v2/pull/733) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
 
-| feature | brief summary | category | pull-request | contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+|                Feature                 |                                 Brief summary                                 |          Category          |                          Pull request                           |                  Contributor                  |
+| -------------------------------------- | ----------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `Storyboard.Init.Actions` | Fix `Init.Actions.GlobalAction` and `Init.Actions.UserDefinedAction` to work. | `openscenario_interpreter` | [#734](https://github.com/tier4/scenario_simulator_v2/pull/734) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 Minor Tweaks :oncoming_police_car:
 
-| feature                   | brief summary                                                                     | category                 | pull-request                                                            | contributor                                   |
-| ------------------------- | --------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------- | --------------------------------------------- |
-| OpenSCENARIO `Storyboard` | Update interpreter's main loop to not to stop even if `Storyboard` was completed. | OpenSCENARIO Interpreter | [pull request](https://github.com/tier4/scenario_simulator_v2/pull/720) | [yamacir-kit](https://github.com/yamacir-kit) |
+|          Feature          |                                   Brief summary                                   |          Category          |                          Pull request                           |                  Contributor                  |
+| ------------------------- | --------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `Storyboard` | Update interpreter's main loop to not to stop even if `Storyboard` was completed. | `openscenario_interpreter` | [#720](https://github.com/tier4/scenario_simulator_v2/pull/720) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.3
 - Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
