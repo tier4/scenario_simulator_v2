@@ -152,9 +152,6 @@ class ScenarioTestRunner(LifecycleController):
             start = time.time()
             while True:
                 if self.get_lifecycle_state() == "inactive":
-                    self.get_logger().info(
-                        "Simulator normally transitioned to the inactive state."
-                    )
                     break
                 elif ((time.time() - start) > self.global_timeout
                         if self.global_timeout is not None else False):

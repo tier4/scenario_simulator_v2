@@ -32,8 +32,10 @@ OpenSCENARIO:
     Init:
       Actions:
         UserDefinedAction:
-          CustomCommandAction:
-            type: exitFailure
+          - CustomCommandAction:
+              type: ':'
+          - CustomCommandAction:
+              type: exitFailure
     Story:
       - name: story
         Act:
