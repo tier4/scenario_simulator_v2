@@ -17,6 +17,12 @@
 
 #include <unistd.h>
 
+#ifndef OPENSCENARIO_INTERPRETER_VERBOSE_RECORD
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#endif  // OPENSCENARIO_INTERPRETER_RECORD_QUIETLY
+
 #include <boost/algorithm/string.hpp>  // boost::algorithm::replace_all_copy
 #include <concealer/execute.hpp>
 #include <cstdlib>
@@ -37,13 +43,25 @@ auto start(Ts &&... xs) -> pid_t
     "python3", boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""), "bag",
     "record", std::forward<decltype(xs)>(xs)...};
 
-  if ((process_id = fork()) < 0) {
-    throw std::system_error(errno, std::system_category());
-  } else if (process_id == 0 and concealer::execute(command) < 0) {
-    std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-    std::exit(EXIT_FAILURE);
-  } else {
-    return process_id;
+  switch (process_id = fork()) {
+    case -1:
+      throw std::system_error(errno, std::system_category());
+
+    case 0:
+#ifndef OPENSCENARIO_INTERPRETER_VERBOSE_RECORD
+      if (const auto fd = ::open("/dev/null", O_WRONLY)) {
+        ::dup2(fd, STDOUT_FILENO);
+        ::close(fd);
+      }
+#endif
+      if (concealer::execute(command) < 0) {
+        std::cerr << std::system_error(errno, std::system_category()).what() << std::endl;
+        std::exit(EXIT_FAILURE);
+      }
+      return 0;
+
+    default:
+      return process_id;
   }
 }
 
