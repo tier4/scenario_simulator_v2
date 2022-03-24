@@ -140,7 +140,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             name="scenario_test_runner",
             output="screen",
-            on_exit=Shutdown(),
+            # on_exit=Shutdown(),
             arguments=[
                 # fmt: off
                 "--global-frame-rate",       global_frame_rate,
