@@ -89,7 +89,7 @@ private:
   zmqpp::socket socket_attach_detection_sensor_;
   zmqpp::socket socket_update_traffic_lights_;
 
-  bool shutdown_flag = false;
+  bool is_running = true;
 };
 }  // namespace zeromq
 

@@ -60,7 +60,7 @@ MultiClient::MultiClient(
   socket_update_traffic_lights_.connect(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::update_traffic_lights));
 
-  rclcpp::on_shutdown([this] { shutdown_flag = true; });
+  rclcpp::on_shutdown([this] { is_running = false; });
 }
 
 MultiClient::~MultiClient()
@@ -82,7 +82,7 @@ void MultiClient::call(
   const simulation_api_schema::InitializeRequest & req,
   simulation_api_schema::InitializeResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_initialize_.send(message);
     zmqpp::message buffer;
@@ -94,7 +94,7 @@ void MultiClient::call(
   const simulation_api_schema::UpdateFrameRequest & req,
   simulation_api_schema::UpdateFrameResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_update_frame_.send(message);
     zmqpp::message buffer;
@@ -106,7 +106,7 @@ void MultiClient::call(
   const simulation_api_schema::UpdateSensorFrameRequest & req,
   simulation_api_schema::UpdateSensorFrameResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_update_sensor_frame_.send(message);
     zmqpp::message buffer;
@@ -118,7 +118,7 @@ void MultiClient::call(
   const simulation_api_schema::SpawnVehicleEntityRequest & req,
   simulation_api_schema::SpawnVehicleEntityResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_spawn_vehicle_entity_.send(message);
     zmqpp::message buffer;
@@ -130,7 +130,7 @@ void MultiClient::call(
   const simulation_api_schema::SpawnPedestrianEntityRequest & req,
   simulation_api_schema::SpawnPedestrianEntityResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_spawn_pedestrian_entity_.send(message);
     zmqpp::message buffer;
@@ -142,7 +142,7 @@ void MultiClient::call(
   const simulation_api_schema::SpawnMiscObjectEntityRequest & req,
   simulation_api_schema::SpawnMiscObjectEntityResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_spawn_misc_object_entity_.send(message);
     zmqpp::message buffer;
@@ -154,7 +154,7 @@ void MultiClient::call(
   const simulation_api_schema::DespawnEntityRequest & req,
   simulation_api_schema::DespawnEntityResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_despawn_entity_.send(message);
     zmqpp::message buffer;
@@ -166,7 +166,7 @@ void MultiClient::call(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_update_entity_status_.send(message);
     zmqpp::message buffer;
@@ -178,7 +178,7 @@ void MultiClient::call(
   const simulation_api_schema::AttachLidarSensorRequest & req,
   simulation_api_schema::AttachLidarSensorResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_attach_lidar_sensor_.send(message);
     zmqpp::message buffer;
@@ -190,7 +190,7 @@ void MultiClient::call(
   const simulation_api_schema::AttachDetectionSensorRequest & req,
   simulation_api_schema::AttachDetectionSensorResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_attach_detection_sensor_.send(message);
     zmqpp::message buffer;
@@ -202,7 +202,7 @@ void MultiClient::call(
   const simulation_api_schema::UpdateTrafficLightsRequest & req,
   simulation_api_schema::UpdateTrafficLightsResponse & res)
 {
-  if (!shutdown_flag) {
+  if (is_running) {
     zmqpp::message message = toZMQ(req);
     socket_update_traffic_lights_.send(message);
     zmqpp::message buffer;

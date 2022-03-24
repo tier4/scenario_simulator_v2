@@ -219,7 +219,9 @@ class ScenarioTestRunner(LifecycleController):
             self.shutdown()
 
         except KeyboardInterrupt:
-            self.get_logger().warn("Scenario runner receives keyboard interrupt signal")
+            self.get_logger().warn("KeyboardInterrupt")
+        except OSError as e:
+            self.get_logger().warn("OSError: {}".format(e))
 
     # def __del__(self):
     #     pass
