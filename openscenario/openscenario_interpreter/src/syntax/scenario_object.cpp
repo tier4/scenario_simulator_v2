@@ -44,14 +44,12 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
 
     if (object_controller.is<Controller>()) {
       auto controller = object_controller.as<Controller>();
-      auto max_jerk = controller["maxJerk"];
-      auto min_jerk = controller["minJerk"];
 
-      if (not max_jerk.name.empty()) {
+      if (auto max_jerk = controller["maxJerk"]; not max_jerk.value.empty()) {
         configuration.max_jerk = boost::lexical_cast<double>(max_jerk.value);
       }
 
-      if (not min_jerk.name.empty()) {
+      if (auto min_jerk = controller["minJerk"]; not min_jerk.value.empty()) {
         configuration.min_jerk = boost::lexical_cast<double>(min_jerk.value);
       }
     }
@@ -69,8 +67,25 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
 
 auto ScenarioObject::activateSensors() -> bool
 {
+  /*
+     NOTE: The term "controller" in OpenSCENARIO is a concept equivalent to
+     "the person driving the car. Here, Autoware is considered anthropomorphic.
+     In other words, the sensor performance of Autoware in a simulation is
+     described in ScenarioObject.ObjectController.Controller.Properties as
+     "characteristics of the person driving the car.
+  */
+  simulation_api_schema::DetectionSensorConfiguration configuration;
+  {
+    configuration.set_entity(name);
+    configuration.set_architecture_type(
+      getParameter<std::string>("architecture_type", "awf/universe"));
+    configuration.set_update_duration(0.1);
+    configuration.set_range(300);
+    configuration.set_filter_by_range(false);
+  }
+
   return object_controller.isUserDefinedController() and attachLidarSensor(name) and
-         attachDetectionSensor(name);
+         attachDetectionSensor(configuration);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

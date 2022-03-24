@@ -33,9 +33,7 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 
 auto Controller::assign(const EntityRef & entity_ref) -> void
 {
-  const auto max_speed = properties["maxSpeed"];
-
-  if (not max_speed.value.empty()) {
+  if (const auto max_speed = properties["maxSpeed"]; not max_speed.value.empty()) {
     setVelocityLimit(entity_ref, Double(max_speed.value));
   }
 
