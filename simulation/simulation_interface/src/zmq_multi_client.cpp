@@ -15,7 +15,6 @@
 #include <rclcpp/utilities.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
-
 #include <string>
 namespace zeromq
 {
