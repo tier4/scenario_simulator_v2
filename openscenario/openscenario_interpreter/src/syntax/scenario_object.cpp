@@ -43,15 +43,10 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
     configuration.max_acceleration = +parameters.performance.max_acceleration;
 
     if (object_controller.is<Controller>()) {
-      auto controller = object_controller.as<Controller>();
-
-      if (auto max_jerk = controller["maxJerk"]; not max_jerk.value.empty()) {
-        configuration.max_jerk = boost::lexical_cast<double>(max_jerk.value);
-      }
-
-      if (auto min_jerk = controller["minJerk"]; not min_jerk.value.empty()) {
-        configuration.min_jerk = boost::lexical_cast<double>(min_jerk.value);
-      }
+      configuration.max_jerk = object_controller.as<Controller>().properties.get<double>(
+        "maxJerk", std::numeric_limits<double>::max());
+      configuration.min_jerk = object_controller.as<Controller>().properties.get<double>(
+        "minJerk", std::numeric_limits<double>::lowest());
     }
 
     if (object_controller.isUserDefinedController()) {
