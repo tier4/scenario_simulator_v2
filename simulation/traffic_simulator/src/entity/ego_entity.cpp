@@ -243,7 +243,15 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
 
     status.pose.orientation = initial_pose_.get().orientation * pose.orientation;
 
-    const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getRouteLanelets(), 1.0);
+    const auto route_lanelets = getRouteLanelets();
+
+    boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+
+    if (route_lanelets.empty()) {
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
+    } else {
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, route_lanelets, 1.0);
+    }
 
     if (lanelet_pose) {
       traffic_simulator::math::CatmullRomSpline spline(
@@ -275,13 +283,16 @@ auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Ob
 
 auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 {
-  std::vector<std::int64_t> ids;
-  const auto points = autoware->getPath().points;
-  for (const auto point : points) {
-    std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+  const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
+  std::vector<std::int64_t> ids = {};
+  if (universe) {
+    const auto points = universe->getPathWithLaneId().points;
+    for (const auto point : points) {
+      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+    }
+    auto result = std::unique(ids.begin(), ids.end());
+    ids.erase(result, ids.end());
   }
-  auto result = std::unique(ids.begin(), ids.end());
-  ids.erase(result, ids.end());
   return ids;
 }
 

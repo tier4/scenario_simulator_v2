@@ -167,9 +167,6 @@ public:
 
   virtual auto getAutowareStateString() const -> std::string = 0;
 
-  using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
-  virtual auto getPath() const -> const PathWithLaneId & = 0;
-
   // returns -1.0 when gear is reverse and 1.0 otherwise
   virtual auto getGearSign() const -> double = 0;
 

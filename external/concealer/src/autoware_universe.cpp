@@ -140,8 +140,6 @@ auto AutowareUniverse::getGearSign() const -> double
   return getGearCommand().command == GearCommand::REVERSE ? -1.0 : 1.0;
 }
 
-auto AutowareUniverse::getPath() const -> const PathWithLaneId & { return getPathWithLaneId(); }
-
 auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;

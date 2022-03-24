@@ -145,8 +145,6 @@ public:
 
   auto getGearSign() const -> double override;
 
-  auto getPath() const -> const PathWithLaneId & override;
-
   auto getSteeringAngle() const -> double override;
 
   auto getVehicleCommand() const -> std::tuple<
