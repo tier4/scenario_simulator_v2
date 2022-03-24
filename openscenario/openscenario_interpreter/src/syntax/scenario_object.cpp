@@ -43,10 +43,10 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
     configuration.max_acceleration = +parameters.performance.max_acceleration;
 
     if (object_controller.is<Controller>()) {
-      configuration.max_jerk = object_controller.as<Controller>().properties.get<double>(
-        "maxJerk", std::numeric_limits<double>::max());
-      configuration.min_jerk = object_controller.as<Controller>().properties.get<double>(
-        "minJerk", std::numeric_limits<double>::lowest());
+      configuration.max_jerk = object_controller.as<Controller>().properties.get<Double>(
+        "maxJerk", std::numeric_limits<Double::value_type>::max());
+      configuration.min_jerk = object_controller.as<Controller>().properties.get<Double>(
+        "minJerk", std::numeric_limits<Double::value_type>::lowest());
     }
 
     if (object_controller.isUserDefinedController()) {
@@ -76,7 +76,8 @@ auto ScenarioObject::activateSensors() -> bool
       getParameter<std::string>("architecture_type", "awf/universe"));
     configuration.set_update_duration(0.1);
     configuration.set_range(300);
-    configuration.set_filter_by_range(false);
+    configuration.set_filter_by_range(
+      object_controller.as<Controller>().properties.get<Boolean>("isClairvoyant"));
   }
 
   return object_controller.isUserDefinedController() and attachLidarSensor(name) and
