@@ -20,6 +20,7 @@
 #include <sys/wait.h>
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
@@ -166,10 +167,11 @@ public:
 
   virtual auto getAutowareStateString() const -> std::string = 0;
 
+  using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
+  virtual auto getPath() const -> const PathWithLaneId & = 0;
+
   // returns -1.0 when gear is reverse and 1.0 otherwise
   virtual auto getGearSign() const -> double = 0;
-
-  virtual auto getRouteLanelets() const -> std::vector<std::int64_t> = 0;
 
   virtual auto getSteeringAngle() const -> double = 0;
 
