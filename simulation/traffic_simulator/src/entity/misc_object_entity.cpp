@@ -20,7 +20,7 @@ namespace entity
 {
 MiscObjectEntity::MiscObjectEntity(
   const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params)
-: EntityBase(params.misc_object_category, name), params_(params)
+: EntityBase(name, params.subtype), params_(params)
 {
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
 }

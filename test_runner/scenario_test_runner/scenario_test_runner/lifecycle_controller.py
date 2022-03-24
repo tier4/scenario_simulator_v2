@@ -135,13 +135,9 @@ class LifecycleController(Node):
         ).done():
             self.get_logger().info("Failed to set parameters. Resending...")
 
-        self.get_logger().info("\x1b[33mConfigure interpreter.\x1b[0m")
         state_expects = "unconfigured"
         if self.get_lifecycle_state() == state_expects:
             success = self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
-            self.get_logger().info(
-                "\x1b[33mInterpreter is " + self.get_lifecycle_state() + " now.\x1b[0m"
-            )
             return success
         else:
             self.get_logger().error(
@@ -155,7 +151,6 @@ class LifecycleController(Node):
 
     def activate_node(self):
         """Activate node to change state from inactive to activate."""
-        self.get_logger().info("\x1b[33mActivate interpreter.\x1b[0m")
         state_expects = "inactive"
         if self.get_lifecycle_state() == state_expects:
             return self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
@@ -171,7 +166,6 @@ class LifecycleController(Node):
 
     def deactivate_node(self):
         """Deactivate node to change state from active to inactive."""
-        self.get_logger().info("\x1b[33mDeactivate interpreter.\x1b[0m")
         state_expects = "active"
         if self.get_lifecycle_state() == state_expects:
             return self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
@@ -187,7 +181,6 @@ class LifecycleController(Node):
 
     def cleanup_node(self):
         """Cleanup node to change state from inactive to unconfigure."""
-        self.get_logger().info("\x1b[33mCleanup interpreter.\x1b[0m")
         state_expects = "inactive"
         if self.get_lifecycle_state() == state_expects:
             return self.set_lifecycle_state(Transition.TRANSITION_CLEANUP)
