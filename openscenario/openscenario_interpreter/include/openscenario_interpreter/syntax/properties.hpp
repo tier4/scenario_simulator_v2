@@ -60,19 +60,19 @@ struct Properties
 
   explicit Properties(const pugi::xml_node &, Scope &);
 
-#define BOILERPLATE(NAME)                                      \
-  template <typename... Ts>                                    \
-  auto NAME(Ts &&... xs)->decltype(auto)                       \
-  {                                                            \
-    return properties.NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                            \
-  static_assert(true)
-
-  BOILERPLATE(end);
-  BOILERPLATE(find);
-  BOILERPLATE(operator[]);
-
-#undef BOILERPLATE
+  template <typename T>
+  auto get(const String & name, const T & default_value = T()) const -> auto
+  {
+    if (auto iter = properties.find(name); iter != std::end(properties)) {
+      if (const auto [name, property] = *iter; not property.value.empty()) {
+        return boost::lexical_cast<T>(property.value);
+      } else {
+        return default_value;
+      }
+    } else {
+      return default_value;
+    }
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
