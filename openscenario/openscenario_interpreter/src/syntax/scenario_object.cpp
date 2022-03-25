@@ -77,7 +77,9 @@ auto ScenarioObject::activateSensors() -> bool
     configuration.set_update_duration(0.1);
     configuration.set_range(300);
     configuration.set_filter_by_range(
-      object_controller.as<Controller>().properties.get<Boolean>("isClairvoyant"));
+      object_controller.is<Controller>()
+        ? object_controller.as<Controller>().properties.get<Boolean>("isClairvoyant")
+        : false);
   }
 
   return object_controller.isUserDefinedController() and attachLidarSensor(name) and
