@@ -66,6 +66,8 @@ class LifecycleController(Node):
             LifecycleController.NODE_NAME + "/set_parameters",
         )
 
+        self.executor = rclpy.executors.SingleThreadedExecutor(context=self.context)
+
     def send_request_to_change_parameters(
         self,  # Arguments are alphabetically sorted
         expect,
@@ -228,8 +230,7 @@ class LifecycleController(Node):
         request = ChangeState.Request()
         request.transition.id = transition_id
         future = self.client_change_state.call_async(request)
-        executor = rclpy.executors.SingleThreadedExecutor(context=self.context)
-        rclpy.spin_until_future_complete(self, future, executor=executor)
+        rclpy.spin_until_future_complete(self, future, executor=self.executor)
         return future.result().success
 
     def get_lifecycle_state(self):
@@ -246,8 +247,7 @@ class LifecycleController(Node):
 
         """
         future = self.client_get_state.call_async(GetState.Request())
-        executor = rclpy.executors.SingleThreadedExecutor(context=self.context)
-        rclpy.spin_until_future_complete(self, future, executor=executor)
+        rclpy.spin_until_future_complete(self, future, executor=self.executor)
         return future.result().current_state.label
 
 
