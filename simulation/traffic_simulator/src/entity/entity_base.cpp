@@ -25,8 +25,9 @@ namespace traffic_simulator
 {
 namespace entity
 {
-EntityBase::EntityBase(const std::string & type, const std::string & name)
-: type(type), name(name), status_(boost::none), verbose_(true), visibility_(true)
+EntityBase::EntityBase(
+  const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
+: name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
 {
   status_ = boost::none;
 }
@@ -129,9 +130,12 @@ void EntityBase::requestLaneChange(
   }
 }
 
-const autoware_vehicle_msgs::msg::VehicleCommand EntityBase::getVehicleCommand()
+auto EntityBase::getVehicleCommand() const -> std::tuple<
+  autoware_auto_control_msgs::msg::AckermannControlCommand,
+  autoware_auto_vehicle_msgs::msg::GearCommand>
 {
-  THROW_SIMULATION_ERROR("get vehicle command does not support in ", type, " entity type");
+  THROW_SIMULATION_ERROR(
+    "`getVehicleCommand` is not provided for ", getEntityTypename(), " type entity.");
 }
 
 void EntityBase::updateStandStillDuration(const double step_time)
@@ -184,6 +188,8 @@ const traffic_simulator_msgs::msg::EntityStatus EntityBase::getStatus() const
   } else {
     auto status = this->status_.get();
     status.bounding_box = getBoundingBox();
+    status.subtype = entity_subtype_;
+    status.type = entity_type_;
     return status;
   }
 }

@@ -34,8 +34,7 @@ StopAtStopLineAction::StopAtStopLineAction(
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle>
-StopAtStopLineAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+StopAtStopLineAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stopline_) {
     return boost::none;
@@ -43,8 +42,7 @@ StopAtStopLineAction::calculateObstacle(
   if (distance_to_stopline_.get() < 0) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
-  if (distance_to_stopline_.get() > spline.getLength()) {
+  if (distance_to_stopline_.get() > reference_trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -62,9 +60,9 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculat
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
-    traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
-    waypoints.waypoints = spline.getTrajectory(
-      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0);
+    waypoints.waypoints = reference_trajectory->getTrajectory(
+      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
+      entity_status.lanelet_pose.offset);
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -106,6 +104,26 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   distance_to_stopline_ = hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
+  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
+  const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets, spline);
+  const auto distance_to_front_entity = getDistanceToFrontEntity(spline);
+  if (!distance_to_stopline_) {
+    stopped_ = false;
+    return BT::NodeStatus::FAILURE;
+  }
+  if (distance_to_front_entity) {
+    if (distance_to_front_entity.get() <= distance_to_stopline_.get()) {
+      stopped_ = false;
+      return BT::NodeStatus::FAILURE;
+    }
+  }
+  if (distance_to_stop_target) {
+    if (distance_to_stop_target.get() <= distance_to_stopline_.get()) {
+      stopped_ = false;
+      return BT::NodeStatus::FAILURE;
+    }
+  }
+
   if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
     if (distance_to_stopline_) {
       if (distance_to_stopline_.get() <= vehicle_parameters.bounding_box.dimensions.x + 5) {

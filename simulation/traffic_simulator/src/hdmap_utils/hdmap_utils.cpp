@@ -51,10 +51,8 @@
 namespace hdmap_utils
 {
 HdMapUtils::HdMapUtils(
-  const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint & origin)
+  const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint &)
 {
-  (void)origin;
-
   lanelet::projection::MGRSProjector projector;
 
   lanelet::ErrorMessages errors;
@@ -388,14 +386,14 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, bool include_crosswalk)
+  geometry_msgs::msg::Pose pose, bool include_crosswalk, double matching_distance)
 {
-  const auto lanelet_ids = getNearbyLaneletIds(pose.position, 3.0, include_crosswalk);
+  const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
   if (lanelet_ids.empty()) {
     return boost::none;
   }
   for (const auto & id : lanelet_ids) {
-    const auto lanelet_pose = toLaneletPose(pose, id);
+    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
     if (lanelet_pose) {
       return lanelet_pose;
     }
@@ -404,17 +402,29 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
+  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance)
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
-  const auto s = spline->getSValue(pose);
+  const auto s = spline->getSValue(pose, matching_distance);
   if (!s) {
     return boost::none;
   }
   auto pose_on_centerline = spline->getPose(s.get());
   auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
     quaternion_operation::getRotation(pose_on_centerline.orientation, pose.orientation));
-  double offset = spline->getSquaredDistanceIn2D(pose.position, s.get());
+  double offset = std::sqrt(spline->getSquaredDistanceIn2D(pose.position, s.get()));
+  /**
+   * @note Hard coded parameter
+   */
+  double yaw_threshold = 0.25;
+  if (M_PI * yaw_threshold < std::fabs(rpy.z) && std::fabs(rpy.z) < M_PI * (1 - yaw_threshold)) {
+    return boost::none;
+  }
+  double inner_prod = traffic_simulator::math::innerProduct(
+    spline->getNormalVector(s.get()), spline->getSquaredDistanceVector(pose.position, s.get()));
+  if (inner_prod < 0) {
+    offset = offset * -1;
+  }
   traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s.get();
@@ -425,26 +435,26 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  bool include_crosswalk)
+  bool include_crosswalk, double matching_distance)
 {
   const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
   if (!lanelet_id) {
-    return toLaneletPose(pose, include_crosswalk);
+    return toLaneletPose(pose, include_crosswalk, matching_distance);
   }
-  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.get());
+  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.get(), matching_distance);
   if (pose_in_target_lanelet) {
     return pose_in_target_lanelet;
   }
   const auto previous = getPreviousLaneletIds(lanelet_id.get());
   for (const auto id : previous) {
-    const auto pose_in_previous = toLaneletPose(pose, id);
+    const auto pose_in_previous = toLaneletPose(pose, id, matching_distance);
     if (pose_in_previous) {
       return pose_in_previous;
     }
   }
   const auto next = getNextLaneletIds(lanelet_id.get());
   for (const auto id : previous) {
-    const auto pose_in_next = toLaneletPose(pose, id);
+    const auto pose_in_next = toLaneletPose(pose, id, matching_distance);
     if (pose_in_next) {
       return pose_in_next;
     }
@@ -691,6 +701,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
     std::vector<geometry_msgs::msg::Point> center_points = getCenterPoints(lanelet_id);
     std::copy(center_points.begin(), center_points.end(), std::back_inserter(ret));
   }
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
   return ret;
 }
 
@@ -794,25 +805,7 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
   return ret;
 }
 
-std::int64_t HdMapUtils::getTrafficLightRelationId(std::int64_t traffic_light_id) const
-{
-  std::vector<std::int64_t> ret;
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
-  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id && id.get() == traffic_light_id) {
-          return light->id();
-        }
-      }
-    }
-  }
-  THROW_SEMANTIC_ERROR("traffic_light_id : ", traffic_light_id, " does not match to relation.");
-}
-
-const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
+std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 {
   std::vector<std::int64_t> ret;
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
@@ -1637,5 +1630,19 @@ std::vector<std::int64_t> HdMapUtils::getLaneletIds(
     ids.emplace_back(lanelet.id());
   }
   return ids;
+}
+
+auto HdMapUtils::isTrafficRelationId(const std::int64_t lanelet_id) const -> bool
+{
+  return lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
+         std::dynamic_pointer_cast<lanelet::TrafficLight>(
+           lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+}
+
+auto HdMapUtils::getTrafficLight(const std::int64_t lanelet_id) const -> lanelet::TrafficLight::Ptr
+{
+  assert(isTrafficRelationId(lanelet_id));
+  return std::dynamic_pointer_cast<lanelet::TrafficLight>(
+    lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 }  // namespace hdmap_utils

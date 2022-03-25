@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 
-#include <boost/mpl/and.hpp>
 #include <cstddef>
 #include <limits>
 #include <openscenario_interpreter/procedure.hpp>
@@ -23,12 +22,11 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
+#include <openscenario_interpreter/syntax/trigger.hpp>
 #include <string>
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
-
-#define REQUIRES(...) typename = typename std::enable_if<__VA_ARGS__::value>::type
 
 namespace openscenario_interpreter
 {
@@ -36,42 +34,56 @@ inline namespace syntax
 {
 class StoryboardElement
 {
+  Trigger stop_trigger;
+
 public:
-  const std::size_t maximum_execution_count;
+  const std::size_t maximum_execution_count = 1;
 
-  std::size_t current_execution_count;
+  std::size_t current_execution_count = 0;
 
-  Object current_state;
+  Object current_state = standby_state;
 
-  explicit StoryboardElement(const std::size_t maximum_execution_count = 0)
-  : maximum_execution_count(maximum_execution_count),
-    current_execution_count(0),
-    current_state(standby_state)
+  Elements elements;
+
+  Trigger start_trigger{{ConditionGroup()}};
+
+  // Storyboard
+  explicit StoryboardElement(const Trigger & stop_trigger)  //
+  : stop_trigger(stop_trigger)
   {
   }
 
-  auto currentState() const -> const auto & { return current_state; }
+  // Act
+  explicit StoryboardElement(const Trigger & start_trigger, const Trigger & stop_trigger)
+  : stop_trigger(stop_trigger), start_trigger(start_trigger)
+  {
+  }
 
-#define BOILERPLATE(NAME, STATE)                                                                  \
-  auto NAME() const noexcept                                                                      \
-  {                                                                                               \
-    return currentState().template as<StoryboardElementState>() == StoryboardElementState::STATE; \
-  }                                                                                               \
-  static_assert(true, "")
+  // Event
+  explicit StoryboardElement(
+    const std::size_t maximum_execution_count, const Trigger & start_trigger)
+  : maximum_execution_count(maximum_execution_count), start_trigger(start_trigger)
+  {
+  }
 
-  BOILERPLATE(standby, standbyState);
-  BOILERPLATE(starting, startTransition);
-  BOILERPLATE(running, runningState);
-  BOILERPLATE(ending, endTransition);
-  BOILERPLATE(complete, completeState);
-  BOILERPLATE(stopping, stopTransition);
-  BOILERPLATE(skipping, skipTransition);
+  explicit StoryboardElement(const std::size_t maximum_execution_count = 1)
+  : maximum_execution_count(maximum_execution_count)
+  {
+  }
 
-#undef BOILERPLATE
+  auto state() const -> const auto & { return current_state; }
+
+  template <StoryboardElementState::value_type State>
+  auto is() const
+  {
+    return current_state.as<StoryboardElementState>() == State;
+  }
 
   auto override()
   {
-    if (not complete() and not stopping()) {
+    if (
+      not is<StoryboardElementState::standbyState>() and
+      not is<StoryboardElementState::stopTransition>()) {
       return current_state = stop_transition;
     } else {
       return current_state;
@@ -79,19 +91,33 @@ public:
   }
 
 private:
-  virtual auto accomplished() const -> bool = 0;
+  virtual auto accomplished() const -> bool
+  {
+    return std::all_of(std::begin(elements), std::end(elements), [](auto && element) {
+      assert(element.template is<StoryboardElement>());
+      return element.template as<StoryboardElement>()
+        .template is<StoryboardElementState::completeState>();
+    });
+  }
 
-  virtual auto elements() -> Elements & = 0;
+  virtual auto run() -> void
+  {
+    for (auto && element : elements) {
+      assert(element.is<StoryboardElement>());
+      element.evaluate();
+    }
+  }
 
-  virtual auto ready() -> bool = 0;
+  virtual auto start() -> void {}
 
-  virtual auto run() -> void = 0;
-
-  virtual auto start() -> void = 0;
-
-  virtual auto stop() -> void = 0;
-
-  virtual auto stopTriggered() -> bool = 0;
+  virtual auto stop() -> void
+  {
+    for (auto && element : elements) {
+      assert(element.is<StoryboardElement>());
+      element.as<StoryboardElement>().override();
+      element.evaluate();
+    }
+  }
 
 protected:
   auto rename(const std::string & name) const
@@ -139,13 +165,13 @@ protected:
 public:
   auto evaluate()
   {
-    if (stopTriggered()) {
+    if (stop_trigger.evaluate().as<Boolean>()) {
       override();
     }
 
     // NOTE: https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
 
-    switch (currentState().template as<StoryboardElementState>()) {
+    switch (state().as<StoryboardElementState>()) {
       case StoryboardElementState::standbyState: /* ----------------------------
         *
         *  This is the default initialization state of a StoryboardElement.
@@ -156,7 +182,8 @@ public:
         *  Story element instantaneously transitions into the runningState.
         *
         * ------------------------------------------------------------------- */
-        return current_state = (ready() ? start_transition : current_state);
+        return current_state =
+                 (start_trigger.evaluate().as<Boolean>() ? start_transition : current_state);
 
       case StoryboardElementState::startTransition: /* -------------------------
         *
@@ -166,7 +193,6 @@ public:
         *
         * ------------------------------------------------------------------- */
         start();
-        // TODO SET CHILD ELEMENTS STATE TO STANDBY_STATE.
         ++current_execution_count;
         return current_state = running_state;
 

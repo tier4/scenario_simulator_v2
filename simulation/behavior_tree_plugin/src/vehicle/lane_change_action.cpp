@@ -61,11 +61,11 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
     } else {
       std::vector<geometry_msgs::msg::Point> center_points =
         hdmap_utils->getCenterPoints(following_lanelets);
+      // DIFFERENT SPLINE - recalculation needed
       traffic_simulator::math::CatmullRomSpline spline(center_points);
       const auto straight_waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
       waypoints.waypoints = straight_waypoints;
       const auto curve_waypoints = curve_->getTrajectory(current_s_, l, 1.0, true);
-      waypoints.waypoints = curve_waypoints;
       std::copy(
         straight_waypoints.begin(), straight_waypoints.end(),
         std::back_inserter(waypoints.waypoints));

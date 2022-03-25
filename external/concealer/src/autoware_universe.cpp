@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware_universe.hpp>
 
@@ -26,7 +24,7 @@ auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       set(initial_pose);
-      waitForAutowareStateToBeInitializingVehicle();
+      waitForAutowareStateToBeInitializing();
       waitForAutowareStateToBeWaitingForRoute([&]() {
         InitialPose initial_pose;
         {
@@ -36,6 +34,15 @@ auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
         }
         return setInitialPose(initial_pose);
       });
+
+      // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
+      // waitForAutowareStateToBeWaitingForRoute([&]() {
+      //   auto request = std::make_shared<InitializePose::Request>();
+      //   request->pose.header.stamp = get_clock()->now();
+      //   request->pose.header.frame_id = "map";
+      //   request->pose.pose.pose = initial_pose;
+      //   requestInitializePose(request);
+      // });
     });
   }
 }
@@ -59,12 +66,9 @@ auto AutowareUniverse::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
-      AutowareEngage message;
-      {
-        message.stamp = get_clock()->now();
-        message.engage = true;
-      }
-      return setAutowareEngage(message);
+      auto request = std::make_shared<Engage::Request>();
+      request->engage = true;
+      requestEngage(request);
     });
   });
 }
@@ -112,13 +116,6 @@ auto AutowareUniverse::update() -> void
   }
   setLocalizationOdometry(localization_odometry);
 
-  VehicleVelocity vehicle_velocity;
-  {
-    vehicle_velocity.stamp = get_clock()->now();
-    vehicle_velocity.max_velocity = current_upper_bound_speed;
-  }
-  setVehicleVelocity(vehicle_velocity);
-
   setTransform(current_pose);
 }
 
@@ -160,9 +157,28 @@ auto AutowareUniverse::restrictTargetSpeed(double value) const -> double
   return value;
 }
 
-auto AutowareUniverse::getAutowareStateMessage() const -> std::string
+auto AutowareUniverse::getAutowareStateString() const -> std::string
 {
-  return getAutowareStatus().autoware_state;
+  using autoware_auto_system_msgs::msg::AutowareState;
+
+#define CASE(IDENTIFIER)          \
+  case AutowareState::IDENTIFIER: \
+    return #IDENTIFIER
+
+  switch (getAutowareState().state) {
+    CASE(INITIALIZING);
+    CASE(WAITING_FOR_ROUTE);
+    CASE(PLANNING);
+    CASE(WAITING_FOR_ENGAGE);
+    CASE(DRIVING);
+    CASE(ARRIVED_GOAL);
+    CASE(FINALIZING);
+
+    default:
+      return "";
+  }
+
+#undef CASE
 }
 
 auto AutowareUniverse::sendSIGINT() -> void  //
@@ -170,98 +186,22 @@ auto AutowareUniverse::sendSIGINT() -> void  //
   ::kill(process_id, SIGINT);
 }
 
+auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
+{
+  auto request = std::make_shared<SetVelocityLimit::Request>();
+  request->velocity = velocity_limit;
+  requestSetVelocityLimit(request);
+}
+
 auto AutowareUniverse::isReady() noexcept -> bool
 {
   return is_ready or (is_ready = isWaitingForRoute());
 }
 
-auto AutowareUniverse::checkAutowareState() -> void
+auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
+  autoware_auto_control_msgs::msg::AckermannControlCommand,
+  autoware_auto_vehicle_msgs::msg::GearCommand>
 {
-  if (isReady() and isEmergency()) {
-    // throw common::AutowareError("Autoware is in emergency state now");
-  }
-}
-
-auto AutowareUniverse::getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand
-{
-  autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
-  {
-    auto ackermann_control_command = getAckermannControlCommand();
-
-    vehicle_command.header.stamp = ackermann_control_command.stamp;
-    vehicle_command.control.steering_angle = ackermann_control_command.lateral.steering_tire_angle;
-    vehicle_command.control.velocity = ackermann_control_command.longitudinal.speed;
-    vehicle_command.control.acceleration = ackermann_control_command.longitudinal.acceleration;
-
-    auto gear_command = getGearCommand();
-
-    switch (gear_command.command) {
-      case autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
-        break;
-      case autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
-        break;
-      case autoware_auto_vehicle_msgs::msg::GearCommand::PARK:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
-        break;
-      case autoware_auto_vehicle_msgs::msg::GearCommand::LOW:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
-        break;
-      case 0:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-        break;
-    }
-
-    // these fields are hard-coded because they are not present in AutowareAuto
-    vehicle_command.header.frame_id = "";
-    vehicle_command.control.steering_angle_velocity = 0.0;
-    vehicle_command.emergency = 0;
-  }
-
-  return vehicle_command;
+  return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
 }  // namespace concealer
-
-#else  // ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-
-#include <concealer/autoware_universe.hpp>
-
-namespace concealer
-{
-AutowareUniverse::~AutowareUniverse() { shutdownAutoware(); }
-
-auto AutowareUniverse::engage() -> void {}
-
-auto AutowareUniverse::getAcceleration() const -> double { return {}; }
-
-auto AutowareUniverse::getAutowareStateMessage() const -> std::string { return {}; }
-
-auto AutowareUniverse::getGearSign() const -> double { return 1.0; }
-
-auto AutowareUniverse::getSteeringAngle() const -> double { return {}; }
-
-auto AutowareUniverse::getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand
-{
-  return {};
-}
-
-auto AutowareUniverse::getVelocity() const -> double { return {}; }
-
-auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
-{
-  return {};
-}
-
-auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose &) -> void {}
-
-auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void {}
-
-auto AutowareUniverse::update() -> void {}
-
-auto AutowareUniverse::restrictTargetSpeed(double value) const -> double { return value; }
-
-auto AutowareUniverse::sendSIGINT() -> void { ::kill(process_id, SIGINT); }
-}  // namespace concealer
-
-#endif  // SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO

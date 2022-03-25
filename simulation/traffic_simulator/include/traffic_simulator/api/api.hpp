@@ -212,7 +212,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrowPhase);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColor);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
-  FORWARD_TO_ENTITY_MANAGER(setUpperBoundSpeed);
+  FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
@@ -222,15 +222,6 @@ private:
   bool updateSensorFrame();
   bool updateEntityStatusInSim();
   bool updateTrafficLightsInSim();
-
-  template <typename Parameters>
-  bool spawn(
-    const bool is_ego, const Parameters & parameters,
-    const traffic_simulator_msgs::msg::EntityStatus & status,
-    const std::string & behavior = PedestrianBehavior::defaultBehavior())
-  {
-    return spawn(is_ego, parameters.toXml(), status, behavior);
-  }
 
   const Configuration configuration;
 

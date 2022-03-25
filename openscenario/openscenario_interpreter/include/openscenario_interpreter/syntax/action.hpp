@@ -44,34 +44,15 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
 
   explicit Action(const pugi::xml_node &, Scope &);
 
-  using StoryboardElement::currentState;
-
   using StoryboardElement::evaluate;
 
-  /* -------------------------------------------------------------------------
-   *
-   *  An Action's goal is a function of the Action type and cannot be
-   *  generalized. Accomplishing an Action's goal will involve meeting some
-   *  arbitrary prerequisites related with the Action type (for example, a
-   *  SpeedAction accomplishes its goal when the considered Entity is
-   *  travelling at the prescribed speed). If an Action is acting on an
-   *  EntitySelection, all instances of Entity within the selection have to
-   *  complete in order to reach the completeState of the Action.
-   *
-   * ---------------------------------------------------------------------- */
   auto accomplished() const -> bool override;
-
-  auto elements() -> Elements & override;
-
-  auto ready() -> bool override;
 
   auto run() -> void override;
 
   auto start() -> void override;
 
   auto stop() -> void override;
-
-  auto stopTriggered() noexcept -> bool override;
 };
 
 auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;

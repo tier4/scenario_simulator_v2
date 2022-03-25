@@ -41,6 +41,7 @@ const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateW
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
   const auto ids = hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id);
+  // DIFFERENT SPLINE - recalculation needed
   traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ids));
   double s_in_spline = 0;
   for (const auto id : ids) {
@@ -52,7 +53,8 @@ const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateW
     }
   }
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
-  waypoints.waypoints = spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0);
+  waypoints.waypoints =
+    spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0, entity_status.lanelet_pose.offset);
   return waypoints;
 }
 

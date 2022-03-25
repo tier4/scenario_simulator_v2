@@ -38,6 +38,8 @@ struct UserDefinedAction : public ComplexType
 
   static auto endsImmediately() -> bool;
 
+  /*  */ auto evaluate() -> Object;
+
   /*  */ auto run() -> void;
 
   /*  */ auto start() -> void;

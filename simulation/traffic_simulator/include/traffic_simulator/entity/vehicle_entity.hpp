@@ -174,6 +174,8 @@ private:
   std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
   traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
+
+  std::vector<std::int64_t> previous_route_lanelets_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

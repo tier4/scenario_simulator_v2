@@ -26,7 +26,7 @@ AcquirePositionAction::AcquirePositionAction(const pugi::xml_node & node, Scope 
 {
 }
 
-auto AcquirePositionAction::run() -> void
+auto AcquirePositionAction::start() -> void
 {
   const auto acquire_position = overload(
     [](const WorldPosition & position, auto && actor) {

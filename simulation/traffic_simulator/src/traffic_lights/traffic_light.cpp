@@ -24,11 +24,10 @@
 namespace traffic_simulator
 {
 TrafficLight::TrafficLight(
-  const std::int64_t id, std::int64_t relation_id,
+  const std::int64_t id,
   const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions,
   const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions)
 : id(id),
-  relation_id(relation_id),
   color_positions_(color_positions),
   arrow_positions_(arrow_positions),
   color_changed_(true),

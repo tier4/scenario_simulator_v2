@@ -16,6 +16,7 @@
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/helper/helper.hpp>
 
 namespace entity_behavior
 {
@@ -164,9 +165,12 @@ PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_spe
   entity_status_updated.action_status.accel = accel_new;
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
   if (entity_status.lanelet_pose_valid) {
-    lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.lanelet_pose.lanelet_id);
+    lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.lanelet_pose.lanelet_id, 1.0);
   } else {
     lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.bounding_box, true);
+  }
+  if (!lanelet_pose) {
+    lanelet_pose = hdmap_utils->toLaneletPose(pose_new, true, 2.0);
   }
   if (lanelet_pose) {
     entity_status_updated.lanelet_pose_valid = true;

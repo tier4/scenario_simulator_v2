@@ -31,36 +31,32 @@ from pathlib import Path
 
 
 def architecture_types():
-    return ["awf/auto", "awf/universe", "tier4/proposal"]
+    return ["awf/universe"]
 
 
 def default_autoware_launch_package_of(architecture_type):
     if architecture_type not in architecture_types():
         raise KeyError(
-            f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+            f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/auto": "scenario_simulator_launch",
         "awf/universe": "autoware_launch",
-        "tier4/proposal": "autoware_launch",
     }[architecture_type]
 
 
 def default_autoware_launch_file_of(architecture_type):
     if architecture_type not in architecture_types():
         raise KeyError(
-            f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+            f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/auto": "autoware_auto.launch.py",
         "awf/universe": "planning_simulator.launch.xml",
-        "tier4/proposal": "planning_simulator.launch.xml",
     }[architecture_type]
 
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
-    architecture_type       = LaunchConfiguration("architecture_type",       default="tier4/proposal")
+    architecture_type       = LaunchConfiguration("architecture_type",       default="awf/universe")
     autoware_launch_file    = LaunchConfiguration("autoware_launch_file",    default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package = LaunchConfiguration("autoware_launch_package", default=default_autoware_launch_package_of(architecture_type.perform(context)))
     global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)

@@ -12,12 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/math/linear_algebra.hpp>
 
 namespace traffic_simulator
 {
 namespace math
 {
+double innerProduct(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
+{
+  return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
+}
+
+double getInternalAngle(
+  const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
+{
+  const auto val = innerProduct(v0, v1) / (getSize(v0) * getSize(v1));
+  if (-1 <= val && val <= 1) {
+    return std::acos(val);
+  }
+  THROW_SIMULATION_ERROR(
+    "value of v0*v1/(size(v0)*size(v1)) in vector v0 : \n", v0, " and v1 : \n", v1,
+    "is out of range, value = ", val);
+}
+
 geometry_msgs::msg::Vector3 vector3(double x, double y, double z)
 {
   geometry_msgs::msg::Vector3 vec;
@@ -83,6 +101,16 @@ geometry_msgs::msg::Vector3 operator+(
   return ret;
 }
 
+geometry_msgs::msg::Point operator+(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1)
+{
+  geometry_msgs::msg::Point ret;
+  ret.x = v0.x + v1.x;
+  ret.y = v0.y + v1.y;
+  ret.z = v0.z + v1.z;
+  return ret;
+}
+
 geometry_msgs::msg::Point operator-(
   const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Vector3 & v1)
 {
@@ -101,4 +129,32 @@ geometry_msgs::msg::Vector3 operator-(
   ret.y = v0.y - v1.y;
   ret.z = v0.z - v1.z;
   return ret;
+}
+
+geometry_msgs::msg::Point operator-(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1)
+{
+  geometry_msgs::msg::Point ret;
+  ret.x = v0.x - v1.x;
+  ret.y = v0.y - v1.y;
+  ret.z = v0.z - v1.z;
+  return ret;
+}
+
+bool operator==(const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1)
+{
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  if (std::fabs(v0.x - v1.x) <= e && std::fabs(v0.y - v1.y) <= e && std::fabs(v0.z - v1.z) <= e) {
+    return true;
+  }
+  return false;
+}
+
+bool operator==(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
+{
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  if (std::fabs(v0.x - v1.x) <= e && std::fabs(v0.y - v1.y) <= e && std::fabs(v0.z - v1.z) <= e) {
+    return true;
+  }
+  return false;
 }
