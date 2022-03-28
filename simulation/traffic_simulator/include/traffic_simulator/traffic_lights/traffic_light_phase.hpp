@@ -35,36 +35,21 @@ public:
   {
     if (phase_.empty()) {
       THROW_SEMANTIC_ERROR("phase is empty");
+    } else {
+      return phase_.front().second;
     }
-    double t = 0;
-    for (const auto p : phase_) {
-      t = t + p.first;
-      if (t > elapsed_time_) {
-        return p.second;
-      }
-    }
-    THROW_SIMULATION_ERROR("failed to get state of the traffic light, time does not match");
   }
 
-  void update(double step_time)
-  {
-    if (phase_.empty()) {
-      elapsed_time_ = 0;
-    } else {
-      elapsed_time_ = elapsed_time_ + step_time;
-    }
-  }
+  void update(double) {}
 
   void setState(const T & state)
   {
     phase_.clear();
     phase_.emplace_back(std::numeric_limits<double>::infinity(), state);
-    elapsed_time_ = 0;
   }
 
 private:
   std::vector<std::pair<double, T>> phase_;
-  double elapsed_time_;
 };
 }  // namespace traffic_simulator
 
