@@ -30,20 +30,9 @@ TrafficLight::TrafficLight(
 : id(id),
   color_positions_(color_positions),
   arrow_positions_(arrow_positions),
-  color_changed_(true),
-  arrow_changed_(true)
+  color_(TrafficLightColor::NONE),
+  arrow_(TrafficLightArrow::NONE)
 {
-  color_ = TrafficLightColor::NONE;
-  arrow_ = TrafficLightArrow::NONE;
-}
-
-void TrafficLight::update(const double)
-{
-  const auto previous_arrow = getArrow();
-  arrow_changed_ = (previous_arrow != getArrow());
-
-  const auto previous_color = getColor();
-  color_changed_ = (previous_color != getColor());
 }
 
 const geometry_msgs::msg::Point & TrafficLight::getPosition(const TrafficLightColor & color) const

@@ -40,10 +40,19 @@ public:
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
 
-  void setArrow(const TrafficLightArrow arrow) { arrow_ = arrow; }
-  void setColor(const TrafficLightColor color) { color_ = color; }
+  void setArrow(const TrafficLightArrow arrow)
+  {
+    arrow_ = arrow;
+    arrow_changed_ = true;
+  }
 
-  void update(const double step_time);
+  void setColor(const TrafficLightColor color)
+  {
+    color_ = color;
+    color_changed_ = true;
+  }
+
+  void update(const double) { arrow_changed_ = color_changed_ = false; }
 
   TrafficLightArrow getArrow() const { return arrow_; }
   TrafficLightColor getColor() const { return color_; }
@@ -91,8 +100,8 @@ private:
   TrafficLightColor color_;
   TrafficLightArrow arrow_;
 
-  bool color_changed_;
-  bool arrow_changed_;
+  bool color_changed_ = false;
+  bool arrow_changed_ = false;
 };
 }  // namespace traffic_simulator
 
