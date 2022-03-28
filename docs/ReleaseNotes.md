@@ -15,9 +15,10 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature                                | Brief summary                                                                 | Category                   | Pull request                                                    | Contributor                                   |
-|----------------------------------------|-------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|-----------------------------------------------|
-| OpenSCENARIO `Storyboard.Init.Actions` | Fix `Init.Actions.GlobalAction` and `Init.Actions.UserDefinedAction` to work. | `openscenario_interpreter` | [#734](https://github.com/tier4/scenario_simulator_v2/pull/734) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Feature                                | Brief summary                                                                       | Category                   | Pull request                                                    | Contributor                                   |
+| -------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `Storyboard.Init.Actions` | Fix `Init.Actions.GlobalAction` and `Init.Actions.UserDefinedAction` to work.       | `openscenario_interpreter` | [#734](https://github.com/tier4/scenario_simulator_v2/pull/734) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Fix waypoint height                    | Height of the NPC waypoint was 0. Get waypoint height from center point of lanelet. | `traffic_simulator`        | [#718](https://github.com/tier4/scenario_simulator_v2/pull/718) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 
@@ -33,6 +34,7 @@ Minor Tweaks :oncoming_police_car:
 - Fix problem in getFrontEntityName function, consider yaw difference while stopping at crossing entity. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/703))
 - Fix problem in delay steer acc geard dynamics model. Vehicle was pulled back very slowly even if the vehicle is stopped. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/707))
 - Start considering offset in collision detection in crossing entity. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/709))
+- Fix waypoint height, the height of the each waypoint was zero. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/718))
 
 ## Version 0.6.2
 - Start supporting linear trajectory shape while changing lane. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/661))
