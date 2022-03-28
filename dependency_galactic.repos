@@ -3,18 +3,10 @@ repositories:
     type: git
     url: https://github.com/tier4/autoware_auto_msgs.git
     version: tier4/main
-  quaternion_operation:
-    type: git
-    url: https://github.com/OUXT-Polaris/quaternion_operation.git
-    version: ros2
   operational-design-domains:
     type: git
     url: https://gitlab.com/autowarefoundation/operational-design-domains
   tier4_msgs:
     type: git
     url: https://github.com/tier4/AutowareArchitectureProposal_msgs.git
-    version: tier4/universe # for Autoware.Unvierse (Tier IV)
-  ouxt_common:
-    type: git
-    url: https://github.com/OUXT-Polaris/ouxt_common.git
-    version: master
+    version: tier4/universe # for Autoware.Universe (Tier IV)

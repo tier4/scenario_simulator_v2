@@ -25,10 +25,39 @@
 
 namespace simple_sensor_simulator
 {
+const std::vector<std::string> DetectionSensorBase::getDetectedObjects(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
+{
+  std::vector<std::string> detected_objects;
+  const auto pose = getSensorPose(status);
+  for (const auto & s : status) {
+    double distance = std::hypot(
+      s.pose().position().x() - pose.position().x(), s.pose().position().y() - pose.position().y(),
+      s.pose().position().z() - pose.position().z());
+    if (s.name() != configuration_.entity() && distance <= configuration_.range()) {
+      detected_objects.emplace_back(s.name());
+    }
+  }
+  return detected_objects;
+}
+
+geometry_msgs::Pose DetectionSensorBase::getSensorPose(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
+{
+  for (const auto & s : status) {
+    if (
+      s.type().type() == traffic_simulator_msgs::EntityType::EGO &&
+      s.name() == configuration_.entity()) {
+      return s.pose();
+    }
+  }
+  throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
+}
+
 template <>
 void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-  const rclcpp::Time & stamp, const std::vector<std::string> & detected_objects)
+  const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity)
 {
   auto makeObjectClassification = [](const auto & label) {
     autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
@@ -39,7 +68,12 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
 
     return object_classification;
   };
-
+  std::vector<std::string> detected_objects;
+  if (configuration_.filter_by_range()) {
+    detected_objects = getDetectedObjects(status);
+  } else {
+    detected_objects = lidar_detected_entity;
+  }
   if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
     autoware_auto_perception_msgs::msg::PredictedObjects msg;
     msg.header.stamp = stamp;

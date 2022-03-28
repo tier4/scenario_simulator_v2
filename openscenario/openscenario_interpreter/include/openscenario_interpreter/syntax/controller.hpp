@@ -55,9 +55,7 @@ struct Controller : public Scope
 
   auto assign(const EntityRef &) -> void;
 
-  auto isUserDefinedController() & -> bool;
-
-  auto operator[](const String &) -> const Property &;
+  auto isUserDefinedController() const & -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
