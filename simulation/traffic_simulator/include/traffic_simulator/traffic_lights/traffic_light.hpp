@@ -43,9 +43,6 @@ public:
   void setColor(const TrafficLightColor color);
   void setArrow(const TrafficLightArrow arrow);
 
-  double getColorPhaseDuration() const;
-  double getArrowPhaseDuration() const;
-
   void update(const double step_time);
 
   TrafficLightArrow getArrow() const;

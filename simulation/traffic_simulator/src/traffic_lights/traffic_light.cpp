@@ -40,9 +40,6 @@ TrafficLight::TrafficLight(
 void TrafficLight::setColor(const TrafficLightColor color) { color_phase_.setState(color); }
 void TrafficLight::setArrow(const TrafficLightArrow arrow) { arrow_phase_.setState(arrow); }
 
-double TrafficLight::getColorPhaseDuration() const { return color_phase_.getPhaseDuration(); }
-double TrafficLight::getArrowPhaseDuration() const { return arrow_phase_.getPhaseDuration(); }
-
 TrafficLightColor TrafficLight::getColor() const { return color_phase_.getState(); }
 TrafficLightArrow TrafficLight::getArrow() const { return arrow_phase_.getState(); }
 
