@@ -40,23 +40,7 @@ struct Maneuver : public Scope, public StoryboardElement
 {
   const ParameterDeclarations parameter_declarations;
 
-  Elements events;
-
   explicit Maneuver(const pugi::xml_node &, Scope &);
-
-  auto accomplished() const -> bool override;
-
-  auto elements() -> Elements & override;
-
-  auto ready() noexcept -> bool override;
-
-  auto run() -> void override;
-
-  auto start() noexcept -> void override;
-
-  auto stop() -> void override;
-
-  auto stopTriggered() noexcept -> bool override;
 };
 
 auto operator<<(nlohmann::json &, const Maneuver &) -> nlohmann::json &;

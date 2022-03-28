@@ -46,7 +46,7 @@ public:
 
   const std::string name;
 
-  EntityBase(const std::string & type, const std::string & name);
+  EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype);
 
   virtual ~EntityBase() = default;
 
@@ -201,6 +201,7 @@ protected:
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
+  std::shared_ptr<traffic_simulator::math::CatmullRomSpline> spline_;
 
   bool verbose_;
   bool visibility_;
@@ -213,6 +214,7 @@ protected:
 
   visualization_msgs::msg::MarkerArray current_marker_;
   traffic_simulator_msgs::msg::EntityType entity_type_;
+  const traffic_simulator_msgs::msg::EntitySubtype entity_subtype_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

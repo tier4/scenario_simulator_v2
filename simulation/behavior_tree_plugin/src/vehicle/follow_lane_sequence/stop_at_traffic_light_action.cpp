@@ -33,8 +33,7 @@ StopAtTrafficLightAction::StopAtTrafficLightAction(
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle>
-StopAtTrafficLightAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+StopAtTrafficLightAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stop_target_) {
     return boost::none;
@@ -42,8 +41,7 @@ StopAtTrafficLightAction::calculateObstacle(
   if (distance_to_stop_target_.get() < 0) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
-  if (distance_to_stop_target_.get() > spline.getLength()) {
+  if (distance_to_stop_target_.get() > reference_trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -59,8 +57,7 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtTrafficLightAction::calc
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
-    waypoints.waypoints = spline.getTrajectory(
+    waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
       entity_status.lanelet_pose.offset);
     return waypoints;

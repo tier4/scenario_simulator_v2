@@ -2,6 +2,48 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.3 (2022-03-09)
+------------------
+* Merge pull request `#717 <https://github.com/tier4/scenario_simulator_v2/issues/717>`_ from tier4/improvement/sample-scenario
+  Improvement/sample scenario
+* Fix some paths `test/scenario` to `scenario`
+* Move directory `test/scenario` to `scenario`
+* Update `sample` Vehicle parameter to match `sample_vehicle_description`
+* Fix scenario `minimal` to work
+* Remove some unused test scenarios
+* Rename scenario `autoware-simple` to `sample`
+* Update scenario `autoware-simple` to parameterize lane IDs
+* Merge pull request `#716 <https://github.com/tier4/scenario_simulator_v2/issues/716>`_ from tier4/dependency/remove-lexus-description
+  Remove `lexus_description` from dependency
+* Update sample scenario `autoware-simple`
+* Remove `lexus_description` from dependency
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
+  Feature/autoware external api
+* Replace `AwapiAutowareStatus` with `autoware_auto_system_msgs::msg::AutowareState`
+* Merge pull request `#702 <https://github.com/tier4/scenario_simulator_v2/issues/702>`_ from tier4/fix/no-perform-method
+  fix: no perform method in str object
+* fix: no perform method in str object
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Remove architecture_type `awf/auto`
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#679 <https://github.com/tier4/scenario_simulator_v2/issues/679>`_ from tier4/refactor/interpreter/scope
+  Refactor/interpreter/scope
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#672 <https://github.com/tier4/scenario_simulator_v2/issues/672>`_ from tier4/fix/interpreter/lifecycle
+  Fix/interpreter/lifecycle
+* construct/destruct connection at on_activate/on_deactivate
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Remove architecture_type `tier4/proposal`
+* Contributors: Makoto Tokunaga, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/lane_change_trajectory_shape

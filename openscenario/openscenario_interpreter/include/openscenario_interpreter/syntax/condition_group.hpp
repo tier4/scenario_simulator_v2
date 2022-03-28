@@ -41,12 +41,20 @@ struct ConditionGroup : public std::list<Condition>
 {
   bool current_value;
 
+  // NOTE: Default constructed ConditionGroup must be return TRUE.
+  ConditionGroup() = default;
+
   explicit ConditionGroup(const pugi::xml_node &, Scope &);
 
   auto evaluate() -> Object;
 };
 
 auto operator<<(nlohmann::json &, const ConditionGroup &) -> nlohmann::json &;
+
+template <typename T>
+using isConditionGroup = typename std::is_same<typename std::decay<T>::type, ConditionGroup>;
+
+static_assert(isConditionGroup<ConditionGroup>::value);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

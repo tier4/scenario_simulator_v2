@@ -43,6 +43,8 @@ struct GlobalAction : public ComplexType
 
   auto endsImmediately() const -> bool;
 
+  auto evaluate() -> Object;
+
   auto run() -> void;
 
   auto start() -> void;

@@ -2,6 +2,25 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.3 (2022-03-09)
+------------------
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge pull request `#699 <https://github.com/tier4/scenario_simulator_v2/issues/699>`_ from tier4/dependabot/pip/openscenario/openscenario_utility/numpy-1.21.0
+  Bump numpy from 1.19.4 to 1.21.0 in /openscenario/openscenario_utility
+* Bump numpy from 1.19.4 to 1.21.0 in /openscenario/openscenario_utility
+  Bumps [numpy](https://github.com/numpy/numpy) from 1.19.4 to 1.21.0.
+  - [Release notes](https://github.com/numpy/numpy/releases)
+  - [Changelog](https://github.com/numpy/numpy/blob/main/doc/HOWTO_RELEASE.rst.txt)
+  - [Commits](https://github.com/numpy/numpy/compare/v1.19.4...v1.21.0)
+  ---
+  updated-dependencies:
+  - dependency-name: numpy
+  dependency-type: direct:production
+  ...
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Contributors: Masaya Kataoka, MasayaKataoka, dependabot[bot], yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
