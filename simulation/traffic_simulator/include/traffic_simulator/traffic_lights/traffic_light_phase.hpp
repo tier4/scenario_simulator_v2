@@ -82,8 +82,6 @@ public:
     elapsed_time_ = time_offset;
   }
 
-  const auto & getPhase() const noexcept { return phase_; }
-
 private:
   std::vector<std::pair<double, T>> phase_;
   double elapsed_time_;
