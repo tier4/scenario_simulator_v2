@@ -40,13 +40,13 @@ public:
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
 
-  void setColor(const TrafficLightColor color);
-  void setArrow(const TrafficLightArrow arrow);
+  void setArrow(const TrafficLightArrow arrow) { arrow_phase_.state = arrow; }
+  void setColor(const TrafficLightColor color) { color_phase_.state = color; }
 
   void update(const double step_time);
 
-  TrafficLightArrow getArrow() const;
-  TrafficLightColor getColor() const;
+  TrafficLightArrow getArrow() const { return arrow_phase_.state; }
+  TrafficLightColor getColor() const { return color_phase_.state; }
 
   const geometry_msgs::msg::Point & getPosition(const TrafficLightColor & color) const;
   const geometry_msgs::msg::Point & getPosition(const TrafficLightArrow & arrow) const;

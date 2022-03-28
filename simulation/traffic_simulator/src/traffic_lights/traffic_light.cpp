@@ -33,15 +33,9 @@ TrafficLight::TrafficLight(
   color_changed_(true),
   arrow_changed_(true)
 {
-  color_phase_.setState(TrafficLightColor::NONE);
-  arrow_phase_.setState(TrafficLightArrow::NONE);
+  color_phase_.state = TrafficLightColor::NONE;
+  arrow_phase_.state = TrafficLightArrow::NONE;
 }
-
-void TrafficLight::setColor(const TrafficLightColor color) { color_phase_.setState(color); }
-void TrafficLight::setArrow(const TrafficLightArrow arrow) { arrow_phase_.setState(arrow); }
-
-TrafficLightColor TrafficLight::getColor() const { return color_phase_.getState(); }
-TrafficLightArrow TrafficLight::getArrow() const { return arrow_phase_.getState(); }
 
 void TrafficLight::update(const double)
 {

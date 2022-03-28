@@ -29,25 +29,11 @@ class TrafficLightPhase
 public:
   TrafficLightPhase() = default;
 
-  explicit TrafficLightPhase(const std::vector<std::pair<double, T>> & phase) : phase_(phase) {}
-
-  const T getState() const
+  explicit TrafficLightPhase(const std::vector<std::pair<double, T>> & phase) : state(phase.front())
   {
-    if (phase_.empty()) {
-      THROW_SEMANTIC_ERROR("phase is empty");
-    } else {
-      return phase_.front().second;
-    }
   }
 
-  void setState(const T & state)
-  {
-    phase_.clear();
-    phase_.emplace_back(std::numeric_limits<double>::infinity(), state);
-  }
-
-private:
-  std::vector<std::pair<double, T>> phase_;
+  T state;
 };
 }  // namespace traffic_simulator
 
