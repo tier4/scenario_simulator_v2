@@ -40,8 +40,6 @@ public:
     }
   }
 
-  void update(double) {}
-
   void setState(const T & state)
   {
     phase_.clear();
