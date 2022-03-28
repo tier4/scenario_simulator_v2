@@ -76,12 +76,6 @@ public:
     elapsed_time_ = 0;
   }
 
-  void setPhase(const std::vector<std::pair<double, T>> & phase, double time_offset = 0)
-  {
-    phase_ = phase;
-    elapsed_time_ = time_offset;
-  }
-
 private:
   std::vector<std::pair<double, T>> phase_;
   double elapsed_time_;
