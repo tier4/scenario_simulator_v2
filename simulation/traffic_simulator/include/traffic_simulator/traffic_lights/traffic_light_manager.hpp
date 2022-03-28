@@ -143,9 +143,7 @@ public:
   static_assert(true, "")
 
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrow);
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrowPhase);
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setColor);
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setColorPhase);
 
 #undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
 };

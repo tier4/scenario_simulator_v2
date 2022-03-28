@@ -164,9 +164,7 @@ public:
   static_assert(true, "")
 
   DEFINE_SET_TRAFFIC_LIGHT(Arrow);
-  DEFINE_SET_TRAFFIC_LIGHT(ArrowPhase);
   DEFINE_SET_TRAFFIC_LIGHT(Color);
-  DEFINE_SET_TRAFFIC_LIGHT(ColorPhase);
 
 #undef DEFINE_SET_TRAFFIC_LIGHT
 

@@ -40,18 +40,6 @@ public:
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
 
-  template <typename... Ts>
-  decltype(auto) setColorPhase(Ts &&... xs)
-  {
-    return color_phase_.setPhase(std::forward<decltype(xs)>(xs)...);
-  }
-
-  template <typename... Ts>
-  decltype(auto) setArrowPhase(Ts &&... xs)
-  {
-    return arrow_phase_.setPhase(std::forward<decltype(xs)>(xs)...);
-  }
-
   void setColor(const TrafficLightColor color);
   void setArrow(const TrafficLightArrow arrow);
 

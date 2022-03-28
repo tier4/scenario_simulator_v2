@@ -132,11 +132,7 @@ private:
       "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
 
-    const std::vector<std::pair<double, traffic_simulator::TrafficLightColor>> phase{
-      {1, traffic_simulator::TrafficLightColor::GREEN},
-      {1, traffic_simulator::TrafficLightColor::YELLOW},
-      {1, traffic_simulator::TrafficLightColor::RED}};
-    api_.setTrafficLightColorPhase(34802, phase);
+    api_.setTrafficLightColor(34802, traffic_simulator::TrafficLightColor::GREEN);
   }
 
 private:

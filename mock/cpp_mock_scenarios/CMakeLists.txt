@@ -48,7 +48,6 @@ add_subdirectory(src/metrics)
 add_subdirectory(src/move_backward)
 add_subdirectory(src/pedestrian)
 add_subdirectory(src/speed_planning)
-add_subdirectory(src/traffic_light)
 
 install(
   DIRECTORY launch rviz
