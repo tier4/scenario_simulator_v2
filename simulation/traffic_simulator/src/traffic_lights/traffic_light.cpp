@@ -33,8 +33,8 @@ TrafficLight::TrafficLight(
   color_changed_(true),
   arrow_changed_(true)
 {
-  color_phase_.state = TrafficLightColor::NONE;
-  arrow_phase_.state = TrafficLightArrow::NONE;
+  color_ = TrafficLightColor::NONE;
+  arrow_ = TrafficLightArrow::NONE;
 }
 
 void TrafficLight::update(const double)

@@ -16,11 +16,11 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
+#include <geometry_msgs/msg/point.hpp>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <traffic_simulator/color_utils/color_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_phase.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <unordered_map>
 #include <utility>
@@ -40,13 +40,13 @@ public:
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
 
-  void setArrow(const TrafficLightArrow arrow) { arrow_phase_.state = arrow; }
-  void setColor(const TrafficLightColor color) { color_phase_.state = color; }
+  void setArrow(const TrafficLightArrow arrow) { arrow_ = arrow; }
+  void setColor(const TrafficLightColor color) { color_ = color; }
 
   void update(const double step_time);
 
-  TrafficLightArrow getArrow() const { return arrow_phase_.state; }
-  TrafficLightColor getColor() const { return color_phase_.state; }
+  TrafficLightArrow getArrow() const { return arrow_; }
+  TrafficLightColor getColor() const { return color_; }
 
   const geometry_msgs::msg::Point & getPosition(const TrafficLightColor & color) const;
   const geometry_msgs::msg::Point & getPosition(const TrafficLightArrow & arrow) const;
@@ -88,8 +88,8 @@ private:
   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;
   std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions_;
 
-  TrafficLightPhase<TrafficLightColor> color_phase_;
-  TrafficLightPhase<TrafficLightArrow> arrow_phase_;
+  TrafficLightColor color_;
+  TrafficLightArrow arrow_;
 
   bool color_changed_;
   bool arrow_changed_;
