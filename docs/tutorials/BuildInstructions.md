@@ -47,5 +47,5 @@ rosdep install -iry --from-paths src/scenario_simulator_v2 --rosdistro galactic
 ## Build scenario_simulator_vs
 
 ```bash
-colcon build --symlink-install
+colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```

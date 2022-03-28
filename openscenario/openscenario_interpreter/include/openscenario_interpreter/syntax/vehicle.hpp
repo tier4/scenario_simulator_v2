@@ -61,12 +61,6 @@ struct Vehicle : public Scope  // for ParameterDeclarations
   explicit Vehicle(const pugi::xml_node &, Scope &);
 
   explicit operator traffic_simulator_msgs::msg::VehicleParameters() const;
-
-  template <typename... Ts>
-  auto operator[](Ts &&... xs) -> decltype(auto)
-  {
-    return properties.operator[](std::forward<decltype(xs)>(xs)...);
-  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

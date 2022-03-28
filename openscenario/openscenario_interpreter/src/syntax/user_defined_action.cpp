@@ -28,6 +28,14 @@ UserDefinedAction::UserDefinedAction(const pugi::xml_node & node, Scope & scope)
 
 auto UserDefinedAction::endsImmediately() -> bool { return true; }
 
+auto UserDefinedAction::evaluate() -> Object
+{
+  assert(endsImmediately());  // NOTE: Called from `InitActions::evaluate`
+  apply<void>([](auto && action) { return action.start(); }, *this);
+  apply<void>([](auto && action) { return action.run(); }, *this);
+  return unspecified;
+}
+
 auto UserDefinedAction::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
