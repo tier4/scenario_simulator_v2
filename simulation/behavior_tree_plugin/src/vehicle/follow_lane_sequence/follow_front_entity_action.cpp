@@ -41,7 +41,7 @@ FollowFrontEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::Wa
   if (distance_to_front_entity_.get() < 0) {
     return boost::none;
   }
-  if (distance_to_front_entity_.get() > subspline->getLength()) {
+  if (distance_to_front_entity_.get() > trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -63,7 +63,7 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
-    subspline = std::make_unique<traffic_simulator::math::CatmullRomSpline>(
+    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSpline>(
       reference_trajectory->getSubspline(
         entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon));
     return waypoints;
@@ -88,9 +88,9 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *subspline);
-  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *subspline);
-  const auto front_entity_name = getFrontEntityName(*subspline);
+  auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
+  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *trajectory);
+  const auto front_entity_name = getFrontEntityName(*trajectory);
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
@@ -102,8 +102,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   // std::cout << "distance_to_front_entity_" << distance_to_front_entity_.get() << std::endl;
 
   // // THIS DOES NOT WORK
-  // std::cout << "subspline calc!" << std::endl;
-  // distance_to_front_entity_ = getDistanceToTargetEntityPolygon(*subspline, front_entity_name.get());
+  // std::cout << "trajectory calc!" << std::endl;
+  // distance_to_front_entity_ = getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.get());
   // std::cout << "distance_to_front_entity_" << distance_to_front_entity_.get() << std::endl;
 
   if (!distance_to_front_entity_) {

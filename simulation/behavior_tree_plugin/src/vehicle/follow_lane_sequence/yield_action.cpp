@@ -41,7 +41,7 @@ const boost::optional<traffic_simulator_msgs::msg::Obstacle> YieldAction::calcul
   if (distance_to_stop_target_.get() < 0) {
     return boost::none;
   }
-  if (distance_to_stop_target_.get() > subspline->getLength()) {
+  if (distance_to_stop_target_.get() > trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -62,7 +62,7 @@ const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoint
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
-    subspline = std::make_unique<traffic_simulator::math::CatmullRomSpline>(
+    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSpline>(
       reference_trajectory->getSubspline(
         entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon));
     return waypoints;
