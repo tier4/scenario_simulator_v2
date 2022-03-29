@@ -94,7 +94,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
 
-  distance_to_front_entity_ = getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.get());
+  distance_to_front_entity_ =
+    getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.get());
 
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
