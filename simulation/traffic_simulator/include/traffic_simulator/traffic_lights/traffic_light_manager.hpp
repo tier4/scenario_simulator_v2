@@ -56,23 +56,8 @@ protected:
     map_frame_(map_frame)
   {
     for (const auto id : hdmap->getTrafficLightIds()) {
-      std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions;
-      if (
-        const auto red_position = hdmap->getTrafficLightBulbPosition(id, TrafficLightColor::RED)) {
-        color_positions.emplace(TrafficLightColor::RED, red_position.get());
-      }
-      if (
-        const auto yellow_position =
-          hdmap->getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW)) {
-        color_positions.emplace(TrafficLightColor::YELLOW, yellow_position.get());
-      }
-      if (
-        const auto green_position =
-          hdmap->getTrafficLightBulbPosition(id, TrafficLightColor::GREEN)) {
-        color_positions.emplace(TrafficLightColor::GREEN, green_position.get());
-      }
       traffic_lights_.emplace(
-        std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, color_positions));
+        std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, hdmap));
     }
   }
 

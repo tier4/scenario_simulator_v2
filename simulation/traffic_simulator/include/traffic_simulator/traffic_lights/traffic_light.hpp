@@ -19,8 +19,10 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <stdexcept>
 #include <traffic_simulator/color_utils/color_utils.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <unordered_map>
 #include <utility>
@@ -36,9 +38,22 @@ public:
   const std::int64_t id;
 
   explicit TrafficLight(
-    std::int64_t id,
-    const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
-    const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
+    const std::int64_t id, const std::shared_ptr<hdmap_utils::HdMapUtils> & map_manager = nullptr)
+  : id(id), color_(TrafficLightColor::NONE), arrow_(TrafficLightArrow::NONE)
+  {
+    auto locate = [&](auto && color) {
+      assert(map_manager);
+      if (const auto position = map_manager->getTrafficLightBulbPosition(id, color)) {
+        color_positions_.emplace(color, position.get());
+      }
+    };
+
+    if (map_manager) {
+      locate(TrafficLightColor::GREEN);
+      locate(TrafficLightColor::RED);
+      locate(TrafficLightColor::YELLOW);
+    }
+  }
 
   void setArrow(const TrafficLightArrow arrow)
   {

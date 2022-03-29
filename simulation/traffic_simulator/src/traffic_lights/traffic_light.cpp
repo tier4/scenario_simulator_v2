@@ -23,18 +23,6 @@
 
 namespace traffic_simulator
 {
-TrafficLight::TrafficLight(
-  const std::int64_t id,
-  const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions,
-  const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions)
-: id(id),
-  color_positions_(color_positions),
-  arrow_positions_(arrow_positions),
-  color_(TrafficLightColor::NONE),
-  arrow_(TrafficLightArrow::NONE)
-{
-}
-
 const geometry_msgs::msg::Point & TrafficLight::getPosition(const TrafficLightColor & color) const
 {
   if (color_positions_.count(color) == 0) {
