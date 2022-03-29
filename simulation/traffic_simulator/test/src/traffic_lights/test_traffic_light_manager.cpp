@@ -31,7 +31,7 @@ TEST(TrafficLightManager, getIds)
     manager(hdmap_utils_ptr, node, "map");
   EXPECT_FALSE(manager.getTrafficLights().find(34836) == std::end(manager.getTrafficLights()));
   EXPECT_FALSE(manager.getTrafficLights().find(34802) == std::end(manager.getTrafficLights()));
-  EXPECT_EQ(manager.getTrafficLights().size() == 2);
+  EXPECT_EQ(manager.getTrafficLights().size(), static_cast<std::size_t>(2));
 }
 
 TEST(TrafficLightManager, setColor)

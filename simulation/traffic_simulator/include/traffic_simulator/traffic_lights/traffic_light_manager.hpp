@@ -84,16 +84,16 @@ protected:
 
   virtual auto publishTrafficLightStateArray() const -> void = 0;
 
+  auto isTrafficLightId(const LaneletID) -> bool;
+
+  auto isTrafficRelationId(const LaneletID) -> bool;
+
 public:
   auto getTrafficLights() const -> const auto & { return traffic_lights_; }
 
   auto hasAnyLightChanged() -> bool;
 
   auto update(const double) -> void;
-
-  auto isTrafficLightId(const LaneletID) -> bool;
-
-  auto isTrafficRelationId(const LaneletID) -> bool;
 
 #define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                         \
   template <typename... Ts>                                                                \
