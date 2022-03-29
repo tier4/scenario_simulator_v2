@@ -275,21 +275,10 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_left, double length_extension_front, double length_extension_rear)
 {
   if (status.lanelet_pose_valid) {
-    // std::cout << "Points(";
-    // for (const auto & point : points) {
-    //   std::cout << "\n\tx: " << point.x << ", y: " << point.y << ", z:" << point.z;
-    // }
-    // std::cout << "\n)." << std::endl;
-
     const auto polygon = traffic_simulator::math::transformPoints(
       status.pose, traffic_simulator::math::getPointsFromBbox(
                      status.bounding_box, width_extension_right, width_extension_left,
                      length_extension_front, length_extension_rear));
-    // std::cout << "Polygon(";
-    // for (const auto & point : polygon) {
-    //   std::cout << "\n\tx: " << point.x << ", y: " << point.y << ", z:" << point.z;
-    // }
-    // std::cout << "\n)." << std::endl;
 
     return spline.getCollisionPointIn2D(polygon, false, true);
   }

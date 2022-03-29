@@ -110,7 +110,6 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   if (!distance_to_traffic_stop_line) {
     return BT::NodeStatus::FAILURE;
   }
-  // calculating the distance for the second time???
   distance_to_stop_target_ = getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
   boost::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {

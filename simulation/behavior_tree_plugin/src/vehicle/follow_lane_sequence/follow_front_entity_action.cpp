@@ -47,7 +47,6 @@ FollowFrontEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::Wa
   traffic_simulator_msgs::msg::Obstacle obstacle;
   obstacle.type = obstacle.ENTITY;
   obstacle.s = distance_to_front_entity_.get();
-  // std::cout << "obstacle.s" << obstacle.s << std::endl;
   return obstacle;
 }
 
@@ -97,14 +96,10 @@ BT::NodeStatus FollowFrontEntityAction::tick()
 
   // THIS WORKS
   const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
-  // std::cout << "spline calc!" << std::endl;
   distance_to_front_entity_ = getDistanceToTargetEntityPolygon(spline, front_entity_name.get());
-  // std::cout << "distance_to_front_entity_" << distance_to_front_entity_.get() << std::endl;
 
   // // THIS DOES NOT WORK
-  // std::cout << "trajectory calc!" << std::endl;
   // distance_to_front_entity_ = getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.get());
-  // std::cout << "distance_to_front_entity_" << distance_to_front_entity_.get() << std::endl;
 
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;

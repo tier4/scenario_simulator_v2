@@ -115,13 +115,6 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     return boost::none;
   }
 
-  // std::cout << "s_values: ";
-  // for (const auto & s : s_values)
-  // {
-  //   std::cout << s << ", ";
-  // }
-  // std::cout << std::endl;;
-
   if (search_backward) {
     return *std::max_element(s_values.begin(), s_values.end());
   }
@@ -141,7 +134,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   double b = by_ * ex - bx_ * ey;
   double c = cy_ * ex - cx_ * ey;
   double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
-  auto solutions = solver_.solveCubicEquation(a, b, c, d, 0, 100);
+  auto solutions = solver_.solveCubicEquation(a, b, c, d);
   for (const auto solution : solutions) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
     double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
@@ -150,7 +143,6 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     double ty = (y - point0.y) / (point1.y - point0.y);
     if (std::fabs(point1.x - point0.x) > epsilon) {
       if (std::fabs(point1.y - point0.y) > epsilon) {
-        // std::cout << "Found solution " << solution << std::endl;
         if (0 > tx || tx > 1) {
           continue;
         }
@@ -178,7 +170,6 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   if (search_backward) {
     return *std::max_element(s_values.begin(), s_values.end());
   }
-  // std::cout << "Cubic eq for s=" << *std::min_element(s_values.begin(), s_values.end()) <<": a=" << a << ", b=" << b << ", c=" << c << ", d=" << d << std::endl;
   return *std::min_element(s_values.begin(), s_values.end());
 }
 
@@ -226,8 +217,6 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_po
 {
   std::vector<geometry_msgs::msg::Point> ret;
   for (size_t i = 0; i <= num_points; i++) {
-    // this is wrong???
-    // it does work only when num_points/100 == length_???
     double t = static_cast<double>(i) / static_cast<double>(num_points);
     ret.emplace_back(getPoint(t, false));
   }
