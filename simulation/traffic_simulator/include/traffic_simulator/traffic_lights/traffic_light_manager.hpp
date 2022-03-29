@@ -85,9 +85,7 @@ protected:
   virtual auto publishTrafficLightStateArray() const -> void = 0;
 
 public:
-  auto getIds() const -> std::vector<LaneletID>;
-
-  auto getInstance(const LaneletID) const -> TrafficLight;
+  auto getTrafficLights() const -> const auto & { return traffic_lights_; }
 
   auto hasAnyLightChanged() -> bool;
 

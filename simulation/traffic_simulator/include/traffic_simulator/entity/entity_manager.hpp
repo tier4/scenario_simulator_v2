@@ -178,10 +178,13 @@ public:
 
   DEFINE_GET_TRAFFIC_LIGHT(Color);
   DEFINE_GET_TRAFFIC_LIGHT(Arrow);
-  DEFINE_GET_TRAFFIC_LIGHT(Ids);
-  DEFINE_GET_TRAFFIC_LIGHT(Instance);
 
 #undef DEFINE_GET_TRAFFIC_LIGHT
+
+  auto getTrafficLights() const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficLights();
+  }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   template <typename... Ts>                                           \

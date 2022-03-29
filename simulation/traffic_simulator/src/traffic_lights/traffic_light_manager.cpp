@@ -22,22 +22,6 @@
 
 namespace traffic_simulator
 {
-auto TrafficLightManagerBase::getIds() const -> std::vector<LaneletID>
-{
-  std::vector<LaneletID> result;
-
-  std::transform(
-    std::begin(traffic_lights_), std::end(traffic_lights_), std::back_inserter(result),
-    [](const auto & each) { return each.first; });
-
-  return result;
-}
-
-auto TrafficLightManagerBase::getInstance(const LaneletID lanelet_id) const -> TrafficLight
-{
-  return traffic_lights_.at(lanelet_id);
-}
-
 auto TrafficLightManagerBase::isTrafficLightId(const LaneletID lanelet_id) -> bool
 {
   return traffic_lights_.find(lanelet_id) != std::end(traffic_lights_);

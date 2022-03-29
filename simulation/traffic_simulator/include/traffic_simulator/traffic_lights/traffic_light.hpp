@@ -67,8 +67,8 @@ public:
 
   void update(const double) { arrow_changed_ = color_changed_ = false; }
 
-  TrafficLightArrow getArrow() const { return arrow_; }
-  TrafficLightColor getColor() const { return color_; }
+  auto getArrow() const { return arrow_; }
+  auto getColor() const { return color_; }
 
   const geometry_msgs::msg::Point & getPosition(const TrafficLightColor & color) const;
   const geometry_msgs::msg::Point & getPosition(const TrafficLightArrow & arrow) const;
