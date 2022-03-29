@@ -32,8 +32,6 @@ namespace traffic_simulator
 {
 class TrafficLight
 {
-  using Duration = double;
-
 public:
   const std::int64_t id;
 
@@ -74,12 +72,6 @@ public:
 
   const geometry_msgs::msg::Point & getPosition(const TrafficLightColor & color) const;
   const geometry_msgs::msg::Point & getPosition(const TrafficLightArrow & arrow) const;
-
-  template <typename... Ts>
-  decltype(auto) setPosition(Ts &&... xs)
-  {
-    return color_positions_.emplace(std::forward<decltype(xs)>(xs)...);
-  }
 
   auto colorChanged() const { return color_changed_; }
   auto arrowChanged() const { return arrow_changed_; }

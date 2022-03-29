@@ -67,18 +67,16 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
 
   const auto now = clock_ptr_->now();
 
-  for (const auto & light : traffic_lights_) {
-    const auto color = std::get<1>(light).getColor();
-
-    if (color != TrafficLightColor::NONE) {
+  for (const auto & [id, light] : traffic_lights_) {
+    if (const auto color = light.getColor(); color != TrafficLightColor::NONE) {
       visualization_msgs::msg::Marker marker;
       marker.header.stamp = now;
       marker.header.frame_id = map_frame_;
       marker.action = marker.ADD;
       marker.ns = "bulb";
-      marker.id = light.first;
+      marker.id = id;
       marker.type = marker.SPHERE;
-      marker.pose.position = std::get<1>(light).getPosition(color);
+      marker.pose.position = light.getPosition(color);
       marker.pose.orientation = geometry_msgs::msg::Quaternion();
       marker.scale.x = 0.3;
       marker.scale.y = 0.3;
