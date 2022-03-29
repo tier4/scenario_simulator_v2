@@ -94,12 +94,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
 
-  // THIS WORKS
-  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
-  distance_to_front_entity_ = getDistanceToTargetEntityPolygon(spline, front_entity_name.get());
-
-  // // THIS DOES NOT WORK
-  // distance_to_front_entity_ = getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.get());
+  distance_to_front_entity_ = getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.get());
 
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
