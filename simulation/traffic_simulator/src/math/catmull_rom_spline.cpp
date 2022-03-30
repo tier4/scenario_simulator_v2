@@ -358,6 +358,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s, double offs
   geometry_msgs::msg::Point point;
   point.x = p.x + offset * std::cos(theta);
   point.y = p.y + offset * std::sin(theta);
+  point.z = p.z;
   return point;
 }
 
