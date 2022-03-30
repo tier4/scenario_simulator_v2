@@ -89,31 +89,26 @@ protected:
   auto isTrafficRelationId(const LaneletID) -> bool;
 
 public:
+  auto getTrafficLight(const LaneletID lanelet_id) const -> const auto &
+  {
+    if (auto iter = traffic_lights_.find(lanelet_id); iter != std::end(traffic_lights_)) {
+      return iter->second;
+    } else {
+      static std::unordered_map<LaneletID, TrafficLight> cached_dummies;
+      if (auto iter = cached_dummies.find(lanelet_id); iter != std::end(cached_dummies)) {
+        return iter->second;
+      } else {
+        cached_dummies.emplace(lanelet_id, lanelet_id);
+        return cached_dummies.at(lanelet_id);
+      }
+    }
+  }
+
   auto getTrafficLights() const -> const auto & { return traffic_lights_; }
 
   auto hasAnyLightChanged() -> bool;
 
   auto update(const double) -> void;
-
-#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                         \
-  template <typename... Ts>                                                                \
-  auto IDENTIFIER(const LaneletID lanelet_id, Ts &&... xs)->decltype(auto)                 \
-  {                                                                                        \
-    try {                                                                                  \
-      return traffic_lights_.at(lanelet_id).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-    } catch (const std::out_of_range &) {                                                  \
-      std::stringstream what;                                                              \
-      what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))               \
-           << " is not a valid traffic-light ID.";                                         \
-      THROW_SEMANTIC_ERROR(what.str());                                                    \
-    }                                                                                      \
-  }                                                                                        \
-  static_assert(true, "")
-
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(getArrow);
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(getColor);
-
-#undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
 
 #define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                         \
   template <typename T>                                                    \

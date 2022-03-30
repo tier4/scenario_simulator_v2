@@ -41,8 +41,10 @@ auto TrafficSignalCondition::evaluate() -> Object
 {
   using LaneletId = TrafficSignalState::LaneletId;
 
-  current_arrow = static_cast<Arrow>(getTrafficSignalArrow(boost::lexical_cast<LaneletId>(name)));
-  current_color = static_cast<Color>(getTrafficSignalColor(boost::lexical_cast<LaneletId>(name)));
+  current_arrow =
+    static_cast<Arrow>(getTrafficSignal(boost::lexical_cast<LaneletId>(name)).getArrow());
+  current_color =
+    static_cast<Color>(getTrafficSignal(boost::lexical_cast<LaneletId>(name)).getColor());
 
   if (state == "none") {
     return asBoolean(current_arrow == Arrow::none and current_color == Color::none);

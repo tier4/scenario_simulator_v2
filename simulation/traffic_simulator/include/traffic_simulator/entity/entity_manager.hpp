@@ -168,18 +168,11 @@ public:
 
 #undef DEFINE_SET_TRAFFIC_LIGHT
 
-#define DEFINE_GET_TRAFFIC_LIGHT(NAME)                                               \
-  template <typename... Ts>                                                          \
-  decltype(auto) getTrafficLight##NAME(Ts &&... xs)                                  \
-  {                                                                                  \
-    return traffic_light_manager_ptr_->get##NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                  \
-  static_assert(true, "")
-
-  DEFINE_GET_TRAFFIC_LIGHT(Color);
-  DEFINE_GET_TRAFFIC_LIGHT(Arrow);
-
-#undef DEFINE_GET_TRAFFIC_LIGHT
+  template <typename... Ts>
+  auto getTrafficLight(Ts &&... xs) const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficLight(std::forward<decltype(xs)>(xs)...);
+  }
 
   auto getTrafficLights() const -> decltype(auto)
   {
