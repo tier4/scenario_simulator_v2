@@ -13,6 +13,7 @@
 
   <depend>ament_index_cpp</depend>
   <depend>concealer</depend>
+  <depend>color_names</depend>
   <depend>geographic_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>lanelet2_core</depend>

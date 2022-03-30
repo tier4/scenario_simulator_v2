@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <color_names/color_names.hpp>
 #include <iterator>
 #include <memory>
 #include <string>
@@ -83,7 +84,7 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
       marker.scale.x = 0.3;
       marker.scale.y = 0.3;
       marker.scale.z = 0.3;
-      marker.color = color_utils::makeColorMsg(boost::lexical_cast<std::string>(color));
+      marker.color = color_names::makeColorMsg(boost::lexical_cast<std::string>(color));
       marker_array.markers.push_back(marker);
     }
   }
