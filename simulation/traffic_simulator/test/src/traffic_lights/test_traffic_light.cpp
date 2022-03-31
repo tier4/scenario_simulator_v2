@@ -31,22 +31,16 @@ geometry_msgs::msg::Point getPoint(double val)
 
 TEST(TrafficLights, getPositionError)
 {
+  using namespace traffic_simulator;
+
   traffic_simulator::TrafficLight light(0);
-  EXPECT_THROW(
-    light.getPosition(traffic_simulator::TrafficLightColor::NONE), common::SemanticError);
-  EXPECT_THROW(
-    light.getPosition(traffic_simulator::TrafficLightColor::GREEN), common::SemanticError);
-  EXPECT_THROW(
-    light.getPosition(traffic_simulator::TrafficLightColor::YELLOW), common::SemanticError);
-  EXPECT_THROW(light.getPosition(traffic_simulator::TrafficLightColor::RED), common::SemanticError);
-  EXPECT_THROW(
-    light.getPosition(traffic_simulator::TrafficLightArrow::NONE), common::SemanticError);
-  EXPECT_THROW(
-    light.getPosition(traffic_simulator::TrafficLightArrow::LEFT), common::SemanticError);
-  EXPECT_THROW(
-    light.getPosition(traffic_simulator::TrafficLightArrow::RIGHT), common::SemanticError);
-  EXPECT_THROW(
-    light.getPosition(traffic_simulator::TrafficLightArrow::STRAIGHT), common::SemanticError);
+  EXPECT_THROW(light.getPosition(TrafficLightColor::GREEN), common::SemanticError);
+  EXPECT_THROW(light.getPosition(TrafficLightColor::YELLOW), common::SemanticError);
+  EXPECT_THROW(light.getPosition(TrafficLightColor::RED), common::SemanticError);
+  EXPECT_THROW(light.getPosition(TrafficLightArrow::NONE), common::SemanticError);
+  EXPECT_THROW(light.getPosition(TrafficLightArrow::LEFT), common::SemanticError);
+  EXPECT_THROW(light.getPosition(TrafficLightArrow::RIGHT), common::SemanticError);
+  EXPECT_THROW(light.getPosition(TrafficLightArrow::STRAIGHT), common::SemanticError);
   EXPECT_EQ(light.id, static_cast<std::int64_t>(0));
 }
 

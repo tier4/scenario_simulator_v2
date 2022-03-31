@@ -21,7 +21,7 @@
 
 namespace traffic_simulator
 {
-enum class TrafficLightColor { NONE, RED, GREEN, YELLOW };
+enum class TrafficLightColor { RED, GREEN, YELLOW };
 
 std::istream & operator>>(std::istream &, TrafficLightColor &);
 

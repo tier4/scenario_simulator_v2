@@ -51,23 +51,22 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
 
   const auto now = clock_ptr_->now();
 
-  for (const auto & [id, light] : traffic_lights_) {
-    if (const auto color = light.getColor(); color != TrafficLightColor::NONE) {
-      visualization_msgs::msg::Marker marker;
-      marker.header.stamp = now;
-      marker.header.frame_id = map_frame_;
-      marker.action = marker.ADD;
-      marker.ns = "bulb";
-      marker.id = id;
-      marker.type = marker.SPHERE;
-      marker.pose.position = light.getPosition(color);
-      marker.pose.orientation = geometry_msgs::msg::Quaternion();
-      marker.scale.x = 0.3;
-      marker.scale.y = 0.3;
-      marker.scale.z = 0.3;
-      marker.color = color_utils::makeColorMsg(boost::lexical_cast<std::string>(color));
-      marker_array.markers.push_back(marker);
-    }
+  for (const auto & [id, traffic_light] : traffic_lights_) {
+    visualization_msgs::msg::Marker marker;
+    marker.header.stamp = now;
+    marker.header.frame_id = map_frame_;
+    marker.action = marker.ADD;
+    marker.ns = "bulb";
+    marker.id = id;
+    marker.type = marker.SPHERE;
+    marker.pose.position = traffic_light.getPosition(traffic_light.getColor());
+    marker.pose.orientation = geometry_msgs::msg::Quaternion();
+    marker.scale.x = 0.3;
+    marker.scale.y = 0.3;
+    marker.scale.z = 0.3;
+    marker.color =
+      color_utils::makeColorMsg(boost::lexical_cast<std::string>(traffic_light.getColor()));
+    marker_array.markers.push_back(marker);
   }
 
   marker_pub_->publish(marker_array);
@@ -106,11 +105,9 @@ auto TrafficLightManager<
   {
     traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
     traffic_light_state_array.header.stamp = clock_ptr_->now();
-    for (const auto & each : traffic_lights_) {
-      if (each.second.getColor() != TrafficLightColor::NONE) {
-        traffic_light_state_array.signals.push_back(
-          static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(each.second));
-      }
+    for (const auto & [id, traffic_light] : traffic_lights_) {
+      traffic_light_state_array.signals.push_back(
+        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light));
     }
   }
   traffic_light_state_array_publisher_->publish(traffic_light_state_array);

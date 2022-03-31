@@ -30,6 +30,7 @@ static_assert(std::is_standard_layout<Color>::value, "");
 Color::Color(const traffic_simulator::TrafficLightColor & color)
 : value([](auto && color) {
     switch (color) {
+      default:
       case traffic_simulator::TrafficLightColor::GREEN:
         return Color::green;
 
@@ -38,12 +39,6 @@ Color::Color(const traffic_simulator::TrafficLightColor & color)
 
       case traffic_simulator::TrafficLightColor::YELLOW:
         return Color::yellow;
-
-      case traffic_simulator::TrafficLightColor::NONE:
-        // [[fallthrough]];
-
-      default:
-        return Color::none;
     }
   }(color))
 {
@@ -58,7 +53,7 @@ auto operator>>(std::istream & is, Color & datum) -> std::istream &
   static const std::unordered_map<std::string, Color::value_type> choice{
     // NOTE: Sorted lexicographically.
     std::make_pair("green", Color::green),
-    std::make_pair("none", Color::none),
+    std::make_pair("none", Color::green),
     std::make_pair("red", Color::red),
     std::make_pair("yellow", Color::yellow),
   };
@@ -81,7 +76,7 @@ auto operator>>(std::istream & is, boost::optional<Color> & datum) -> std::istre
   static const std::unordered_map<std::string, Color::value_type> choice{
     // NOTE: Sorted lexicographically.
     std::make_pair("green", Color::green),
-    std::make_pair("none", Color::none),
+    std::make_pair("none", Color::green),
     std::make_pair("red", Color::red),
     std::make_pair("yellow", Color::yellow),
   };
@@ -103,7 +98,6 @@ auto operator<<(std::ostream & os, const Color & datum) -> std::ostream &
 
   switch (datum.value) {
     BOILERPLATE(green);
-    BOILERPLATE(none);
     BOILERPLATE(red);
     BOILERPLATE(yellow);
 

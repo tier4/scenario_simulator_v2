@@ -855,9 +855,6 @@ std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulbPosition(
   std::int64_t traffic_light_id, traffic_simulator::TrafficLightColor color) const
 {
-  if (color == traffic_simulator::TrafficLightColor::NONE) {
-    return boost::none;
-  }
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto light : autoware_traffic_lights) {
@@ -882,8 +879,6 @@ const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulb
                     case traffic_simulator::TrafficLightColor::RED:
                       color_string = "red";
                       break;
-                    case traffic_simulator::TrafficLightColor::NONE:
-                      return boost::none;
                   }
                   lanelet::Attribute attr = pt.attribute("color");
                   if (attr.value().compare(color_string) == 0) {

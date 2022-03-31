@@ -29,7 +29,6 @@ std::istream & operator>>(std::istream & is, TrafficLightColor & datum)
 
   static const std::unordered_map<std::string, TrafficLightColor> conversions{
     // clang-format off
-    std::make_pair("none",   TrafficLightColor::NONE),
     std::make_pair("red",    TrafficLightColor::RED),
     std::make_pair("green",  TrafficLightColor::GREEN),
     std::make_pair("yellow", TrafficLightColor::YELLOW),
@@ -51,7 +50,6 @@ std::ostream & operator<<(std::ostream & os, const TrafficLightColor & datum)
 {
   // clang-format off
   switch (datum) {
-    case TrafficLightColor::NONE:   return os << "none";
     case TrafficLightColor::RED:    return os << "red";
     case TrafficLightColor::GREEN:  return os << "green";
     case TrafficLightColor::YELLOW: return os << "yellow";

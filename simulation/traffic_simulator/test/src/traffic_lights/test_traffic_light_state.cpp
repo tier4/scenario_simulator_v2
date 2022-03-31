@@ -14,60 +14,39 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/lexical_cast.hpp>
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 
 TEST(TrafficLights, OPERATOR_INSERT)
 {
-  std::stringstream ss;
-  ss << traffic_simulator::TrafficLightArrow::STRAIGHT;
-  EXPECT_STREQ(ss.str().c_str(), "straight");
-  ss = std::stringstream();
-  ss << traffic_simulator::TrafficLightArrow::NONE;
-  EXPECT_STREQ(ss.str().c_str(), "none");
-  ss = std::stringstream();
-  ss << traffic_simulator::TrafficLightArrow::LEFT;
-  EXPECT_STREQ(ss.str().c_str(), "left");
-  ss = std::stringstream();
-  ss << traffic_simulator::TrafficLightArrow::RIGHT;
-  EXPECT_STREQ(ss.str().c_str(), "right");
-  ss = std::stringstream();
-  ss << traffic_simulator::TrafficLightColor::NONE;
-  EXPECT_STREQ(ss.str().c_str(), "none");
-  ss = std::stringstream();
-  ss << traffic_simulator::TrafficLightColor::RED;
-  EXPECT_STREQ(ss.str().c_str(), "red");
-  ss = std::stringstream();
-  ss << traffic_simulator::TrafficLightColor::GREEN;
-  EXPECT_STREQ(ss.str().c_str(), "green");
-  ss = std::stringstream();
-  ss << traffic_simulator::TrafficLightColor::YELLOW;
-  EXPECT_STREQ(ss.str().c_str(), "yellow");
+  using namespace traffic_simulator;
+
+  EXPECT_STREQ(boost::lexical_cast<std::string>(TrafficLightArrow::STRAIGHT).c_str(), "straight");
+  EXPECT_STREQ(boost::lexical_cast<std::string>(TrafficLightArrow::NONE).c_str(), "none");
+  EXPECT_STREQ(boost::lexical_cast<std::string>(TrafficLightArrow::LEFT).c_str(), "left");
+  EXPECT_STREQ(boost::lexical_cast<std::string>(TrafficLightArrow::RIGHT).c_str(), "right");
+
+  EXPECT_STREQ(boost::lexical_cast<std::string>(TrafficLightColor::RED).c_str(), "red");
+  EXPECT_STREQ(boost::lexical_cast<std::string>(TrafficLightColor::GREEN).c_str(), "green");
+  EXPECT_STREQ(boost::lexical_cast<std::string>(TrafficLightColor::YELLOW).c_str(), "yellow");
 }
 
 TEST(TrafficLights, OPERATOR_INPUT)
 {
-  traffic_simulator::TrafficLightArrow arrow;
-  std::stringstream("straight") >> arrow;
-  EXPECT_EQ(arrow, traffic_simulator::TrafficLightArrow::STRAIGHT);
-  std::stringstream("none") >> arrow;
-  EXPECT_EQ(arrow, traffic_simulator::TrafficLightArrow::NONE);
-  std::stringstream("left") >> arrow;
-  EXPECT_EQ(arrow, traffic_simulator::TrafficLightArrow::LEFT);
-  std::stringstream("right") >> arrow;
-  EXPECT_EQ(arrow, traffic_simulator::TrafficLightArrow::RIGHT);
-  EXPECT_THROW(std::stringstream("invalid") >> arrow, common::SimulationError);
-  traffic_simulator::TrafficLightColor color;
-  std::stringstream("red") >> color;
-  EXPECT_EQ(color, traffic_simulator::TrafficLightColor::RED);
-  std::stringstream("green") >> color;
-  EXPECT_EQ(color, traffic_simulator::TrafficLightColor::GREEN);
-  std::stringstream("yellow") >> color;
-  EXPECT_EQ(color, traffic_simulator::TrafficLightColor::YELLOW);
-  std::stringstream("none") >> color;
-  EXPECT_EQ(color, traffic_simulator::TrafficLightColor::NONE);
-  EXPECT_THROW(std::stringstream("invalid") >> color, common::SimulationError);
+  using namespace traffic_simulator;
+
+  EXPECT_EQ(boost::lexical_cast<TrafficLightArrow>("straight"), TrafficLightArrow::STRAIGHT);
+  EXPECT_EQ(boost::lexical_cast<TrafficLightArrow>("none"), TrafficLightArrow::NONE);
+  EXPECT_EQ(boost::lexical_cast<TrafficLightArrow>("left"), TrafficLightArrow::LEFT);
+  EXPECT_EQ(boost::lexical_cast<TrafficLightArrow>("right"), TrafficLightArrow::RIGHT);
+  EXPECT_THROW(boost::lexical_cast<TrafficLightArrow>("invalid"), common::SimulationError);
+
+  EXPECT_EQ(boost::lexical_cast<TrafficLightColor>("red"), TrafficLightColor::RED);
+  EXPECT_EQ(boost::lexical_cast<TrafficLightColor>("green"), TrafficLightColor::GREEN);
+  EXPECT_EQ(boost::lexical_cast<TrafficLightColor>("yellow"), TrafficLightColor::YELLOW);
+  EXPECT_THROW(boost::lexical_cast<TrafficLightColor>("invalid"), common::SimulationError);
 }
 
 int main(int argc, char ** argv)

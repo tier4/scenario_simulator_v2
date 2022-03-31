@@ -46,15 +46,12 @@ TEST(TrafficLightManager, setColor)
   traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
     manager(hdmap_utils_ptr, node, "map");
   for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
-    EXPECT_EQ(manager.getTrafficLight(id).getColor(), traffic_simulator::TrafficLightColor::NONE);
     manager.setColor(id, traffic_simulator::TrafficLightColor::GREEN);
     EXPECT_EQ(manager.getTrafficLight(id).getColor(), traffic_simulator::TrafficLightColor::GREEN);
     manager.setColor(id, traffic_simulator::TrafficLightColor::YELLOW);
     EXPECT_EQ(manager.getTrafficLight(id).getColor(), traffic_simulator::TrafficLightColor::YELLOW);
     manager.setColor(id, traffic_simulator::TrafficLightColor::RED);
     EXPECT_EQ(manager.getTrafficLight(id).getColor(), traffic_simulator::TrafficLightColor::RED);
-    manager.setColor(id, traffic_simulator::TrafficLightColor::NONE);
-    EXPECT_EQ(manager.getTrafficLight(id).getColor(), traffic_simulator::TrafficLightColor::NONE);
   }
 }
 

@@ -37,7 +37,7 @@ public:
 
   explicit TrafficLight(
     const std::int64_t id, const std::shared_ptr<hdmap_utils::HdMapUtils> & map_manager = nullptr)
-  : id(id), color_(TrafficLightColor::NONE), arrow_(TrafficLightArrow::NONE)
+  : id(id), color_(TrafficLightColor::GREEN), arrow_(TrafficLightArrow::NONE)
   {
     auto locate = [&](auto && color) {
       assert(map_manager);

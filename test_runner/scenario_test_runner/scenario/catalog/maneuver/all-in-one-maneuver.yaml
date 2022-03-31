@@ -16,20 +16,20 @@ OpenSCENARIO:
             StartTrigger:
               ConditionGroup:
                 - Condition:
-                    - name: "if signal(34802).state() == none"
+                    - name: "if signal(34802).state() == red"
                       delay: 0
                       conditionEdge: none
                       ByValueCondition:
                         TrafficSignalCondition:
                           name: "34802"
-                          state: none
-                    - name: "if simple_controller.phase() == blank"
+                          state: red
+                    - name: "if simple_controller.phase() == default"
                       delay: 0
                       conditionEdge: none
                       ByValueCondition:
                         TrafficSignalControllerCondition:
                           trafficSignalControllerRef: $controllerName
-                          phase: blank
+                          phase: default
             Action:
               - name: "change_phase(simple_controller, green)"
                 GlobalAction:
