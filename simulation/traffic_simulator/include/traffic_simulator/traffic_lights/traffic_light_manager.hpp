@@ -55,10 +55,6 @@ protected:
     hdmap_(hdmap),
     map_frame_(map_frame)
   {
-    for (const auto id : hdmap->getTrafficLightIds()) {
-      traffic_lights_.emplace(
-        std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, hdmap));
-    }
   }
 
   auto deleteAllMarkers() const -> void;
@@ -69,10 +65,10 @@ protected:
   auto forEachTrafficLights(const LaneletID lanelet_id, F && f) -> void
   {
     if (hdmap_->isTrafficLight(lanelet_id)) {
-      f(traffic_lights_.at(lanelet_id));
+      f(getTrafficLight(lanelet_id));
     } else if (hdmap_->isTrafficRelation(lanelet_id)) {
       for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
-        f(traffic_lights_.at(traffic_light.id()));
+        f(getTrafficLight(traffic_light.id()));
       }
     } else {
       std::stringstream what;
@@ -85,18 +81,14 @@ protected:
   virtual auto publishTrafficLightStateArray() const -> void = 0;
 
 public:
-  auto getTrafficLight(const LaneletID lanelet_id) const -> const auto &
+  auto getTrafficLight(const LaneletID lanelet_id) -> auto &
   {
     if (auto iter = traffic_lights_.find(lanelet_id); iter != std::end(traffic_lights_)) {
       return iter->second;
     } else {
-      static std::unordered_map<LaneletID, TrafficLight> cached_dummies;
-      if (auto iter = cached_dummies.find(lanelet_id); iter != std::end(cached_dummies)) {
-        return iter->second;
-      } else {
-        cached_dummies.emplace(lanelet_id, lanelet_id);
-        return cached_dummies.at(lanelet_id);
-      }
+      traffic_lights_.emplace(
+        std::piecewise_construct, std::make_tuple(lanelet_id), std::make_tuple(lanelet_id, hdmap_));
+      return traffic_lights_.at(lanelet_id);
     }
   }
 

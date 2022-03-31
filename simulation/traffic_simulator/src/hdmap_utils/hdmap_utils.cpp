@@ -1657,7 +1657,7 @@ std::vector<std::int64_t> HdMapUtils::getLaneletIds(
   return ids;
 }
 
-auto HdMapUtils::isTrafficLight(const std::int64_t lanelet_id) const -> bool
+auto HdMapUtils::isTrafficLight(const LaneletId lanelet_id) const -> bool
 {
   using namespace lanelet;
 
@@ -1671,15 +1671,14 @@ auto HdMapUtils::isTrafficLight(const std::int64_t lanelet_id) const -> bool
   return false;
 }
 
-auto HdMapUtils::isTrafficRelation(const std::int64_t lanelet_id) const -> bool
+auto HdMapUtils::isTrafficRelation(const LaneletId lanelet_id) const -> bool
 {
   return lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
            lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 
-auto HdMapUtils::getTrafficRelation(const std::int64_t lanelet_id) const
-  -> lanelet::TrafficLight::Ptr
+auto HdMapUtils::getTrafficRelation(const LaneletId lanelet_id) const -> lanelet::TrafficLight::Ptr
 {
   assert(isTrafficRelation(lanelet_id));
   return std::dynamic_pointer_cast<lanelet::TrafficLight>(

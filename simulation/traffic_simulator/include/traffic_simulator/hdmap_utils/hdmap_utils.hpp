@@ -168,9 +168,11 @@ public:
   traffic_simulator_msgs::msg::LaneletPose getAlongLaneletPose(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along);
 
-  auto isTrafficLight(const std::int64_t) const -> bool;
-  auto isTrafficRelation(const std::int64_t) const -> bool;
-  auto getTrafficRelation(const std::int64_t) const -> lanelet::TrafficLight::Ptr;
+  using LaneletId = std::int64_t;
+
+  auto isTrafficLight(const LaneletId) const -> bool;
+  auto isTrafficRelation(const LaneletId) const -> bool;
+  auto getTrafficRelation(const LaneletId) const -> lanelet::TrafficLight::Ptr;
 
 private:
   traffic_simulator::math::HermiteCurve getLaneChangeTrajectory(
