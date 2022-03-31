@@ -47,9 +47,11 @@ public:
     };
 
     if (map_manager) {
-      locate(TrafficLightColor::GREEN);
-      locate(TrafficLightColor::RED);
-      locate(TrafficLightColor::YELLOW);
+      if (map_manager->isTrafficLight(id)) {
+        locate(TrafficLightColor::GREEN);
+        locate(TrafficLightColor::RED);
+        locate(TrafficLightColor::YELLOW);
+      }
     }
   }
 

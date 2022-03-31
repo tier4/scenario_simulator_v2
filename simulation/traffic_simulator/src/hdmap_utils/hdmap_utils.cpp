@@ -836,20 +836,21 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
 
 std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 {
-  std::vector<std::int64_t> ret;
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
-  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
-          ret.emplace_back(id.get());
+  using namespace lanelet::utils::query;
+
+  std::vector<std::int64_t> ids;
+
+  for (auto && traffic_light : autowareTrafficLights(laneletLayer(lanelet_map_ptr_))) {
+    for (auto && light_bulb : traffic_light->lightBulbs()) {
+      if (light_bulb.hasAttribute("traffic_light_id")) {
+        if (auto id = light_bulb.attribute("traffic_light_id").asId()) {
+          ids.emplace_back(id.get());
         }
       }
     }
   }
-  return ret;
+
+  return ids;
 }
 
 const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulbPosition(
@@ -1656,16 +1657,31 @@ std::vector<std::int64_t> HdMapUtils::getLaneletIds(
   return ids;
 }
 
-auto HdMapUtils::isTrafficRelationId(const std::int64_t lanelet_id) const -> bool
+auto HdMapUtils::isTrafficLight(const std::int64_t lanelet_id) const -> bool
+{
+  using namespace lanelet;
+
+  if (lanelet_map_ptr_->lineStringLayer.exists(lanelet_id)) {
+    if (auto && linestring = lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
+        linestring.hasAttribute(AttributeName::Type)) {
+      return linestring.attribute(AttributeName::Type).value() == "traffic_light";
+    }
+  }
+
+  return false;
+}
+
+auto HdMapUtils::isTrafficRelation(const std::int64_t lanelet_id) const -> bool
 {
   return lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
            lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 
-auto HdMapUtils::getTrafficLight(const std::int64_t lanelet_id) const -> lanelet::TrafficLight::Ptr
+auto HdMapUtils::getTrafficRelation(const std::int64_t lanelet_id) const
+  -> lanelet::TrafficLight::Ptr
 {
-  assert(isTrafficRelationId(lanelet_id));
+  assert(isTrafficRelation(lanelet_id));
   return std::dynamic_pointer_cast<lanelet::TrafficLight>(
     lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }

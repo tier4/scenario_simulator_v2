@@ -68,25 +68,21 @@ protected:
   template <typename F>
   auto forEachTrafficLights(const LaneletID lanelet_id, F && f) -> void
   {
-    if (isTrafficLightId(lanelet_id)) {
+    if (hdmap_->isTrafficLight(lanelet_id)) {
       f(traffic_lights_.at(lanelet_id));
-    } else if (isTrafficRelationId(lanelet_id)) {
-      for (auto && traffic_light : hdmap_->getTrafficLight(lanelet_id)->trafficLights()) {
+    } else if (hdmap_->isTrafficRelation(lanelet_id)) {
+      for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
         f(traffic_lights_.at(traffic_light.id()));
       }
     } else {
       std::stringstream what;
       what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))
-           << " is neither a traffic light ID not a traffc light relation ID.";
+           << " is neither a traffic light ID not a traffc relation ID.";
       THROW_SEMANTIC_ERROR(what.str());
     }
   }
 
   virtual auto publishTrafficLightStateArray() const -> void = 0;
-
-  auto isTrafficLightId(const LaneletID) -> bool;
-
-  auto isTrafficRelationId(const LaneletID) -> bool;
 
 public:
   auto getTrafficLight(const LaneletID lanelet_id) const -> const auto &

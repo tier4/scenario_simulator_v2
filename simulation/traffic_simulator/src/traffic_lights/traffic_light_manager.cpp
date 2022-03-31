@@ -22,17 +22,6 @@
 
 namespace traffic_simulator
 {
-auto TrafficLightManagerBase::isTrafficLightId(const LaneletID lanelet_id) -> bool
-{
-  return traffic_lights_.find(lanelet_id) != std::end(traffic_lights_);
-}
-
-auto TrafficLightManagerBase::isTrafficRelationId(const LaneletID lanelet_id) -> bool
-{
-  assert(hdmap_);
-  return hdmap_->isTrafficRelationId(lanelet_id);
-}
-
 auto TrafficLightManagerBase::deleteAllMarkers() const -> void
 {
   visualization_msgs::msg::MarkerArray message;
