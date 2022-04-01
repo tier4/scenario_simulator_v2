@@ -46,6 +46,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <color_names/color_names.hpp>
 #include <openscenario_visualization/openscenario_visualization_component.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>
@@ -127,13 +128,13 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   std_msgs::msg::ColorRGBA color;
   switch (status.type.type) {
     case status.type.EGO:
-      color = color_utils::makeColorMsg("limegreen", 0.99);
+      color = color_names::makeColorMsg("limegreen", 0.99);
       break;
     case status.type.PEDESTRIAN:
-      color = color_utils::makeColorMsg("orange", 0.99);
+      color = color_names::makeColorMsg("orange", 0.99);
       break;
     case status.type.VEHICLE:
-      color = color_utils::makeColorMsg("lightskyblue", 0.99);
+      color = color_names::makeColorMsg("lightskyblue", 0.99);
       break;
   }
 
@@ -178,7 +179,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
         goal_pose_text_marker.lifetime = rclcpp::Duration::from_seconds(0.1);
         goal_pose_text_marker.text =
           status.name + "_goal_" + std::to_string(int(goal_pose_max_size - goal_pose.size() + i));
-        goal_pose_text_marker.color = color_utils::makeColorMsg("white", 0.99);
+        goal_pose_text_marker.color = color_names::makeColorMsg("white", 0.99);
         ret.markers.emplace_back(goal_pose_text_marker);
       } else {
         visualization_msgs::msg::Marker goal_pose_marker;
@@ -326,7 +327,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.scale.z = 0.6;
   text.lifetime = rclcpp::Duration::from_seconds(0.1);
   text.text = status.name;
-  text.color = color_utils::makeColorMsg("white", 0.99);
+  text.color = color_names::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text);
 
   visualization_msgs::msg::Marker arrow;
@@ -364,7 +365,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   arrow.scale.y = 1.0;
   arrow.scale.z = 1.0;
   arrow.lifetime = rclcpp::Duration::from_seconds(0.1);
-  arrow.color = color_utils::makeColorMsg("red", 0.99);
+  arrow.color = color_names::makeColorMsg("red", 0.99);
   ret.markers.emplace_back(arrow);
 
   visualization_msgs::msg::Marker text_action;
@@ -391,7 +392,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
                        "\ns:" + std::to_string(status.lanelet_pose.s) +
                        "\noffset:" + std::to_string(status.lanelet_pose.offset);
   }
-  text_action.color = color_utils::makeColorMsg("white", 0.99);
+  text_action.color = color_names::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text_action);
 
   if (waypoints.waypoints.size() > 2) {
@@ -431,7 +432,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
       obstacle_marker.pose = spline.getPose(obstacle.s);
       obstacle_marker.pose.position.z =
         obstacle_marker.pose.position.z + status.bounding_box.dimensions.z * 0.5;
-      obstacle_marker.color = color_utils::makeColorMsg("red", 0.5);
+      obstacle_marker.color = color_names::makeColorMsg("red", 0.5);
       obstacle_marker.scale.x = 0.3;
       obstacle_marker.scale.y = status.bounding_box.dimensions.y + 0.3;
       obstacle_marker.scale.z = status.bounding_box.dimensions.z;
