@@ -94,6 +94,8 @@ public:
 
   auto getTrafficLights() const -> const auto & { return traffic_lights_; }
 
+  auto getTrafficLights() -> auto & { return traffic_lights_; }
+
   auto hasAnyLightChanged() -> bool;
 
   auto update(const double) -> void;

@@ -40,7 +40,7 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
 
   const auto now = clock_ptr_->now();
 
-  for (const auto & [id, traffic_light] : traffic_lights_) {
+  for (const auto & [id, traffic_light] : getTrafficLights()) {
     visualization_msgs::msg::Marker marker;
     marker.header.stamp = now;
     marker.header.frame_id = map_frame_;
@@ -64,7 +64,7 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
 auto TrafficLightManagerBase::hasAnyLightChanged() -> bool
 {
   return std::any_of(
-    std::begin(traffic_lights_), std::end(traffic_lights_), [](auto && id_and_traffic_light) {
+    std::begin(getTrafficLights()), std::end(getTrafficLights()), [](auto && id_and_traffic_light) {
       return id_and_traffic_light.second.colorChanged() or
              id_and_traffic_light.second.arrowChanged();
     });
@@ -74,7 +74,7 @@ auto TrafficLightManagerBase::update(const double step_time) -> void
 {
   publishTrafficLightStateArray();
 
-  for (auto & light : traffic_lights_) {
+  for (auto & light : getTrafficLights()) {
     light.second.update(step_time);
   }
 
@@ -94,7 +94,7 @@ auto TrafficLightManager<
   {
     traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
     traffic_light_state_array.header.stamp = clock_ptr_->now();
-    for (const auto & [id, traffic_light] : traffic_lights_) {
+    for (const auto & [id, traffic_light] : getTrafficLights()) {
       traffic_light_state_array.signals.push_back(
         static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light));
     }
