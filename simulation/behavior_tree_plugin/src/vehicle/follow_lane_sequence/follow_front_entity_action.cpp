@@ -128,8 +128,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
-  } else if (
-    distance_to_front_entity_.get() <= calculateStopDistance(driver_model.deceleration)) {
+  } else if (distance_to_front_entity_.get() <= calculateStopDistance(driver_model.deceleration)) {
     auto entity_status_updated =
       calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x - 2);
     setOutput("updated_status", entity_status_updated);

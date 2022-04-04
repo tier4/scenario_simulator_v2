@@ -111,9 +111,8 @@ BT::NodeStatus FollowLaneAction::tick()
     }
     if (distance_to_conflicting_entity) {
       if (
-        distance_to_conflicting_entity.get() <
-        (vehicle_parameters.bounding_box.dimensions.x +
-         calculateStopDistance(driver_model.deceleration))) {
+        distance_to_conflicting_entity.get() < (vehicle_parameters.bounding_box.dimensions.x +
+                                                calculateStopDistance(driver_model.deceleration))) {
         return BT::NodeStatus::FAILURE;
       }
     }
