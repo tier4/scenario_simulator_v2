@@ -18,8 +18,7 @@
 namespace zeromq
 {
 MultiClient::MultiClient(
-  const simulation_interface::TransportProtocol & protocol,
-  const simulation_interface::HostName & hostname)
+  const simulation_interface::TransportProtocol & protocol, const std::string & hostname)
 : protocol(protocol),
   hostname(hostname),
   context_(zmqpp::context()),
