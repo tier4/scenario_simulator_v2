@@ -40,6 +40,7 @@ public:
     job::Type type, bool exclusive);
   bool checkCondition();
   void execute();
+  void inactivate();
 
 private:
   std::function<bool()> func_condition_;

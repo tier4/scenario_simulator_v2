@@ -26,10 +26,12 @@ Job::Job(
   status_ = Status::ACTIVE;
 }
 
+void Job::inactivate() { status_ = Status::INACTIVE; }
+
 bool Job::checkCondition()
 {
   if (func_condition_()) {
-    status_ = Status::INACTIVE;
+    inactivate();
     return true;
   }
   return false;

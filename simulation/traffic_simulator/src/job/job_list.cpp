@@ -22,6 +22,11 @@ void JobList::append(
   const std::function<bool()> & func_condition, const std::function<void()> & func_execution,
   job::Type type, bool exclusive)
 {
+  for (auto & job : list_) {
+    if (job.type == type && job.exclusive == exclusive) {
+      job.inactivate();
+    }
+  }
   list_.emplace_back(Job(func_condition, func_execution, type, exclusive));
 }
 
