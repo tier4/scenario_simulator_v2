@@ -23,6 +23,7 @@
 #include <string>
 #include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/driver_model.hpp>
@@ -215,6 +216,8 @@ protected:
   visualization_msgs::msg::MarkerArray current_marker_;
   traffic_simulator_msgs::msg::EntityType entity_type_;
   const traffic_simulator_msgs::msg::EntitySubtype entity_subtype_;
+
+  traffic_simulator::job::JobList job_list_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

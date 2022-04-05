@@ -107,12 +107,49 @@ void PedestrianEntity::cancelRequest()
 
 void PedestrianEntity::requestSpeedChange(double target_speed, bool continuous)
 {
+  if (!continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target Pedestrian reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (getStatus().action_status.twist.linear.x >= target_speed) {
+          return true;
+        }
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_planner_.cancelSpeedChange(); });
+  }
   target_speed_planner_.requestSpeedChange(target_speed, continuous);
 }
 
 void PedestrianEntity::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
+  if (!continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target Pedestrian reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        if (
+          getStatus().action_status.twist.linear.x >=
+          target_speed.getAbsoluteValue(other_status_)) {
+          return true;
+        }
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_planner_.cancelSpeedChange(); });
+  }
   target_speed_planner_.requestSpeedChange(target_speed, continuous);
 }
 

@@ -51,6 +51,8 @@ void TargetSpeedPlanner::update(
   }
 }
 
+void TargetSpeedPlanner::cancelSpeedChange() { target_speed_ = boost::none; }
+
 boost::optional<double> TargetSpeedPlanner::getTargetSpeed() const
 {
   if (target_speed_ && relative_target_speed_) {

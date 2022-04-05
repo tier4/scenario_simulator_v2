@@ -29,6 +29,7 @@ class TargetSpeedPlanner
 public:
   void requestSpeedChange(double target_speed, bool continuous);
   void requestSpeedChange(const speed_change::RelativeTargetSpeed & target_speed, bool continuous);
+  void cancelSpeedChange();
   void update(
     double current_speed,
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &
