@@ -121,11 +121,6 @@ public:
 
   virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool;
 
-  virtual void requestSpeedChange(double target_speed, bool continuous) = 0;
-
-  virtual void requestSpeedChange(
-    const speed_change::RelativeTargetSpeed & target_speed, bool continuous) = 0;
-
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
   {
@@ -160,6 +155,11 @@ public:
     const speed_change::RelativeTargetSpeed & target_speed,
     const speed_change::Transition transition, const speed_change::Constraint constraint,
     const bool continuous);
+
+  virtual void requestSpeedChange(double target_speed, bool continuous);
+
+  virtual void requestSpeedChange(
+    const speed_change::RelativeTargetSpeed & target_speed, bool continuous);
 
   virtual void requestLaneChange(const std::int64_t){};
 

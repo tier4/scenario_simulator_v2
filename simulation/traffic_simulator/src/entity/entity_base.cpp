@@ -87,6 +87,67 @@ void EntityBase::requestSpeedChange(
   }
 }
 
+void EntityBase::requestSpeedChange(double target_speed, bool continuous)
+{
+  target_speed_ = target_speed;
+  if (!continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (getStatus().action_status.twist.linear.x >= target_speed) {
+          return true;
+        }
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+  }
+}
+
+void EntityBase::requestSpeedChange(
+  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
+{
+  if (continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        target_speed_ = target_speed.getAbsoluteValue(other_status_);
+        return false;
+      },
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+  } else {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        if (
+          getStatus().action_status.twist.linear.x >=
+          target_speed.getAbsoluteValue(other_status_)) {
+          target_speed_ = target_speed.getAbsoluteValue(other_status_);
+          return true;
+        }
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+  }
+}
+
 void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::AbsoluteTarget & target,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
