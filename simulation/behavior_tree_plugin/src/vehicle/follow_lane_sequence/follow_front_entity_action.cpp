@@ -87,8 +87,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  if (trajectory == nullptr)
-  {
+  if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
 
