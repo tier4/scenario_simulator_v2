@@ -87,6 +87,11 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
+  if (trajectory == nullptr)
+  {
+    return BT::NodeStatus::FAILURE;
+  }
+
   auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
   auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *trajectory);
   const auto front_entity_name = getFrontEntityName(*trajectory);

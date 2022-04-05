@@ -105,6 +105,11 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
+  if (trajectory == nullptr)
+  {
+    return BT::NodeStatus::FAILURE;
+  }
+
   const auto distance_to_traffic_stop_line =
     hdmap_utils->getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
   if (!distance_to_traffic_stop_line) {

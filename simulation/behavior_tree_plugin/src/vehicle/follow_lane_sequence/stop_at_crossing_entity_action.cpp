@@ -110,6 +110,11 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
+  if (trajectory == nullptr)
+  {
+    return BT::NodeStatus::FAILURE;
+  }
+
   distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, *trajectory);
   auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);

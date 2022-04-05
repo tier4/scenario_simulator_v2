@@ -86,6 +86,11 @@ BT::NodeStatus FollowLaneAction::tick()
     if (getRightOfWayEntities(route_lanelets).size() != 0) {
       return BT::NodeStatus::FAILURE;
     }
+    if (trajectory == nullptr)
+    {
+      return BT::NodeStatus::FAILURE;
+    }
+
     auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
     if (distance_to_front_entity) {
       if (
