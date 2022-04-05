@@ -37,7 +37,11 @@ void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*mark
   return;
 }
 
-void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
+void EntityBase::onUpdate(double, double)
+{
+  job_list_.update();
+  status_before_update_ = status_;
+}
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
