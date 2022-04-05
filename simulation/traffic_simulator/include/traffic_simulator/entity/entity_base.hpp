@@ -217,6 +217,7 @@ protected:
   traffic_simulator_msgs::msg::EntityType entity_type_;
   const traffic_simulator_msgs::msg::EntitySubtype entity_subtype_;
 
+  boost::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
 };
 }  // namespace entity

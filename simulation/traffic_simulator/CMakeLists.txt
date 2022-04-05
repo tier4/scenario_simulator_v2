@@ -25,7 +25,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
   src/behavior/behavior_plugin_base.cpp
   src/behavior/route_planner.cpp
-  src/behavior/target_speed_planner.cpp
   src/color_utils/color_utils.cpp
   src/data_type/data_types.cpp
   src/entity/ego_entity.cpp

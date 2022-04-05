@@ -126,9 +126,8 @@ void VehicleEntity::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_planner_.cancelSpeedChange(); });
+      [this]() { target_speed_ = boost::none; });
   }
-  target_speed_planner_.requestSpeedChange(target_speed, continuous);
 }
 
 void VehicleEntity::requestSpeedChange(
@@ -153,9 +152,8 @@ void VehicleEntity::requestSpeedChange(
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_planner_.cancelSpeedChange(); });
+      [this]() { target_speed_ = boost::none; });
   }
-  target_speed_planner_.requestSpeedChange(target_speed, continuous);
 }
 
 auto VehicleEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
@@ -175,8 +173,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(status_.get());
-    target_speed_planner_.update(status_->action_status.twist.linear.x, other_status_);
-    behavior_plugin_ptr_->setTargetSpeed(target_speed_planner_.getTargetSpeed());
+    behavior_plugin_ptr_->setTargetSpeed(target_speed_);
 
     std::vector<std::int64_t> route_lanelets = {};
     if (status_->lanelet_pose_valid) {

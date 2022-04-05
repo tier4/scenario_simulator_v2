@@ -23,7 +23,6 @@
 #include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
-#include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
@@ -173,7 +172,6 @@ private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
   std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
-  traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
 
   std::vector<std::int64_t> previous_route_lanelets_;
 };
