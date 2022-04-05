@@ -19,17 +19,17 @@ namespace traffic_simulator
 namespace job
 {
 void JobList::append(
-  const std::function<bool()> & func_condition, const std::function<void()> & func_execution)
+  const std::function<bool()> & func_condition, const std::function<void()> & func_execution,
+  job::Type type, bool exclusive)
 {
-  list_.emplace_back(Job(func_condition, func_execution));
+  list_.emplace_back(Job(func_condition, func_execution, type, exclusive));
 }
 
 void JobList::update()
 {
-  for (auto job_itr = list_.begin(); job_itr != list_.end(); job_itr++) {
-    if (job_itr->checkCondition()) {
-      job_itr->execute();
-      list_.erase(job_itr);
+  for (auto & job : list_) {
+    if (job.checkCondition()) {
+      job.execute();
     }
   }
 }

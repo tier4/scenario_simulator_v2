@@ -26,7 +26,8 @@ class JobList
 {
 public:
   void append(
-    const std::function<bool()> & func_condition, const std::function<void()> & func_execution);
+    const std::function<bool()> & func_condition, const std::function<void()> & func_execution,
+    job::Type type, bool exclusive);
   void update();
 
 private:

@@ -126,7 +126,7 @@ void VehicleEntity::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_ = boost::none; });
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
 }
 
@@ -152,7 +152,7 @@ void VehicleEntity::requestSpeedChange(
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_ = boost::none; });
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
 }
 

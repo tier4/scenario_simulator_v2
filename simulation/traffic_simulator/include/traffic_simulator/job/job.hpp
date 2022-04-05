@@ -22,16 +22,33 @@ namespace traffic_simulator
 {
 namespace job
 {
+enum class Type {
+  UNKOWN = 0,
+  LINEAR_VELOCITY = 1,
+};
+
+enum class Status {
+  ACTIVE = 0,
+  INACTIVE = 1,
+};
+
 class Job
 {
 public:
-  Job(const std::function<bool()> & func_condition, const std::function<void()> & func_execution);
+  Job(
+    const std::function<bool()> & func_condition, const std::function<void()> & func_execution,
+    job::Type type, bool exclusive);
   bool checkCondition();
   void execute();
 
 private:
   std::function<bool()> func_condition_;
   std::function<void()> func_execution_;
+  Status status_;
+
+public:
+  const job::Type type;
+  const bool exclusive;
 };
 }  // namespace job
 }  // namespace traffic_simulator

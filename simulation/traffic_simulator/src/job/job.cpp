@@ -18,13 +18,32 @@ namespace traffic_simulator
 {
 namespace job
 {
-Job::Job(const std::function<bool()> & func_condition, const std::function<void()> & func_execution)
-: func_condition_(func_condition), func_execution_(func_execution)
+Job::Job(
+  const std::function<bool()> & func_condition, const std::function<void()> & func_execution,
+  job::Type type, bool exclusive)
+: func_condition_(func_condition), func_execution_(func_execution), type(type), exclusive(exclusive)
 {
+  status_ = Status::ACTIVE;
 }
 
-bool Job::checkCondition() { return func_condition_(); }
+bool Job::checkCondition()
+{
+  if (func_condition_()) {
+    status_ = Status::INACTIVE;
+    return true;
+  }
+  return false;
+}
 
-void Job::execute() { return func_execution_(); }
+void Job::execute()
+{
+  switch (status_) {
+    case Status::ACTIVE:
+      func_execution_();
+      return;
+    case Status::INACTIVE:
+      return;
+  }
+}
 }  // namespace job
 }  // namespace traffic_simulator
