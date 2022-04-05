@@ -13,6 +13,7 @@ Major Changes :race_car: :red_car: :blue_car:
 | OpenSCENARIO `Controller.Properties.Property` | Support new controller property `isClairvoyant`.                                                                                                                         | `openscenario_interpreter`                  | [#735](https://github.com/tier4/scenario_simulator_v2/pull/735) | [yamacir-kit](https://github.com/yamacir-kit) |
 | Lane matching improvement for EgoEntity       | Subscribe route information from Autoware (topic : `/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id`) and try matching to on route lanelet. | `traffic_simulator`                         | [#733](https://github.com/tier4/scenario_simulator_v2/pull/733) | [hakuturu583](https://github.com/hakuturu583) |
 | ZMQ client can connect through the network | Add `"simulator_host"` argument to define the address of the simulator host that ZMQ tries to connect to | `simulation_interface`, `traffic_simulator`, `random_test_runner` | [#690](https://github.com/tier4/scenario_simulator_v2/pull/690) | [danielm1405](https://github.com/danielm1405) |
+| Optimization of the trajectory calculation    | Calculate a segment of trajectory spline instead of recalculating it from scratch | `traffic_simulator`, `behavior_tree_plugin` | [#710](https://github.com/tier4/scenario_simulator_v2/pull/710) | [danielm1405](https://github.com/danielm1405) |
 
 Bug Fixes:bug:
 
