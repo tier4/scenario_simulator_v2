@@ -112,13 +112,24 @@ void VehicleEntity::cancelRequest()
 
 void VehicleEntity::requestSpeedChange(double target_speed, bool continuous)
 {
-  if (!continuous) {
+  if (continuous) {
     job_list_.append(
       /**
-       * @brief If the target Pedestrian reaches the target speed, return true.
+       * @brief If the target Vehicle reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        target_speed_ = target_speed;
+        return false;
+      },
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+  } else {
+    job_list_.append(
+      /**
+       * @brief If the target Vehicle reaches the target speed, return true.
        */
       [this, target_speed]() {
         if (getStatus().action_status.twist.linear.x >= target_speed) {
+          target_speed_ = target_speed;
           return true;
         }
         return false;
@@ -133,10 +144,23 @@ void VehicleEntity::requestSpeedChange(double target_speed, bool continuous)
 void VehicleEntity::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
-  if (!continuous) {
+  if (continuous) {
     job_list_.append(
       /**
-       * @brief If the target Pedestrian reaches the target speed, return true.
+       * @brief If the target Vehicle reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        target_speed_ = target_speed.getAbsoluteValue(other_status_);
+        return false;
+      },
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+  } else {
+    job_list_.append(
+      /**
+       * @brief If the target Vehicle reaches the target speed, return true.
        */
       [this, target_speed]() {
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
@@ -145,6 +169,7 @@ void VehicleEntity::requestSpeedChange(
         if (
           getStatus().action_status.twist.linear.x >=
           target_speed.getAbsoluteValue(other_status_)) {
+          target_speed_ = target_speed.getAbsoluteValue(other_status_);
           return true;
         }
         return false;

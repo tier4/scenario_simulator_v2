@@ -35,16 +35,24 @@ enum class Status {
 class Job
 {
 public:
+  /**
+   * @brief Construct a new Job object
+   * 
+   * @param func_on_update If func_on_update function returns true, runs func_on_update function.
+   * @param func_on_cleanup If func_on_update function returns true, runs func_on_update function.
+   * @param type Type of the Job
+   * @param exclusive If true, the Job works exclusively by type.
+   */
   Job(
-    const std::function<bool()> & func_condition, const std::function<void()> & func_execution,
+    const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
     job::Type type, bool exclusive);
-  bool checkCondition();
+  bool onUpdate();
   void execute();
   void inactivate();
 
 private:
-  std::function<bool()> func_condition_;
-  std::function<void()> func_execution_;
+  std::function<bool()> func_on_update_;
+  std::function<void()> func_on_cleanup_;
   Status status_;
 
 public:
