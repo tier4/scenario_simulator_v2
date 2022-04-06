@@ -71,13 +71,9 @@ auto TrafficLightManagerBase::hasAnyLightChanged() -> bool
     });
 }
 
-auto TrafficLightManagerBase::update(const double step_time) -> void
+auto TrafficLightManagerBase::update(const double) -> void
 {
   publishTrafficLightStateArray();
-
-  for (auto & light : getTrafficLights()) {
-    light.second.update(step_time);
-  }
 
   if (hasAnyLightChanged()) {
     deleteAllMarkers();

@@ -235,15 +235,15 @@ TEST(TrafficLight, Bulb)
   using Bulb = TrafficLight::Bulb;
 
   // clang-format off
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::circle).hash() == 0b0000'0000'0000'0000);
-  static_assert(Bulb(Color::green, Status::solid_on,  Shape::circle).hash() == 0b0001'0000'0000'0000);
-  static_assert(Bulb(Color::red,   Status::solid_on,  Shape::circle).hash() == 0b0010'0000'0000'0000);
-  static_assert(Bulb(Color::white, Status::solid_on,  Shape::circle).hash() == 0b0011'0000'0000'0000);
+  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::circle     ).hash() == 0b0001'0000'0000'0000);
+  static_assert(Bulb(Color::red,   Status::solid_on,  Shape::circle     ).hash() == 0b0010'0000'0000'0000);
+  static_assert(Bulb(Color::white, Status::solid_on,  Shape::circle     ).hash() == 0b0011'0000'0000'0000);
 
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::circle).hash() == 0b0000'0000'0000'0000);
-  static_assert(Bulb(Color::amber, Status::solid_off, Shape::circle).hash() == 0b0000'0001'0000'0000);
-  static_assert(Bulb(Color::amber, Status::flashing,  Shape::circle).hash() == 0b0000'0010'0000'0000);
-  static_assert(Bulb(Color::amber, Status::unknown,   Shape::circle).hash() == 0b0000'0011'0000'0000);
+  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000);
+  static_assert(Bulb(Color::amber, Status::solid_off, Shape::circle     ).hash() == 0b0000'0001'0000'0000);
+  static_assert(Bulb(Color::amber, Status::flashing,  Shape::circle     ).hash() == 0b0000'0010'0000'0000);
+  static_assert(Bulb(Color::amber, Status::unknown,   Shape::circle     ).hash() == 0b0000'0011'0000'0000);
 
   static_assert(Bulb(Color::amber, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000);
   static_assert(Bulb(Color::amber, Status::solid_on,  Shape::cross      ).hash() == 0b0000'0000'0000'0001);

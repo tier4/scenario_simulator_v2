@@ -27,6 +27,7 @@
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
+#include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -302,11 +303,11 @@ struct TrafficLight_
     {}
 
     constexpr Bulb(const Color color = {}, const Status status = {}, const Shape shape = {})
-      : value(color, status, shape)
+      : Bulb(std::forward_as_tuple(color, status, shape))
     {}
 
     Bulb(const std::string & s)
-      : value(parse(s))
+      : Bulb(parse(s))
     {}
 
     auto parse(const std::string & s) -> Value
@@ -455,8 +456,15 @@ struct TrafficLight_
 
   std::set<Bulb> bulbs;
 
+  const std::map<Bulb::Hash, boost::optional<geometry_msgs::msg::Point>> locations;
+
   explicit TrafficLight_(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
-  : id(id)
+  : id(id),
+    locations{
+      std::make_pair(id, map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::GREEN)),
+      std::make_pair(id, map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::RED)),
+      std::make_pair(id, map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW))
+      }
   {
     if (not map_manager.isTrafficLight(id)) {
       throw common::scenario_simulator_exception::Error("Invalid traffic light ID ", id, " given.");
@@ -524,8 +532,6 @@ public:
     color_ = color;
     color_changed_ = true;
   }
-
-  void update(const double) { arrow_changed_ = color_changed_ = false; }
 
   auto getArrow() const { return arrow_; }
   auto getColor() const { return color_; }
