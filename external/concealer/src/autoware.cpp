@@ -13,10 +13,30 @@
 // limitations under the License.
 
 #include <concealer/autoware.hpp>
+#include <cstdlib>
 #include <exception>
 
 namespace concealer
 {
+
+void Autoware::shutdownWhenUnexpectedExit()
+{
+  int wstatus = 0;
+
+  if (waitpid(process_id, &wstatus, 0) < 0) {
+    AUTOWARE_SYSTEM_ERROR("waitpid");
+    std::exit(EXIT_FAILURE);
+  }
+
+  if (not is_autoware_exit && WIFEXITED(wstatus)) {
+    is_autoware_exit = true;
+    AUTOWARE_WARN_STREAM(
+      "Autoware process is unexpectedly exit. exit code: " << WEXITSTATUS(wstatus));
+    thrown = std::make_exception_ptr(std::runtime_error("Autoware process is unexpectedly exit"));
+    rclcpp::shutdown(nullptr, "Autoware process is unexpectedly exit.");
+  }
+}
+
 void Autoware::shutdownAutoware()
 {
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
@@ -27,7 +47,9 @@ void Autoware::shutdownAutoware()
     }
   }
 
-  if (process_id != 0) {
+  if (process_id != 0 && not is_autoware_exit) {
+    is_autoware_exit = true;
+
     AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
     {
       sendSIGINT();

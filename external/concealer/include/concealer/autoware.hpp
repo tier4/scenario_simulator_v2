@@ -69,6 +69,10 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 
   std::exception_ptr thrown;
 
+  std::atomic<bool> is_autoware_exit = false;
+
+  void shutdownWhenUnexpectedExit();
+
 protected:
   const pid_t process_id = 0;
 
@@ -95,9 +99,9 @@ protected:
   void resetTimerCallback();
 
 public:
-  CONCEALER_PUBLIC explicit Autoware()
+  CONCEALER_PUBLIC explicit Autoware(pid_t pid = 0)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    future(std::move(promise.get_future())),
+    future(promise.get_future()),
     spinner([this]() {
       while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
                                 std::future_status::timeout) {
@@ -107,28 +111,17 @@ public:
           thrown = std::current_exception();
         }
       }
-    })
+    }),
+    process_id(pid)
   {
+    if (pid != 0) {
+      std::thread([this] { shutdownWhenUnexpectedExit(); }).detach();
+    }
   }
 
   template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
-  : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    future(std::move(promise.get_future())),
-    spinner([this]() {
-      while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
-                                std::future_status::timeout) {
-        try {
-          rclcpp::spin_some(get_node_base_interface());
-        } catch (...) {
-          thrown = std::current_exception();
-        }
-      }
-      RCLCPP_INFO_STREAM(
-        get_logger(),
-        "\x1b[32mShutting down Autoware: (1/3) Stopped publishing/subscribing.\x1b[0m");
-    }),
-    process_id(ros2_launch(std::forward<decltype(xs)>(xs)...))
+  : Autoware(ros2_launch(std::forward<decltype(xs)>(xs)...))
   {
   }
 
