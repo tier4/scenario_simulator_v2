@@ -22,6 +22,17 @@
 
 namespace traffic_simulator
 {
+namespace behavior
+{
+enum class Request {
+  NONE,
+  LANE_CHANGE,
+  FOLLOW_LANE,
+  WALK_STRAIGHT,
+};
+std::ostream & operator<<(std::ostream & stream, const Request & value);
+}  // namespace behavior
+
 namespace speed_change
 {
 enum class Transition {

@@ -60,7 +60,7 @@ public:
   DEFINE_GETTER_SETTER(Obstacle, "obstacle", boost::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus, "other_entity_status", EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters, "pedestrian_parameters", traffic_simulator_msgs::msg::PedestrianParameters)
-  DEFINE_GETTER_SETTER(Request, "request", std::string)
+  DEFINE_GETTER_SETTER(Request, "request", traffic_simulator::behavior::Request)
   DEFINE_GETTER_SETTER(RouteLanelets, "route_lanelets", std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(ReferenceTrajectory, "reference_trajectory", std::shared_ptr<traffic_simulator::math::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(StepTime, "step_time", double)

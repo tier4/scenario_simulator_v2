@@ -87,7 +87,9 @@ boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double 
 BT::NodeStatus StopAtCrossingEntityAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }

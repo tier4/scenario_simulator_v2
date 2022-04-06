@@ -16,6 +16,27 @@
 
 namespace traffic_simulator
 {
+namespace behavior
+{
+std::ostream & operator<<(std::ostream & stream, const Request & value)
+{
+  switch (value) {
+    case Request::NONE:
+      stream << "request : NONE" << std::endl;
+      break;
+    case Request::LANE_CHANGE:
+      stream << "request : LANE_CHANGE" << std::endl;
+      break;
+    case Request::FOLLOW_LANE:
+      stream << "request : FOLLOW_LANE" << std::endl;
+      break;
+    case Request::WALK_STRAIGHT:
+      stream << "request : WALK_STRAIGHT" << std::endl;
+      break;
+  }
+  return stream;
+}
+
 namespace speed_change
 {
 Constraint::Constraint(Constraint::Type type, double value) : type(type), value(value) {}
@@ -247,4 +268,4 @@ std::ostream & operator<<(std::ostream & stream, const Parameter & value)
   return stream;
 }
 }  // namespace lane_change
-}  // namespace traffic_simulator
+}  // namespace behavior

@@ -34,7 +34,7 @@ void PedestrianBehaviorTree::configure(const rclcpp::Logger & logger)
   reset_request_event_ptr_ = std::make_unique<behavior_tree_plugin::ResetRequestEvent>(
     tree_.rootNode(), [&]() { return getRequest(); },
     [&](std::string request) { return setRequest(request); });
-  setRequest("none");
+  setRequest(traffic_simulator::behavior::Request::NONE);
 }
 
 const std::string & PedestrianBehaviorTree::getCurrentAction() const
