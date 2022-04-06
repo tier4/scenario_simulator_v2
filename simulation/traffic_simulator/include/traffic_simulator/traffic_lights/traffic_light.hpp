@@ -16,20 +16,391 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
+#include <cstdint>
 #include <geometry_msgs/msg/point.hpp>
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <regex>
+#include <set>
 #include <stdexcept>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 namespace traffic_simulator
 {
+// clang-format off
+struct TrafficLight_
+{
+  struct Color
+  {
+    enum Value : std::uint8_t { amber, green, red, white, } value;
+
+    static_assert(static_cast<std::uint8_t>(amber) == 0b0000);
+    static_assert(static_cast<std::uint8_t>(green) == 0b0001);
+    static_assert(static_cast<std::uint8_t>(red  ) == 0b0010);
+    static_assert(static_cast<std::uint8_t>(white) == 0b0011);
+
+    constexpr Color(const Value value = green) : value(value) {}
+
+    Color(const std::string & name)
+      : value(makeValue(name))
+    {}
+
+    static inline const std::unordered_map<std::string, Value> table
+    {
+      std::make_pair("amber", amber),
+      std::make_pair("green", green),
+      std::make_pair("red", red),
+      std::make_pair("white", white),
+      std::make_pair("yellow", amber),  // DEPRECATED
+    };
+
+    static auto makeValue(const std::string & name) -> Value
+    {
+      try {
+        return table.at(name);
+      } catch (const std::out_of_range &) {
+        throw common::SyntaxError("Invalid traffic light color name ", std::quoted(name), " given.");
+      }
+    }
+
+    constexpr auto is(const Color given) const
+    {
+      return value == given;
+    }
+
+    constexpr operator Value() const noexcept { return value; }
+
+    friend auto operator>>(std::istream & is, Color & color) -> std::istream &
+    {
+      std::string name;
+      is >> name;
+      color.value = Color::makeValue(name);
+      return is;
+    }
+
+    friend auto operator<<(std::ostream & os, const Color & color) -> std::ostream &
+    {
+      switch (color.value) {
+        case amber:
+          return os << "amber";
+        case green:
+          return os << "green";
+        case red:
+          return os << "red";
+        case white:
+          return os << "white";
+        default:
+          return os;
+      }
+    }
+  };
+
+  struct Status
+  {
+    enum Value : std::uint8_t { solid_on, solid_off, flashing, unknown, } value;
+
+    static_assert(static_cast<std::uint8_t>(solid_on ) == 0b0000);
+    static_assert(static_cast<std::uint8_t>(solid_off) == 0b0001);
+    static_assert(static_cast<std::uint8_t>(flashing ) == 0b0010);
+    static_assert(static_cast<std::uint8_t>(unknown  ) == 0b0011);
+
+    constexpr Status(const Value value = solid_on) : value(value) {}
+
+    Status(const std::string & name)
+      : value(makeValue(name))
+    {}
+
+    static inline const std::unordered_map<std::string, Value> table
+    {
+      std::make_pair("solidOn", solid_on),
+      std::make_pair("solidOff", solid_off),
+      std::make_pair("flashing", flashing),
+      std::make_pair("unknown", unknown),
+    };
+
+    static auto makeValue(const std::string & name) -> Value
+    {
+      try {
+        return table.at(name);
+      } catch (const std::out_of_range &) {
+        throw common::SyntaxError("Invalid traffic light status name ", std::quoted(name), " given.");
+      }
+    }
+
+    constexpr auto is(const Value given) const
+    {
+      return value == given;
+    }
+
+    constexpr operator Value() const noexcept { return value; }
+
+    friend auto operator>>(std::istream & is, Status & status) -> std::istream &
+    {
+      std::string name;
+      is >> name;
+      status.value = Status::makeValue(name);
+      return is;
+    }
+
+    friend auto operator<<(std::ostream & os, const Status & status) -> std::ostream &
+    {
+      switch (status.value) {
+        case solid_on:
+          return os << "solidOn";
+        case solid_off:
+          return os << "solidOff";
+        case flashing:
+          return os << "flashing";
+        default:
+        case unknown:
+          return os << "unknown";
+      }
+    }
+
+    constexpr operator bool() const
+    {
+      return value == solid_on or value == flashing;
+    }
+  };
+
+  struct Shape
+  {
+    enum class Category : std::uint8_t
+    {
+      circle, cross, arrow,
+    };
+
+    static_assert(static_cast<std::uint8_t>(Category::circle) == 0b0000);
+    static_assert(static_cast<std::uint8_t>(Category::cross ) == 0b0001);
+    static_assert(static_cast<std::uint8_t>(Category::arrow ) == 0b0010);
+
+    enum Value : std::uint16_t
+    {
+      circle      =                 static_cast<std::uint8_t>(Category::circle),
+      cross       =                 static_cast<std::uint8_t>(Category::cross ),
+      left        = (0b1000 << 4) | static_cast<std::uint8_t>(Category::arrow ),
+      down        = (0b0100 << 4) | static_cast<std::uint8_t>(Category::arrow ),
+      up          = (0b0010 << 4) | static_cast<std::uint8_t>(Category::arrow ),
+      right       = (0b0001 << 4) | static_cast<std::uint8_t>(Category::arrow ),
+      lower_left  = (0b1100 << 4) | static_cast<std::uint8_t>(Category::arrow ),
+      upper_left  = (0b1010 << 4) | static_cast<std::uint8_t>(Category::arrow ),
+      lower_right = (0b0101 << 4) | static_cast<std::uint8_t>(Category::arrow ),
+      upper_right = (0b0011 << 4) | static_cast<std::uint8_t>(Category::arrow ),
+    } value;
+
+    static_assert(static_cast<std::uint16_t>(circle     ) == 0b0000'0000);
+    static_assert(static_cast<std::uint16_t>(cross      ) == 0b0000'0001);
+    static_assert(static_cast<std::uint16_t>(left       ) == 0b1000'0010);
+    static_assert(static_cast<std::uint16_t>(down       ) == 0b0100'0010);
+    static_assert(static_cast<std::uint16_t>(up         ) == 0b0010'0010);
+    static_assert(static_cast<std::uint16_t>(right      ) == 0b0001'0010);
+    static_assert(static_cast<std::uint16_t>(lower_left ) == 0b1100'0010);
+    static_assert(static_cast<std::uint16_t>(upper_left ) == 0b1010'0010);
+    static_assert(static_cast<std::uint16_t>(lower_right) == 0b0101'0010);
+    static_assert(static_cast<std::uint16_t>(upper_right) == 0b0011'0010);
+
+    constexpr Shape(const Value value = circle) : value(value) {}
+
+    Shape(const std::string & name)
+      : value(makeValue(name))
+    {}
+
+    static inline const std::unordered_map<std::string, Shape::Value> table
+    {
+      std::make_pair("circle",     Shape::circle),
+      std::make_pair("cross",      Shape::cross),
+      std::make_pair("left",       Shape::left),
+      std::make_pair("down",       Shape::down),
+      std::make_pair("up",         Shape::up),
+      std::make_pair("right",      Shape::right),
+      std::make_pair("lowerLeft",  Shape::lower_left),
+      std::make_pair("upperLeft",  Shape::upper_left),
+      std::make_pair("lowerRight", Shape::lower_right),
+      std::make_pair("upperRight", Shape::upper_right),
+    };
+
+    static auto makeValue(const std::string & name) -> Value
+    {
+      try {
+        return table.at(name);
+      } catch (const std::out_of_range &) {
+        throw common::SyntaxError("Invalid traffic light shape name ", std::quoted(name), " given.");
+      }
+    }
+
+    constexpr auto category() const
+    {
+      return static_cast<Category>(static_cast<std::uint16_t>(value) & 0b1111);
+    }
+
+    constexpr auto is(const Value given) const
+    {
+      return value == given;
+    }
+
+    constexpr auto is(const Category given) const
+    {
+      return category() == given;
+    }
+
+    constexpr operator Value() const noexcept { return value; }
+
+    friend auto operator>>(std::istream & is, Shape & shape) -> std::istream &
+    {
+      std::string name;
+      is >> name;
+      shape.value = Shape::makeValue(name);
+      return is;
+    }
+
+    friend auto operator<<(std::ostream & os, const Shape & shape) -> std::ostream &
+    {
+      switch (shape.value) {
+        case circle:
+          return os << "circle";
+        case cross:
+          return os << "cross";
+        case left:
+          return os << "left";
+        case down:
+          return os << "down";
+        case up:
+          return os << "up";
+        case right:
+          return os << "right";
+        case lower_left:
+          return os << "lowerLeft";
+        case upper_left:
+          return os << "upperLeft";
+        case lower_right:
+          return os << "lowerRight";
+        case upper_right:
+          return os << "upperRight";
+        default:
+          return os;
+      }
+    }
+  };
+
+  struct Bulb : public std::tuple<Color, Status, Shape>
+  {
+    constexpr Bulb(const Color color = {}, const Status status = {}, const Shape shape = {})
+      : std::tuple<Color, Status, Shape> { color, status, shape }
+    {}
+
+    Bulb(const std::string & s)
+      : std::tuple<Color, Status, Shape> { parse(s) }
+    {}
+
+    auto parse(const std::string & s) -> std::tuple<Color, Status, Shape>
+    {
+      auto make_pattern_from = [](auto && map)
+      {
+        std::stringstream ss;
+
+        auto const * separator = "";
+
+        for (auto && [name, value] : map)
+        {
+          ss << separator << name;
+          separator = "|";
+        }
+
+        return "(" + ss.str() + ")";
+      };
+
+
+      static const auto pattern = std::regex(
+        R"(^)" + make_pattern_from(Color::table)  + R"(?\s*)"
+               + make_pattern_from(Status::table) + R"(?\s*)"
+               + make_pattern_from(Shape::table)  + R"(?$)"
+      );
+
+      if (std::smatch result; std::regex_match(s, result, pattern))
+      {
+        auto color = [](auto && name)
+        {
+          return name.empty() ? Color() : Color(name);
+        };
+
+        auto status = [](auto && name)
+        {
+          return name.empty() ? Status() : Status(name);
+        };
+
+        auto shape = [](auto && name)
+        {
+          return name.empty() ? Shape() : Shape(name);
+        };
+
+        return std::make_tuple(color(result.str(1)), status(result.str(2)), shape(result.str(3)));
+      }
+      else
+      {
+        throw common::SyntaxError("");
+      }
+    }
+
+    constexpr auto is(const Color color) const
+    {
+      return std::get<Color>(*this).is(color);
+    }
+
+    constexpr auto is(const Status status) const
+    {
+      return std::get<Status>(*this).is(status);
+    }
+
+    constexpr auto is(const Shape shape) const
+    {
+      return std::get<Shape>(*this).is(shape);
+    }
+
+    constexpr auto is(const Shape::Category category) const
+    {
+      return std::get<Shape>(*this).is(category);
+    }
+
+    constexpr auto value() const -> std::uint32_t
+    {
+      return (static_cast<std::uint32_t>(std::get<Color>(*this).value) << 12) |
+             (static_cast<std::uint32_t>(std::get<Status>(*this).value) << 8) |
+             static_cast<std::uint32_t>(std::get<Shape>(*this).value);
+    }
+
+    friend constexpr auto operator <(const Bulb & lhs, const Bulb & rhs) -> bool
+    {
+      return lhs.value() < rhs.value();
+    }
+  };
+
+  std::set<Bulb> bulbs;
+
+  template <typename... Ts>
+  auto emplace(Ts&&... xs)
+  {
+    bulbs.emplace(std::forward<decltype(xs)>(xs)...);
+  }
+
+  auto clear()
+  {
+    bulbs.clear();
+  }
+
+  auto contains(const Color & color, const Status & status, const Shape & shape) const
+  {
+    return bulbs.find({color, status, shape}) != std::end(bulbs);
+  }
+};
+// clang-format on
+
 class TrafficLight
 {
 public:
