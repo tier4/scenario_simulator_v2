@@ -21,30 +21,6 @@
 
 #include "../expect_eq_macros.hpp"
 
-geometry_msgs::msg::Point getPoint(double val)
-{
-  geometry_msgs::msg::Point p;
-  p.x = val;
-  p.y = val;
-  p.z = val;
-  return p;
-}
-
-TEST(TrafficLights, getPositionError)
-{
-  using namespace traffic_simulator;
-
-  traffic_simulator::TrafficLight light(0);
-  EXPECT_THROW(light.getPosition(TrafficLightColor::GREEN), common::SemanticError);
-  EXPECT_THROW(light.getPosition(TrafficLightColor::YELLOW), common::SemanticError);
-  EXPECT_THROW(light.getPosition(TrafficLightColor::RED), common::SemanticError);
-  EXPECT_THROW(light.getPosition(TrafficLightArrow::NONE), common::SemanticError);
-  EXPECT_THROW(light.getPosition(TrafficLightArrow::LEFT), common::SemanticError);
-  EXPECT_THROW(light.getPosition(TrafficLightArrow::RIGHT), common::SemanticError);
-  EXPECT_THROW(light.getPosition(TrafficLightArrow::STRAIGHT), common::SemanticError);
-  EXPECT_EQ(light.id, static_cast<std::int64_t>(0));
-}
-
 TEST(TrafficLight, Color)
 {
   using Color = traffic_simulator::TrafficLight_::Color;

@@ -23,6 +23,7 @@
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -87,7 +88,8 @@ public:
       return iter->second;
     } else {
       traffic_lights_.emplace(
-        std::piecewise_construct, std::make_tuple(lanelet_id), std::make_tuple(lanelet_id, hdmap_));
+        std::piecewise_construct, std::forward_as_tuple(lanelet_id),
+        std::forward_as_tuple(lanelet_id, *hdmap_));
       return traffic_lights_.at(lanelet_id);
     }
   }

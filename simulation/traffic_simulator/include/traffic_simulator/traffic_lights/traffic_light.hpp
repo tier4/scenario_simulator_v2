@@ -49,7 +49,7 @@ struct TrafficLight_
     constexpr Color(const Value value = green) : value(value) {}
 
     Color(const std::string & name)
-      : value(makeValue(name))
+      : value(make(name))
     {}
 
     static inline const std::unordered_map<std::string, Value> table
@@ -61,7 +61,7 @@ struct TrafficLight_
       std::make_pair("yellow", amber),  // DEPRECATED
     };
 
-    static auto makeValue(const std::string & name) -> Value
+    static auto make(const std::string & name) -> Color
     {
       try {
         return table.at(name);
@@ -81,7 +81,7 @@ struct TrafficLight_
     {
       std::string name;
       is >> name;
-      color.value = Color::makeValue(name);
+      color.value = Color::make(name);
       return is;
     }
 
@@ -114,7 +114,7 @@ struct TrafficLight_
     constexpr Status(const Value value = solid_on) : value(value) {}
 
     Status(const std::string & name)
-      : value(makeValue(name))
+      : value(make(name))
     {}
 
     static inline const std::unordered_map<std::string, Value> table
@@ -125,7 +125,7 @@ struct TrafficLight_
       std::make_pair("unknown", unknown),
     };
 
-    static auto makeValue(const std::string & name) -> Value
+    static auto make(const std::string & name) -> Status
     {
       try {
         return table.at(name);
@@ -145,7 +145,7 @@ struct TrafficLight_
     {
       std::string name;
       is >> name;
-      status.value = Status::makeValue(name);
+      status.value = Status::make(name);
       return is;
     }
 
@@ -209,7 +209,7 @@ struct TrafficLight_
     constexpr Shape(const Value value = circle) : value(value) {}
 
     Shape(const std::string & name)
-      : value(makeValue(name))
+      : value(make(name))
     {}
 
     static inline const std::unordered_map<std::string, Shape::Value> table
@@ -226,7 +226,7 @@ struct TrafficLight_
       std::make_pair("upperRight", Shape::upper_right),
     };
 
-    static auto makeValue(const std::string & name) -> Value
+    static auto make(const std::string & name) -> Shape
     {
       try {
         return table.at(name);
@@ -256,7 +256,7 @@ struct TrafficLight_
     {
       std::string name;
       is >> name;
-      shape.value = Shape::makeValue(name);
+      shape.value = Shape::make(name);
       return is;
     }
 
@@ -477,23 +477,19 @@ class TrafficLight
 public:
   const std::int64_t id;
 
-  explicit TrafficLight(
-    const std::int64_t id, const std::shared_ptr<hdmap_utils::HdMapUtils> & map_manager = nullptr)
+  explicit TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
   : id(id), color_(TrafficLightColor::GREEN), arrow_(TrafficLightArrow::NONE)
   {
     auto locate = [&](auto && color) {
-      assert(map_manager);
-      if (const auto position = map_manager->getTrafficLightBulbPosition(id, color)) {
+      if (const auto position = map_manager.getTrafficLightBulbPosition(id, color)) {
         color_positions_.emplace(color, position.get());
       }
     };
 
-    if (map_manager) {
-      if (map_manager->isTrafficLight(id)) {
-        locate(TrafficLightColor::GREEN);
-        locate(TrafficLightColor::RED);
-        locate(TrafficLightColor::YELLOW);
-      }
+    if (map_manager.isTrafficLight(id)) {
+      locate(TrafficLightColor::GREEN);
+      locate(TrafficLightColor::RED);
+      locate(TrafficLightColor::YELLOW);
     }
   }
 
