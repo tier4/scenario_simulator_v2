@@ -32,7 +32,6 @@ void Autoware::shutdownWhenUnexpectedExit()
     is_autoware_exit = true;
     AUTOWARE_WARN_STREAM(
       "Autoware process is unexpectedly exit. exit code: " << WEXITSTATUS(wstatus));
-    thrown = std::make_exception_ptr(std::runtime_error("Autoware process is unexpectedly exit"));
     rclcpp::shutdown(nullptr, "Autoware process is unexpectedly exit.");
   }
 }
