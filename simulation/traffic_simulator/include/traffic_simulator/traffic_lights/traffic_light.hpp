@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
+#include <color_names/color_names.hpp>
 #include <cstdint>
 #include <geometry_msgs/msg/point.hpp>
 #include <iostream>
@@ -24,7 +25,6 @@
 #include <regex>
 #include <set>
 #include <stdexcept>
-#include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <tuple>
@@ -36,7 +36,9 @@
 namespace traffic_simulator
 {
 // clang-format off
-struct TrafficLight_
+namespace experimental
+{
+struct TrafficLight
 {
   struct Color
   {
@@ -456,11 +458,11 @@ struct TrafficLight_
 
   std::set<Bulb> bulbs;
 
-  const std::map<Bulb::Hash, boost::optional<geometry_msgs::msg::Point>> locations;
+  const std::map<Bulb::Hash, boost::optional<geometry_msgs::msg::Point>> positions;
 
-  explicit TrafficLight_(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
+  explicit TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
   : id(id),
-    locations{
+    positions{
       std::make_pair(id, map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::GREEN)),
       std::make_pair(id, map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::RED)),
       std::make_pair(id, map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW))
@@ -498,6 +500,7 @@ struct TrafficLight_
     return traffic_signal;
   }
 };
+}  // namespace experimental
 // clang-format on
 
 class TrafficLight
@@ -536,8 +539,24 @@ public:
   auto getArrow() const { return arrow_; }
   auto getColor() const { return color_; }
 
-  const geometry_msgs::msg::Point & getPosition(const TrafficLightColor & color) const;
-  const geometry_msgs::msg::Point & getPosition(const TrafficLightArrow & arrow) const;
+  template <typename Markers, typename Now>
+  auto draw(Markers & markers, const Now & now, const std::string & frame_id) const
+  {
+    visualization_msgs::msg::Marker marker;
+    marker.header.stamp = now;
+    marker.header.frame_id = frame_id;
+    marker.action = marker.ADD;
+    marker.ns = "bulb";
+    marker.id = id;
+    marker.type = marker.SPHERE;
+    marker.pose.position = color_positions_.at(color_);
+    marker.pose.orientation = geometry_msgs::msg::Quaternion();
+    marker.scale.x = 0.3;
+    marker.scale.y = 0.3;
+    marker.scale.z = 0.3;
+    marker.color = color_names::makeColorMsg(boost::lexical_cast<std::string>(color_));
+    markers.push_back(marker);
+  }
 
   auto colorChanged() const { return color_changed_; }
   auto arrowChanged() const { return arrow_changed_; }

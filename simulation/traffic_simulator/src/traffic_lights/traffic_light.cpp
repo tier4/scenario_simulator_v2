@@ -23,19 +23,4 @@
 
 namespace traffic_simulator
 {
-const geometry_msgs::msg::Point & TrafficLight::getPosition(const TrafficLightColor & color) const
-{
-  if (color_positions_.count(color) == 0) {
-    THROW_SEMANTIC_ERROR("target color does not exist");
-  }
-  return color_positions_.at(color);
-}
-
-const geometry_msgs::msg::Point & TrafficLight::getPosition(const TrafficLightArrow & arrow) const
-{
-  if (arrow_positions_.count(arrow) == 0) {
-    THROW_SEMANTIC_ERROR("target arrow does not exist");
-  }
-  return arrow_positions_.at(arrow);
-}
 }  // namespace traffic_simulator

@@ -42,21 +42,7 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
   const auto now = clock_ptr_->now();
 
   for (const auto & [id, traffic_light] : getTrafficLights()) {
-    visualization_msgs::msg::Marker marker;
-    marker.header.stamp = now;
-    marker.header.frame_id = map_frame_;
-    marker.action = marker.ADD;
-    marker.ns = "bulb";
-    marker.id = id;
-    marker.type = marker.SPHERE;
-    marker.pose.position = traffic_light.getPosition(traffic_light.getColor());
-    marker.pose.orientation = geometry_msgs::msg::Quaternion();
-    marker.scale.x = 0.3;
-    marker.scale.y = 0.3;
-    marker.scale.z = 0.3;
-    marker.color =
-      color_names::makeColorMsg(boost::lexical_cast<std::string>(traffic_light.getColor()));
-    marker_array.markers.push_back(marker);
+    traffic_light.draw(marker_array.markers, now, map_frame_);
   }
 
   marker_pub_->publish(marker_array);
@@ -64,11 +50,12 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
 
 auto TrafficLightManagerBase::hasAnyLightChanged() -> bool
 {
-  return std::any_of(
-    std::begin(getTrafficLights()), std::end(getTrafficLights()), [](auto && id_and_traffic_light) {
-      return id_and_traffic_light.second.colorChanged() or
-             id_and_traffic_light.second.arrowChanged();
-    });
+  return true;
+  // return std::any_of(
+  //   std::begin(getTrafficLights()), std::end(getTrafficLights()), [](auto && id_and_traffic_light) {
+  //     return id_and_traffic_light.second.colorChanged() or
+  //            id_and_traffic_light.second.arrowChanged();
+  //   });
 }
 
 auto TrafficLightManagerBase::update(const double) -> void
