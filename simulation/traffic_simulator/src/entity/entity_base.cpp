@@ -103,18 +103,15 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
        */
       [this]() {}, job::Type::LINEAR_VELOCITY, true);
   } else {
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
     job_list_.append(
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
       [this, target_speed]() {
         if (getStatus().action_status.twist.linear.x >= target_speed) {
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
           return true;
         }
         target_speed_ = target_speed;
-        RCLCPP_INFO_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
         return false;
       },
       /**
