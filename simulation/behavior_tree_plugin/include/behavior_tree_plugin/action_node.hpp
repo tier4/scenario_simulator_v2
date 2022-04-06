@@ -20,6 +20,7 @@
 #include <boost/algorithm/clamp.hpp>
 #include <memory>
 #include <string>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
@@ -77,7 +78,7 @@ public:
       BT::InputPort<double>("step_time"),
       BT::InputPort<boost::optional<double>>("target_speed"),
       BT::OutputPort<traffic_simulator_msgs::msg::EntityStatus>("updated_status"),
-      BT::OutputPort<std::string>("request"),
+      BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus>>(
         "other_entity_status"),
       BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>(
@@ -89,7 +90,7 @@ public:
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
   }
   void getBlackBoardValues();
-  std::string request;
+  traffic_simulator::behavior::Request request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager;
   traffic_simulator_msgs::msg::EntityStatus entity_status;
