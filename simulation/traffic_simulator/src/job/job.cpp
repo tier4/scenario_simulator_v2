@@ -29,22 +29,19 @@ Job::Job(
   status_ = Status::ACTIVE;
 }
 
-void Job::inactivate() { status_ = Status::INACTIVE; }
-
-bool Job::onUpdate()
+void Job::inactivate()
 {
-  if (func_on_update_()) {
-    inactivate();
-    return true;
-  }
-  return false;
+  status_ = Status::INACTIVE;
+  func_on_cleanup_();
 }
 
-void Job::execute()
+void Job::onUpdate()
 {
   switch (status_) {
     case Status::ACTIVE:
-      func_on_cleanup_();
+      if (func_on_update_()) {
+        inactivate();
+      }
       return;
     case Status::INACTIVE:
       return;

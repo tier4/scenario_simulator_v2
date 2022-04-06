@@ -46,8 +46,7 @@ public:
   Job(
     const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
     job::Type type, bool exclusive);
-  bool onUpdate();
-  void execute();
+  void onUpdate();
   void inactivate();
 
 private:

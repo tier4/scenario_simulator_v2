@@ -33,9 +33,7 @@ void JobList::append(
 void JobList::update()
 {
   for (auto & job : list_) {
-    if (job.onUpdate()) {
-      job.execute();
-    }
+    job.onUpdate();
   }
 }
 }  // namespace job
