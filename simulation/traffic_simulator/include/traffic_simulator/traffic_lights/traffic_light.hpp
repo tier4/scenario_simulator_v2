@@ -441,12 +441,16 @@ struct TrafficLight_
     }
   };
 
+  const std::int64_t id;
+
   std::set<Bulb> bulbs;
 
-  template <typename... Ts>
-  auto emplace(Ts&&... xs)
+  explicit TrafficLight_(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
+  : id(id)
   {
-    bulbs.emplace(std::forward<decltype(xs)>(xs)...);
+    if (not map_manager.isTrafficLight(id)) {
+      throw common::scenario_simulator_exception::Error("Invalid traffic light ID ", id, " given.");
+    }
   }
 
   auto clear()
@@ -457,6 +461,12 @@ struct TrafficLight_
   auto contains(const Color & color, const Status & status, const Shape & shape) const
   {
     return bulbs.find({color, status, shape}) != std::end(bulbs);
+  }
+
+  template <typename... Ts>
+  auto emplace(Ts&&... xs)
+  {
+    bulbs.emplace(std::forward<decltype(xs)>(xs)...);
   }
 
   explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const

@@ -14,12 +14,11 @@
 
 #include <gtest/gtest.h>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/lexical_cast.hpp>
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
-
-#include "../expect_eq_macros.hpp"
 
 TEST(TrafficLight, Color)
 {
@@ -322,15 +321,24 @@ TEST(TrafficLight, Bulb)
   }
 }
 
-TEST(TrafficLight, Bulbs)
+TEST(TrafficLight, TrafficLight)
 {
   using TrafficLight = traffic_simulator::TrafficLight_;
   using Color = TrafficLight::Color;
   using Status = TrafficLight::Status;
   using Shape = TrafficLight::Shape;
 
+  hdmap_utils::HdMapUtils map_manager(
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+    []() {
+      geographic_msgs::msg::GeoPoint geo_point;
+      geo_point.latitude = 35.61836750154;
+      geo_point.longitude = 139.78066608243;
+      return geo_point;
+    }());
+
   {
-    auto traffic_light = TrafficLight();
+    auto traffic_light = TrafficLight(34802, map_manager);
 
     traffic_light.emplace(Color::red, Status::flashing, Shape::circle);
     traffic_light.emplace(Color::green, Status::solid_on, Shape::right);
@@ -340,7 +348,7 @@ TEST(TrafficLight, Bulbs)
   }
 
   {
-    auto traffic_light = TrafficLight();
+    auto traffic_light = TrafficLight(34802, map_manager);
 
     traffic_light.emplace("red flashing circle");
     traffic_light.emplace("green solidOn right");
