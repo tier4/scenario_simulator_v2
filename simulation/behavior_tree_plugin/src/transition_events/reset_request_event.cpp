@@ -34,8 +34,8 @@ void ResetRequestEvent::callback(
 {
   TransitionEvent::updateCurrentAction(status, node);
   if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
-    if (get_request_function_() == current_action_) {
-      set_request_function_("none");
+    if (traffic_simulator::behavior::getRequestString(get_request_function_()) == current_action_) {
+      set_request_function_(traffic_simulator::behavior::Request::NONE);
     }
   }
 }

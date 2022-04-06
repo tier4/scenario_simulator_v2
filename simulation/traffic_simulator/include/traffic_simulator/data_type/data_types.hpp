@@ -30,6 +30,7 @@ enum class Request {
   FOLLOW_LANE,
   WALK_STRAIGHT,
 };
+std::string getRequestString(const Request & value);
 std::ostream & operator<<(std::ostream & stream, const Request & value);
 }  // namespace behavior
 

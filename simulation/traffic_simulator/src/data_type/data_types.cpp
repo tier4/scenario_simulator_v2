@@ -36,6 +36,25 @@ std::ostream & operator<<(std::ostream & stream, const Request & value)
   }
   return stream;
 }
+
+std::string getRequestString(const Request & value)
+{
+  switch (value) {
+    case Request::NONE:
+      return "none";
+      break;
+    case Request::LANE_CHANGE:
+      return "lane_change";
+      break;
+    case Request::FOLLOW_LANE:
+      return "follow_lane";
+      break;
+    case Request::WALK_STRAIGHT:
+      return "walk_straight";
+      break;
+  }
+  THROW_SEMANTIC_ERROR(value, " is invalid");
+}
 }  // namespace behavior
 
 namespace speed_change
