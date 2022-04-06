@@ -36,6 +36,7 @@ std::ostream & operator<<(std::ostream & stream, const Request & value)
   }
   return stream;
 }
+}  // namespace behavior
 
 namespace speed_change
 {
@@ -268,4 +269,4 @@ std::ostream & operator<<(std::ostream & stream, const Parameter & value)
   return stream;
 }
 }  // namespace lane_change
-}  // namespace behavior
+}  // namespace traffic_simulator
