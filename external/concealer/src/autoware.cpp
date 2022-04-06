@@ -18,7 +18,6 @@
 
 namespace concealer
 {
-
 void Autoware::shutdownWhenUnexpectedExit()
 {
   int wstatus = 0;
