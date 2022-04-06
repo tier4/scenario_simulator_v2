@@ -289,17 +289,27 @@ struct TrafficLight_
     }
   };
 
-  struct Bulb : public std::tuple<Color, Status, Shape>
+  struct Bulb
   {
+    using Value = std::tuple<Color, Status, Shape>;
+
+    const Value value;
+
+    using Hash = std::uint32_t;  // (Color::Value << 12) | (Status::Value << 8) | Shape::Value
+
+    constexpr Bulb(const Value value)
+      : value(value)
+    {}
+
     constexpr Bulb(const Color color = {}, const Status status = {}, const Shape shape = {})
-      : std::tuple<Color, Status, Shape> { color, status, shape }
+      : value(color, status, shape)
     {}
 
     Bulb(const std::string & s)
-      : std::tuple<Color, Status, Shape> { parse(s) }
+      : value(parse(s))
     {}
 
-    auto parse(const std::string & s) -> std::tuple<Color, Status, Shape>
+    auto parse(const std::string & s) -> Value
     {
       auto make_pattern_from = [](auto && map)
       {
@@ -350,40 +360,40 @@ struct TrafficLight_
 
     constexpr auto is(const Color color) const
     {
-      return std::get<Color>(*this).is(color);
+      return std::get<Color>(value).is(color);
     }
 
     constexpr auto is(const Status status) const
     {
-      return std::get<Status>(*this).is(status);
+      return std::get<Status>(value).is(status);
     }
 
     constexpr auto is(const Shape shape) const
     {
-      return std::get<Shape>(*this).is(shape);
+      return std::get<Shape>(value).is(shape);
     }
 
     constexpr auto is(const Shape::Category category) const
     {
-      return std::get<Shape>(*this).is(category);
+      return std::get<Shape>(value).is(category);
     }
 
-    constexpr auto value() const -> std::uint32_t
+    constexpr auto hash() const -> Hash
     {
-      return (static_cast<std::uint32_t>(std::get<Color>(*this).value) << 12) |
-             (static_cast<std::uint32_t>(std::get<Status>(*this).value) << 8) |
-             static_cast<std::uint32_t>(std::get<Shape>(*this).value);
+      return (static_cast<Hash>(std::get<Color >(value).value) << 12) |
+             (static_cast<Hash>(std::get<Status>(value).value) <<  8) |
+              static_cast<Hash>(std::get<Shape >(value).value);
     }
 
     friend constexpr auto operator <(const Bulb & lhs, const Bulb & rhs) -> bool
     {
-      return lhs.value() < rhs.value();
+      return lhs.hash() < rhs.hash();
     }
 
     explicit operator autoware_auto_perception_msgs::msg::TrafficLight() const
     {
       auto color = [this]() {
-        switch (std::get<Color>(*this).value) {
+        switch (std::get<Color>(value).value) {
           case Color::amber:
             return autoware_auto_perception_msgs::msg::TrafficLight::AMBER;
           case Color::green:
@@ -396,7 +406,7 @@ struct TrafficLight_
       };
 
       auto status = [this]() {
-        switch (std::get<Status>(*this).value) {
+        switch (std::get<Status>(value).value) {
           case Status::solid_on:
             return autoware_auto_perception_msgs::msg::TrafficLight::SOLID_ON;
           case Status::solid_off:
@@ -409,7 +419,7 @@ struct TrafficLight_
       };
 
       auto shape = [this]() {
-        switch (std::get<Shape>(*this).value) {
+        switch (std::get<Shape>(value).value) {
           case Shape::circle:
             return autoware_auto_perception_msgs::msg::TrafficLight::CIRCLE;
           case Shape::cross:
@@ -428,7 +438,7 @@ struct TrafficLight_
             return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_RIGHT_ARROW;
           default:
             throw common::SyntaxError(
-              std::get<Shape>(*this), " is not supported as a shape for autoware_auto_perception_msgs::msg::TrafficLight.");
+              std::get<Shape>(value), " is not supported as a shape for autoware_auto_perception_msgs::msg::TrafficLight.");
         }
       };
 
