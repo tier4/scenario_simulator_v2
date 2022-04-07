@@ -135,7 +135,7 @@ public:
     resetTimerCallback();
   }
 
-  virtual ~AutowareUniverse();
+  ~AutowareUniverse() override;
 
   auto engage() -> void override;
 

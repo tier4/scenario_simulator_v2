@@ -364,8 +364,9 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   return false;
 }
 
-double ActionNode::calculateStopDistance() const
+double ActionNode::calculateStopDistance(double deceleration) const
 {
-  return std::pow(entity_status.action_status.twist.linear.x, 2) / (2 * 5);
+  return (entity_status.action_status.twist.linear.x * entity_status.action_status.twist.linear.x) /
+         (2 * std::fabs(deceleration));
 }
 }  // namespace entity_behavior

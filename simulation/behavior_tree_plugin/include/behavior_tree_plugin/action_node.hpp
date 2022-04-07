@@ -43,7 +43,7 @@ public:
     const traffic_simulator::math::CatmullRomSpline & spline);
   boost::optional<std::string> getFrontEntityName(
     const traffic_simulator::math::CatmullRomSpline & spline);
-  double calculateStopDistance() const;
+  double calculateStopDistance(double deceleration) const;
   boost::optional<double> getDistanceToFrontEntity(
     const traffic_simulator::math::CatmullRomSpline & spline);
   boost::optional<double> getDistanceToStopLine(
