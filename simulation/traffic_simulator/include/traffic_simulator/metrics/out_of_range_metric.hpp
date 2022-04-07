@@ -96,7 +96,6 @@ private:
   double linear_acceleration_ = 0;
   double linear_jerk_ = 0;
 
-  std::unique_ptr<rclcpp::Node> node_ptr_;
   rclcpp::Subscription<JerkMessageType>::SharedPtr jerk_callback_ptr_;
 };
 }  // namespace metrics

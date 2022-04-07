@@ -23,6 +23,7 @@
 #include <string>
 #include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/driver_model.hpp>
@@ -120,11 +121,6 @@ public:
 
   virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool;
 
-  virtual void requestSpeedChange(double target_speed, bool continuous) = 0;
-
-  virtual void requestSpeedChange(
-    const speed_change::RelativeTargetSpeed & target_speed, bool continuous) = 0;
-
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
   {
@@ -159,6 +155,11 @@ public:
     const speed_change::RelativeTargetSpeed & target_speed,
     const speed_change::Transition transition, const speed_change::Constraint constraint,
     const bool continuous);
+
+  virtual void requestSpeedChange(double target_speed, bool continuous);
+
+  virtual void requestSpeedChange(
+    const speed_change::RelativeTargetSpeed & target_speed, bool continuous);
 
   virtual void requestLaneChange(const std::int64_t){};
 
@@ -215,6 +216,9 @@ protected:
   visualization_msgs::msg::MarkerArray current_marker_;
   traffic_simulator_msgs::msg::EntityType entity_type_;
   const traffic_simulator_msgs::msg::EntitySubtype entity_subtype_;
+
+  boost::optional<double> target_speed_;
+  traffic_simulator::job::JobList job_list_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -65,6 +65,7 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
   RCLCPP_INFO_STREAM(get_logger(), message);
 
   traffic_simulator::Configuration configuration(map_path);
+  configuration.simulator_host = test_control_parameters.simulator_host;
   api_ = std::make_shared<traffic_simulator::API>(this, configuration);
   auto lanelet_utils = std::make_shared<LaneletUtils>(configuration.lanelet2_map_path());
 
@@ -139,6 +140,7 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
   tp.test_count = this->declare_parameter<int>("test_count", 5);
   tp.simulator_type = simulatorTypeFromString(
     this->declare_parameter<std::string>("simulator_type", "simple_sensor_simulator"));
+  tp.simulator_host = this->declare_parameter<std::string>("simulator_host", "localhost");
 
   if (!tp.input_dir.empty() && !boost::filesystem::is_directory(tp.input_dir)) {
     throw std::runtime_error(

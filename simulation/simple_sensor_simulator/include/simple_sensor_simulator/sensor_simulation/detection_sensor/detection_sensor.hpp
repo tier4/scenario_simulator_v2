@@ -46,6 +46,8 @@ protected:
     const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
 
 public:
+  virtual ~DetectionSensorBase() = default;
+
   virtual void update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> & lidar_detected_entity) = 0;

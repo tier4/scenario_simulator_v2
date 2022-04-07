@@ -12,6 +12,7 @@ Major Changes :race_car: :red_car: :blue_car:
 | Optimization of the trajectory calculation    | Hermite curve optimization, entities' trajectories calculated only when route changes                                                                                    | `traffic_simulator`, `behavior_tree_plugin` | [#708](https://github.com/tier4/scenario_simulator_v2/pull/708) | [danielm1405](https://github.com/danielm1405) |
 | OpenSCENARIO `Controller.Properties.Property` | Support new controller property `isClairvoyant`.                                                                                                                         | `openscenario_interpreter`                  | [#735](https://github.com/tier4/scenario_simulator_v2/pull/735) | [yamacir-kit](https://github.com/yamacir-kit) |
 | Lane matching improvement for EgoEntity       | Subscribe route information from Autoware (topic : `/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id`) and try matching to on route lanelet. | `traffic_simulator`                         | [#733](https://github.com/tier4/scenario_simulator_v2/pull/733) | [hakuturu583](https://github.com/hakuturu583) |
+| ZMQ client can connect through the network | Add `"simulator_host"` argument to define the address of the simulator host that ZMQ tries to connect to | `simulation_interface`, `traffic_simulator`, `random_test_runner` | [#690](https://github.com/tier4/scenario_simulator_v2/pull/690) | [danielm1405](https://github.com/danielm1405) |
 
 Bug Fixes:bug:
 
@@ -19,6 +20,7 @@ Bug Fixes:bug:
 | -------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
 | OpenSCENARIO `Storyboard.Init.Actions` | Fix `Init.Actions.GlobalAction` and `Init.Actions.UserDefinedAction` to work.       | `openscenario_interpreter` | [#734](https://github.com/tier4/scenario_simulator_v2/pull/734) | [yamacir-kit](https://github.com/yamacir-kit) |
 | Fix waypoint height                    | Height of the NPC waypoint was 0. Get waypoint height from center point of lanelet. | `traffic_simulator`        | [#718](https://github.com/tier4/scenario_simulator_v2/pull/718) | [hakuturu583](https://github.com/hakuturu583) |
+| Fix calculateStopDistance function     | While calculating stop distance, deceleration was always 5.                         | `behavior_tree_plugin`     | [#747](https://github.com/tier4/scenario_simulator_v2/pull/747) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 
