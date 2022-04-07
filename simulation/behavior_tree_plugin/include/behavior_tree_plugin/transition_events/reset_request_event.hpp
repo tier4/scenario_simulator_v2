@@ -28,7 +28,7 @@ public:
   ResetRequestEvent(
     BT::TreeNode * root_node,
     std::function<traffic_simulator::behavior::Request()> get_request_function,
-    std::function<void(const traffic_simulator::behavior::Request &)> set_request_function);
+    std::function<void()> reset_request_function);
   const std::string & getCurrentAction() const;
 
 private:
@@ -36,7 +36,7 @@ private:
     BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
     BT::NodeStatus status) override;
   std::function<traffic_simulator::behavior::Request()> get_request_function_;
-  std::function<void(const traffic_simulator::behavior::Request &)> set_request_function_;
+  std::function<void()> reset_request_function_;
 };
 }  // namespace behavior_tree_plugin
 
