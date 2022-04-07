@@ -36,19 +36,9 @@ auto TrafficSignalStateAction::run() noexcept -> void {}
 
 auto TrafficSignalStateAction::start() const -> void
 {
-  const auto color = boost::lexical_cast<boost::optional<Color>>(state);
-  if (color.has_value()) {
-    setTrafficSignalColor(id(), color.value());
-  }
-
-  const auto arrow = boost::lexical_cast<boost::optional<Arrow>>(state);
-  if (arrow.has_value()) {
-    setTrafficSignalArrow(id(), arrow.value());
-  }
-
-  if (not color.has_value() and not arrow.has_value()) {
-    throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
-  }
+  auto & traffic_signal = getTrafficSignal(id());
+  traffic_signal.clear();
+  traffic_signal.emplace(state);
 }
 
 auto TrafficSignalStateAction::id() const -> std::int64_t

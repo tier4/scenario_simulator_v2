@@ -207,8 +207,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightColor);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);

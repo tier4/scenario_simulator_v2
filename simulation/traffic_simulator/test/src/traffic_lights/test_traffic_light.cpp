@@ -25,21 +25,21 @@ TEST(TrafficLight, Color)
   using Color = traffic_simulator::experimental::TrafficLight::Color;
 
   {
-    const auto color = Color("amber");
-
-    EXPECT_TRUE(color == Color::amber);
-    EXPECT_TRUE(color.is(Color::amber));
-    EXPECT_TRUE(boost::lexical_cast<Color>("amber") == Color::amber);
-    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "amber");
-  }
-
-  {
     const auto color = Color("green");
 
     EXPECT_TRUE(color == Color::green);
     EXPECT_TRUE(color.is(Color::green));
     EXPECT_TRUE(boost::lexical_cast<Color>("green") == Color::green);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "green");
+  }
+
+  {
+    const auto color = Color("yellow");
+
+    EXPECT_TRUE(color == Color::yellow);
+    EXPECT_TRUE(color.is(Color::yellow));
+    EXPECT_TRUE(boost::lexical_cast<Color>("yellow") == Color::yellow);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
   }
 
   {
@@ -61,12 +61,12 @@ TEST(TrafficLight, Color)
   }
 
   {
-    const auto color = Color("yellow");
+    const auto color = Color("amber");
 
-    EXPECT_TRUE(color == Color::amber);
-    EXPECT_TRUE(color.is(Color::amber));
-    EXPECT_TRUE(boost::lexical_cast<Color>("yellow") == Color::amber);
-    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "amber");
+    EXPECT_TRUE(color == Color::yellow);
+    EXPECT_TRUE(color.is(Color::yellow));
+    EXPECT_TRUE(boost::lexical_cast<Color>("amber") == Color::yellow);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
   }
 }
 
@@ -235,26 +235,26 @@ TEST(TrafficLight, Bulb)
   using Bulb = TrafficLight::Bulb;
 
   // clang-format off
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000);
-  static_assert(Bulb(Color::green, Status::solid_on,  Shape::circle     ).hash() == 0b0001'0000'0000'0000);
-  static_assert(Bulb(Color::red,   Status::solid_on,  Shape::circle     ).hash() == 0b0010'0000'0000'0000);
-  static_assert(Bulb(Color::white, Status::solid_on,  Shape::circle     ).hash() == 0b0011'0000'0000'0000);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000);
+  static_assert(Bulb(Color::yellow, Status::solid_on,  Shape::circle     ).hash() == 0b0001'0000'0000'0000);
+  static_assert(Bulb(Color::red,    Status::solid_on,  Shape::circle     ).hash() == 0b0010'0000'0000'0000);
+  static_assert(Bulb(Color::white,  Status::solid_on,  Shape::circle     ).hash() == 0b0011'0000'0000'0000);
 
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000);
-  static_assert(Bulb(Color::amber, Status::solid_off, Shape::circle     ).hash() == 0b0000'0001'0000'0000);
-  static_assert(Bulb(Color::amber, Status::flashing,  Shape::circle     ).hash() == 0b0000'0010'0000'0000);
-  static_assert(Bulb(Color::amber, Status::unknown,   Shape::circle     ).hash() == 0b0000'0011'0000'0000);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000);
+  static_assert(Bulb(Color::green, Status::solid_off, Shape::circle     ).hash() == 0b0000'0001'0000'0000);
+  static_assert(Bulb(Color::green, Status::flashing,  Shape::circle     ).hash() == 0b0000'0010'0000'0000);
+  static_assert(Bulb(Color::green, Status::unknown,   Shape::circle     ).hash() == 0b0000'0011'0000'0000);
 
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000);
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::cross      ).hash() == 0b0000'0000'0000'0001);
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::left       ).hash() == 0b0000'0000'1000'0010);
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::down       ).hash() == 0b0000'0000'0100'0010);
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::up         ).hash() == 0b0000'0000'0010'0010);
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::right      ).hash() == 0b0000'0000'0001'0010);
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::lower_left ).hash() == 0b0000'0000'1100'0010);
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::upper_left ).hash() == 0b0000'0000'1010'0010);
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::lower_right).hash() == 0b0000'0000'0101'0010);
-  static_assert(Bulb(Color::amber, Status::solid_on,  Shape::upper_right).hash() == 0b0000'0000'0011'0010);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::cross      ).hash() == 0b0000'0000'0000'0001);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::left       ).hash() == 0b0000'0000'1000'0010);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::down       ).hash() == 0b0000'0000'0100'0010);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::up         ).hash() == 0b0000'0000'0010'0010);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::right      ).hash() == 0b0000'0000'0001'0010);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::lower_left ).hash() == 0b0000'0000'1100'0010);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::upper_left ).hash() == 0b0000'0000'1010'0010);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::lower_right).hash() == 0b0000'0000'0101'0010);
+  static_assert(Bulb(Color::green, Status::solid_on,  Shape::upper_right).hash() == 0b0000'0000'0011'0010);
   // clang-format on
 
   {

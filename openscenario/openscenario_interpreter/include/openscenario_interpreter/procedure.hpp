@@ -137,8 +137,6 @@ RENAME(evaluateCollisionCondition, checkCollision);
 RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(getTrafficSignal, getTrafficLight);
-RENAME(setTrafficSignalArrow, setTrafficLightArrow);
-RENAME(setTrafficSignalColor, setTrafficLightColor);
 RENAME(toWorldPosition, toMapPose);
 
 #undef RENAME

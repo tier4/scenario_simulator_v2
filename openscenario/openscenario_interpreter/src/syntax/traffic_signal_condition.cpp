@@ -39,19 +39,11 @@ auto TrafficSignalCondition::description() const -> String
 
 auto TrafficSignalCondition::evaluate() -> Object
 {
-  using LaneletId = TrafficSignalState::LaneletId;
-
-  current_arrow =
-    static_cast<Arrow>(getTrafficSignal(boost::lexical_cast<LaneletId>(name)).getArrow());
-  current_color =
-    static_cast<Color>(getTrafficSignal(boost::lexical_cast<LaneletId>(name)).getColor());
-
-  if (state == "none") {
-    return asBoolean(current_arrow == Arrow::none and current_color == Color::green);
+  if (auto && traffic_signal = getTrafficSignal(boost::lexical_cast<std::int64_t>(name));
+      state == "none") {
+    return asBoolean(traffic_signal.empty());
   } else {
-    return asBoolean(
-      boost::lexical_cast<String>(current_arrow) == state or
-      boost::lexical_cast<String>(current_color) == state);
+    return asBoolean(traffic_signal.contains(state));
   }
 }
 }  // namespace syntax

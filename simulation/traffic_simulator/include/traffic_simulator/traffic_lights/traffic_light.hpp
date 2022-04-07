@@ -36,18 +36,18 @@
 namespace traffic_simulator
 {
 // clang-format off
-namespace experimental
+inline namespace experimental
 {
 struct TrafficLight
 {
   struct Color
   {
-    enum Value : std::uint8_t { amber, green, red, white, } value;
+    enum Value : std::uint8_t { green, yellow, red, white, } value;
 
-    static_assert(static_cast<std::uint8_t>(amber) == 0b0000);
-    static_assert(static_cast<std::uint8_t>(green) == 0b0001);
-    static_assert(static_cast<std::uint8_t>(red  ) == 0b0010);
-    static_assert(static_cast<std::uint8_t>(white) == 0b0011);
+    static_assert(static_cast<std::uint8_t>(green ) == 0b0000);
+    static_assert(static_cast<std::uint8_t>(yellow) == 0b0001);
+    static_assert(static_cast<std::uint8_t>(red  )  == 0b0010);
+    static_assert(static_cast<std::uint8_t>(white)  == 0b0011);
 
     constexpr Color(const Value value = green) : value(value) {}
 
@@ -57,11 +57,11 @@ struct TrafficLight
 
     static inline const std::unordered_map<std::string, Value> table
     {
-      std::make_pair("amber", amber),
+      std::make_pair("amber", yellow),
       std::make_pair("green", green),
       std::make_pair("red", red),
       std::make_pair("white", white),
-      std::make_pair("yellow", amber),  // DEPRECATED
+      std::make_pair("yellow", yellow),
     };
 
     static auto make(const std::string & name) -> Color
@@ -91,10 +91,10 @@ struct TrafficLight
     friend auto operator<<(std::ostream & os, const Color & color) -> std::ostream &
     {
       switch (color.value) {
-        case amber:
-          return os << "amber";
         case green:
           return os << "green";
+        case yellow:
+          return os << "yellow";
         case red:
           return os << "red";
         case white:
@@ -393,18 +393,26 @@ struct TrafficLight
       return lhs.hash() < rhs.hash();
     }
 
+    friend auto operator<<(std::ostream & os, const Bulb & bulb) -> std::ostream &
+    {
+      return os << std::get<Color>(bulb.value) << " " << std::get<Status>(bulb.value) << " " << std::get<Shape>(bulb.value);
+    }
+
     explicit operator autoware_auto_perception_msgs::msg::TrafficLight() const
     {
       auto color = [this]() {
         switch (std::get<Color>(value).value) {
-          case Color::amber:
-            return autoware_auto_perception_msgs::msg::TrafficLight::AMBER;
           case Color::green:
             return autoware_auto_perception_msgs::msg::TrafficLight::GREEN;
+          case Color::yellow:
+            return autoware_auto_perception_msgs::msg::TrafficLight::AMBER;
           case Color::red:
             return autoware_auto_perception_msgs::msg::TrafficLight::RED;
           case Color::white:
             return autoware_auto_perception_msgs::msg::TrafficLight::WHITE;
+          default:
+            throw common::SyntaxError(
+              std::get<Color>(value), " is not supported as a color for autoware_auto_perception_msgs::msg::TrafficLight.");
         }
       };
 
@@ -418,6 +426,9 @@ struct TrafficLight
             return autoware_auto_perception_msgs::msg::TrafficLight::FLASHING;
           case Status::unknown:
             return autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN;
+          default:
+            throw common::SyntaxError(
+              std::get<Status>(value), " is not supported as a status for autoware_auto_perception_msgs::msg::TrafficLight.");
         }
       };
 
@@ -463,9 +474,9 @@ struct TrafficLight
   explicit TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
   : id(id),
     positions{
-      std::make_pair(id, map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::GREEN)),
-      std::make_pair(id, map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::RED)),
-      std::make_pair(id, map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW))
+      std::make_pair(Bulb(Color::green,  Status::solid_on, Shape::circle).hash(), map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::GREEN)),
+      std::make_pair(Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(), map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW)),
+      std::make_pair(Bulb(Color::red,    Status::solid_on, Shape::circle).hash(), map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::RED)),
       }
   {
     if (not map_manager.isTrafficLight(id)) {
@@ -478,15 +489,63 @@ struct TrafficLight
     bulbs.clear();
   }
 
+  auto contains(const Bulb & bulb) const
+  {
+    return bulbs.find(bulb) != std::end(bulbs);
+  }
+
   auto contains(const Color & color, const Status & status, const Shape & shape) const
   {
-    return bulbs.find({color, status, shape}) != std::end(bulbs);
+    return contains(Bulb(color, status, shape));
+  }
+
+  auto contains(const std::string & name) const
+  {
+    return contains(Bulb(name));
+  }
+
+  template <typename Markers, typename Now>
+  auto draw(Markers & markers, const Now & now, const std::string & frame_id) const
+  {
+    auto position = [this](auto && bulb)
+    {
+      try {
+        return positions.at(bulb.hash()).get();
+      } catch (const std::out_of_range &) {
+        throw common::scenario_simulator_exception::Error(
+          "There is no position for bulb {", bulb, "}.");
+      }
+    };
+
+    for (auto && bulb : bulbs) {
+      if (bulb.is(Shape::Category::circle)) {
+        visualization_msgs::msg::Marker marker;
+        marker.header.stamp = now;
+        marker.header.frame_id = frame_id;
+        marker.action = marker.ADD;
+        marker.ns = "bulb";
+        marker.id = id;
+        marker.type = marker.SPHERE;
+        marker.pose.position = position(bulb);
+        marker.pose.orientation = geometry_msgs::msg::Quaternion();
+        marker.scale.x = 0.3;
+        marker.scale.y = 0.3;
+        marker.scale.z = 0.3;
+        marker.color = color_names::makeColorMsg(boost::lexical_cast<std::string>(std::get<Color>(bulb.value)));
+        markers.push_back(marker);
+      }
+    }
   }
 
   template <typename... Ts>
   auto emplace(Ts&&... xs)
   {
     bulbs.emplace(std::forward<decltype(xs)>(xs)...);
+  }
+
+  auto empty() const
+  {
+    return bulbs.empty();
   }
 
   explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const
@@ -503,98 +562,98 @@ struct TrafficLight
 }  // namespace experimental
 // clang-format on
 
-class TrafficLight
-{
-public:
-  const std::int64_t id;
-
-  explicit TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
-  : id(id), color_(TrafficLightColor::GREEN), arrow_(TrafficLightArrow::NONE)
-  {
-    auto locate = [&](auto && color) {
-      if (const auto position = map_manager.getTrafficLightBulbPosition(id, color)) {
-        color_positions_.emplace(color, position.get());
-      }
-    };
-
-    if (map_manager.isTrafficLight(id)) {
-      locate(TrafficLightColor::GREEN);
-      locate(TrafficLightColor::RED);
-      locate(TrafficLightColor::YELLOW);
-    }
-  }
-
-  void setArrow(const TrafficLightArrow arrow)
-  {
-    arrow_ = arrow;
-    arrow_changed_ = true;
-  }
-
-  void setColor(const TrafficLightColor color)
-  {
-    color_ = color;
-    color_changed_ = true;
-  }
-
-  auto getArrow() const { return arrow_; }
-  auto getColor() const { return color_; }
-
-  template <typename Markers, typename Now>
-  auto draw(Markers & markers, const Now & now, const std::string & frame_id) const
-  {
-    visualization_msgs::msg::Marker marker;
-    marker.header.stamp = now;
-    marker.header.frame_id = frame_id;
-    marker.action = marker.ADD;
-    marker.ns = "bulb";
-    marker.id = id;
-    marker.type = marker.SPHERE;
-    marker.pose.position = color_positions_.at(color_);
-    marker.pose.orientation = geometry_msgs::msg::Quaternion();
-    marker.scale.x = 0.3;
-    marker.scale.y = 0.3;
-    marker.scale.z = 0.3;
-    marker.color = color_names::makeColorMsg(boost::lexical_cast<std::string>(color_));
-    markers.push_back(marker);
-  }
-
-  auto colorChanged() const { return color_changed_; }
-  auto arrowChanged() const { return arrow_changed_; }
-
-  explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const
-  {
-    autoware_auto_perception_msgs::msg::TrafficSignal traffic_light_state;
-    {
-      traffic_light_state.map_primitive_id = id;
-
-      try {
-        traffic_light_state.lights.push_back(
-          convert<autoware_auto_perception_msgs::msg::TrafficLight>(getArrow()));
-      } catch (const std::out_of_range &) {
-        // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
-      }
-
-      try {
-        traffic_light_state.lights.push_back(
-          convert<autoware_auto_perception_msgs::msg::TrafficLight>(getColor()));
-      } catch (const std::out_of_range &) {
-        // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
-      }
-    }
-
-    return traffic_light_state;
-  }
-
-private:
-  std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;
-  std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions_;
-
-  TrafficLightColor color_;
-  TrafficLightArrow arrow_;
-
-  bool color_changed_ = false;
-  bool arrow_changed_ = false;
-};
+// class TrafficLight
+// {
+// public:
+//   const std::int64_t id;
+//
+//   explicit TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
+//   : id(id), color_(TrafficLightColor::GREEN), arrow_(TrafficLightArrow::NONE)
+//   {
+//     auto locate = [&](auto && color) {
+//       if (const auto position = map_manager.getTrafficLightBulbPosition(id, color)) {
+//         color_positions_.emplace(color, position.get());
+//       }
+//     };
+//
+//     if (map_manager.isTrafficLight(id)) {
+//       locate(TrafficLightColor::GREEN);
+//       locate(TrafficLightColor::RED);
+//       locate(TrafficLightColor::YELLOW);
+//     }
+//   }
+//
+//   void setArrow(const TrafficLightArrow arrow)
+//   {
+//     arrow_ = arrow;
+//     arrow_changed_ = true;
+//   }
+//
+//   void setColor(const TrafficLightColor color)
+//   {
+//     color_ = color;
+//     color_changed_ = true;
+//   }
+//
+//   auto getArrow() const { return arrow_; }
+//   auto getColor() const { return color_; }
+//
+//   template <typename Markers, typename Now>
+//   auto draw(Markers & markers, const Now & now, const std::string & frame_id) const
+//   {
+//     visualization_msgs::msg::Marker marker;
+//     marker.header.stamp = now;
+//     marker.header.frame_id = frame_id;
+//     marker.action = marker.ADD;
+//     marker.ns = "bulb";
+//     marker.id = id;
+//     marker.type = marker.SPHERE;
+//     marker.pose.position = color_positions_.at(color_);
+//     marker.pose.orientation = geometry_msgs::msg::Quaternion();
+//     marker.scale.x = 0.3;
+//     marker.scale.y = 0.3;
+//     marker.scale.z = 0.3;
+//     marker.color = color_names::makeColorMsg(boost::lexical_cast<std::string>(color_));
+//     markers.push_back(marker);
+//   }
+//
+//   auto colorChanged() const { return color_changed_; }
+//   auto arrowChanged() const { return arrow_changed_; }
+//
+//   explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const
+//   {
+//     autoware_auto_perception_msgs::msg::TrafficSignal traffic_light_state;
+//     {
+//       traffic_light_state.map_primitive_id = id;
+//
+//       try {
+//         traffic_light_state.lights.push_back(
+//           convert<autoware_auto_perception_msgs::msg::TrafficLight>(getArrow()));
+//       } catch (const std::out_of_range &) {
+//         // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
+//       }
+//
+//       try {
+//         traffic_light_state.lights.push_back(
+//           convert<autoware_auto_perception_msgs::msg::TrafficLight>(getColor()));
+//       } catch (const std::out_of_range &) {
+//         // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
+//       }
+//     }
+//
+//     return traffic_light_state;
+//   }
+//
+// private:
+//   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;
+//   std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions_;
+//
+//   TrafficLightColor color_;
+//   TrafficLightArrow arrow_;
+//
+//   bool color_changed_ = false;
+//   bool arrow_changed_ = false;
+// };
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_

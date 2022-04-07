@@ -48,12 +48,20 @@ TEST(TrafficLightManager, setColor)
   traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
     manager(hdmap_utils_ptr, node, "map");
   for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
-    manager.setColor(id, traffic_simulator::TrafficLightColor::GREEN);
-    EXPECT_EQ(manager.getTrafficLight(id).getColor(), traffic_simulator::TrafficLightColor::GREEN);
-    manager.setColor(id, traffic_simulator::TrafficLightColor::YELLOW);
-    EXPECT_EQ(manager.getTrafficLight(id).getColor(), traffic_simulator::TrafficLightColor::YELLOW);
-    manager.setColor(id, traffic_simulator::TrafficLightColor::RED);
-    EXPECT_EQ(manager.getTrafficLight(id).getColor(), traffic_simulator::TrafficLightColor::RED);
+    using Color = traffic_simulator::TrafficLight::Color;
+    using Status = traffic_simulator::TrafficLight::Status;
+    using Shape = traffic_simulator::TrafficLight::Shape;
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::green);
+    EXPECT_TRUE(
+      manager.getTrafficLight(id).contains(Color::green, Status::solid_on, Shape::circle));
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::yellow);
+    EXPECT_TRUE(
+      manager.getTrafficLight(id).contains(Color::yellow, Status::solid_on, Shape::circle));
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::red);
+    EXPECT_TRUE(manager.getTrafficLight(id).contains(Color::red, Status::solid_on, Shape::circle));
   }
 }
 
@@ -69,16 +77,19 @@ TEST(TrafficLightManager, setArrow)
   traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
     manager(hdmap_utils_ptr, node, "map");
   for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
-    EXPECT_EQ(manager.getTrafficLight(id).getArrow(), traffic_simulator::TrafficLightArrow::NONE);
-    manager.setArrow(id, traffic_simulator::TrafficLightArrow::LEFT);
-    EXPECT_EQ(manager.getTrafficLight(id).getArrow(), traffic_simulator::TrafficLightArrow::LEFT);
-    manager.setArrow(id, traffic_simulator::TrafficLightArrow::RIGHT);
-    EXPECT_EQ(manager.getTrafficLight(id).getArrow(), traffic_simulator::TrafficLightArrow::RIGHT);
-    manager.setArrow(id, traffic_simulator::TrafficLightArrow::STRAIGHT);
-    EXPECT_EQ(
-      manager.getTrafficLight(id).getArrow(), traffic_simulator::TrafficLightArrow::STRAIGHT);
-    manager.setArrow(id, traffic_simulator::TrafficLightArrow::NONE);
-    EXPECT_EQ(manager.getTrafficLight(id).getArrow(), traffic_simulator::TrafficLightArrow::NONE);
+    using Color = traffic_simulator::TrafficLight::Color;
+    using Status = traffic_simulator::TrafficLight::Status;
+    using Shape = traffic_simulator::TrafficLight::Shape;
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::green, Status::solid_on, Shape::left);
+    EXPECT_TRUE(manager.getTrafficLight(id).contains(Color::green, Status::solid_on, Shape::left));
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::green, Status::solid_on, Shape::right);
+    EXPECT_TRUE(
+      manager.getTrafficLight(id).contains(Color::yellow, Status::solid_on, Shape::right));
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::green, Status::solid_on, Shape::up);
+    EXPECT_TRUE(manager.getTrafficLight(id).contains(Color::green, Status::solid_on, Shape::up));
   }
 }
 

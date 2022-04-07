@@ -155,19 +155,6 @@ public:
   ~EntityManager() = default;
 
 public:
-#define DEFINE_SET_TRAFFIC_LIGHT(NAME)                                               \
-  template <typename... Ts>                                                          \
-  decltype(auto) setTrafficLight##NAME(Ts &&... xs)                                  \
-  {                                                                                  \
-    return traffic_light_manager_ptr_->set##NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                  \
-  static_assert(true, "")
-
-  DEFINE_SET_TRAFFIC_LIGHT(Arrow);
-  DEFINE_SET_TRAFFIC_LIGHT(Color);
-
-#undef DEFINE_SET_TRAFFIC_LIGHT
-
   template <typename... Ts>
   auto getTrafficLight(Ts &&... xs) const -> decltype(auto)
   {

@@ -101,21 +101,6 @@ public:
   auto hasAnyLightChanged() -> bool;
 
   auto update(const double) -> void;
-
-#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                         \
-  template <typename T>                                                    \
-  auto IDENTIFIER(const LaneletID lanelet_id, const T & x)->decltype(auto) \
-  {                                                                        \
-    forEachTrafficLights(lanelet_id, [&](auto && traffic_light) {          \
-      return traffic_light.IDENTIFIER(std::forward<decltype(x)>(x));       \
-    });                                                                    \
-  }                                                                        \
-  static_assert(true, "")
-
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrow);
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setColor);
-
-#undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
 };
 
 template <typename Message>
