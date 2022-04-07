@@ -58,7 +58,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic/traffic_sink.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
-  src/traffic_lights/traffic_light_state.cpp
   src/vehicle_model/sim_model_delay_steer_acc.cpp
   src/vehicle_model/sim_model_delay_steer_acc_geared.cpp
   src/vehicle_model/sim_model_delay_steer_vel.cpp

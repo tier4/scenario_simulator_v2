@@ -44,7 +44,6 @@
 #include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
@@ -153,7 +152,7 @@ public:
   const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   std::vector<std::int64_t> getTrafficLightIds() const;
   const boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
-    std::int64_t traffic_light_id, traffic_simulator::TrafficLightColor color) const;
+    std::int64_t traffic_light_id, const std::string &) const;
   std::vector<std::int64_t> getTrafficLightStopLineIds(const std::int64_t & traffic_light_id) const;
   std::vector<std::vector<geometry_msgs::msg::Point>> getTrafficLightStopLinesPoints(
     std::int64_t traffic_light_id) const;

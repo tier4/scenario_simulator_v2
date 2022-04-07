@@ -26,7 +26,6 @@
 #include <set>
 #include <stdexcept>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
@@ -474,9 +473,9 @@ struct TrafficLight
   explicit TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
   : id(id),
     positions{
-      std::make_pair(Bulb(Color::green,  Status::solid_on, Shape::circle).hash(), map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::GREEN)),
-      std::make_pair(Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(), map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW)),
-      std::make_pair(Bulb(Color::red,    Status::solid_on, Shape::circle).hash(), map_manager.getTrafficLightBulbPosition(id, TrafficLightColor::RED)),
+      std::make_pair(Bulb(Color::green,  Status::solid_on, Shape::circle).hash(), map_manager.getTrafficLightBulbPosition(id, "green")),
+      std::make_pair(Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(), map_manager.getTrafficLightBulbPosition(id, "yellow")),
+      std::make_pair(Bulb(Color::red,    Status::solid_on, Shape::circle).hash(), map_manager.getTrafficLightBulbPosition(id, "red")),
       }
   {
     if (not map_manager.isTrafficLight(id)) {

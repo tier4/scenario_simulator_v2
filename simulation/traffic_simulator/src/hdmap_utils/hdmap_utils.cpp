@@ -854,43 +854,25 @@ std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 }
 
 const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulbPosition(
-  std::int64_t traffic_light_id, traffic_simulator::TrafficLightColor color) const
+  std::int64_t traffic_light_id, const std::string & color_name) const
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
-          if (id.get() == traffic_light_id) {
-            const auto light_bulbs = light->lightBulbs();
-            for (auto ls : light_bulbs) {
-              lanelet::ConstLineString3d l = static_cast<lanelet::ConstLineString3d>(ls);
-              for (auto pt : l) {
-                if (pt.hasAttribute("color")) {
-                  std::string color_string;
-                  switch (color) {
-                    case traffic_simulator::TrafficLightColor::GREEN:
-                      color_string = "green";
-                      break;
-                    case traffic_simulator::TrafficLightColor::YELLOW:
-                      color_string = "yellow";
-                      break;
-                    case traffic_simulator::TrafficLightColor::RED:
-                      color_string = "red";
-                      break;
-                  }
-                  lanelet::Attribute attr = pt.attribute("color");
-                  if (attr.value().compare(color_string) == 0) {
-                    geometry_msgs::msg::Point point;
-                    point.x = pt.x();
-                    point.y = pt.y();
-                    point.z = pt.z();
-                    return point;
-                  }
-                }
-              }
+      if (
+        light_string.hasAttribute("traffic_light_id") and
+        light_string.attribute("traffic_light_id").asId() and
+        light_string.attribute("traffic_light_id").asId().get() == traffic_light_id) {
+        for (auto light_bulb : light->lightBulbs()) {
+          for (auto pt : static_cast<lanelet::ConstLineString3d>(light_bulb)) {
+            if (
+              pt.hasAttribute("color") and pt.attribute("color").value().compare(color_name) == 0) {
+              geometry_msgs::msg::Point point;
+              point.x = pt.x();
+              point.y = pt.y();
+              point.z = pt.z();
+              return point;
             }
           }
         }
