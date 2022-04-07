@@ -14,8 +14,6 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/arrow.hpp>
-#include <openscenario_interpreter/syntax/color.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 
 namespace openscenario_interpreter

@@ -31,8 +31,8 @@ auto TrafficSignalCondition::description() const -> String
 {
   std::stringstream description;
 
-  description << "Is TrafficSignal " << std::quoted(name) << " (Arrow = " << current_arrow
-              << ", Color = " << current_color << ") in state " << std::quoted(state) << "?";
+  description << "Is TrafficSignal " << std::quoted(name) << " (" << current_state << ") in state "
+              << std::quoted(state) << "?";
 
   return description.str();
 }
@@ -41,8 +41,16 @@ auto TrafficSignalCondition::evaluate() -> Object
 {
   if (auto && traffic_signal = getTrafficSignal(boost::lexical_cast<std::int64_t>(name));
       state == "none") {
+    current_state = "none";
     return asBoolean(traffic_signal.empty());
   } else {
+    current_state.clear();
+    std::string separator = "";
+    for (auto && bulb : traffic_signal.bulbs) {
+      current_state += separator;
+      current_state += boost::lexical_cast<std::string>(bulb);
+      separator = ", ";
+    }
     return asBoolean(traffic_signal.contains(state));
   }
 }
