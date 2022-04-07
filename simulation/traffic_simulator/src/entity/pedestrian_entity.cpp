@@ -105,17 +105,6 @@ void PedestrianEntity::cancelRequest()
   route_planner_ptr_->cancelGoal();
 }
 
-void PedestrianEntity::requestSpeedChange(double target_speed, bool continuous)
-{
-  target_speed_planner_.requestSpeedChange(target_speed, continuous);
-}
-
-void PedestrianEntity::requestSpeedChange(
-  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
-{
-  target_speed_planner_.requestSpeedChange(target_speed, continuous);
-}
-
 auto PedestrianEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
 {
   return behavior_plugin_ptr_->getDriverModel();
@@ -158,8 +147,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(status_.get());
-    target_speed_planner_.update(status_->action_status.twist.linear.x, other_status_);
-    behavior_plugin_ptr_->setTargetSpeed(target_speed_planner_.getTargetSpeed());
+    behavior_plugin_ptr_->setTargetSpeed(target_speed_);
     if (status_->lanelet_pose_valid) {
       auto route = route_planner_ptr_->getRouteLanelets(status_->lanelet_pose);
       behavior_plugin_ptr_->setRouteLanelets(route);

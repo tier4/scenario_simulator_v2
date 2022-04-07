@@ -37,7 +37,11 @@ void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*mark
   return;
 }
 
-void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
+void EntityBase::onUpdate(double, double)
+{
+  job_list_.update();
+  status_before_update_ = status_;
+}
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
@@ -80,6 +84,80 @@ void EntityBase::requestSpeedChange(
       setStatus(status);
       break;
     }
+  }
+}
+
+void EntityBase::requestSpeedChange(double target_speed, bool continuous)
+{
+  if (continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        target_speed_ = target_speed;
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+  } else {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (getStatus().action_status.twist.linear.x >= target_speed) {
+          return true;
+        }
+        target_speed_ = target_speed;
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+  }
+}
+
+void EntityBase::requestSpeedChange(
+  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
+{
+  if (continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        target_speed_ = target_speed.getAbsoluteValue(other_status_);
+        return false;
+      },
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+  } else {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        if (
+          getStatus().action_status.twist.linear.x >=
+          target_speed.getAbsoluteValue(other_status_)) {
+          target_speed_ = target_speed.getAbsoluteValue(other_status_);
+          return true;
+        }
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
 }
 
