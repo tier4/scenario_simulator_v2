@@ -28,9 +28,9 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 
 auto TrafficSignalState::evaluate() const -> Object
 {
-  auto & traffic_signal = getTrafficSignal(id());
+  auto && traffic_signal = getTrafficSignal(id());
   traffic_signal.clear();
-  traffic_signal.emplace(state);
+  traffic_signal.set(state);
   return unspecified;
 }
 

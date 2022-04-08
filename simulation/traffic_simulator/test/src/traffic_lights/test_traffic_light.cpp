@@ -356,6 +356,15 @@ TEST(TrafficLight, TrafficLight)
     EXPECT_TRUE(traffic_light.contains(Color::red, Status::flashing, Shape::circle));
     EXPECT_TRUE(traffic_light.contains(Color::green, Status::solid_on, Shape::right));
   }
+
+  {
+    auto traffic_light = TrafficLight(34802, map_manager);
+
+    traffic_light.set("red flashing circle, green solidOn right");
+
+    EXPECT_TRUE(traffic_light.contains(Color::red, Status::flashing, Shape::circle));
+    EXPECT_TRUE(traffic_light.contains(Color::green, Status::solid_on, Shape::right));
+  }
 }
 
 int main(int argc, char ** argv)

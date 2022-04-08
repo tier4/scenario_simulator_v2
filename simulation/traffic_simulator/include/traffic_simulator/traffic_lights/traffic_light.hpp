@@ -226,6 +226,9 @@ struct TrafficLight
       std::make_pair("upperLeft",  Shape::upper_left),
       std::make_pair("lowerRight", Shape::lower_right),
       std::make_pair("upperRight", Shape::upper_right),
+
+      // BACKWARD COMPATIBILITY
+      std::make_pair("straight",   Shape::up),
     };
 
     static auto make(const std::string & name) -> Shape
@@ -356,7 +359,7 @@ struct TrafficLight
       }
       else
       {
-        throw common::SyntaxError("");
+        throw common::SyntaxError("Invalid traffic light state ", std::quoted(s), " given.");
       }
     }
 
@@ -545,6 +548,24 @@ struct TrafficLight
   auto empty() const
   {
     return bulbs.empty();
+  }
+
+  auto set(const std::string & states) -> void
+  {
+    auto split = [](auto && given) {
+      static const auto pattern = std::regex(R"(^(\w[\w\s]+)(,\s*)?(.*)$)");
+      if (std::smatch result; std::regex_match(given, result, pattern)) {
+        return std::make_pair(result.str(1), result.str(3));
+      } else {
+        throw common::SyntaxError("Invalid traffic light state ", std::quoted(given), " given.");
+      }
+    };
+
+    if (not states.empty()) {
+      auto && [head, tail] = split(states);
+      emplace(head);
+      set(tail);
+    }
   }
 
   explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const
