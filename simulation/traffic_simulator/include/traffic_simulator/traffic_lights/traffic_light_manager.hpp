@@ -62,29 +62,15 @@ protected:
 
   auto drawMarkers() const -> void;
 
-  template <typename F>
-  auto forEachTrafficLights(const LaneletID lanelet_id, F && f) -> void
-  {
-    if (hdmap_->isTrafficLight(lanelet_id)) {
-      f(getTrafficLight(lanelet_id));
-    } else if (hdmap_->isTrafficRelation(lanelet_id)) {
-      for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
-        f(getTrafficLight(traffic_light.id()));
-      }
-    } else {
-      std::stringstream what;
-      what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))
-           << " is neither a traffic light ID not a traffc relation ID.";
-      THROW_SEMANTIC_ERROR(what.str());
-    }
-  }
-
   virtual auto publishTrafficLightStateArray() const -> void = 0;
 
 public:
   auto getTrafficLight(const LaneletID lanelet_id) -> auto &
   {
-    if (auto iter = traffic_lights_.find(lanelet_id); iter != std::end(traffic_lights_)) {
+    if (hdmap_->isTrafficRelation(lanelet_id)) {
+      throw common::scenario_simulator_exception::Error(
+        "Given Lanelet ID ", lanelet_id, " is a traffic relation ID, not a traffic light ID.");
+    } else if (auto iter = traffic_lights_.find(lanelet_id); iter != std::end(traffic_lights_)) {
       return iter->second;
     } else {
       traffic_lights_.emplace(
@@ -97,6 +83,26 @@ public:
   auto getTrafficLights() const -> const auto & { return traffic_lights_; }
 
   auto getTrafficLights() -> auto & { return traffic_lights_; }
+
+  auto getTrafficRelation(const LaneletID lanelet_id)
+    -> std::vector<std::reference_wrapper<TrafficLight>>
+  {
+    std::vector<std::reference_wrapper<TrafficLight>> refers;
+
+    if (hdmap_->isTrafficRelation(lanelet_id)) {
+      for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
+        refers.emplace_back(getTrafficLight(traffic_light.id()));
+      }
+    } else if (hdmap_->isTrafficLight(lanelet_id)) {
+      refers.emplace_back(getTrafficLight(lanelet_id));
+    } else {
+      throw common::scenario_simulator_exception::Error(
+        "Given lanelet ID ", lanelet_id,
+        " is neither a traffic light ID not a traffic relation ID.");
+    }
+
+    return refers;
+  }
 
   auto hasAnyLightChanged() -> bool;
 

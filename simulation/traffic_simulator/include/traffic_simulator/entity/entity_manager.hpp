@@ -166,6 +166,12 @@ public:
     return traffic_light_manager_ptr_->getTrafficLights();
   }
 
+  template <typename... Ts>
+  auto getTrafficRelation(Ts &&... xs) const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficRelation(std::forward<decltype(xs)>(xs)...);
+  }
+
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   template <typename... Ts>                                           \
   decltype(auto) NAME(Ts &&... xs) const                              \

@@ -482,7 +482,9 @@ struct TrafficLight
       }
   {
     if (not map_manager.isTrafficLight(id)) {
-      throw common::scenario_simulator_exception::Error("Invalid traffic light ID ", id, " given.");
+      throw common::scenario_simulator_exception::Error("Given lanelet ID ", id, " is not a traffic light ID.");
+    } else if (map_manager.isTrafficRelation(id)) {
+      throw common::scenario_simulator_exception::Error("Given lanelet ID ", id, " is a traffic relation ID, not a traffic light ID.");
     }
   }
 
@@ -571,12 +573,22 @@ struct TrafficLight
   explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const
   {
     autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
-    traffic_signal.map_primitive_id = 42;
+    traffic_signal.map_primitive_id = id;
     for (auto && bulb : bulbs) {
       traffic_signal.lights.push_back(
         static_cast<autoware_auto_perception_msgs::msg::TrafficLight>(bulb));
     }
     return traffic_signal;
+  }
+
+  friend auto operator<<(std::ostream & os, const TrafficLight & traffic_light) -> std::ostream &
+  {
+    std::string separator = "";
+    for (auto && bulb : traffic_light.bulbs) {
+      os << separator << bulb;
+      separator = ", ";
+    }
+    return os;
   }
 };
 }  // namespace experimental

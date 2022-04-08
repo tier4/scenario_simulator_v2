@@ -39,19 +39,26 @@ auto TrafficSignalCondition::description() const -> String
 
 auto TrafficSignalCondition::evaluate() -> Object
 {
-  if (auto && traffic_signal = getTrafficSignal(boost::lexical_cast<std::int64_t>(name));
+  if (auto && traffic_relation = getTrafficRelation(boost::lexical_cast<std::int64_t>(name));
       state == "none") {
     current_state = "none";
-    return asBoolean(traffic_signal.empty());
+    return asBoolean(std::all_of(
+      std::begin(traffic_relation), std::end(traffic_relation),
+      [](const traffic_simulator::TrafficLight & traffic_light) { return traffic_light.empty(); }));
   } else {
-    current_state.clear();
+    std::stringstream ss;
     std::string separator = "";
-    for (auto && bulb : traffic_signal.bulbs) {
-      current_state += separator;
-      current_state += boost::lexical_cast<std::string>(bulb);
-      separator = ", ";
+    for (traffic_simulator::TrafficLight & traffic_light : traffic_relation) {
+      ss << separator << traffic_light;
+      separator = "; ";
     }
-    return asBoolean(traffic_signal.contains(state));
+    current_state = ss.str();
+
+    return asBoolean(std::all_of(
+      std::begin(traffic_relation), std::end(traffic_relation),
+      [this](const traffic_simulator::TrafficLight & traffic_light) {
+        return traffic_light.contains(state);
+      }));
   }
 }
 }  // namespace syntax
