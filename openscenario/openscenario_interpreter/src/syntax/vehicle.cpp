@@ -36,11 +36,13 @@ Vehicle::operator traffic_simulator_msgs::msg::VehicleParameters() const
 {
   traffic_simulator_msgs::msg::VehicleParameters parameter;
   {
+    using namespace traffic_simulator_msgs;
+
     parameter.name = name;
-    parameter.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
-    parameter.bounding_box = static_cast<traffic_simulator_msgs::msg::BoundingBox>(bounding_box);
-    parameter.performance = static_cast<traffic_simulator_msgs::msg::Performance>(performance);
-    parameter.axles = static_cast<traffic_simulator_msgs::msg::Axles>(axles);
+    parameter.subtype = static_cast<msg::EntitySubtype>(vehicle_category);
+    parameter.bounding_box = static_cast<msg::BoundingBox>(bounding_box);
+    parameter.performance = static_cast<msg::Performance>(performance);
+    parameter.axles = static_cast<msg::Axles>(axles);
   }
 
   return parameter;
