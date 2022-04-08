@@ -71,7 +71,9 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
 BT::NodeStatus FollowFrontEntityAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
   if (getRightOfWayEntities(route_lanelets).size() != 0) {
