@@ -57,8 +57,16 @@ struct TrafficLight
     Color(const std::string & name) : value(make(name)) {}
 
     static inline const std::unordered_map<std::string, Value> table{
-      std::make_pair("amber", yellow), std::make_pair("green", green),   std::make_pair("red", red),
-      std::make_pair("white", white),  std::make_pair("yellow", yellow),
+      std::make_pair("amber", yellow),
+      std::make_pair("green", green),
+      std::make_pair("red", red),
+      std::make_pair("white", white),
+      std::make_pair("yellow", yellow),
+
+      // BACKWARD COMPATIBILITY
+      std::make_pair("Green", green),
+      std::make_pair("Red", red),
+      std::make_pair("Yellow", yellow),
     };
 
     static auto make(const std::string & name) -> Color;
@@ -97,6 +105,9 @@ struct TrafficLight
       std::make_pair("solidOff", solid_off),
       std::make_pair("flashing", flashing),
       std::make_pair("unknown", unknown),
+
+      // BACKWARD COMPATIBILITY
+      std::make_pair("none", solid_off),
     };
 
     static auto make(const std::string & name) -> Status;
@@ -263,7 +274,7 @@ struct TrafficLight
   {
     auto position = [this](auto && bulb) {
       try {
-        return positions.at(bulb.hash()).get();
+        return positions.at(bulb.hash() & 0b1111'0000'1111'1111).get();  // NOTE: Ignore status
       } catch (const std::out_of_range &) {
         throw common::scenario_simulator_exception::Error(
           "There is no position for bulb {", bulb, "}.");
