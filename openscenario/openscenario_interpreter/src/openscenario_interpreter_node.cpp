@@ -29,11 +29,13 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::NodeOptions options{};
 
-  const auto node = std::make_shared<openscenario_interpreter::Interpreter>(options);
+  auto node = std::make_shared<openscenario_interpreter::Interpreter>(options);
 
   executor.add_node((*node).get_node_base_interface());
 
   executor.spin();
 
-  return rclcpp::shutdown() ? EXIT_SUCCESS : EXIT_FAILURE;
+  rclcpp::shutdown();
+
+  return 0;
 }

@@ -57,7 +57,7 @@ void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
     std::make_unique<behavior_tree_plugin::LoggingEvent>(tree_.rootNode(), logger);
   reset_request_event_ptr_ = std::make_unique<behavior_tree_plugin::ResetRequestEvent>(
     tree_.rootNode(), [&]() { return getRequest(); },
-    [&](traffic_simulator::behavior::Request request) { return setRequest(request); });
+    [&]() { setRequest(traffic_simulator::behavior::Request::NONE); });
   setRequest(traffic_simulator::behavior::Request::NONE);
 }
 

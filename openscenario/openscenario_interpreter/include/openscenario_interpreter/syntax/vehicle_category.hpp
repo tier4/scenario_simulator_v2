@@ -15,9 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_CATEGORY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_CATEGORY_HPP_
 
-#include <openscenario_interpreter/object.hpp>
-#include <string>
-#include <utility>
+#include <iostream>
+#include <traffic_simulator_msgs/msg/entity_subtype.hpp>
 
 namespace openscenario_interpreter
 {
@@ -29,16 +28,16 @@ inline namespace syntax
  *    <xsd:union>
  *      <xsd:simpleType>
  *        <xsd:restriction base="xsd:string">
- *          <xsd:enumeration value="car"/>
- *          <xsd:enumeration value="van"/>
- *          <xsd:enumeration value="truck"/>
- *          <xsd:enumeration value="trailer"/>
- *          <xsd:enumeration value="semitrailer"/>
- *          <xsd:enumeration value="bus"/>
- *          <xsd:enumeration value="motorbike"/>
  *          <xsd:enumeration value="bicycle"/>
+ *          <xsd:enumeration value="bus"/>
+ *          <xsd:enumeration value="car"/>
+ *          <xsd:enumeration value="motorbike"/>
+ *          <xsd:enumeration value="semitrailer"/>
+ *          <xsd:enumeration value="trailer"/>
  *          <xsd:enumeration value="train"/>
  *          <xsd:enumeration value="tram"/>
+ *          <xsd:enumeration value="truck"/>
+ *          <xsd:enumeration value="van"/>
  *        </xsd:restriction>
  *      </xsd:simpleType>
  *      <xsd:simpleType>
@@ -51,9 +50,11 @@ inline namespace syntax
 struct VehicleCategory
 {
   enum value_type {
+    car,  // NOTE: This is the default value and should not be included in the sort.
+
+    // NOTE: Sorted by lexicographic order.
     bicycle,
     bus,
-    car,
     motorbike,
     semitrailer,
     trailer,
@@ -66,6 +67,38 @@ struct VehicleCategory
   explicit constexpr VehicleCategory(value_type value = car) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
+
+  explicit operator traffic_simulator_msgs::msg::EntitySubtype() const
+  {
+    traffic_simulator_msgs::msg::EntitySubtype result;
+    {
+      switch (value) {  // NOTE: Sorted by lexicographic order.
+        case bicycle:
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::BICYCLE;
+          break;
+        case bus:
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::BUS;
+          break;
+        case car:
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+          break;
+        case motorbike:
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE;
+          break;
+        case trailer:
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::TRAILER;
+          break;
+        case truck:
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::TRUCK;
+          break;
+        default:  // semitrailer, train, tram, van
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
+          break;
+      }
+    }
+
+    return result;
+  }
 };
 
 auto operator>>(std::istream &, VehicleCategory &) -> std::istream &;
