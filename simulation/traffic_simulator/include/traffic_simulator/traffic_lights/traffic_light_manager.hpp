@@ -84,7 +84,7 @@ public:
 
   auto getTrafficLights() -> auto & { return traffic_lights_; }
 
-  auto getTrafficRelation(const LaneletID lanelet_id)
+  auto getTrafficRelationReferees(const LaneletID lanelet_id)
     -> std::vector<std::reference_wrapper<TrafficLight>>
   {
     std::vector<std::reference_wrapper<TrafficLight>> refers;

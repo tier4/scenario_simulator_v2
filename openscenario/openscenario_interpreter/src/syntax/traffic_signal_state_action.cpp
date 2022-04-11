@@ -34,7 +34,7 @@ auto TrafficSignalStateAction::run() noexcept -> void {}
 
 auto TrafficSignalStateAction::start() const -> void
 {
-  for (traffic_simulator::TrafficLight & traffic_light : getTrafficRelation(id())) {
+  for (traffic_simulator::TrafficLight & traffic_light : getTrafficRelationReferees(id())) {
     traffic_light.clear();
     traffic_light.set(state);
   };

@@ -197,7 +197,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficRelation);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
   FORWARD_TO_ENTITY_MANAGER(getVehicleCommand);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(ready);

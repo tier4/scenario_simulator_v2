@@ -39,7 +39,8 @@ auto TrafficSignalCondition::description() const -> String
 
 auto TrafficSignalCondition::evaluate() -> Object
 {
-  if (auto && traffic_relation = getTrafficRelation(boost::lexical_cast<std::int64_t>(name));
+  if (auto && traffic_relation =
+        getTrafficRelationReferees(boost::lexical_cast<std::int64_t>(name));
       state == "none") {
     current_state = "none";
     return asBoolean(std::all_of(
