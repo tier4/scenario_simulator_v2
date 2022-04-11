@@ -91,7 +91,7 @@ void LaneChangeAction::getBlackBoardValues()
 BT::NodeStatus LaneChangeAction::tick()
 {
   getBlackBoardValues();
-  if (request != "lane_change") {
+  if (request != traffic_simulator::behavior::Request::LANE_CHANGE) {
     curve_ = boost::none;
     current_s_ = 0;
     return BT::NodeStatus::FAILURE;
@@ -102,7 +102,7 @@ BT::NodeStatus LaneChangeAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!curve_) {
-    if (request == "lane_change") {
+    if (request == traffic_simulator::behavior::Request::LANE_CHANGE) {
       if (!hdmap_utils->canChangeLane(
             entity_status.lanelet_pose.lanelet_id, lane_change_parameters_->target.lanelet_id)) {
         return BT::NodeStatus::FAILURE;

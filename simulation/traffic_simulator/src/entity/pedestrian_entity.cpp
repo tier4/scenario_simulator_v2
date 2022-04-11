@@ -50,7 +50,7 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
 void PedestrianEntity::requestAssignRoute(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
-  behavior_plugin_ptr_->setRequest("follow_lane");
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (!status_) {
     return;
   }
@@ -74,12 +74,15 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   requestAssignRoute(route);
 }
 
-void PedestrianEntity::requestWalkStraight() { behavior_plugin_ptr_->setRequest("walk_straight"); }
+void PedestrianEntity::requestWalkStraight()
+{
+  behavior_plugin_ptr_->setRequest(behavior::Request::WALK_STRAIGHT);
+}
 
 void PedestrianEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
-  behavior_plugin_ptr_->setRequest("follow_lane");
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (!status_) {
     return;
   }
@@ -101,7 +104,7 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 
 void PedestrianEntity::cancelRequest()
 {
-  behavior_plugin_ptr_->setRequest("none");
+  behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
   route_planner_ptr_->cancelGoal();
 }
 

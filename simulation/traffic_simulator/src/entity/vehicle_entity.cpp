@@ -91,7 +91,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 
 void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 {
-  behavior_plugin_ptr_->setRequest("lane_change");
+  behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   const auto parameter = lane_change::Parameter(
     lane_change::AbsoluteTarget(to_lanelet_id), lane_change::TrajectoryShape::CUBIC,
     lane_change::Constraint());
@@ -100,13 +100,13 @@ void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 
 void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter & parameter)
 {
-  behavior_plugin_ptr_->setRequest("lane_change");
+  behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }
 
 void VehicleEntity::cancelRequest()
 {
-  behavior_plugin_ptr_->setRequest("none");
+  behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
   route_planner_ptr_->cancelGoal();
 }
 

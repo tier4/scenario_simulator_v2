@@ -37,7 +37,7 @@ BT::NodeStatus ActionNode::executeTick() { return BT::ActionNodeBase::executeTic
 
 void ActionNode::getBlackBoardValues()
 {
-  if (!getInput("request", request)) {
+  if (!getInput<traffic_simulator::behavior::Request>("request", request)) {
     THROW_SIMULATION_ERROR("failed to get input request in ActionNode");
   }
   if (!getInput<double>("step_time", step_time)) {
