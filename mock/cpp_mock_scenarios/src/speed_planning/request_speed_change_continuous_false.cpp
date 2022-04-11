@@ -42,6 +42,9 @@ private:
   bool speed_reached;
   void onUpdate() override
   {
+    /**
+     * @brief checking linear speed
+     */
     if (
       api_.getCurrentTime() <= 0.9 &&
       api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {
@@ -56,6 +59,15 @@ private:
       speed_reached && api_.getCurrentTime() >= 1.5 &&
       api_.getEntityStatus("ego").action_status.twist.linear.x >= 13.88) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
+    }
+    /**
+     * @brief checking linear acceleration
+     */
+    if (api_.getCurrentTime() != 0.0 && api_.getCurrentTime() <= 1.0) {
+      // RCLCPP_INFO_STREAM(get_logger(), api_.getEntityStatus("ego").action_status.twist.linear.x);
+      if (api_.getEntityStatus("ego").action_status.accel.linear.x != 10.0) {
+        // stop(cpp_mock_scenarios::Result::FAILURE);
+      }
     }
   }
 

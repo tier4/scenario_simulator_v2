@@ -51,13 +51,16 @@ void EntityBase::requestSpeedChange(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
-      if (getStatus().action_status.twist.linear.x > target_speed) {
+      if (getStatus().action_status.twist.linear.x < target_speed) {
         setAccelerationLimit(std::fabs(constraint.value));
         job_list_.append(
           /**
            * @brief Checking if the entity reaches target speed.
            */
           [this, target_speed]() {
+            RCLCPP_INFO_STREAM(
+              rclcpp::get_logger("checking velocity"),
+              getStatus().action_status.twist.linear.x << "," << target_speed);
             if (getStatus().action_status.twist.linear.x >= target_speed) {
               return true;
             }
@@ -69,8 +72,8 @@ void EntityBase::requestSpeedChange(
           [this]() {
             setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration);
           },
-          job::Type::LINEAR_VELOCITY, true);
-      } else if (getStatus().action_status.twist.linear.x < target_speed) {
+          job::Type::LINEAR_ACCELERATION, true);
+      } else if (getStatus().action_status.twist.linear.x > target_speed) {
         setDecelerationLimit(std::fabs(constraint.value));
         job_list_.append(
           /**
@@ -88,7 +91,7 @@ void EntityBase::requestSpeedChange(
           [this]() {
             setDecelerationLimit(traffic_simulator_msgs::msg::DriverModel().deceleration);
           },
-          job::Type::LINEAR_VELOCITY, true);
+          job::Type::LINEAR_ACCELERATION, true);
       }
       requestSpeedChange(target_speed, continuous);
       break;
@@ -129,7 +132,7 @@ void EntityBase::requestSpeedChange(
           [this]() {
             setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration);
           },
-          job::Type::LINEAR_VELOCITY, true);
+          job::Type::LINEAR_ACCELERATION, true);
       } else if (
         getStatus().action_status.twist.linear.x > target_speed.getAbsoluteValue(other_status_)) {
         setDecelerationLimit(std::fabs(constraint.value));
@@ -151,7 +154,7 @@ void EntityBase::requestSpeedChange(
           [this]() {
             setDecelerationLimit(traffic_simulator_msgs::msg::DriverModel().deceleration);
           },
-          job::Type::LINEAR_VELOCITY, true);
+          job::Type::LINEAR_ACCELERATION, true);
       }
       requestSpeedChange(target_speed, continuous);
       break;
