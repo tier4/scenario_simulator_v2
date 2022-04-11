@@ -22,7 +22,7 @@
 
 TEST(TrafficLight, Color)
 {
-  using Color = traffic_simulator::experimental::TrafficLight::Color;
+  using Color = traffic_simulator::TrafficLight::Color;
 
   {
     const auto color = Color("green");
@@ -72,7 +72,7 @@ TEST(TrafficLight, Color)
 
 TEST(TrafficLight, Status)
 {
-  using Status = traffic_simulator::experimental::TrafficLight::Status;
+  using Status = traffic_simulator::TrafficLight::Status;
 
   {
     const auto status = Status("solidOn");
@@ -113,7 +113,7 @@ TEST(TrafficLight, Status)
 
 TEST(TrafficLight, Shape)
 {
-  using Shape = traffic_simulator::experimental::TrafficLight::Shape;
+  using Shape = traffic_simulator::TrafficLight::Shape;
 
   {
     const auto shape = Shape("circle");
@@ -228,7 +228,7 @@ TEST(TrafficLight, Shape)
 
 TEST(TrafficLight, Bulb)
 {
-  using TrafficLight = traffic_simulator::experimental::TrafficLight;
+  using TrafficLight = traffic_simulator::TrafficLight;
   using Color = TrafficLight::Color;
   using Status = TrafficLight::Status;
   using Shape = TrafficLight::Shape;
@@ -323,7 +323,7 @@ TEST(TrafficLight, Bulb)
 
 TEST(TrafficLight, TrafficLight)
 {
-  using TrafficLight = traffic_simulator::experimental::TrafficLight;
+  using TrafficLight = traffic_simulator::TrafficLight;
   using Color = TrafficLight::Color;
   using Status = TrafficLight::Status;
   using Shape = TrafficLight::Shape;
