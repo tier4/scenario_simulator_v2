@@ -58,9 +58,6 @@ void EntityBase::requestSpeedChange(
            * @brief Checking if the entity reaches target speed.
            */
           [this, target_speed]() {
-            RCLCPP_INFO_STREAM(
-              rclcpp::get_logger("checking velocity"),
-              getStatus().action_status.twist.linear.x << "," << target_speed);
             if (getStatus().action_status.twist.linear.x >= target_speed) {
               return true;
             }
