@@ -46,6 +46,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
 }
 
+Interpreter::~Interpreter() { disconnect(); }
+
 auto Interpreter::currentLocalFrameRate() const -> std::chrono::milliseconds
 {
   return std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000));

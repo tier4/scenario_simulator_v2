@@ -50,7 +50,7 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
 void PedestrianEntity::requestAssignRoute(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
-  behavior_plugin_ptr_->setRequest("follow_lane");
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (!status_) {
     return;
   }
@@ -74,12 +74,15 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   requestAssignRoute(route);
 }
 
-void PedestrianEntity::requestWalkStraight() { behavior_plugin_ptr_->setRequest("walk_straight"); }
+void PedestrianEntity::requestWalkStraight()
+{
+  behavior_plugin_ptr_->setRequest(behavior::Request::WALK_STRAIGHT);
+}
 
 void PedestrianEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
-  behavior_plugin_ptr_->setRequest("follow_lane");
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (!status_) {
     return;
   }
@@ -101,19 +104,8 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 
 void PedestrianEntity::cancelRequest()
 {
-  behavior_plugin_ptr_->setRequest("none");
+  behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
   route_planner_ptr_->cancelGoal();
-}
-
-void PedestrianEntity::requestSpeedChange(double target_speed, bool continuous)
-{
-  target_speed_planner_.requestSpeedChange(target_speed, continuous);
-}
-
-void PedestrianEntity::requestSpeedChange(
-  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
-{
-  target_speed_planner_.requestSpeedChange(target_speed, continuous);
 }
 
 auto PedestrianEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
@@ -158,8 +150,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(status_.get());
-    target_speed_planner_.update(status_->action_status.twist.linear.x, other_status_);
-    behavior_plugin_ptr_->setTargetSpeed(target_speed_planner_.getTargetSpeed());
+    behavior_plugin_ptr_->setTargetSpeed(target_speed_);
     if (status_->lanelet_pose_valid) {
       auto route = route_planner_ptr_->getRouteLanelets(status_->lanelet_pose);
       behavior_plugin_ptr_->setRouteLanelets(route);

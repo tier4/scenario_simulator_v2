@@ -141,7 +141,7 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "sensor_model:=" + getParameter<std::string>("sensor_model"),
                  "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
                  "rviz_config:=" + configuration.rviz_config_path.string(),
-                 "scenario_simulation:=true")
+                 "scenario_simulation:=true", "perception/enable_traffic_light:=false")
              : std::make_unique<concealer::AutowareUniverse>();
   } else {
     throw common::SemanticError(
