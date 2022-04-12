@@ -116,6 +116,9 @@ void EntityBase::requestSpeedChange(
         [this, target_speed, constraint]() {
           double diff =
             target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
+          /**
+           * @brief Hard coded parameter, threashold for difference
+           */
           if (std::fabs(diff) <= 0.1) {
             return true;
           }
