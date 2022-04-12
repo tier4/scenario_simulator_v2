@@ -107,6 +107,7 @@ struct TrafficLight
       std::make_pair("unknown", unknown),
 
       // BACKWARD COMPATIBILITY
+      std::make_pair("Blank", solid_off),
       std::make_pair("none", solid_off),
     };
 
