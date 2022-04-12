@@ -109,50 +109,31 @@ void EntityBase::requestSpeedChange(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
-      if (getStatus().action_status.twist.linear.x < target_speed.getAbsoluteValue(other_status_)) {
-        setAccelerationLimit(std::fabs(constraint.value));
-        job_list_.append(
-          /**
+      job_list_.append(
+        /**
            * @brief Checking if the entity reaches target speed.
            */
-          [this, target_speed]() {
-            if (
-              getStatus().action_status.twist.linear.x >=
-              target_speed.getAbsoluteValue(other_status_)) {
-              return true;
-            }
+        [this, target_speed, constraint]() {
+          double diff =
+            target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
+          if (std::fabs(diff) <= 0.1) {
+            return true;
+          }
+          if (diff > 0) {
+            setAccelerationLimit(std::fabs(constraint.value));
             return false;
-          },
-          /**
+          }
+          if (diff < 0) {
+            setDecelerationLimit(std::fabs(constraint.value));
+            return false;
+          }
+          return false;
+        },
+        /**
            * @brief Resets acceleration limit.
            */
-          [this]() {
-            setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration);
-          },
-          job::Type::LINEAR_ACCELERATION, true);
-      } else if (
-        getStatus().action_status.twist.linear.x > target_speed.getAbsoluteValue(other_status_)) {
-        setDecelerationLimit(std::fabs(constraint.value));
-        job_list_.append(
-          /**
-           * @brief Checking if the entity reaches target speed.
-           */
-          [this, target_speed]() {
-            if (
-              getStatus().action_status.twist.linear.x <=
-              target_speed.getAbsoluteValue(other_status_)) {
-              return true;
-            }
-            return false;
-          },
-          /**
-           * @brief Resets deceleration limit.
-           */
-          [this]() {
-            setDecelerationLimit(traffic_simulator_msgs::msg::DriverModel().deceleration);
-          },
-          job::Type::LINEAR_ACCELERATION, true);
-      }
+        [this]() { setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration); },
+        job::Type::LINEAR_ACCELERATION, true);
       requestSpeedChange(target_speed, continuous);
       break;
     }
