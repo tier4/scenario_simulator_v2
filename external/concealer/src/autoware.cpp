@@ -13,15 +13,11 @@
 // limitations under the License.
 
 #include <concealer/autoware.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-
 #include <cstdlib>
 #include <exception>
-#include <string>
 
 namespace concealer
 {
-
 auto Autoware::checkAutowareProcess() const -> bool
 {
   if (process_id != 0) {
