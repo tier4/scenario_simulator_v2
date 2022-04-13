@@ -16,8 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONDITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/arrow.hpp>
-#include <openscenario_interpreter/syntax/color.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
@@ -46,9 +44,7 @@ struct TrafficSignalCondition
 
   explicit TrafficSignalCondition(const pugi::xml_node &, Scope &);
 
-  Arrow current_arrow;  // for description
-
-  Color current_color;  // for description
+  String current_state;  // for description
 
   auto description() const -> String;
 
