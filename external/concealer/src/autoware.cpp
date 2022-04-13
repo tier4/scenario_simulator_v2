@@ -60,8 +60,8 @@ void Autoware::shutdownAutoware()
     }
   }
 
-  if (process_id != 0 && not is_autoware_exit) {
-    is_autoware_exit = true;
+  if (process_id != 0 && not is_autoware_exited) {
+    is_autoware_exited = true;
 
     AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
     {
