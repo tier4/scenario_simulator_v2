@@ -31,25 +31,35 @@ auto TrafficSignalCondition::description() const -> String
 {
   std::stringstream description;
 
-  description << "Is TrafficSignal " << std::quoted(name) << " (Arrow = " << current_arrow
-              << ", Color = " << current_color << ") in state " << std::quoted(state) << "?";
+  description << "Is TrafficSignal " << std::quoted(name) << " (" << current_state << ") in state "
+              << std::quoted(state) << "?";
 
   return description.str();
 }
 
 auto TrafficSignalCondition::evaluate() -> Object
 {
-  using LaneletId = TrafficSignalState::LaneletId;
-
-  current_arrow = static_cast<Arrow>(getTrafficSignalArrow(boost::lexical_cast<LaneletId>(name)));
-  current_color = static_cast<Color>(getTrafficSignalColor(boost::lexical_cast<LaneletId>(name)));
-
-  if (state == "none") {
-    return asBoolean(current_arrow == Arrow::none and current_color == Color::none);
+  if (auto && traffic_relation =
+        getTrafficRelationReferees(boost::lexical_cast<std::int64_t>(name));
+      state == "none") {
+    current_state = "none";
+    return asBoolean(std::all_of(
+      std::begin(traffic_relation), std::end(traffic_relation),
+      [](const traffic_simulator::TrafficLight & traffic_light) { return traffic_light.empty(); }));
   } else {
-    return asBoolean(
-      boost::lexical_cast<String>(current_arrow) == state or
-      boost::lexical_cast<String>(current_color) == state);
+    std::stringstream ss;
+    std::string separator = "";
+    for (traffic_simulator::TrafficLight & traffic_light : traffic_relation) {
+      ss << separator << traffic_light;
+      separator = "; ";
+    }
+    current_state = ss.str();
+
+    return asBoolean(std::all_of(
+      std::begin(traffic_relation), std::end(traffic_relation),
+      [this](const traffic_simulator::TrafficLight & traffic_light) {
+        return traffic_light.contains(state);
+      }));
   }
 }
 }  // namespace syntax

@@ -836,65 +836,43 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
 
 std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 {
-  std::vector<std::int64_t> ret;
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
-  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
-          ret.emplace_back(id.get());
+  using namespace lanelet::utils::query;
+
+  std::vector<std::int64_t> ids;
+
+  for (auto && traffic_light : autowareTrafficLights(laneletLayer(lanelet_map_ptr_))) {
+    for (auto && light_bulb : traffic_light->lightBulbs()) {
+      if (light_bulb.hasAttribute("traffic_light_id")) {
+        if (auto id = light_bulb.attribute("traffic_light_id").asId()) {
+          ids.emplace_back(id.get());
         }
       }
     }
   }
-  return ret;
+
+  return ids;
 }
 
 const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulbPosition(
-  std::int64_t traffic_light_id, traffic_simulator::TrafficLightColor color) const
+  std::int64_t traffic_light_id, const std::string & color_name) const
 {
-  if (color == traffic_simulator::TrafficLightColor::NONE) {
-    return boost::none;
-  }
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
-          if (id.get() == traffic_light_id) {
-            const auto light_bulbs = light->lightBulbs();
-            for (auto ls : light_bulbs) {
-              lanelet::ConstLineString3d l = static_cast<lanelet::ConstLineString3d>(ls);
-              for (auto pt : l) {
-                if (pt.hasAttribute("color")) {
-                  std::string color_string;
-                  switch (color) {
-                    case traffic_simulator::TrafficLightColor::GREEN:
-                      color_string = "green";
-                      break;
-                    case traffic_simulator::TrafficLightColor::YELLOW:
-                      color_string = "yellow";
-                      break;
-                    case traffic_simulator::TrafficLightColor::RED:
-                      color_string = "red";
-                      break;
-                    case traffic_simulator::TrafficLightColor::NONE:
-                      return boost::none;
-                  }
-                  lanelet::Attribute attr = pt.attribute("color");
-                  if (attr.value().compare(color_string) == 0) {
-                    geometry_msgs::msg::Point point;
-                    point.x = pt.x();
-                    point.y = pt.y();
-                    point.z = pt.z();
-                    return point;
-                  }
-                }
-              }
+      if (
+        light_string.hasAttribute("traffic_light_id") and
+        light_string.attribute("traffic_light_id").asId() and
+        light_string.attribute("traffic_light_id").asId().get() == traffic_light_id) {
+        for (auto light_bulb : light->lightBulbs()) {
+          for (auto pt : static_cast<lanelet::ConstLineString3d>(light_bulb)) {
+            if (
+              pt.hasAttribute("color") and pt.attribute("color").value().compare(color_name) == 0) {
+              geometry_msgs::msg::Point point;
+              point.x = pt.x();
+              point.y = pt.y();
+              point.z = pt.z();
+              return point;
             }
           }
         }
@@ -1661,16 +1639,30 @@ std::vector<std::int64_t> HdMapUtils::getLaneletIds(
   return ids;
 }
 
-auto HdMapUtils::isTrafficRelationId(const std::int64_t lanelet_id) const -> bool
+auto HdMapUtils::isTrafficLight(const LaneletId lanelet_id) const -> bool
+{
+  using namespace lanelet;
+
+  if (lanelet_map_ptr_->lineStringLayer.exists(lanelet_id)) {
+    if (auto && linestring = lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
+        linestring.hasAttribute(AttributeName::Type)) {
+      return linestring.attribute(AttributeName::Type).value() == "traffic_light";
+    }
+  }
+
+  return false;
+}
+
+auto HdMapUtils::isTrafficRelation(const LaneletId lanelet_id) const -> bool
 {
   return lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
            lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 
-auto HdMapUtils::getTrafficLight(const std::int64_t lanelet_id) const -> lanelet::TrafficLight::Ptr
+auto HdMapUtils::getTrafficRelation(const LaneletId lanelet_id) const -> lanelet::TrafficLight::Ptr
 {
-  assert(isTrafficRelationId(lanelet_id));
+  assert(isTrafficRelation(lanelet_id));
   return std::dynamic_pointer_cast<lanelet::TrafficLight>(
     lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
