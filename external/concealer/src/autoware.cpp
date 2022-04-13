@@ -13,26 +13,41 @@
 // limitations under the License.
 
 #include <concealer/autoware.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+
 #include <cstdlib>
 #include <exception>
+#include <string>
 
 namespace concealer
 {
-void Autoware::shutdownWhenUnexpectedExit()
+
+auto Autoware::checkAutowareProcess() const -> bool
 {
-  int wstatus = 0;
+  if (process_id != 0) {
+    int wstatus = 0;
+    int ret = waitpid(process_id, &wstatus, WNOHANG);
+    if (ret == 0) {
+      return true;
+    } else if (ret < 0) {
+      if (errno == ECHILD) {
+        AUTOWARE_WARN_STREAM("Autoware process is already exited");
+        return false;
+      } else {
+        AUTOWARE_SYSTEM_ERROR("waitpid");
+        std::exit(EXIT_FAILURE);
+      }
+    }
 
-  if (waitpid(process_id, &wstatus, 0) < 0) {
-    AUTOWARE_SYSTEM_ERROR("waitpid");
-    std::exit(EXIT_FAILURE);
+    if (WIFEXITED(wstatus)) {
+      AUTOWARE_WARN_STREAM("Autoware process is exit. exit code: " << WEXITSTATUS(wstatus));
+      return false;
+    } else if (WIFSIGNALED(wstatus)) {
+      AUTOWARE_WARN_STREAM("Autoware process is killed. signal is " << WTERMSIG(wstatus));
+      return false;
+    }
   }
-
-  if (not is_autoware_exit && WIFEXITED(wstatus)) {
-    is_autoware_exit = true;
-    AUTOWARE_WARN_STREAM(
-      "Autoware process is unexpectedly exit. exit code: " << WEXITSTATUS(wstatus));
-    rclcpp::shutdown(nullptr, "Autoware process is unexpectedly exit.");
-  }
+  return true;
 }
 
 void Autoware::shutdownAutoware()
@@ -97,8 +112,12 @@ void Autoware::shutdownAutoware()
       int status = 0;
 
       if (waitpid(process_id, &status, waitpid_options) < 0) {
-        AUTOWARE_SYSTEM_ERROR("waitpid");
-        std::exit(EXIT_FAILURE);
+        if (errno == ECHILD) {
+          AUTOWARE_WARN_STREAM("Try to wait for the autoware process but it was already exited.");
+        } else {
+          AUTOWARE_SYSTEM_ERROR("waitpid");
+          std::exit(EXIT_FAILURE);
+        }
       }
     }
   }

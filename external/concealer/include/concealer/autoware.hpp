@@ -69,10 +69,6 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 
   std::exception_ptr thrown;
 
-  std::atomic<bool> is_autoware_exit = false;
-
-  void shutdownWhenUnexpectedExit();
-
 protected:
   const pid_t process_id = 0;
 
@@ -88,6 +84,8 @@ protected:
 
   auto currentFuture() -> auto & { return future; }
 
+  virtual auto update() -> void = 0;
+
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
   virtual void sendSIGINT() = 0;
@@ -98,6 +96,10 @@ protected:
 
   void resetTimerCallback();
 
+  auto checkAutowareProcess() const -> bool;
+
+  std::atomic<bool> is_autoware_exited = false;
+
 public:
   CONCEALER_PUBLIC explicit Autoware(pid_t pid = 0)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
@@ -106,7 +108,12 @@ public:
       while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
                                 std::future_status::timeout) {
         try {
-          rclcpp::spin_some(get_node_base_interface());
+          if (checkAutowareProcess()) {
+            rclcpp::spin_some(get_node_base_interface());
+          } else {
+            is_autoware_exited = true;
+            rclcpp::shutdown();
+          }
         } catch (...) {
           thrown = std::current_exception();
         }
@@ -114,9 +121,6 @@ public:
     }),
     process_id(pid)
   {
-    if (pid != 0) {
-      std::thread([this] { shutdownWhenUnexpectedExit(); }).detach();
-    }
   }
 
   template <typename... Ts>
@@ -153,8 +157,6 @@ public:
    *
    * -------------------------------------------------------------------------- */
   virtual auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void = 0;
-
-  virtual auto update() -> void = 0;
 
   virtual auto getAcceleration() const -> double = 0;
 

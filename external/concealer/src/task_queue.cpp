@@ -33,7 +33,7 @@ TaskQueue::TaskQueue()
         }
       }
     },
-    std::move(notifier.get_future()))
+    notifier.get_future())
 {
 }
 
