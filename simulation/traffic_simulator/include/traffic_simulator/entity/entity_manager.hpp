@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
@@ -91,7 +92,7 @@ class EntityManager
 
   MarkerArray markers_raw_;
 
-  const std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
+  const std::shared_ptr<TrafficLightManagerBase> traffic_light_manager_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -114,13 +115,25 @@ public:
     return origin;
   }
 
+  template <typename... Ts>
+  auto makeTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
+  {
+    const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
+
+    if (architecture_type == "awf/universe") {
+      return std::make_shared<
+        TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
+        std::forward<decltype(xs)>(xs)...);
+    } else {
+      throw common::SemanticError(
+        "Unexpected architecture_type ", std::quoted(architecture_type), " given.");
+    }
+  }
+
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const Configuration & configuration)
   : configuration(configuration),
-    node_topics_interface([](auto && node) {
-      using rclcpp::node_interfaces::get_node_topics_interface;
-      return get_node_topics_interface(node);
-    }(node)),
+    node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
@@ -134,13 +147,7 @@ public:
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(
-      hdmap_utils_ptr_,
-      rclcpp::create_publisher<MarkerArray>(node, "traffic_light/marker", LaneletMarkerQoS()),
-      rclcpp::create_publisher<autoware_perception_msgs::msg::TrafficLightStateArray>(
-        node, "/perception/traffic_light_recognition/traffic_light_states",
-        rclcpp::QoS(10).transient_local()),
-      clock_ptr_))
+    traffic_light_manager_ptr_(makeTrafficLightManager(hdmap_utils_ptr_, node))
   {
     updateHdmapMarker();
   }
@@ -148,35 +155,23 @@ public:
   ~EntityManager() = default;
 
 public:
-#define DEFINE_SET_TRAFFIC_LIGHT(NAME)                                               \
-  template <typename... Ts>                                                          \
-  decltype(auto) setTrafficLight##NAME(Ts &&... xs)                                  \
-  {                                                                                  \
-    return traffic_light_manager_ptr_->set##NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                  \
-  static_assert(true, "")
+  template <typename... Ts>
+  auto getTrafficLight(Ts &&... xs) const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficLight(std::forward<decltype(xs)>(xs)...);
+  }
 
-  DEFINE_SET_TRAFFIC_LIGHT(Arrow);
-  DEFINE_SET_TRAFFIC_LIGHT(ArrowPhase);
-  DEFINE_SET_TRAFFIC_LIGHT(Color);
-  DEFINE_SET_TRAFFIC_LIGHT(ColorPhase);
+  auto getTrafficLights() const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficLights();
+  }
 
-#undef DEFINE_SET_TRAFFIC_LIGHT
-
-#define DEFINE_GET_TRAFFIC_LIGHT(NAME)                                               \
-  template <typename... Ts>                                                          \
-  decltype(auto) getTrafficLight##NAME(Ts &&... xs)                                  \
-  {                                                                                  \
-    return traffic_light_manager_ptr_->get##NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                  \
-  static_assert(true, "")
-
-  DEFINE_GET_TRAFFIC_LIGHT(Color);
-  DEFINE_GET_TRAFFIC_LIGHT(Arrow);
-  DEFINE_GET_TRAFFIC_LIGHT(Ids);
-  DEFINE_GET_TRAFFIC_LIGHT(Instance);
-
-#undef DEFINE_GET_TRAFFIC_LIGHT
+  template <typename... Ts>
+  auto getTrafficRelationReferees(Ts &&... xs) const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficRelationReferees(
+      std::forward<decltype(xs)>(xs)...);
+  }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   template <typename... Ts>                                           \
@@ -218,8 +213,10 @@ public:
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
+  FORWARD_TO_ENTITY(setAccelerationLimit, );
+  FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDriverModel, );
-  FORWARD_TO_ENTITY(setUpperBoundSpeed, );
+  FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
 
@@ -227,7 +224,20 @@ public:
 
   bool trafficLightsChanged();
 
-  void setTargetSpeed(const std::string & name, double target_speed, bool continuous);
+  void requestSpeedChange(const std::string & name, double target_speed, bool continuous);
+
+  void requestSpeedChange(
+    const std::string & name, const double target_speed, const speed_change::Transition transition,
+    const speed_change::Constraint constraint, const bool continuous);
+
+  void requestSpeedChange(
+    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+    bool continuous);
+
+  void requestSpeedChange(
+    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, const speed_change::Constraint constraint,
+    const bool continuous);
 
   traffic_simulator_msgs::msg::EntityStatus updateNpcLogic(
     const std::string & name,
@@ -323,7 +333,8 @@ public:
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
 
-  void requestLaneChange(const std::string & name, const Direction & direction);
+  void requestLaneChange(
+    const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
   bool setEntityStatus(const std::string & name, traffic_simulator_msgs::msg::EntityStatus status);
 

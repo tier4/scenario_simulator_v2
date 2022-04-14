@@ -17,17 +17,18 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
 #include <boost/variant.hpp>
 #include <cassert>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
-#include <simulation_interface/zmq_client.hpp>
+#include <simulation_interface/zmq_multi_client.hpp>
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -73,39 +74,7 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    initialize_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::initialize),
-    update_frame_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::update_frame),
-    update_sensor_frame_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::update_sensor_frame),
-    spawn_vehicle_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::spawn_vehicle_entity),
-    spawn_pedestrian_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::spawn_pedestrian_entity),
-    spawn_misc_object_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::spawn_misc_object_entity),
-    despawn_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::despawn_entity),
-    update_entity_status_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::update_entity_status),
-    attach_lidar_sensor_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::attach_lidar_sensor),
-    attach_detection_sensor_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::attach_detection_sensor),
-    update_traffic_lights_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
-      simulation_interface::ports::update_traffic_lights)
+    zeromq_client_(simulation_interface::protocol, configuration.simulator_host)
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
@@ -173,9 +142,12 @@ public:
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
 
-  bool attachLidarSensor(simulation_api_schema::LidarConfiguration configuration);
+  bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
+  bool attachLidarSensor(
+    const std::string &, const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
 
-  bool attachDetectionSensor(simulation_api_schema::DetectionSensorConfiguration configuration);
+  bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
+  bool attachDetectionSensor(const std::string &);
 
   bool initialize(double realtime_factor, double step_time);
 
@@ -186,7 +158,20 @@ public:
   void requestLaneChange(const std::string & name, const std::int64_t & lanelet_id);
 
   void requestLaneChange(
-    const std::string & name, const traffic_simulator::entity::Direction & direction);
+    const std::string & name, const traffic_simulator::lane_change::Direction & direction);
+
+  void requestLaneChange(
+    const std::string & name, const traffic_simulator::lane_change::Parameter &);
+
+  void requestLaneChange(
+    const std::string & name, const traffic_simulator::lane_change::RelativeTarget & target,
+    const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+    const lane_change::Constraint & constraint);
+
+  void requestLaneChange(
+    const std::string & name, const traffic_simulator::lane_change::AbsoluteTarget & target,
+    const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+    const lane_change::Constraint & constraint);
 
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   template <typename... Ts>                                                \
@@ -210,21 +195,20 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficLightArrow);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
   FORWARD_TO_ENTITY_MANAGER(getVehicleCommand);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(ready);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
+  FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
+  FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
-  FORWARD_TO_ENTITY_MANAGER(setTargetSpeed);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrowPhase);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightColor);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
-  FORWARD_TO_ENTITY_MANAGER(setUpperBoundSpeed);
+  FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
@@ -234,15 +218,6 @@ private:
   bool updateSensorFrame();
   bool updateEntityStatusInSim();
   bool updateTrafficLightsInSim();
-
-  template <typename Parameters>
-  bool spawn(
-    const bool is_ego, const Parameters & parameters,
-    const traffic_simulator_msgs::msg::EntityStatus & status,
-    const std::string & behavior = PedestrianBehavior::defaultBehavior())
-  {
-    return spawn(is_ego, parameters.toXml(), status, behavior);
-  }
 
   const Configuration configuration;
 
@@ -258,47 +233,7 @@ private:
 
   traffic_simulator::SimulationClock clock_;
 
-  zeromq::Client<
-    simulation_api_schema::InitializeRequest, simulation_api_schema::InitializeResponse>
-    initialize_client_;
-  zeromq::Client<
-    simulation_api_schema::UpdateFrameRequest, simulation_api_schema::UpdateFrameResponse>
-    update_frame_client_;
-  zeromq::Client<
-    simulation_api_schema::UpdateSensorFrameRequest,
-    simulation_api_schema::UpdateSensorFrameResponse>
-    update_sensor_frame_client_;
-  zeromq::Client<
-    simulation_api_schema::SpawnVehicleEntityRequest,
-    simulation_api_schema::SpawnVehicleEntityResponse>
-    spawn_vehicle_entity_client_;
-  zeromq::Client<
-    simulation_api_schema::SpawnPedestrianEntityRequest,
-    simulation_api_schema::SpawnPedestrianEntityResponse>
-    spawn_pedestrian_entity_client_;
-  zeromq::Client<
-    simulation_api_schema::SpawnMiscObjectEntityRequest,
-    simulation_api_schema::SpawnMiscObjectEntityResponse>
-    spawn_misc_object_entity_client_;
-  zeromq::Client<
-    simulation_api_schema::DespawnEntityRequest, simulation_api_schema::DespawnEntityResponse>
-    despawn_entity_client_;
-  zeromq::Client<
-    simulation_api_schema::UpdateEntityStatusRequest,
-    simulation_api_schema::UpdateEntityStatusResponse>
-    update_entity_status_client_;
-  zeromq::Client<
-    simulation_api_schema::AttachLidarSensorRequest,
-    simulation_api_schema::AttachLidarSensorResponse>
-    attach_lidar_sensor_client_;
-  zeromq::Client<
-    simulation_api_schema::AttachDetectionSensorRequest,
-    simulation_api_schema::AttachDetectionSensorResponse>
-    attach_detection_sensor_client_;
-  zeromq::Client<
-    simulation_api_schema::UpdateTrafficLightsRequest,
-    simulation_api_schema::UpdateTrafficLightsResponse>
-    update_traffic_lights_client_;
+  zeromq::MultiClient zeromq_client_;
 };
 }  // namespace traffic_simulator
 

@@ -60,7 +60,9 @@ public:
     const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0,
     bool autoscale = false) const;
   double getSquaredDistanceIn2D(
-    geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
+    const geometry_msgs::msg::Point & point, double s, bool autoscale = false) const;
+  geometry_msgs::msg::Vector3 getSquaredDistanceVector(
+    const geometry_msgs::msg::Point & point, double s, bool autoscale = false) const;
   boost::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     bool search_backward = false) const;

@@ -53,16 +53,18 @@ public:
   DEFINE_GETTER_SETTER(DriverModel, traffic_simulator_msgs::msg::DriverModel)
   DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
+  DEFINE_GETTER_SETTER(GoalPoses, std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)
+  DEFINE_GETTER_SETTER(LaneChangeParameters, traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(Obstacle, boost::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus, EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters, traffic_simulator_msgs::msg::PedestrianParameters)
-  DEFINE_GETTER_SETTER(Request, std::string)
+  DEFINE_GETTER_SETTER(Request, traffic_simulator::behavior::Request)
   DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
+  DEFINE_GETTER_SETTER(ReferenceTrajectory, std::shared_ptr<traffic_simulator::math::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(StepTime, double)
   DEFINE_GETTER_SETTER(TargetSpeed, boost::optional<double>)
-  DEFINE_GETTER_SETTER(ToLaneletId, std::int64_t)
-  DEFINE_GETTER_SETTER(TrafficLightManager,std::shared_ptr<traffic_simulator::TrafficLightManager>)
+  DEFINE_GETTER_SETTER(TrafficLightManager, std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
   DEFINE_GETTER_SETTER(UpdatedStatus, traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(VehicleParameters, traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints, traffic_simulator_msgs::msg::WaypointsArray)
@@ -74,8 +76,8 @@ private:
   BT::NodeStatus tickOnce(double current_time, double step_time);
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
-  std::shared_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;
-  std::shared_ptr<behavior_tree_plugin::ResetRequestEvent> reset_request_event_ptr_;
+  std::unique_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;
+  std::unique_ptr<behavior_tree_plugin::ResetRequestEvent> reset_request_event_ptr_;
 };
 }  // namespace entity_behavior
 

@@ -26,64 +26,39 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
     readAttribute<UnsignedInteger>("maximumExecutionCount", node, local(), UnsignedInteger())),
   actors(readElement<Actors>("Actors", node, local()))
 {
-  callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
-    return push_back(readCatalogedStoryboardElement<Maneuver>(node, local()));
+  traverse<0, unbounded>(node, "CatalogReference", [&](auto && node) {
+    return elements.push_back(readCatalogedStoryboardElement<Maneuver>(node, local()));
   });
 
-  callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Maneuver>(node, local()));
+  traverse<0, unbounded>(node, "Maneuver", [&](auto && node) {
+    return elements.push_back(readStoryboardElement<Maneuver>(node, local()));
   });
-}
-
-auto ManeuverGroup::accomplished() const -> bool
-{
-  // A ManeuverGroup's goal is accomplished when all its Maneuvers are in the completeState.
-  return std::all_of(std::begin(*this), std::end(*this), [&](auto && each) {
-    return each.template as<Maneuver>().complete();
-  });
-}
-
-auto ManeuverGroup::ready() noexcept -> bool { return true; }
-
-auto ManeuverGroup::run() -> void
-{
-  for (auto && each : *this) {
-    each.evaluate();
-  }
 }
 
 auto ManeuverGroup::start() -> void
 {
-  for (auto && each : *this) {
-    each.as<Maneuver>().changeStateIf(true, standby_state);
+  for (auto && element : elements) {
+    assert(element.template is<Maneuver>());
+    assert(element.template is_also<StoryboardElement>());
+    element.template as<StoryboardElement>().current_state = start_transition;
   }
 }
 
-auto ManeuverGroup::stop() -> void
+auto operator<<(nlohmann::json & json, const ManeuverGroup & maneuver_group) -> nlohmann::json &
 {
-  for (auto && each : *this) {
-    each.as<Maneuver>().override();
-    each.evaluate();
-  }
-}
+  json["name"] = maneuver_group.name;
 
-auto ManeuverGroup::stopTriggered() noexcept -> bool { return false; }
+  json["currentState"] = boost::lexical_cast<std::string>(maneuver_group.state());
 
-auto operator<<(nlohmann::json & json, const ManeuverGroup & datum) -> nlohmann::json &
-{
-  json["name"] = datum.name;
-
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
-
-  json["currentExecutionCount"] = datum.current_execution_count;
-  json["maximumExecutionCount"] = datum.maximum_execution_count;
+  json["currentExecutionCount"] = maneuver_group.current_execution_count;
+  json["maximumExecutionCount"] = maneuver_group.maximum_execution_count;
 
   json["Maneuver"] = nlohmann::json::array();
 
-  for (const auto & each : datum) {
-    nlohmann::json maneuver;
-    maneuver << each.as<Maneuver>();
-    json["Maneuver"].push_back(maneuver);
+  for (auto && maneuver : maneuver_group.elements) {
+    nlohmann::json json_maneuver;
+    json_maneuver << maneuver.as<Maneuver>();
+    json["Maneuver"].push_back(json_maneuver);
   }
 
   return json;

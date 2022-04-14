@@ -1,24 +1,9 @@
 repositories:
-  quaternion_operation:
+  autoware_auto_msgs:
     type: git
-    url: https://github.com/OUXT-Polaris/quaternion_operation.git
-    version: ros2
-  operational-design-domains:
+    url: https://github.com/tier4/autoware_auto_msgs.git
+    version: tier4/main
+  tier4_msgs:
     type: git
-    url: https://gitlab.com/autowarefoundation/operational-design-domains
-  AutowareArchitectureProposal_msgs:
-    type: git
-    url: https://github.com/tier4/AutowareArchitectureProposal_msgs.git
-    version: main
-  AutowareArchitectureProposal_api_msgs:
-    type: git
-    url: https://github.com/tier4/AutowareArchitectureProposal_api_msgs.git
-    version: main
-  lexus_description:
-    type: git
-    url: https://github.com/tier4/lexus_description.iv.universe.git
-    version: ros2
-  ouxt_common:
-    type: git
-    url: https://github.com/OUXT-Polaris/ouxt_common.git
-    version: master
+    url: https://github.com/tier4/tier4_autoware_msgs.git
+    version: tier4/universe # for Autoware.Universe (Tier IV)

@@ -2,6 +2,90 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.3 (2022-03-09)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#683 <https://github.com/tier4/scenario_simulator_v2/issues/683>`_ from tier4/feature/zeromq_multi_client
+  Feature/zeromq multi client
+* add EOL white line
+* remove unused files
+* use close function
+* use multi client class
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#673 <https://github.com/tier4/scenario_simulator_v2/issues/673>`_ from tier4/fix/universe/traffic-signal
+  Fix `toProto` for `autoware_auto_perception_msgs::msg::TrafficSignal`
+* Add unit test for conversion TrafficSignal => TrafficLightState
+* Fix `toProto` for `autoware_auto_perception_msgs::msg::TrafficSignal`
+* Add missing new protobuf files
+* Replace `VehicleCommand` with `AckermannControlCommand` and `GearCommand`
+* Remove package `autoware_perception_msgs`
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
+0.6.2 (2022-01-20)
+------------------
+* Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* Merge branch 'master' into matsuura/feature/add-time-to-panel
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Merge pull request `#659 <https://github.com/tier4/scenario_simulator_v2/issues/659>`_ from tier4/release-0.6.1
+* merge fix/galactic_build
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into matsuura/feature/add-time-to-panel
+* pull master
+* merge master
+* Merge tier4:master
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
+0.6.1 (2022-01-11)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/get_driver_model_in_pedestrian
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_speed_change
+* Merge pull request `#647 <https://github.com/tier4/scenario_simulator_v2/issues/647>`_ from tier4/tier4/universe
+* Add `autoware_control_msgs` to dependency of `simulation_interface`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* Merge branch 'master' into feature/interpreter/expr
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge remote-tracking branch 'origin/master' into feature/avoid_overwrite_acceleration
+* Contributors: Masaya Kataoka, MasayaKataoka, kyabe2718, yamacir-kit
+
+0.6.0 (2021-12-16)
+------------------
+* Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Rename `LiDAR` to `Lidar`
+* Update CMakeLists to not to reference undefined variable
+* Update packages to compile with `awf/autoware_auto_msgs` if flag given
+* Update class `SensorSimulation` to choice topic name and type based on Autoware's architecture type
+* Rename protobuf message `TrafficLightState` field `lights` to `lamp_states`
+* Remove `autoware_auto_control_msgs.proto`
+* Remove unused protobuf <=> message conversions
+* Restore virtual function `EntityBase::getVehicleCommand`
+* Merge pull request `#617 <https://github.com/tier4/scenario_simulator_v2/issues/617>`_ from tier4/autoware-universe-concealer
+* Comment-out some tests and Remove protobuf type `GearCommand`, `GearReport`
+* detected object -> predicted object, and apply ament_clang_format
+* Remove member function `getVehicleCommand` from Vehicle type entity
+* dealt with test conversion, and fix proto of deprecated vehicle command
+* Add some protobuf <=> ROS2 message conversions
+* fix toProt/Msgs of shift
+* fix topic type name
+* control command -> ackermann control command
+* use auto_msgs for dynamic objects
+* use auto_msgs for traffic lights
+* Contributors: MasayaKataoka, Takayuki Murooka, Tatsuya Yamasaki, yamacir-kit
+
+0.5.8 (2021-12-13)
+------------------
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
+* Contributors: Piotr Zyskowski, yamacir-kit
+
 0.5.7 (2021-11-09)
 ------------------
 * Merge branch 'master' into feature/interpreter/catalog

@@ -39,10 +39,11 @@
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/math/linear_algebra.hpp>
-#include <traffic_simulator/math/transfrom.hpp>
+#include <traffic_simulator/math/transform.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -50,10 +51,8 @@
 namespace hdmap_utils
 {
 HdMapUtils::HdMapUtils(
-  const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint & origin)
+  const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint &)
 {
-  (void)origin;
-
   lanelet::projection::MGRSProjector projector;
 
   lanelet::ErrorMessages errors;
@@ -356,7 +355,7 @@ lanelet::BasicPoint2d HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & po
 
 boost::optional<std::int64_t> HdMapUtils::matchToLane(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  bool include_crosswalk, double reduction_ratio) const
+  bool include_crosswalk, double reduction_ratio)
 {
   boost::optional<std::int64_t> id;
   lanelet::matching::Object2d obj;
@@ -380,21 +379,38 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(
   if (matches.empty()) {
     return boost::none;
   }
-  std::sort(matches.begin(), matches.end(), [](auto const & lhs, auto const & rhs) {
-    return lhs.distance < rhs.distance;
+  std::vector<std::pair<std::int64_t, double>> id_and_distance;
+  for (const auto & match : matches) {
+    /**
+     * @brief Hard coded parameter. Matching threshold for lanelet.
+     */
+    if (match.distance <= 1.0) {
+      auto lanelet_pose = toLaneletPose(pose, match.lanelet.id());
+      if (lanelet_pose) {
+        id_and_distance.emplace_back(std::make_pair<std::int64_t, double>(
+          static_cast<std::int64_t>(lanelet_pose->lanelet_id),
+          static_cast<double>(lanelet_pose->offset)));
+      }
+    }
+  }
+  if (id_and_distance.empty()) {
+    return boost::none;
+  }
+  std::sort(id_and_distance.begin(), id_and_distance.end(), [](auto const & lhs, auto const & rhs) {
+    return lhs.second < rhs.second;
   });
-  return matches[0].lanelet.id();
+  return id_and_distance[0].first;
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, bool include_crosswalk)
+  geometry_msgs::msg::Pose pose, bool include_crosswalk, double matching_distance)
 {
-  const auto lanelet_ids = getNearbyLaneletIds(pose.position, 3.0, include_crosswalk);
+  const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
   if (lanelet_ids.empty()) {
     return boost::none;
   }
   for (const auto & id : lanelet_ids) {
-    const auto lanelet_pose = toLaneletPose(pose, id);
+    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
     if (lanelet_pose) {
       return lanelet_pose;
     }
@@ -403,17 +419,29 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
+  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance)
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
-  const auto s = spline->getSValue(pose);
+  const auto s = spline->getSValue(pose, matching_distance);
   if (!s) {
     return boost::none;
   }
   auto pose_on_centerline = spline->getPose(s.get());
   auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
     quaternion_operation::getRotation(pose_on_centerline.orientation, pose.orientation));
-  double offset = spline->getSquaredDistanceIn2D(pose.position, s.get());
+  double offset = std::sqrt(spline->getSquaredDistanceIn2D(pose.position, s.get()));
+  /**
+   * @note Hard coded parameter
+   */
+  double yaw_threshold = 0.25;
+  if (M_PI * yaw_threshold < std::fabs(rpy.z) && std::fabs(rpy.z) < M_PI * (1 - yaw_threshold)) {
+    return boost::none;
+  }
+  double inner_prod = traffic_simulator::math::innerProduct(
+    spline->getNormalVector(s.get()), spline->getSquaredDistanceVector(pose.position, s.get()));
+  if (inner_prod < 0) {
+    offset = offset * -1;
+  }
   traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s.get();
@@ -423,27 +451,39 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
+  geometry_msgs::msg::Pose pose, std::vector<std::int64_t> lanelet_ids, double matching_distance)
+{
+  for (const auto id : lanelet_ids) {
+    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
+    if (lanelet_pose) {
+      return lanelet_pose.get();
+    }
+  }
+  return boost::none;
+}
+
+boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  bool include_crosswalk)
+  bool include_crosswalk, double matching_distance)
 {
   const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
   if (!lanelet_id) {
-    return toLaneletPose(pose, include_crosswalk);
+    return toLaneletPose(pose, include_crosswalk, matching_distance);
   }
-  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.get());
+  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.get(), matching_distance);
   if (pose_in_target_lanelet) {
     return pose_in_target_lanelet;
   }
   const auto previous = getPreviousLaneletIds(lanelet_id.get());
   for (const auto id : previous) {
-    const auto pose_in_previous = toLaneletPose(pose, id);
+    const auto pose_in_previous = toLaneletPose(pose, id, matching_distance);
     if (pose_in_previous) {
       return pose_in_previous;
     }
   }
   const auto next = getNextLaneletIds(lanelet_id.get());
   for (const auto id : previous) {
-    const auto pose_in_next = toLaneletPose(pose, id);
+    const auto pose_in_next = toLaneletPose(pose, id, matching_distance);
     if (pose_in_next) {
       return pose_in_next;
     }
@@ -496,23 +536,50 @@ double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)
   return *std::min_element(limits.begin(), limits.end());
 }
 
-boost::optional<int> HdMapUtils::getLaneChangeableLaneletId(
-  std::int64_t lanelet_id, std::string direction)
+boost::optional<int64_t> HdMapUtils::getLaneChangeableLaneletId(
+  std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, uint8_t shift)
 {
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  if (direction == "left") {
-    auto left_lanelet = vehicle_routing_graph_ptr_->left(lanelet);
-    if (left_lanelet) {
-      return left_lanelet->id();
-    }
-  }
-  if (direction == "right") {
-    auto right_lanelet = vehicle_routing_graph_ptr_->right(lanelet);
-    if (right_lanelet) {
-      return right_lanelet->id();
+  if (shift == 0) {
+    return getLaneChangeableLaneletId(
+      lanelet_id, traffic_simulator::lane_change::Direction::STRAIGHT);
+  } else {
+    std::int64_t reference_id = lanelet_id;
+    for (uint8_t i = 0; i < shift; i++) {
+      auto id = getLaneChangeableLaneletId(reference_id, direction);
+      if (!id) {
+        return boost::none;
+      } else {
+        reference_id = id.get();
+      }
+      if (i == (shift - 1)) {
+        return reference_id;
+      }
     }
   }
   return boost::none;
+}
+
+boost::optional<std::int64_t> HdMapUtils::getLaneChangeableLaneletId(
+  std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction)
+{
+  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  boost::optional<std::int64_t> target = boost::none;
+  switch (direction) {
+    case traffic_simulator::lane_change::Direction::STRAIGHT:
+      target = lanelet.id();
+      break;
+    case traffic_simulator::lane_change::Direction::LEFT:
+      if (vehicle_routing_graph_ptr_->left(lanelet)) {
+        target = vehicle_routing_graph_ptr_->left(lanelet)->id();
+      }
+      break;
+    case traffic_simulator::lane_change::Direction::RIGHT:
+      if (vehicle_routing_graph_ptr_->right(lanelet)) {
+        target = vehicle_routing_graph_ptr_->right(lanelet)->id();
+      }
+      break;
+  }
+  return target;
 }
 
 std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(std::int64_t lanelet_id, double distance)
@@ -663,6 +730,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
     std::vector<geometry_msgs::msg::Point> center_points = getCenterPoints(lanelet_id);
     std::copy(center_points.begin(), center_points.end(), std::back_inserter(ret));
   }
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
   return ret;
 }
 
@@ -766,67 +834,45 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
   return ret;
 }
 
-const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
+std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 {
-  std::vector<std::int64_t> ret;
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
-  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
-          ret.emplace_back(id.get());
+  using namespace lanelet::utils::query;
+
+  std::vector<std::int64_t> ids;
+
+  for (auto && traffic_light : autowareTrafficLights(laneletLayer(lanelet_map_ptr_))) {
+    for (auto && light_bulb : traffic_light->lightBulbs()) {
+      if (light_bulb.hasAttribute("traffic_light_id")) {
+        if (auto id = light_bulb.attribute("traffic_light_id").asId()) {
+          ids.emplace_back(id.get());
         }
       }
     }
   }
-  return ret;
+
+  return ids;
 }
 
 const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulbPosition(
-  std::int64_t traffic_light_id, traffic_simulator::TrafficLightColor color) const
+  std::int64_t traffic_light_id, const std::string & color_name) const
 {
-  if (color == traffic_simulator::TrafficLightColor::NONE) {
-    return boost::none;
-  }
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
-          if (id.get() == traffic_light_id) {
-            const auto light_bulbs = light->lightBulbs();
-            for (auto ls : light_bulbs) {
-              lanelet::ConstLineString3d l = static_cast<lanelet::ConstLineString3d>(ls);
-              for (auto pt : l) {
-                if (pt.hasAttribute("color")) {
-                  std::string color_string;
-                  switch (color) {
-                    case traffic_simulator::TrafficLightColor::GREEN:
-                      color_string = "green";
-                      break;
-                    case traffic_simulator::TrafficLightColor::YELLOW:
-                      color_string = "yellow";
-                      break;
-                    case traffic_simulator::TrafficLightColor::RED:
-                      color_string = "red";
-                      break;
-                    case traffic_simulator::TrafficLightColor::NONE:
-                      return boost::none;
-                  }
-                  lanelet::Attribute attr = pt.attribute("color");
-                  if (attr.value().compare(color_string) == 0) {
-                    geometry_msgs::msg::Point point;
-                    point.x = pt.x();
-                    point.y = pt.y();
-                    point.z = pt.z();
-                    return point;
-                  }
-                }
-              }
+      if (
+        light_string.hasAttribute("traffic_light_id") and
+        light_string.attribute("traffic_light_id").asId() and
+        light_string.attribute("traffic_light_id").asId().get() == traffic_light_id) {
+        for (auto light_bulb : light->lightBulbs()) {
+          for (auto pt : static_cast<lanelet::ConstLineString3d>(light_bulb)) {
+            if (
+              pt.hasAttribute("color") and pt.attribute("color").value().compare(color_name) == 0) {
+              geometry_msgs::msg::Point point;
+              point.x = pt.x();
+              point.y = pt.y();
+              point.z = pt.z();
+              return point;
             }
           }
         }
@@ -836,18 +882,106 @@ const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulb
   return boost::none;
 }
 
+traffic_simulator_msgs::msg::LaneletPose HdMapUtils::getAlongLaneletPose(
+  const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along)
+{
+  traffic_simulator_msgs::msg::LaneletPose along_pose = from_pose;
+  along_pose.s = along_pose.s + along;
+  if (along_pose.s >= 0) {
+    while (along_pose.s >= getLaneletLength(along_pose.lanelet_id)) {
+      auto next_ids = getNextLaneletIds(along_pose.lanelet_id, "straight");
+      if (next_ids.empty()) {
+        next_ids = getNextLaneletIds(along_pose.lanelet_id);
+        if (next_ids.empty()) {
+          THROW_SEMANTIC_ERROR(
+            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        }
+      }
+      along_pose.s = along_pose.s - getLaneletLength(along_pose.lanelet_id);
+      along_pose.lanelet_id = next_ids[0];
+    }
+  } else {
+    while (along_pose.s < 0) {
+      auto previous_ids = getPreviousLaneletIds(along_pose.lanelet_id, "straight");
+      if (previous_ids.empty()) {
+        previous_ids = getPreviousLaneletIds(along_pose.lanelet_id);
+        if (previous_ids.empty()) {
+          THROW_SEMANTIC_ERROR(
+            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        }
+      }
+      along_pose.s = along_pose.s + getLaneletLength(previous_ids[0]);
+      along_pose.lanelet_id = previous_ids[0];
+    }
+  }
+  return along_pose;
+}
+
 boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
-  geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id,
+  const traffic_simulator_msgs::msg::LaneletPose & from_pose,
+  const traffic_simulator::lane_change::Parameter & lane_change_parameter)
+{
+  double longitudinal_distance =
+    traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+  switch (lane_change_parameter.constraint.type) {
+    case traffic_simulator::lane_change::Constraint::Type::NONE:
+      longitudinal_distance =
+        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+      break;
+    case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
+      longitudinal_distance =
+        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+      break;
+    case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
+      longitudinal_distance = lane_change_parameter.constraint.value;
+      break;
+    case traffic_simulator::lane_change::Constraint::Type::TIME:
+      longitudinal_distance =
+        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+      break;
+  }
+  const auto along_pose = getAlongLaneletPose(from_pose, longitudinal_distance);
+  const auto left_point =
+    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset + 5.0).pose.position;
+  const auto right_point =
+    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset - 5.0).pose.position;
+  const auto collision_point = getCenterPointsSpline(lane_change_parameter.target.lanelet_id)
+                                 ->getCollisionPointIn2D(left_point, right_point);
+  if (!collision_point) {
+    return boost::none;
+  }
+  const auto to_pose = traffic_simulator::helper::constructLaneletPose(
+    lane_change_parameter.target.lanelet_id, collision_point.get(),
+    lane_change_parameter.target.offset);
+  const auto goal_pose_in_map = toMapPose(to_pose).pose;
+  const auto from_pose_in_map = toMapPose(from_pose).pose;
+  double start_to_goal_distance = std::sqrt(
+    std::pow(from_pose_in_map.position.x - goal_pose_in_map.position.x, 2) +
+    std::pow(from_pose_in_map.position.y - goal_pose_in_map.position.y, 2) +
+    std::pow(from_pose_in_map.position.z - goal_pose_in_map.position.z, 2));
+
+  auto traj = getLaneChangeTrajectory(
+    toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape,
+    start_to_goal_distance * 0.5);
+  return std::make_pair(traj, collision_point.get());
+}
+
+boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
+HdMapUtils::getLaneChangeTrajectory(
+  const geometry_msgs::msg::Pose & from_pose,
+  const traffic_simulator::lane_change::Parameter & lane_change_parameter,
   double maximum_curvature_threshold, double target_trajectory_length,
   double forward_distance_threshold)
 {
-  double to_length = getLaneletLength(to_lanelet_id);
+  double to_length = getLaneletLength(lane_change_parameter.target.lanelet_id);
   std::vector<double> evaluation, target_s;
   std::vector<traffic_simulator::math::HermiteCurve> curves;
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
-    auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
+    auto goal_pose = toMapPose(lane_change_parameter.target.lanelet_id, to_s, 0);
     if (
       traffic_simulator::math::getRelativePose(from_pose, goal_pose.pose).position.x <=
       forward_distance_threshold) {
@@ -857,8 +991,11 @@ HdMapUtils::getLaneChangeTrajectory(
       std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
       std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
       std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
-    auto traj =
-      getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_distance * 0.5);
+    traffic_simulator_msgs::msg::LaneletPose to_pose;
+    to_pose.lanelet_id = lane_change_parameter.target.lanelet_id;
+    to_pose.s = to_s;
+    auto traj = getLaneChangeTrajectory(
+      from_pose, to_pose, lane_change_parameter.trajectory_shape, start_to_goal_distance * 0.5);
     if (traj.getMaximum2DCurvature() < maximum_curvature_threshold) {
       double eval = std::fabs(target_trajectory_length - traj.getLength());
       evaluation.push_back(eval);
@@ -875,18 +1012,39 @@ HdMapUtils::getLaneChangeTrajectory(
 }
 
 traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
-  geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id, double to_s,
+  const geometry_msgs::msg::Pose & from_pose,
+  const traffic_simulator_msgs::msg::LaneletPose & to_pose,
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   double tangent_vector_size)
 {
-  std::vector<geometry_msgs::msg::Point> ret;
-  auto to_vec = getTangentVector(to_lanelet_id, to_s);
-  auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
-  geometry_msgs::msg::Vector3 start_vec = getVectorFromPose(from_pose, tangent_vector_size);
-  geometry_msgs::msg::Vector3 goal_vec = to_vec.get();
+  geometry_msgs::msg::Vector3 start_vec;
+  geometry_msgs::msg::Vector3 to_vec;
+  geometry_msgs::msg::Pose goal_pose =
+    toMapPose(to_pose.lanelet_id, to_pose.s, to_pose.offset).pose;
+  switch (trajectory_shape) {
+    case traffic_simulator::lane_change::TrajectoryShape::CUBIC:
+      start_vec = getVectorFromPose(from_pose, tangent_vector_size);
+      if (getTangentVector(to_pose.lanelet_id, to_pose.s)) {
+        to_vec = getTangentVector(to_pose.lanelet_id, to_pose.s).get();
+      } else {
+        THROW_SIMULATION_ERROR(
+          "Failed to calculate tangent vector at lanelet_id : ", to_pose.lanelet_id,
+          " s : ", to_pose.s);
+      }
+      break;
+    case traffic_simulator::lane_change::TrajectoryShape::LINEAR:
+      start_vec.x = (goal_pose.position.x - from_pose.position.x);
+      start_vec.y = (goal_pose.position.y - from_pose.position.y);
+      start_vec.z = (goal_pose.position.z - from_pose.position.z);
+      to_vec = start_vec;
+      tangent_vector_size = 1;
+      break;
+  }
+  geometry_msgs::msg::Vector3 goal_vec = to_vec;
   goal_vec.x = goal_vec.x * tangent_vector_size;
   goal_vec.y = goal_vec.y * tangent_vector_size;
   goal_vec.z = goal_vec.z * tangent_vector_size;
-  traffic_simulator::math::HermiteCurve curve(from_pose, goal_pose.pose, start_vec, goal_vec);
+  traffic_simulator::math::HermiteCurve curve(from_pose, goal_pose, start_vec, goal_vec);
   return curve;
 }
 
@@ -1008,7 +1166,7 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
   return distance;
 }
 
-const autoware_auto_msgs::msg::HADMapBin HdMapUtils::toMapBin()
+const autoware_auto_mapping_msgs::msg::HADMapBin HdMapUtils::toMapBin()
 {
   std::stringstream ss;
   boost::archive::binary_oarchive oa(ss);
@@ -1016,7 +1174,7 @@ const autoware_auto_msgs::msg::HADMapBin HdMapUtils::toMapBin()
   auto id_counter = lanelet::utils::getId();
   oa << id_counter;
   std::string tmp_str = ss.str();
-  autoware_auto_msgs::msg::HADMapBin msg;
+  autoware_auto_mapping_msgs::msg::HADMapBin msg;
   msg.data.clear();
   msg.data.resize(tmp_str.size());
   msg.data.assign(tmp_str.begin(), tmp_str.end());
@@ -1153,7 +1311,7 @@ const std::vector<std::int64_t> HdMapUtils::getRightOfWayLaneletIds(std::int64_t
 }
 
 std::vector<std::shared_ptr<const lanelet::TrafficSign>>
-HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<std::int64_t> lanelet_ids)
+HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<std::int64_t> lanelet_ids) const
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
   for (const auto & lanelet_id : lanelet_ids) {
@@ -1197,9 +1355,10 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
   return ret;
 }
 
-lanelet::AutowareTrafficLightConstPtr HdMapUtils::getTrafficLight(
+std::vector<lanelet::AutowareTrafficLightConstPtr> HdMapUtils::getTrafficLights(
   const std::int64_t traffic_light_id) const
 {
+  std::vector<lanelet::AutowareTrafficLightConstPtr> ret;
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto light : autoware_traffic_lights) {
@@ -1207,37 +1366,47 @@ lanelet::AutowareTrafficLightConstPtr HdMapUtils::getTrafficLight(
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
         if (id == traffic_light_id) {
-          return light;
+          ret.emplace_back(light);
         }
       }
     }
   }
-  THROW_SEMANTIC_ERROR("traffic_light_id does not match. ID : ", traffic_light_id);
+  if (ret.empty()) {
+    THROW_SEMANTIC_ERROR("traffic_light_id does not match. ID : ", traffic_light_id);
+  }
+  return ret;
 }
 
-const boost::optional<std::int64_t> HdMapUtils::getTrafficLightStopLineId(
+std::vector<std::int64_t> HdMapUtils::getTrafficLightStopLineIds(
   const std::int64_t & traffic_light_id) const
 {
-  const auto traffic_light = getTrafficLight(traffic_light_id);
-  if (traffic_light->stopLine()) {
-    return traffic_light->stopLine()->id();
+  std::vector<std::int64_t> ret;
+  const auto traffic_lights = getTrafficLights(traffic_light_id);
+  for (const auto & traffic_light : traffic_lights) {
+    if (traffic_light->stopLine()) {
+      ret.emplace_back(traffic_light->stopLine()->id());
+    }
   }
-  return boost::none;
+  return ret;
 }
 
-const std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLinePoints(
+std::vector<std::vector<geometry_msgs::msg::Point>> HdMapUtils::getTrafficLightStopLinesPoints(
   std::int64_t traffic_light_id) const
 {
-  std::vector<geometry_msgs::msg::Point> ret;
-  const auto traffic_light = getTrafficLight(traffic_light_id);
-  const auto stop_line = traffic_light->stopLine();
-  if (stop_line) {
-    for (const auto point : stop_line.get()) {
-      geometry_msgs::msg::Point p;
-      p.x = point.x();
-      p.y = point.y();
-      p.z = point.z();
-      ret.emplace_back(p);
+  std::vector<std::vector<geometry_msgs::msg::Point>> ret;
+  const auto traffic_lights = getTrafficLights(traffic_light_id);
+  for (const auto & traffic_light : traffic_lights) {
+    ret.emplace_back(std::vector<geometry_msgs::msg::Point>{});
+    const auto stop_line = traffic_light->stopLine();
+    if (stop_line) {
+      auto & current_stop_line = ret.back();
+      for (const auto point : stop_line.get()) {
+        geometry_msgs::msg::Point p;
+        p.x = point.x();
+        p.y = point.y();
+        p.z = point.z();
+        current_stop_line.emplace_back(p);
+      }
     }
   }
   return ret;
@@ -1304,12 +1473,14 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
     return boost::none;
   }
   traffic_simulator::math::CatmullRomSpline spline(waypoints);
-  const auto stop_line = getTrafficLightStopLinePoints(traffic_light_id);
-  if (stop_line.size() <= 1) {
-    return boost::none;
+  const auto stop_lines = getTrafficLightStopLinesPoints(traffic_light_id);
+  for (const auto & stop_line : stop_lines) {
+    const auto collision_point = spline.getCollisionPointIn2D(stop_line);
+    if (collision_point) {
+      return collision_point;
+    }
   }
-  const auto collision_point = spline.getCollisionPointIn2D(stop_line);
-  return collision_point;
+  return boost::none;
 }
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
@@ -1466,5 +1637,33 @@ std::vector<std::int64_t> HdMapUtils::getLaneletIds(
     ids.emplace_back(lanelet.id());
   }
   return ids;
+}
+
+auto HdMapUtils::isTrafficLight(const LaneletId lanelet_id) const -> bool
+{
+  using namespace lanelet;
+
+  if (lanelet_map_ptr_->lineStringLayer.exists(lanelet_id)) {
+    if (auto && linestring = lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
+        linestring.hasAttribute(AttributeName::Type)) {
+      return linestring.attribute(AttributeName::Type).value() == "traffic_light";
+    }
+  }
+
+  return false;
+}
+
+auto HdMapUtils::isTrafficRelation(const LaneletId lanelet_id) const -> bool
+{
+  return lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
+         std::dynamic_pointer_cast<lanelet::TrafficLight>(
+           lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+}
+
+auto HdMapUtils::getTrafficRelation(const LaneletId lanelet_id) const -> lanelet::TrafficLight::Ptr
+{
+  assert(isTrafficRelation(lanelet_id));
+  return std::dynamic_pointer_cast<lanelet::TrafficLight>(
+    lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 }  // namespace hdmap_utils

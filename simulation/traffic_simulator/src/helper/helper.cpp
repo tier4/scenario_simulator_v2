@@ -76,21 +76,25 @@ geometry_msgs::msg::Pose constructPose(
 }
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
-  std::string entity, std::string topic_name, double update_duration)
+  const std::string & entity, const std::string & architecture_type, const double update_duration,
+  const double range, bool filter_by_range)
 {
   simulation_api_schema::DetectionSensorConfiguration configuration;
   configuration.set_entity(entity);
-  configuration.set_topic_name(topic_name);
+  configuration.set_architecture_type(architecture_type);
   configuration.set_update_duration(update_duration);
+  configuration.set_range(range);
+  configuration.set_filter_by_range(filter_by_range);
   return configuration;
 }
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
-  LidarType type, std::string entity, std::string topic_name, double horizontal_resolution)
+  const LidarType type, const std::string & entity, const std::string & architecture_type,
+  const double horizontal_resolution)
 {
   simulation_api_schema::LidarConfiguration configuration;
   configuration.set_horizontal_resolution(horizontal_resolution);
-  configuration.set_topic_name(topic_name);
+  configuration.set_architecture_type(architecture_type);
   configuration.set_entity(entity);
   switch (type) {
     case LidarType::VLP16:
@@ -157,5 +161,33 @@ std::ostream & operator<<(
   std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose)
 {
   os << "lanelet id : " << ll_pose.lanelet_id << "\ns : " << ll_pose.s;
+  return os;
+}
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point)
+{
+  os << "x : " << point.x << ",y : " << point.y << ",z : " << point.z << std::endl;
+  return os;
+}
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Vector3 & vector)
+{
+  os << "x : " << vector.x << ",y : " << vector.y << ",z : " << vector.z << std::endl;
+  return os;
+}
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternion & quat)
+{
+  os << "x : " << quat.x << ",y : " << quat.y << ",z : " << quat.z << ",w : " << quat.z
+     << std::endl;
+  return os;
+}
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose)
+{
+  os << "position : " << std::endl;
+  os << pose.position << std::endl;
+  os << "orientation : " << std::endl;
+  os << pose.orientation << std::endl;
   return os;
 }

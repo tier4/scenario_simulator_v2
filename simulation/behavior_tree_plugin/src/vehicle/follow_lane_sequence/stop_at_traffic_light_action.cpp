@@ -33,8 +33,7 @@ StopAtTrafficLightAction::StopAtTrafficLightAction(
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle>
-StopAtTrafficLightAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+StopAtTrafficLightAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stop_target_) {
     return boost::none;
@@ -42,8 +41,7 @@ StopAtTrafficLightAction::calculateObstacle(
   if (distance_to_stop_target_.get() < 0) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
-  if (distance_to_stop_target_.get() > spline.getLength()) {
+  if (distance_to_stop_target_.get() > reference_trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -59,9 +57,9 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtTrafficLightAction::calc
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
-    waypoints.waypoints = spline.getTrajectory(
-      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0);
+    waypoints.waypoints = reference_trajectory->getTrajectory(
+      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
+      entity_status.lanelet_pose.offset);
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -75,7 +73,7 @@ boost::optional<double> StopAtTrafficLightAction::calculateTargetSpeed(double cu
   }
   double rest_distance =
     distance_to_stop_target_.get() - (vehicle_parameters.bounding_box.dimensions.x + 3);
-  if (rest_distance < calculateStopDistance()) {
+  if (rest_distance < calculateStopDistance(driver_model.deceleration)) {
     if (rest_distance > 0) {
       return std::sqrt(2 * driver_model.deceleration * rest_distance);
     } else {
@@ -88,7 +86,9 @@ boost::optional<double> StopAtTrafficLightAction::calculateTargetSpeed(double cu
 BT::NodeStatus StopAtTrafficLightAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {

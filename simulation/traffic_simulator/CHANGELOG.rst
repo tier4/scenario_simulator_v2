@@ -2,6 +2,357 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.3 (2022-03-09)
+------------------
+* Merge pull request `#716 <https://github.com/tier4/scenario_simulator_v2/issues/716>`_ from tier4/dependency/remove-lexus-description
+  Remove `lexus_description` from dependency
+* Cleanup
+* Merge pull request `#714 <https://github.com/tier4/scenario_simulator_v2/issues/714>`_ from tier4/fix/get_longitudinal_distance
+  Fix/get longitudinal distance
+* fix typo
+* remove unused lines
+* change hard coded parameter
+* remove debug line
+* configure parameter
+* add getLongitudinalDistance function in world frame
+* Merge pull request `#709 <https://github.com/tier4/scenario_simulator_v2/issues/709>`_ from tier4/feature/waypoint_offset
+  Feature/waypoint offset
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* remove debug line
+* erase not unique waypoint
+* Merge pull request `#706 <https://github.com/tier4/scenario_simulator_v2/issues/706>`_ from tier4/fix/hard_coded_parameter
+  fix hard coded parameter in hermite curve class
+* Merge pull request `#707 <https://github.com/tier4/scenario_simulator_v2/issues/707>`_ from tier4/fix/sim_model_delay_steer_acc_geared
+  fix sim_model_delay_steer_acc_geard model
+* modify getPoint function
+* add offset
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* add white line at the EOF
+* fix typo and add new line at EOF
+* add offset in waypoint calculation
+* Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
+  Feature/autoware external api
+* fix sim_model_delay_steer_acc_geard model
+* fix hard coded parameter in hermite curve class
+* Rename member function `setUpperBoundSpeed` to `setVelocityLimit`
+* Replace `AwapiAutowareStatus` with `autoware_auto_system_msgs::msg::AutowareState`
+* Merge pull request `#698 <https://github.com/tier4/scenario_simulator_v2/issues/698>`_ from tier4/fix/idead_steer_acc_geard
+  fix sim model ideal steer acc geard
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* fix sim model ideal steer acc geard
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Remove legacy vehicle model types
+* Remove architecture_type `awf/auto`
+* Remove class `AutowareAuto`
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#688 <https://github.com/tier4/scenario_simulator_v2/issues/688>`_ from tier4/fix/traffic_simulator/traffic_light_manager
+  Fix/traffic simulator/traffic light manager
+* Cleanup
+* Merge pull request `#686 <https://github.com/tier4/scenario_simulator_v2/issues/686>`_ from tier4/fix/warp_problem
+  Fix/warp problem
+* Fix traffic signal topic name (for Autoware.Universe)
+* Update `TrafficLightManager::set*` to be traffic relation ID acceptable
+* Merge pull request `#689 <https://github.com/tier4/scenario_simulator_v2/issues/689>`_ from tier4/feature/add-occlusion-spot-no-stopping-area-marker
+  feat(behavior_velocity): add occlusion spot no stopping area marker
+* fix typo
+* remove debug line
+* fix compile errors
+* lane matching fails when the offset overs 1
+* Add new member function `HdMapUtils::isTrafficRelationId`
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into fix/traffic_simulator/traffic_light_manager
+* Lipsticks
+* feat(behavior_velocity): add occlusion spot no stopping area marker
+* add std::sqrt function in offset calculation
+* enable get - offset value
+* Merge pull request `#684 <https://github.com/tier4/scenario_simulator_v2/issues/684>`_ from tier4/fix/virtual_destructor
+  Fix/virtual destructor
+* use override in entity class
+* use override in metrics
+* Merge pull request `#683 <https://github.com/tier4/scenario_simulator_v2/issues/683>`_ from tier4/feature/zeromq_multi_client
+  Feature/zeromq multi client
+* add virtual destructor to the metric class
+* modify destructor
+* add virtual destructor to the entity class
+* use multi client class
+* Merge pull request `#680 <https://github.com/tier4/scenario_simulator_v2/issues/680>`_ from tier4/feature/speed_up_metrics_manager
+  Feature/speed up metrics manager
+* remove unused lines
+* remove log output step in every update frame
+* remove output to file step
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge branch 'master' into fix/interpreter/lifecycle
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Replace `VehicleCommand` with `AckermannControlCommand` and `GearCommand`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Remove package `autoware_perception_msgs`
+* Replace `autoware_debug_msgs` with `tier4_debug_msgs`
+* Remove architecture_type `tier4/proposal`
+* Remove class `AutowareArchitectureProposal`
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, tanaka3, yamacir-kit
+
+0.6.2 (2022-01-20)
+------------------
+* Merge pull request `#671 <https://github.com/tier4/scenario_simulator_v2/issues/671>`_ from tier4/fix/lane_change_trajectory_shape
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/lane_change_trajectory_shape
+* Merge pull request `#670 <https://github.com/tier4/scenario_simulator_v2/issues/670>`_ from tier4/feature/request_speed_change_in_pedestrian
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_speed_change_in_pedestrian
+* Merge branch 'master' into feature/request_speed_change_in_pedestrian
+* Merge pull request `#668 <https://github.com/tier4/scenario_simulator_v2/issues/668>`_ from tier4/feature/interpreter/lane-change-action
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/lane-change-action
+* modify trajectory tangent size
+* fix problem in passing driver model in pedestrian behavior plugin
+* Merge pull request `#669 <https://github.com/tier4/scenario_simulator_v2/issues/669>`_ from tier4/refactor/add_speed_change_namespace
+* rename functions
+* add whitespace
+* specify class
+* fix compile error
+* add speed_change namespace
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/lane-change-action
+* Update some syntaxes to support conversion operator
+* Merge pull request `#667 <https://github.com/tier4/scenario_simulator_v2/issues/667>`_ from tier4/feature/control_from_relation_id
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/control_from_relation_id
+* remove const
+* Merge pull request `#665 <https://github.com/tier4/scenario_simulator_v2/issues/665>`_ from tier4/feature/interpreter/speed-action
+* add relation id
+* apply reformat
+* Update some structures to support cast operator
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/speed-action
+* Merge pull request `#664 <https://github.com/tier4/scenario_simulator_v2/issues/664>`_ from tier4/feature/lateral_velocity_constraint
+* Update `EgoEntity` to override `EntityBase::requestSpeedChange`
+* apply reformat
+* add new test scenario
+* modify scenario
+* add TIME constraint
+* fix typo
+* use switch
+* add default value
+* split NPC logic by using constraint type
+* fix logic in calculating along pose
+* add test case
+* add new API
+* Merge pull request `#662 <https://github.com/tier4/scenario_simulator_v2/issues/662>`_ from tier4/fix/rename_trajectory
+* rename data field and remove unused field
+* Merge pull request `#661 <https://github.com/tier4/scenario_simulator_v2/issues/661>`_ from tier4/feature/lane_change_trajectory_shape
+* Merge pull request `#660 <https://github.com/tier4/scenario_simulator_v2/issues/660>`_ from tier4/feature/traffic_simulator/vehicle_model
+* Merge pull request `#654 <https://github.com/tier4/scenario_simulator_v2/issues/654>`_ from tier4/feature/request_relative_speed_change
+* apply reformat
+* remove debug line and modify scenario
+* Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
+* Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* Merge branch 'master' into matsuura/feature/add-time-to-panel
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Merge pull request `#659 <https://github.com/tier4/scenario_simulator_v2/issues/659>`_ from tier4/release-0.6.1
+* Add new VehicleModelType `DELAY_STEER_VEL`
+* enable change lane
+* add debug line
+* add namespace
+* move to .cpp
+* add << operator override
+* change size_t to uint8_t
+* fix problems in always return boost::none
+* enable use self entity as reference
+* add linear lanechange scenario
+* merge fix/galactic_build
+* fix compile error
+* enable generate linear trajectory
+* modify argument type
+* change argument type
+* change to private
+* fix compile error
+* add void requestLaneChange(const traffic_simulator::lane_change::Parameter &)
+* add copy constructor
+* add copy constructor
+* add constructor
+* rename to_lanelet_id to lane_change_parameters
+* add Parameter struct
+* add constructor
+* add data types for constraint and trajectory
+* add Lane change data types
+* Merge branch 'fix/galactic_build' of https://github.com/tier4/scenario_simulator.auto into feature/request_relative_speed_change
+* remove glog functions
+* Merge branch 'fix/galactic_build' of https://github.com/tier4/scenario_simulator.auto into feature/request_relative_speed_change
+* update bounding box size while get status
+* Merge branch 'fix/galactic_build' of https://github.com/tier4/scenario_simulator.auto into feature/request_relative_speed_change
+* remove debug lines
+* set other status first
+* update requestSpeedChange logic
+* add new test case
+* enable calculate relative target speed
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* add getAbsoluteValue function in RelativeTargetSpeed class
+* add setTargetSpeed(const RelativeTargetSpeed & target_speed, bool continuous) function to the each entity
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into matsuura/feature/add-time-to-panel
+* pull master
+* merge master
+* Merge tier4:master
+* fix to build
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
+0.6.1 (2022-01-11)
+------------------
+* Merge pull request `#655 <https://github.com/tier4/scenario_simulator_v2/issues/655>`_ from tier4/fix/galactic_build
+* remove debug line
+* remove glog functions
+* remove glog from depends
+* add glog and use unique_ptr
+* add debug line
+* add virtual destructor
+* Merge pull request `#652 <https://github.com/tier4/scenario_simulator_v2/issues/652>`_ from tier4/feature/traffic_simulator/vehicle_model
+* Lipsticks
+* Cleanup some switch statements
+* Cleanup `EgoEntity::makeSimulationModel`
+* Remove message type `VehicleStateCommand` from VehicleModels
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Remove old VehicleModel `sim_model_ideal.[ch]pp`
+* Merge pull request `#648 <https://github.com/tier4/scenario_simulator_v2/issues/648>`_ from tier4/feature/request_speed_change
+* Merge pull request `#653 <https://github.com/tier4/scenario_simulator_v2/issues/653>`_ from tier4/fix/error_in_driver_model_from_blackboard
+* fix typo
+* remove recurrent call in setDriverModel function
+* Restore AAP's VehicleModels
+* apply reformat
+* Fix `EgoEntity` to set `GearCommand` to VehicleModel
+* add space
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/request_speed_change
+* Lipsticks
+* set default driver model in pedestrian entity class
+* Merge pull request `#650 <https://github.com/tier4/scenario_simulator_v2/issues/650>`_ from tier4/fix/get_driver_model_in_pedestrian
+* remove old header file
+* Update VehicleModels to match latest `simple_planning_simulator_node`
+* fix linter error
+* Remove unused enumerations of `VehicleModelType`
+* enable pass compile
+* add const to the function
+* fix way of calling API
+* remove old API
+* add requestSpeedChange function to the misc object and pedestrian
+* change EntityBase::setDriverModel to the pure virtual function
+* add data type
+* modify test case
+* add requestSpeedChange API
+* Merge pull request `#646 <https://github.com/tier4/scenario_simulator_v2/issues/646>`_ from tier4/feature/set_acceleration_deceleration
+* rename function
+* rename function
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge pull request `#628 <https://github.com/tier4/scenario_simulator_v2/issues/628>`_ from tier4/feature/avoid_overwrite_acceleration
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* enable pass colcon test
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* add getDriverModel function in egoEntity class
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* Merge branch 'master' into feature/interpreter/expr
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge remote-tracking branch 'origin/master' into feature/avoid_overwrite_acceleration
+* add setAcceleration/Deceleration function to the API class
+* add setAcceleration/Develeration to the vehicle entity class
+* add setAcceleration/Deceleration function to the entity manager class
+* add setAcceleration and setDeceleration to the base class
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
+0.6.0 (2021-12-16)
+------------------
+* Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
+* Merge pull request `#640 <https://github.com/tier4/scenario_simulator_v2/issues/640>`_ from RobotecAI/fix/multi-lane-traffic-light-stopline-search
+* multiple lane traffic light stopline search fix
+* Merge pull request `#637 <https://github.com/tier4/scenario_simulator_v2/issues/637>`_ from tier4/feature/pass_goal_poses_to_the_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Merge pull request `#633 <https://github.com/tier4/scenario_simulator_v2/issues/633>`_ from tier4/feature/transform_point
+* remove header
+* add getGoalPosesInWorldFrame();
+* Merge branch 'feature/transform_point' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* use const &
+* Merge branch 'feature/transform_point' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* add transformPoint function
+* move transform points to the transform.cpp and hpp
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* add key
+* add getGoalPoses function to the plugin
+* Break indentation (due to ament_clang_format)
+* Update CMakeLists to not to reference undefined variable
+* Update packages to compile with `awf/autoware_auto_msgs` if flag given
+* Remove `autoware_auto_msgs` from dependency
+* Set default `architecture_type` to `tier4/proposal`
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* Update `EntityManager` to select `TrafficLightManager` message type
+* Update `TrafficLight(Arrow|Color)` to ROS2 message type conversion
+* Update `TrafficLightManager` publisher to be parameterizable
+* Merge pull request `#622 <https://github.com/tier4/scenario_simulator_v2/issues/622>`_ from tier4/fix-pointcloud-topic
+* fix topic name of pointcloud
+* Update `TrafficLightManager` to create publishers by itself
+* Update class `SensorSimulation` to choice topic name and type based on Autoware's architecture type
+* Add new virtual class `DetectionSensorBase`
+* Update `API::attachDetectionSensor` to detect Autoware architecture
+* Update `API::attachLidarSensor` to detect Autoware architecture
+* Remove `autoware_auto_control_msgs.proto`
+* Merge remote-tracking branch 'origin/master' into use-autoware-auto-msgs
+* Restore virtual function `EntityBase::getVehicleCommand`
+* Merge pull request `#617 <https://github.com/tier4/scenario_simulator_v2/issues/617>`_ from tier4/autoware-universe-concealer
+* Comment-out some tests and Remove protobuf type `GearCommand`, `GearReport`
+* change no_ground pointcloud topic name
+* Update DetectionSensor to use `autoware_auto_perception_msgs`
+* Remove member function `getVehicleCommand` from Vehicle type entity
+* use auto_msgs for traffic lights
+* remove autoware_auto_msgs dependency
+* some changes to run psim with autoware_universe
+* Update some packages to use `tier4/autoware_auto_msgs`
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Takayuki Murooka, Tatsuya Yamasaki, yamacir-kit
+
+0.5.8 (2021-12-13)
+------------------
+* Merge pull request `#630 <https://github.com/tier4/scenario_simulator_v2/issues/630>`_ from tier4/feature/add_ideal_accel_model
+* Merge commit 'ce08abe39ed83d7ec0630560d293187fbcf08b5e' into feature/add_ideal_accel_model
+* Merge pull request `#631 <https://github.com/tier4/scenario_simulator_v2/issues/631>`_ from tier4/fix/set_driver_model
+* Merge pull request `#619 <https://github.com/tier4/scenario_simulator_v2/issues/619>`_ from RobotecAI/AJD-254-simple_abstract_scenario_for_simple_random_testing
+* disable throw errors while calling setDriverModel error
+* add IDEAL_ACCEL model
+* Merge remote-tracking branch 'tier/master' into AJD-254-simple_abstract_scenario_for_simple_random_testing
+* Merge pull request `#626 <https://github.com/tier4/scenario_simulator_v2/issues/626>`_ from tier4/feature/get_driver_model
+* add getDriverModel function
+* fix compile errors
+* move functions into .cpp file
+* add getter setter to the base class
+* Merge pull request `#623 <https://github.com/tier4/scenario_simulator_v2/issues/623>`_ from RobotecAI/fix/traffic_light_lookup
+* traffic lights to stop line lookup fix
+* Merge pull request `#621 <https://github.com/tier4/scenario_simulator_v2/issues/621>`_ from tier4/fix/empty_trafic_light
+* publish empty message
+* change topic name
+* Merge pull request `#618 <https://github.com/tier4/scenario_simulator_v2/issues/618>`_ from tier4/fix/remove_lanechange_route
+* random test runner
+* set withLaneChange parameter as false
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* Merge pull request `#612 <https://github.com/tier4/scenario_simulator_v2/issues/612>`_ from tier4/feature/remove_newton_method_from_get_s_value
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* use autoscale option
+* add getNearbyLaneletIds function
+* consider bounding box if possible
+* remove default argument
+* modify test cases
+* add bounding box to the argument
+* remove debug line
+* enable consider edge case (tx and ty sometimes inf)
+* simplify get s value algorithum
+* add matchToLane function
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
+* Merge branch 'feature/lane_matching' into feature/remove_newton_method_from_get_s_value
+* remove newton method
+* return boost::none when the value under 0 or over 1
+* Revert "Merge pull request `#603 <https://github.com/tier4/scenario_simulator_v2/issues/603>`_ from tier4/fix/get_s_value"
+* fix compile error
+* add matchToLane function
+* add lanelet2_matching package to the external directory
+* Merge pull request `#609 <https://github.com/tier4/scenario_simulator_v2/issues/609>`_ from tier4/feature/load_plugin_in_spawn_api
+* put values into TODO
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, dai0912th, yamacir-kit
+
 0.5.7 (2021-11-09)
 ------------------
 * Merge pull request `#603 <https://github.com/tier4/scenario_simulator_v2/issues/603>`_ from tier4/fix/get_s_value

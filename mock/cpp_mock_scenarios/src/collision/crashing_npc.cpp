@@ -57,7 +57,7 @@ private:
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
-    api_.setTargetSpeed("ego", 15, true);
+    api_.requestSpeedChange("ego", 15, true);
     traffic_simulator_msgs::msg::DriverModel driver_model;
     driver_model.see_around = false;
     api_.setDriverModel("ego", driver_model);
@@ -65,7 +65,7 @@ private:
     api_.setEntityStatus(
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
       traffic_simulator::helper::constructActionStatus(0));
-    api_.setTargetSpeed("npc", 5, true);
+    api_.requestSpeedChange("npc", 5, true);
   }
 };
 

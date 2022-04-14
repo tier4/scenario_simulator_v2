@@ -21,8 +21,10 @@
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/utility/execution_timer.hpp>
 #include <openscenario_interpreter/utility/visibility.hpp>
 #include <openscenario_interpreter_msgs/msg/context.hpp>
@@ -57,7 +59,9 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   String output_directory;
 
-  Object script;
+  std::shared_ptr<OpenScenario> script;
+
+  std::list<std::shared_ptr<ScenarioDefinition>> scenarios;
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
@@ -73,7 +77,11 @@ public:
   OPENSCENARIO_INTERPRETER_PUBLIC
   explicit Interpreter(const rclcpp::NodeOptions &);
 
+  ~Interpreter() override;
+
   auto currentLocalFrameRate() const -> std::chrono::milliseconds;
+
+  auto currentScenarioDefinition() const -> const std::shared_ptr<ScenarioDefinition> &;
 
   auto isAnErrorIntended() const -> bool;
 

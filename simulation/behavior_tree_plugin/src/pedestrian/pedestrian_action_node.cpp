@@ -16,6 +16,7 @@
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/helper/helper.hpp>
 
 namespace entity_behavior
 {
@@ -28,6 +29,9 @@ PedestrianActionNode::PedestrianActionNode(
 void PedestrianActionNode::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
+  if (!getInput<traffic_simulator_msgs::msg::DriverModel>("driver_model", driver_model)) {
+    driver_model = traffic_simulator_msgs::msg::DriverModel();
+  }
   if (!getInput<traffic_simulator_msgs::msg::PedestrianParameters>(
         "pedestrian_parameters", pedestrian_parameters)) {
     THROW_SIMULATION_ERROR("failed to get input pedestrian_parameters in PedestrianActionNode");
@@ -41,9 +45,9 @@ traffic_simulator_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityS
   accel_new = entity_status.action_status.accel;
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(target_accel, -5, 0);
+    target_accel = boost::algorithm::clamp(target_accel, driver_model.deceleration * -1, 0);
   } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, 3);
+    target_accel = boost::algorithm::clamp(target_accel, 0, driver_model.acceleration);
   }
   accel_new.linear.x = target_accel;
   geometry_msgs::msg::Twist twist_new;
@@ -119,27 +123,24 @@ PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_spe
 {
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(target_accel, -5, 0);
+    target_accel = boost::algorithm::clamp(target_accel, driver_model.deceleration * -1, 0);
   } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, 3);
+    target_accel = boost::algorithm::clamp(target_accel, 0, driver_model.acceleration);
   }
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;
   accel_new.linear.x = target_accel;
 
   geometry_msgs::msg::Twist twist_new;
-  twist_new.linear.x = entity_status.action_status.twist.linear.x +
-                       entity_status.action_status.accel.linear.x * step_time;
-  twist_new.linear.y = entity_status.action_status.twist.linear.y +
-                       entity_status.action_status.accel.linear.y * step_time;
-  twist_new.linear.z = entity_status.action_status.twist.linear.z +
-                       entity_status.action_status.accel.linear.z * step_time;
-  twist_new.angular.x = entity_status.action_status.twist.angular.x +
-                        entity_status.action_status.accel.angular.x * step_time;
-  twist_new.angular.y = entity_status.action_status.twist.angular.y +
-                        entity_status.action_status.accel.angular.y * step_time;
-  twist_new.angular.z = entity_status.action_status.twist.angular.z +
-                        entity_status.action_status.accel.angular.z * step_time;
+  twist_new.linear.x = entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time;
+  twist_new.linear.y = entity_status.action_status.twist.linear.y + accel_new.linear.y * step_time;
+  twist_new.linear.z = entity_status.action_status.twist.linear.z + accel_new.linear.z * step_time;
+  twist_new.angular.x =
+    entity_status.action_status.twist.angular.x + accel_new.angular.x * step_time;
+  twist_new.angular.y =
+    entity_status.action_status.twist.angular.y + accel_new.angular.y * step_time;
+  twist_new.angular.z =
+    entity_status.action_status.twist.angular.z + accel_new.angular.z * step_time;
 
   geometry_msgs::msg::Pose pose_new;
   geometry_msgs::msg::Vector3 angular_trans_vec;
@@ -164,9 +165,12 @@ PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_spe
   entity_status_updated.action_status.accel = accel_new;
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
   if (entity_status.lanelet_pose_valid) {
-    lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.lanelet_pose.lanelet_id);
+    lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.lanelet_pose.lanelet_id, 1.0);
   } else {
     lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.bounding_box, true);
+  }
+  if (!lanelet_pose) {
+    lanelet_pose = hdmap_utils->toLaneletPose(pose_new, true, 2.0);
   }
   if (lanelet_pose) {
     entity_status_updated.lanelet_pose_valid = true;

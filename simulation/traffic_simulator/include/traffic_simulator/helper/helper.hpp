@@ -20,6 +20,7 @@
 #include <cmath>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <iostream>
 #include <string>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
@@ -91,16 +92,24 @@ geometry_msgs::msg::Pose constructPose(
 enum class LidarType { VLP16, VLP32 };
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
-  LidarType type, std::string entity, std::string topic_name,
-  double horizontal_resolution = 1.0 / 180.0 * M_PI);
+  const LidarType type, const std::string & entity, const std::string & architecture_type,
+  const double horizontal_resolution = 1.0 / 180.0 * M_PI);
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
-  std::string entity, std::string topic_name, double update_duration);
-
+  const std::string & entity, const std::string & architecture_type, const double update_duration,
+  const double range = 300.0, bool filter_by_range = false);
 }  // namespace helper
 }  // namespace traffic_simulator
 
 std::ostream & operator<<(
   std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose);
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point);
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Vector3 & vector);
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternion & quat);
+
+std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose);
 
 #endif  // TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_

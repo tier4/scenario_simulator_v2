@@ -24,52 +24,23 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
   parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
-  callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Event>(node, local()));
+  traverse<1, unbounded>(node, "Event", [&](auto && node) {
+    return elements.push_back(readStoryboardElement<Event>(node, local()));
   });
 }
 
-auto Maneuver::accomplished() const -> bool
+auto operator<<(nlohmann::json & json, const Maneuver & maneuver) -> nlohmann::json &
 {
-  // NOTE: A Maneuver's goal is accomplished when all its Events are in the completeState.
-  return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
-    return each.template as<Event>().complete();
-  });
-}
+  json["name"] = maneuver.name;
 
-auto Maneuver::ready() noexcept -> bool { return true; }
-
-auto Maneuver::run() -> void
-{
-  for (auto && each : *this) {
-    each.evaluate();
-  }
-}
-
-auto Maneuver::start() noexcept -> void {}
-
-auto Maneuver::stop() -> void
-{
-  for (auto && each : *this) {
-    each.as<Event>().override();
-    each.evaluate();
-  }
-}
-
-auto Maneuver::stopTriggered() noexcept -> bool { return false; }
-
-auto operator<<(nlohmann::json & json, const Maneuver & datum) -> nlohmann::json &
-{
-  json["name"] = datum.name;
-
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(maneuver.state());
 
   json["Event"] = nlohmann::json::array();
 
-  for (const auto & each : datum) {
-    nlohmann::json event;
-    event << each.as<Event>();
-    json["Event"].push_back(event);
+  for (const auto & event : maneuver.elements) {
+    nlohmann::json json_event;
+    json_event << event.as<Event>();
+    json["Event"].push_back(json_event);
   }
 
   return json;

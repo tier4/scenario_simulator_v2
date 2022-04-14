@@ -18,8 +18,7 @@
 
 namespace behavior_tree_plugin
 {
-LoggingEvent::LoggingEvent(
-  const std::shared_ptr<BT::TreeNode> & root_node, const rclcpp::Logger & logger)
+LoggingEvent::LoggingEvent(BT::TreeNode * root_node, const rclcpp::Logger & logger)
 : TransitionEvent(root_node), ros_logger_(logger)
 {
 }
@@ -28,9 +27,9 @@ void LoggingEvent::callback(
   BT::Duration /*timestamp*/, const BT::TreeNode & node, BT::NodeStatus prev_status,
   BT::NodeStatus status)
 {
-  RCLCPP_INFO_STREAM(
-    ros_logger_, "Action " << node.name() << " changed status, " << BT::toStr(prev_status, true)
-                           << " => " << BT::toStr(status, true));
+  // RCLCPP_INFO_STREAM(
+  //   ros_logger_, "Action " << node.name() << " changed status, " << BT::toStr(prev_status, true)
+  //                          << " => " << BT::toStr(status, true));
   TransitionEvent::updateCurrentAction(status, node);
 }
 

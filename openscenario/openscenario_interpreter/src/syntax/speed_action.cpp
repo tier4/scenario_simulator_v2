@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
@@ -29,64 +30,90 @@ SpeedAction::SpeedAction(const pugi::xml_node & node, Scope & scope)
 
 auto SpeedAction::accomplished() -> bool
 {
-  return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](const auto & each) {
-    return std::get<1>(each);
-  });
+  // See OpenSCENARIO 1.1 User Guide Appendix A: Action tables
+
+  auto ends_on_reaching_the_speed = [this]() {
+    return speed_action_target.is<AbsoluteTargetSpeed>() or
+           not speed_action_target.as<RelativeTargetSpeed>().continuous;
+  };
+
+  auto there_is_no_regular_ending = [this]() {
+    return speed_action_target.is<RelativeTargetSpeed>() and
+           speed_action_target.as<RelativeTargetSpeed>().continuous;
+  };
+
+  auto check = [this](auto && actor) {
+    if (speed_action_target.is<AbsoluteTargetSpeed>()) {
+      return equal_to<double>()(
+        speed_action_target.as<AbsoluteTargetSpeed>().value,
+        getEntityStatus(actor).action_status.twist.linear.x);
+    } else {
+      switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
+        case SpeedTargetValueType::delta:
+          return equal_to<double>()(
+            getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
+                .action_status.twist.linear.x +
+              speed_action_target.as<RelativeTargetSpeed>().value,
+            getEntityStatus(actor).action_status.twist.linear.x);
+        case SpeedTargetValueType::factor:
+          return equal_to<double>()(
+            getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
+                .action_status.twist.linear.x *
+              speed_action_target.as<RelativeTargetSpeed>().value,
+            getEntityStatus(actor).action_status.twist.linear.x);
+        default:
+          return false;
+      }
+    }
+  };
+
+  if (endsImmediately()) {
+    return true;
+  } else if (ends_on_reaching_the_speed()) {
+    return std::all_of(
+      std::begin(accomplishments), std::end(accomplishments), [&](auto && accomplishment) {
+        return accomplishment.second = accomplishment.second or check(accomplishment.first);
+      });
+  } else if (there_is_no_regular_ending()) {
+    return false;  // no regular ending
+  } else {
+    return true;
+  }
 }
 
 auto SpeedAction::endsImmediately() const -> bool
 {
-  return speed_action_target.is<AbsoluteTargetSpeed>() and
-         speed_action_dynamics.dynamics_shape == DynamicsShape::step;
+  return speed_action_dynamics.dynamics_shape == DynamicsShape::step;
 }
 
-auto SpeedAction::reset() -> void
+auto SpeedAction::run() -> void {}
+
+auto SpeedAction::start() -> void
 {
   accomplishments.clear();
 
   for (const auto & actor : actors) {
     accomplishments.emplace(actor, false);
   }
-}
 
-auto SpeedAction::run() -> void
-{
   for (auto && each : accomplishments) {
-    std::get<1>(each) = std::get<1>(each) or update(EntityRef(std::get<0>(each)));
+    if (speed_action_target.is<AbsoluteTargetSpeed>()) {
+      requestSpeedChange(
+        std::get<0>(each), speed_action_target.as<AbsoluteTargetSpeed>().value,
+        static_cast<traffic_simulator::speed_change::Transition>(
+          speed_action_dynamics.dynamics_shape),
+        static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics), true);
+    } else {
+      requestSpeedChange(
+        std::get<0>(each),
+        static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
+          speed_action_target.as<RelativeTargetSpeed>()),
+        static_cast<traffic_simulator::speed_change::Transition>(
+          speed_action_dynamics.dynamics_shape),
+        static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics),
+        speed_action_target.as<RelativeTargetSpeed>().continuous);
+    }
   }
-}
-
-auto SpeedAction::start() -> void
-{
-  reset();
-
-  update = [this](const EntityRef & actor)  //
-  {
-    const auto get_current_absolute_target_speed =
-      speed_action_target.getCalculateAbsoluteTargetSpeed();
-
-    switch (speed_action_dynamics.dynamics_shape) {
-      case DynamicsShape::step: {
-        auto status = getEntityStatus(actor);
-        status.action_status.twist.linear.x = get_current_absolute_target_speed();
-        setEntityStatus(actor, status);
-        setTargetSpeed(actor, status.action_status.twist.linear.x, true);
-        break;
-      }
-      case DynamicsShape::linear:
-        setTargetSpeed(actor, get_current_absolute_target_speed(), true);
-        break;
-
-      default:
-        throw UNSUPPORTED_SETTING_DETECTED(SpeedAction, speed_action_dynamics.dynamics_shape);
-    }
-
-    if (speed_action_target.is<RelativeTargetSpeed>()) {
-      setTargetSpeed(actor, get_current_absolute_target_speed(), true);
-    }
-
-    return speed_action_target.getIsEnd()(actor);
-  };
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

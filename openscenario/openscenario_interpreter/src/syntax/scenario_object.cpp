@@ -43,17 +43,10 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
     configuration.max_acceleration = +parameters.performance.max_acceleration;
 
     if (object_controller.is<Controller>()) {
-      auto controller = object_controller.as<Controller>();
-      auto max_jerk = controller["maxJerk"];
-      auto min_jerk = controller["minJerk"];
-
-      if (not max_jerk.name.empty()) {
-        configuration.max_jerk = boost::lexical_cast<double>(max_jerk.value);
-      }
-
-      if (not min_jerk.name.empty()) {
-        configuration.min_jerk = boost::lexical_cast<double>(min_jerk.value);
-      }
+      configuration.max_jerk = object_controller.as<Controller>().properties.get<Double>(
+        "maxJerk", std::numeric_limits<Double::value_type>::max());
+      configuration.min_jerk = object_controller.as<Controller>().properties.get<Double>(
+        "minJerk", std::numeric_limits<Double::value_type>::lowest());
     }
 
     if (object_controller.isUserDefinedController()) {
@@ -62,37 +55,35 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
     }
   }
 
-  connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);
+  addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);
 
   return true;
 }
 
 auto ScenarioObject::activateSensors() -> bool
 {
-  if (object_controller.isUserDefinedController()) {
-    const auto architecture_type = getParameter<std::string>("architecture_type", "");
-    if (architecture_type == "tier4/proposal") {
-      return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-               traffic_simulator::helper::LidarType::VLP16, name,
-               "/sensing/lidar/no_ground/pointcloud")) and
-             attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-               name, "/perception/object_recognition/objects", 0.1));
-    } else if (architecture_type == "awf/auto") {
-      /*
-         Autoware.Auto does not currently support object prediction however it
-         is work-in-progress for Cargo ODD msgs are already implemented and
-         autoware_auto_msgs::msg::PredictedObjects will probably be used here
-         topic name is yet unknown.
-      */
-      return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-        traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
-    } else {
-      throw SemanticError(
-        "Unexpected architecture_type ", std::quoted(architecture_type), " specified");
-    }
-  } else {
-    return true;
+  /*
+     NOTE: The term "controller" in OpenSCENARIO is a concept equivalent to
+     "the person driving the car. Here, Autoware is considered anthropomorphic.
+     In other words, the sensor performance of Autoware in a simulation is
+     described in ScenarioObject.ObjectController.Controller.Properties as
+     "characteristics of the person driving the car.
+  */
+  simulation_api_schema::DetectionSensorConfiguration configuration;
+  {
+    configuration.set_entity(name);
+    configuration.set_architecture_type(
+      getParameter<std::string>("architecture_type", "awf/universe"));
+    configuration.set_update_duration(0.1);
+    configuration.set_range(300);
+    configuration.set_filter_by_range(
+      object_controller.is<Controller>()
+        ? object_controller.as<Controller>().properties.get<Boolean>("isClairvoyant")
+        : false);
   }
+
+  return object_controller.isUserDefinedController() and attachLidarSensor(name) and
+         attachDetectionSensor(configuration);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

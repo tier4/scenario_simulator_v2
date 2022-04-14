@@ -20,6 +20,7 @@
 #include <boost/algorithm/clamp.hpp>
 #include <memory>
 #include <string>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
@@ -43,7 +44,7 @@ public:
     const traffic_simulator::math::CatmullRomSpline & spline);
   boost::optional<std::string> getFrontEntityName(
     const traffic_simulator::math::CatmullRomSpline & spline);
-  double calculateStopDistance() const;
+  double calculateStopDistance(double deceleration) const;
   boost::optional<double> getDistanceToFrontEntity(
     const traffic_simulator::math::CatmullRomSpline & spline);
   boost::optional<double> getDistanceToStopLine(
@@ -70,28 +71,28 @@ public:
   static BT::PortsList providedPorts()
   {
     return {
-      BT::InputPort<std::string>("request"),
+      BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::InputPort<traffic_simulator_msgs::msg::EntityStatus>("entity_status"),
       BT::InputPort<double>("current_time"),
       BT::InputPort<double>("step_time"),
       BT::InputPort<boost::optional<double>>("target_speed"),
       BT::OutputPort<traffic_simulator_msgs::msg::EntityStatus>("updated_status"),
-      BT::OutputPort<std::string>("request"),
+      BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus>>(
         "other_entity_status"),
       BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>(
         "entity_type_list"),
       BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManagerBase>>(
         "traffic_light_manager"),
       BT::OutputPort<boost::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
   }
   void getBlackBoardValues();
-  std::string request;
+  traffic_simulator::behavior::Request request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
-  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager;
+  std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager;
   traffic_simulator_msgs::msg::EntityStatus entity_status;
   double current_time;
   double step_time;
@@ -102,7 +103,9 @@ public:
   std::vector<std::int64_t> route_lanelets;
   traffic_simulator_msgs::msg::EntityStatus getEntityStatus(const std::string target_name) const;
   boost::optional<double> getDistanceToTargetEntityPolygon(
-    const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name);
+    const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name,
+    double width_extension_right = 0.0, double width_extension_left = 0.0,
+    double length_extension_front = 0.0, double length_extension_rear = 0.0);
 
 private:
   boost::optional<double> getDistanceToTargetEntityOnCrosswalk(
@@ -110,7 +113,9 @@ private:
     const traffic_simulator_msgs::msg::EntityStatus & status);
   boost::optional<double> getDistanceToTargetEntityPolygon(
     const traffic_simulator::math::CatmullRomSpline & spline,
-    const traffic_simulator_msgs::msg::EntityStatus & status);
+    const traffic_simulator_msgs::msg::EntityStatus & status, double width_extension_right = 0.0,
+    double width_extension_left = 0.0, double length_extension_front = 0.0,
+    double length_extension_rear = 0.0);
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> getConflictingEntityStatus(
     const std::vector<std::int64_t> & following_lanelets) const;
   std::vector<traffic_simulator_msgs::msg::EntityStatus> getConflictingEntityStatusOnCrossWalk(

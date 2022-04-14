@@ -40,14 +40,15 @@ public:
   {
     BT::PortsList ports = {
       BT::InputPort<traffic_simulator_msgs::msg::DriverModel>("driver_model"),
-      BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters")};
+      BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::math::CatmullRomSpline>>(
+        "reference_trajectory")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
     }
     return ports;
   }
-  traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(
     double target_speed, const std::vector<std::int64_t> & following_lanelets);
@@ -56,7 +57,11 @@ public:
   virtual const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() = 0;
   virtual const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) = 0;
+
+protected:
   traffic_simulator_msgs::msg::DriverModel driver_model;
+  traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
+  std::shared_ptr<traffic_simulator::math::CatmullRomSpline> reference_trajectory;
 };
 }  // namespace entity_behavior
 

@@ -51,9 +51,9 @@ struct TrafficSignalControllerAction : public Scope
 
   static auto endsImmediately() noexcept -> bool;
 
-  /*  */ auto run() -> void;
+  static auto run() noexcept -> void;
 
-  static auto start() noexcept -> void;
+  /*  */ auto start() -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

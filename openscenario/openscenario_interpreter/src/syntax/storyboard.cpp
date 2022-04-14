@@ -24,11 +24,11 @@ inline namespace syntax
 {
 Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 : Scope("Storyboard", scope),  // FIXME DIRTY HACK
-  init(readElement<Init>("Init", node, local())),
-  stop_trigger(readElement<Trigger>("StopTrigger", node, local()))
+  StoryboardElement(readElement<Trigger>("StopTrigger", node, local())),
+  init(readElement<Init>("Init", node, local()))
 {
-  callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
-    return push_back(readStoryboardElement<Story>(node, local()));
+  traverse<1, unbounded>(node, "Story", [&](auto && node) {
+    return elements.push_back(readStoryboardElement<Story>(node, local()));
   });
 
   if (not init.endsImmediately()) {
@@ -36,19 +36,10 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto Storyboard::accomplished() const -> bool
-{
-  return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
-    return each.template as<Story>().complete();
-  });
-}
-
-auto Storyboard::ready() noexcept -> bool { return true; }
-
 auto Storyboard::run() -> void
 {
   if (engaged) {
-    for (auto && story : *this) {
+    for (auto && story : elements) {
       story.evaluate();
     }
   } else if (std::all_of(  // XXX DIRTY HACK!!!
@@ -66,7 +57,7 @@ auto Storyboard::run() -> void
   } else {
     throw common::AutowareError(
       "Autoware did not reach an engageable state within the specified time "
-      "(initialize_duration). It is likely that some nodes were corrupted during launch");
+      "(initialize_duration).");
   }
 }
 
@@ -75,28 +66,18 @@ auto Storyboard::start() -> void
   init.evaluate();  // NOTE RENAME TO 'start'?
 }
 
-auto Storyboard::stop() -> void
-{
-  for (auto && each : *this) {
-    each.as<Story>().override();
-    each.evaluate();
-  }
-}
-
-auto Storyboard::stopTriggered() -> bool { return stop_trigger.evaluate().as<Boolean>(); }
-
 auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::json &
 {
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(datum.state());
 
   json["Init"] << datum.init;
 
   json["Story"] = nlohmann::json::array();
 
-  for (const auto & each : datum) {
-    nlohmann::json story;
-    story << each.as<Story>();
-    json["Story"].push_back(story);
+  for (const auto & story : datum.elements) {
+    nlohmann::json each;
+    each << story.as<Story>();
+    json["Story"].push_back(each);
   }
 
   return json;

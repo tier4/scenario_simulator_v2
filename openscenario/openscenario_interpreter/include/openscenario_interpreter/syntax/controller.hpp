@@ -55,11 +55,7 @@ struct Controller : public Scope
 
   auto assign(const EntityRef &) -> void;
 
-  auto isUserDefinedController() & -> bool;
-
-  auto operator[](const String &) -> const Property &;
-
-  operator traffic_simulator_msgs::msg::DriverModel();
+  auto isUserDefinedController() const & -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

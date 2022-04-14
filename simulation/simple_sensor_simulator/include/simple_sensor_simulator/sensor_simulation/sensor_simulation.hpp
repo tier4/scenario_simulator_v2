@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
@@ -28,21 +29,48 @@ namespace simple_sensor_simulator
 class SensorSimulation
 {
 public:
-  void attachLidarSensor(
-    const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
-    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
-  void attachDetectionSensor(
-    const double current_time,
-    const simulation_api_schema::DetectionSensorConfiguration & configuration,
-    std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
-      publisher_ptr);
+  auto attachLidarSensor(
+    const double current_simulation_time,
+    const simulation_api_schema::LidarConfiguration & configuration, rclcpp::Node & node) -> void
+  {
+    if (configuration.architecture_type() == "awf/universe") {
+      lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
+        current_simulation_time, configuration,
+        node.create_publisher<sensor_msgs::msg::PointCloud2>(
+          "/perception/obstacle_segmentation/pointcloud", 1)));
+    } else {
+      std::stringstream ss;
+      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
+         << " given.";
+      throw std::runtime_error(ss.str());
+    }
+  }
+
+  auto attachDetectionSensor(
+    const double current_simulation_time,
+    const simulation_api_schema::DetectionSensorConfiguration & configuration, rclcpp::Node & node)
+    -> void
+  {
+    if (configuration.architecture_type() == "awf/universe") {
+      using Message = autoware_auto_perception_msgs::msg::DetectedObjects;
+      detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
+        current_simulation_time, configuration,
+        node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1)));
+    } else {
+      std::stringstream ss;
+      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
+         << " given.";
+      throw std::runtime_error(ss.str());
+    }
+  }
+
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,
     const std::vector<traffic_simulator_msgs::EntityStatus> & status);
 
 private:
-  std::vector<LidarSensor> lidar_sensors_;
-  std::vector<DetectionSensor> detection_sensors_;
+  std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
+  std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
 };
 }  // namespace simple_sensor_simulator
 

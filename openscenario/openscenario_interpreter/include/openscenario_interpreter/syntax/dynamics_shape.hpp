@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_SHAPE_HPP_
 
 #include <iostream>
+#include <traffic_simulator/data_type/data_types.hpp>
 
 namespace openscenario_interpreter
 {
@@ -85,6 +86,30 @@ struct DynamicsShape
   explicit DynamicsShape() = default;
 
   constexpr operator value_type() const noexcept { return value; }
+
+  explicit constexpr operator traffic_simulator::speed_change::Transition() const
+  {
+    switch (value) {
+      case linear:
+        return traffic_simulator::speed_change::Transition::LINEAR;
+      case step:
+        return traffic_simulator::speed_change::Transition::STEP;
+      default:
+        return {};
+    }
+  }
+
+  explicit constexpr operator traffic_simulator::lane_change::TrajectoryShape() const
+  {
+    switch (value) {
+      case linear:
+        return traffic_simulator::lane_change::TrajectoryShape::LINEAR;
+      case cubic:
+        return traffic_simulator::lane_change::TrajectoryShape::CUBIC;
+      default:
+        return {};
+    }
+  }
 };
 
 static_assert(std::is_standard_layout<DynamicsShape>::value, "");

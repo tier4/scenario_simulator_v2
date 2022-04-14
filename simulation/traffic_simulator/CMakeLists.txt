@@ -6,7 +6,7 @@ if(NOT CMAKE_C_STANDARD)
 endif()
 
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -23,10 +23,9 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
-  src/behavior/behavior_plugin_base.cpp
   src/behavior/route_planner.cpp
-  src/behavior/target_speed_planner.cpp
   src/color_utils/color_utils.cpp
+  src/data_type/data_types.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
   src/entity/entity_manager.cpp
@@ -35,6 +34,8 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/vehicle_entity.cpp
   src/hdmap_utils/hdmap_utils.cpp
   src/helper/helper.cpp
+  src/job/job.cpp
+  src/job/job_list.cpp
   src/math/bounding_box.cpp
   src/math/catmull_rom_spline.cpp
   src/math/collision.cpp
@@ -53,12 +54,16 @@ ament_auto_add_library(traffic_simulator SHARED
   src/metrics/standstill_metric.cpp
   src/metrics/traveled_distance_metric.cpp
   src/simulation_clock/simulation_clock.cpp
-  src/traffic_lights/traffic_light_manager.cpp
-  src/traffic_lights/traffic_light_state.cpp
-  src/traffic_lights/traffic_light.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
-  src/vehicle_model/sim_model_ideal.cpp
+  src/traffic_lights/traffic_light.cpp
+  src/traffic_lights/traffic_light_manager.cpp
+  src/vehicle_model/sim_model_delay_steer_acc.cpp
+  src/vehicle_model/sim_model_delay_steer_acc_geared.cpp
+  src/vehicle_model/sim_model_delay_steer_vel.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
+  src/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_model/sim_model_interface.cpp
   src/vehicle_model/sim_model_time_delay.cpp
   src/vehicle_model/sim_model_util.cpp

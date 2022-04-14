@@ -25,17 +25,5 @@ AbsoluteTargetSpeed::AbsoluteTargetSpeed(const pugi::xml_node & node, Scope & sc
 : value(readAttribute<Double>("value", node, scope))
 {
 }
-
-auto AbsoluteTargetSpeed::getIsEnd() const -> std::function<bool(const EntityRef &)>
-{
-  return [target_speed = value](const EntityRef & actor) {  // is_end
-    try {
-      const auto compare = Rule(Rule::equalTo);
-      return compare(getEntityStatus(actor).action_status.twist.linear.x, target_speed);
-    } catch (const SemanticError &) {
-      return false;  // NOTE: The actor is maybe lane-changing now
-    }
-  };
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

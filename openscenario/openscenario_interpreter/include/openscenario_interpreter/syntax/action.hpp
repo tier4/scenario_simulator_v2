@@ -38,38 +38,21 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Action : public Scope, public ComplexType, public StoryboardElement<Action>
+struct Action : public Scope, public ComplexType, public StoryboardElement
 {
   bool overridden = false;
 
   explicit Action(const pugi::xml_node &, Scope &);
 
-  using StoryboardElement::currentState;
-
-  /* -------------------------------------------------------------------------
-   *
-   *  An Action's goal is a function of the Action type and cannot be
-   *  generalized. Accomplishing an Action's goal will involve meeting some
-   *  arbitrary prerequisites related with the Action type (for example, a
-   *  SpeedAction accomplishes its goal when the considered Entity is
-   *  travelling at the prescribed speed). If an Action is acting on an
-   *  EntitySelection, all instances of Entity within the selection have to
-   *  complete in order to reach the completeState of the Action.
-   *
-   * ---------------------------------------------------------------------- */
-  using ComplexType::accomplished;
-
   using StoryboardElement::evaluate;
 
-  /*  */ auto ready() const -> bool;
+  auto accomplished() const -> bool override;
 
-  /*  */ auto run() -> void;
+  auto run() -> void override;
 
-  /*  */ auto start() -> void;
+  auto start() -> void override;
 
-  /*  */ auto stop() -> void;
-
-  static auto stopTriggered() noexcept -> bool;
+  auto stop() -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;

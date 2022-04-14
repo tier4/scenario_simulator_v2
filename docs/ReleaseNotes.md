@@ -1,6 +1,65 @@
 # Release Notes
 
 ## Difference between the latest release and master
+
+Major Changes :race_car: :red_car: :blue_car:
+
+| Feature                                       | Brief summary                                                                                                                                                            | Category                                                          | Pull request                                                    | Contributor                                   |
+|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| Entity label publisher                        | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`.                                                                                | `traffic_simulator`                                               | [#726](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
+| ROS2 Launch XML-like substitution syntax      | Add new substitution syntax `$(ros2 <argument>...)`.                                                                                                                     | `openscenario_interpreter`                                        | [#727](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
+| `Filter by range` option                      | Add `filter by range` option for detection sensor. If false, simulate detection result by lidar detection. If true, simulate detection result by range.                  | `traffic_simulator`                                               | [#729](https://github.com/tier4/scenario_simulator_v2/pull/729) | [hakuturu583](https://github.com/hakuturu583) |
+| Optimization of the trajectory calculation    | Hermite curve optimization, entities' trajectories calculated only when route changes                                                                                    | `traffic_simulator`, `behavior_tree_plugin`                       | [#708](https://github.com/tier4/scenario_simulator_v2/pull/708) | [danielm1405](https://github.com/danielm1405) |
+| OpenSCENARIO `Controller.Properties.Property` | Support new controller property `isClairvoyant`.                                                                                                                         | `openscenario_interpreter`                                        | [#735](https://github.com/tier4/scenario_simulator_v2/pull/735) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Lane matching improvement for EgoEntity       | Subscribe route information from Autoware (topic : `/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id`) and try matching to on route lanelet. | `traffic_simulator`                                               | [#733](https://github.com/tier4/scenario_simulator_v2/pull/733) | [hakuturu583](https://github.com/hakuturu583) |
+| ZMQ client can connect through the network    | Add `"simulator_host"` argument to define the address of the simulator host that ZMQ tries to connect to                                                                 | `simulation_interface`, `traffic_simulator`, `random_test_runner` | [#690](https://github.com/tier4/scenario_simulator_v2/pull/690) | [danielm1405](https://github.com/danielm1405) |
+| Traffic signals                               | Support for multiple simultaneous lights at traffic signals and addition of color information to arrow signals.                                                          | `openscenario_interpreter`, `traffic_simulator`                   | [#740](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
+
+Bug Fixes:bug:
+
+| Feature                                | Brief summary                                                                       | Category                   | Pull request                                                    | Contributor                                   |
+| -------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `Storyboard.Init.Actions` | Fix `Init.Actions.GlobalAction` and `Init.Actions.UserDefinedAction` to work.       | `openscenario_interpreter` | [#734](https://github.com/tier4/scenario_simulator_v2/pull/734) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Fix waypoint height                    | Height of the NPC waypoint was 0. Get waypoint height from center point of lanelet. | `traffic_simulator`        | [#718](https://github.com/tier4/scenario_simulator_v2/pull/718) | [hakuturu583](https://github.com/hakuturu583) |
+| Fix calculateStopDistance function     | While calculating stop distance, deceleration was always 5.                         | `behavior_tree_plugin`     | [#747](https://github.com/tier4/scenario_simulator_v2/pull/747) | [hakuturu583](https://github.com/hakuturu583) |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature                   | Brief summary                                                                     | Category                   | Pull request                                                    | Contributor                                   |
+|---------------------------|-----------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| OpenSCENARIO `Storyboard` | Update interpreter's main loop to not to stop even if `Storyboard` was completed. | `openscenario_interpreter` | [#720](https://github.com/tier4/scenario_simulator_v2/pull/720) | [yamacir-kit](https://github.com/yamacir-kit) |
+
+## Version 0.6.3
+- Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
+- Fix problem in warping NPCs spawned in world coordinate. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/686))
+- End of support for ROS2 Foxy and Autoware.Auto ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/696)).
+- Fix problem in ideal steer acc geard dynamics model. Vehicle was pulled back very slowly even if the vehicle is stopped. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/698))
+- Fix problem in getFrontEntityName function, consider yaw difference while stopping at crossing entity. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/703))
+- Fix problem in delay steer acc geard dynamics model. Vehicle was pulled back very slowly even if the vehicle is stopped. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/707))
+- Start considering offset in collision detection in crossing entity. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/709))
+- Fix waypoint height, the height of the each waypoint was zero. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/718))
+
+## Version 0.6.2
+- Start supporting linear trajectory shape while changing lane. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/661))
+- Fix context panel to display simulation time. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
+- Support new vehicle_model_type `DELAY_STEER_VEL` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/660)).
+- Add lateral velocity and time constraint. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/664)).
+- Update syntax `SpeedAction` to use `API::requestSpeedChange` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/665)).
+- Enable control multiple traffic lights by relation ID from lanelet2 map. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/667)).
+- Start supporting requestSpeedChange API in pedestrian. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/670)).
+- Update syntax `LaneChangeAction` to use `API::requestLaneChange` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/668)).
+- Fix logic in calculating lane change trajectory shape. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/671)).
+
+## Version 0.6.1
+- Add API::requestSpeedChange function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
+- Fix syntax `Controller` to not to overwrite `traffic_simulator`'s `DriverModel` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/649)).
+- Update simulation models ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/652)).
+- Enable request relative speed change. ([link](https://github.com/tier4/scenario_simulator_v2/pull/654))
+
+## Version 0.6.0
+- Start supporting Autoware.Universe. ([link](https://github.com/tier4/scenario_simulator_v2/pull/614))
+
+## Version 0.5.8
 - Remove newton methods in getSValue function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/612))
 - Set withLaneChange parameter as false. ([link](https://github.com/tier4/scenario_simulator_v2/pull/618))
 - Change traffic light topic name to "/perception/traffic_light_recognition/traffic_light_states" ([link](https://github.com/tier4/scenario_simulator_v2/pull/621))
@@ -8,6 +67,8 @@
 - Enable build with foxy latest version of behavior_tree_cpp_v3. ([link](https://github.com/tier4/scenario_simulator_v2/pull/625))
 - Add node to convert from DiagnosticArray to ParameterDeclaration type (Needed to integrate the planner evaluation metrics with the scenario runner). ([link](https://github.com/tier4/scenario_simulator_v2-docs/pull/598))
 - Add API::getDriverModel function. ([link](https://github.com/tier4/scenario_simulator_v2/pull/626))
+- Add Random test runner. [Link](https://github.com/tier4/scenario_simulator_v2-docs/pull/619) (Contribution by [Robotec.ai](https://robotec.ai/)).
+- Support new Autoware architecture `Universe` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/614)).
 
 ## Version 0.5.7
 - Fix problem in getNormalVector function. (Contribution by [Utaro-M](https://github.com/Utaro-M)).

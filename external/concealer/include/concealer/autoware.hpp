@@ -19,11 +19,11 @@
 
 #include <sys/wait.h>
 
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
-#include <concealer/conversion.hpp>
-#include <concealer/define_macro.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
@@ -61,6 +61,8 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 
   std::promise<void> promise;
 
+  std::future<void> future;
+
   std::thread spinner;
 
   rclcpp::TimerBase::SharedPtr updater;
@@ -80,7 +82,7 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
-  double current_upper_bound_speed = std::numeric_limits<double>::max();
+  auto currentFuture() -> auto & { return future; }
 
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
@@ -95,44 +97,42 @@ protected:
 public:
   CONCEALER_PUBLIC explicit Autoware()
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    spinner(
-      [this](auto future) {
-        while (rclcpp::ok() and
-               future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-          try {
-            rclcpp::spin_some(get_node_base_interface());
-          } catch (...) {
-            thrown = std::current_exception();
-          }
+    future(std::move(promise.get_future())),
+    spinner([this]() {
+      while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
+                                std::future_status::timeout) {
+        try {
+          rclcpp::spin_some(get_node_base_interface());
+        } catch (...) {
+          thrown = std::current_exception();
         }
-      },
-      std::move(promise.get_future()))
+      }
+    })
   {
   }
 
   template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    spinner(
-      [this](auto future) {
-        while (rclcpp::ok() and
-               future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-          try {
-            rclcpp::spin_some(get_node_base_interface());
-          } catch (...) {
-            thrown = std::current_exception();
-          }
+    future(std::move(promise.get_future())),
+    spinner([this]() {
+      while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
+                                std::future_status::timeout) {
+        try {
+          rclcpp::spin_some(get_node_base_interface());
+        } catch (...) {
+          thrown = std::current_exception();
         }
-        RCLCPP_INFO_STREAM(
-          get_logger(),
-          "\x1b[32mShutting down Autoware: (1/3) Stopped publishing/subscribing.\x1b[0m");
-      },
-      std::move(promise.get_future())),
+      }
+      RCLCPP_INFO_STREAM(
+        get_logger(),
+        "\x1b[32mShutting down Autoware: (1/3) Stopped publishing/subscribing.\x1b[0m");
+    }),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...))
   {
   }
 
-  virtual ~Autoware() = default;
+  ~Autoware() override = default;
 
   /* ---- NOTE -------------------------------------------------------------------
    *
@@ -165,14 +165,16 @@ public:
 
   virtual auto getAcceleration() const -> double = 0;
 
-  virtual auto getAutowareStateMessage() const -> std::string = 0;
+  virtual auto getAutowareStateString() const -> std::string = 0;
 
   // returns -1.0 when gear is reverse and 1.0 otherwise
   virtual auto getGearSign() const -> double = 0;
 
   virtual auto getSteeringAngle() const -> double = 0;
 
-  virtual auto getVehicleCommand() const -> autoware_vehicle_msgs::msg::VehicleCommand = 0;
+  virtual auto getVehicleCommand() const -> std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
   virtual auto getVelocity() const -> double = 0;
 
@@ -193,10 +195,8 @@ public:
 
   /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
 
-  /*   */ auto setUpperBoundSpeed(double) -> double;
+  virtual auto setVelocityLimit(double) -> void = 0;
 };
 }  // namespace concealer
-
-#include <concealer/undefine_macro.hpp>
 
 #endif  // CONCEALER__AUTOWARE_HPP_

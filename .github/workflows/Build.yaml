@@ -19,12 +19,12 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-20.04
-    timeout-minutes: 90
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       max-parallel: 8
       matrix:
-        rosdistro: [foxy, galactic]
+        rosdistro: [galactic]
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:

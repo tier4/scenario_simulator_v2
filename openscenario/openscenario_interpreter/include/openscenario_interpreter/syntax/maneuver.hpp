@@ -36,25 +36,11 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Maneuver : public Scope, public StoryboardElement<Maneuver>, public Elements
+struct Maneuver : public Scope, public StoryboardElement
 {
   const ParameterDeclarations parameter_declarations;
 
   explicit Maneuver(const pugi::xml_node &, Scope &);
-
-  using StoryboardElement::evaluate;
-
-  /*  */ auto accomplished() const -> bool;
-
-  static auto ready() noexcept -> bool;
-
-  /*  */ auto run() -> void;
-
-  static auto start() noexcept -> void;
-
-  /*  */ auto stop() -> void;
-
-  static auto stopTriggered() noexcept -> bool;
 };
 
 auto operator<<(nlohmann::json &, const Maneuver &) -> nlohmann::json &;

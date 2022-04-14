@@ -36,6 +36,8 @@ public:
     return result;
   }
 
+  ~MiscObjectEntity() override = default;
+
   std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override
   {
     return {};
@@ -56,9 +58,14 @@ public:
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
 
-  void setTargetSpeed(double, bool) override
+  void requestSpeedChange(double, bool) override
   {
-    THROW_SEMANTIC_ERROR("setTargetSpeed function cannot not use in MiscObjectEntity");
+    THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
+  }
+
+  void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool) override
+  {
+    THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
   }
 
   void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override
@@ -80,6 +87,17 @@ public:
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }
+
+  void requestSpeedChange(
+    const double, const speed_change::Transition, const speed_change::Constraint,
+    const bool) override
+  {
+    THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
+  }
+
+  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
+
+  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) override;
 
 private:
   const traffic_simulator_msgs::msg::MiscObjectParameters params_;

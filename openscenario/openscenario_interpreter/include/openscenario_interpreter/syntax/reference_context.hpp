@@ -46,7 +46,7 @@ struct ReferenceContext
     absolute,
   } value;
 
-  explicit ReferenceContext() = default;
+  ReferenceContext() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };

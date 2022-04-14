@@ -33,33 +33,19 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 
 auto Controller::assign(const EntityRef & entity_ref) -> void
 {
-  const auto max_speed = properties["maxSpeed"];
+  setVelocityLimit(
+    entity_ref, properties.get<Double>("maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
-  if (not max_speed.value.empty()) {
-    setUpperBoundSpeed(entity_ref, Double(max_speed.value));
-  }
-
-  applyAssignControllerAction(entity_ref, *this);
+  applyAssignControllerAction(entity_ref, [&]() {
+    auto message = getDriverModel(entity_ref);
+    message.see_around = not properties.get<Boolean>("isBlind");
+    return message;
+  }());
 }
 
-auto Controller::isUserDefinedController() & -> bool
+auto Controller::isUserDefinedController() const & -> bool
 {
-  return static_cast<bool>(properties["isEgo"]);
-}
-
-auto Controller::operator[](const String & name) -> const Property &  //
-{
-  return properties[name];
-}
-
-Controller::operator traffic_simulator_msgs::msg::DriverModel()
-{
-  traffic_simulator_msgs::msg::DriverModel controller;
-  {
-    controller.see_around = not properties["isBlind"];
-  }
-
-  return controller;
+  return properties.get<Boolean>("isEgo");
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

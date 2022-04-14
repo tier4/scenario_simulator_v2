@@ -79,7 +79,7 @@ TEST(HELPER, DETECTION_SENSOR_CONFIGURATION)
   const auto configuration =
     traffic_simulator::helper::constructDetectionSensorConfiguration("ego", "test", 3);
   simulation_api_schema::DetectionSensorConfiguration expect_configuration;
-  expect_configuration.set_topic_name("test");
+  expect_configuration.set_architecture_type("test");
   expect_configuration.set_entity("ego");
   expect_configuration.set_update_duration(3.0);
   EXPECT_DETECTION_SENSOR_CONFIGURATION_EQ(configuration, expect_configuration);

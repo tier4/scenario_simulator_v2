@@ -42,9 +42,9 @@ struct AssignRouteAction : private Scope
 
   static auto endsImmediately() noexcept -> bool;
 
-  /*  */ auto run() -> void;
+  static auto run() -> void;
 
-  static auto start() -> void;
+  /*  */ auto start() -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

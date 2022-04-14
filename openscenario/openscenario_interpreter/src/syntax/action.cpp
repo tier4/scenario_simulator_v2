@@ -32,7 +32,7 @@ Action::Action(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto Action::ready() const -> bool { return static_cast<bool>(*this); }
+auto Action::accomplished() const -> bool { return ComplexType::accomplished(); }
 
 auto Action::run() -> void
 {
@@ -53,13 +53,11 @@ auto Action::stop() -> void
   }
 }
 
-auto Action::stopTriggered() noexcept -> bool { return false; }
-
 auto operator<<(nlohmann::json & json, const Action & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;
 
-  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
+  json["currentState"] = boost::lexical_cast<std::string>(datum.state());
 
   json["type"] =
     apply<std::string>([](auto && action) { return makeTypename(action.type()); }, datum);

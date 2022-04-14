@@ -22,7 +22,6 @@
 #include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
-#include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
 #include <vector>
@@ -56,6 +55,8 @@ public:
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
     const std::string & = BuiltinBehavior::defaultBehavior());
 
+  ~PedestrianEntity() override = default;
+
   const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
@@ -85,18 +86,24 @@ public:
   }
 
   void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override
+    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr) override
   {
     EntityBase::setTrafficLightManager(ptr);
     behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
   }
 
-  void setTargetSpeed(double target_speed, bool continuous) override;
-
   const traffic_simulator_msgs::msg::BoundingBox getBoundingBox() const override
   {
     return parameters.bounding_box;
   }
+
+  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel;
+
+  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);
+
+  void setAccelerationLimit(double acceleration) override;
+
+  void setDecelerationLimit(double deceleration) override;
 
   void requestAssignRoute(
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) override;
@@ -137,7 +144,6 @@ public:
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
   std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
-  traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };
 }  // namespace entity

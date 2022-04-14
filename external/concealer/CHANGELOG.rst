@@ -2,6 +2,115 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.3 (2022-03-09)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
+  Feature/autoware external api
+* Remove macro `CONCEALER_CURRENT_VALUE_OF`
+* Remove header `undefine_macro.hpp`
+* Add `CONCEALER\_` prefix to `concealer`'s macros
+* Remove member function `AutowareUniverse::checkAutowareState`
+* Rename member function `setUpperBoundSpeed` to `setVelocityLimit`
+* Remove `HazardLightsReport` and `HazardLightsCommand` from dependency
+* Remove member function `AutowareUniverse::setLaneChangeApproval`
+* Remove member function `getVehicleStatus`
+* Fix macro `CONCEALER_DEFINE_CLIENT` to check status code of response
+* Add new macro `CONCEALER_INIT_CLIENT`
+* Add new macro `CONCEALER_DEFINE_CLIENT`
+* Add missing package dependency
+* Replace engagement API with new ROS2 service version
+* Remove macro `DEFINE_SUBSCRIPTION_WITH_OVERRIDE`
+* Remove `tier4_system_msgs` from dependency
+* Replace `AwapiAutowareStatus` with `autoware_auto_system_msgs::msg::AutowareState`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Remove class `AutowareAuto`
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Remove package `autoware_control_msgs` from dependency
+* Remove package `autoware_vehicle_msgs` from dependency
+* Replace `VehicleCommand` with `AckermannControlCommand` and `GearCommand`
+* Remove package `autoware_perception_msgs`
+* Replace `autoware_debug_msgs` with `tier4_debug_msgs`
+* Remove some unused dependencies
+* Remove class `AutowareArchitectureProposal`
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
+0.6.2 (2022-01-20)
+------------------
+* Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_relative_speed_change
+* Merge branch 'master' into matsuura/feature/add-time-to-panel
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/vehicle_model
+* Merge pull request `#659 <https://github.com/tier4/scenario_simulator_v2/issues/659>`_ from tier4/release-0.6.1
+* merge fix/galactic_build
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into matsuura/feature/add-time-to-panel
+* pull master
+* merge master
+* Merge tier4:master
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
+0.6.1 (2022-01-11)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/get_driver_model_in_pedestrian
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/request_speed_change
+* Merge pull request `#647 <https://github.com/tier4/scenario_simulator_v2/issues/647>`_ from tier4/tier4/universe
+* Lipsticks
+* Update `AutowareUniverse` to use message types `tier4\_*_msgs`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/avoid_overwrite_acceleration
+* Merge branch 'master' into feature/interpreter/expr
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_acceleration_deceleration
+* Merge remote-tracking branch 'origin/master' into feature/avoid_overwrite_acceleration
+* Contributors: Masaya Kataoka, MasayaKataoka, kyabe2718, yamacir-kit
+
+0.6.0 (2021-12-16)
+------------------
+* Merge pull request `#614 <https://github.com/tier4/scenario_simulator_v2/issues/614>`_ from tier4/use-autoware-auto-msgs
+* Fix `waitForAutowareStateToBe*` to receive std::chrono::seconds
+* Fix `TransitionAssertion` to stop if class `Autoware` down
+* Fix `waitForAutowareStateToBe*` to call thunk at least one time.
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pass_goal_poses_to_the_plugin
+* Update CMakeLists to not to reference undefined variable
+* Update packages to compile with `awf/autoware_auto_msgs` if flag given
+* Add macro to switching Autoware.Auto or Autoware.Unvierse (DIRTY HACK)
+* Remove `autoware_auto_msgs` from dependency
+* Simplify `autoware_universe.hpp`
+* Restore virtual function `Autoware::getVehicleCommand` for backward compatibility
+* Merge pull request `#617 <https://github.com/tier4/scenario_simulator_v2/issues/617>`_ from tier4/autoware-universe-concealer
+* Lipsticks
+* detected object -> predicted object, and apply ament_clang_format
+* Remove member function `getVehicleCommand` from Vehicle type entity
+* fix concealer to execute without segmentation fault
+* remove autoware_auto_msgs dependency
+* check TODO(murooka), and remove them
+* add covariance to odometry
+* enable CurrentSteering publisher
+* use autoware_auto_perception/planning_msgs
+* remove unnecessary codes
+* add some comments
+* some changes to run psim with autoware_universe
+* impelement autoware_universe
+* set autoware_universe as aap
+* add autoware_universe
+* fix dependency
+* Update some packages to use `tier4/autoware_auto_msgs`
+* Contributors: MasayaKataoka, Takayuki Murooka, Tatsuya Yamasaki, yamacir-kit
+
+0.5.8 (2021-12-13)
+------------------
+* Merge remote-tracking branch 'tier/master' into feature/AJD-288-AAP_with_scenario_simulator_instruction
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_newton_method_from_get_s_value
+* Merge pull request `#611 <https://github.com/tier4/scenario_simulator_v2/issues/611>`_ from tier4/fix/documentation
+* Fix typo
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/reference
+* Contributors: MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.5.7 (2021-11-09)
 ------------------
 * Merge branch 'master' into feature/interpreter/catalog

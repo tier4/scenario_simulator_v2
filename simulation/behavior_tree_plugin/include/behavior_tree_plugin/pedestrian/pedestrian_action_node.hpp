@@ -32,6 +32,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
+      BT::InputPort<traffic_simulator_msgs::msg::DriverModel>("driver_model"),
       BT::InputPort<traffic_simulator_msgs::msg::PedestrianParameters>("pedestrian_parameters")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
@@ -43,6 +44,9 @@ public:
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
+
+protected:
+  traffic_simulator_msgs::msg::DriverModel driver_model;
 };
 }  // namespace entity_behavior
 

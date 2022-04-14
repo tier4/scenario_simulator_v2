@@ -37,27 +37,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Act : public Scope, public StoryboardElement<Act>, public Elements
+struct Act : public Scope, public StoryboardElement
 {
-  Trigger start_trigger;
-
-  Object stop_trigger;
-
   explicit Act(const pugi::xml_node &, Scope &);
-
-  using StoryboardElement::evaluate;
-
-  /*  */ auto accomplished() const -> bool;
-
-  static auto start() noexcept -> void;
-
-  /*  */ auto stop() -> void;
-
-  /*  */ auto stopTriggered() const -> bool;
-
-  /*  */ auto ready() -> bool;
-
-  /*  */ auto run() -> void;
 };
 
 auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;

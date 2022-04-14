@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_DIMENSION_HPP_
 
 #include <iostream>
+#include <traffic_simulator/data_type/data_types.hpp>
 
 namespace openscenario_interpreter
 {
@@ -55,6 +56,30 @@ struct DynamicsDimension
   explicit DynamicsDimension() = default;
 
   constexpr operator value_type() const noexcept { return value; }
+
+  explicit constexpr operator traffic_simulator::speed_change::Constraint::Type() const
+  {
+    switch (value) {
+      case rate:
+        return traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION;
+      default:
+        return {};
+    }
+  }
+
+  explicit constexpr operator traffic_simulator::lane_change::Constraint::Type() const
+  {
+    switch (value) {
+      case rate:
+        return traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY;
+      case time:
+        return traffic_simulator::lane_change::Constraint::Type::TIME;
+      case distance:
+        return traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE;
+      default:
+        return {};
+    }
+  }
 };
 
 auto operator>>(std::istream &, DynamicsDimension &) -> std::istream &;

@@ -102,7 +102,8 @@ auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) ->
   auto catalog_locations = scope.global().catalog_locations;
 
   if (catalog_locations) {
-    for (auto & [type, catalog_location] : *catalog_locations) {
+    for (auto & p : *catalog_locations) {
+      auto & catalog_location = p.second;
       auto found_catalog = catalog_location.find(catalog_name);
 
       if (found_catalog != std::end(catalog_location)) {

@@ -20,7 +20,7 @@ namespace entity
 {
 MiscObjectEntity::MiscObjectEntity(
   const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params)
-: EntityBase(params.misc_object_category, name), params_(params)
+: EntityBase(name, params.subtype), params_(params)
 {
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
 }
@@ -48,6 +48,16 @@ auto MiscObjectEntity::getCurrentAction() const -> const std::string
     return status_->action_status.current_action;
   }
   return "";
+}
+
+auto MiscObjectEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
+{
+  THROW_SEMANTIC_ERROR("getDriverModel function does not support in MiscObjectEntity.");
+}
+
+void MiscObjectEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &)
+{
+  THROW_SEMANTIC_ERROR("setDriverModel function does not support in MiscObjectEntity.");
 }
 }  // namespace entity
 }  // namespace traffic_simulator

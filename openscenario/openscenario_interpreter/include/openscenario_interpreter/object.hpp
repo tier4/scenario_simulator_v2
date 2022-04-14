@@ -15,15 +15,42 @@
 #ifndef OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 
+#include <boost/mpl/and.hpp>
 #include <list>
 #include <openscenario_interpreter/expression.hpp>
 #include <type_traits>
 #include <typeindex>
 #include <utility>
 
+#define REQUIRES(...) typename = typename std::enable_if<boost::mpl::and_<__VA_ARGS__>::value>::type
+
 namespace openscenario_interpreter
 {
 using Object = Pointer<Expression>;
+
+template <typename T>
+struct is
+{
+  auto operator()(const Object & object) const { return object.is<T>(); }
+};
+
+template <>
+struct is<Object>
+{
+  auto operator()(const Object &) const noexcept { return true; }
+};
+
+template <typename T>
+struct is_also
+{
+  auto operator()(const Object & object) const { return object.is_also<T>(); }
+};
+
+template <>
+struct is_also<Object>
+{
+  auto operator()(const Object &) const noexcept { return true; }
+};
 
 using ComplexType = Object;
 

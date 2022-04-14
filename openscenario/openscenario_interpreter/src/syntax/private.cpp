@@ -26,7 +26,7 @@ Private::Private(const pugi::xml_node & node, Scope & scope)
 {
   actors.emplace_back(entity_ref);
 
-  callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
+  traverse<1, unbounded>(node, "PrivateAction", [&](auto && node) {
     return private_actions.emplace_back(node, local());
   });
 }
@@ -40,21 +40,11 @@ auto Private::endsImmediately() const -> bool
 
 auto Private::evaluate() -> Object
 {
+  assert(endsImmediately());  // NOTE: Called from `InitActions::evaluate`
   for (auto && private_action : private_actions) {
-    // NOTE: standbyState -> startTransition (if ready)
-    // private_action.ready();
-
-    // NOTE: startTransition -> runningState (unconditionally)
     private_action.start();
-
-    // NOTE: runningState -> endTransition (if accomplished)
-    do {
-      private_action.run();
-    } while (not private_action.accomplished());
-
-    // NOTE: endTransition -> completeState (Init.Actions only once executed)
+    private_action.run();
   }
-
   return unspecified;
 }
 

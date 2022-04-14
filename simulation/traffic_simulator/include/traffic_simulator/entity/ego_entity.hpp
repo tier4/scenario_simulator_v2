@@ -18,16 +18,14 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <concealer/autoware_architecture_proposal.hpp>
-#include <concealer/autoware_auto.hpp>
+#include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
+#include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
-#include <unordered_map>
 #include <vector>
 
 template <typename T>
@@ -46,15 +44,12 @@ namespace traffic_simulator
 namespace entity
 {
 enum class VehicleModelType {
-  IDEAL_TWIST = 0,
-  IDEAL_STEER = 1,
-  DELAY_TWIST = 2,
-  DELAY_STEER = 3,
-  CONST_ACCEL_TWIST = 4,
-  IDEAL_FORKLIFT_RLS = 5,
-  DELAY_FORKLIFT_RLS = 6,
-  IDEAL_ACCEL = 7,
-  DELAY_STEER_ACC = 8,
+  DELAY_STEER_ACC,
+  DELAY_STEER_ACC_GEARED,
+  DELAY_STEER_VEL,
+  IDEAL_STEER_ACC,
+  IDEAL_STEER_ACC_GEARED,
+  IDEAL_STEER_VEL,
 };
 
 class EgoEntity : public VehicleEntity
@@ -92,6 +87,8 @@ public:
 
   auto getCurrentAction() const -> const std::string override;
 
+  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
+
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
 
@@ -99,7 +96,11 @@ public:
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand override;
+  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+
+  auto getVehicleCommand() const -> std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
@@ -117,13 +118,26 @@ public:
 
   void requestLaneChange(const std::int64_t) override;
 
+  auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
+
+  auto requestSpeedChange(
+    const double, const speed_change::Transition, const speed_change::Constraint, const bool)
+    -> void override;
+
+  auto requestSpeedChange(
+    const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
+    const speed_change::Constraint, const bool) -> void override;
+
   auto setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void override;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool override;
 
-  void setTargetSpeed(double, bool) override;
+  void requestSpeedChange(double, bool) override;
 
-  auto setUpperBoundSpeed(double) -> void override;
+  void requestSpeedChange(
+    const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
+
+  auto setVelocityLimit(double) -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
 #include <openscenario_interpreter/syntax/lane_change_target.hpp>
+#include <openscenario_interpreter/syntax/relative_target_lane.hpp>
 
 namespace openscenario_interpreter
 {
@@ -24,7 +25,7 @@ LaneChangeTarget::LaneChangeTarget(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
     choice(node,
-      std::make_pair("RelativeTargetLane", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair("RelativeTargetLane", [&](auto && node) { return make<RelativeTargetLane>(node, scope); }),
       std::make_pair("AbsoluteTargetLane", [&](auto && node) { return make<AbsoluteTargetLane>(node, scope); })))
 // clang-format on
 {

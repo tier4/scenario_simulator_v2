@@ -32,10 +32,7 @@ auto ParameterSetAction::accomplished() noexcept -> bool  //
   return true;
 }
 
-auto ParameterSetAction::run() const -> void  //
-{
-  set(local(), parameter_ref, value);
-}
+auto ParameterSetAction::run() noexcept -> void {}
 
 auto ParameterSetAction::set(
   const Scope & scope, const String & parameter_ref, const String & value) -> void
@@ -53,11 +50,14 @@ auto ParameterSetAction::set(
       // clang-format on
     };
 
-  const auto parameter = scope.findObject(parameter_ref);
+  const auto parameter = scope.ref(parameter_ref);
 
   overloads.at(parameter.type())(parameter, value);
 }
 
-auto ParameterSetAction::start() noexcept -> void {}
+auto ParameterSetAction::start() const -> void  //
+{
+  set(local(), parameter_ref, value);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

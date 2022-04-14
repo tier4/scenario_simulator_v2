@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
+#include <openscenario_interpreter/syntax/relative_target_lane.hpp>
 
 namespace openscenario_interpreter
 {
@@ -33,18 +34,12 @@ LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
 
 auto LaneChangeAction::accomplished() -> bool
 {
-  if (lane_change_target.is<AbsoluteTargetLane>()) {
-    for (auto && each : accomplishments) {
-      if (not std::get<1>(each)) {
-        std::get<1>(each) = isInLanelet(
-          std::get<0>(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value), 0.1);
-      }
-    }
-    return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
-  } else {
-    // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(lane_change_target.type().name());
-  }
+  return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](auto && each) {
+    const auto is_lane_changing = [](auto &&... xs) {
+      return getCurrentAction(std::forward<decltype(xs)>(xs)...) == "lane_change";
+    };
+    return each.second or (each.second = not is_lane_changing(each.first));
+  });
 }
 
 auto LaneChangeAction::endsImmediately() noexcept -> bool { return false; }
@@ -55,15 +50,42 @@ auto LaneChangeAction::start() -> void
 {
   accomplishments.clear();
 
-  if (lane_change_target.is<AbsoluteTargetLane>()) {
-    for (const auto & actor : actors) {
-      accomplishments.emplace(actor, false);
-      applyLaneChangeAction(actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
-    }
-  } else {
-    // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(lane_change_target.type().name());
+  for (const auto & actor : actors) {
+    accomplishments.emplace(actor, false);
   }
+
+  for (const auto & accomplishment : accomplishments) {
+    if (lane_change_target.is<AbsoluteTargetLane>()) {
+      return requestLaneChange(
+        accomplishment.first, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
+        static_cast<traffic_simulator::lane_change::TrajectoryShape>(
+          lane_change_action_dynamics.dynamics_shape),
+        static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
+    } else {
+      return requestLaneChange(
+        accomplishment.first, static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
+        static_cast<traffic_simulator::lane_change::TrajectoryShape>(
+          lane_change_action_dynamics.dynamics_shape),
+        static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
+    }
+  }
+}
+
+LaneChangeAction::operator traffic_simulator::lane_change::AbsoluteTarget() const
+{
+  return traffic_simulator::lane_change::AbsoluteTarget(
+    boost::lexical_cast<std::int64_t>(lane_change_target.as<AbsoluteTargetLane>().value),
+    target_lane_offset);
+}
+
+LaneChangeAction::operator traffic_simulator::lane_change::RelativeTarget() const
+{
+  return traffic_simulator::lane_change::RelativeTarget(
+    lane_change_target.template as<RelativeTargetLane>().entity_ref,
+    static_cast<traffic_simulator::lane_change::Direction>(
+      lane_change_target.as<RelativeTargetLane>()),
+    std::abs(lane_change_target.as<RelativeTargetLane>().value),  //
+    target_lane_offset);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rosdistro: [foxy, galactic]
+        rosdistro: [galactic]
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:

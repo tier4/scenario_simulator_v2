@@ -21,18 +21,16 @@ inline namespace syntax
 {
 Properties::Properties(const pugi::xml_node & node, Scope & scope)
 {
-  callWithElements(node, "Property", 0, unbounded, [&](auto && node) {
+  traverse<0, unbounded>(node, "Property", [&](auto && node) {
     return properties.emplace(
       std::piecewise_construct,  //
       std::forward_as_tuple(readAttribute<String>("name", node, scope)),
       std::forward_as_tuple(node, scope));
   });
 
-  callWithElements(node, "File", 0, unbounded, [&](auto && node) {
+  traverse<0, unbounded>(node, "File", [&](auto && node) {
     return files.emplace_back(std::forward<decltype(node)>(node), scope);
   });
 }
-
-auto Properties::operator[](const String & name) -> const Property & { return properties[name]; }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

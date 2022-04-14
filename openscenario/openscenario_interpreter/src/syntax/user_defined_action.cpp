@@ -21,12 +21,20 @@ inline namespace syntax
 {
 UserDefinedAction::UserDefinedAction(const pugi::xml_node & node, Scope & scope)
 {
-  callWithElements(node, "CustomCommandAction", 1, 1, [&](auto && node) {
+  traverse<1, 1>(node, "CustomCommandAction", [&](auto && node) {
     return rebind<CustomCommandAction>(node, scope);
   });
 }
 
 auto UserDefinedAction::endsImmediately() -> bool { return true; }
+
+auto UserDefinedAction::evaluate() -> Object
+{
+  assert(endsImmediately());  // NOTE: Called from `InitActions::evaluate`
+  apply<void>([](auto && action) { return action.start(); }, *this);
+  apply<void>([](auto && action) { return action.run(); }, *this);
+  return unspecified;
+}
 
 auto UserDefinedAction::run() -> void
 {

@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PEDESTRIAN_CATEGORY_HPP_
 
 #include <iostream>
+#include <traffic_simulator_msgs/msg/entity_subtype.hpp>
 
 namespace openscenario_interpreter
 {
@@ -27,9 +28,9 @@ inline namespace syntax
  *    <xsd:union>
  *      <xsd:simpleType>
  *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="animal"/>
  *          <xsd:enumeration value="pedestrian"/>
  *          <xsd:enumeration value="wheelchair"/>
- *          <xsd:enumeration value="animal"/>
  *        </xsd:restriction>
  *      </xsd:simpleType>
  *      <xsd:simpleType>
@@ -42,14 +43,33 @@ inline namespace syntax
 struct PedestrianCategory
 {
   enum value_type {
-    pedestrian,
-    wheelchair,
+    pedestrian,  // NOTE: This is the default value and should not be included in the sort.
+
+    // NOTE: Sorted by lexicographic order.
     animal,
+    wheelchair,
   } value;
 
   explicit constexpr PedestrianCategory(value_type value = pedestrian) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
+
+  explicit operator traffic_simulator_msgs::msg::EntitySubtype() const
+  {
+    traffic_simulator_msgs::msg::EntitySubtype result;
+    {
+      switch (value) {
+        case pedestrian:
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
+          break;
+        default:  // animal, wheelchair
+          result.value = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
+          break;
+      }
+    }
+
+    return result;
+  }
 };
 
 auto operator>>(std::istream &, PedestrianCategory &) -> std::istream &;

@@ -40,29 +40,15 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Event : private Scope, public StoryboardElement<Event>
+struct Event : private Scope, public StoryboardElement
 {
   using Scope::name;
 
   const Priority priority;  // Priority of each event.
 
-  Elements actions;
-
-  Trigger start_trigger;
-
   explicit Event(const pugi::xml_node &, Scope &);
 
-  /*  */ auto accomplished() const -> bool;
-
-  /*  */ auto ready() -> bool;
-
-  /*  */ auto run() -> void;
-
-  /*  */ auto start() -> void;
-
-  /*  */ auto stop() -> void;
-
-  static auto stopTriggered() noexcept -> bool;
+  auto start() -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;

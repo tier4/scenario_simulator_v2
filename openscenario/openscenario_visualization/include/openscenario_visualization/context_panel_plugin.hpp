@@ -66,6 +66,7 @@ private:
   void contextCallback(const openscenario_interpreter_msgs::msg::Context::SharedPtr msg);
   void spin();
   std::string context_;
+  double simulation_time_;
   std::vector<std::string> item_vec_;
   std::vector<std::vector<std::string>> condition_group_vec_;
   bool runnning_ = true;

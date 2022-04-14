@@ -147,26 +147,19 @@ class ScenarioTestRunner(LifecycleController):
     def spin(self):
         """Run scenario."""
         time.sleep(self.SLEEP_RATE)
-        self.activate_node()
-        start = time.time()
 
-        while (
-            (time.time() - start) < self.global_timeout
-            if self.global_timeout is not None
-            else True
-        ):
-
-            if self.get_lifecycle_state() == "inactive":
-                self.get_logger().info(
-                    "Simulator normally transitioned to the inactive state."
-                )
-                return
-            else:
-                time.sleep(self.SLEEP_RATE)
-
-        self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
-
-        self.deactivate_node()
+        while self.activate_node():
+            start = time.time()
+            while True:
+                if self.get_lifecycle_state() == "inactive":
+                    break
+                elif ((time.time() - start) > self.global_timeout
+                        if self.global_timeout is not None else False):
+                    self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
+                    self.deactivate_node()
+                    break
+                else:
+                    time.sleep(self.SLEEP_RATE)
 
     def run_scenario(self, scenario: Scenario):
         converted_scenarios = convert_scenarios([scenario], self.output_directory)
@@ -192,36 +185,43 @@ class ScenarioTestRunner(LifecycleController):
         None
 
         """
-        length = len(scenarios)
+        try:
+            length = len(scenarios)
 
-        for index, each in enumerate(scenarios):
+            for index, each in enumerate(scenarios):
 
-            self.get_logger().info(
-                "Run "
-                + str(each.path.name)
-                + " ("
-                + str(index + 1)
-                + " of "
-                + str(length)
-                + ")"
-            )
+                self.get_logger().info(
+                    "Run "
+                    + str(each.path.name)
+                    + " ("
+                    + str(index + 1)
+                    + " of "
+                    + str(length)
+                    + ")"
+                )
 
-            self.configure_node(
-                expect=each.expect,
-                frame_rate=each.frame_rate,
-                output_directory=self.output_directory,
-                real_time_factor=self.global_real_time_factor,
-                scenario=each.path,
-            )
+                self.configure_node(
+                    expect=each.expect,
+                    frame_rate=each.frame_rate,
+                    output_directory=self.output_directory,
+                    real_time_factor=self.global_real_time_factor,
+                    scenario=each.path,
+                )
 
-            if self.get_lifecycle_state() == "unconfigured":
-                self.get_logger().error("Failed to configure interpreter")
+                if self.get_lifecycle_state() == "unconfigured":
+                    self.get_logger().error("Failed to configure interpreter")
 
-            else:
-                self.spin()
+                else:
+                    self.spin()
+
                 self.cleanup_node()
 
-        self.shutdown()
+            self.shutdown()
+
+        except KeyboardInterrupt:
+            self.get_logger().warn("KeyboardInterrupt")
+        except OSError as e:
+            self.get_logger().warn("OSError: {}".format(e))
 
     # def __del__(self):
     #     pass

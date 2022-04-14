@@ -40,11 +40,11 @@ struct AcquirePositionAction : private Scope
 
   static constexpr auto accomplished() -> bool { return true; }
 
-  static constexpr auto endsImmediately() -> bool { return true; };
+  static constexpr auto endsImmediately() -> bool { return true; }
 
-  auto run() -> void;
+  static constexpr auto run() noexcept -> void {}
 
-  static constexpr auto start() noexcept -> void {}
+  auto start() -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

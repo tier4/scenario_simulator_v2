@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__POINTER_HPP_
 #define OPENSCENARIO_INTERPRETER__POINTER_HPP_
 
+#include <cstddef>
 #include <memory>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_accomplished.hpp>
-#include <openscenario_interpreter/type_traits/if_has_member_function_current_state.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_description.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_evaluate.hpp>
 #include <openscenario_interpreter/type_traits/if_has_stream_output_operator.hpp>
@@ -60,11 +60,6 @@ class Pointer : public std::shared_ptr<T>
       return IfHasMemberFunctionEvaluate<Bound>::invoke(static_cast<Bound &>(*this), else_);
     }
 
-    auto currentState() const -> const Pointer & override
-    {
-      return IfHasMemberFunctionCurrentState<Bound>::template invoke<Pointer>(*this);
-    }
-
     auto write(std::ostream & os) const -> std::ostream & override
     {
       return IfHasStreamOutputOperator<Bound>::invoke(os, *this);
@@ -72,10 +67,7 @@ class Pointer : public std::shared_ptr<T>
   };
 
 public:
-  template <typename... Ts>
-  explicit constexpr Pointer(Ts &&... xs) : std::shared_ptr<T>{std::forward<decltype(xs)>(xs)...}
-  {
-  }
+  using std::shared_ptr<T>::shared_ptr;
 
   template <typename U, typename... Ts>
   static Pointer bind(Ts &&... xs)
@@ -100,7 +92,7 @@ public:
     }
   }
 
-  decltype(auto) type() const { return binding().type(); }
+  auto type() const -> const std::type_info & { return *this ? binding().type() : typeid(nullptr); }
 
   template <typename U>
   auto is() const -> bool
@@ -134,12 +126,6 @@ public:
   decltype(auto) accomplished(Ts &&... xs) const
   {
     return binding().accomplished(std::forward<decltype(xs)>(xs)...);
-  }
-
-  template <typename... Ts>
-  decltype(auto) currentState(Ts &&... xs) const
-  {
-    return binding().currentState(std::forward<decltype(xs)>(xs)...);
   }
 
   template <typename... Ts>

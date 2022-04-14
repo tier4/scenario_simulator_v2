@@ -54,6 +54,7 @@ void ContextPanel::onDisable()
 void ContextPanel::contextCallback(const openscenario_interpreter_msgs::msg::Context::SharedPtr msg)
 {
   context_ = msg->data;
+  simulation_time_ = msg->time;
   json j_ = json::parse(context_);
   condition_group_vec_.clear();
   item_vec_.clear();
@@ -172,6 +173,7 @@ void ContextPanel::update_display()
       }
       ui_->success_condition_status->setTextColor(QColor("blue"));
     }
+    ui_->simulation_time_data->setText(QString::number(simulation_time_));
   }
 }
 

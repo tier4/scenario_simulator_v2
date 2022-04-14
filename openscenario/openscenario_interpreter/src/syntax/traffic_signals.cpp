@@ -23,12 +23,12 @@ inline namespace syntax
 {
 TrafficSignals::TrafficSignals(const pugi::xml_node & node, Scope & scope)
 {
-  for (auto & element :
-       readElementsAsElement<TrafficSignalController, 0>("TrafficSignalController", node, scope)) {
-    const auto controller = std::dynamic_pointer_cast<TrafficSignalController>(element);
-    scope.insert(controller->name, element);
-    traffic_signal_controllers.push_back(std::move(controller));
-  }
+  traverse<0, unbounded>(node, "TrafficSignalController", [&](auto && each) {
+    const auto element = make<TrafficSignalController>(each, scope);
+    scope.insert(element.template as<TrafficSignalController>().name, element);
+    traffic_signal_controllers.push_back(
+      std::dynamic_pointer_cast<TrafficSignalController>(element));
+  });
 
   resolve_reference(scope);
 }
@@ -47,13 +47,14 @@ auto TrafficSignals::resolve_reference(Scope & scope) -> void
   for (auto & each : traffic_signal_controllers) {
     if (not each->reference.empty()) {
       try {
-        auto & reference = scope.findObject(each->reference).as<TrafficSignalController>();
+        auto & reference = scope.ref<TrafficSignalController>(each->reference);
         if (each->cycleTime() != reference.cycleTime()) {
           THROW_SEMANTIC_ERROR(
             "The cycle time of ", each->name, "(", each->cycleTime(), " sec) and ", each->reference,
             "(", reference.cycleTime(), " sec) is different");
+        } else {
+          reference.observers.push_back(each);
         }
-        reference.observers.push_back(each);
       } catch (const std::out_of_range &) {
         THROW_SYNTAX_ERROR(each->reference, " is not declared in the TrafficSignals.");
       }

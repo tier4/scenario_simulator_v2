@@ -27,7 +27,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       matrix:
-        rosdistro: [foxy, galactic]
+        rosdistro: [galactic]
     steps:
       - uses: actions/checkout@v2-beta
       - name: Build and Push Docker Image

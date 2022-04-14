@@ -14,8 +14,6 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/arrow.hpp>
-#include <openscenario_interpreter/syntax/color.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 
 namespace openscenario_interpreter
@@ -30,26 +28,12 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 
 auto TrafficSignalState::evaluate() const -> Object
 {
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  `state: none` is valid for both Arrow / Color. That is, `state: none`
-   *  changes both the arrow signal and the color signal to unlit at once.
-   *
-   * ------------------------------------------------------------------------ */
+  for (traffic_simulator::TrafficLight & traffic_light : getTrafficRelationReferees(id())) {
+    traffic_light.clear();
+    traffic_light.set(state);
+  };
 
-  const auto color = boost::lexical_cast<boost::optional<Color>>(state);
-  if (color.has_value()) {
-    setTrafficSignalColor(id(), color.value());
-    return unspecified;
-  }
-
-  const auto arrow = boost::lexical_cast<boost::optional<Arrow>>(state);
-  if (arrow.has_value()) {
-    setTrafficSignalArrow(id(), arrow.value());
-    return unspecified;
-  }
-
-  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
+  return unspecified;
 }
 
 auto TrafficSignalState::id() const -> LaneletId

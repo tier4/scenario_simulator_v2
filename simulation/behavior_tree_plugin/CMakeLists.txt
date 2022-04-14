@@ -5,16 +5,13 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-if($ENV{ROS_DISTRO} STREQUAL "foxy")
-  add_definitions(-DFOXY)
-endif()
-
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(traffic_simulator REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(pluginlib REQUIRED)
+find_package(quaternion_operation REQUIRED)
 
 add_library(behavior_tree_plugin SHARED
   src/action_node.cpp
@@ -48,6 +45,7 @@ ament_target_dependencies(behavior_tree_plugin
   traffic_simulator
   behaviortree_cpp_v3
   pluginlib
+  quaternion_operation
 )
 
 pluginlib_export_plugin_description_file(traffic_simulator plugins.xml)
@@ -68,6 +66,7 @@ ament_export_dependencies(behavior_tree_plugin
   traffic_simulator
   behaviortree_cpp_v3
   pluginlib
+  quaternion_operation
 )
 
 install(

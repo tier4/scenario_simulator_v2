@@ -27,7 +27,7 @@ namespace entity
 PedestrianEntity::PedestrianEntity(
   const std::string & name, const traffic_simulator_msgs::msg::PedestrianParameters & params,
   const std::string & plugin_name)
-: EntityBase(params.pedestrian_category, name),
+: EntityBase(name, params.subtype),
   parameters(params),
   plugin_name(plugin_name),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
@@ -38,6 +38,7 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
+  behavior_plugin_ptr_->setDriverModel(traffic_simulator_msgs::msg::DriverModel());
 }
 
 void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
@@ -49,7 +50,7 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
 void PedestrianEntity::requestAssignRoute(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
-  behavior_plugin_ptr_->setRequest("follow_lane");
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (!status_) {
     return;
   }
@@ -73,12 +74,15 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   requestAssignRoute(route);
 }
 
-void PedestrianEntity::requestWalkStraight() { behavior_plugin_ptr_->setRequest("walk_straight"); }
+void PedestrianEntity::requestWalkStraight()
+{
+  behavior_plugin_ptr_->setRequest(behavior::Request::WALK_STRAIGHT);
+}
 
 void PedestrianEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
-  behavior_plugin_ptr_->setRequest("follow_lane");
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (!status_) {
     return;
   }
@@ -100,13 +104,38 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 
 void PedestrianEntity::cancelRequest()
 {
-  behavior_plugin_ptr_->setRequest("none");
+  behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
   route_planner_ptr_->cancelGoal();
 }
 
-void PedestrianEntity::setTargetSpeed(double target_speed, bool continuous)
+auto PedestrianEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
 {
-  target_speed_planner_.setTargetSpeed(target_speed, continuous);
+  return behavior_plugin_ptr_->getDriverModel();
+}
+
+void PedestrianEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel & driver_model)
+{
+  behavior_plugin_ptr_->setDriverModel(driver_model);
+}
+
+void PedestrianEntity::setAccelerationLimit(double acceleration)
+{
+  if (acceleration <= 0.0) {
+    THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
+  }
+  auto driver_model = getDriverModel();
+  driver_model.acceleration = acceleration;
+  setDriverModel(driver_model);
+}
+
+void PedestrianEntity::setDecelerationLimit(double deceleration)
+{
+  if (deceleration <= 0.0) {
+    THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
+  }
+  auto driver_model = getDriverModel();
+  driver_model.deceleration = deceleration;
+  setDriverModel(driver_model);
 }
 
 void PedestrianEntity::onUpdate(double current_time, double step_time)
@@ -121,8 +150,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(status_.get());
-    target_speed_planner_.update(status_->action_status.twist.linear.x);
-    behavior_plugin_ptr_->setTargetSpeed(target_speed_planner_.getTargetSpeed());
+    behavior_plugin_ptr_->setTargetSpeed(target_speed_);
     if (status_->lanelet_pose_valid) {
       auto route = route_planner_ptr_->getRouteLanelets(status_->lanelet_pose);
       behavior_plugin_ptr_->setRouteLanelets(route);

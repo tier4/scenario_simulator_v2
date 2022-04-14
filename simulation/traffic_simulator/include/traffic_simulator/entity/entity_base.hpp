@@ -15,12 +15,15 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <boost/optional.hpp>
 #include <memory>
 #include <queue>
 #include <string>
+#include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/driver_model.hpp>
@@ -37,8 +40,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
-
 class EntityBase
 {
 public:
@@ -46,7 +47,7 @@ public:
 
   const std::string name;
 
-  EntityBase(const std::string & type, const std::string & name);
+  EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype);
 
   virtual ~EntityBase() = default;
 
@@ -81,7 +82,9 @@ public:
 
   /*   */ auto getVisibility() { return visibility_; }
 
-  virtual auto getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand;
+  virtual auto getVehicleCommand() const -> std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand>;
 
   /*   */ auto getVehicleParameters() const
     -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
@@ -93,9 +96,13 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
 
-  virtual auto getDriverModel() -> const traffic_simulator_msgs::msg::DriverModel;
+  virtual auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel = 0;
 
-  virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);
+  virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) = 0;
+
+  virtual void setAccelerationLimit(double acceleration);
+
+  virtual void setDecelerationLimit(double deceleration);
 
   /*   */ void setEntityTypeList(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &
@@ -114,15 +121,13 @@ public:
 
   virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool;
 
-  virtual void setTargetSpeed(double target_speed, bool continuous) = 0;
-
   virtual void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
+    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
   {
     traffic_light_manager_ = ptr;
   }
 
-  virtual auto setUpperBoundSpeed(double) -> void {}
+  virtual auto setVelocityLimit(double) -> void {}
 
   /*   */ void setVerbose(bool verbose) { verbose_ = verbose; }
 
@@ -142,7 +147,33 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints) = 0;
 
+  virtual void requestSpeedChange(
+    const double target_speed, const speed_change::Transition transition,
+    const speed_change::Constraint constraint, const bool continuous);
+
+  virtual void requestSpeedChange(
+    const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, const speed_change::Constraint constraint,
+    const bool continuous);
+
+  virtual void requestSpeedChange(double target_speed, bool continuous);
+
+  virtual void requestSpeedChange(
+    const speed_change::RelativeTargetSpeed & target_speed, bool continuous);
+
   virtual void requestLaneChange(const std::int64_t){};
+
+  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
+
+  void requestLaneChange(
+    const traffic_simulator::lane_change::AbsoluteTarget & target,
+    const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+    const traffic_simulator::lane_change::Constraint & constraint);
+
+  void requestLaneChange(
+    const traffic_simulator::lane_change::RelativeTarget & target,
+    const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+    const traffic_simulator::lane_change::Constraint & constraint);
 
   virtual void requestWalkStraight()
   {
@@ -170,7 +201,8 @@ protected:
   std::queue<traffic_simulator_msgs::msg::LaneletPose> waypoints_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;
+  std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
+  std::shared_ptr<traffic_simulator::math::CatmullRomSpline> spline_;
 
   bool verbose_;
   bool visibility_;
@@ -183,6 +215,10 @@ protected:
 
   visualization_msgs::msg::MarkerArray current_marker_;
   traffic_simulator_msgs::msg::EntityType entity_type_;
+  const traffic_simulator_msgs::msg::EntitySubtype entity_subtype_;
+
+  boost::optional<double> target_speed_;
+  traffic_simulator::job::JobList job_list_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

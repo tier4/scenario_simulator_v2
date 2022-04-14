@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "autoware_auto_control_msgs.proto";
+import "autoware_auto_vehicle_msgs.proto";
 import "geometry_msgs.proto";
 
 package traffic_simulator_msgs;
@@ -34,11 +36,32 @@ message LaneletPose {
 /**
  * Protobuf definition of traffic_simulator_msgs/msg/EntityType type in ROS2.
  **/
-enum EntityType {
-  EGO = 0;         // Ego Vehicle (Autoware Vehicle)
-  VEHICLE = 1;     // Vehicle Entity (NPC Vehicle)
-  PEDESTRIAN = 2;  // Pedestrian Entity (NPC Pedestrian)
-  MISC_OBJECT = 3; // Misc Object Entity (Static Objects in environment like cones)
+
+message EntityType {
+  enum Enum {
+    EGO = 0;         // Ego Vehicle (Autoware Vehicle)
+    VEHICLE = 1;     // Vehicle Entity (NPC Vehicle)
+    PEDESTRIAN = 2;  // Pedestrian Entity (NPC Pedestrian)
+    MISC_OBJECT = 3; // Misc Object Entity (Static Objects in environment like cones)
+  }
+  Enum type = 1;
+}
+
+/**
+ * Protobuf definition of traffic_simulator_msgs/msg/EntitySubtype type in ROS2.
+ **/
+message EntitySubtype {
+  enum Enum {
+    UNKNOWN = 0;    // The entity is unknown object
+    CAR = 1;        // The entity is car like a passenger vehicle
+    TRUCK = 2;      // The entity is truck
+    BUS = 3;        // The entity is bus
+    TRAILER = 4;    // The entity is trailer 
+    MOTORCYCLE = 5; // The entity is motorcycle
+    BICYCLE = 6;    // THe entity is bicycle
+    PEDESTRIAN = 7; // The entity is pedestrian
+  }
+  Enum value = 1;
 }
 
 /**
@@ -46,13 +69,14 @@ enum EntityType {
  **/
 message EntityStatus {
   EntityType type = 1;            // Type of the entity.
-  double time = 2;                // Current simulation time.
-  string name = 3;                // Name of the entity.
-  BoundingBox bounding_box = 4;   // Bounding box of the entity.
-  ActionStatus action_status = 5; // Action status of the entity.
-  geometry_msgs.Pose pose = 6;    // Pose in map coordinate of the entity.
-  LaneletPose lanelet_pose = 7;   // Pose in lane coordinate of the entity.
-  bool lanelet_pose_valid = 8; // If true, the lane matching of the entity is succeeded.
+  EntitySubtype subtype = 2;      // subtype of the entity.
+  double time = 3;                // Current simulation time.
+  string name = 4;                // Name of the entity.
+  BoundingBox bounding_box = 5;   // Bounding box of the entity.
+  ActionStatus action_status = 6; // Action status of the entity.
+  geometry_msgs.Pose pose = 7;    // Pose in map coordinate of the entity.
+  LaneletPose lanelet_pose = 8;   // Pose in lane coordinate of the entity.
+  bool lanelet_pose_valid = 9;    // If true, the lane matching of the entity is succeeded.
 }
 
 /**
@@ -93,11 +117,10 @@ message Property {}
  **/
 message VehicleParameters {
   string name = 1;              // Name of the vehicle entity
-  string vehicle_category = 2;  // Category of the vehicle entity.
-  Performance performance = 3;  // Performance parameter of vehicle entity.
-  BoundingBox bounding_box = 4; // Bounding box of the vehicle entity.
-  Axles axles = 5;              // Axles of the vehicle entity.
-  Property property = 6;        // Other parameters of the vehicle entity.
+  Performance performance = 2;  // Performance parameter of vehicle entity.
+  BoundingBox bounding_box = 3; // Bounding box of the vehicle entity.
+  Axles axles = 4;              // Axles of the vehicle entity.
+  Property property = 5;        // Other parameters of the vehicle entity.
 }
 
 /**
@@ -105,14 +128,12 @@ message VehicleParameters {
  **/
 message PedestrianParameters {
   string name = 1;                // Name of the pedestrian entity.
-  string pedestrian_category = 2; // Category of pedestrian entity.
-  BoundingBox bounding_box = 3;   // Bounding box of the pedestrian entity.
+  BoundingBox bounding_box = 2;   // Bounding box of the pedestrian entity.
 }
 
 message MiscObjectParameters {
   string name = 1;                 // Name of the pedestrian entity.
-  string misc_object_category = 2; // Category of pedestrian entity.
-  BoundingBox bounding_box = 3;    // Bounding box of the pedestrian entity.
+  BoundingBox bounding_box = 2;    // Bounding box of the pedestrian entity.
 }
 
 /**
@@ -120,4 +141,9 @@ message MiscObjectParameters {
  **/
 message Waypoints {
   repeated geometry_msgs.Point waypoints = 1; // Waypoints of the entity.
+}
+
+message VehicleCommand {
+  autoware_auto_control_msgs.AckermannControlCommand ackermann_control_command = 1;
+  autoware_auto_vehicle_msgs.GearCommand gear_command = 2;
 }

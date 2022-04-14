@@ -15,14 +15,16 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 
-#define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <concealer/execute.hpp>
 #include <functional>
+#include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <openscenario_interpreter/utility/highlighter.hpp>
 #include <pugixml.hpp>
 #include <regex>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <unordered_map>
 
@@ -30,43 +32,68 @@ namespace openscenario_interpreter
 {
 inline namespace reader
 {
-/* ---- Dynamic Configuration --------------------------------------------------
- *
- *  See https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
- *
- * -------------------------------------------------------------------------- */
 template <typename Scope>
 auto substitute(std::string attribute, Scope & scope)
 {
-  static const std::regex substitution_syntax{R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))"};
+  auto dirname = [](auto &&, auto && scope) {
+    return scope.global().pathname.parent_path().string();
+  };
+
+  auto find_pkg_share = [](auto && package_name, auto &&) {
+    return ament_index_cpp::get_package_share_directory(package_name);
+  };
+
+  auto ros2 = [](auto && arguments, auto &&) {
+    auto remove_trailing_newline = [](auto && s) {
+      while (s.back() == '\n') {
+        s.pop_back();
+      }
+      return s;
+    };
+    if (auto && result = remove_trailing_newline(concealer::dollar("ros2 " + arguments));
+        result.find('\n') != std::string::npos) {
+      throw SyntaxError(
+        "The substitution result by `$(ros2 ...)` must not contain a newline character. "
+        "You gave `$(ros2 ",
+        arguments, ")` and the result was ",
+        std::quoted(boost::replace_all_copy(result, "\n", "\\n")),
+        ", which is unacceptable for the reasons stated above.");
+    } else {
+      return result;
+    }
+  };
+
+  auto var = [](auto && name, auto && scope) {
+    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
+    if (const auto found = scope.ref(name); found) {
+      return boost::lexical_cast<String>(found);
+    } else {
+      return String();
+    }
+  };
+
+  // NOTE: https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
   static const std::unordered_map<
     std::string, std::function<std::string(const std::string &, Scope &)> >
     substitutions{
-      {"find-pkg-share",
-       [](auto && package_name, auto &&) {
-         return ament_index_cpp::get_package_share_directory(package_name);
-       }},
+      {"dirname", dirname},
+      // TODO {"env", env},
+      // TODO {"eval", eval},
+      // TODO {"exec-in-package", exec_in_package},
+      // TODO {"find-exec", find_exec},
+      // TODO {"find-pkg-prefix", find_pkg_prefix},
+      {"find-pkg-share", find_pkg_share},
+      {"ros2", ros2},  // NOTE: TIER IV extension (Not included in the ROS2 Launch XML Substitution)
+      {"var", var},
+    };
 
-      {"var",
-       [](auto && name, auto && scope) -> String {
-         const auto found = scope.findObject(name);
-         if (found) {
-           return boost::lexical_cast<String>(found);
-         } else {
-           return "";
-         }
-       }},
-      {"dirname",
-       [](auto &&, auto && scope) { return scope.global().pathname.parent_path().string(); }}};
+  static const auto pattern = std::regex(R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))");
 
-  std::smatch match{};
-  while (std::regex_match(attribute, match, substitution_syntax)) {
-    const auto iter{substitutions.find(match.str(3))};
-
-    if (iter != std::end(substitutions)) {
-      attribute = match.str(1) + std::get<1>(*iter)(match.str(4), scope) + match.str(5);
+  for (std::smatch result; std::regex_match(attribute, result, pattern);) {
+    if (const auto iter = substitutions.find(result.str(3)); iter != std::end(substitutions)) {
+      attribute = result.str(1) + std::get<1>(*iter)(result.str(4), scope) + result.str(5);
     } else {
-      throw SyntaxError("Unknown substitution ", std::quoted(match.str(3)), " specified");
+      throw SyntaxError("Unknown substitution ", std::quoted(result.str(3)), " specified");
     }
   }
 
@@ -76,34 +103,51 @@ auto substitute(std::string attribute, Scope & scope)
 template <typename T, typename Node, typename Scope>
 auto readAttribute(const std::string & name, const Node & node, const Scope & scope) -> T
 {
-  if (const auto & attribute{node.attribute(name.c_str())}) {
-    std::string value{substitute(attribute.value(), scope)};
+  auto is_openscenario_standard_expression = [](const auto & s) {
+    return s.substr(0, 2) == "${" and s.back() == '}';
+  };
 
-    if (value.empty()) {
-#ifndef OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
-      throw SyntaxError(
-        "Blank is not allowed for the value of attribute ", std::quoted(name), " of class ",
-        std::quoted(node.name()));
-#else
-      return T();
-#endif
-    } else if (value.front() == '$') {
-      const auto found = scope.findObject(value.substr(1));
-      if (found) {
-        return boost::lexical_cast<T>(boost::lexical_cast<String>(found));
-      } else {
-        throw SyntaxError(
-          "There is no parameter named ", std::quoted(value.substr(1)), " (Attribute ",
-          std::quoted(name), " of class ", std::quoted(node.name()), " references this parameter)");
-      }
+  auto read_openscenario_standard_expression = [&](const auto & s) {
+    return boost::lexical_cast<T>(evaluate(std::string(std::begin(s) + 2, std::end(s) - 1), scope));
+  };
+
+  auto is_openscenario_standard_parameter_reference = [](const auto & s) {
+    return s.front() == '$';
+  };
+
+  auto read_openscenario_standard_parameter_reference = [&](const auto & s) {
+    // TODO Use `return scope.template ref<T>(s.substr(1));`
+    if (auto && object = scope.ref(s.substr(1)); object) {
+      return boost::lexical_cast<T>(boost::lexical_cast<String>(object));
     } else {
-      try {
-        return boost::lexical_cast<T>(value);
-      } catch (const boost::bad_lexical_cast &) {
-        throw SyntaxError(
-          "Value ", std::quoted(value), " specified for attribute ", std::quoted(name),
-          " is invalid (Is not value of type ", typeid(T).name(), ")");
-      }
+      throw SyntaxError(
+        "There is no parameter named ", std::quoted(s.substr(1)), " (Attribute ", std::quoted(name),
+        " of class ", std::quoted(node.name()), " references this parameter)");
+    }
+  };
+
+  auto read_openscenario_standard_literal = [&](const auto & s) {
+    try {
+      return boost::lexical_cast<T>(s);
+    } catch (const boost::bad_lexical_cast &) {
+      throw SyntaxError(
+        "Value ", std::quoted(s), " specified for attribute ", std::quoted(name),
+        " is invalid (Is not value of type ", typeid(T).name(), ")");
+    }
+  };
+
+  // NOTE: https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
+
+  if (const auto & attribute = node.attribute(name.c_str())) {
+    // NOTE: `substitute` is TIER IV extension (Non-OpenSCENARIO standard)
+    if (std::string value = substitute(attribute.value(), scope); value.empty()) {
+      return T();
+    } else if (is_openscenario_standard_expression(value)) {
+      return read_openscenario_standard_expression(value);
+    } else if (is_openscenario_standard_parameter_reference(value)) {
+      return read_openscenario_standard_parameter_reference(value);
+    } else {
+      return read_openscenario_standard_literal(value);
     }
   } else {
     throw SyntaxError(
@@ -113,7 +157,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
 }
 
 template <typename T, typename Node, typename Scope>
-T readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
+auto readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
 {
   if (node.attribute(name.c_str())) {
     return readAttribute<T>(name, node, scope);

@@ -29,10 +29,12 @@ ParameterModifyAction::ParameterModifyAction(
 
 auto ParameterModifyAction::accomplished() noexcept -> bool { return true; }
 
-auto ParameterModifyAction::run() -> void
+auto ParameterModifyAction::run() noexcept -> void {}
+
+auto ParameterModifyAction::start() const -> void
 {
   try {
-    const auto target = local().findObject(parameter_ref);
+    const auto target = local().ref(parameter_ref);
     if (rule.is<ParameterAddValueRule>()) {
       rule.as<ParameterAddValueRule>()(target);
     } else {
@@ -42,7 +44,5 @@ auto ParameterModifyAction::run() -> void
     throw SemanticError("No such parameter ", std::quoted(parameter_ref));
   }
 }
-
-auto ParameterModifyAction::start() noexcept -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

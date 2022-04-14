@@ -139,7 +139,7 @@ If you want to build a docker image in your local machine, please type the comma
 
 ```bash
 cd (path_to_scenario_simulator_v2)
-docker build -t scenario_simulator_v2 .
+docker build -t scenario_simulator_v2 . --build-arg ROS_DISTRO=galactic
 ```
 
 ## Running Simulation with docker.
@@ -180,10 +180,8 @@ If your local machine does not have NVIDIA GPUs,
 
 ```bash
 docker pull tier4/scenario_simulator_v2:galactic
-rocker --x11 tier4/scenario_simulator_v2:galactic ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
+rocker --x11 tier4/scenario_simulator_v2:galactic ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60.0
 ```
-
-If you want to use docker with ROS2 Foxy, please replace galactic to foxy.
 
 <video
   class="c-video__embed"
