@@ -39,6 +39,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/job/job_list.cpp
   src/math/bounding_box.cpp
   src/math/catmull_rom_spline.cpp
+  src/math/catmull_rom_subspline.cpp
   src/math/collision.cpp
   src/math/distance.cpp
   src/math/hermite_curve.cpp

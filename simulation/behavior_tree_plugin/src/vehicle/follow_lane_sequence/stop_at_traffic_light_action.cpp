@@ -16,7 +16,6 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <utility>
 #include <vector>
 
@@ -60,9 +59,9 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtTrafficLightAction::calc
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
       entity_status.lanelet_pose.offset);
-    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSpline>(
-      reference_trajectory->getSubspline(
-        entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon()));
+    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSubspline>(
+      reference_trajectory, entity_status.lanelet_pose.s,
+      entity_status.lanelet_pose.s + getHorizon());
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -108,7 +107,6 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-
   const auto distance_to_traffic_stop_line =
     hdmap_utils->getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
   if (!distance_to_traffic_stop_line) {

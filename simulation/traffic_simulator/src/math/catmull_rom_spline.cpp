@@ -128,30 +128,6 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
   }
 }
 
-CatmullRomSpline CatmullRomSpline::getSubspline(double start_s, double end_s) const
-{
-  const auto start_index_and_s = getCurveIndexAndS(start_s);
-  const auto end_index_and_s = getCurveIndexAndS(end_s);
-
-  if (start_index_and_s.first > end_index_and_s.first) {
-    THROW_SEMANTIC_ERROR(
-      "Start index ", start_index_and_s.first, " for start s ", start_s,
-      " should not be greater than end index ", end_index_and_s.first, "for end s ", end_s, ".");
-  }
-
-  std::vector<HermiteCurve> subspline_curves;
-
-  auto staring_curve_length = length_list_[start_index_and_s.first] - start_index_and_s.second;
-  auto ending_curve_length = end_index_and_s.second;
-
-  // copy the middle curves
-  subspline_curves.insert(
-    subspline_curves.end(), curves_.begin() + start_index_and_s.first,
-    curves_.begin() + end_index_and_s.first + 1);
-
-  return CatmullRomSpline(subspline_curves, staring_curve_length, ending_curve_length);
-}
-
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
 : control_points(control_points)
 {
@@ -256,28 +232,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   for (const auto & length : length_list_) {
     total_length_ = total_length_ + length;
   }
-
   checkConnection();
-}
-
-CatmullRomSpline::CatmullRomSpline(
-  const std::vector<HermiteCurve> & curves, double staring_curve_length, double ending_curve_length)
-{
-  curves_ = curves;
-
-  for (const auto & curve : curves_) {
-    length_list_.emplace_back(curve.getLength());
-    maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
-  }
-
-  length_list_.front() = staring_curve_length;
-  curves_.front().setLength(staring_curve_length);
-  length_list_.back() = ending_curve_length;
-  curves_.back().setLength(ending_curve_length);
-
-  for (const auto & length : length_list_) {
-    total_length_ = total_length_ + length;
-  }
 }
 
 std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const

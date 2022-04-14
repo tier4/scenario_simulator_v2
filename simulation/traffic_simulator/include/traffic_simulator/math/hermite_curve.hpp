@@ -56,7 +56,6 @@ public:
   double getMaximum2DCurvature() const;
   double getLength(size_t num_points) const;
   double getLength() const { return length_; }
-  void setLength(double length) { length_ = length; }
   boost::optional<double> getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0,
     bool autoscale = false) const;

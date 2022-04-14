@@ -114,7 +114,6 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   if (s_values.empty()) {
     return boost::none;
   }
-
   if (search_backward) {
     return *std::max_element(s_values.begin(), s_values.end());
   }

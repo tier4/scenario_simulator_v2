@@ -40,18 +40,18 @@ public:
   bool foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const;
   boost::optional<double> getDistanceToConflictingEntity(
     const std::vector<std::int64_t> & route_lanelets,
-    const traffic_simulator::math::CatmullRomSpline & spline);
+    const traffic_simulator::math::CatmullRomInterface & spline);
   boost::optional<std::string> getFrontEntityName(
-    const traffic_simulator::math::CatmullRomSpline & spline);
+    const traffic_simulator::math::CatmullRomInterface & spline);
   double calculateStopDistance(double deceleration) const;
   boost::optional<double> getDistanceToFrontEntity(
-    const traffic_simulator::math::CatmullRomSpline & spline);
+    const traffic_simulator::math::CatmullRomInterface & spline);
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
   boost::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
-    const traffic_simulator::math::CatmullRomSpline & spline);
+    const traffic_simulator::math::CatmullRomInterface & spline);
   std::vector<traffic_simulator_msgs::msg::EntityStatus> getRightOfWayEntities();
   std::vector<traffic_simulator_msgs::msg::EntityStatus> getRightOfWayEntities(
     const std::vector<std::int64_t> & following_lanelets);
@@ -102,16 +102,16 @@ public:
   std::vector<std::int64_t> route_lanelets;
   traffic_simulator_msgs::msg::EntityStatus getEntityStatus(const std::string target_name) const;
   boost::optional<double> getDistanceToTargetEntityPolygon(
-    const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name,
+    const traffic_simulator::math::CatmullRomInterface & spline, const std::string target_name,
     double width_extension_right = 0.0, double width_extension_left = 0.0,
     double length_extension_front = 0.0, double length_extension_rear = 0.0);
 
 private:
   boost::optional<double> getDistanceToTargetEntityOnCrosswalk(
-    const traffic_simulator::math::CatmullRomSpline & spline,
+    const traffic_simulator::math::CatmullRomInterface & spline,
     const traffic_simulator_msgs::msg::EntityStatus & status);
   boost::optional<double> getDistanceToTargetEntityPolygon(
-    const traffic_simulator::math::CatmullRomSpline & spline,
+    const traffic_simulator::math::CatmullRomInterface & spline,
     const traffic_simulator_msgs::msg::EntityStatus & status, double width_extension_right = 0.0,
     double width_extension_left = 0.0, double length_extension_front = 0.0,
     double length_extension_rear = 0.0);

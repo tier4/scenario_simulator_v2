@@ -18,7 +18,6 @@
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -62,9 +61,8 @@ const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoint
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
-    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSpline>(
-      reference_trajectory->getSubspline(
-        entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon));
+    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSubspline>(
+      reference_trajectory, entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon);
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
