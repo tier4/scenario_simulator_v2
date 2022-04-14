@@ -303,6 +303,7 @@ double HermiteCurve::getMaximum2DCurvature() const
 
 double HermiteCurve::getLength(size_t num_points) const
 {
+  /*
   auto trajectory = getTrajectory(num_points);
   double ret = 0.0;
   for (size_t i = 0; i < trajectory.size() - 1; i++) {
@@ -310,6 +311,16 @@ double HermiteCurve::getLength(size_t num_points) const
                   std::pow(trajectory[i + 1].x - trajectory[i].x, 2) +
                   std::pow(trajectory[i + 1].y - trajectory[i].y, 2) +
                   std::pow(trajectory[i + 1].z - trajectory[i].z, 2));
+  }
+  */
+  double delta_s = 1.0 / num_points;
+  double ret = 0.0;
+  for (size_t i = 0; i < num_points; i++) {
+    double s = i * delta_s;
+    double x_diff = (3 * s * s) * ax_ + 2 * s * bx_ + cx_;
+    double y_diff = (3 * s * s) * ay_ + 2 * s * by_ + cy_;
+    double z_diff = (3 * s * s) * az_ + 2 * s * bz_ + cz_;
+    ret = ret + std::sqrt(x_diff * x_diff + y_diff * y_diff + z_diff * z_diff) * delta_s;
   }
   return ret;
 }
