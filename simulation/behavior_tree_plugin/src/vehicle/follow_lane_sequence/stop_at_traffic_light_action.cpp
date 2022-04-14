@@ -88,7 +88,9 @@ boost::optional<double> StopAtTrafficLightAction::calculateTargetSpeed(double cu
 BT::NodeStatus StopAtTrafficLightAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {

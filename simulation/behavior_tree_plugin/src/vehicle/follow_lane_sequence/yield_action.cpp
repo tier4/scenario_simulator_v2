@@ -89,7 +89,9 @@ boost::optional<double> YieldAction::calculateTargetSpeed()
 BT::NodeStatus YieldAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
   if (!driver_model.see_around) {

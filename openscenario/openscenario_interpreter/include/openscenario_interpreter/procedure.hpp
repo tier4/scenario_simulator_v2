@@ -104,6 +104,7 @@ FORWARD_TO_SIMULATION_API(engage);
 FORWARD_TO_SIMULATION_API(getCurrentAction);
 FORWARD_TO_SIMULATION_API(getCurrentTime);
 FORWARD_TO_SIMULATION_API(getDriverModel);
+FORWARD_TO_SIMULATION_API(getTrafficRelationReferees);
 FORWARD_TO_SIMULATION_API(initialize);
 FORWARD_TO_SIMULATION_API(isInLanelet);
 FORWARD_TO_SIMULATION_API(ready);
@@ -136,10 +137,6 @@ RENAME(applyWalkStraightAction, requestWalkStraight);
 RENAME(evaluateCollisionCondition, checkCollision);
 RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateReachPositionCondition, reachPosition);
-RENAME(getTrafficSignalArrow, getTrafficLightArrow);
-RENAME(getTrafficSignalColor, getTrafficLightColor);
-RENAME(setTrafficSignalArrow, setTrafficLightArrow);
-RENAME(setTrafficSignalColor, setTrafficLightColor);
 RENAME(toWorldPosition, toMapPose);
 
 #undef RENAME

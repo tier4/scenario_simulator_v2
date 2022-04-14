@@ -90,7 +90,9 @@ boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(double curren
 BT::NodeStatus StopAtStopLineAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
