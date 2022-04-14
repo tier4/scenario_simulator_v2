@@ -139,7 +139,7 @@ If you want to build a docker image in your local machine, please type the comma
 
 ```bash
 cd (path_to_scenario_simulator_v2)
-docker build -t scenario_simulator_v2 .
+docker build -t scenario_simulator_v2 . --build-arg ROS_DISTRO=galactic
 ```
 
 ## Running Simulation with docker.
