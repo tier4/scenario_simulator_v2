@@ -183,6 +183,10 @@ public:
 
     // NOTE: https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
 
+    // NOTE: The fooTransition state must not return from case fooTransition
+    // because it is a waypoint in the transition to barState.
+
+  dispatch:
     switch (state().as<StoryboardElementState>()) {
       case StoryboardElementState::standbyState: /* ----------------------------
         *
@@ -194,14 +198,11 @@ public:
         *  Story element instantaneously transitions into the runningState.
         *
         * ------------------------------------------------------------------- */
-        // return current_state =
-        //          (start_trigger.evaluate().as<Boolean>() ? start_transition : current_state);
-
-        if (not start_trigger.evaluate().as<Boolean>()) {
-          return current_state;
-        } else {
+        if (start_trigger.evaluate().as<Boolean>()) {
           notify(current_state = start_transition);
-          return current_state;  // TODO [[fallthrough]];
+          goto dispatch;
+        } else {
+          return current_state;
         }
 
       case StoryboardElementState::startTransition: /* -------------------------
@@ -214,7 +215,7 @@ public:
         start();
         ++current_execution_count;
         notify(current_state = running_state);
-        return current_state;
+        goto dispatch;
 
       case StoryboardElementState::runningState: /* ----------------------------
         *
@@ -258,12 +259,11 @@ public:
         if (0 <= getCurrentTime()) {
           run();
         }
-        // return current_state = (accomplished() ? end_transition : current_state);
 
-        if (not accomplished()) {
-          return current_state;
-        } else {
+        if (accomplished()) {
           notify(current_state = end_transition);
+          goto dispatch;
+        } else {
           return current_state;
         }
 
@@ -277,17 +277,10 @@ public:
         *  be used in conditions to trigger based on this transition.
         *
         * -------------------------------------------------------------------- */
-        // return current_state =
-        //          (current_execution_count < maximum_execution_count ? standby_state
-        //                                                             : complete_state);
-
-        if (current_execution_count < maximum_execution_count) {
-          notify(current_state = standby_state);
-          return current_state;
-        } else {
-          notify(current_state = complete_state);
-          return current_state;
-        }
+        notify(
+          current_state =
+            current_execution_count < maximum_execution_count ? standby_state : complete_state);
+        goto dispatch;
 
       case StoryboardElementState::completeState: /* ---------------------------
         *
@@ -320,7 +313,7 @@ public:
         *  used in conditions to trigger based on this transition.
         *
         * ------------------------------------------------------------------- */
-        return current_state;
+        throw Error("UNIMPLEMENTED!");
 
       default:
       case StoryboardElementState::stopTransition: /* --------------------------
@@ -339,11 +332,10 @@ public:
         * ------------------------------------------------------------------- */
         if (not accomplished()) {
           stop();
-          return current_state;
-        } else {
-          notify(current_state = complete_state);
-          return current_state;
         }
+
+        notify(current_state = complete_state);
+        goto dispatch;
     }
   }
 };
