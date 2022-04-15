@@ -29,10 +29,26 @@ StoryboardElementStateCondition::StoryboardElementStateCondition(
   state(readAttribute<StoryboardElementState>("state", node, local())),
   current_state(StoryboardElementState::standbyState)
 {
-  local().ref<StoryboardElement>(storyboard_element_ref).callbacks[state].emplace_back([this](auto && storyboard_element)
-  {
-    notified = true;
-  });
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Register a callback for the StoryboardElement specified by
+   *  storyboardElementRef to notify that it has transitioned to the monitored
+   *  state.
+   *
+   *  Note that there is no guarantee that the StoryboardElement will remain in
+   *  the same state as when the notification is made until
+   *  StoryboardElementStateCondition::evaluate is executed after the callback
+   *  is called. The In other words, the StoryboardElement may immediately
+   *  transition to the next state after calling the callback function.
+   *
+   * ------------------------------------------------------------------------ */
+
+  local()
+    .ref<StoryboardElement>(storyboard_element_ref)
+    .callbacks[state]
+    .emplace_back([this](auto && storyboard_element) {
+      current_state = storyboard_element.state().template as<StoryboardElementState>();
+    });
 }
 
 auto StoryboardElementStateCondition::description() const -> String
@@ -47,16 +63,30 @@ auto StoryboardElementStateCondition::description() const -> String
 
 auto StoryboardElementStateCondition::evaluate() -> Object
 {
-  try {
-    auto const result = notified;  // at least once
+  auto update = [this]() {
+    auto storyboard_element = [this]() {
+      return local().ref<StoryboardElement>(storyboard_element_ref);
+    };
+    return current_state = storyboard_element().state().template as<StoryboardElementState>();
+  };
 
-    current_state = local().ref<StoryboardElement>(storyboard_element_ref).state().template as<StoryboardElementState>();
-    notified = (current_state == state);
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Note that current_state may have been updated by a callback function set
+   *  in the constructor (before this member function was called).  And at this
+   *  point local().ref<StoryboardElement>(storyboard_element_ref).state() may
+   *  have transitioned to a different state than the one recorded in
+   *  current_state.
+   *
+   *  Therefore, we must first check to see if the callback function has
+   *  updated current_state (= has the StoryboardElement transitioned to the
+   *  monitored state at least once since the last time evaluate was called),
+   *  and then check to see if the current StoryboardElement state is indeed
+   *  the state being monitored.
+   *
+   * ------------------------------------------------------------------------ */
 
-    return asBoolean(result);
-  } catch (const std::out_of_range &) {
-    return false_v;
-  }
+  return asBoolean(current_state == state or update() == state);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

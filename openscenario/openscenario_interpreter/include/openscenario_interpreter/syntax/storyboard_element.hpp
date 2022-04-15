@@ -165,9 +165,8 @@ protected:
 
 public:
   std::unordered_map<
-    StoryboardElementState::value_type,
-    std::vector<std::function<void(const StoryboardElement &)>>
-  > callbacks;
+    StoryboardElementState::value_type, std::vector<std::function<void(const StoryboardElement &)>>>
+    callbacks;
 
   auto notify(const Object & state)
   {
