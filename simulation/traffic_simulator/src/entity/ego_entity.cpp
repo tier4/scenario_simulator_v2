@@ -361,9 +361,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
 
-    setStatus(getEntityStatus(current_time + step_time, step_time));
-    updateStandStillDuration(step_time);
-
     if (previous_linear_velocity_) {
       linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
     } else {
@@ -372,6 +369,9 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
     previous_linear_velocity_ = vehicle_model_ptr_->getVx();
     previous_angular_velocity_ = vehicle_model_ptr_->getWz();
+
+    setStatus(getEntityStatus(current_time + step_time, step_time));
+    updateStandStillDuration(step_time);
   }
 }
 

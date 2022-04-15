@@ -30,6 +30,7 @@ EntityBase::EntityBase(
 : name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
 {
   status_ = boost::none;
+  
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
