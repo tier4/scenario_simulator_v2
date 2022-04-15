@@ -27,8 +27,12 @@ StoryboardElementStateCondition::StoryboardElementStateCondition(
   storyboard_element_type(
     readAttribute<StoryboardElementType>("storyboardElementType", node, local())),
   state(readAttribute<StoryboardElementState>("state", node, local())),
-  result(StoryboardElementState::standbyState)
+  current_state(StoryboardElementState::standbyState)
 {
+  local().ref<StoryboardElement>(storyboard_element_ref).callbacks[state].emplace_back([this](auto && storyboard_element)
+  {
+    notified = true;
+  });
 }
 
 auto StoryboardElementStateCondition::description() const -> String
@@ -36,7 +40,7 @@ auto StoryboardElementStateCondition::description() const -> String
   std::stringstream description;
 
   description << "The state of StoryboardElement " << std::quoted(storyboard_element_ref)
-              << " (= " << result << ") is given state " << state << "?";
+              << " (= " << current_state << ") is given state " << state << "?";
 
   return description.str();
 }
@@ -44,11 +48,12 @@ auto StoryboardElementStateCondition::description() const -> String
 auto StoryboardElementStateCondition::evaluate() -> Object
 {
   try {
-    result = local()
-               .ref<StoryboardElement>(storyboard_element_ref)
-               .state()
-               .template as<StoryboardElementState>();
-    return asBoolean(result == state);
+    auto const result = notified;  // at least once
+
+    current_state = local().ref<StoryboardElement>(storyboard_element_ref).state().template as<StoryboardElementState>();
+    notified = (current_state == state);
+
+    return asBoolean(result);
   } catch (const std::out_of_range &) {
     return false_v;
   }

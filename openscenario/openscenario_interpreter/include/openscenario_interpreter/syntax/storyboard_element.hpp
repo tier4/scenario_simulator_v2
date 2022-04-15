@@ -25,6 +25,7 @@
 #include <openscenario_interpreter/syntax/trigger.hpp>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 
@@ -163,6 +164,18 @@ protected:
   }
 
 public:
+  std::unordered_map<
+    StoryboardElementState::value_type,
+    std::vector<std::function<void(const StoryboardElement &)>>
+  > callbacks;
+
+  auto notify(const Object & state)
+  {
+    for (auto && callback : callbacks[state.as<StoryboardElementState>()]) {
+      callback(std::as_const(*this));
+    }
+  }
+
   auto evaluate()
   {
     if (stop_trigger.evaluate().as<Boolean>()) {
@@ -182,8 +195,15 @@ public:
         *  Story element instantaneously transitions into the runningState.
         *
         * ------------------------------------------------------------------- */
-        return current_state =
-                 (start_trigger.evaluate().as<Boolean>() ? start_transition : current_state);
+        // return current_state =
+        //          (start_trigger.evaluate().as<Boolean>() ? start_transition : current_state);
+
+        if (not start_trigger.evaluate().as<Boolean>()) {
+          return current_state;
+        } else {
+          notify(current_state = start_transition);
+          return current_state;  // TODO [[fallthrough]];
+        }
 
       case StoryboardElementState::startTransition: /* -------------------------
         *
@@ -194,7 +214,8 @@ public:
         * ------------------------------------------------------------------- */
         start();
         ++current_execution_count;
-        return current_state = running_state;
+        notify(current_state = running_state);
+        return current_state;
 
       case StoryboardElementState::runningState: /* ----------------------------
         *
@@ -238,7 +259,14 @@ public:
         if (0 <= getCurrentTime()) {
           run();
         }
-        return current_state = (accomplished() ? end_transition : current_state);
+        // return current_state = (accomplished() ? end_transition : current_state);
+
+        if (not accomplished()) {
+          return current_state;
+        } else {
+          notify(current_state = end_transition);
+          return current_state;
+        }
 
       case StoryboardElementState::endTransition: /* ---------------------------
         *
@@ -250,9 +278,17 @@ public:
         *  be used in conditions to trigger based on this transition.
         *
         * -------------------------------------------------------------------- */
-        return current_state =
-                 (current_execution_count < maximum_execution_count ? standby_state
-                                                                    : complete_state);
+        // return current_state =
+        //          (current_execution_count < maximum_execution_count ? standby_state
+        //                                                             : complete_state);
+
+        if (current_execution_count < maximum_execution_count) {
+          notify(current_state = standby_state);
+          return current_state;
+        } else {
+          notify(current_state = complete_state);
+          return current_state;
+        }
 
       case StoryboardElementState::completeState: /* ---------------------------
         *
@@ -306,7 +342,8 @@ public:
           stop();
           return current_state;
         } else {
-          return current_state = complete_state;
+          notify(current_state = complete_state);
+          return current_state;
         }
     }
   }

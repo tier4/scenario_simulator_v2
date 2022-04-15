@@ -41,7 +41,9 @@ struct StoryboardElementStateCondition : private Scope
 
   const StoryboardElementState state;
 
-  StoryboardElementState result;
+  StoryboardElementState current_state;
+
+  bool notified = false;
 
   explicit StoryboardElementStateCondition(const pugi::xml_node &, const Scope &);
 
