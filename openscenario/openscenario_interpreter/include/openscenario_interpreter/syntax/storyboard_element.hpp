@@ -168,9 +168,10 @@ public:
     StoryboardElementState::value_type, std::vector<std::function<void(const StoryboardElement &)>>>
     callbacks;
 
-  auto notify(const Object & state)
+  auto transitionTo(const Object & state)
   {
-    for (auto && callback : callbacks[state.as<StoryboardElementState>()]) {
+    current_state = state;
+    for (auto && callback : callbacks[current_state.as<StoryboardElementState>()]) {
       callback(std::as_const(*this));
     }
   }
@@ -199,7 +200,7 @@ public:
         *
         * ------------------------------------------------------------------- */
         if (start_trigger.evaluate().as<Boolean>()) {
-          notify(current_state = start_transition);
+          transitionTo(start_transition);
           goto dispatch;
         } else {
           return current_state;
@@ -214,7 +215,7 @@ public:
         * ------------------------------------------------------------------- */
         start();
         ++current_execution_count;
-        notify(current_state = running_state);
+        transitionTo(running_state);
         goto dispatch;
 
       case StoryboardElementState::runningState: /* ----------------------------
@@ -261,7 +262,7 @@ public:
         }
 
         if (accomplished()) {
-          notify(current_state = end_transition);
+          transitionTo(end_transition);
           goto dispatch;
         } else {
           return current_state;
@@ -277,9 +278,8 @@ public:
         *  be used in conditions to trigger based on this transition.
         *
         * -------------------------------------------------------------------- */
-        notify(
-          current_state =
-            current_execution_count < maximum_execution_count ? standby_state : complete_state);
+        transitionTo(
+          current_execution_count < maximum_execution_count ? standby_state : complete_state);
         goto dispatch;
 
       case StoryboardElementState::completeState: /* ---------------------------
@@ -334,7 +334,7 @@ public:
           stop();
         }
 
-        notify(current_state = complete_state);
+        transitionTo(complete_state);
         goto dispatch;
     }
   }
