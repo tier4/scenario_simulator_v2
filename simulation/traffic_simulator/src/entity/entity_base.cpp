@@ -58,10 +58,7 @@ void EntityBase::requestSpeedChange(
            * @brief Checking if the entity reaches target speed.
            */
           [this, target_speed]() {
-            if (getStatus().action_status.twist.linear.x >= target_speed) {
-              return true;
-            }
-            return false;
+            return getStatus().action_status.twist.linear.x >= target_speed;
           },
           /**
            * @brief Resets acceleration limit.
@@ -77,10 +74,7 @@ void EntityBase::requestSpeedChange(
            * @brief Checking if the entity reaches target speed.
            */
           [this, target_speed]() {
-            if (getStatus().action_status.twist.linear.x <= target_speed) {
-              return true;
-            }
-            return false;
+            return getStatus().action_status.twist.linear.x <= target_speed;
           },
           /**
            * @brief Resets deceleration limit.
