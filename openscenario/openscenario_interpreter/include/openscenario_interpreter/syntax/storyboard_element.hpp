@@ -129,7 +129,11 @@ protected:
 
   std::unordered_set<std::string> names;
 
-  auto unique(const std::string & name) { return cdr(names.emplace(name)); }
+  auto unique(const std::string & name)
+  {
+    [[maybe_unused]] auto [iter, success] = names.emplace(name);
+    return success;
+  }
 
   template <typename U, typename Node, typename... Ts>
   auto readStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
