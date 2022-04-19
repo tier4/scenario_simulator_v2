@@ -26,14 +26,14 @@
 #include <utility>
 #include <vector>
 
-
-std::ostream &operator<<(std::ostream &out, const autoware_auto_system_msgs::msg::EmergencyState &msg)
+std::ostream & operator<<(
+  std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & msg)
 {
   using autoware_auto_system_msgs::msg::EmergencyState;
 
-#define CASE(IDENTIFIER)            \
-  case EmergencyState::IDENTIFIER:  \
-    out << #IDENTIFIER;             \
+#define CASE(IDENTIFIER)           \
+  case EmergencyState::IDENTIFIER: \
+    out << #IDENTIFIER;            \
     break
 
   switch (msg.state) {
@@ -53,16 +53,13 @@ std::ostream &operator<<(std::ostream &out, const autoware_auto_system_msgs::msg
 #undef CASE
 }
 
-std::istream &operator>>(std::istream &is, autoware_auto_system_msgs::msg::EmergencyState &msg)
+std::istream & operator>>(std::istream & is, autoware_auto_system_msgs::msg::EmergencyState & msg)
 {
   using autoware_auto_system_msgs::msg::EmergencyState;
-#define STATE(IDENTIFIER) { #IDENTIFIER, EmergencyState::IDENTIFIER }
+#define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
 
   std::unordered_map<std::string, uint8_t> state_dict{
-    STATE(NORMAL),
-    STATE(OVERRIDE_REQUESTING),
-    STATE(MRM_OPERATING),
-    STATE(MRM_SUCCEEDED),
+    STATE(NORMAL), STATE(OVERRIDE_REQUESTING), STATE(MRM_OPERATING), STATE(MRM_SUCCEEDED),
     STATE(MRM_FAILED)};
 
 #undef STATE
@@ -71,7 +68,7 @@ std::istream &operator>>(std::istream &is, autoware_auto_system_msgs::msg::Emerg
   is >> state_str;
 
   auto itr = state_dict.find(state_str);
-  if(itr != state_dict.end()){
+  if (itr != state_dict.end()) {
     msg.set__state(itr->second);
   } else {
     THROW_SEMANTIC_ERROR("Unsupported EmergencyState::state : ", state_str.c_str());
@@ -348,6 +345,20 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
     ids.erase(result, ids.end());
   }
   return ids;
+}
+
+auto EgoEntity::getEmergencyStateString() -> const std::string
+{
+  const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
+  if (universe) {
+    try {
+      auto s = boost::lexical_cast<std::string>(universe->getEmergencyState());
+      return s;
+    } catch (boost::bad_lexical_cast & e) {
+      return "";
+    }
+  }
+  return "";
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray

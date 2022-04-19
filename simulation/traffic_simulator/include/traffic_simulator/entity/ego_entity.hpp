@@ -40,7 +40,7 @@ auto getParameter(const std::string & name, T value = {})
   return value;
 }
 
-// for boost::lexical_cast<EmergencyState>
+// for boost::lexical_cast<EmergencyState[>
 std::ostream &operator<<(std::ostream &out, const autoware_auto_system_msgs::msg::EmergencyState &msg);
 std::istream &operator>>(std::istream &is, autoware_auto_system_msgs::msg::EmergencyState &msg);
 
@@ -108,6 +108,8 @@ public:
     autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
+
+  auto getEmergencyStateString() -> const std::string;
 
   void onUpdate(double current_time, double step_time) override;
 
