@@ -42,6 +42,23 @@ private:
   bool speed_reached;
   void onUpdate() override
   {
+    /**
+     * @brief checking linear acceleration
+     */
+    if (
+      api_.getCurrentTime() != 0.0 && api_.getCurrentTime() <= 1.0 &&
+      api_.getEntityStatus("ego").action_status.accel.linear.x != 10.0) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (
+      api_.getCurrentTime() >= 1.05 &&
+      api_.getEntityStatus("ego").action_status.accel.linear.x > 3.0) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+
+    /**
+     * @brief checking linear speed
+     */
     if (
       api_.getCurrentTime() <= 0.9 &&
       api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {

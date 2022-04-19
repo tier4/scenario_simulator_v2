@@ -253,9 +253,6 @@ TrafficLight::TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_
   if (not map_manager.isTrafficLight(id)) {
     throw common::scenario_simulator_exception::Error(
       "Given lanelet ID ", id, " is not a traffic light ID.");
-  } else if (map_manager.isTrafficRelation(id)) {
-    throw common::scenario_simulator_exception::Error(
-      "Given lanelet ID ", id, " is a traffic relation ID, not a traffic light ID.");
   }
 }
 
