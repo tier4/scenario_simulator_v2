@@ -26,6 +26,8 @@
 #include <utility>
 #include <vector>
 
+namespace autoware_auto_system_msgs::msg
+{
 std::ostream & operator<<(
   std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & msg)
 {
@@ -76,11 +78,13 @@ std::istream & operator>>(std::istream & is, autoware_auto_system_msgs::msg::Eme
 
   return is;
 }
+}  // namespace autoware_auto_system_msgs::msg
 
 namespace traffic_simulator
 {
 namespace entity
 {
+
 auto toString(const VehicleModelType datum) -> std::string
 {
 #define BOILERPLATE(IDENTIFIER)      \
@@ -352,8 +356,7 @@ auto EgoEntity::getEmergencyStateString() -> const std::string
   const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
   if (universe) {
     try {
-      auto s = boost::lexical_cast<std::string>(universe->getEmergencyState());
-      return s;
+      return = boost::lexical_cast<std::string>(universe->getEmergencyState());
     } catch (boost::bad_lexical_cast & e) {
       return "";
     }

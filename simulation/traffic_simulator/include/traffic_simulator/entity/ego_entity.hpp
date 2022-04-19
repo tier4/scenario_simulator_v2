@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
+#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <concealer/autoware_universe.hpp>
@@ -26,7 +27,6 @@
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <vector>
 
 template <typename T>
@@ -41,13 +41,19 @@ auto getParameter(const std::string & name, T value = {})
 }
 
 // for boost::lexical_cast<EmergencyState[>
-std::ostream &operator<<(std::ostream &out, const autoware_auto_system_msgs::msg::EmergencyState &msg);
-std::istream &operator>>(std::istream &is, autoware_auto_system_msgs::msg::EmergencyState &msg);
+namespace autoware_auto_system_msgs::msg
+{
+auto operator<<(std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & msg)
+  -> std::ostream &;
+auto operator>>(std::istream & is, autoware_auto_system_msgs::msg::EmergencyState & msg)
+  -> std::istream &;
+}  // namespace autoware_auto_system_msgs::msg
 
 namespace traffic_simulator
 {
 namespace entity
 {
+
 enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
