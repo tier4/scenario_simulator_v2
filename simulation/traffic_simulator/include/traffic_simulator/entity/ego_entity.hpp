@@ -40,15 +40,6 @@ auto getParameter(const std::string & name, T value = {})
   return value;
 }
 
-// for boost::lexical_cast<EmergencyState[>
-namespace autoware_auto_system_msgs::msg
-{
-auto operator<<(std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & msg)
-  -> std::ostream &;
-auto operator>>(std::istream & is, autoware_auto_system_msgs::msg::EmergencyState & msg)
-  -> std::istream &;
-}  // namespace autoware_auto_system_msgs::msg
-
 namespace traffic_simulator
 {
 namespace entity
@@ -115,7 +106,7 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  auto getEmergencyStateString() -> const std::string;
+  auto getEmergencyStateString() -> std::string;
 
   void onUpdate(double current_time, double step_time) override;
 

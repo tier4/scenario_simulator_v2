@@ -175,4 +175,14 @@ public:
 };
 }  // namespace concealer
 
+// for boost::lexical_cast
+namespace autoware_auto_system_msgs::msg
+{
+auto operator<<(std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & message)
+  -> std::ostream &;
+
+auto operator>>(std::istream & is, autoware_auto_system_msgs::msg::EmergencyState & message)
+  -> std::istream &;
+}  // namespace autoware_auto_system_msgs::msg
+
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_

@@ -26,60 +26,6 @@
 #include <utility>
 #include <vector>
 
-namespace autoware_auto_system_msgs::msg
-{
-std::ostream & operator<<(
-  std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & msg)
-{
-  using autoware_auto_system_msgs::msg::EmergencyState;
-
-#define CASE(IDENTIFIER)           \
-  case EmergencyState::IDENTIFIER: \
-    out << #IDENTIFIER;            \
-    break
-
-  switch (msg.state) {
-    CASE(NORMAL);
-    CASE(OVERRIDE_REQUESTING);
-    CASE(MRM_OPERATING);
-    CASE(MRM_SUCCEEDED);
-    CASE(MRM_FAILED);
-
-    default:
-      THROW_SEMANTIC_ERROR(
-        "Unsupported EmergencyState, state number : ", static_cast<int>(msg.state));
-      break;
-  }
-
-  return out;
-#undef CASE
-}
-
-std::istream & operator>>(std::istream & is, autoware_auto_system_msgs::msg::EmergencyState & msg)
-{
-  using autoware_auto_system_msgs::msg::EmergencyState;
-#define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
-
-  std::unordered_map<std::string, uint8_t> state_dict{
-    STATE(NORMAL), STATE(OVERRIDE_REQUESTING), STATE(MRM_OPERATING), STATE(MRM_SUCCEEDED),
-    STATE(MRM_FAILED)};
-
-#undef STATE
-
-  std::string state_str;
-  is >> state_str;
-
-  auto itr = state_dict.find(state_str);
-  if (itr != state_dict.end()) {
-    msg.set__state(itr->second);
-  } else {
-    THROW_SEMANTIC_ERROR("Unsupported EmergencyState::state : ", state_str.c_str());
-  }
-
-  return is;
-}
-}  // namespace autoware_auto_system_msgs::msg
-
 namespace traffic_simulator
 {
 namespace entity
@@ -351,13 +297,13 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   return ids;
 }
 
-auto EgoEntity::getEmergencyStateString() -> const std::string
+auto EgoEntity::getEmergencyStateString() -> std::string
 {
   const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
   if (universe) {
     try {
       return boost::lexical_cast<std::string>(universe->getEmergencyState());
-    } catch (boost::bad_lexical_cast & e) {
+    } catch (const boost::bad_lexical_cast &) {
       return "";
     }
   }

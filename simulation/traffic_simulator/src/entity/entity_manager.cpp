@@ -615,7 +615,7 @@ bool EntityManager::setEntityStatus(
   return entities_.at(name)->setStatus(status);
 }
 
-auto EntityManager::getEmergencyStateString(const std::string & name) -> const std::string
+auto EntityManager::getEmergencyStateString(const std::string & name) -> std::string
 {
   if (!isEgo(name)) {
     THROW_SEMANTIC_ERROR(
