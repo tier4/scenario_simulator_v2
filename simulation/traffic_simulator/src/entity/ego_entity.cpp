@@ -36,7 +36,6 @@ std::ostream &operator<<(std::ostream &out, const autoware_auto_system_msgs::msg
     out << #IDENTIFIER;             \
     break
 
-
   switch (msg.state) {
     CASE(NORMAL);
     CASE(OVERRIDE_REQUESTING);
@@ -45,6 +44,8 @@ std::ostream &operator<<(std::ostream &out, const autoware_auto_system_msgs::msg
     CASE(MRM_FAILED);
 
     default:
+      THROW_SEMANTIC_ERROR(
+        "Unsupported EmergencyState, state number : ", static_cast<int>(msg.state));
       break;
   }
 
@@ -72,6 +73,8 @@ std::istream &operator>>(std::istream &is, autoware_auto_system_msgs::msg::Emerg
   auto itr = state_dict.find(state_str);
   if(itr != state_dict.end()){
     msg.set__state(itr->second);
+  } else {
+    THROW_SEMANTIC_ERROR("Unsupported EmergencyState::state : ", state_str.c_str());
   }
 
   return is;
