@@ -57,7 +57,7 @@ private:
     config.min_velocity = 2.95;
     config.max_velocity = 3.05;
     config.min_acceleration = -0.1;
-    config.max_acceleration = 0.1;
+    config.vel_rate_lim = 0.1;
     api_.addMetric<metrics::OutOfRangeMetric>("ego_out_of_range", config);
   }
 };

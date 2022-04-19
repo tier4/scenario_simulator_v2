@@ -57,7 +57,7 @@ traffic_simulator_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStat
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = boost::algorithm::clamp(
     entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10,
-    vehicle_parameters.performance.max_speed);
+    vehicle_parameters.performance.vel_lim);
   twist_new.linear.y = 0.0;
   twist_new.linear.z = 0.0;
   twist_new.angular.x = 0.0;
@@ -127,8 +127,8 @@ traffic_simulator_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStat
 traffic_simulator_msgs::msg::EntityStatus
 VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_speed)
 {
-  if (target_speed > vehicle_parameters.performance.max_speed) {
-    target_speed = vehicle_parameters.performance.max_speed;
+  if (target_speed > vehicle_parameters.performance.vel_lim) {
+    target_speed = vehicle_parameters.performance.vel_lim;
   } else {
     target_speed = entity_status.action_status.twist.linear.x;
   }

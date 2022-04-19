@@ -83,8 +83,8 @@ message EntityStatus {
  * Protobuf definition of traffic_simulator_msgs/msg/Performance type in ROS2.
  **/
 message Performance {
-  double max_speed = 1;        // Max speed of the entity.
-  double max_acceleration = 2; // Max acceleration of the entity.
+  double vel_lim = 1;          // Max speed of the entity.
+  double vel_rate_lim = 2;     // Max acceleration of the entity.
   double max_deceleration = 3; // Max deceleration of the entity.
 }
 

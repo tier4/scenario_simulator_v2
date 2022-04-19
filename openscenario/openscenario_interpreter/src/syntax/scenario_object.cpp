@@ -37,10 +37,10 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
     const auto parameters = static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle);
 
     configuration.target_entity = name;
-    configuration.min_velocity = -parameters.performance.max_speed;
-    configuration.max_velocity = +parameters.performance.max_speed;
+    configuration.min_velocity = -parameters.performance.vel_lim;
+    configuration.max_velocity = +parameters.performance.vel_lim;
     configuration.min_acceleration = -parameters.performance.max_deceleration;
-    configuration.max_acceleration = +parameters.performance.max_acceleration;
+    configuration.max_acceleration = +parameters.performance.vel_rate_lim;
 
     if (object_controller.is<Controller>()) {
       configuration.max_jerk = object_controller.as<Controller>().properties.get<Double>(

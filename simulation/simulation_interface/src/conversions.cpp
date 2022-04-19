@@ -119,7 +119,7 @@ void toProto(
 {
   proto.set_max_acceleration(performance.max_acceleration);
   proto.set_max_deceleration(performance.max_deceleration);
-  proto.set_max_speed(performance.max_speed);
+  proto.set_vel_lim(performance.vel_lim);
 }
 
 void toMsg(
@@ -128,7 +128,7 @@ void toMsg(
 {
   performance.max_acceleration = proto.max_acceleration();
   performance.max_deceleration = proto.max_deceleration();
-  performance.max_speed = proto.max_speed();
+  performance.vel_lim = proto.vel_lim();
 }
 
 void toProto(const traffic_simulator_msgs::msg::Axle & axle, traffic_simulator_msgs::Axle & proto)

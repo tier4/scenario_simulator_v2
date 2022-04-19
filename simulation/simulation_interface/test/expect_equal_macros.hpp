@@ -89,9 +89,9 @@
  * @brief Expect equal macros for traffic_simulator_msgs.
  */
 
-#define EXPECT_PERFORMANCE_EQ(MSG, PROTO)                           \
-  EXPECT_DOUBLE_EQ(MSG.max_speed, PROTO.max_speed());               \
-  EXPECT_DOUBLE_EQ(MSG.max_acceleration, PROTO.max_acceleration()); \
+#define EXPECT_PERFORMANCE_EQ(MSG, PROTO)                   \
+  EXPECT_DOUBLE_EQ(MSG.vel_lim, PROTO.vel_lim());           \
+  EXPECT_DOUBLE_EQ(MSG.vel_rate_lim, PROTO.vel_rate_lim()); \
   EXPECT_DOUBLE_EQ(MSG.max_deceleration, PROTO.max_deceleration());
 
 #define EXPECT_AXLE_EQ(MSG, PROTO)                              \
