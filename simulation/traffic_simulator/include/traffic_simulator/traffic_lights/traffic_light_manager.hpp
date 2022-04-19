@@ -67,10 +67,7 @@ protected:
 public:
   auto getTrafficLight(const LaneletID lanelet_id) -> auto &
   {
-    if (hdmap_->isTrafficRelation(lanelet_id)) {
-      throw common::scenario_simulator_exception::Error(
-        "Given Lanelet ID ", lanelet_id, " is a traffic relation ID, not a traffic light ID.");
-    } else if (auto iter = traffic_lights_.find(lanelet_id); iter != std::end(traffic_lights_)) {
+    if (auto iter = traffic_lights_.find(lanelet_id); iter != std::end(traffic_lights_)) {
       return iter->second;
     } else {
       traffic_lights_.emplace(

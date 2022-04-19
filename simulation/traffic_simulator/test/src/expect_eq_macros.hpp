@@ -20,6 +20,9 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 
+#define EXPECT_DECIMAL_EQ(DATA0, DATA1, TOLERANCE) \
+  EXPECT_TRUE(std::fabs(DATA0 - DATA1) <= std::fabs(TOLERANCE));
+
 #define EXPECT_POINT_EQ(DATA0, DATA1) \
   EXPECT_DOUBLE_EQ(DATA0.x, DATA1.x); \
   EXPECT_DOUBLE_EQ(DATA0.y, DATA1.y); \
