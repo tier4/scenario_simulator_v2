@@ -68,7 +68,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
-  using EmenrgencyState = autoware_auto_system_msgs::msg::EmergencyState;
+  using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
@@ -76,7 +76,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
-  CONCEALER_DEFINE_SUBSCRIPTION(EmenrgencyState);
+  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
@@ -124,7 +124,7 @@ public:
     CONCEALER_INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
-    CONCEALER_INIT_SUBSCRIPTION(EmenrgencyState, "/system/emergency/emergency_state"),
+    CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
