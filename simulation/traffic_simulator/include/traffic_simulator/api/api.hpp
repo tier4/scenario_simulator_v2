@@ -74,7 +74,7 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    zeromq_client_(simulation_interface::protocol, simulation_interface::HostName::LOCALHOST)
+    zeromq_client_(simulation_interface::protocol, configuration.simulator_host)
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
@@ -195,8 +195,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficLightArrow);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
   FORWARD_TO_ENTITY_MANAGER(getVehicleCommand);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(ready);
@@ -207,11 +208,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
-  // FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrowPhase);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightColor);
-  FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);

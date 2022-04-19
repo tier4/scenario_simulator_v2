@@ -40,6 +40,8 @@ struct Configuration
 
   double initialize_duration = 0;
 
+  std::string simulator_host = "localhost";
+
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  This setting comes from the argument of the same name (= `map_path`) in

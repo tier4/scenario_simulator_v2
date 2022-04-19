@@ -37,7 +37,7 @@ BT::NodeStatus ActionNode::executeTick() { return BT::ActionNodeBase::executeTic
 
 void ActionNode::getBlackBoardValues()
 {
-  if (!getInput("request", request)) {
+  if (!getInput<traffic_simulator::behavior::Request>("request", request)) {
     THROW_SIMULATION_ERROR("failed to get input request in ActionNode");
   }
   if (!getInput<double>("step_time", step_time)) {
@@ -170,10 +170,12 @@ boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
   }
   std::set<double> collision_points = {};
   for (const auto id : traffic_light_ids) {
-    const auto color = traffic_light_manager->getColor(id);
-    if (
-      color == traffic_simulator::TrafficLightColor::RED ||
-      color == traffic_simulator::TrafficLightColor::YELLOW) {
+    using Color = traffic_simulator::TrafficLight::Color;
+    using Status = traffic_simulator::TrafficLight::Status;
+    using Shape = traffic_simulator::TrafficLight::Shape;
+    if (auto && traffic_light = traffic_light_manager->getTrafficLight(id);
+        traffic_light.contains(Color::red, Status::solid_on, Shape::circle) or
+        traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
       const auto collision_point = hdmap_utils->getDistanceToTrafficLightStopLine(waypoints, id);
       if (collision_point) {
         collision_points.insert(collision_point.get());
@@ -363,8 +365,9 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   return false;
 }
 
-double ActionNode::calculateStopDistance() const
+double ActionNode::calculateStopDistance(double deceleration) const
 {
-  return std::pow(entity_status.action_status.twist.linear.x, 2) / (2 * 5);
+  return (entity_status.action_status.twist.linear.x * entity_status.action_status.twist.linear.x) /
+         (2 * std::fabs(deceleration));
 }
 }  // namespace entity_behavior

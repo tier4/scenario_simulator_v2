@@ -35,10 +35,11 @@ MiscObject::operator traffic_simulator_msgs::msg::MiscObjectParameters() const
 {
   traffic_simulator_msgs::msg::MiscObjectParameters misc_object_parameters;
   {
+    using namespace traffic_simulator_msgs;
+
     misc_object_parameters.name = name;
-    misc_object_parameters.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
-    misc_object_parameters.bounding_box =
-      static_cast<const traffic_simulator_msgs::msg::BoundingBox>(bounding_box);
+    misc_object_parameters.subtype = static_cast<msg::EntitySubtype>(misc_object_category);
+    misc_object_parameters.bounding_box = static_cast<msg::BoundingBox>(bounding_box);
   }
 
   return misc_object_parameters;

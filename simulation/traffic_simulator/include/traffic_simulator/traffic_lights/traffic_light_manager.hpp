@@ -23,6 +23,7 @@
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -55,99 +56,54 @@ protected:
     hdmap_(hdmap),
     map_frame_(map_frame)
   {
-    for (const auto id : hdmap->getTrafficLightIds()) {
-      std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions;
-      if (
-        const auto red_position = hdmap->getTrafficLightBulbPosition(id, TrafficLightColor::RED)) {
-        color_positions.emplace(TrafficLightColor::RED, red_position.get());
-      }
-      if (
-        const auto yellow_position =
-          hdmap->getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW)) {
-        color_positions.emplace(TrafficLightColor::YELLOW, yellow_position.get());
-      }
-      if (
-        const auto green_position =
-          hdmap->getTrafficLightBulbPosition(id, TrafficLightColor::GREEN)) {
-        color_positions.emplace(TrafficLightColor::GREEN, green_position.get());
-      }
-      traffic_lights_.emplace(
-        std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, color_positions));
-    }
   }
 
   auto deleteAllMarkers() const -> void;
 
   auto drawMarkers() const -> void;
 
-  template <typename F>
-  auto forEachTrafficLights(const LaneletID lanelet_id, F && f) -> void
-  {
-    if (isTrafficLightId(lanelet_id)) {
-      f(traffic_lights_.at(lanelet_id));
-    } else if (isTrafficRelationId(lanelet_id)) {
-      for (auto && traffic_light : hdmap_->getTrafficLight(lanelet_id)->trafficLights()) {
-        f(traffic_lights_.at(traffic_light.id()));
-      }
-    } else {
-      std::stringstream what;
-      what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))
-           << " is neither a traffic light ID not a traffc light relation ID.";
-      THROW_SEMANTIC_ERROR(what.str());
-    }
-  }
-
   virtual auto publishTrafficLightStateArray() const -> void = 0;
 
 public:
-  auto getIds() const -> std::vector<LaneletID>;
+  auto getTrafficLight(const LaneletID lanelet_id) -> auto &
+  {
+    if (auto iter = traffic_lights_.find(lanelet_id); iter != std::end(traffic_lights_)) {
+      return iter->second;
+    } else {
+      traffic_lights_.emplace(
+        std::piecewise_construct, std::forward_as_tuple(lanelet_id),
+        std::forward_as_tuple(lanelet_id, *hdmap_));
+      return traffic_lights_.at(lanelet_id);
+    }
+  }
 
-  auto getInstance(const LaneletID) const -> TrafficLight;
+  auto getTrafficLights() const -> const auto & { return traffic_lights_; }
+
+  auto getTrafficLights() -> auto & { return traffic_lights_; }
+
+  auto getTrafficRelationReferees(const LaneletID lanelet_id)
+    -> std::vector<std::reference_wrapper<TrafficLight>>
+  {
+    std::vector<std::reference_wrapper<TrafficLight>> refers;
+
+    if (hdmap_->isTrafficRelation(lanelet_id)) {
+      for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
+        refers.emplace_back(getTrafficLight(traffic_light.id()));
+      }
+    } else if (hdmap_->isTrafficLight(lanelet_id)) {
+      refers.emplace_back(getTrafficLight(lanelet_id));
+    } else {
+      throw common::scenario_simulator_exception::Error(
+        "Given lanelet ID ", lanelet_id,
+        " is neither a traffic light ID not a traffic relation ID.");
+    }
+
+    return refers;
+  }
 
   auto hasAnyLightChanged() -> bool;
 
   auto update(const double) -> void;
-
-  auto isTrafficLightId(const LaneletID) -> bool;
-
-  auto isTrafficRelationId(const LaneletID) -> bool;
-
-#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                         \
-  template <typename... Ts>                                                                \
-  auto IDENTIFIER(const LaneletID lanelet_id, Ts &&... xs)->decltype(auto)                 \
-  {                                                                                        \
-    try {                                                                                  \
-      return traffic_lights_.at(lanelet_id).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-    } catch (const std::out_of_range &) {                                                  \
-      std::stringstream what;                                                              \
-      what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))               \
-           << " is not a valid traffic-light ID.";                                         \
-      THROW_SEMANTIC_ERROR(what.str());                                                    \
-    }                                                                                      \
-  }                                                                                        \
-  static_assert(true, "")
-
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(getArrow);
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(getColor);
-
-#undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
-
-#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                         \
-  template <typename T>                                                    \
-  auto IDENTIFIER(const LaneletID lanelet_id, const T & x)->decltype(auto) \
-  {                                                                        \
-    forEachTrafficLights(lanelet_id, [&](auto && traffic_light) {          \
-      return traffic_light.IDENTIFIER(std::forward<decltype(x)>(x));       \
-    });                                                                    \
-  }                                                                        \
-  static_assert(true, "")
-
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrow);
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrowPhase);
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setColor);
-  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setColorPhase);
-
-#undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
 };
 
 template <typename Message>

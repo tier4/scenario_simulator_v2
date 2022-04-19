@@ -12,6 +12,7 @@
 
   <depend version_gte="1.11.2">pluginlib</depend>
   <depend>class_loader</depend>
+  <depend>color_names</depend>
   <depend>openscenario_interpreter_msgs</depend>
   <depend>qtbase5-dev</depend>
   <depend>rclcpp</depend>

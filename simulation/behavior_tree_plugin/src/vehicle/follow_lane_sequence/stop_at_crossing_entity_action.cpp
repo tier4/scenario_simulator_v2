@@ -34,8 +34,7 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle>
-StopAtCrossingEntityAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+StopAtCrossingEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stop_target_) {
     return boost::none;
@@ -43,8 +42,7 @@ StopAtCrossingEntityAction::calculateObstacle(
   if (distance_to_stop_target_.get() < 0) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
-  if (distance_to_stop_target_.get() > spline.getLength()) {
+  if (distance_to_stop_target_.get() > reference_trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -60,8 +58,7 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::ca
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
-    waypoints.waypoints = spline.getTrajectory(
+    waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
       entity_status.lanelet_pose.offset);
     return waypoints;
@@ -77,7 +74,7 @@ boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double 
   }
   double rest_distance =
     distance_to_stop_target_.get() - (vehicle_parameters.bounding_box.dimensions.x + 3);
-  if (rest_distance < calculateStopDistance()) {
+  if (rest_distance < calculateStopDistance(driver_model.deceleration)) {
     if (rest_distance > 0) {
       return std::sqrt(2 * driver_model.deceleration * rest_distance);
     } else {
@@ -90,7 +87,9 @@ boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double 
 BT::NodeStatus StopAtCrossingEntityAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }

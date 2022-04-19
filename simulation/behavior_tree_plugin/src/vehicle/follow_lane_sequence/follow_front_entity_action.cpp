@@ -33,8 +33,7 @@ FollowFrontEntityAction::FollowFrontEntityAction(
 }
 
 const boost::optional<traffic_simulator_msgs::msg::Obstacle>
-FollowFrontEntityAction::calculateObstacle(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints)
+FollowFrontEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_front_entity_) {
     return boost::none;
@@ -42,8 +41,7 @@ FollowFrontEntityAction::calculateObstacle(
   if (distance_to_front_entity_.get() < 0) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
-  if (distance_to_front_entity_.get() > spline.getLength()) {
+  if (distance_to_front_entity_.get() > reference_trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -61,8 +59,7 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
-    traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
-    waypoints.waypoints = spline.getTrajectory(
+    waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
     return waypoints;
@@ -74,7 +71,9 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
 BT::NodeStatus FollowFrontEntityAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
   if (getRightOfWayEntities(route_lanelets).size() != 0) {
@@ -122,8 +121,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   if (
-    distance_to_front_entity_.get() >=
-    (calculateStopDistance() + vehicle_parameters.bounding_box.dimensions.x + 5)) {
+    distance_to_front_entity_.get() >= (calculateStopDistance(driver_model.deceleration) +
+                                        vehicle_parameters.bounding_box.dimensions.x + 5)) {
     auto entity_status_updated =
       calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x + 2);
     setOutput("updated_status", entity_status_updated);
@@ -131,7 +130,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
-  } else if (distance_to_front_entity_.get() <= calculateStopDistance()) {
+  } else if (distance_to_front_entity_.get() <= calculateStopDistance(driver_model.deceleration)) {
     auto entity_status_updated =
       calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x - 2);
     setOutput("updated_status", entity_status_updated);

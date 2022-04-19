@@ -141,7 +141,7 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "sensor_model:=" + getParameter<std::string>("sensor_model"),
                  "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
                  "rviz_config:=" + configuration.rviz_config_path.string(),
-                 "scenario_simulation:=true")
+                 "scenario_simulation:=true", "perception/enable_traffic_light:=false")
              : std::make_unique<concealer::AutowareUniverse>();
   } else {
     throw common::SemanticError(
@@ -241,20 +241,25 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     status.pose.position.y = v(1) + initial_pose_.get().position.y;
     status.pose.position.z = v(2) + initial_pose_.get().position.z;
 
-    const auto closest_lanelet_id = hdmap_utils_ptr_->getClosestLaneletId(status.pose);
-    if (!closest_lanelet_id) {
-      THROW_SEMANTIC_ERROR("failed to find the closest lane, lane is too far away.");
-    }
-
-    traffic_simulator::math::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(closest_lanelet_id.get()));
-    if (const auto s_value = spline.getSValue(status.pose)) {
-      status.pose.position.z = spline.getPoint(s_value.get()).z;
-    }
-
     status.pose.orientation = initial_pose_.get().orientation * pose.orientation;
 
-    const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
+    const auto route_lanelets = getRouteLanelets();
+
+    boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+
+    if (route_lanelets.empty()) {
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
+    } else {
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, route_lanelets, 1.0);
+    }
+
+    if (lanelet_pose) {
+      traffic_simulator::math::CatmullRomSpline spline(
+        hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+      if (const auto s_value = spline.getSValue(status.pose)) {
+        status.pose.position.z = spline.getPoint(s_value.get()).z;
+      }
+    }
 
     status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
     if (status.lanelet_pose_valid) {
@@ -274,6 +279,21 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
 auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return boost::none;
+}
+
+auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
+{
+  const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
+  std::vector<std::int64_t> ids = {};
+  if (universe) {
+    const auto points = universe->getPathWithLaneId().points;
+    for (const auto point : points) {
+      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+    }
+    auto result = std::unique(ids.begin(), ids.end());
+    ids.erase(result, ids.end());
+  }
+  return ids;
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray

@@ -61,6 +61,7 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
     } else {
       std::vector<geometry_msgs::msg::Point> center_points =
         hdmap_utils->getCenterPoints(following_lanelets);
+      // DIFFERENT SPLINE - recalculation needed
       traffic_simulator::math::CatmullRomSpline spline(center_points);
       const auto straight_waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
       waypoints.waypoints = straight_waypoints;
@@ -90,7 +91,7 @@ void LaneChangeAction::getBlackBoardValues()
 BT::NodeStatus LaneChangeAction::tick()
 {
   getBlackBoardValues();
-  if (request != "lane_change") {
+  if (request != traffic_simulator::behavior::Request::LANE_CHANGE) {
     curve_ = boost::none;
     current_s_ = 0;
     return BT::NodeStatus::FAILURE;
@@ -101,7 +102,7 @@ BT::NodeStatus LaneChangeAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!curve_) {
-    if (request == "lane_change") {
+    if (request == traffic_simulator::behavior::Request::LANE_CHANGE) {
       if (!hdmap_utils->canChangeLane(
             entity_status.lanelet_pose.lanelet_id, lane_change_parameters_->target.lanelet_id)) {
         return BT::NodeStatus::FAILURE;

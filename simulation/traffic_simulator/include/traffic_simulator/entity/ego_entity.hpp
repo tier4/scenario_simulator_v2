@@ -96,6 +96,8 @@ public:
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
+  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+
   auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand> override;

@@ -37,6 +37,14 @@ auto GlobalAction::endsImmediately() const -> bool
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
 }
 
+auto GlobalAction::evaluate() -> Object
+{
+  assert(endsImmediately());  // NOTE: Called from `InitActions::evaluate`
+  apply<void>([](auto && action) { return action.start(); }, *this);
+  apply<void>([](auto && action) { return action.run(); }, *this);
+  return unspecified;
+}
+
 auto GlobalAction::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);
