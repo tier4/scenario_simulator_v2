@@ -301,10 +301,19 @@ double HermiteCurve::getMaximum2DCurvature() const
   return values.second;
 }
 
+/**
+ * @brief get length of the hermite curve. Calculate distance of two points on hermite curve and accumulate it's distance
+ * @param num_points 
+ * @return double length
+ */
 double HermiteCurve::getLength(size_t num_points) const
 {
   double delta_s = 1.0 / num_points;
   double ret = 0.0;
+  /**
+   * @brief Approximate distance of two points on hermite curve, ignore terms above the second order of delta s.
+   * @image html get_length_in_hermite_curve.png
+   */
   for (size_t i = 0; i < num_points; i++) {
     double s = i * delta_s;
     double x_diff = (3 * s * s) * ax_ + 2 * s * bx_ + cx_;
