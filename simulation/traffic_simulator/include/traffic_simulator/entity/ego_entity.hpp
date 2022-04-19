@@ -26,6 +26,7 @@
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
+#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <vector>
 
 template <typename T>
@@ -38,6 +39,10 @@ auto getParameter(const std::string & name, T value = {})
 
   return value;
 }
+
+// for boost::lexical_cast<EmergencyState>
+std::ostream &operator<<(std::ostream &out, const autoware_auto_system_msgs::msg::EmergencyState &msg);
+std::istream &operator>>(std::istream &is, autoware_auto_system_msgs::msg::EmergencyState &msg);
 
 namespace traffic_simulator
 {

@@ -26,6 +26,57 @@
 #include <utility>
 #include <vector>
 
+
+std::ostream &operator<<(std::ostream &out, const autoware_auto_system_msgs::msg::EmergencyState &msg)
+{
+  using autoware_auto_system_msgs::msg::EmergencyState;
+
+#define CASE(IDENTIFIER)            \
+  case EmergencyState::IDENTIFIER:  \
+    out << #IDENTIFIER;             \
+    break
+
+
+  switch (msg.state) {
+    CASE(NORMAL);
+    CASE(OVERRIDE_REQUESTING);
+    CASE(MRM_OPERATING);
+    CASE(MRM_SUCCEEDED);
+    CASE(MRM_FAILED);
+
+    default:
+      break;
+  }
+
+  return out;
+#undef CASE
+}
+
+std::istream &operator>>(std::istream &is, autoware_auto_system_msgs::msg::EmergencyState &msg)
+{
+  using autoware_auto_system_msgs::msg::EmergencyState;
+#define STATE(IDENTIFIER) { #IDENTIFIER, EmergencyState::IDENTIFIER }
+
+  std::unordered_map<std::string, uint8_t> state_dict{
+    STATE(NORMAL),
+    STATE(OVERRIDE_REQUESTING),
+    STATE(MRM_OPERATING),
+    STATE(MRM_SUCCEEDED),
+    STATE(MRM_FAILED)};
+
+#undef STATE
+
+  std::string state_str;
+  is >> state_str;
+
+  auto itr = state_dict.find(state_str);
+  if(itr != state_dict.end()){
+    msg.set__state(itr->second);
+  }
+
+  return is;
+}
+
 namespace traffic_simulator
 {
 namespace entity
