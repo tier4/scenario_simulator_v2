@@ -338,6 +338,8 @@ public:
 
   bool setEntityStatus(const std::string & name, traffic_simulator_msgs::msg::EntityStatus status);
 
+  auto getEmergencyStateString(const std::string & name) -> const std::string;
+
   void setVerbose(const bool verbose);
 
   template <typename Entity, typename... Ts>

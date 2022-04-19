@@ -356,7 +356,7 @@ auto EgoEntity::getEmergencyStateString() -> const std::string
   const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
   if (universe) {
     try {
-      return = boost::lexical_cast<std::string>(universe->getEmergencyState());
+      return boost::lexical_cast<std::string>(universe->getEmergencyState());
     } catch (boost::bad_lexical_cast & e) {
       return "";
     }

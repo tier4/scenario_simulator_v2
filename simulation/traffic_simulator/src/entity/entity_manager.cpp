@@ -615,6 +615,22 @@ bool EntityManager::setEntityStatus(
   return entities_.at(name)->setStatus(status);
 }
 
+auto EntityManager::getEmergencyStateString(const std::string & name) -> const std::string
+{
+  if (!isEgo(name)) {
+    THROW_SEMANTIC_ERROR(
+      "You can only get EmergencyState if the Autoware.Universe is behind entity (i.e. ego "
+      "vehicle)");
+  }
+
+  const auto ego = dynamic_cast<EgoEntity *>(entities_.at(name).get());
+  if (ego) {
+    return ego->getEmergencyStateString();
+  }
+
+  THROW_SEMANTIC_ERROR("dynamic_cast to EgoEntity failed even though isEgo (name) == true");
+}
+
 void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;
