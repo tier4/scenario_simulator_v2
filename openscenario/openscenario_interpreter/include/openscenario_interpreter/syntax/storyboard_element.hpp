@@ -261,11 +261,7 @@ public:
         *    completeState.
         *
         * ------------------------------------------------------------------- */
-        if (0 <= getCurrentTime()) {
-          run();
-        }
-
-        if (accomplished()) {
+        if (run(), accomplished()) {
           transitionTo(end_transition);
           goto dispatch;
         } else {
