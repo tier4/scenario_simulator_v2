@@ -38,22 +38,32 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 
 auto Storyboard::run() -> void
 {
-  if (engaged) {
-    for (auto && story : elements) {
-      story.evaluate();
-    }
-  } else if (std::all_of(  // XXX DIRTY HACK!!!
-               std::cbegin(global().entities), std::cend(global().entities),
-               [&](const auto & each) {
-                 return not std::get<1>(each).template as<ScenarioObject>().is_added or
-                        openscenario_interpreter::ready(std::get<0>(each));
-               })) {
-    for (const auto & each : global().entities) {
-      if (std::get<1>(each).template as<ScenarioObject>().is_added) {
-        engage(std::get<0>(each));
+  for (auto && story : elements) {
+    story.evaluate();
+  }
+}
+
+auto Storyboard::start() -> void
+{
+  auto everyone_engageable = [this]() {
+    return std::all_of(
+      std::cbegin(global().entities), std::cend(global().entities), [&](const auto & each) {
+        const auto & [name, scenario_object] = each;
+        return not scenario_object.template as<ScenarioObject>().is_added or
+               openscenario_interpreter::ready(name);
+      });
+  };
+
+  auto engage_everyone = [this]() {
+    for (const auto & [name, scenario_object] : global().entities) {
+      if (scenario_object.template as<ScenarioObject>().is_added) {
+        engage(name);
       }
     }
-    engaged = true;
+  };
+
+  if (everyone_engageable()) {
+    return engage_everyone();
   } else {
     throw common::AutowareError(
       "Autoware did not reach an engageable state within the specified time "
