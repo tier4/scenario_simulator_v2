@@ -142,31 +142,18 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       });
   };
 
-  auto warnFrameDrop = [this](const auto & statistics) {
-    RCLCPP_WARN_STREAM(
-      get_logger(),
-      "Your machine is not powerful enough to run the scenario at the specified frame rate ("
-        << local_frame_rate << " Hz). We recommend that you reduce the frame rate to "
-        << 1000.0 / statistics.template max<std::chrono::milliseconds>().count() << " or less.");
-  };
-
   auto evaluateStoryboard = [&]() {
     withExceptionHandler(
       [this](auto &&...) { deactivate(); },
-      [&]() {
+      [this]() {
         if (getCurrentTime() < 0) {
           updateFrame();
         } else if (currentScenarioDefinition()) {
-          if (const auto evaluation_time = execution_timer.invoke(
-                "evaluate",
-                [this]() {
-                  currentScenarioDefinition()->evaluate();
-                  updateFrame();
-                  publishCurrentContext();
-                });
-              currentLocalFrameRate() < evaluation_time) {
-            warnFrameDrop(execution_timer.getStatistics("evaluate"));
-          }
+          withTimeoutHandler(defaultTimeoutHandler(), [this]() {
+            currentScenarioDefinition()->evaluate();
+            updateFrame();
+            publishCurrentContext();
+          });
         } else {
           throw Error("No script evaluable.");
         }
