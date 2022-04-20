@@ -30,7 +30,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-
 auto toString(const VehicleModelType datum) -> std::string
 {
 #define BOILERPLATE(IDENTIFIER)      \

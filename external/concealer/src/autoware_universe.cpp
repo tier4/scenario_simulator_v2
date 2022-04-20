@@ -226,9 +226,8 @@ std::ostream & operator<<(
     CASE(OVERRIDE_REQUESTING);
 
     default:
-      THROW_SEMANTIC_ERROR(
+      throw common::Error(
         "Unsupported EmergencyState, state number : ", static_cast<int>(message.state));
-      break;
   }
 
   return out;
@@ -255,7 +254,7 @@ std::istream & operator>>(
   if (iter != state_dictionary.end()) {
     message.set__state(iter->second);
   } else {
-    THROW_SEMANTIC_ERROR("Unsupported EmergencyState::state : ", state_string.c_str());
+    throw common::Error("Unsupported EmergencyState::state : ", state_string.c_str());
   }
 
   return is;

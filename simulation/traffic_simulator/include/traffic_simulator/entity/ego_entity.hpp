@@ -44,7 +44,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-
 enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
