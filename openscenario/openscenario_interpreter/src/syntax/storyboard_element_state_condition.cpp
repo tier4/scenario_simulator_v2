@@ -29,20 +29,17 @@ StoryboardElementStateCondition::StoryboardElementStateCondition(
   state(readAttribute<StoryboardElementState>("state", node, local())),
   current_state(StoryboardElementState::standbyState)
 {
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  Register a callback for the StoryboardElement specified by
-   *  storyboardElementRef to notify that it has transitioned to the monitored
-   *  state.
-   *
-   *  Note that there is no guarantee that the StoryboardElement will remain in
-   *  the same state as when the notification is made until
-   *  StoryboardElementStateCondition::evaluate is executed after the callback
-   *  is called. The In other words, the StoryboardElement may immediately
-   *  transition to the next state after calling the callback function.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     Register a callback for the StoryboardElement specified by
+     storyboardElementRef to notify that it has transitioned to the monitored
+     state.
 
+     Note that there is no guarantee that the StoryboardElement will remain in
+     the same state as when the notification is made until
+     StoryboardElementStateCondition::evaluate is executed after the callback
+     is called. The In other words, the StoryboardElement may immediately
+     transition to the next state after calling the callback function.
+  */
   local()
     .ref<StoryboardElement>(storyboard_element_ref)
     .callbacks[state]
@@ -70,22 +67,19 @@ auto StoryboardElementStateCondition::evaluate() -> Object
     return current_state = storyboard_element().state().template as<StoryboardElementState>();
   };
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  Note that current_state may have been updated by a callback function set
-   *  in the constructor (before this member function was called).  And at this
-   *  point local().ref<StoryboardElement>(storyboard_element_ref).state() may
-   *  have transitioned to a different state than the one recorded in
-   *  current_state.
-   *
-   *  Therefore, we must first check to see if the callback function has
-   *  updated current_state (= has the StoryboardElement transitioned to the
-   *  monitored state at least once since the last time evaluate was called),
-   *  and then check to see if the current StoryboardElement state is indeed
-   *  the state being monitored.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     Note that current_state may have been updated by a callback function set
+     in the constructor (before this member function was called).  And at this
+     point local().ref<StoryboardElement>(storyboard_element_ref).state() may
+     have transitioned to a different state than the one recorded in
+     current_state.
 
+     Therefore, we must first check to see if the callback function has updated
+     current_state (= has the StoryboardElement transitioned to the monitored
+     state at least once since the last time evaluate was called), and then
+     check to see if the current StoryboardElement state is indeed the state
+     being monitored.
+  */
   return asBoolean(current_state == state or update() == state);
 }
 }  // namespace syntax
