@@ -61,11 +61,6 @@ auto Storyboard::run() -> void
   }
 }
 
-auto Storyboard::start() -> void
-{
-  init.evaluate();  // NOTE RENAME TO 'start'?
-}
-
 auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::json &
 {
   json["currentState"] = boost::lexical_cast<std::string>(datum.state());

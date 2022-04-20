@@ -129,6 +129,19 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
+  auto initializeStoryboard = [this]() {
+    return withExceptionHandler(
+      [this](auto &&...) { deactivate(); },
+      [this]() {
+        if (currentScenarioDefinition()) {
+          currentScenarioDefinition()->storyboard.init.evaluate();
+          updateFrame();
+        } else {
+          throw Error("No script evaluable.");
+        }
+      });
+  };
+
   auto evaluateStoryboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) { deactivate(); },
@@ -153,7 +166,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
                 << " or less.");
           }
         } else {
-          throw Error("No script evaluable");
+          throw Error("No script evaluable.");
         }
       });
   };
@@ -173,11 +186,25 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
 
+        /*
+           DIRTY HACK!
+
+           Since traffic_simulator is initially in an undefined internal state,
+           it will not have the necessary information to transition from
+           Autoware's INITIALIZING state to the WAITING_FOR_ROUTE state unless
+           it calls updateFrame at least once. This means that the simulation
+           cannot start at exactly zero simulation time, which is a serious
+           problem that must be solved in the future.
+        */
+        updateFrame();
+
         execution_timer.clear();
 
         publisher_of_context->on_activate();
 
         assert(publisher_of_context->is_activated());
+
+        initializeStoryboard();
 
         timer = create_wall_timer(currentLocalFrameRate(), evaluateStoryboard);
 
