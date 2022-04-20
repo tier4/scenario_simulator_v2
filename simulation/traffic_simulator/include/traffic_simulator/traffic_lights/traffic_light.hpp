@@ -46,10 +46,10 @@ struct TrafficLight
     } value;
 
     // clang-format off
-    static_assert(static_cast<std::uint8_t>(green ) == 0b0000);
-    static_assert(static_cast<std::uint8_t>(yellow) == 0b0001);
-    static_assert(static_cast<std::uint8_t>(red   ) == 0b0010);
-    static_assert(static_cast<std::uint8_t>(white ) == 0b0011);
+    static_assert(static_cast<std::uint8_t>(green ) == 0b0000'0000);
+    static_assert(static_cast<std::uint8_t>(yellow) == 0b0000'0001);
+    static_assert(static_cast<std::uint8_t>(red   ) == 0b0000'0010);
+    static_assert(static_cast<std::uint8_t>(white ) == 0b0000'0011);
     // clang-format on
 
     constexpr Color(const Value value = green) : value(value) {}
@@ -90,10 +90,10 @@ struct TrafficLight
     } value;
 
     // clang-format off
-    static_assert(static_cast<std::uint8_t>(solid_on ) == 0b0000);
-    static_assert(static_cast<std::uint8_t>(solid_off) == 0b0001);
-    static_assert(static_cast<std::uint8_t>(flashing ) == 0b0010);
-    static_assert(static_cast<std::uint8_t>(unknown  ) == 0b0011);
+    static_assert(static_cast<std::uint8_t>(solid_on ) == 0b0000'0000);
+    static_assert(static_cast<std::uint8_t>(solid_off) == 0b0000'0001);
+    static_assert(static_cast<std::uint8_t>(flashing ) == 0b0000'0010);
+    static_assert(static_cast<std::uint8_t>(unknown  ) == 0b0000'0011);
     // clang-format on
 
     constexpr Status(const Value value = solid_on) : value(value) {}
@@ -133,37 +133,37 @@ struct TrafficLight
     };
 
     // clang-format off
-    static_assert(static_cast<std::uint8_t>(Category::circle) == 0b0000);
-    static_assert(static_cast<std::uint8_t>(Category::cross ) == 0b0001);
-    static_assert(static_cast<std::uint8_t>(Category::arrow ) == 0b0010);
+    static_assert(static_cast<std::uint8_t>(Category::circle) == 0b0000'0000);
+    static_assert(static_cast<std::uint8_t>(Category::cross ) == 0b0000'0001);
+    static_assert(static_cast<std::uint8_t>(Category::arrow ) == 0b0000'0010);
     // clang-format on
 
     enum Value : std::uint16_t {
       // clang-format off
-      circle      =                 static_cast<std::uint8_t>(Category::circle),
-      cross       =                 static_cast<std::uint8_t>(Category::cross ),
-      left        = (0b1000 << 4) | static_cast<std::uint8_t>(Category::arrow ),
-      down        = (0b0100 << 4) | static_cast<std::uint8_t>(Category::arrow ),
-      up          = (0b0010 << 4) | static_cast<std::uint8_t>(Category::arrow ),
-      right       = (0b0001 << 4) | static_cast<std::uint8_t>(Category::arrow ),
-      lower_left  = (0b1100 << 4) | static_cast<std::uint8_t>(Category::arrow ),
-      upper_left  = (0b1010 << 4) | static_cast<std::uint8_t>(Category::arrow ),
-      lower_right = (0b0101 << 4) | static_cast<std::uint8_t>(Category::arrow ),
-      upper_right = (0b0011 << 4) | static_cast<std::uint8_t>(Category::arrow ),
+      circle      =                      static_cast<std::uint8_t>(Category::circle),
+      cross       =                      static_cast<std::uint8_t>(Category::cross ),
+      left        = (0b0000'1000 << 8) | static_cast<std::uint8_t>(Category::arrow ),
+      down        = (0b0000'0100 << 8) | static_cast<std::uint8_t>(Category::arrow ),
+      up          = (0b0000'0010 << 8) | static_cast<std::uint8_t>(Category::arrow ),
+      right       = (0b0000'0001 << 8) | static_cast<std::uint8_t>(Category::arrow ),
+      lower_left  = (0b0000'1100 << 8) | static_cast<std::uint8_t>(Category::arrow ),
+      upper_left  = (0b0000'1010 << 8) | static_cast<std::uint8_t>(Category::arrow ),
+      lower_right = (0b0000'0101 << 8) | static_cast<std::uint8_t>(Category::arrow ),
+      upper_right = (0b0000'0011 << 8) | static_cast<std::uint8_t>(Category::arrow ),
       // clang-format on
     } value;
 
     // clang-format off
-    static_assert(static_cast<std::uint16_t>(circle     ) == 0b0000'0000);
-    static_assert(static_cast<std::uint16_t>(cross      ) == 0b0000'0001);
-    static_assert(static_cast<std::uint16_t>(left       ) == 0b1000'0010);
-    static_assert(static_cast<std::uint16_t>(down       ) == 0b0100'0010);
-    static_assert(static_cast<std::uint16_t>(up         ) == 0b0010'0010);
-    static_assert(static_cast<std::uint16_t>(right      ) == 0b0001'0010);
-    static_assert(static_cast<std::uint16_t>(lower_left ) == 0b1100'0010);
-    static_assert(static_cast<std::uint16_t>(upper_left ) == 0b1010'0010);
-    static_assert(static_cast<std::uint16_t>(lower_right) == 0b0101'0010);
-    static_assert(static_cast<std::uint16_t>(upper_right) == 0b0011'0010);
+    static_assert(static_cast<std::uint16_t>(circle     ) == 0b0000'0000'0000'0000);
+    static_assert(static_cast<std::uint16_t>(cross      ) == 0b0000'0000'0000'0001);
+    static_assert(static_cast<std::uint16_t>(left       ) == 0b0000'1000'0000'0010);
+    static_assert(static_cast<std::uint16_t>(down       ) == 0b0000'0100'0000'0010);
+    static_assert(static_cast<std::uint16_t>(up         ) == 0b0000'0010'0000'0010);
+    static_assert(static_cast<std::uint16_t>(right      ) == 0b0000'0001'0000'0010);
+    static_assert(static_cast<std::uint16_t>(lower_left ) == 0b0000'1100'0000'0010);
+    static_assert(static_cast<std::uint16_t>(upper_left ) == 0b0000'1010'0000'0010);
+    static_assert(static_cast<std::uint16_t>(lower_right) == 0b0000'0101'0000'0010);
+    static_assert(static_cast<std::uint16_t>(upper_right) == 0b0000'0011'0000'0010);
     // clang-format on
 
     constexpr Shape(const Value value = circle) : value(value) {}
@@ -190,7 +190,7 @@ struct TrafficLight
 
     constexpr auto category() const
     {
-      return static_cast<Category>(static_cast<std::uint16_t>(value) & 0b1111);
+      return static_cast<Category>(static_cast<std::uint16_t>(value) & 0b1111'1111);
     }
 
     constexpr auto is(const Value given) const { return value == given; }
@@ -210,7 +210,7 @@ struct TrafficLight
 
     const Value value;
 
-    using Hash = std::uint32_t;  // (Color::Value << 12) | (Status::Value << 8) | Shape::Value
+    using Hash = std::uint32_t;  // (Color::Value << 8 + 16) | (Status::Value << 16) | Shape::Value
 
     constexpr Bulb(const Value value) : value(value) {}
 
@@ -236,8 +236,8 @@ struct TrafficLight
 
     constexpr auto hash() const -> Hash
     {
-      return (static_cast<Hash>(std::get<Color>(value).value) << 12) |
-             (static_cast<Hash>(std::get<Status>(value).value) << 8) |
+      return (static_cast<Hash>(std::get<Color>(value).value) << 24) |
+             (static_cast<Hash>(std::get<Status>(value).value) << 16) |
              static_cast<Hash>(std::get<Shape>(value).value);
     }
 
