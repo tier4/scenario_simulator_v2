@@ -71,7 +71,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
 {
   std::smatch result;
 
-  if (std::regex_match(name, result, std::regex(R"(([^\.]+)\.(.+))"))) {
+  if (std::regex_match(name, result, std::regex(R"(([^.]+)\.(.+))"))) {
     const std::unordered_map<std::string, std::function<Object()>> dispatch{
       std::make_pair(
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
