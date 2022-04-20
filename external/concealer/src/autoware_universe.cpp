@@ -251,7 +251,7 @@ std::istream & operator>>(
   is >> state_string;
 
   auto iter = state_dictionary.find(state_string);
-  if (iter != state_dictionary.end()) {
+  if (iter not_eq state_dictionary.end()) {
     message.set__state(iter->second);
   } else {
     throw common::Error("Unsupported EmergencyState::state : ", state_string.c_str());

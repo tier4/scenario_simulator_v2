@@ -298,8 +298,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 
 auto EgoEntity::getEmergencyStateString() -> std::string
 {
-  const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
-  if (universe) {
+  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
     try {
       return boost::lexical_cast<std::string>(universe->getEmergencyState());
     } catch (const boost::bad_lexical_cast &) {
