@@ -149,6 +149,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         if (currentScenarioDefinition()) {
           const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
             currentScenarioDefinition()->evaluate();
+            updateFrame();
             publishCurrentContext();
             return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
           });
