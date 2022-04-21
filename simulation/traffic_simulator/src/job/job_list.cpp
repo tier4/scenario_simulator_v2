@@ -23,8 +23,10 @@ void JobList::append(
   job::Type type, bool exclusive)
 {
   for (auto & job : list_) {
-    if (job.type == type && job.exclusive == exclusive) {
-      job.inactivate();
+    if (exclusive) {
+      if (job.type == type && job.exclusive) {
+        job.inactivate();
+      }
     }
   }
   list_.emplace_back(Job(func_on_update, func_on_cleanup, type, exclusive));

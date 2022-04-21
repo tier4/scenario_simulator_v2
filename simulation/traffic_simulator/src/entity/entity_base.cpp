@@ -51,7 +51,7 @@ EntityBase::EntityBase(
       }
       return false;
     },
-    [this]() {}, job::Type::STAND_STILL_DURATION, true);
+    [this]() {}, job::Type::STAND_STILL_DURATION, false);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
