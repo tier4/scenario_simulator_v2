@@ -296,7 +296,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   return ids;
 }
 
-auto EgoEntity::getEmergencyStateString() -> std::string
+auto EgoEntity::getEmergencyStateString() const -> std::string
 {
   if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
     try {

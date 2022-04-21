@@ -1,4 +1,4 @@
-// Copyright 2015 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -178,11 +178,10 @@ public:
 // for boost::lexical_cast
 namespace autoware_auto_system_msgs::msg
 {
-auto operator<<(std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & message)
+auto operator<<(std::ostream &, const autoware_auto_system_msgs::msg::EmergencyState &)
   -> std::ostream &;
 
-auto operator>>(std::istream & is, autoware_auto_system_msgs::msg::EmergencyState & message)
-  -> std::istream &;
+auto operator>>(std::istream &, autoware_auto_system_msgs::msg::EmergencyState &) -> std::istream &;
 }  // namespace autoware_auto_system_msgs::msg
 
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_

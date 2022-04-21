@@ -105,7 +105,7 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  auto getEmergencyStateString() -> std::string;
+  auto getEmergencyStateString() const -> std::string override;
 
   void onUpdate(double current_time, double step_time) override;
 
