@@ -53,16 +53,13 @@ void EntityBase::requestSpeedChange(
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       if (getStatus().action_status.twist.linear.x < target_speed) {
-        setAccelerationLimit(std::fabs(constraint.value));
+        setAccelerationLimit(std::abs(constraint.value));
         job_list_.append(
           /**
            * @brief Checking if the entity reaches target speed.
            */
           [this, target_speed]() {
-            if (getStatus().action_status.twist.linear.x >= target_speed) {
-              return true;
-            }
-            return false;
+            return getStatus().action_status.twist.linear.x >= target_speed;
           },
           /**
            * @brief Resets acceleration limit.
@@ -72,16 +69,13 @@ void EntityBase::requestSpeedChange(
           },
           job::Type::LINEAR_ACCELERATION, true);
       } else if (getStatus().action_status.twist.linear.x > target_speed) {
-        setDecelerationLimit(std::fabs(constraint.value));
+        setDecelerationLimit(std::abs(constraint.value));
         job_list_.append(
           /**
            * @brief Checking if the entity reaches target speed.
            */
           [this, target_speed]() {
-            if (getStatus().action_status.twist.linear.x <= target_speed) {
-              return true;
-            }
-            return false;
+            return getStatus().action_status.twist.linear.x <= target_speed;
           },
           /**
            * @brief Resets deceleration limit.
@@ -120,15 +114,15 @@ void EntityBase::requestSpeedChange(
           /**
            * @brief Hard coded parameter, threashold for difference
            */
-          if (std::fabs(diff) <= 0.1) {
+          if (std::abs(diff) <= 0.1) {
             return true;
           }
           if (diff > 0) {
-            setAccelerationLimit(std::fabs(constraint.value));
+            setAccelerationLimit(std::abs(constraint.value));
             return false;
           }
           if (diff < 0) {
-            setDecelerationLimit(std::fabs(constraint.value));
+            setDecelerationLimit(std::abs(constraint.value));
             return false;
           }
           return false;
