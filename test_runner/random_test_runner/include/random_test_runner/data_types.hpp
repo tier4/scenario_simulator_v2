@@ -58,6 +58,7 @@ struct TestControlParameters
   int64_t test_count = 5;
   SimulatorType simulator_type = SimulatorType::SIMPLE_SENSOR_SIMULATOR;
   ArchitectureType architecture_type = ArchitectureType::AWF_UNIVERSE;
+  std::string simulator_host = "localhost";
 };
 
 struct TestSuiteParameters

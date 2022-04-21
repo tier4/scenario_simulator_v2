@@ -12,30 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <glog/logging.h>
+#include <traffic_simulator/job/job_list.hpp>
 
-#include <cstdlib>
-#include <memory>
-#include <openscenario_interpreter/openscenario_interpreter.hpp>
-
-int main(const int argc, char const * const * const argv)
+namespace traffic_simulator
 {
-  google::InitGoogleLogging(argv[0]);
-  google::InstallFailureSignalHandler();
-
-  rclcpp::init(argc, argv);
-
-  rclcpp::executors::SingleThreadedExecutor executor{};
-
-  rclcpp::NodeOptions options{};
-
-  auto node = std::make_shared<openscenario_interpreter::Interpreter>(options);
-
-  executor.add_node((*node).get_node_base_interface());
-
-  executor.spin();
-
-  rclcpp::shutdown();
-
-  return 0;
+namespace job
+{
+void JobList::append(
+  const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
+  job::Type type, bool exclusive)
+{
+  for (auto & job : list_) {
+    if (job.type == type && job.exclusive == exclusive) {
+      job.inactivate();
+    }
+  }
+  list_.emplace_back(Job(func_on_update, func_on_cleanup, type, exclusive));
 }
+
+void JobList::update()
+{
+  for (auto & job : list_) {
+    job.onUpdate();
+  }
+}
+}  // namespace job
+}  // namespace traffic_simulator

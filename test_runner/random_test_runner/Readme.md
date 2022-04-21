@@ -148,6 +148,7 @@ Please refer to [Node parameters](#node-parameters) chapter for more details on 
 |------------------------------|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `test_parameters_filename`   |  `""`                         | Yaml filename within `random_test_runner/param directory` containing test parameters. With exception from [Launch arguments](#launch-arguments) chapter, parameters specified here will override values passed as arguments |
 | `simulator_type`             |  `"simple_sensor_simulator"`  | Backend simulator. Supported values are `unity` and `simple_sensor_simulator`. It's also accepted by the node but should be supplied as direct launch argument                                                              |
+|`simulator_host`              | `"localhost"`                 | Simulation host. It can be either IP address or the host name that is resolvable in the environment (you can add a host by appending `"<SIMULATOR_IP> <SIMULATOR_NAME>"` line to the `/etc/hosts` file)                     |
 
 ### Autoware related arguments
 

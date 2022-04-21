@@ -74,7 +74,7 @@ boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double 
   }
   double rest_distance =
     distance_to_stop_target_.get() - (vehicle_parameters.bounding_box.dimensions.x + 3);
-  if (rest_distance < calculateStopDistance()) {
+  if (rest_distance < calculateStopDistance(driver_model.deceleration)) {
     if (rest_distance > 0) {
       return std::sqrt(2 * driver_model.deceleration * rest_distance);
     } else {
@@ -87,7 +87,9 @@ boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double 
 BT::NodeStatus StopAtCrossingEntityAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }

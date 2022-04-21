@@ -155,35 +155,23 @@ public:
   ~EntityManager() = default;
 
 public:
-#define DEFINE_SET_TRAFFIC_LIGHT(NAME)                                               \
-  template <typename... Ts>                                                          \
-  decltype(auto) setTrafficLight##NAME(Ts &&... xs)                                  \
-  {                                                                                  \
-    return traffic_light_manager_ptr_->set##NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                  \
-  static_assert(true, "")
+  template <typename... Ts>
+  auto getTrafficLight(Ts &&... xs) const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficLight(std::forward<decltype(xs)>(xs)...);
+  }
 
-  DEFINE_SET_TRAFFIC_LIGHT(Arrow);
-  DEFINE_SET_TRAFFIC_LIGHT(ArrowPhase);
-  DEFINE_SET_TRAFFIC_LIGHT(Color);
-  DEFINE_SET_TRAFFIC_LIGHT(ColorPhase);
+  auto getTrafficLights() const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficLights();
+  }
 
-#undef DEFINE_SET_TRAFFIC_LIGHT
-
-#define DEFINE_GET_TRAFFIC_LIGHT(NAME)                                               \
-  template <typename... Ts>                                                          \
-  decltype(auto) getTrafficLight##NAME(Ts &&... xs)                                  \
-  {                                                                                  \
-    return traffic_light_manager_ptr_->get##NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                  \
-  static_assert(true, "")
-
-  DEFINE_GET_TRAFFIC_LIGHT(Color);
-  DEFINE_GET_TRAFFIC_LIGHT(Arrow);
-  DEFINE_GET_TRAFFIC_LIGHT(Ids);
-  DEFINE_GET_TRAFFIC_LIGHT(Instance);
-
-#undef DEFINE_GET_TRAFFIC_LIGHT
+  template <typename... Ts>
+  auto getTrafficRelationReferees(Ts &&... xs) const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficRelationReferees(
+      std::forward<decltype(xs)>(xs)...);
+  }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   template <typename... Ts>                                           \
@@ -230,7 +218,7 @@ public:
   FORWARD_TO_ENTITY(setDriverModel, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
-#undef FORWARD_TO_SPECIFIED_ENTITY
+#undef FORWARD_TO_ENTITY
 
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 

@@ -19,11 +19,12 @@
 namespace behavior_tree_plugin
 {
 ResetRequestEvent::ResetRequestEvent(
-  BT::TreeNode * root_node, std::function<std::string()> get_request_function,
-  std::function<void(const std::string &)> set_request_function)
+  BT::TreeNode * root_node,
+  std::function<traffic_simulator::behavior::Request()> get_request_function,
+  std::function<void()> reset_request_function)
 : TransitionEvent(root_node),
   get_request_function_(get_request_function),
-  set_request_function_(set_request_function)
+  reset_request_function_(reset_request_function)
 {
 }
 
@@ -33,8 +34,8 @@ void ResetRequestEvent::callback(
 {
   TransitionEvent::updateCurrentAction(status, node);
   if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
-    if (get_request_function_() == current_action_) {
-      set_request_function_("none");
+    if (traffic_simulator::behavior::getRequestString(get_request_function_()) == current_action_) {
+      reset_request_function_();
     }
   }
 }

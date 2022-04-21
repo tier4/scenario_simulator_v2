@@ -22,7 +22,6 @@
 #include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
-#include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
 #include <vector>
@@ -93,11 +92,6 @@ public:
     behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
   }
 
-  void requestSpeedChange(double target_speed, bool continuous) override;
-
-  void requestSpeedChange(
-    const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
-
   const traffic_simulator_msgs::msg::BoundingBox getBoundingBox() const override
   {
     return parameters.bounding_box;
@@ -150,7 +144,6 @@ public:
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
   std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
-  traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };
 }  // namespace entity

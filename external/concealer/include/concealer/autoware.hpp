@@ -132,7 +132,7 @@ public:
   {
   }
 
-  virtual ~Autoware() = default;
+  ~Autoware() override = default;
 
   /* ---- NOTE -------------------------------------------------------------------
    *

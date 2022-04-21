@@ -76,7 +76,7 @@ boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(double curren
   }
   double rest_distance =
     distance_to_stopline_.get() - (vehicle_parameters.bounding_box.dimensions.x);
-  if (rest_distance < calculateStopDistance()) {
+  if (rest_distance < calculateStopDistance(driver_model.deceleration)) {
     if (rest_distance > 0) {
       return std::sqrt(2 * driver_model.deceleration * rest_distance);
     } else {
@@ -89,7 +89,9 @@ boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(double curren
 BT::NodeStatus StopAtStopLineAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }

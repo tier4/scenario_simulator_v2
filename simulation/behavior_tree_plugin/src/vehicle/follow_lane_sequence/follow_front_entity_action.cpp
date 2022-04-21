@@ -71,7 +71,9 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
 BT::NodeStatus FollowFrontEntityAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (
+    request != traffic_simulator::behavior::Request::NONE &&
+    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
   if (getRightOfWayEntities(route_lanelets).size() != 0) {
@@ -119,8 +121,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   if (
-    distance_to_front_entity_.get() >=
-    (calculateStopDistance() + vehicle_parameters.bounding_box.dimensions.x + 5)) {
+    distance_to_front_entity_.get() >= (calculateStopDistance(driver_model.deceleration) +
+                                        vehicle_parameters.bounding_box.dimensions.x + 5)) {
     auto entity_status_updated =
       calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x + 2);
     setOutput("updated_status", entity_status_updated);
@@ -128,7 +130,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
-  } else if (distance_to_front_entity_.get() <= calculateStopDistance()) {
+  } else if (distance_to_front_entity_.get() <= calculateStopDistance(driver_model.deceleration)) {
     auto entity_status_updated =
       calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x - 2);
     setOutput("updated_status", entity_status_updated);

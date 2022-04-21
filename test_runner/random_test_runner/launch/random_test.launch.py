@@ -82,6 +82,10 @@ class RandomTestRunnerLaunch(object):
                                 "If specified (not empty), other test arguments will be ignored"},
             "simulator_type": {"default": "simple_sensor_simulator", "description": "Simulation backend",
                                "values": ["simple_sensor_simulator", "unity"]},
+            "simulator_host":
+                {"default": "localhost",
+                 "description": "Simulation host. It can be either IP address "
+                                "or the host name that is resolvable in the environment"},
 
             # control arguments #
             "test_count": {"default": 5, "description": "Test count to be performed in test suite"},
