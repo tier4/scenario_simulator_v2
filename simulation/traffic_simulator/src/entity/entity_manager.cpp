@@ -457,16 +457,21 @@ void EntityManager::getGoalPoses(
 
 bool EntityManager::isEgo(const std::string & name) const
 {
-  auto entity = getEntityType(name);
-  if (entity.type == traffic_simulator_msgs::msg::EntityType::EGO) {
-    if(dynamic_cast<EgoEntity*>(entity.get()){
-      return true;
-    }else{
-      // It shouldn't happen at the time of writing this, but it may happen in a future update.
-      throw common::Error(
-        "There is a scenario object ", name.c_str(),
-        ", whose property \"isEgo\" is true, but it doesn't controlled by Autoware. Please contact "
-        "developers!");
+  if (getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::EGO) {
+    try {
+      auto & entity = entities_.at(name);
+      if (dynamic_cast<EgoEntity *>(entity.get())) {
+        return true;
+      } else {
+        // It shouldn't happen at the time of writing this, but it may happen in a future update.
+        throw common::Error(
+          "There is a scenario object ", name.c_str(),
+          ", whose property \"isEgo\" is true, but it doesn't controlled by Autoware. Please "
+          "contact "
+          "developers!");
+      }
+    } catch (const std::out_of_range &) {
+      throw common::Error("entity : ", name, "does not exist");
     }
   } else {
     return false;
