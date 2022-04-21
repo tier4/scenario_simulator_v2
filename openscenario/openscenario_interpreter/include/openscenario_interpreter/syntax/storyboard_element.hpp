@@ -95,7 +95,7 @@ private:
   virtual auto accomplished() const -> bool
   {
     return std::all_of(std::begin(elements), std::end(elements), [](auto && element) {
-      assert(element.template is<StoryboardElement>());
+      assert(element.template is_also<StoryboardElement>());
       return element.template as<StoryboardElement>()
         .template is<StoryboardElementState::completeState>();
     });
@@ -104,7 +104,7 @@ private:
   virtual auto run() -> void
   {
     for (auto && element : elements) {
-      assert(element.is<StoryboardElement>());
+      assert(element.is_also<StoryboardElement>());
       element.evaluate();
     }
   }
@@ -114,7 +114,7 @@ private:
   virtual auto stop() -> void
   {
     for (auto && element : elements) {
-      assert(element.is<StoryboardElement>());
+      assert(element.is_also<StoryboardElement>());
       element.as<StoryboardElement>().override();
       element.evaluate();
     }
