@@ -121,8 +121,8 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   if (!status_) {
     return;
   }
-  if (current_time < 0) {
-    updateEntityStatusTimestamp(current_time);
+  if (current_time_ < 0) {
+    updateEntityStatusTimestamp(current_time_);
   } else {
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
@@ -148,7 +148,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     }
     behavior_plugin_ptr_->setReferenceTrajectory(spline_);
 
-    behavior_plugin_ptr_->update(current_time, step_time);
+    behavior_plugin_ptr_->update(current_time_, step_time_);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (status_updated.lanelet_pose_valid) {
       auto following_lanelets =
@@ -164,10 +164,10 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     } else {
       linear_jerk_ =
         (status_updated.action_status.accel.linear.x - status_->action_status.accel.linear.x) /
-        step_time;
+        step_time_;
     }
     setStatus(status_updated);
-    updateStandStillDuration(step_time);
+    updateStandStillDuration(step_time_);
   }
 }
 

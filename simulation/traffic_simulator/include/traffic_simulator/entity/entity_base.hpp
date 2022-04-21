@@ -135,6 +135,8 @@ public:
 
   virtual void onUpdate(double current_time, double step_time);
 
+  void updateJobList();
+
   virtual auto ready() const -> bool { return static_cast<bool>(status_); }
 
   virtual void requestAcquirePosition(
@@ -219,6 +221,9 @@ protected:
 
   boost::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
+
+  double current_time_;
+  double step_time_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

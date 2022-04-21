@@ -373,6 +373,9 @@ public:
   void update(const double current_time, const double step_time);
 
   void updateHdmapMarker();
+
+private:
+  void updateAllJob();
 };
 }  // namespace entity
 }  // namespace traffic_simulator

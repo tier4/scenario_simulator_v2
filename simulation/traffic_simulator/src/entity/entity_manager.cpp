@@ -720,11 +720,20 @@ void EntityManager::update(const double current_time, const double step_time)
     status_with_traj.time = current_time + step_time;
     status_array_msg.data.emplace_back(status_with_traj);
   }
+  updateAllJob();
   entity_status_array_pub_ptr_->publish(status_array_msg);
   end = std::chrono::system_clock::now();
   double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
   if (configuration.verbose) {
     std::cout << "elapsed " << elapsed / 1000 << " seconds in update function." << std::endl;
+  }
+}
+
+void EntityManager::updateAllJob()
+{
+  const std::vector<std::string> entity_names = getEntityNames();
+  for (const auto & entity_name : entity_names) {
+    entities_[entity_name]->updateJobList();
   }
 }
 

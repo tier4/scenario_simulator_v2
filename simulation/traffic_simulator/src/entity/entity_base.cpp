@@ -30,7 +30,6 @@ EntityBase::EntityBase(
 : name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
 {
   status_ = boost::none;
-  
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
@@ -38,11 +37,14 @@ void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*mark
   return;
 }
 
-void EntityBase::onUpdate(double, double)
+void EntityBase::onUpdate(double current_time, double step_time)
 {
-  job_list_.update();
+  current_time_ = current_time;
+  step_time_ = step_time;
   status_before_update_ = status_;
 }
+
+void EntityBase::updateJobList() { job_list_.update(); }
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
