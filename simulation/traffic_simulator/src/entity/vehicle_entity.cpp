@@ -167,7 +167,6 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         step_time_;
     }
     setStatus(status_updated);
-    updateStandStillDuration(step_time_);
   }
 }
 

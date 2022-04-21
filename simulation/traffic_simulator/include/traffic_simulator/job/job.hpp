@@ -26,6 +26,7 @@ enum class Type {
   UNKOWN = 0,
   LINEAR_VELOCITY = 1,
   LINEAR_ACCELERATION = 2,
+  STAND_STILL_DURATION = 3,
 };
 
 enum class Status {

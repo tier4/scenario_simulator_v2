@@ -188,8 +188,6 @@ public:
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
-  /*   */ void updateStandStillDuration(const double step_time);
-
   virtual void cancelRequest()
   {
     THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support cancel request");

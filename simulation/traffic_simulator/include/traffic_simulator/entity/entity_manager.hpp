@@ -375,7 +375,7 @@ public:
   void updateHdmapMarker();
 
 private:
-  void updateAllJob();
+  void updateAllJobs();
 };
 }  // namespace entity
 }  // namespace traffic_simulator

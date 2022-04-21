@@ -30,6 +30,28 @@ EntityBase::EntityBase(
 : name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
 {
   status_ = boost::none;
+  job_list_.append(
+    /**
+     * @brief Update stand still duration.
+     */
+    [this]() {
+      if (!status_) {
+        stand_still_duration_ = boost::none;
+      } else {
+        if (!stand_still_duration_) {
+          stand_still_duration_ = 0;
+        }
+        if (
+          std::fabs(status_->action_status.twist.linear.x) <=
+          std::numeric_limits<double>::epsilon()) {
+          stand_still_duration_ = step_time_ + stand_still_duration_.get();
+        } else {
+          stand_still_duration_ = 0;
+        }
+      }
+      return false;
+    },
+    [this]() {}, job::Type::STAND_STILL_DURATION, true);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
@@ -274,23 +296,6 @@ auto EntityBase::getVehicleCommand() const -> std::tuple<
 {
   THROW_SIMULATION_ERROR(
     "`getVehicleCommand` is not provided for ", getEntityTypename(), " type entity.");
-}
-
-void EntityBase::updateStandStillDuration(const double step_time)
-{
-  if (!status_) {
-    stand_still_duration_ = boost::none;
-  } else {
-    if (!stand_still_duration_) {
-      stand_still_duration_ = 0;
-    }
-    if (
-      std::fabs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
-      stand_still_duration_ = step_time + stand_still_duration_.get();
-    } else {
-      stand_still_duration_ = 0;
-    }
-  }
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
