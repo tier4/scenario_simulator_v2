@@ -205,6 +205,7 @@ class RandomTestRunnerLaunch(object):
         scenario_node = Node(
             package="random_test_runner",
             executable="random_test_runner",
+            namespace="simulation",
             name="random_test_runner",
             output="screen",
             arguments=[("__log_level:=info")],
@@ -221,7 +222,8 @@ class RandomTestRunnerLaunch(object):
             Node(
                 package="openscenario_visualization",
                 executable="openscenario_visualization_node",
-                name="openscenario_visualization_node",
+                namespace="simulation",
+                name="openscenario_visualizer",
                 output="screen",
             ),
         ]
@@ -234,6 +236,7 @@ class RandomTestRunnerLaunch(object):
                     package="simple_sensor_simulator",
                     executable="simple_sensor_simulator_node",
                     name="simple_sensor_simulator_node",
+                    namespace="simulation",
                     output="log",
                     arguments=[("__log_level:=warn")],
                     parameters=[{"port": 8080}],
