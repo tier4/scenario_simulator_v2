@@ -457,7 +457,20 @@ void EntityManager::getGoalPoses(
 
 bool EntityManager::isEgo(const std::string & name) const
 {
-  return getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::EGO;
+  auto entity = getEntityType(name);
+  if (entity.type == traffic_simulator_msgs::msg::EntityType::EGO) {
+    if(dynamic_cast<EgoEntity*>(entity.get()){
+      return true;
+    }else{
+      // It shouldn't happen at the time of writing this, but it may happen in a future update.
+      throw common::Error(
+        "There is a scenario object ", name.c_str(),
+        ", whose property \"isEgo\" is true, but it doesn't controlled by Autoware. Please contact "
+        "developers!");
+    }
+  } else {
+    return false;
+  }
 }
 
 bool EntityManager::isInLanelet(
@@ -617,7 +630,7 @@ bool EntityManager::setEntityStatus(
 
 auto EntityManager::getEmergencyStateString(const std::string & name) -> std::string
 {
-  if (!isEgo(name)) {
+  if (not isEgo(name)) {
     throw common::Error(
       "You can only get EmergencyState if the Autoware.Universe is behind entity (i.e. ego "
       "vehicle)");
