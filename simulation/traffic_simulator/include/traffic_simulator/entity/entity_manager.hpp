@@ -218,7 +218,7 @@ public:
   FORWARD_TO_ENTITY(setDriverModel, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
-#undef FORWARD_TO_SPECIFIED_ENTITY
+#undef FORWARD_TO_ENTITY
 
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 

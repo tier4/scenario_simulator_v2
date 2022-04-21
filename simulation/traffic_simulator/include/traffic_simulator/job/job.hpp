@@ -25,6 +25,7 @@ namespace job
 enum class Type {
   UNKOWN = 0,
   LINEAR_VELOCITY = 1,
+  LINEAR_ACCELERATION = 2,
 };
 
 enum class Status {
