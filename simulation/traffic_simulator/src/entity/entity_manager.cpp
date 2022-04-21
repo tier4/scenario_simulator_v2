@@ -457,25 +457,9 @@ void EntityManager::getGoalPoses(
 
 bool EntityManager::isEgo(const std::string & name) const
 {
-  if (getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::EGO) {
-    try {
-      auto & entity = entities_.at(name);
-      if (dynamic_cast<EgoEntity *>(entity.get())) {
-        return true;
-      } else {
-        // It shouldn't happen at the time of writing this, but it may happen in a future update.
-        throw common::Error(
-          "There is a scenario object ", name.c_str(),
-          ", whose property \"isEgo\" is true, but it doesn't controlled by Autoware. Please "
-          "contact "
-          "developers!");
-      }
-    } catch (const std::out_of_range &) {
-      throw common::Error("entity : ", name, "does not exist");
-    }
-  } else {
-    return false;
-  }
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::EGO and
+         dynamic_cast<EgoEntity const *>(entities_.at(name).get());
 }
 
 bool EntityManager::isInLanelet(
@@ -631,22 +615,6 @@ bool EntityManager::setEntityStatus(
       "You cannot set entity status to the ego vehicle name:", name, " after starting scenario.");
   }
   return entities_.at(name)->setStatus(status);
-}
-
-auto EntityManager::getEmergencyStateString(const std::string & name) -> std::string
-{
-  if (not isEgo(name)) {
-    throw common::Error(
-      "You can only get EmergencyState if the Autoware.Universe is behind entity (i.e. ego "
-      "vehicle)");
-  }
-
-  const auto ego = dynamic_cast<EgoEntity *>(entities_.at(name).get());
-  if (ego) {
-    return ego->getEmergencyStateString();
-  }
-
-  throw common::Error("dynamic_cast to EgoEntity failed even though isEgo (name) == true");
 }
 
 void EntityManager::setVerbose(const bool verbose)

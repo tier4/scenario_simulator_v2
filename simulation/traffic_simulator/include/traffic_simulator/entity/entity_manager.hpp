@@ -201,6 +201,7 @@ public:
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getDriverModel, const);
+  FORWARD_TO_ENTITY(getEmergencyStateString, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
@@ -337,8 +338,6 @@ public:
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
   bool setEntityStatus(const std::string & name, traffic_simulator_msgs::msg::EntityStatus status);
-
-  auto getEmergencyStateString(const std::string & name) -> std::string;
 
   void setVerbose(const bool verbose);
 
