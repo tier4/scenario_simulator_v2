@@ -51,7 +51,7 @@ EntityBase::EntityBase(
       }
       return false;
     },
-    [this]() {}, job::Type::STAND_STILL_DURATION, false);
+    [this]() {}, job::Type::STAND_STILL_DURATION, false, job::Trigger::ON_MEASURE);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
@@ -65,8 +65,6 @@ void EntityBase::onUpdate(double current_time, double step_time)
   step_time_ = step_time;
   status_before_update_ = status_;
 }
-
-void EntityBase::updateJobList() { job_list_.update(); }
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
@@ -91,7 +89,7 @@ void EntityBase::requestSpeedChange(
           [this]() {
             setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration);
           },
-          job::Type::LINEAR_ACCELERATION, true);
+          job::Type::LINEAR_ACCELERATION, true, job::Trigger::ON_UPDATE);
       } else if (getStatus().action_status.twist.linear.x > target_speed) {
         setDecelerationLimit(std::abs(constraint.value));
         job_list_.append(
@@ -107,7 +105,7 @@ void EntityBase::requestSpeedChange(
           [this]() {
             setDecelerationLimit(traffic_simulator_msgs::msg::DriverModel().deceleration);
           },
-          job::Type::LINEAR_ACCELERATION, true);
+          job::Type::LINEAR_ACCELERATION, true, job::Trigger::ON_UPDATE);
       }
       requestSpeedChange(target_speed, continuous);
       break;
@@ -155,7 +153,7 @@ void EntityBase::requestSpeedChange(
            * @brief Resets acceleration limit.
            */
         [this]() { setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration); },
-        job::Type::LINEAR_ACCELERATION, true);
+        job::Type::LINEAR_ACCELERATION, true, job::Trigger::ON_UPDATE);
       requestSpeedChange(target_speed, continuous);
       break;
     }
@@ -183,7 +181,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cansel speed change request.
        */
-      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+      [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Trigger::ON_UPDATE);
   } else {
     job_list_.append(
       /**
@@ -199,7 +197,8 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      job::Trigger::ON_UPDATE);
   }
 }
 
@@ -218,7 +217,7 @@ void EntityBase::requestSpeedChange(
         target_speed_ = target_speed.getAbsoluteValue(other_status_);
         return false;
       },
-      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+      [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Trigger::ON_UPDATE);
   } else {
     job_list_.append(
       /**
@@ -239,7 +238,8 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      job::Trigger::ON_UPDATE);
   }
 }
 
@@ -289,6 +289,10 @@ void EntityBase::requestLaneChange(
       "Failed to calculate absolute target lane. Please check the target lane exists.");
   }
 }
+
+void EntityBase::runMeasureJob() { job_list_.measure(); }
+
+void EntityBase::runUpdateJob() { job_list_.update(); }
 
 auto EntityBase::getVehicleCommand() const -> std::tuple<
   autoware_auto_control_msgs::msg::AckermannControlCommand,

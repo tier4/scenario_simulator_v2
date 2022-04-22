@@ -34,6 +34,11 @@ enum class Status {
   INACTIVE = 1,
 };
 
+enum class Trigger {
+  ON_UPDATE = 0,
+  ON_MEASURE = 1,
+};
+
 class Job
 {
 public:
@@ -47,8 +52,8 @@ public:
    */
   Job(
     const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
-    job::Type type, bool exclusive);
-  void onUpdate();
+    job::Type type, bool exclusive, job::Trigger trigger);
+  void update();
   void inactivate();
 
 private:
@@ -59,6 +64,7 @@ private:
 public:
   const job::Type type;
   const bool exclusive;
+  const job::Trigger trigger;
 };
 }  // namespace job
 }  // namespace traffic_simulator

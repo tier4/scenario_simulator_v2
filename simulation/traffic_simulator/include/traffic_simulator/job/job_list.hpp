@@ -27,8 +27,9 @@ class JobList
 public:
   void append(
     const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
-    job::Type type, bool exclusive);
+    job::Type type, bool exclusive, job::Trigger trigger);
   void update();
+  void measure();
 
 private:
   std::vector<Job> list_;

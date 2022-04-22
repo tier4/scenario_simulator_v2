@@ -20,11 +20,12 @@ namespace job
 {
 Job::Job(
   const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
-  job::Type type, bool exclusive)
+  job::Type type, bool exclusive, job::Trigger trigger)
 : func_on_update_(func_on_update),
   func_on_cleanup_(func_on_cleanup),
   type(type),
-  exclusive(exclusive)
+  exclusive(exclusive),
+  trigger(trigger)
 {
   status_ = Status::ACTIVE;
 }
@@ -35,7 +36,7 @@ void Job::inactivate()
   func_on_cleanup_();
 }
 
-void Job::onUpdate()
+void Job::update()
 {
   switch (status_) {
     case Status::ACTIVE:

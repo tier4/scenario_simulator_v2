@@ -650,6 +650,7 @@ void EntityManager::update(const double current_time, const double step_time)
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
   current_time_ = current_time;
+  configuration.verbose = true;
   if (configuration.verbose) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
     std::cout << "current_time : " << current_time_ << std::endl;
@@ -675,6 +676,7 @@ void EntityManager::update(const double current_time, const double step_time)
   all_status.clear();
   for (const auto & entity_name : entity_names) {
     if (entities_[entity_name]->statusSet()) {
+      entities_[entity_name]->runUpdateJob();
       auto status = updateNpcLogic(entity_name, type_list);
       status.bounding_box = getBoundingBox(entity_name);
       all_status.emplace(entity_name, status);
@@ -720,20 +722,16 @@ void EntityManager::update(const double current_time, const double step_time)
     status_with_traj.time = current_time + step_time;
     status_array_msg.data.emplace_back(status_with_traj);
   }
-  updateAllJobs();
   entity_status_array_pub_ptr_->publish(status_array_msg);
   end = std::chrono::system_clock::now();
   double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+  for (const auto & entity_name : entity_names) {
+    if (entities_[entity_name]->statusSet()) {
+      entities_[entity_name]->runMeasureJob();
+    }
+  }
   if (configuration.verbose) {
     std::cout << "elapsed " << elapsed / 1000 << " seconds in update function." << std::endl;
-  }
-}
-
-void EntityManager::updateAllJobs()
-{
-  const std::vector<std::string> entity_names = getEntityNames();
-  for (const auto & entity_name : entity_names) {
-    entities_[entity_name]->updateJobList();
   }
 }
 

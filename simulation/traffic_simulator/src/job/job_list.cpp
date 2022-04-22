@@ -20,7 +20,7 @@ namespace job
 {
 void JobList::append(
   const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
-  job::Type type, bool exclusive)
+  job::Type type, bool exclusive, job::Trigger trigger)
 {
   for (auto & job : list_) {
     if (exclusive) {
@@ -29,13 +29,24 @@ void JobList::append(
       }
     }
   }
-  list_.emplace_back(Job(func_on_update, func_on_cleanup, type, exclusive));
+  list_.emplace_back(Job(func_on_update, func_on_cleanup, type, exclusive, trigger));
 }
 
 void JobList::update()
 {
   for (auto & job : list_) {
-    job.onUpdate();
+    if (job.trigger == job::Trigger::ON_UPDATE) {
+      job.update();
+    }
+  }
+}
+
+void JobList::measure()
+{
+  for (auto & job : list_) {
+    if (job.trigger == job::Trigger::ON_MEASURE) {
+      job.update();
+    }
   }
 }
 }  // namespace job

@@ -135,8 +135,6 @@ public:
 
   virtual void onUpdate(double current_time, double step_time);
 
-  void updateJobList();
-
   virtual auto ready() const -> bool { return static_cast<bool>(status_); }
 
   virtual void requestAcquirePosition(
@@ -181,6 +179,10 @@ public:
   {
     THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
   }
+
+  void runMeasureJob();
+
+  void runUpdateJob();
 
   /*   */ auto statusSet() const noexcept { return static_cast<bool>(status_); }
 
