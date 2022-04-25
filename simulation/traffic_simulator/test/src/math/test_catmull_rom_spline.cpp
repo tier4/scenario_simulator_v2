@@ -17,6 +17,8 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 
+#include "../expect_eq_macros.hpp"
+
 TEST(CatmullRomSpline, GetCollisionPointIn2D)
 {
   geometry_msgs::msg::Point p0;
@@ -161,16 +163,16 @@ TEST(CatmullRomSpline, GetTrajectory)
   auto spline = traffic_simulator::math::CatmullRomSpline(points);
   auto trajectory = spline.getTrajectory(0, 3, 1.0);
   EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
-  EXPECT_DOUBLE_EQ(trajectory[0].x, 0);
-  EXPECT_DOUBLE_EQ(trajectory[1].x, 1);
-  EXPECT_DOUBLE_EQ(trajectory[2].x, 2);
-  EXPECT_DOUBLE_EQ(trajectory[3].x, 3);
+  EXPECT_DECIMAL_EQ(trajectory[0].x, 0, 0.00001);
+  EXPECT_DECIMAL_EQ(trajectory[1].x, 1, 0.00001);
+  EXPECT_DECIMAL_EQ(trajectory[2].x, 2, 0.00001);
+  EXPECT_DECIMAL_EQ(trajectory[3].x, 3, 0.00001);
   trajectory = spline.getTrajectory(3, 0, 1.0);
   EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
-  EXPECT_DOUBLE_EQ(trajectory[0].x, 3);
-  EXPECT_DOUBLE_EQ(trajectory[1].x, 2);
-  EXPECT_DOUBLE_EQ(trajectory[2].x, 1);
-  EXPECT_DOUBLE_EQ(trajectory[3].x, 0);
+  EXPECT_DECIMAL_EQ(trajectory[0].x, 3, 0.00001);
+  EXPECT_DECIMAL_EQ(trajectory[1].x, 2, 0.00001);
+  EXPECT_DECIMAL_EQ(trajectory[2].x, 1, 0.00001);
+  EXPECT_DECIMAL_EQ(trajectory[3].x, 0, 0.00001);
 }
 
 TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointisAreNotEnough)
