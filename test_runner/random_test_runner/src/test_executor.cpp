@@ -22,7 +22,6 @@
 #include "random_test_runner/file_interactions/yaml_test_params_saver.hpp"
 
 const double test_timeout = 60.0;
-const bool attach_sensors = false;
 
 traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
 {
@@ -53,11 +52,13 @@ traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
 
 TestExecutor::TestExecutor(
   std::shared_ptr<traffic_simulator::API> api, TestDescription description,
-  JunitXmlReporterTestCase test_case_reporter, SimulatorType simulator_type, rclcpp::Logger logger)
+  JunitXmlReporterTestCase test_case_reporter, SimulatorType simulator_type,
+  ArchitectureType architecture_type, rclcpp::Logger logger)
 : api_(std::move(api)),
   test_description_(std::move(description)),
   error_reporter_(std::move(test_case_reporter)),
   simulator_type_(simulator_type),
+  architecture_type_(architecture_type),
   logger_(logger)
 {
 }
@@ -76,18 +77,26 @@ void TestExecutor::initialize()
     api_->setEntityStatus(
       ego_name_, test_description_.ego_start_position,
       traffic_simulator::helper::constructActionStatus());
-    if (attach_sensors) {
+
+    if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
       api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-        traffic_simulator::helper::LidarType::VLP16, ego_name_, "/perception/points_nonground"));
+        traffic_simulator::helper::LidarType::VLP16, ego_name_,
+        stringFromArchitectureType(architecture_type_)));
+
+      double constexpr detection_update_duration = 0.1;
+      api_->attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
+        ego_name_, stringFromArchitectureType(architecture_type_), detection_update_duration));
     }
 
-    // XXX dirty hack: wait for autoware system to launch, ugly but helps for
-    // now
+    // XXX dirty hack: wait for autoware system to launch
+    // ugly but helps for now
     std::this_thread::sleep_for(std::chrono::milliseconds{5000});
 
     api_->requestAssignRoute(
       ego_name_,
       std::vector<traffic_simulator_msgs::msg::LaneletPose>{test_description_.ego_goal_position});
+    api_->engage(ego_name_);
+
     goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
   }
 
