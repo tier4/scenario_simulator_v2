@@ -240,7 +240,7 @@ std::istream & operator>>(
   using autoware_auto_system_msgs::msg::EmergencyState;
 #define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
 
-  std::unordered_map<std::string, uint8_t> state_dictionary{
+  std::unordered_map<std::string, std::uint8_t> state_dictionary{
     STATE(MRM_FAILED), STATE(MRM_OPERATING),       STATE(MRM_SUCCEEDED),
     STATE(NORMAL),     STATE(OVERRIDE_REQUESTING),
   };
@@ -250,8 +250,7 @@ std::istream & operator>>(
   std::string state_string;
   is >> state_string;
 
-  auto iter = state_dictionary.find(state_string);
-  if (iter not_eq state_dictionary.end()) {
+  if (auto iter = state_dictionary.find(state_string); iter != state_dictionary.end()) {
     message.set__state(iter->second);
   } else {
     throw common::Error("Unsupported EmergencyState::state : ", state_string.c_str());
