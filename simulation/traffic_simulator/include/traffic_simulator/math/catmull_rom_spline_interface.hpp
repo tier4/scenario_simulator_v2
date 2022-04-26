@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_INTERFACE_HPP_
-#define TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_INTERFACE_HPP_
+#ifndef TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
+#define TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
 
 #include <boost/optional.hpp>
 #include <exception>
@@ -26,7 +26,7 @@ namespace traffic_simulator
 {
 namespace math
 {
-class CatmullRomInterface
+class CatmullRomSplineInterface
 {
 public:
   virtual double getLength() const = 0;
@@ -37,4 +37,4 @@ public:
 }  // namespace math
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_INTERFACE_HPP_
+#endif  // TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_

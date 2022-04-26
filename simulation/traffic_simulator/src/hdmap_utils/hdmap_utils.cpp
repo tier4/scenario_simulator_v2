@@ -1467,7 +1467,7 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
 
 const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const traffic_simulator::math::CatmullRomInterface & spline) const
+  const traffic_simulator::math::CatmullRomSplineInterface & spline) const
 {
   auto traffic_light_ids = getTrafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.size() == 0) {
@@ -1505,7 +1505,7 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
 }
 
 const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
-  const traffic_simulator::math::CatmullRomInterface & spline,
+  const traffic_simulator::math::CatmullRomSplineInterface & spline,
   const std::int64_t & traffic_light_id) const
 {
   if (spline.getLength() <= 0) {
@@ -1556,7 +1556,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const traffic_simulator::math::CatmullRomInterface & spline)
+  const traffic_simulator::math::CatmullRomSplineInterface & spline)
 {
   if (spline.getLength() <= 0) {
     return boost::none;

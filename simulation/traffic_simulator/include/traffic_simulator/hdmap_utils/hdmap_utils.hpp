@@ -43,8 +43,8 @@
 #include <string>
 #include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
-#include <traffic_simulator/math/catmull_rom_interface.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
+#include <traffic_simulator/math/catmull_rom_spline_interface.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -101,7 +101,7 @@ public:
     const std::vector<geometry_msgs::msg::Point> & waypoints);
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
-    const traffic_simulator::math::CatmullRomInterface & spline);
+    const traffic_simulator::math::CatmullRomSplineInterface & spline);
   double getLaneletLength(std::int64_t lanelet_id);
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
@@ -165,14 +165,14 @@ public:
     const std::vector<geometry_msgs::msg::Point> & waypoints,
     const std::int64_t & traffic_light_id) const;
   const boost::optional<double> getDistanceToTrafficLightStopLine(
-    const traffic_simulator::math::CatmullRomInterface & spline,
+    const traffic_simulator::math::CatmullRomSplineInterface & spline,
     const std::int64_t & traffic_light_id) const;
   const boost::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
   const boost::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
-    const traffic_simulator::math::CatmullRomInterface & spline) const;
+    const traffic_simulator::math::CatmullRomSplineInterface & spline) const;
   const std::vector<std::int64_t> getTrafficLightIdsOnPath(
     const std::vector<std::int64_t> & route_lanelets) const;
   traffic_simulator_msgs::msg::LaneletPose getAlongLaneletPose(

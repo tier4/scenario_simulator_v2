@@ -17,7 +17,7 @@
 #include <exception>
 #include <geometry_msgs/msg/point.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_interface.hpp>
+#include <traffic_simulator/math/catmull_rom_spline_interface.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <utility>
 #include <vector>
@@ -26,7 +26,7 @@ namespace traffic_simulator
 {
 namespace math
 {
-class CatmullRomSpline : public CatmullRomInterface
+class CatmullRomSpline : public CatmullRomSplineInterface
 {
 public:
   CatmullRomSpline() = default;
