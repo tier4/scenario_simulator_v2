@@ -2,6 +2,60 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#728 <https://github.com/tier4/scenario_simulator_v2/issues/728>`_ from tier4/fix/interpreter/interrupt
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/job_system
+* Merge pull request `#690 <https://github.com/tier4/scenario_simulator_v2/issues/690>`_ from RobotecAI/AJD-331-make-zmq-client-work-through-network
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* shutdown_flag -> is_running
+* ament_clang_format
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/improve_ego_lane_matching
+* Merge pull request `#729 <https://github.com/tier4/scenario_simulator_v2/issues/729>`_ from tier4/feature/ignore_raycast_result
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge branch 'master' into feature/interpreter/reader
+* Merge pull request `#726 <https://github.com/tier4/scenario_simulator_v2/issues/726>`_ from tier4/feature/semantics
+* update error message
+* rename data field
+* enable filter by range
+* update proto
+* rename args
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* use switch in conversion
+* rename to subtype
+* Merge branch 'feature/semantics' of https://github.com/tier4/scenario_simulator_v2 into feature/semantics
+* remove category
+* fix typo and remove debug line
+* add disconect() to ~Interpreter(). stop zeromq call if shut down.
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* fix error
+* add test code
+* add semantics conversion function
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* modify proto file
+* add EntityTypeProto
+* enable filter by range
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* revert some changes from option 2
+* change to option 1 (simulator host as a launch parameter)
+* fix clang format
+* internal review fixes
+* zmq client can connect through the network
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
 0.6.3 (2022-03-09)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard

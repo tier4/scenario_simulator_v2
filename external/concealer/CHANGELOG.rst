@@ -2,6 +2,39 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#728 <https://github.com/tier4/scenario_simulator_v2/issues/728>`_ from tier4/fix/interpreter/interrupt
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge pull request `#733 <https://github.com/tier4/scenario_simulator_v2/issues/733>`_ from tier4/feature/improve_ego_lane_matching
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* use dynamic_cast
+* fix virtual specifier
+* add getPath function
+* apply reformat
+* enable matching to on route lane
+* add getRouteLanelets function
+* fixes and cleanup
+* ugly but working
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* fixes and cleanup
+* ugly but working
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
 0.6.3 (2022-03-09)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset

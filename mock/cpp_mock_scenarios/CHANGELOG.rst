@@ -2,6 +2,49 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_get_length
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/traffic_light
+* Merge pull request `#752 <https://github.com/tier4/scenario_simulator_v2/issues/752>`_ from tier4/feature/reset_acecel_in_request_speed_change
+* remove unused if line in scenario
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge pull request `#740 <https://github.com/tier4/scenario_simulator_v2/issues/740>`_ from tier4/refactor/traffic_simulator/traffic_light_manager
+* remove debug lines
+* remove debug line
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Switch struct `TrafficLight` to experimental version
+* Merge pull request `#749 <https://github.com/tier4/scenario_simulator_v2/issues/749>`_ from tier4/feature/job_system
+* add test scenario
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Remove member function `setTrafficLightManager::set(Arrow|Color)Phase`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge pull request `#733 <https://github.com/tier4/scenario_simulator_v2/issues/733>`_ from tier4/feature/improve_ego_lane_matching
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'master' into fix/interpreter/interrupt
+* change coordinate
+* change goal position
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge branch 'master' into feature/interpreter/reader
+* Merge pull request `#726 <https://github.com/tier4/scenario_simulator_v2/issues/726>`_ from tier4/feature/semantics
+* rename data field
+* fix compile error in catalog
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* rename to subtype
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Revert "[TMP] meassure update time"
+* [TMP] meassure update time
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
 0.6.3 (2022-03-09)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
