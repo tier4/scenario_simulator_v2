@@ -60,6 +60,8 @@ public:
 
   virtual auto getCurrentAction() const -> const std::string = 0;
 
+  virtual auto getEmergencyStateString() const -> std::string;
+
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>
   {

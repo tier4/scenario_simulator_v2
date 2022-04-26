@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
+#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <concealer/autoware_universe.hpp>
@@ -103,6 +104,8 @@ public:
     autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
+
+  auto getEmergencyStateString() const -> std::string override;
 
   void onUpdate(double current_time, double step_time) override;
 
