@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.4 (2022-04-26)
+------------------
 * Merge branch 'tier4:master' into feature/awf_universe_instruction
 * Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
 * Merge branch 'tier4:master' into AJD-331-optimization

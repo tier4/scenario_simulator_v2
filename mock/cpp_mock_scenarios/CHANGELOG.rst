@@ -2,8 +2,8 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.4 (2022-04-26)
+------------------
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_get_length
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/traffic_light

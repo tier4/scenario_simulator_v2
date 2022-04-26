@@ -2,8 +2,8 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.4 (2022-04-26)
+------------------
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
 * Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
 * Merge pull request `#744 <https://github.com/tier4/scenario_simulator_v2/issues/744>`_ from tier4/feature/remove_color_names_function

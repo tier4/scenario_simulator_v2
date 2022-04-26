@@ -2,8 +2,8 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.4 (2022-04-26)
+------------------
 * Merge pull request `#762 <https://github.com/tier4/scenario_simulator_v2/issues/762>`_ from tier4/fix/email
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
 * fix email address

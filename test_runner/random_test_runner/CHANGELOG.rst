@@ -2,8 +2,8 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.4 (2022-04-26)
+------------------
 * Merge pull request `#697 <https://github.com/tier4/scenario_simulator_v2/issues/697>`_ from RobotecAI/AJD-345-random_test_runner_with_autoware_universe
 * added namespace to nodes in random_test_runner
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe

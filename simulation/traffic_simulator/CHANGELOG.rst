@@ -2,8 +2,8 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.4 (2022-04-26)
+------------------
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
 * Merge pull request `#761 <https://github.com/tier4/scenario_simulator_v2/issues/761>`_ from tier4/refactor/undef_mistake
 * Merge pull request `#757 <https://github.com/tier4/scenario_simulator_v2/issues/757>`_ from tier4/feature/speed_up_get_length
