@@ -218,6 +218,10 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     if (previous_angular_velocity_ && previous_linear_velocity_) {
       accel.linear.x = (twist.linear.x - previous_linear_velocity_.get()) / step_time;
       accel.angular.z = (twist.angular.z - previous_angular_velocity_.get()) / step_time;
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
+    }
+    else {
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
     }
   }
 
