@@ -62,35 +62,23 @@ void MoveBackwardAction::getBlackBoardValues() { VehicleActionNode::getBlackBoar
 
 BT::NodeStatus MoveBackwardAction::tick()
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   getBlackBoardValues();
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (
     request != traffic_simulator::behavior::Request::NONE &&
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return BT::NodeStatus::FAILURE;
   }
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto waypoints = calculateWaypoints();
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (waypoints.waypoints.empty()) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return BT::NodeStatus::FAILURE;
   }
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto obstacle = calculateObstacle(waypoints);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   setOutput("waypoints", waypoints);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   setOutput("obstacle", obstacle);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
