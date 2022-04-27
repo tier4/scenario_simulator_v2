@@ -25,8 +25,9 @@ namespace traffic_simulator
 {
 namespace entity
 {
-EntityBase::EntityBase(const std::string & type, const std::string & name)
-: type(type), name(name), status_(boost::none), verbose_(true), visibility_(true)
+EntityBase::EntityBase(
+  const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
+: name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
 {
   status_ = boost::none;
 }
@@ -36,7 +37,18 @@ void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*mark
   return;
 }
 
-void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
+void EntityBase::onUpdate(double, double)
+{
+  job_list_.update();
+  status_before_update_ = status_;
+}
+
+auto EntityBase::getEmergencyStateString() const -> std::string
+{
+  throw common::Error(
+    "Inquiry of emergency state is valid query to only Autoware.Universe-controlled entity.",
+    "But the target entity ", std::quoted(name.c_str()), " is not controlled by Autoware.Universe");
+}
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
@@ -46,8 +58,39 @@ void EntityBase::requestSpeedChange(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
-      setAccelerationLimit(std::fabs(constraint.value));
-      setDecelerationLimit(std::fabs(constraint.value));
+      if (getStatus().action_status.twist.linear.x < target_speed) {
+        setAccelerationLimit(std::abs(constraint.value));
+        job_list_.append(
+          /**
+           * @brief Checking if the entity reaches target speed.
+           */
+          [this, target_speed]() {
+            return getStatus().action_status.twist.linear.x >= target_speed;
+          },
+          /**
+           * @brief Resets acceleration limit.
+           */
+          [this]() {
+            setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration);
+          },
+          job::Type::LINEAR_ACCELERATION, true);
+      } else if (getStatus().action_status.twist.linear.x > target_speed) {
+        setDecelerationLimit(std::abs(constraint.value));
+        job_list_.append(
+          /**
+           * @brief Checking if the entity reaches target speed.
+           */
+          [this, target_speed]() {
+            return getStatus().action_status.twist.linear.x <= target_speed;
+          },
+          /**
+           * @brief Resets deceleration limit.
+           */
+          [this]() {
+            setDecelerationLimit(traffic_simulator_msgs::msg::DriverModel().deceleration);
+          },
+          job::Type::LINEAR_ACCELERATION, true);
+      }
       requestSpeedChange(target_speed, continuous);
       break;
     }
@@ -67,8 +110,34 @@ void EntityBase::requestSpeedChange(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
-      setAccelerationLimit(std::fabs(constraint.value));
-      setDecelerationLimit(std::fabs(constraint.value));
+      job_list_.append(
+        /**
+           * @brief Checking if the entity reaches target speed.
+           */
+        [this, target_speed, constraint]() {
+          double diff =
+            target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
+          /**
+           * @brief Hard coded parameter, threashold for difference
+           */
+          if (std::abs(diff) <= 0.1) {
+            return true;
+          }
+          if (diff > 0) {
+            setAccelerationLimit(std::abs(constraint.value));
+            return false;
+          }
+          if (diff < 0) {
+            setDecelerationLimit(std::abs(constraint.value));
+            return false;
+          }
+          return false;
+        },
+        /**
+           * @brief Resets acceleration limit.
+           */
+        [this]() { setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration); },
+        job::Type::LINEAR_ACCELERATION, true);
       requestSpeedChange(target_speed, continuous);
       break;
     }
@@ -79,6 +148,80 @@ void EntityBase::requestSpeedChange(
       setStatus(status);
       break;
     }
+  }
+}
+
+void EntityBase::requestSpeedChange(double target_speed, bool continuous)
+{
+  if (continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        target_speed_ = target_speed;
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+  } else {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (getStatus().action_status.twist.linear.x >= target_speed) {
+          return true;
+        }
+        target_speed_ = target_speed;
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+  }
+}
+
+void EntityBase::requestSpeedChange(
+  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
+{
+  if (continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        target_speed_ = target_speed.getAbsoluteValue(other_status_);
+        return false;
+      },
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+  } else {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed]() {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        if (
+          getStatus().action_status.twist.linear.x >=
+          target_speed.getAbsoluteValue(other_status_)) {
+          target_speed_ = target_speed.getAbsoluteValue(other_status_);
+          return true;
+        }
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
 }
 
@@ -129,9 +272,12 @@ void EntityBase::requestLaneChange(
   }
 }
 
-const autoware_vehicle_msgs::msg::VehicleCommand EntityBase::getVehicleCommand()
+auto EntityBase::getVehicleCommand() const -> std::tuple<
+  autoware_auto_control_msgs::msg::AckermannControlCommand,
+  autoware_auto_vehicle_msgs::msg::GearCommand>
 {
-  THROW_SIMULATION_ERROR("get vehicle command does not support in ", type, " entity type");
+  THROW_SIMULATION_ERROR(
+    "`getVehicleCommand` is not provided for ", getEntityTypename(), " type entity.");
 }
 
 void EntityBase::updateStandStillDuration(const double step_time)
@@ -184,6 +330,8 @@ const traffic_simulator_msgs::msg::EntityStatus EntityBase::getStatus() const
   } else {
     auto status = this->status_.get();
     status.bounding_box = getBoundingBox();
+    status.subtype = entity_subtype_;
+    status.type = entity_type_;
     return status;
   }
 }

@@ -42,6 +42,8 @@ protected:
   }
 
 public:
+  virtual ~LidarSensorBase() = default;
+
   virtual auto update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
     -> void = 0;

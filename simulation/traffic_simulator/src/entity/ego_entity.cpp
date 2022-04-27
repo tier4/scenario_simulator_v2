@@ -43,10 +43,6 @@ auto toString(const VehicleModelType datum) -> std::string
     BOILERPLATE(IDEAL_STEER_ACC);
     BOILERPLATE(IDEAL_STEER_ACC_GEARED);
     BOILERPLATE(IDEAL_STEER_VEL);
-    BOILERPLATE(LEGACY_DELAY_STEER);
-    BOILERPLATE(LEGACY_DELAY_STEER_ACC);
-    BOILERPLATE(LEGACY_IDEAL_ACCEL);
-    BOILERPLATE(LEGACY_IDEAL_STEER);
   }
 
 #undef BOILERPLATE
@@ -56,12 +52,10 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
   const auto vehicle_model_type =
-    architecture_type == "awf/auto"
-      ? "IDEAL_STEER"
-      : getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
+    getParameter<std::string>("vehicle_model_type", "IDEAL_STEER_VEL");
 
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
@@ -72,17 +66,7 @@ auto getVehicleModelType()
     {"IDEAL_STEER_VEL", VehicleModelType::IDEAL_STEER_VEL},
   };
 
-  static const std::unordered_map<std::string, VehicleModelType> legacy_table{
-    {"DELAY_STEER", VehicleModelType::LEGACY_DELAY_STEER},
-    {"DELAY_STEER_ACC", VehicleModelType::LEGACY_DELAY_STEER_ACC},
-    {"IDEAL_ACCEL", VehicleModelType::LEGACY_IDEAL_ACCEL},
-    {"IDEAL_STEER", VehicleModelType::LEGACY_IDEAL_STEER},
-  };
-
-  const auto iter =
-    (architecture_type == "tier4/proposal" or architecture_type == "awf/auto" ? legacy_table
-                                                                              : table)
-      .find(vehicle_model_type);
+  const auto iter = table.find(vehicle_model_type);
 
   if (iter != std::end(table)) {
     return iter->second;
@@ -98,33 +82,20 @@ auto makeSimulationModel(
   -> const std::shared_ptr<SimModelInterface>
 {
   // clang-format off
-  const auto acc_time_constant    = getParameter<double>("acc_time_constant",     0.1);
-  const auto acc_time_delay       = getParameter<double>("acc_time_delay",        0.1);
-  const auto accel_rate           = getParameter<double>("accel_rate",           10.0);
-  const auto deadzone_delta_steer = getParameter<double>("deadzone_delta_steer",  0.0);
-  const auto steer_lim            = getParameter<double>("steer_lim",            parameters.axles.front_axle.max_steering);  // 1.0
-  const auto steer_rate_lim       = getParameter<double>("steer_rate_lim",        5.0);
-  const auto steer_time_constant  = getParameter<double>("steer_time_constant",   0.27);
-  const auto steer_time_delay     = getParameter<double>("steer_time_delay",      0.24);
-  const auto vel_lim              = getParameter<double>("vel_lim",              parameters.performance.max_speed);  // 50.0
-  const auto vel_rate_lim         = getParameter<double>("vel_rate_lim",         parameters.performance.max_acceleration);  // 7.0
-  const auto vel_time_constant    = getParameter<double>("vel_time_constant",     0.1);
-  const auto vel_time_delay       = getParameter<double>("vel_time_delay",        0.1);
-  const auto wheel_base           = getParameter<double>("wheel_base",           parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
+  const auto acc_time_constant   = getParameter<double>("acc_time_constant",     0.1);
+  const auto acc_time_delay      = getParameter<double>("acc_time_delay",        0.1);
+  const auto steer_lim           = getParameter<double>("steer_lim",            parameters.axles.front_axle.max_steering);  // 1.0
+  const auto steer_rate_lim      = getParameter<double>("steer_rate_lim",        5.0);
+  const auto steer_time_constant = getParameter<double>("steer_time_constant",   0.27);
+  const auto steer_time_delay    = getParameter<double>("steer_time_delay",      0.24);
+  const auto vel_lim             = getParameter<double>("vel_lim",              parameters.performance.max_speed);  // 50.0
+  const auto vel_rate_lim        = getParameter<double>("vel_rate_lim",         parameters.performance.max_acceleration);  // 7.0
+  const auto vel_time_constant   = getParameter<double>("vel_time_constant",     0.1);
+  const auto vel_time_delay      = getParameter<double>("vel_time_delay",        0.1);
+  const auto wheel_base          = getParameter<double>("wheel_base",           parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
   // clang-format on
 
   switch (vehicle_model_type) {
-    case VehicleModelType::IDEAL_STEER_VEL:
-    case VehicleModelType::LEGACY_IDEAL_STEER:
-      return std::make_shared<SimModelIdealSteerVel>(wheel_base);
-
-    case VehicleModelType::IDEAL_STEER_ACC:
-    case VehicleModelType::LEGACY_IDEAL_ACCEL:
-      return std::make_shared<SimModelIdealSteerAcc>(wheel_base);
-
-    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-      return std::make_shared<SimModelIdealSteerAccGeared>(wheel_base);
-
     case VehicleModelType::DELAY_STEER_ACC:
       return std::make_shared<SimModelDelaySteerAcc>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
@@ -140,15 +111,14 @@ auto makeSimulationModel(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, vel_time_delay,
         vel_time_constant, steer_time_delay, steer_time_constant);
 
-    case VehicleModelType::LEGACY_DELAY_STEER:
-      return std::make_shared<SimModelTimeDelaySteer>(
-        vel_lim, steer_lim, accel_rate, steer_rate_lim, wheel_base, step_time, vel_time_delay,
-        vel_time_constant, steer_time_delay, steer_time_constant, deadzone_delta_steer);
+    case VehicleModelType::IDEAL_STEER_ACC:
+      return std::make_shared<SimModelIdealSteerAcc>(wheel_base);
 
-    case VehicleModelType::LEGACY_DELAY_STEER_ACC:
-      return std::make_shared<SimModelTimeDelaySteerAccel>(
-        vel_lim, steer_lim, accel_rate, steer_rate_lim, wheel_base, step_time, acc_time_delay,
-        acc_time_constant, steer_time_delay, steer_time_constant, deadzone_delta_steer);
+    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+      return std::make_shared<SimModelIdealSteerAccGeared>(wheel_base);
+
+    case VehicleModelType::IDEAL_STEER_VEL:
+      return std::make_shared<SimModelIdealSteerVel>(wheel_base);
 
     default:
       THROW_SEMANTIC_ERROR(
@@ -158,22 +128,9 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
-  if (architecture_type == "tier4/proposal") {
-    return getParameter<bool>("launch_autoware", true)
-             ? std::make_unique<concealer::AutowareArchitectureProposal>(
-                 getParameter<std::string>("autoware_launch_package"),
-                 getParameter<std::string>("autoware_launch_file"),
-                 "map_path:=" + configuration.map_path.string(),
-                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + configuration.rviz_config_path.string(),
-                 "scenario_simulation:=true")
-             : std::make_unique<concealer::AutowareArchitectureProposal>();
-  } else if (architecture_type == "awf/universe") {
+  if (architecture_type == "awf/universe") {
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
                  getParameter<std::string>("autoware_launch_package"),
@@ -184,23 +141,11 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "sensor_model:=" + getParameter<std::string>("sensor_model"),
                  "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
                  "rviz_config:=" + configuration.rviz_config_path.string(),
-                 "scenario_simulation:=true")
+                 "scenario_simulation:=true", "perception/enable_traffic_light:=false")
              : std::make_unique<concealer::AutowareUniverse>();
-  } else if (architecture_type == "awf/auto") {
-    return getParameter<bool>("launch_autoware", true)
-             ? std::make_unique<concealer::AutowareAuto>(
-                 getParameter<std::string>("autoware_launch_package"),
-                 getParameter<std::string>("autoware_launch_file"),
-                 "map_path:=" + configuration.map_path.string(),
-                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + configuration.rviz_config_path.string(),
-                 "scenario_simulation:=true")
-             : std::make_unique<concealer::AutowareAuto>();
   } else {
-    throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
+    throw common::SemanticError(
+      "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
   }
 }
 
@@ -219,14 +164,16 @@ EgoEntity::EgoEntity(
 
 void EgoEntity::engage() { autoware->engage(); }
 
-auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
+auto EgoEntity::getVehicleCommand() const -> std::tuple<
+  autoware_auto_control_msgs::msg::AckermannControlCommand,
+  autoware_auto_vehicle_msgs::msg::GearCommand>
 {
   return autoware->getVehicleCommand();
 }
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  const auto state = autoware->getAutowareStateMessage();
+  const auto state = autoware->getAutowareStateString();
   return state.empty() ? "Launching" : state;
 }
 
@@ -294,20 +241,25 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     status.pose.position.y = v(1) + initial_pose_.get().position.y;
     status.pose.position.z = v(2) + initial_pose_.get().position.z;
 
-    const auto closest_lanelet_id = hdmap_utils_ptr_->getClosestLaneletId(status.pose);
-    if (!closest_lanelet_id) {
-      THROW_SEMANTIC_ERROR("failed to find the closest lane, lane is too far away.");
-    }
-
-    traffic_simulator::math::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(closest_lanelet_id.get()));
-    if (const auto s_value = spline.getSValue(status.pose)) {
-      status.pose.position.z = spline.getPoint(s_value.get()).z;
-    }
-
     status.pose.orientation = initial_pose_.get().orientation * pose.orientation;
 
-    const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
+    const auto route_lanelets = getRouteLanelets();
+
+    boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+
+    if (route_lanelets.empty()) {
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
+    } else {
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, route_lanelets, 1.0);
+    }
+
+    if (lanelet_pose) {
+      traffic_simulator::math::CatmullRomSpline spline(
+        hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+      if (const auto s_value = spline.getSValue(status.pose)) {
+        status.pose.position.z = spline.getPoint(s_value.get()).z;
+      }
+    }
 
     status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
     if (status.lanelet_pose_valid) {
@@ -327,6 +279,29 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
 auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return boost::none;
+}
+
+auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
+{
+  const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
+  std::vector<std::int64_t> ids = {};
+  if (universe) {
+    const auto points = universe->getPathWithLaneId().points;
+    for (const auto point : points) {
+      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+    }
+    auto result = std::unique(ids.begin(), ids.end());
+    ids.erase(result, ids.end());
+  }
+  return ids;
+}
+
+auto EgoEntity::getEmergencyStateString() const -> std::string
+{
+  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
+    return boost::lexical_cast<std::string>(universe->getEmergencyState());
+  }
+  return "";
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
@@ -372,7 +347,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC:
-      case VehicleModelType::LEGACY_IDEAL_ACCEL:
         input << autoware->getAcceleration(), autoware->getSteeringAngle();
         break;
 
@@ -384,16 +358,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
       case VehicleModelType::DELAY_STEER_VEL:
       case VehicleModelType::IDEAL_STEER_VEL:
-      case VehicleModelType::LEGACY_IDEAL_STEER:
         input << autoware->getVelocity(), autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::LEGACY_DELAY_STEER:
-        input << autoware->getVelocity(), autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::LEGACY_DELAY_STEER_ACC:
-        input << autoware->getAcceleration(), autoware->getSteeringAngle(), autoware->getGearSign();
         break;
 
       default:
@@ -539,22 +504,15 @@ void EgoEntity::requestSpeedChange(double value, bool)
 
     case VehicleModelType::IDEAL_STEER_ACC:
     case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-    case VehicleModelType::LEGACY_IDEAL_ACCEL:
       v << 0, 0, 0, autoware->restrictTargetSpeed(value);
       break;
 
     case VehicleModelType::IDEAL_STEER_VEL:
-    case VehicleModelType::LEGACY_IDEAL_STEER:
       v << 0, 0, 0;
       break;
 
     case VehicleModelType::DELAY_STEER_VEL:
-    case VehicleModelType::LEGACY_DELAY_STEER:
       v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0;
-      break;
-
-    case VehicleModelType::LEGACY_DELAY_STEER_ACC:
-      v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0, 0;
       break;
 
     default:
@@ -570,9 +528,9 @@ void EgoEntity::requestSpeedChange(
 {
 }
 
-auto EgoEntity::setUpperBoundSpeed(double value) -> void  //
+auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
-  autoware->setUpperBoundSpeed(value);
+  autoware->setVelocityLimit(value);
 }
 }  // namespace entity
 }  // namespace traffic_simulator

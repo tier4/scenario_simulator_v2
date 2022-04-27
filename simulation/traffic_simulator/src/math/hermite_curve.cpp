@@ -216,7 +216,7 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_po
 {
   std::vector<geometry_msgs::msg::Point> ret;
   for (size_t i = 0; i <= num_points; i++) {
-    double t = static_cast<double>(i) / 100.0;
+    double t = static_cast<double>(i) / static_cast<double>(num_points);
     ret.emplace_back(getPoint(t, false));
   }
   return ret;
@@ -301,15 +301,25 @@ double HermiteCurve::getMaximum2DCurvature() const
   return values.second;
 }
 
+/**
+ * @brief get length of the hermite curve. Calculate distance of two points on hermite curve and accumulate it's distance
+ * @param num_points 
+ * @return double length
+ */
 double HermiteCurve::getLength(size_t num_points) const
 {
-  auto trajectory = getTrajectory(num_points);
+  double delta_s = 1.0 / num_points;
   double ret = 0.0;
-  for (size_t i = 0; i < trajectory.size() - 1; i++) {
-    ret = ret + std::sqrt(
-                  std::pow(trajectory[i + 1].x - trajectory[i].x, 2) +
-                  std::pow(trajectory[i + 1].y - trajectory[i].y, 2) +
-                  std::pow(trajectory[i + 1].z - trajectory[i].z, 2));
+  /**
+   * @brief Approximate distance of two points on hermite curve, ignore terms above the second order of delta s.
+   * @image html get_length_in_hermite_curve.png
+   */
+  for (size_t i = 0; i < num_points; i++) {
+    double s = i * delta_s;
+    double x_diff = (3 * s * s) * ax_ + 2 * s * bx_ + cx_;
+    double y_diff = (3 * s * s) * ay_ + 2 * s * by_ + cy_;
+    double z_diff = (3 * s * s) * az_ + 2 * s * bz_ + cz_;
+    ret = ret + std::sqrt(x_diff * x_diff + y_diff * y_diff + z_diff * z_diff) * delta_s;
   }
   return ret;
 }
@@ -320,9 +330,16 @@ const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale)
     s = s / getLength();
   }
   geometry_msgs::msg::Point p;
-  p.x = ax_ * std::pow(s, 3) + bx_ * std::pow(s, 2) + cx_ * s + dx_;
-  p.y = ay_ * std::pow(s, 3) + by_ * std::pow(s, 2) + cy_ * s + dy_;
-  p.z = az_ * std::pow(s, 3) + bz_ * std::pow(s, 2) + cz_ * s + dz_;
+
+  // optimization
+  auto s2 = s * s;
+  auto s3 = s2 * s;
+
+  p.x = ax_ * s3 + bx_ * s2 + cx_ * s + dx_;
+  p.y = ay_ * s3 + by_ * s2 + cy_ * s + dy_;
+  p.z = az_ * s3 + bz_ * s2 + cz_ * s + dz_;
+  // optimization
+
   return p;
 }
 }  // namespace math

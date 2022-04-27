@@ -2,6 +2,74 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#712 <https://github.com/tier4/scenario_simulator_v2/issues/712>`_ from tier4/fix/object-recognition-from-prediction-to-detection
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#728 <https://github.com/tier4/scenario_simulator_v2/issues/728>`_ from tier4/fix/interpreter/interrupt
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* add virtual destructor to DetectionSensorBase and LidarSensorBase
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/improve_ego_lane_matching
+* Merge pull request `#729 <https://github.com/tier4/scenario_simulator_v2/issues/729>`_ from tier4/feature/ignore_raycast_result
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* apply clanf-format
+* fix enum access
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge branch 'master' into feature/interpreter/reader
+* Merge pull request `#726 <https://github.com/tier4/scenario_simulator_v2/issues/726>`_ from tier4/feature/semantics
+* rename data field
+* enable filter by lidar detection result
+* enable filter by range
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* add default case
+* fix invalid return
+* use switch and remove warning
+* use else if
+* fix compile errors in simulator
+* rename to subtype
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* fix compile error
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* modify proto file
+* enable filter by range
+* fix ci test
+* fix topic name
+* use detected objects instead of predicted ones
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Takayuki Murooka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
+0.6.3 (2022-03-09)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Remove architecture_type `awf/auto`
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#683 <https://github.com/tier4/scenario_simulator_v2/issues/683>`_ from tier4/feature/zeromq_multi_client
+  Feature/zeromq multi client
+* remove unused files
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Remove package `autoware_perception_msgs`
+* Remove some unused dependencies
+* Remove architecture_type `tier4/proposal`
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape

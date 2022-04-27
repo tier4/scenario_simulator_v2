@@ -2,6 +2,32 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#744 <https://github.com/tier4/scenario_simulator_v2/issues/744>`_ from tier4/feature/remove_color_names_function
+* remove functions in color_names package
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Contributors: Daniel Marczak, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, yamacir-kit
+
+0.6.3 (2022-03-09)
+------------------
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#686 <https://github.com/tier4/scenario_simulator_v2/issues/686>`_ from tier4/fix/warp_problem
+  Fix/warp problem
+* add offset visualization
+* enable get - offset value
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape

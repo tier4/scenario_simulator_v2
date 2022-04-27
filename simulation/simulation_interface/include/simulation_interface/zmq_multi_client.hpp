@@ -33,8 +33,7 @@ class MultiClient
 {
 public:
   explicit MultiClient(
-    const simulation_interface::TransportProtocol & protocol,
-    const simulation_interface::HostName & hostname);
+    const simulation_interface::TransportProtocol & protocol, const std::string & hostname);
   ~MultiClient();
 
   void call(
@@ -72,7 +71,7 @@ public:
     simulation_api_schema::UpdateTrafficLightsResponse & res);
 
   const simulation_interface::TransportProtocol protocol;
-  const simulation_interface::HostName hostname;
+  const std::string hostname;
 
 private:
   zmqpp::context context_;
@@ -88,6 +87,8 @@ private:
   zmqpp::socket socket_attach_lidar_sensor_;
   zmqpp::socket socket_attach_detection_sensor_;
   zmqpp::socket socket_update_traffic_lights_;
+
+  bool is_running = true;
 };
 }  // namespace zeromq
 

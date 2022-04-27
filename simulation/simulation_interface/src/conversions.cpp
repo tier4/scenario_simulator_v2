@@ -187,7 +187,6 @@ void toProto(
   toProto(p.performance, *proto.mutable_performance());
   // toProto(p.property, *proto.mutable_property());
   proto.set_name(p.name);
-  proto.set_vehicle_category(p.vehicle_category);
 }
 
 void toMsg(
@@ -199,7 +198,6 @@ void toMsg(
   toMsg(proto.performance(), p.performance);
   // toMsg(proto.property(), p.property);
   p.name = proto.name();
-  p.vehicle_category = proto.vehicle_category();
 }
 
 void toProto(
@@ -208,7 +206,6 @@ void toProto(
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   proto.set_name(p.name);
-  proto.set_pedestrian_category(p.pedestrian_category);
 }
 
 void toMsg(
@@ -216,7 +213,6 @@ void toMsg(
   traffic_simulator_msgs::msg::PedestrianParameters & p)
 {
   p.name = proto.name();
-  p.pedestrian_category = proto.pedestrian_category();
   toMsg(proto.bounding_box(), p.bounding_box);
 }
 
@@ -226,7 +222,6 @@ void toProto(
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   proto.set_name(p.name);
-  proto.set_misc_object_category(p.misc_object_category);
 }
 
 void toMsg(
@@ -234,7 +229,6 @@ void toMsg(
   traffic_simulator_msgs::msg::MiscObjectParameters & p)
 {
   p.name = proto.name();
-  p.misc_object_category = proto.misc_object_category();
   toMsg(proto.bounding_box(), p.bounding_box);
 }
 
@@ -277,57 +271,137 @@ void toMsg(
 void toProto(
   const traffic_simulator_msgs::msg::EntityType & type, traffic_simulator_msgs::EntityType & proto)
 {
-  if (type.type == traffic_simulator_msgs::msg::EntityType::EGO) {
-    proto = traffic_simulator_msgs::EntityType::EGO;
-    return;
-  } else if (type.type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    proto = traffic_simulator_msgs::EntityType::VEHICLE;
-    return;
-  } else if (type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN) {
-    proto = traffic_simulator_msgs::EntityType::PEDESTRIAN;
-    return;
-  } else if (type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT) {
-    proto = traffic_simulator_msgs::EntityType::MISC_OBJECT;
-    return;
+  switch (type.type) {
+    case traffic_simulator_msgs::msg::EntityType::EGO:
+      proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO);
+      break;
+    case traffic_simulator_msgs::msg::EntityType::VEHICLE:
+      proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_VEHICLE);
+      break;
+    case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
+      proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_PEDESTRIAN);
+      break;
+    case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
+      proto.set_type(traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_MISC_OBJECT);
+      break;
+    default:
+      // LCOV_EXCL_START
+      std::string message =
+        "type of the Entity Type is invalid!\ntype is " + std::to_string(type.type);
+      THROW_SIMULATION_ERROR(message);
+      // LCOV_EXCL_STOP
+      break;
   }
-  // LCOV_EXCL_START
-  std::string message = "type of the Entity Type is invalid!\ntype is " + std::to_string(type.type);
-  THROW_SIMULATION_ERROR(message);
-  // LCOV_EXCL_STOP
 }
 
 void toMsg(
   const traffic_simulator_msgs::EntityType & proto, traffic_simulator_msgs::msg::EntityType & type)
 {
-  if (proto == traffic_simulator_msgs::EntityType::EGO) {
-    type.type = traffic_simulator_msgs::msg::EntityType::EGO;
-    return;
+  switch (proto.type()) {
+    case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO:
+      type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+      break;
+    case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_VEHICLE:
+      type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+      break;
+    case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_PEDESTRIAN:
+      type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+      break;
+    case traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_MISC_OBJECT:
+      type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
+      break;
+    default:
+      // LCOV_EXCL_START
+      std::string message = "type of the Entity Type is invalid!";
+      THROW_SIMULATION_ERROR(message);
+      // LCOV_EXCL_STOP
+      break;
   }
-  if (proto == traffic_simulator_msgs::EntityType::VEHICLE) {
-    type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-    return;
+}
+
+void toProto(
+  const traffic_simulator_msgs::msg::EntitySubtype & subtype,
+  traffic_simulator_msgs::EntitySubtype & proto)
+{
+  switch (subtype.value) {
+    case traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::CAR:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::TRUCK:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::BUS:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::TRAILER:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::BICYCLE:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE);
+      break;
+    case traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN:
+      proto.set_value(traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN);
+      break;
+    default:
+      // LCOV_EXCL_START
+      std::string message =
+        "subtype of the Entity Type is invalid!\nsubtype is " + std::to_string(subtype.value);
+      THROW_SIMULATION_ERROR(message);
+      // LCOV_EXCL_STOP
+      break;
   }
-  if (proto == traffic_simulator_msgs::EntityType::PEDESTRIAN) {
-    type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-    return;
+}
+
+void toMsg(
+  const traffic_simulator_msgs::EntitySubtype & proto,
+  traffic_simulator_msgs::msg::EntitySubtype & subtype)
+{
+  switch (proto.value()) {
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::TRUCK;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::BUS;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::TRAILER;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::BICYCLE;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
+      subtype.value = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
+      break;
+    default:
+      // LCOV_EXCL_START
+      std::string message = "type of the Entity subtype is invalid!";
+      THROW_SIMULATION_ERROR(message);
+      // LCOV_EXCL_STOP
+      break;
   }
-  if (proto == traffic_simulator_msgs::EntityType::MISC_OBJECT) {
-    type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
-    return;
-  }
-  // LCOV_EXCL_START
-  std::string message = "type of the Entity Type is invalid!";
-  THROW_SIMULATION_ERROR(message);
-  // LCOV_EXCL_STOP
 }
 
 void toProto(
   const traffic_simulator_msgs::msg::EntityStatus & status,
   traffic_simulator_msgs::EntityStatus & proto)
 {
-  traffic_simulator_msgs::EntityType type;
-  toProto(status.type, type);
-  proto.set_type(type);
+  toProto(status.type, *proto.mutable_type());
+  toProto(status.subtype, *proto.mutable_subtype());
   proto.set_time(status.time);
   proto.set_name(status.name);
   toProto(status.bounding_box, *proto.mutable_bounding_box());
@@ -335,15 +409,15 @@ void toProto(
   toProto(status.pose, *proto.mutable_pose());
   toProto(status.lanelet_pose, *proto.mutable_lanelet_pose());
   proto.set_lanelet_pose_valid(status.lanelet_pose_valid);
+  // proto.PrintDebugString();
 }
 
 void toMsg(
   const traffic_simulator_msgs::EntityStatus & proto,
   traffic_simulator_msgs::msg::EntityStatus & status)
 {
-  traffic_simulator_msgs::msg::EntityType type;
-  toMsg(proto.type(), type);
-  status.type = type;
+  toMsg(proto.type(), status.type);
+  toMsg(proto.subtype(), status.subtype);
   status.time = proto.time();
   status.name = proto.name();
   toMsg(proto.bounding_box(), status.bounding_box);
@@ -401,114 +475,119 @@ void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header)
 }
 
 void toProto(
-  const autoware_control_msgs::msg::ControlCommand & control_command,
-  autoware_control_msgs::ControlCommand & proto)
+  const autoware_auto_control_msgs::msg::AckermannLateralCommand & message,
+  autoware_auto_control_msgs::AckermannLateralCommand & proto)
 {
-  proto.set_velocity(control_command.velocity);
-  proto.set_acceleration(control_command.acceleration);
-  proto.set_steering_angle(control_command.steering_angle);
-  proto.set_steering_angle_velocity(control_command.steering_angle_velocity);
+  toProto(message.stamp, *proto.mutable_stamp());
+  proto.set_steering_tire_angle(message.steering_tire_angle);
+  proto.set_steering_tire_rotation_rate(message.steering_tire_rotation_rate);
 }
 
 void toMsg(
-  const autoware_control_msgs::ControlCommand & proto,
-  autoware_control_msgs::msg::ControlCommand & control_command)
+  const autoware_auto_control_msgs::AckermannLateralCommand & proto,
+  autoware_auto_control_msgs::msg::AckermannLateralCommand & message)
 {
-  control_command.velocity = proto.velocity();
-  control_command.acceleration = proto.acceleration();
-  control_command.steering_angle = proto.steering_angle();
-  control_command.steering_angle_velocity = proto.steering_angle_velocity();
-}
-
-void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto)
-{
-  switch (shift.data) {
-    case autoware_vehicle_msgs::msg::Shift::NONE:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::NONE);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::PARKING:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::REVERSE:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::REVERSE);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::NEUTRAL:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::NEUTRAL);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::DRIVE:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::DRIVE);
-      break;
-    case autoware_vehicle_msgs::msg::Shift::LOW:
-      proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::LOW);
-      break;
-    default:
-      THROW_SIMULATION_ERROR(
-        "shift position is invalid while converting ROS2 message to proto, shit position is ",
-        proto.data());
-  }
-}
-
-void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift)
-{
-  switch (proto.data()) {
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::NONE:
-      shift.data = autoware_vehicle_msgs::msg::Shift::NONE;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING:
-      shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::REVERSE:
-      shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::NEUTRAL:
-      shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::DRIVE:
-      shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::LOW:
-      shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
-      break;
-    default:
-      THROW_SIMULATION_ERROR(
-        "shift position is invalid while converting proto to ROS2 message, shit position is ",
-        proto.data());
-  }
+  toMsg(proto.stamp(), message.stamp);
+  message.steering_tire_angle = proto.steering_tire_angle();
+  message.steering_tire_rotation_rate = proto.steering_tire_rotation_rate();
 }
 
 void toProto(
-  const autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command,
-  autoware_vehicle_msgs::VehicleCommand & proto)
+  const autoware_auto_control_msgs::msg::LongitudinalCommand & message,
+  autoware_auto_control_msgs::LongitudinalCommand & proto)
 {
-  toProto(vehicle_command.control, *proto.mutable_control());
-  proto.set_emergency(vehicle_command.emergency);
-  toProto(vehicle_command.header, *proto.mutable_header());
-  toProto(vehicle_command.shift, *proto.mutable_shift());
+  toProto(message.stamp, *proto.mutable_stamp());
+  proto.set_speed(message.speed);
+  proto.set_acceleration(message.acceleration);
+  proto.set_jerk(message.jerk);
 }
 
 void toMsg(
-  const autoware_vehicle_msgs::VehicleCommand & proto,
-  autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command)
+  const autoware_auto_control_msgs::LongitudinalCommand & proto,
+  autoware_auto_control_msgs::msg::LongitudinalCommand & message)
 {
-  toMsg(proto.control(), vehicle_command.control);
-  vehicle_command.emergency = proto.emergency();
-  toMsg(proto.header(), vehicle_command.header);
-  toMsg(proto.shift(), vehicle_command.shift);
+  toMsg(proto.stamp(), message.stamp);
+  message.speed = proto.speed();
+  message.acceleration = proto.acceleration();
+  message.jerk = proto.jerk();
 }
 
 void toProto(
-  const autoware_perception_msgs::msg::TrafficLightState & traffic_light_state,
-  simulation_api_schema::TrafficLightState & proto)
+  const autoware_auto_control_msgs::msg::AckermannControlCommand & message,
+  autoware_auto_control_msgs::AckermannControlCommand & proto)
 {
-  proto.set_id(traffic_light_state.id);
-  for (const autoware_perception_msgs::msg::LampState & ls : traffic_light_state.lamp_states) {
-    simulation_api_schema::TrafficLightState::LampState lamp_state;
-    lamp_state.set_type((simulation_api_schema::TrafficLightState_LampState_State)ls.type);
-    *proto.add_lamp_states() = lamp_state;
+  toProto(message.stamp, *proto.mutable_stamp());
+  toProto(message.lateral, *proto.mutable_lateral());
+  toProto(message.longitudinal, *proto.mutable_longitudinal());
+}
+
+void toMsg(
+  const autoware_auto_control_msgs::AckermannControlCommand & proto,
+  autoware_auto_control_msgs::msg::AckermannControlCommand & message)
+{
+  toMsg(proto.stamp(), message.stamp);
+  toMsg(proto.lateral(), message.lateral);
+  toMsg(proto.longitudinal(), message.longitudinal);
+}
+
+auto toProto(
+  const autoware_auto_vehicle_msgs::msg::GearCommand & message,
+  autoware_auto_vehicle_msgs::GearCommand & proto) -> void
+{
+  toProto(message.stamp, *proto.mutable_stamp());
+
+#define CASE(NAME)                                                              \
+  case autoware_auto_vehicle_msgs::msg::GearCommand::NAME:                      \
+    proto.set_command(autoware_auto_vehicle_msgs::GearCommand_Constants::NAME); \
+    break
+
+  switch (message.command) {
+    CASE(NONE);
+    CASE(NEUTRAL);
+    CASE(DRIVE);
+    CASE(DRIVE_2);
+    CASE(DRIVE_3);
+    CASE(DRIVE_4);
+    CASE(DRIVE_5);
+    CASE(DRIVE_6);
+    CASE(DRIVE_7);
+    CASE(DRIVE_8);
+    CASE(DRIVE_9);
+    CASE(DRIVE_10);
+    CASE(DRIVE_11);
+    CASE(DRIVE_12);
+    CASE(DRIVE_13);
+    CASE(DRIVE_14);
+    CASE(DRIVE_15);
+    CASE(DRIVE_16);
+    CASE(DRIVE_17);
+    CASE(DRIVE_18);
+    CASE(REVERSE);
+    CASE(REVERSE_2);
+    CASE(PARK);
+    CASE(LOW);
+    CASE(LOW_2);
   }
 }
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
+auto toMsg(
+  const autoware_auto_vehicle_msgs::GearCommand & proto,
+  autoware_auto_vehicle_msgs::msg::GearCommand & message) -> void
+{
+  toMsg(proto.stamp(), message.stamp);
+  message.command = proto.command();
+}
+
+auto toProto(
+  const std::tuple<
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> & message,
+  traffic_simulator_msgs::VehicleCommand & proto) -> void
+{
+  toProto(std::get<0>(message), *proto.mutable_ackermann_control_command());
+  toProto(std::get<1>(message), *proto.mutable_gear_command());
+}
+
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficLightState & proto)
@@ -598,5 +677,4 @@ void toProto(
     }
   }
 }
-#endif
 }  // namespace simulation_interface

@@ -2,6 +2,185 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge pull request `#740 <https://github.com/tier4/scenario_simulator_v2/issues/740>`_ from tier4/refactor/traffic_simulator/traffic_light_manager
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Rename member function `getTrafficRelation` to `getTrafficRelationReferees`
+* Add new member function `TrafficLight::getTrafficRelation`
+* Add new member function `TrafficSignal::set`
+* Merge pull request `#731 <https://github.com/tier4/scenario_simulator_v2/issues/731>`_ from tier4/feature/interpreter/category
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Remove struct `Color` and `Arrow` from interpreter
+* Switch struct `TrafficLight` to experimental version
+* Merge pull request `#728 <https://github.com/tier4/scenario_simulator_v2/issues/728>`_ from tier4/fix/interpreter/interrupt
+* Remove enumeration `TrafficLightColor::NONE`
+* Merge branch 'master' into fix/interpreter/interrupt
+* Remove member function `TrafficLightManager::get(Arrow|Color)`
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/improve_ego_lane_matching
+* Merge pull request `#735 <https://github.com/tier4/scenario_simulator_v2/issues/735>`_ from tier4/feature/interpreter/object-controller
+* Fix `ScenarioObject::activateSensors` to check if `Controller` was given
+* Support new controller property `isClairvoyant`
+* Remove `Controller::operator []` and `Properties::operator []`
+* Add new member function `Properties::get<T>`
+* Update `ScenarioObject::activateSensors` to make `DetectionSensorConfiguration` explicitly
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/improve_ego_lane_matching
+* Merge pull request `#734 <https://github.com/tier4/scenario_simulator_v2/issues/734>`_ from tier4/fix/interpreter/global-action
+* Update `record::start` to redirect child process stdout to `/dev/null`
+* Remove unnecessary prints from the interpreter and simulator
+* Update Interpreter to catch error on actionvation
+* Update `record::stop` wait 3 seconds before send `SIGINT`
+* Update syntax `UserDefinedAction` to callable from `InitActions`
+* Cleanup `Private::evaluate`
+* Fix syntax `GlobalAction` to be callable from `InitActions`
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Update syntax `Vehicle`, `Pedestrian` and `MiscObject` to set subtype correctly
+* Update syntax `MiscObjectCategory` to support `operator EntitySubtype`
+* Update syntax `PedestrianCategory` to support `operator EntitySubtype`
+* Update syntax `VehicleCategory` to support `operator EntitySubtype`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge pull request `#727 <https://github.com/tier4/scenario_simulator_v2/issues/727>`_ from tier4/feature/interpreter/reader
+* Merge branch 'master' into feature/interpreter/reader
+* Merge pull request `#726 <https://github.com/tier4/scenario_simulator_v2/issues/726>`_ from tier4/feature/semantics
+* remove unused comments
+* rename data field
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Add new experimental substitution `$(ros2 ...)`
+* set default value fron interpreter
+* Lipsticks
+* Cleanup free function `readAttribute`
+* Remove macro `OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK`
+* Cleanup free function `substitute`
+* add disconect() to ~Interpreter(). stop zeromq call if shut down.
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/semantics
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into doc/release_note_format
+* Merge pull request `#711 <https://github.com/tier4/scenario_simulator_v2/issues/711>`_ from tier4/refactor/interpreter/storyboard-element
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Update `StoryboardElement::start` to not to pure-virtual
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/semantics
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into doc/release_note_format
+* Merge pull request `#720 <https://github.com/tier4/scenario_simulator_v2/issues/720>`_ from tier4/refactor/interpreter/execution
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* enable pass copile in all packages
+* Cleanup
+* Update main loop to not to stop even if storyboard was completed
+* Lipsticks
+* Update `ExecutionTimer::invoke` to receive thunk
+* Lipsticks
+* Remove member function `StoryboardElement::ready`
+* Add new data member `StoryboardElement::start_trigger`
+* Merge branch 'master' into AJD-331-optimization
+* Remove member function `Storyboard::stop`
+* Add new data member `StoryboardElement::stop_trigger`
+* Update syntax `Trigger` to be default constructible
+* Update `StoryboardElement::stop` to not to pure-virtual
+* Update `StoryboardElement::run` to not to pure-virtual
+* Update `StoryboardElement::accomplished` to not to pure-virutal
+* Remove free function `readElementsAsElement`
+* Rename free function `callWithElements` to `traverse`
+* Update free function `callWithElements` template parameter
+* Add new data member `StoryboardElement::elements`
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Remove obsoleted `StoryboardElement`'s member functions
+* Add new member function `StoryboardElement::is<STATE>`
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
+0.6.3 (2022-03-09)
+------------------
+* Merge pull request `#713 <https://github.com/tier4/scenario_simulator_v2/issues/713>`_ from tier4/fix/interpreter/traffic-signal-state-action
+  Fix/interpreter/traffic signal state action
+* Update syntax `TrafficSignalState` to reset both of color and arrow if `none` specified
+* Fix `TrafficSignalStateAction::start` to not to throw error if given state is valid
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
+  Feature/autoware external api
+* Rename member function `setUpperBoundSpeed` to `setVelocityLimit`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#693 <https://github.com/tier4/scenario_simulator_v2/issues/693>`_ from tier4/refactor/interpreter/storyboard-element-state
+  Refactor/interpreter/storyboard element state
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element-state
+* Fix simulation context output
+* Rename member function `StoryboardElement::currentState` to `state`
+* Merge pull request `#692 <https://github.com/tier4/scenario_simulator_v2/issues/692>`_ from tier4/refactor/interpreter/storyboard-element
+  Refactor/interpreter/storyboard element
+* Update member function `Scope::ref<T>` to allow polymorphic type
+* Remove obsoleted metafunction headers
+* Remove member function `Expression::currentState`
+* Remove meaningless semicolon
+* Lipsticks
+* Lipsticks
+* Update the immediate actions to effect at the timing of `startTransition`
+* Merge pull request `#688 <https://github.com/tier4/scenario_simulator_v2/issues/688>`_ from tier4/fix/traffic_simulator/traffic_light_manager
+  Fix/traffic simulator/traffic light manager
+* Lipsticks
+* Merge pull request `#681 <https://github.com/tier4/scenario_simulator_v2/issues/681>`_ from tier4/refactor/interpreter/storyboard-element
+  Refactor/interpreter/storyboard element
+* Add pure virtual function `StoryboardElement::elements`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/zeromq_multi_client
+* Merge pull request `#682 <https://github.com/tier4/scenario_simulator_v2/issues/682>`_ from tier4/fix/interpreter/explicit_nop
+  explicit ignore ':'
+* Update syntax `StoryboardElement` to be virtual class
+* avoid early return
+* Merge branch 'fix/interpreter/explicit_nop' of https://github.com/tier4/scenario_simulator_v2 into feature/zeromq_multi_client
+* explicit ignore ':'
+* Remove member function `StoryboardElement::changeStateIf`
+* Lipsticks
+* Merge pull request `#679 <https://github.com/tier4/scenario_simulator_v2/issues/679>`_ from tier4/refactor/interpreter/scope
+  Refactor/interpreter/scope
+* Rename member function `resolveFrontPrefix` to `resolvePrefix`
+* Move struct `is` into header `object.hpp`
+* Update some Action/Condtions to use `Scope::ref<T>`
+* Update `Scope::ref` to receive return value type as template parameter
+* Update `EnvironmentFrame::find<T>` to return T type value
+* Move member function `EnvironmentFrame::lookdown` into prefixless`find`
+* Lipsticks
+* Simplify member function `EnvironmentFrame::lookdown`
+* Rename `EnvironmentFrame::frames` to `resolveFrontPrefix`
+* Update some `EnvironmentFrame`'s member functions to receive `Prefixed<Name>`
+* Move some member functions into header
+* Simplify member function `EnvironmentFrame::outermostFrame`
+* Rename member function `findObject` to `ref`
+* Move member function `findObject` implemenation into header
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#678 <https://github.com/tier4/scenario_simulator_v2/issues/678>`_ from tier4/refactor/interpreter
+  Refactor/interpreter
+* Remove data member `current_scenario`
+* Lipsticks
+* Merge pull request `#672 <https://github.com/tier4/scenario_simulator_v2/issues/672>`_ from tier4/fix/interpreter/lifecycle
+  Fix/interpreter/lifecycle
+* Merge branch 'master' into fix/interpreter/lifecycle
+* ament_clang_format
+* construct/destruct connection at on_activate/on_deactivate
+* fix missing #include
+* make connection std::unique_ptr
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Remove package `autoware_api_msgs` from dependency
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/lane_change_trajectory_shape

@@ -25,6 +25,13 @@ std::string getEndPoint(
          simulation_interface::enumToString(hostname) + ":" + std::to_string(port);
 }
 
+std::string getEndPoint(
+  const TransportProtocol & protocol, const std::string & hostname, const unsigned int & port)
+{
+  return simulation_interface::enumToString(protocol) + "://" + hostname + ":" +
+         std::to_string(port);
+}
+
 std::string enumToString(const TransportProtocol & protocol)
 {
   switch (protocol) {

@@ -2,14 +2,13 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>openscenario_interpreter</name>
-  <version>0.6.2</version>
+  <version>0.6.4</version>
   <description>OpenSCENARIO 1.0.0 interpreter package for Autoware</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>autoware_simulation_msgs</depend>
   <depend>concealer</depend>
   <depend>geometry_msgs</depend>
   <depend>libgoogle-glog-dev</depend>
@@ -24,6 +23,7 @@
   <depend>scenario_simulator_exception</depend>
   <depend>simple_junit</depend>
   <depend>std_msgs</depend>
+  <depend>tier4_simulation_msgs</depend>
   <depend>traffic_simulator</depend>
   <depend>traffic_simulator_msgs</depend>
 

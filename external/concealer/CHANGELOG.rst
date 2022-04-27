@@ -2,6 +2,78 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#728 <https://github.com/tier4/scenario_simulator_v2/issues/728>`_ from tier4/fix/interpreter/interrupt
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge pull request `#733 <https://github.com/tier4/scenario_simulator_v2/issues/733>`_ from tier4/feature/improve_ego_lane_matching
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* use dynamic_cast
+* fix virtual specifier
+* add getPath function
+* apply reformat
+* enable matching to on route lane
+* add getRouteLanelets function
+* fixes and cleanup
+* ugly but working
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* fixes and cleanup
+* ugly but working
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
+0.6.3 (2022-03-09)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
+  Feature/autoware external api
+* Remove macro `CONCEALER_CURRENT_VALUE_OF`
+* Remove header `undefine_macro.hpp`
+* Add `CONCEALER\_` prefix to `concealer`'s macros
+* Remove member function `AutowareUniverse::checkAutowareState`
+* Rename member function `setUpperBoundSpeed` to `setVelocityLimit`
+* Remove `HazardLightsReport` and `HazardLightsCommand` from dependency
+* Remove member function `AutowareUniverse::setLaneChangeApproval`
+* Remove member function `getVehicleStatus`
+* Fix macro `CONCEALER_DEFINE_CLIENT` to check status code of response
+* Add new macro `CONCEALER_INIT_CLIENT`
+* Add new macro `CONCEALER_DEFINE_CLIENT`
+* Add missing package dependency
+* Replace engagement API with new ROS2 service version
+* Remove macro `DEFINE_SUBSCRIPTION_WITH_OVERRIDE`
+* Remove `tier4_system_msgs` from dependency
+* Replace `AwapiAutowareStatus` with `autoware_auto_system_msgs::msg::AutowareState`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Remove class `AutowareAuto`
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Remove package `autoware_control_msgs` from dependency
+* Remove package `autoware_vehicle_msgs` from dependency
+* Replace `VehicleCommand` with `AckermannControlCommand` and `GearCommand`
+* Remove package `autoware_perception_msgs`
+* Replace `autoware_debug_msgs` with `tier4_debug_msgs`
+* Remove some unused dependencies
+* Remove class `AutowareArchitectureProposal`
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge branch 'feature/request_relative_speed_change' of https://github.com/tier4/scenario_simulator_v2 into feature/lane_change_trajectory_shape

@@ -17,8 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <autoware_auto_perception_msgs/msg/predicted_objects.hpp>
-#include <autoware_perception_msgs/msg/dynamic_object_array.hpp>
+#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -40,10 +39,18 @@ protected:
   {
   }
 
+  const std::vector<std::string> getDetectedObjects(
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+
+  geometry_msgs::Pose getSensorPose(
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+
 public:
+  virtual ~DetectionSensorBase() = default;
+
   virtual void update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    const std::vector<std::string> &) = 0;
+    const std::vector<std::string> & lidar_detected_entity) = 0;
 };
 
 template <typename T>
@@ -62,20 +69,13 @@ public:
 
   auto update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    const std::vector<std::string> &) -> void override;
+    const std::vector<std::string> & lidar_detected_entity) -> void override;
 };
 
 template <>
-void DetectionSensor<autoware_perception_msgs::msg::DynamicObjectArray>::update(
+void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-  const std::vector<std::string> &);
-
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
-template <>
-void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
-  const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-  const std::vector<std::string> &);
-#endif
+  const std::vector<std::string> & lidar_detected_entity);
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_

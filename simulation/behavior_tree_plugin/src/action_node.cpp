@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <memory>
@@ -35,7 +37,7 @@ BT::NodeStatus ActionNode::executeTick() { return BT::ActionNodeBase::executeTic
 
 void ActionNode::getBlackBoardValues()
 {
-  if (!getInput("request", request)) {
+  if (!getInput<traffic_simulator::behavior::Request>("request", request)) {
     THROW_SIMULATION_ERROR("failed to get input request in ActionNode");
   }
   if (!getInput<double>("step_time", step_time)) {
@@ -168,10 +170,12 @@ boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
   }
   std::set<double> collision_points = {};
   for (const auto id : traffic_light_ids) {
-    const auto color = traffic_light_manager->getColor(id);
-    if (
-      color == traffic_simulator::TrafficLightColor::RED ||
-      color == traffic_simulator::TrafficLightColor::YELLOW) {
+    using Color = traffic_simulator::TrafficLight::Color;
+    using Status = traffic_simulator::TrafficLight::Status;
+    using Shape = traffic_simulator::TrafficLight::Shape;
+    if (auto && traffic_light = traffic_light_manager->getTrafficLight(id);
+        traffic_light.contains(Color::red, Status::solid_on, Shape::circle) or
+        traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
       const auto collision_point = hdmap_utils->getDistanceToTrafficLightStopLine(waypoints, id);
       if (collision_point) {
         collision_points.insert(collision_point.get());
@@ -208,8 +212,15 @@ boost::optional<std::string> ActionNode::getFrontEntityName(
   std::vector<std::string> entities;
   for (const auto & each : other_entity_status) {
     const auto distance = getDistanceToTargetEntityPolygon(spline, each.first);
-    if (distance) {
-      if (distance.get() < 40) {
+    const auto quat = quaternion_operation::getRotation(
+      entity_status.pose.orientation, other_entity_status.at(each.first).pose.orientation);
+    /**
+     * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
+     */
+    if (
+      std::fabs(quaternion_operation::convertQuaternionToEulerAngle(quat).z) <=
+      boost::math::constants::half_pi<double>()) {
+      if (distance && distance.get() < 40) {
         entities.emplace_back(each.first);
         distances.emplace_back(distance.get());
       }
@@ -247,22 +258,29 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::getEntityStatus(
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
-  const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name)
+  const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name,
+  double width_extension_right, double width_extension_left, double length_extension_front,
+  double length_extension_rear)
 {
   const auto status = getEntityStatus(target_name);
   if (status.lanelet_pose_valid == true) {
-    return getDistanceToTargetEntityPolygon(spline, status);
+    return getDistanceToTargetEntityPolygon(
+      spline, status, width_extension_right, width_extension_left, length_extension_front,
+      length_extension_rear);
   }
   return boost::none;
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
   const traffic_simulator::math::CatmullRomSpline & spline,
-  const traffic_simulator_msgs::msg::EntityStatus & status)
+  const traffic_simulator_msgs::msg::EntityStatus & status, double width_extension_right,
+  double width_extension_left, double length_extension_front, double length_extension_rear)
 {
   if (status.lanelet_pose_valid) {
     const auto polygon = traffic_simulator::math::transformPoints(
-      status.pose, traffic_simulator::math::getPointsFromBbox(status.bounding_box));
+      status.pose, traffic_simulator::math::getPointsFromBbox(
+                     status.bounding_box, width_extension_right, width_extension_left,
+                     length_extension_front, length_extension_rear));
     return spline.getCollisionPointIn2D(polygon, false, true);
   }
   return boost::none;
@@ -282,7 +300,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     }
   }
   for (const auto & status : lane_entity_status) {
-    const auto s = getDistanceToTargetEntityPolygon(spline, status);
+    const auto s = getDistanceToTargetEntityPolygon(spline, status, 0.0, 0.0, 0.0, 1.0);
     if (s) {
       distances.insert(s.get());
     }
@@ -347,8 +365,9 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   return false;
 }
 
-double ActionNode::calculateStopDistance() const
+double ActionNode::calculateStopDistance(double deceleration) const
 {
-  return std::pow(entity_status.action_status.twist.linear.x, 2) / (2 * 5);
+  return (entity_status.action_status.twist.linear.x * entity_status.action_status.twist.linear.x) /
+         (2 * std::fabs(deceleration));
 }
 }  // namespace entity_behavior

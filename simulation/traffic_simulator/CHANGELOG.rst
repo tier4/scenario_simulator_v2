@@ -2,6 +2,262 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge pull request `#761 <https://github.com/tier4/scenario_simulator_v2/issues/761>`_ from tier4/refactor/undef_mistake
+* Merge pull request `#757 <https://github.com/tier4/scenario_simulator_v2/issues/757>`_ from tier4/feature/speed_up_get_length
+* Fix undef macro target
+* add image and doxygen comment
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_get_length
+* Merge pull request `#759 <https://github.com/tier4/scenario_simulator_v2/issues/759>`_ from tier4/feature/traffic_simulator/traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/traffic_light
+* Merge pull request `#752 <https://github.com/tier4/scenario_simulator_v2/issues/752>`_ from tier4/feature/reset_acecel_in_request_speed_change
+* use std::abs instead of std::fabs
+* remove if line
+* Update class `TrafficLight` to not to check given ID is relation ID
+* Update TrafficLight::Bulb value to be more redundant
+* Update `TrafficLightManager::getTrafficLight` to not to check if given ID is traffic relation
+* add EXPECT_DECIMAL_EQ
+* remove old implementation
+* Ignore terms above the second order of delta s
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge pull request `#740 <https://github.com/tier4/scenario_simulator_v2/issues/740>`_ from tier4/refactor/traffic_simulator/traffic_light_manager
+* add comment
+* modify onUpdate function
+* Support old status name `Blank`
+* Update `TrafficLight::Color` and `Status` to accept old names
+* Lipsticks
+* remove debug lines
+* remove debug line
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Rename member function `getTrafficRelation` to `getTrafficRelationReferees`
+* Cleanup
+* Add new member function `TrafficLight::getTrafficRelation`
+* Add new member function `TrafficSignal::set`
+* Merge pull request `#712 <https://github.com/tier4/scenario_simulator_v2/issues/712>`_ from tier4/fix/object-recognition-from-prediction-to-detection
+* Merge pull request `#751 <https://github.com/tier4/scenario_simulator_v2/issues/751>`_ from tier4/feature/behavior_request_enum
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Remove enumeration `TrafficLightColor` and `TrafficLightArrow`
+* Switch struct `TrafficLight` to experimental version
+* Merge pull request `#728 <https://github.com/tier4/scenario_simulator_v2/issues/728>`_ from tier4/fix/interpreter/interrupt
+* Merge pull request `#749 <https://github.com/tier4/scenario_simulator_v2/issues/749>`_ from tier4/feature/job_system
+* Remove member function `TrafficLight::getPosition`
+* enable reset acceleration limit
+* Merge branch 'feature/behavior_request_enum' into feature/reset_acecel_in_request_speed_change
+* fix compile errors
+* Remove member function `TrafficLight::update`
+* fix namespace
+* use enum
+* Lipsticks
+* Update experimental TrafficLight constructor to receive ID and map
+* Update class `TrafficLight` to accept only valid ID
+* Update experimental traffic light to be publishable
+* remove debug line
+* remove debug line
+* Add experimental class `TrafficLight\_`
+* move to base class
+* rename members
+* add inactivate function
+* add status
+* fix compile error
+* remove targetSpeedPlanner class
+* enable resolve relative value
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/job_system
+* Merge pull request `#690 <https://github.com/tier4/scenario_simulator_v2/issues/690>`_ from RobotecAI/AJD-331-make-zmq-client-work-through-network
+* add Job and JobList class
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#744 <https://github.com/tier4/scenario_simulator_v2/issues/744>`_ from tier4/feature/remove_color_names_function
+* Lipsticks
+* Fix test `test_traffic_light_manager`
+* Update `TrafficLightManager` to not to instantiate all TrafficLight
+* Add new member function `HdMapUtils::isTrafficLight`
+* Remove enumeration `TrafficLightColor::NONE`
+* Merge branch 'master' into fix/interpreter/interrupt
+* change license (MIT licensed code was removed)
+* remove functions in color_names package
+* Remove member function `TrafficLightManager::get(Arrow|Color)`
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Lipsticks
+* Remove member function `TrafficLightManager::getIds` and `getInstance`
+* Lipsticks
+* Update `TrafficLight` contructor to locate bulb position by itself
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Fix `TrafficLight::(arrow|color)_changed\_`
+* Remove header `traffic_simulator/traffic_lights/traffic_light_phase.hpp`
+* Remove member function `TrafficLightPhase::(get|set)State`
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge pull request `#718 <https://github.com/tier4/scenario_simulator_v2/issues/718>`_ from tier4/fix/waypoint_height
+* Remove member function `TrafficLightPhase::update`
+* Remove data member `TrafficLightPhase::elapsed_time\_`
+* Remove member function `TrafficLightPhase::getPhaseDuration`
+* Remove member function `TrafficLightPhase::setPhase`
+* Remove member function `TrafficLightPhase::getPhase`
+* Remove member function `TrafficLight::get(Arrow|Color)PhaseDuration`
+* Remove member function `setTrafficLightManager::set(Arrow|Color)Phase`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge pull request `#733 <https://github.com/tier4/scenario_simulator_v2/issues/733>`_ from tier4/feature/improve_ego_lane_matching
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/object-controller
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/improve_ego_lane_matching
+* Merge pull request `#708 <https://github.com/tier4/scenario_simulator_v2/issues/708>`_ from RobotecAI/AJD-331-optimization
+* use dynamic_cast
+* add getPath function
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-optimization
+* fix typo
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/improve_ego_lane_matching
+* fix height matching algorithum
+* enable matching to on route lane
+* Merge pull request `#729 <https://github.com/tier4/scenario_simulator_v2/issues/729>`_ from tier4/feature/ignore_raycast_result
+* add getRouteLanelets function
+* configure matching function
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge branch 'master' into feature/interpreter/reader
+* Merge pull request `#726 <https://github.com/tier4/scenario_simulator_v2/issues/726>`_ from tier4/feature/semantics
+* update error message
+* rename data field
+* set default value
+* enable filter by range
+* update proto
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* rename to subtype
+* Merge branch 'feature/semantics' of https://github.com/tier4/scenario_simulator_v2 into feature/semantics
+* remove category
+* fix typo and remove debug line
+* add disconect() to ~Interpreter(). stop zeromq call if shut down.
+* remove debug line
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* apply reformat
+* fix error
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* remove old method
+* enable pass compile in traffic_simulator package
+* add entity semantics to the member variable
+* enable filter by range
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* set z value in getPoint function
+* review changes: common_spline -> reference_trajectory
+* Merge branch 'master' into AJD-331-optimization
+* fix ci test
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* add option to disable traffic light module
+* fix tests
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* clang format
+* change to option 1 (simulator host as a launch parameter)
+* calculate spline only when route_lanelets change
+* calculate and pass common_spline
+* optimize hermite curve
+* internal review fixes
+* zmq client can connect through the network
+* Contributors: Daniel Marczak, HansRobo, Masaya Kataoka, MasayaKataoka, Takayuki Murooka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
+0.6.3 (2022-03-09)
+------------------
+* Merge pull request `#716 <https://github.com/tier4/scenario_simulator_v2/issues/716>`_ from tier4/dependency/remove-lexus-description
+  Remove `lexus_description` from dependency
+* Cleanup
+* Merge pull request `#714 <https://github.com/tier4/scenario_simulator_v2/issues/714>`_ from tier4/fix/get_longitudinal_distance
+  Fix/get longitudinal distance
+* fix typo
+* remove unused lines
+* change hard coded parameter
+* remove debug line
+* configure parameter
+* add getLongitudinalDistance function in world frame
+* Merge pull request `#709 <https://github.com/tier4/scenario_simulator_v2/issues/709>`_ from tier4/feature/waypoint_offset
+  Feature/waypoint offset
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* remove debug line
+* erase not unique waypoint
+* Merge pull request `#706 <https://github.com/tier4/scenario_simulator_v2/issues/706>`_ from tier4/fix/hard_coded_parameter
+  fix hard coded parameter in hermite curve class
+* Merge pull request `#707 <https://github.com/tier4/scenario_simulator_v2/issues/707>`_ from tier4/fix/sim_model_delay_steer_acc_geared
+  fix sim_model_delay_steer_acc_geard model
+* modify getPoint function
+* add offset
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
+* add white line at the EOF
+* fix typo and add new line at EOF
+* add offset in waypoint calculation
+* Merge pull request `#704 <https://github.com/tier4/scenario_simulator_v2/issues/704>`_ from tier4/feature/autoware-external-api
+  Feature/autoware external api
+* fix sim_model_delay_steer_acc_geard model
+* fix hard coded parameter in hermite curve class
+* Rename member function `setUpperBoundSpeed` to `setVelocityLimit`
+* Replace `AwapiAutowareStatus` with `autoware_auto_system_msgs::msg::AutowareState`
+* Merge pull request `#698 <https://github.com/tier4/scenario_simulator_v2/issues/698>`_ from tier4/fix/idead_steer_acc_geard
+  fix sim model ideal steer acc geard
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/idead_steer_acc_geard
+* Merge pull request `#696 <https://github.com/tier4/scenario_simulator_v2/issues/696>`_ from tier4/dependency/remove-autoware-auto
+  Dependency/remove autoware auto
+* fix sim model ideal steer acc geard
+* Merge pull request `#663 <https://github.com/tier4/scenario_simulator_v2/issues/663>`_ from tier4/dependency/remove-architecture-proposal
+  Dependency/remove architecture proposal
+* Remove legacy vehicle model types
+* Remove architecture_type `awf/auto`
+* Remove class `AutowareAuto`
+* Merge remote-tracking branch 'origin/dependency/remove-architecture-proposal' into dependency/remove-autoware-auto
+* Remove macro identifier `SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge pull request `#688 <https://github.com/tier4/scenario_simulator_v2/issues/688>`_ from tier4/fix/traffic_simulator/traffic_light_manager
+  Fix/traffic simulator/traffic light manager
+* Cleanup
+* Merge pull request `#686 <https://github.com/tier4/scenario_simulator_v2/issues/686>`_ from tier4/fix/warp_problem
+  Fix/warp problem
+* Fix traffic signal topic name (for Autoware.Universe)
+* Update `TrafficLightManager::set*` to be traffic relation ID acceptable
+* Merge pull request `#689 <https://github.com/tier4/scenario_simulator_v2/issues/689>`_ from tier4/feature/add-occlusion-spot-no-stopping-area-marker
+  feat(behavior_velocity): add occlusion spot no stopping area marker
+* fix typo
+* remove debug line
+* fix compile errors
+* lane matching fails when the offset overs 1
+* Add new member function `HdMapUtils::isTrafficRelationId`
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into fix/traffic_simulator/traffic_light_manager
+* Lipsticks
+* feat(behavior_velocity): add occlusion spot no stopping area marker
+* add std::sqrt function in offset calculation
+* enable get - offset value
+* Merge pull request `#684 <https://github.com/tier4/scenario_simulator_v2/issues/684>`_ from tier4/fix/virtual_destructor
+  Fix/virtual destructor
+* use override in entity class
+* use override in metrics
+* Merge pull request `#683 <https://github.com/tier4/scenario_simulator_v2/issues/683>`_ from tier4/feature/zeromq_multi_client
+  Feature/zeromq multi client
+* add virtual destructor to the metric class
+* modify destructor
+* add virtual destructor to the entity class
+* use multi client class
+* Merge pull request `#680 <https://github.com/tier4/scenario_simulator_v2/issues/680>`_ from tier4/feature/speed_up_metrics_manager
+  Feature/speed up metrics manager
+* remove unused lines
+* remove log output step in every update frame
+* remove output to file step
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge branch 'master' into fix/interpreter/lifecycle
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Replace `VehicleCommand` with `AckermannControlCommand` and `GearCommand`
+* Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal
+* Remove package `autoware_perception_msgs`
+* Replace `autoware_debug_msgs` with `tier4_debug_msgs`
+* Remove architecture_type `tier4/proposal`
+* Remove class `AutowareArchitectureProposal`
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, tanaka3, yamacir-kit
+
 0.6.2 (2022-01-20)
 ------------------
 * Merge pull request `#671 <https://github.com/tier4/scenario_simulator_v2/issues/671>`_ from tier4/fix/lane_change_trajectory_shape

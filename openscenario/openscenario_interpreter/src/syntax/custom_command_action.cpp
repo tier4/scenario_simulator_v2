@@ -40,9 +40,9 @@ auto CustomCommandAction::applyFaultInjectionAction(
   const auto now = node().now();
 
   auto makeFaultInjectionEvent = [](const auto & name) {
-    autoware_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
+    tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
     {
-      fault_injection_event.level = autoware_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+      fault_injection_event.level = tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
       fault_injection_event.name = name;
     }
 
@@ -50,7 +50,7 @@ auto CustomCommandAction::applyFaultInjectionAction(
   };
 
   auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
-    autoware_simulation_msgs::msg::SimulationEvents simulation_events;
+    tier4_simulation_msgs::msg::SimulationEvents simulation_events;
     {
       simulation_events.stamp = now;
 
@@ -109,9 +109,9 @@ auto CustomCommandAction::node() -> rclcpp::Node &
 }
 
 auto CustomCommandAction::publisher()
-  -> rclcpp::Publisher<autoware_simulation_msgs::msg::SimulationEvents> &
+  -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &
 {
-  static auto publisher = node().create_publisher<autoware_simulation_msgs::msg::SimulationEvents>(
+  static auto publisher = node().create_publisher<tier4_simulation_msgs::msg::SimulationEvents>(
     "/simulation/events", rclcpp::QoS(1).reliable());
   return *publisher;
 }

@@ -46,6 +46,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
 }
 
+Interpreter::~Interpreter() { disconnect(); }
+
 auto Interpreter::currentLocalFrameRate() const -> std::chrono::milliseconds
 {
   return std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000));
@@ -87,8 +89,6 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("Configuring.");
-
   return withExceptionHandler(
     [](auto &&...) {
       return Interpreter::Result::FAILURE;  // => Unconfigured
@@ -129,73 +129,66 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("Activating.");
+  auto evaluateStoryboard = [this]() {
+    withExceptionHandler(
+      [this](auto &&...) { deactivate(); },
+      [this]() {
+        if (currentScenarioDefinition()) {
+          const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
+            currentScenarioDefinition()->evaluate();
+            publishCurrentContext();
+            return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
+          });
+
+          if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
+            RCLCPP_WARN_STREAM(
+              get_logger(),
+              "Your machine is not powerful enough to run the scenario at the specified "
+              "frame rate ("
+                << currentLocalFrameRate().count()
+                << " Hz). We recommend that you reduce the frame rate to "
+                << 1000.0 / execution_timer.getStatistics("evaluate")
+                              .max<std::chrono::milliseconds>()
+                              .count()
+                << " or less.");
+          }
+        } else {
+          throw Error("No script evaluable");
+        }
+      });
+  };
 
   if (scenarios.empty()) {
-    INTERPRETER_INFO_STREAM("There are no more scenarios to run.");
     return Result::FAILURE;
   } else {
-    if (getParameter<bool>("record", true)) {
-      record::start("-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
-    }
+    return withExceptionHandler(
+      [this](auto &&...) { return Interpreter::Result::ERROR; },
+      [&]() {
+        if (getParameter<bool>("record", true)) {
+          record::start(
+            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+        }
 
-    connect(shared_from_this(), makeCurrentConfiguration());
+        connect(shared_from_this(), makeCurrentConfiguration());
 
-    initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
+        initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
 
-    execution_timer.clear();
+        execution_timer.clear();
 
-    publisher_of_context->on_activate();
+        publisher_of_context->on_activate();
 
-    assert(publisher_of_context->is_activated());
+        assert(publisher_of_context->is_activated());
 
-    timer = create_wall_timer(currentLocalFrameRate(), [this]() {
-      withExceptionHandler(
-        [this](auto &&...) { deactivate(); },
-        [this]() -> void {
-          if (currentScenarioDefinition()) {
-            if (not currentScenarioDefinition()->complete()) {
-              const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
-                currentScenarioDefinition()->evaluate();
-                publishCurrentContext();
-                return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
-              });
+        timer = create_wall_timer(currentLocalFrameRate(), evaluateStoryboard);
 
-              if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
-                using namespace std::chrono;
-                const auto time_ms = duration_cast<milliseconds>(evaluate_time).count();
-                const auto & time_statistics = execution_timer.getStatistics("evaluate");
-                RCLCPP_WARN_STREAM(
-                  get_logger(),
-                  "The execution time of evaluate() ("
-                    << time_ms << " ms) is not in time. The current local frame rate ("
-                    << local_frame_rate << " Hz) (period = " << currentLocalFrameRate().count()
-                    << " ms) is too high. If the frame rate is less than "
-                    << static_cast<unsigned int>(1.0 / time_ms * 1e3)
-                    << " Hz, you will make it. (Statistics: count = " << time_statistics.count()
-                    << ", mean = " << duration_cast<milliseconds>(time_statistics.mean()).count()
-                    << " ms, max = " << duration_cast<milliseconds>(time_statistics.max()).count()
-                    << " ms, standard deviation = "
-                    << duration_cast<microseconds>(time_statistics.standardDeviation()).count() /
-                         1000.0
-                    << " ms)");
-              }
-            }
-          } else {
-            throw Error("No script evaluable");
-          }
-        });
-    });
-
-    return Interpreter::Result::SUCCESS;  // => Active
+        return Interpreter::Result::SUCCESS;  // => Active
+      });
   }
 }
 
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("Deactivating.");
-
-  timer.reset();  // Deactivate scenario evaluation
+  timer.reset();  // Stop scenario evaluation
 
   publisher_of_context->on_deactivate();
 
@@ -203,8 +196,7 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 
   scenarios.pop_front();
 
-  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
-  // INFO_STREAM.
+  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
   boost::apply_visitor(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
@@ -221,24 +213,18 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("CleaningUp.");
-
   return Interpreter::Result::SUCCESS;  // => Unconfigured
 }
 
 auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("ErrorProcessing.");
-
-  timer.reset();
+  deactivate();  // DIRTY HACK!!!
 
   return Interpreter::Result::SUCCESS;  // => Unconfigured
 }
 
 auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
 {
-  INTERPRETER_INFO_STREAM("ShuttingDown.");
-
   timer.reset();
 
   return Interpreter::Result::SUCCESS;  // => Finalized

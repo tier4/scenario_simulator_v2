@@ -27,16 +27,13 @@ TEST(TrafficLightManager, getIds)
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
   traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
-#else
-  traffic_simulator::TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>
-#endif
     manager(hdmap_utils_ptr, node, "map");
-  const auto ids = manager.getIds();
-  EXPECT_FALSE(std::find(ids.begin(), ids.end(), 34836) == ids.end());
-  EXPECT_FALSE(std::find(ids.begin(), ids.end(), 34802) == ids.end());
-  EXPECT_EQ(ids.size(), static_cast<size_t>(2));
+  manager.getTrafficLight(34836);
+  EXPECT_FALSE(manager.getTrafficLights().find(34836) == std::end(manager.getTrafficLights()));
+  manager.getTrafficLight(34802);
+  EXPECT_FALSE(manager.getTrafficLights().find(34802) == std::end(manager.getTrafficLights()));
+  EXPECT_EQ(manager.getTrafficLights().size(), static_cast<std::size_t>(2));
 }
 
 TEST(TrafficLightManager, setColor)
@@ -48,23 +45,23 @@ TEST(TrafficLightManager, setColor)
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
   traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
-#else
-  traffic_simulator::TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>
-#endif
     manager(hdmap_utils_ptr, node, "map");
-  const auto ids = manager.getIds();
-  for (const auto id : ids) {
-    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::NONE);
-    manager.setColor(id, traffic_simulator::TrafficLightColor::GREEN);
-    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::GREEN);
-    manager.setColor(id, traffic_simulator::TrafficLightColor::YELLOW);
-    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::YELLOW);
-    manager.setColor(id, traffic_simulator::TrafficLightColor::RED);
-    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::RED);
-    manager.setColor(id, traffic_simulator::TrafficLightColor::NONE);
-    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::NONE);
+  for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
+    using Color = traffic_simulator::TrafficLight::Color;
+    using Status = traffic_simulator::TrafficLight::Status;
+    using Shape = traffic_simulator::TrafficLight::Shape;
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::green);
+    EXPECT_TRUE(
+      manager.getTrafficLight(id).contains(Color::green, Status::solid_on, Shape::circle));
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::yellow);
+    EXPECT_TRUE(
+      manager.getTrafficLight(id).contains(Color::yellow, Status::solid_on, Shape::circle));
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::red);
+    EXPECT_TRUE(manager.getTrafficLight(id).contains(Color::red, Status::solid_on, Shape::circle));
   }
 }
 
@@ -77,23 +74,22 @@ TEST(TrafficLightManager, setArrow)
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
   traffic_simulator::TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
-#else
-  traffic_simulator::TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>
-#endif
     manager(hdmap_utils_ptr, node, "map");
-  const auto ids = manager.getIds();
-  for (const auto id : ids) {
-    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::NONE);
-    manager.setArrow(id, traffic_simulator::TrafficLightArrow::LEFT);
-    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::LEFT);
-    manager.setArrow(id, traffic_simulator::TrafficLightArrow::RIGHT);
-    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::RIGHT);
-    manager.setArrow(id, traffic_simulator::TrafficLightArrow::STRAIGHT);
-    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::STRAIGHT);
-    manager.setArrow(id, traffic_simulator::TrafficLightArrow::NONE);
-    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::NONE);
+  for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
+    using Color = traffic_simulator::TrafficLight::Color;
+    using Status = traffic_simulator::TrafficLight::Status;
+    using Shape = traffic_simulator::TrafficLight::Shape;
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::green, Status::solid_on, Shape::left);
+    EXPECT_TRUE(manager.getTrafficLight(id).contains(Color::green, Status::solid_on, Shape::left));
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::green, Status::solid_on, Shape::right);
+    EXPECT_TRUE(
+      manager.getTrafficLight(id).contains(Color::yellow, Status::solid_on, Shape::right));
+    manager.getTrafficLight(id).clear();
+    manager.getTrafficLight(id).emplace(Color::green, Status::solid_on, Shape::up);
+    EXPECT_TRUE(manager.getTrafficLight(id).contains(Color::green, Status::solid_on, Shape::up));
   }
 }
 

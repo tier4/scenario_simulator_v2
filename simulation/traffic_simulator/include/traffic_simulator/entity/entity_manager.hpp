@@ -118,24 +118,15 @@ public:
   template <typename... Ts>
   auto makeTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
   {
-    const auto architecture_type = getParameter<std::string>("architecture_type", "tier4/proposal");
+    const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
-#ifndef SCENARIO_SIMULATOR_V2_BACKWARD_COMPATIBLE_TO_AWF_AUTO
     if (architecture_type == "awf/universe") {
       return std::make_shared<
         TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
-    } else
-#endif
-      // NOTE: This broken indent is due to ament_clang_format.
-      if (architecture_type == "tier4/proposal" or architecture_type == "awf/auto") {
-      return std::make_shared<
-        TrafficLightManager<autoware_perception_msgs::msg::TrafficLightStateArray>>(
-        std::forward<decltype(xs)>(xs)...);
     } else {
-      std::stringstream what;
-      what << "Unexpected architecture_type " << std::quoted(architecture_type) << " given.";
-      throw std::invalid_argument(what.str());
+      throw common::SemanticError(
+        "Unexpected architecture_type ", std::quoted(architecture_type), " given.");
     }
   }
 
@@ -164,35 +155,23 @@ public:
   ~EntityManager() = default;
 
 public:
-#define DEFINE_SET_TRAFFIC_LIGHT(NAME)                                               \
-  template <typename... Ts>                                                          \
-  decltype(auto) setTrafficLight##NAME(Ts &&... xs)                                  \
-  {                                                                                  \
-    return traffic_light_manager_ptr_->set##NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                  \
-  static_assert(true, "")
+  template <typename... Ts>
+  auto getTrafficLight(Ts &&... xs) const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficLight(std::forward<decltype(xs)>(xs)...);
+  }
 
-  DEFINE_SET_TRAFFIC_LIGHT(Arrow);
-  DEFINE_SET_TRAFFIC_LIGHT(ArrowPhase);
-  DEFINE_SET_TRAFFIC_LIGHT(Color);
-  DEFINE_SET_TRAFFIC_LIGHT(ColorPhase);
+  auto getTrafficLights() const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficLights();
+  }
 
-#undef DEFINE_SET_TRAFFIC_LIGHT
-
-#define DEFINE_GET_TRAFFIC_LIGHT(NAME)                                               \
-  template <typename... Ts>                                                          \
-  decltype(auto) getTrafficLight##NAME(Ts &&... xs)                                  \
-  {                                                                                  \
-    return traffic_light_manager_ptr_->get##NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                  \
-  static_assert(true, "")
-
-  DEFINE_GET_TRAFFIC_LIGHT(Color);
-  DEFINE_GET_TRAFFIC_LIGHT(Arrow);
-  DEFINE_GET_TRAFFIC_LIGHT(Ids);
-  DEFINE_GET_TRAFFIC_LIGHT(Instance);
-
-#undef DEFINE_GET_TRAFFIC_LIGHT
+  template <typename... Ts>
+  auto getTrafficRelationReferees(Ts &&... xs) const -> decltype(auto)
+  {
+    return traffic_light_manager_ptr_->getTrafficRelationReferees(
+      std::forward<decltype(xs)>(xs)...);
+  }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   template <typename... Ts>                                           \
@@ -222,6 +201,7 @@ public:
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getDriverModel, const);
+  FORWARD_TO_ENTITY(getEmergencyStateString, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
@@ -237,9 +217,9 @@ public:
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDriverModel, );
-  FORWARD_TO_ENTITY(setUpperBoundSpeed, );
+  FORWARD_TO_ENTITY(setVelocityLimit, );
 
-#undef FORWARD_TO_SPECIFIED_ENTITY
+#undef FORWARD_TO_ENTITY
 
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 

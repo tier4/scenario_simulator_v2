@@ -36,9 +36,11 @@ Pedestrian::operator traffic_simulator_msgs::msg::PedestrianParameters() const
 {
   traffic_simulator_msgs::msg::PedestrianParameters parameter;
   {
+    using namespace traffic_simulator_msgs;
+
     parameter.name = name;
-    parameter.pedestrian_category = boost::lexical_cast<String>(pedestrian_category);
-    parameter.bounding_box = static_cast<traffic_simulator_msgs::msg::BoundingBox>(bounding_box);
+    parameter.subtype = static_cast<msg::EntitySubtype>(pedestrian_category);
+    parameter.bounding_box = static_cast<msg::BoundingBox>(bounding_box);
   }
 
   return parameter;

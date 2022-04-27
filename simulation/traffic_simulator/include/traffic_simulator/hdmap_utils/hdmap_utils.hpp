@@ -44,7 +44,6 @@
 #include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
@@ -68,15 +67,18 @@ public:
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id, std::vector<double> s);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
-    geometry_msgs::msg::Pose pose, bool include_crosswalk);
+    geometry_msgs::msg::Pose pose, bool include_crosswalk, double matching_distance = 1.0);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-    bool include_crosswalk);
+    bool include_crosswalk, double matching_distance = 1.0);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
-    geometry_msgs::msg::Pose pose, std::int64_t lanelet_id);
+    geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance = 1.0);
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose, std::vector<std::int64_t> lanelet_ids,
+    double matching_distance = 1.0);
   boost::optional<std::int64_t> matchToLane(
     const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-    bool include_crosswalk, double reduction_ratio = 0.8) const;
+    bool include_crosswalk, double reduction_ratio = 0.8);
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
@@ -150,7 +152,7 @@ public:
   const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   std::vector<std::int64_t> getTrafficLightIds() const;
   const boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
-    std::int64_t traffic_light_id, traffic_simulator::TrafficLightColor color) const;
+    std::int64_t traffic_light_id, const std::string &) const;
   std::vector<std::int64_t> getTrafficLightStopLineIds(const std::int64_t & traffic_light_id) const;
   std::vector<std::vector<geometry_msgs::msg::Point>> getTrafficLightStopLinesPoints(
     std::int64_t traffic_light_id) const;
@@ -164,8 +166,12 @@ public:
     const std::vector<std::int64_t> & route_lanelets) const;
   traffic_simulator_msgs::msg::LaneletPose getAlongLaneletPose(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along);
-  auto isTrafficRelationId(const std::int64_t) const -> bool;
-  auto getTrafficLight(const std::int64_t) const -> lanelet::TrafficLight::Ptr;
+
+  using LaneletId = std::int64_t;
+
+  auto isTrafficLight(const LaneletId) const -> bool;
+  auto isTrafficRelation(const LaneletId) const -> bool;
+  auto getTrafficRelation(const LaneletId) const -> lanelet::TrafficLight::Ptr;
 
 private:
   traffic_simulator::math::HermiteCurve getLaneChangeTrajectory(

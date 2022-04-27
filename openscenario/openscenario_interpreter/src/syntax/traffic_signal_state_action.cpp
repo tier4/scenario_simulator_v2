@@ -14,8 +14,6 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/arrow.hpp>
-#include <openscenario_interpreter/syntax/color.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state_action.hpp>
 
 namespace openscenario_interpreter
@@ -36,17 +34,10 @@ auto TrafficSignalStateAction::run() noexcept -> void {}
 
 auto TrafficSignalStateAction::start() const -> void
 {
-  const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
-  if (color_opt.has_value()) {
-    setTrafficSignalColor(id(), color_opt.value());
-  }
-
-  const auto arrow_opt = boost::lexical_cast<boost::optional<Arrow>>(state);
-  if (arrow_opt.has_value()) {
-    setTrafficSignalArrow(id(), arrow_opt.value());
-  }
-
-  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
+  for (traffic_simulator::TrafficLight & traffic_light : getTrafficRelationReferees(id())) {
+    traffic_light.clear();
+    traffic_light.set(state);
+  };
 }
 
 auto TrafficSignalStateAction::id() const -> std::int64_t
