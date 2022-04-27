@@ -2,6 +2,17 @@
 Changelog for package lanelet2_matching
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Contributors: Daniel Marczak, MasayaKataoka, Wojciech Jaworski, yamacir-kit
+
 0.6.3 (2022-03-09)
 ------------------
 * Merge remote-tracking branch 'origin/master' into dependency/remove-architecture-proposal

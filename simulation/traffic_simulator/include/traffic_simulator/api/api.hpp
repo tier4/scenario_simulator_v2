@@ -190,6 +190,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getDriverModel);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
+  FORWARD_TO_ENTITY_MANAGER(getEmergencyStateString);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);

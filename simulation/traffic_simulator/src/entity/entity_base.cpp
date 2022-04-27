@@ -66,6 +66,13 @@ void EntityBase::onUpdate(double current_time, double step_time)
   status_before_update_ = status_;
 }
 
+auto EntityBase::getEmergencyStateString() const -> std::string
+{
+  throw common::Error(
+    "Inquiry of emergency state is valid query to only Autoware.Universe-controlled entity.",
+    "But the target entity ", std::quoted(name.c_str()), " is not controlled by Autoware.Universe");
+}
+
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
 void EntityBase::requestSpeedChange(

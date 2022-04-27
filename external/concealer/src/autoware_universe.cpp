@@ -205,3 +205,57 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
 }  // namespace concealer
+
+namespace autoware_auto_system_msgs::msg
+{
+std::ostream & operator<<(
+  std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & message)
+{
+  using autoware_auto_system_msgs::msg::EmergencyState;
+
+#define CASE(IDENTIFIER)           \
+  case EmergencyState::IDENTIFIER: \
+    out << #IDENTIFIER;            \
+    break
+
+  switch (message.state) {
+    CASE(MRM_FAILED);
+    CASE(MRM_OPERATING);
+    CASE(MRM_SUCCEEDED);
+    CASE(NORMAL);
+    CASE(OVERRIDE_REQUESTING);
+
+    default:
+      throw common::Error(
+        "Unsupported EmergencyState, state number : ", static_cast<int>(message.state));
+  }
+
+  return out;
+#undef CASE
+}
+
+std::istream & operator>>(
+  std::istream & is, autoware_auto_system_msgs::msg::EmergencyState & message)
+{
+  using autoware_auto_system_msgs::msg::EmergencyState;
+#define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
+
+  std::unordered_map<std::string, std::uint8_t> state_dictionary{
+    STATE(MRM_FAILED), STATE(MRM_OPERATING),       STATE(MRM_SUCCEEDED),
+    STATE(NORMAL),     STATE(OVERRIDE_REQUESTING),
+  };
+
+#undef STATE
+
+  std::string state_string;
+  is >> state_string;
+
+  if (auto iter = state_dictionary.find(state_string); iter != state_dictionary.end()) {
+    message.set__state(iter->second);
+  } else {
+    throw common::Error("Unsupported EmergencyState::state : ", state_string.c_str());
+  }
+
+  return is;
+}
+}  // namespace autoware_auto_system_msgs::msg

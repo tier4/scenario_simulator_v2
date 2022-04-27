@@ -457,7 +457,9 @@ void EntityManager::getGoalPoses(
 
 bool EntityManager::isEgo(const std::string & name) const
 {
-  return getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::EGO;
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::EGO and
+         dynamic_cast<EgoEntity const *>(entities_.at(name).get());
 }
 
 bool EntityManager::isInLanelet(
