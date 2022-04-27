@@ -218,10 +218,6 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     if (previous_angular_velocity_ && previous_linear_velocity_) {
       accel.linear.x = (twist.linear.x - previous_linear_velocity_.get()) / step_time;
       accel.angular.z = (twist.angular.z - previous_angular_velocity_.get()) / step_time;
-      RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
-    }
-    else {
-      RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
     }
   }
 
@@ -379,10 +375,10 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       linear_jerk_ = 0;
     }
 
+    setStatus(getEntityStatus(current_time + step_time, step_time));
+
     previous_linear_velocity_ = vehicle_model_ptr_->getVx();
     previous_angular_velocity_ = vehicle_model_ptr_->getWz();
-
-    setStatus(getEntityStatus(current_time + step_time, step_time));
   }
 }
 

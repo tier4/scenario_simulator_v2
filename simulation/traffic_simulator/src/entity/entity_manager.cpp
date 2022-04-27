@@ -651,8 +651,6 @@ void EntityManager::update(const double current_time, const double step_time)
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
-  current_time_ = current_time;
-  configuration.verbose = true;
   if (configuration.verbose) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
     std::cout << "current_time : " << current_time_ << std::endl;
