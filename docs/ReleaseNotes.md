@@ -4,9 +4,9 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| Feature                   | Brief summary                                                                 | Category                   | Pull request                                                    | Contributor                                   |
+| ------------------------- | ----------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `Storyboard` | The state transition of StoryboardElement no longer consumes simulation time. | `openscenario_interpreter` | [#758](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 Bug Fixes:bug:
 
@@ -36,7 +36,6 @@ Major Changes :race_car: :red_car: :blue_car:
 | Traffic signals                               | Support for multiple simultaneous lights at traffic signals and addition of color information to arrow signals.                                                          | `openscenario_interpreter`, `traffic_simulator`                   | [#740](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
 | Reset acceleration after speed was changed    | reset acceleration and deceleration only while speed change was enabled.                                                                                                 | `traffic_simulator`                                               | [#752](https://github.com/tier4/scenario_simulator_v2/pull/752) | [hakuturu583](https://github.com/hakuturu583) |
 | Traffic signals                               | Thereafter, a Lanelet ID that can be interpreted as either a relation ID or a way ID is treated as a relation ID.                                                        | `traffic_simulator`                                               | [#759](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
-| OpenSCENARIO `Storyboard`                     | The state transition of StoryboardElement no longer consumes simulation time.                                                                                            | `openscenario_interpreter`                                        | [#758](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 Bug Fixes:bug:
 
