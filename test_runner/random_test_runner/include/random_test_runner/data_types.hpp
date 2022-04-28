@@ -44,6 +44,11 @@ struct TestDescription
 enum RandomTestType { RANDOM_RUN, REPLAY };
 
 enum SimulatorType { SIMPLE_SENSOR_SIMULATOR, UNITY };
+SimulatorType simulatorTypeFromString(const std::string & simulator_type_str);
+
+enum ArchitectureType { AWF_AUTO, AWF_UNIVERSE, TIER4_PROPOSAL };
+ArchitectureType architectureTypeFromString(const std::string & architecture_type_str);
+std::string stringFromArchitectureType(const ArchitectureType architecture_type);
 
 struct TestControlParameters
 {
@@ -52,6 +57,7 @@ struct TestControlParameters
   RandomTestType random_test_type = RandomTestType::RANDOM_RUN;
   int64_t test_count = 5;
   SimulatorType simulator_type = SimulatorType::SIMPLE_SENSOR_SIMULATOR;
+  ArchitectureType architecture_type = ArchitectureType::AWF_UNIVERSE;
   std::string simulator_host = "localhost";
 };
 

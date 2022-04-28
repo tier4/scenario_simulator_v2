@@ -33,7 +33,7 @@ public:
   TestExecutor(
     std::shared_ptr<traffic_simulator::API> api, TestDescription description,
     JunitXmlReporterTestCase test_case_reporter, SimulatorType simulator_type,
-    rclcpp::Logger logger);
+    ArchitectureType architecture_type, rclcpp::Logger logger);
 
   void initialize();
   void update(double current_time);
@@ -51,6 +51,7 @@ private:
   JunitXmlReporterTestCase error_reporter_;
 
   SimulatorType simulator_type_;
+  ArchitectureType architecture_type_;
 
   bool scenario_completed_ = false;
 
