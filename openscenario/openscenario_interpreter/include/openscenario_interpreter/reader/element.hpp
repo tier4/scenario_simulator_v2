@@ -73,44 +73,38 @@ auto traverse(const pugi::xml_node & parent, const std::string & name, F && f) -
 template <typename T, typename Scope>
 auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope)
 {
-  if(const auto child = parent.child(name.c_str())) {
-      return T(child, scope);
-  }else{
+  if (const auto child = parent.child(name.c_str())) {
+    return T(child, scope);
+  } else {
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  If the given XML node does not have a child element (T type) with the
+     *  specified name, it assumes that the T type is an optional element and
+     *  attempts to build a default T type.
+     *
+     * ---------------------------------------------------------------------- */
     return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
       parent.name(), " requires class ", name, " as element, but there is no declaration"));
   }
-
 }
 
 template <typename T, typename U, typename Scope>
-auto readElement(const std::string & name, const pugi::xml_node & parent, Scope &scope, const U && value)
+auto readElement(
+  const std::string & name, const pugi::xml_node & parent, Scope & scope, const U && value)
 {
-//  using RAW_U = std::decay<U>::type;
-  if (parent.child(name.c_str())) {
-    return readElement<T, Scope>(name, parent, scope);
+  if constexpr (std::is_same<T, U>::value) {
+    // return "value" as a default value
+    return value;
   } else {
-    if constexpr (std::is_same<T, U>::value) {
-      return value;
-    }else{
-      return T(parent, scope, value);
+    // use "value" as an additional arguments to the constructor
+    if (const auto child = parent.child(name.c_str())) {
+      return T(child, scope, value);
+    } else {
+      return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
+        parent.name(), " requires class ", name, " as element, but there is no declaration"));
     }
   }
 }
-//{
-//  if (const auto child = parent.child(name.c_str())) {
-//    return T(child, std::forward<decltype(xs)>(xs)...);
-//  } else {
-//    /* ---- NOTE ---------------------------------------------------------------
-//     *
-//     *  If the given XML node does not have a child element (T type) with the
-//     *  specified name, it assumes that the T type is an optional element and
-//     *  attempts to build a default T type.
-//     *
-//     * ---------------------------------------------------------------------- */
-//    return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
-//      parent.name(), " requires class ", name, " as element, but there is no declaration"));
-//  }
-//}
 
 template <typename T, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, typename... Ts>
 auto readElements(const std::string & name, const pugi::xml_node & node, Ts &&... xs)
