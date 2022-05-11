@@ -208,11 +208,8 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 
 namespace autoware_auto_system_msgs::msg
 {
-std::ostream & operator<<(
-  std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & message)
+std::ostream & operator<<(std::ostream & out, const EmergencyState & message)
 {
-  using autoware_auto_system_msgs::msg::EmergencyState;
-
 #define CASE(IDENTIFIER)           \
   case EmergencyState::IDENTIFIER: \
     out << #IDENTIFIER;            \
@@ -234,10 +231,8 @@ std::ostream & operator<<(
 #undef CASE
 }
 
-std::istream & operator>>(
-  std::istream & is, autoware_auto_system_msgs::msg::EmergencyState & message)
+std::istream & operator>>(std::istream & is, EmergencyState & message)
 {
-  using autoware_auto_system_msgs::msg::EmergencyState;
 #define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
 
   std::unordered_map<std::string, std::uint8_t> state_dictionary{
@@ -259,3 +254,53 @@ std::istream & operator>>(
   return is;
 }
 }  // namespace autoware_auto_system_msgs::msg
+
+namespace autoware_auto_vehicle_msgs::msg
+{
+
+std::ostream & operator<<(std::ostream & out, const TurnIndicatorsCommand & message)
+{
+#define CASE(IDENTIFIER)                  \
+  case TurnIndicatorsCommand::IDENTIFIER: \
+    out << #IDENTIFIER;                   \
+    break
+
+  switch (message.command) {
+    CASE(DISABLE);
+    CASE(ENABLE_LEFT);
+    CASE(ENABLE_RIGHT);
+    CASE(NO_COMMAND);
+
+    default:
+      throw common::Error(
+        "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
+  }
+
+  return out;
+#undef CASE
+}
+std::istream & operator>>(std::istream & is, TurnIndicatorsCommand & message)
+{
+#define STATE(IDENTIFIER) {#IDENTIFIER, TurnIndicatorsCommand::IDENTIFIER}
+
+  std::unordered_map<std::string, std::uint8_t> state_dictionary{
+    STATE(DISABLE),
+    STATE(ENABLE_LEFT),
+    STATE(ENABLE_RIGHT),
+    STATE(NO_COMMAND),
+  };
+
+#undef STATE
+
+  std::string command_string;
+  is >> command_string;
+
+  if (auto iter = state_dictionary.find(command_string); iter != state_dictionary.end()) {
+    message.set__command(iter->second);
+  } else {
+    throw common::Error("Unsupported TurnIndicatorsCommand::command : ", command_string.c_str());
+  }
+
+  return is;
+}
+}  // namespace autoware_auto_vehicle_msgs::msg

@@ -82,6 +82,8 @@ public:
 
   /*   */ auto getStandStillDuration() const -> boost::optional<double>;
 
+  virtual auto getTurnIndicatorsCommandString() const -> std::string;
+
   /*   */ auto getVisibility() { return visibility_; }
 
   virtual auto getVehicleCommand() const -> std::tuple<
