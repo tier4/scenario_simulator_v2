@@ -257,7 +257,6 @@ std::istream & operator>>(std::istream & is, EmergencyState & message)
 
 namespace autoware_auto_vehicle_msgs::msg
 {
-
 std::ostream & operator<<(std::ostream & out, const TurnIndicatorsCommand & message)
 {
 #define CASE(IDENTIFIER)                  \
