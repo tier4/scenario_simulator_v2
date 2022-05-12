@@ -157,7 +157,7 @@ auto AutowareUniverse::restrictTargetSpeed(double value) const -> double
   return value;
 }
 
-auto AutowareUniverse::getAutowareStateString() const -> std::string
+auto AutowareUniverse::getAutowareStateName() const -> std::string
 {
   using autoware_auto_system_msgs::msg::AutowareState;
 

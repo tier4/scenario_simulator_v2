@@ -43,7 +43,7 @@ void EntityBase::onUpdate(double, double)
   status_before_update_ = status_;
 }
 
-auto EntityBase::getEmergencyStateString() const -> std::string
+auto EntityBase::getEmergencyStateName() const -> std::string
 {
   throw common::Error(
     "Inquiry of emergency state is valid query to only Autoware.Universe-controlled entity.",

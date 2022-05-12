@@ -173,7 +173,7 @@ auto EgoEntity::getVehicleCommand() const -> std::tuple<
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  const auto state = autoware->getAutowareStateString();
+  const auto state = autoware->getAutowareStateName();
   return state.empty() ? "Launching" : state;
 }
 
@@ -189,7 +189,7 @@ auto EgoEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverMod
   return model;
 }
 
-auto EgoEntity::getEmergencyStateString() const -> std::string
+auto EgoEntity::getEmergencyStateName() const -> std::string
 {
   if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
     return boost::lexical_cast<std::string>(universe->getEmergencyState());

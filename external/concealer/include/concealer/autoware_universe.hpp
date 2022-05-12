@@ -145,7 +145,7 @@ public:
 
   auto getAcceleration() const -> double override;
 
-  auto getAutowareStateString() const -> std::string override;
+  auto getAutowareStateName() const -> std::string override;
 
   auto getGearSign() const -> double override;
 

@@ -90,7 +90,7 @@ public:
 
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
 
-  auto getEmergencyStateString() const -> std::string override;
+  auto getEmergencyStateName() const -> std::string override;
 
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
