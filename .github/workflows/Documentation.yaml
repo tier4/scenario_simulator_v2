@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.6.15"
       - name: Install
-        run: pip3 install mkdocs mkdocs-material pymdown-extensions mdx_unimoji fontawesome_markdown markdown python-markdown-math plantuml-markdown mkdocs-codeinclude-plugin
+        run: pip3 install mkdocs mkdocs-material pymdown-extensions fontawesome_markdown markdown python-markdown-math plantuml-markdown mkdocs-codeinclude-plugin
       - name: Install doxygen/depends of doxybook
         run: sudo apt install -y doxygen wget
       - name: Wget package
