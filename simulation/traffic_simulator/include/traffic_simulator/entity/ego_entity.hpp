@@ -101,7 +101,7 @@ public:
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 
-  auto getTurnIndicatorsCommandString() const -> std::string override;
+  auto getTurnIndicatorsCommandName() const -> std::string override;
 
   auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,

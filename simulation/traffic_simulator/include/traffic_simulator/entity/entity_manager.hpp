@@ -207,7 +207,7 @@ public:
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getTurnIndicatorsCommandString, const);
+  FORWARD_TO_ENTITY(getTurnIndicatorsCommandName, const);
   FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(ready, const);

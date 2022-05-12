@@ -208,7 +208,7 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 
 namespace autoware_auto_system_msgs::msg
 {
-std::ostream & operator<<(std::ostream & out, const EmergencyState & message)
+auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostream &
 {
 #define CASE(IDENTIFIER)           \
   case EmergencyState::IDENTIFIER: \
@@ -231,7 +231,7 @@ std::ostream & operator<<(std::ostream & out, const EmergencyState & message)
 #undef CASE
 }
 
-std::istream & operator>>(std::istream & is, EmergencyState & message)
+auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
 {
 #define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
 
@@ -257,7 +257,7 @@ std::istream & operator>>(std::istream & is, EmergencyState & message)
 
 namespace autoware_auto_vehicle_msgs::msg
 {
-std::ostream & operator<<(std::ostream & out, const TurnIndicatorsCommand & message)
+auto operator<<(std::ostream & out, const TurnIndicatorsCommand & message) -> std::ostream &
 {
 #define CASE(IDENTIFIER)                  \
   case TurnIndicatorsCommand::IDENTIFIER: \
@@ -278,7 +278,7 @@ std::ostream & operator<<(std::ostream & out, const TurnIndicatorsCommand & mess
   return out;
 #undef CASE
 }
-std::istream & operator>>(std::istream & is, TurnIndicatorsCommand & message)
+auto operator>>(std::istream & is, TurnIndicatorsCommand & message) -> std::istream &
 {
 #define STATE(IDENTIFIER) {#IDENTIFIER, TurnIndicatorsCommand::IDENTIFIER}
 

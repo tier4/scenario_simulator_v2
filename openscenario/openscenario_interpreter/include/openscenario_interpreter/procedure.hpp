@@ -136,7 +136,7 @@ RENAME(applyTeleportAction, setEntityStatus);
 RENAME(applyWalkStraightAction, requestWalkStraight);
 RENAME(evaluateCollisionCondition, checkCollision);
 RENAME(evaluateCurrentEmergencyState, getEmergencyStateName);
-RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandString);
+RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandName);
 RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(toWorldPosition, toMapPose);

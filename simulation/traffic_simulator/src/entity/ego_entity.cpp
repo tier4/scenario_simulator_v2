@@ -193,8 +193,9 @@ auto EgoEntity::getEmergencyStateName() const -> std::string
 {
   if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
     return boost::lexical_cast<std::string>(universe->getEmergencyState());
+  } else {
+    return "";
   }
-  return "";
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
@@ -304,12 +305,13 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   return ids;
 }
 
-auto EgoEntity::getTurnIndicatorsCommandString() const -> std::string
+auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
 {
   if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
     return boost::lexical_cast<std::string>(universe->getTurnIndicatorsCommand());
+  } else {
+    return "";
   }
-  return "";
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray

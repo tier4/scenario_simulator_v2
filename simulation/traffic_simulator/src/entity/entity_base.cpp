@@ -52,7 +52,7 @@ auto EntityBase::getEmergencyStateName() const -> std::string
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
-auto EntityBase::getTurnIndicatorsCommandString() const -> std::string
+auto EntityBase::getTurnIndicatorsCommandName() const -> std::string
 {
   throw common::Error(
     "Inquiry of turn indicators command is valid query to only Autoware.Universe-controlled "
