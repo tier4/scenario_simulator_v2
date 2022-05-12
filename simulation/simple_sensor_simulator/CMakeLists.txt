@@ -43,7 +43,6 @@ target_link_libraries(simple_sensor_simulator_component
   embree3
   pthread
   sodium
-  zmqpp
   zmq
 )
 ament_target_dependencies(simple_sensor_simulator_component
