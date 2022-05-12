@@ -19,6 +19,7 @@ external/operational-design-domains
 external/ouxt_common
 external/quaternion_operation
 external/tier4_msgs
+external/zmqpp_vendor
 
 # auto-generated files
 html
