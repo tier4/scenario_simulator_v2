@@ -67,6 +67,9 @@ public:
     const simulation_api_schema::AttachDetectionSensorRequest & req,
     simulation_api_schema::AttachDetectionSensorResponse & res);
   void call(
+    const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
+    simulation_api_schema::AttachOccupancyGridSensorResponse & res);
+  void call(
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);
 
@@ -86,6 +89,7 @@ private:
   zmqpp::socket socket_update_entity_status_;
   zmqpp::socket socket_attach_lidar_sensor_;
   zmqpp::socket socket_attach_detection_sensor_;
+  zmqpp::socket socket_attach_occupancy_grid_sensor_;
   zmqpp::socket socket_update_traffic_lights_;
 
   bool is_running = true;
