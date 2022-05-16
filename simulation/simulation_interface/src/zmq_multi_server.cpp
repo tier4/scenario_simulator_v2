@@ -61,6 +61,10 @@ MultiServer::MultiServer(
     simulation_api_schema::AttachDetectionSensorResponse &)>
     attach_detection_sensor_func,
   std::function<void(
+    const simulation_api_schema::AttachOccupancyGridSensorRequest &,
+    simulation_api_schema::AttachOccupancyGridSensorResponse &)>
+    attach_occupancy_sensor_func,
+  std::function<void(
     const simulation_api_schema::UpdateTrafficLightsRequest &,
     simulation_api_schema::UpdateTrafficLightsResponse &)>
     update_traffic_lights_func)
@@ -86,6 +90,8 @@ MultiServer::MultiServer(
   attach_lidar_sensor_func_(attach_lidar_sensor_func),
   attach_detection_sensor_sock_(context_, type_),
   attach_detection_sensor_func_(attach_detection_sensor_func),
+  attach_occupancy_grid_sensor_sock_(context_, type_),
+  attach_occupancy_grid_sensor_func_(attach_occupancy_sensor_func),
   update_traffic_lights_sock_(context_, type_),
   update_traffic_lights_func_(update_traffic_lights_func)
 {
@@ -109,6 +115,8 @@ MultiServer::MultiServer(
     protocol, hostname, simulation_interface::ports::attach_lidar_sensor));
   attach_detection_sensor_sock_.bind(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::attach_detection_sensor));
+  attach_occupancy_grid_sensor_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::attach_occupancy_grid_sensor));
   update_traffic_lights_sock_.bind(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::update_traffic_lights));
   poller_.add(initialize_sock_);
