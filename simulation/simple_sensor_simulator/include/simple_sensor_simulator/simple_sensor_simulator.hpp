@@ -113,6 +113,9 @@ private:
   void attachLidarSensor(
     const simulation_api_schema::AttachLidarSensorRequest & req,
     simulation_api_schema::AttachLidarSensorResponse & res);
+  void attachOccupancyGridSensor(
+    const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
+    simulation_api_schema::AttachOccupancyGridSensorResponse & res);
   void updateSensorFrame(
     const simulation_api_schema::UpdateSensorFrameRequest & req,
     simulation_api_schema::UpdateSensorFrameResponse & res);
