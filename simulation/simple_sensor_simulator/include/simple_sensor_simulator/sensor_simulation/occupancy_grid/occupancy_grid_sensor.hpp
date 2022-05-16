@@ -18,8 +18,8 @@
 #include <simulation_api_schema.pb.h>
 
 #include <memory>
-#include <rclcpp/rclcpp.hpp>
 #include <nav_msgs/msg/occupancy_grid.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <vector>
 
@@ -30,12 +30,13 @@ class OccupancyGridSensorBase
 protected:
   double last_update_stamp_;
 
-  simulation_api_schema::OccupancyGridConfiguration configuration_;
+  simulation_api_schema::OccupancyGridSensorConfiguration configuration_;
 
   std::vector<std::string> detected_objects_;
 
   explicit OccupancyGridSensorBase(
-    const double last_update_stamp, const simulation_api_schema::OccupancyGridConfiguration & configuration)
+    const double last_update_stamp,
+    const simulation_api_schema::OccupancyGridSensorConfiguration & configuration)
   : last_update_stamp_(last_update_stamp), configuration_(configuration)
   {
   }
@@ -55,12 +56,13 @@ class OccupancyGridSensor : public OccupancyGridSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
-  auto raycast(const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
-    -> T;
+  auto getOccupancyGrid(
+    const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &) -> T;
 
 public:
   explicit OccupancyGridSensor(
-    const double current_time, const simulation_api_schema::OccupancyGridConfiguration & configuration,
+    const double current_time,
+    const simulation_api_schema::OccupancyGridSensorConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
   : OccupancyGridSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr)
   {
@@ -70,9 +72,9 @@ public:
     const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
     const rclcpp::Time & stamp) -> void override
   {
-    if (current_time - last_update_stamp_ - configuration_.scan_duration() >= -0.002) {
+    if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
       last_update_stamp_ = current_time;
-      publisher_ptr_->publish(raycast(status, stamp));
+      publisher_ptr_->publish(getOccupancyGrid(status, stamp));
     } else {
       detected_objects_ = {};
     }
@@ -80,9 +82,9 @@ public:
 };
 
 template <>
-auto OccupancyGridSensor<sensor_msgs::msg::PointCloud2>::raycast(
+auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
-  -> sensor_msgs::msg::PointCloud2;
+  -> nav_msgs::msg::OccupancyGrid;
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_SENSOR_HPP_
