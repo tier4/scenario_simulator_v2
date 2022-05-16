@@ -131,7 +131,10 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
   auto initializeStoryboard = [this]() {
     return withExceptionHandler(
-      [this](auto &&...) { deactivate(); },
+      [this](auto &&...) {
+        publishCurrentContext();
+        deactivate();
+      },
       [this]() {
         if (currentScenarioDefinition()) {
           currentScenarioDefinition()->storyboard.init.evaluate();
@@ -144,10 +147,14 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
   auto evaluateStoryboard = [&]() {
     withExceptionHandler(
-      [this](auto &&...) { deactivate(); },
+      [this](auto &&...) {
+        publishCurrentContext();
+        deactivate();
+      },
       [this]() {
         if (getCurrentTime() < 0) {
           updateFrame();
+          publishCurrentContext();
         } else if (currentScenarioDefinition()) {
           withTimeoutHandler(defaultTimeoutHandler(), [this]() {
             currentScenarioDefinition()->evaluate();
