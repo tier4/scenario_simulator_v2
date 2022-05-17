@@ -13,3 +13,12 @@
 // limitations under the License.
 
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_generator.hpp>
+
+namespace simple_sensor_simulator
+{
+OccupancyGridGenerator::OccupancyGridGenerator(
+  const simulation_api_schema::OccupancyGridSensorConfiguration & configuration)
+: configuration(configuration)
+{
+}
+}  // namespace simple_sensor_simulator

@@ -15,4 +15,38 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_GENERATOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_GENERATOR_HPP_
 
+#include <simulation_api_schema.pb.h>
+
+#include <memory>
+#include <nav_msgs/msg/occupancy_grid.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
+#include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
+#include <string>
+#include <vector>
+
+namespace simple_sensor_simulator
+{
+class OccupancyGridGenerator
+{
+public:
+  OccupancyGridGenerator(
+    const simulation_api_schema::OccupancyGridSensorConfiguration & configuration);
+  nav_msgs::msg::OccupancyGrid generate(const geometry_msgs::msg::Pose & ego_pose) const;
+  template <typename T, typename... Ts>
+  void addPrimitive(std::string name, Ts &&... xs)
+  {
+    if (primitive_ptrs_.count(name) != 0) {
+      throw std::runtime_error("primitive " + name + " already exist.");
+    }
+    auto primitive_ptr = std::make_unique<T>(std::forward<Ts>(xs)...);
+    primitive_ptrs_.emplace(name, std::move(primitive_ptr));
+  }
+  const simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+
+private:
+  std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
+};
+}  // namespace simple_sensor_simulator
+
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_GENERATOR_HPP_
