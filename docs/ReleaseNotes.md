@@ -6,8 +6,8 @@ Major Changes :race_car: :red_car: :blue_car:
 
 | Feature                                  | Brief summary                                                                             | Category                    | Pull request                                                     | Contributor                      |
 |------------------------------------------|-------------------------------------------------------------------------------------------|-----------------------------|------------------------------------------------------------------|----------------------------------|
-| OpenSCNARIO `UserDefinedValueCondition`  | Add condition to determin the state of the turn indicators. (unique to Autoware.Universe) | `openscenario_interpreter`  | [#777](https://github.com/tier4/scenario_simulator_v2/pull/777)  | [HansRobo](https://github.com/HansRobo) |
-| OpenSCNARIO `UserDefinedValueCondition` | Add condition to determin the emergency state of the Autoware.Universe                     | `openscenario_interpreter` | [#760](https://github.com/tier4/scenario_simulator_v2/pull/760)  | [HansRobo](https://github.com/HansRobo) |
+| OpenSCENARIO `UserDefinedValueCondition`  | Add condition to determin the state of the turn indicators. (unique to Autoware.Universe) | `openscenario_interpreter`  | [#777](https://github.com/tier4/scenario_simulator_v2/pull/777)  | [HansRobo](https://github.com/HansRobo) |
+| OpenSCENARIO `UserDefinedValueCondition` | Add condition to determin the emergency state of the Autoware.Universe                     | `openscenario_interpreter` | [#760](https://github.com/tier4/scenario_simulator_v2/pull/760)  | [HansRobo](https://github.com/HansRobo) |
 
 Bug Fixes:bug:
 
