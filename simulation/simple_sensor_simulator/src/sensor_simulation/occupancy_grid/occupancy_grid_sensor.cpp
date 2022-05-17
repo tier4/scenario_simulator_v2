@@ -16,6 +16,7 @@
 
 #include <boost/optional.hpp>
 #include <memory>
+#include <nav_msgs/msg/occupancy_grid.hpp>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_generator.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
@@ -27,9 +28,15 @@ namespace simple_sensor_simulator
 {
 template <>
 auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & /*stamp*/)
-  -> nav_msgs::msg::OccupancyGrid
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & /*stamp*/,
+  const std::vector<std::string> & lidar_detected_entity) -> nav_msgs::msg::OccupancyGrid
 {
+  std::vector<std::string> detected_objects;
+  if (configuration_.filter_by_range()) {
+    detected_objects = getDetectedObjects(status);
+  } else {
+    detected_objects = lidar_detected_entity;
+  }
   boost::optional<geometry_msgs::msg::Pose> ego_pose_north_up;
   OccupancyGridGenerator generator(configuration_);
   for (const auto & s : status) {
@@ -39,6 +46,9 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
       pose.orientation = geometry_msgs::msg::Quaternion();
       ego_pose_north_up = pose;
     } else {
+      if (std::find(detected_objects, s.name) == detected_objects.end()) {
+        continue;
+      }
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(s.pose(), pose);
       auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);

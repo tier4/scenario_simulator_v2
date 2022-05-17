@@ -136,14 +136,14 @@ private:
     attach_lidar_sensor_func_;
   zmqpp::socket attach_detection_sensor_sock_;
   std::function<void(
-    const simulation_api_schema::AttachOccupancyGridSensorRequest &,
-    simulation_api_schema::AttachOccupancyGridSensorResponse &)>
-    attach_occupancy_grid_sensor_func_;
-  zmqpp::socket attach_occupancy_grid_sensor_sock_;
-  std::function<void(
     const simulation_api_schema::AttachDetectionSensorRequest &,
     simulation_api_schema::AttachDetectionSensorResponse &)>
     attach_detection_sensor_func_;
+  zmqpp::socket attach_occupancy_grid_sensor_sock_;
+  std::function<void(
+    const simulation_api_schema::AttachOccupancyGridSensorRequest &,
+    simulation_api_schema::AttachOccupancyGridSensorResponse &)>
+    attach_occupancy_grid_sensor_func_;
   zmqpp::socket update_traffic_lights_sock_;
   std::function<void(
     const simulation_api_schema::UpdateTrafficLightsRequest &,

@@ -22,6 +22,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
 #include <vector>
 
 namespace simple_sensor_simulator
@@ -71,6 +72,7 @@ public:
 private:
   std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
   std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
+  std::vector<std::unique_ptr<OccupancyGridSensorBase>> occupancy_grid_sensors_;
 };
 }  // namespace simple_sensor_simulator
 

@@ -44,9 +44,9 @@ protected:
 public:
   virtual ~OccupancyGridSensorBase() = default;
 
-  virtual auto update(
-    const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
-    -> void = 0;
+  virtual void update(
+    const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
+    const std::vector<std::string> & lidar_detected_entity) = 0;
 
   auto getDetectedObjects() const -> const std::vector<std::string> & { return detected_objects_; }
 };
@@ -70,7 +70,8 @@ public:
 
   auto update(
     const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const rclcpp::Time & stamp) -> void override
+    const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity)
+    -> void override
   {
     if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
       last_update_stamp_ = current_time;
