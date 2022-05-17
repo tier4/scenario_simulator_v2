@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <boost/optional.hpp>
+#include <memory>
+#include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
+#include <simulation_interface/conversions.hpp>
+#include <string>
+#include <vector>
 
 namespace simple_sensor_simulator
 {
 template <>
 auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & /*stamp*/)
   -> nav_msgs::msg::OccupancyGrid
 {
-  /*
-  Raycaster raycaster;
   boost::optional<geometry_msgs::msg::Pose> ego_pose;
   for (const auto & s : status) {
     if (configuration_.entity() == s.name()) {
@@ -40,11 +46,15 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
       pose.position.x = pose.position.x + center.x();
       pose.position.y = pose.position.y + center.y();
       pose.position.z = pose.position.z + center.z();
+      /*
       raycaster.addPrimitive<simple_sensor_simulator::primitives::Box>(
         s.name(), s.bounding_box().dimensions().x(), s.bounding_box().dimensions().y(),
         s.bounding_box().dimensions().z(), pose);
+      */
     }
   }
+  /*
+  Raycaster raycaster;
   if (ego_pose) {
     std::vector<double> vertical_angles;
     for (const auto v : configuration_.vertical_angles()) {
