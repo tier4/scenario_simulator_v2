@@ -16,9 +16,29 @@
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
+#include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
+#include <vector>
 
 namespace simple_sensor_simulator
 {
+class LineSegment
+{
+public:
+  LineSegment(
+    const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point);
+  ~LineSegment();
+  const geometry_msgs::msg::Point start_point;
+  const geometry_msgs::msg::Point end_point;
+};
+
+class GridCell
+{
+public:
+  GridCell(const geometry_msgs::msg::Point & origin, double size);
+  const geometry_msgs::msg::Point origin;
+  const double size;
+};
+
 class Grid
 {
 public:
@@ -26,6 +46,8 @@ public:
   const double resolution;
   const double height;
   const double width;
+  std::vector<GridCell> getCell(
+    const simple_sensor_simulator::primitives::Primitive & primitive) const;
 };
 }  // namespace simple_sensor_simulator
 

@@ -16,14 +16,6 @@
 
 namespace simple_sensor_simulator
 {
-LineSegment::LineSegment(
-  const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point)
-: start_point(start_point), end_point(end_point)
-{
-}
-
-LineSegment::~LineSegment() {}
-
 bool intersection2D(const LineSegment & l0, const LineSegment & l1)
 {
   double s, t;

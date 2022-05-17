@@ -108,7 +108,7 @@ Box::Box(float depth, float width, float height, geometry_msgs::msg::Pose pose)
   triangles_[11].v1 = 5;
   triangles_[11].v2 = 7;
 
-  transform();
+  // transform();
 }
 }  // namespace primitives
 }  // namespace simple_sensor_simulator

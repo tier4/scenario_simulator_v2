@@ -16,19 +16,10 @@
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__INTERSECTION_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
+#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 
 namespace simple_sensor_simulator
 {
-class LineSegment
-{
-public:
-  LineSegment(
-    const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point);
-  ~LineSegment();
-  const geometry_msgs::msg::Point start_point;
-  const geometry_msgs::msg::Point end_point;
-};
-
 bool intersection2D(const LineSegment & l0, const LineSegment & l1);
 }  // namespace simple_sensor_simulator
 

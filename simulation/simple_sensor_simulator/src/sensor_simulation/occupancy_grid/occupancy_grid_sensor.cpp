@@ -29,12 +29,13 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & /*stamp*/)
   -> nav_msgs::msg::OccupancyGrid
 {
-  boost::optional<geometry_msgs::msg::Pose> ego_pose;
+  boost::optional<geometry_msgs::msg::Pose> ego_pose_north_up;
   for (const auto & s : status) {
     if (configuration_.entity() == s.name()) {
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(s.pose(), pose);
-      ego_pose = pose;
+      pose.orientation = geometry_msgs::msg::Quaternion();
+      ego_pose_north_up = pose;
     } else {
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(s.pose(), pose);
