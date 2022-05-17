@@ -17,6 +17,7 @@
 #include <exception>
 #include <geometry_msgs/msg/point.hpp>
 #include <string>
+#include <traffic_simulator/math/catmull_rom_spline_interface.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <utility>
 #include <vector>
@@ -25,12 +26,12 @@ namespace traffic_simulator
 {
 namespace math
 {
-class CatmullRomSpline
+class CatmullRomSpline : public CatmullRomSplineInterface
 {
 public:
   CatmullRomSpline() = default;
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
-  double getLength() const { return total_length_; }
+  double getLength() const override { return total_length_; }
   double getMaximum2DCurvature() const;
   const geometry_msgs::msg::Point getPoint(double s) const;
   const geometry_msgs::msg::Point getPoint(double s, double offset) const;
@@ -49,7 +50,7 @@ public:
     bool search_backward = false) const;
   boost::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
-    bool close_start_end = true) const;
+    bool close_start_end = true) const override;
   const geometry_msgs::msg::Point getRightBoundsPoint(
     double width, double s, double z_offset = 0) const;
   const geometry_msgs::msg::Point getLeftBoundsPoint(
@@ -66,6 +67,7 @@ private:
   std::pair<size_t, double> getCurveIndexAndS(double s) const;
   bool checkConnection() const;
   bool equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const;
+
   std::vector<HermiteCurve> curves_;
   std::vector<double> length_list_;
   std::vector<double> maximum_2d_curvatures_;
