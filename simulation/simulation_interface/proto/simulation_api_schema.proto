@@ -46,7 +46,8 @@ message OccupancyGridSensorConfiguration {
   uint32 width = 4;             // Width of the occupancy grid.
   uint32 height = 5;            // Height of the occupancy grid.
   string architecture_type = 6; // Autoware architecture type.
-  bool filter_by_range = 7;     // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
+  double range = 7;             // Sensor detection range.
+  bool filter_by_range = 8;     // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
 }
 
 /**

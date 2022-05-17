@@ -26,6 +26,35 @@
 
 namespace simple_sensor_simulator
 {
+geometry_msgs::Pose OccupancyGridSensorBase::getSensorPose(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
+{
+  for (const auto & s : status) {
+    if (
+      s.type().type() == traffic_simulator_msgs::EntityType::EGO &&
+      s.name() == configuration_.entity()) {
+      return s.pose();
+    }
+  }
+  throw SimulationRuntimeError("Occupancy grid sensor can be attached only ego entity.");
+}
+
+const std::vector<std::string> OccupancyGridSensorBase::getDetectedObjects(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
+{
+  std::vector<std::string> detected_objects;
+  const auto pose = getSensorPose(status);
+  for (const auto & s : status) {
+    double distance = std::hypot(
+      s.pose().position().x() - pose.position().x(), s.pose().position().y() - pose.position().y(),
+      s.pose().position().z() - pose.position().z());
+    if (s.name() != configuration_.entity() && distance <= configuration_.range()) {
+      detected_objects.emplace_back(s.name());
+    }
+  }
+  return detected_objects;
+}
+
 template <>
 auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & /*stamp*/,
@@ -46,7 +75,8 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
       pose.orientation = geometry_msgs::msg::Quaternion();
       ego_pose_north_up = pose;
     } else {
-      if (std::find(detected_objects, s.name) == detected_objects.end()) {
+      auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
+      if (result != detected_objects.end()) {
         continue;
       }
       geometry_msgs::msg::Pose pose;
@@ -64,6 +94,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
         s.bounding_box().dimensions().z(), pose);
     }
   }
+  return nav_msgs::msg::OccupancyGrid();
   /*
   Raycaster raycaster;
   if (ego_pose) {

@@ -48,7 +48,10 @@ public:
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> & lidar_detected_entity) = 0;
 
-  auto getDetectedObjects() const -> const std::vector<std::string> & { return detected_objects_; }
+  const std::vector<std::string> getDetectedObjects(
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+  geometry_msgs::Pose getSensorPose(
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
 };
 
 template <typename T>
@@ -57,7 +60,8 @@ class OccupancyGridSensor : public OccupancyGridSensorBase
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
   auto getOccupancyGrid(
-    const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &) -> T;
+    const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
+    const std::vector<std::string> &) -> T;
 
 public:
   explicit OccupancyGridSensor(
@@ -84,8 +88,8 @@ public:
 
 template <>
 auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
-  const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
-  -> nav_msgs::msg::OccupancyGrid;
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp,
+  const std::vector<std::string> & lidar_detected_entity) -> nav_msgs::msg::OccupancyGrid;
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_SENSOR_HPP_
