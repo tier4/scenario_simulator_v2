@@ -21,4 +21,10 @@ OccupancyGridGenerator::OccupancyGridGenerator(
 : configuration(configuration)
 {
 }
+
+nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
+  const geometry_msgs::msg::Pose & ego_pose) const
+{
+  
+}
 }  // namespace simple_sensor_simulator

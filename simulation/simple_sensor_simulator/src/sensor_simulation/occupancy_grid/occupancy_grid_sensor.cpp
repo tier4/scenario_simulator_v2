@@ -17,6 +17,7 @@
 #include <boost/optional.hpp>
 #include <memory>
 #include <simple_sensor_simulator/exception.hpp>
+#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_generator.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
@@ -30,6 +31,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   -> nav_msgs::msg::OccupancyGrid
 {
   boost::optional<geometry_msgs::msg::Pose> ego_pose_north_up;
+  OccupancyGridGenerator generator(configuration_);
   for (const auto & s : status) {
     if (configuration_.entity() == s.name()) {
       geometry_msgs::msg::Pose pose;
@@ -47,11 +49,9 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
       pose.position.x = pose.position.x + center.x();
       pose.position.y = pose.position.y + center.y();
       pose.position.z = pose.position.z + center.z();
-      /*
-      raycaster.addPrimitive<simple_sensor_simulator::primitives::Box>(
+      generator.addPrimitive<simple_sensor_simulator::primitives::Box>(
         s.name(), s.bounding_box().dimensions().x(), s.bounding_box().dimensions().y(),
         s.bounding_box().dimensions().z(), pose);
-      */
     }
   }
   /*
