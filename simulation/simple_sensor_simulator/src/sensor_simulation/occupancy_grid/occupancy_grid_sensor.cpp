@@ -97,20 +97,10 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
         s.bounding_box().dimensions().z(), pose);
     }
   }
-  return nav_msgs::msg::OccupancyGrid();
-  /*
-  Raycaster raycaster;
-  if (ego_pose) {
-    std::vector<double> vertical_angles;
-    for (const auto v : configuration_.vertical_angles()) {
-      vertical_angles.emplace_back(v);
-    }
-    const auto pointcloud = raycaster.raycast(
-      "base_link", stamp, ego_pose.get(), configuration_.horizontal_resolution(), vertical_angles);
-    detected_objects_ = raycaster.getDetectedObject();
-    return pointcloud;
+  if (ego_pose_north_up) {
+    return generator.generate(ego_pose_north_up.get());
+  } else {
+    throw SimulationRuntimeError("Failed to calculate ego pose with north up.");
   }
-  throw simple_sensor_simulator::SimulationRuntimeError("failed to found ego vehicle");
-  */
 }
 }  // namespace simple_sensor_simulator
