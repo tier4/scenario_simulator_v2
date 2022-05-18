@@ -47,11 +47,39 @@ Vertex Primitive::transform(Vertex v) const
   return ret;
 }
 
+Vertex Primitive::transform(Vertex v, const geometry_msgs::msg::Pose & sensor_pose) const
+{
+  auto mat = quaternion_operation::getRotationMatrix(
+    quaternion_operation::getRotation(sensor_pose.orientation, pose.orientation));
+  Eigen::VectorXd point(3);
+  point(0) = v.x;
+  point(1) = v.y;
+  point(2) = v.z;
+  point = mat * point;
+  point(0) = point(0) + pose.position.x - sensor_pose.position.x;
+  point(1) = point(1) + pose.position.y - sensor_pose.position.y;
+  point(2) = point(2) + pose.position.z - sensor_pose.position.z;
+  Vertex ret;
+  ret.x = point(0);
+  ret.y = point(1);
+  ret.z = point(2);
+  return ret;
+}
+
 std::vector<Vertex> Primitive::transform() const
 {
   std::vector<Vertex> ret;
   for (auto & v : vertices_) {
     ret.emplace_back(transform(v));
+  }
+  return ret;
+}
+
+std::vector<Vertex> Primitive::transform(const geometry_msgs::msg::Pose & sensor_pose) const
+{
+  std::vector<Vertex> ret;
+  for (auto & v : vertices_) {
+    ret.emplace_back(transform(v, sensor_pose));
   }
   return ret;
 }

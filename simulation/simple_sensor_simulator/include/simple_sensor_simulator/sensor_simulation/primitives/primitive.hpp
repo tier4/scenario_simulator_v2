@@ -64,6 +64,7 @@ protected:
 
 private:
   Vertex transform(Vertex v) const;
+  Vertex transform(Vertex v, const geometry_msgs::msg::Pose & sensor_pose) const;
 };
 }  // namespace primitives
 }  // namespace simple_sensor_simulator
