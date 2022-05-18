@@ -48,7 +48,7 @@ auto SpeedCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(getEntityStatus(triggering_entity).action_status.twist.linear.x);
+    results.push_back(evaluateSpeed(triggering_entity));
     return compare(results.back(), value);
   }));
 }

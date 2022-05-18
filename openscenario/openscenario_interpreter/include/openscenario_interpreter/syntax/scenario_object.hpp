@@ -37,7 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ScenarioObject : public Scope, public EntityObject, private SimulatorCore::GeneralCommands
+struct ScenarioObject : public Scope, public EntityObject, private SimulatorCore::GeneralCommand
 {
   ObjectController object_controller;  // Controller of the EntityObject instance.
 

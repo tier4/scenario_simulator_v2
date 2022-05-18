@@ -23,11 +23,12 @@
 
 namespace openscenario_interpreter
 {
-struct SimulatorCore
+class SimulatorCore
 {
-  // TODO PRIVATE!
+public:  // TODO PRIVATE!
   static inline std::unique_ptr<traffic_simulator::API> connection = nullptr;
 
+public:
   template <typename... Ts>
   static auto activate(Ts &&... xs) -> void
   {
@@ -40,7 +41,7 @@ struct SimulatorCore
 
   static auto deactivate() -> void { connection.reset(); }
 
-  struct GeneralCommands
+  class GeneralCommand  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
   protected:
     template <typename Metric, typename... Ts>
@@ -50,26 +51,33 @@ struct SimulatorCore
     }
   };
 
-  struct ActionApplications
+  class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
   protected:
   };
 
-  struct ConditionEvaluations
+  class ConditionEvaluation  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
+    template <typename... Ts>
+    auto currentEntityStatus(Ts &&... xs)
+    {
+      return connection->getEntityStatus(std::forward<decltype(xs)>(xs)...);
+    }
+
   protected:
+    template <typename... Ts>
+    auto evaluateSpeed(Ts &&... xs)
+    {
+      return currentEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.twist.linear.x;
+    }
+
+    template <typename... Ts>
+    auto evaluateAcceleration(Ts &&... xs)
+    {
+      return currentEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.accel.linear.x;
+    }
   };
 };
-
-template <typename... Ts>
-decltype(auto) getEntityStatus(Ts &&... xs)
-try {
-  return SimulatorCore::connection->getEntityStatus(std::forward<decltype(xs)>(xs)...);
-} catch (const common::scenario_simulator_exception::SimulationError & error) {
-  throw SemanticError(
-    error.what(), ".\n", "Possible causes:\n",
-    "  (1) The position of the corresponding entity is not specified by Teleport Action");
-}
 
 template <typename... Ts>
 auto getRelativePose(Ts &&... xs)
