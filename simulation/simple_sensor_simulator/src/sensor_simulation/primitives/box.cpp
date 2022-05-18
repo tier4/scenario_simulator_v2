@@ -21,7 +21,7 @@ namespace simple_sensor_simulator
 {
 namespace primitives
 {
-Box::Box(float depth, float width, float height, geometry_msgs::msg::Pose pose)
+Box::Box(float depth, float width, float height, const geometry_msgs::msg::Pose & pose)
 : Primitive("Box", pose), depth(depth), width(width), height(height)
 {
   vertices_ = std::vector<Vertex>(8);

@@ -24,7 +24,10 @@ namespace simple_sensor_simulator
 {
 namespace primitives
 {
-Primitive::Primitive(std::string type, geometry_msgs::msg::Pose pose) : type(type), pose(pose) {}
+Primitive::Primitive(std::string type, const geometry_msgs::msg::Pose & pose)
+: type(type), pose(pose)
+{
+}
 
 Vertex Primitive::transform(Vertex v) const
 {

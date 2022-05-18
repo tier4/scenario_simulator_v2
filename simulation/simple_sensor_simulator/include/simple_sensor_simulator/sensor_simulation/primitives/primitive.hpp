@@ -46,7 +46,7 @@ namespace primitives
 class Primitive
 {
 public:
-  Primitive(std::string type, geometry_msgs::msg::Pose pose);
+  Primitive(std::string type, const geometry_msgs::msg::Pose & pose);
   virtual ~Primitive() = default;
   const std::string type;
   const geometry_msgs::msg::Pose pose;
@@ -55,6 +55,7 @@ public:
   std::vector<Triangle> getTriangles() const;
   boost::optional<double> getMax(const Axis & axis) const;
   boost::optional<double> getMin(const Axis & axis) const;
+  std::vector<Vertex> transform(const geometry_msgs::msg::Pose & sensor_pose) const;
 
 protected:
   std::vector<Vertex> transform() const;
