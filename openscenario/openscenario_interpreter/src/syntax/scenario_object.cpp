@@ -32,28 +32,24 @@ ScenarioObject::ScenarioObject(const pugi::xml_node & node, Scope & scope)
 
 auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> bool
 {
+  assert(object_controller.isUserDefinedController());
+
   metrics::OutOfRangeMetric::Config configuration;
-  {
-    const auto parameters = static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle);
 
-    configuration.target_entity = name;
-    configuration.min_velocity = -parameters.performance.max_speed;
-    configuration.max_velocity = +parameters.performance.max_speed;
-    configuration.min_acceleration = -parameters.performance.max_deceleration;
-    configuration.max_acceleration = +parameters.performance.max_acceleration;
-
-    if (object_controller.is<Controller>()) {
-      configuration.max_jerk = object_controller.as<Controller>().properties.get<Double>(
-        "maxJerk", std::numeric_limits<Double::value_type>::max());
-      configuration.min_jerk = object_controller.as<Controller>().properties.get<Double>(
-        "minJerk", std::numeric_limits<Double::value_type>::lowest());
-    }
-
-    if (object_controller.isUserDefinedController()) {
-      configuration.jerk_topic =
-        "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
-    }
-  }
+  configuration.target_entity = name;
+  configuration.min_velocity = -vehicle.performance.max_speed;
+  configuration.max_velocity = +vehicle.performance.max_speed;
+  configuration.min_acceleration = -vehicle.performance.max_deceleration;
+  configuration.max_acceleration = +vehicle.performance.max_acceleration;
+  configuration.min_jerk =
+    object_controller.is<Controller>()
+      ? object_controller.as<Controller>().properties.get<Double>("minJerk", Double::lowest())
+      : Double::lowest();
+  configuration.max_jerk =
+    object_controller.is<Controller>()
+      ? object_controller.as<Controller>().properties.get<Double>("maxJerk", Double::max())
+      : Double::max();
+  configuration.jerk_topic = "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
 
   addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);
 

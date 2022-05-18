@@ -39,6 +39,26 @@ struct SimulatorCore
   }
 
   static auto deactivate() -> void { connection.reset(); }
+
+  struct GeneralCommands
+  {
+  protected:
+    template <typename Metric, typename... Ts>
+    static auto addMetric(Ts &&... xs) -> void
+    {
+      connection->addMetric<Metric>(std::forward<Ts>(xs)...);
+    }
+  };
+
+  struct ActionApplications
+  {
+  protected:
+  };
+
+  struct ConditionEvaluations
+  {
+  protected:
+  };
 };
 
 template <typename... Ts>
@@ -65,12 +85,6 @@ try {
   result.orientation.z = 0;
   result.orientation.w = 1;
   return result;
-}
-
-template <typename TMetric, typename... Ts>
-void addMetric(Ts &&... xs)
-{
-  SimulatorCore::connection->addMetric<TMetric>(std::forward<Ts>(xs)...);
 }
 
 auto toLanePosition(const geometry_msgs::msg::Pose & pose) ->

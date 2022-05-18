@@ -36,6 +36,10 @@ struct Double : public std_msgs::msg::Float64
 
   static auto nan() noexcept -> Double;
 
+  static auto max() noexcept -> Double;
+
+  static auto lowest() noexcept -> Double;
+
   auto operator=(const value_type & rhs) noexcept -> Double &;
 
   auto operator+=(const value_type & rhs) noexcept -> Double &;
