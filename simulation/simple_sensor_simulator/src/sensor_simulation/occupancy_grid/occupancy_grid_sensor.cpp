@@ -57,7 +57,7 @@ const std::vector<std::string> OccupancyGridSensorBase::getDetectedObjects(
 
 template <>
 auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & /*stamp*/,
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp,
   const std::vector<std::string> & lidar_detected_entity) -> nav_msgs::msg::OccupancyGrid
 {
   std::vector<std::string> detected_objects;
@@ -98,7 +98,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
     }
   }
   if (ego_pose_north_up) {
-    return generator.generate(ego_pose_north_up.get());
+    return generator.generate(ego_pose_north_up.get(), stamp);
   } else {
     throw SimulationRuntimeError("Failed to calculate ego pose with north up.");
   }

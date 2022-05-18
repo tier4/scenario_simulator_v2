@@ -33,7 +33,8 @@ class OccupancyGridGenerator
 public:
   OccupancyGridGenerator(
     const simulation_api_schema::OccupancyGridSensorConfiguration & configuration);
-  nav_msgs::msg::OccupancyGrid generate(const geometry_msgs::msg::Pose & ego_pose) const;
+  nav_msgs::msg::OccupancyGrid generate(
+    const geometry_msgs::msg::Pose & ego_pose, const rclcpp::Time & stamp) const;
   template <typename T, typename... Ts>
   void addPrimitive(std::string name, Ts &&... xs)
   {

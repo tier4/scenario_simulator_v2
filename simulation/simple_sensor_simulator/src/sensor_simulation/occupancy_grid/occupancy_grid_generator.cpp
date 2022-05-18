@@ -24,9 +24,17 @@ OccupancyGridGenerator::OccupancyGridGenerator(
 }
 
 nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
-  const geometry_msgs::msg::Pose & ego_pose) const
+  const geometry_msgs::msg::Pose & ego_pose, const rclcpp::Time & stamp) const
 {
   nav_msgs::msg::OccupancyGrid occupancy_grid;
+  occupancy_grid.header.stamp = stamp;
+  occupancy_grid.header.frame_id = "map";
+  occupancy_grid.data = std::vector<int8_t>(configuration.height() * configuration.width());
+  occupancy_grid.info.height = configuration.height();
+  occupancy_grid.info.width = configuration.width();
+  occupancy_grid.info.map_load_time = stamp;
+  occupancy_grid.info.resolution = configuration.resolution();
+  occupancy_grid.info.origin = ego_pose;
   for (const auto & primitive : primitive_ptrs_) {
     grid_.getCell(primitive.second, ego_pose);
   }
