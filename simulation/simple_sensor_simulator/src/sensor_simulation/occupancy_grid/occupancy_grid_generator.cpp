@@ -18,12 +18,18 @@ namespace simple_sensor_simulator
 {
 OccupancyGridGenerator::OccupancyGridGenerator(
   const simulation_api_schema::OccupancyGridSensorConfiguration & configuration)
-: configuration(configuration)
+: configuration(configuration),
+  grid_(configuration.resolution(), configuration.height(), configuration.width())
 {
 }
 
 nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
   const geometry_msgs::msg::Pose & ego_pose) const
 {
+  nav_msgs::msg::OccupancyGrid occupancy_grid;
+  for (const auto & primitive : primitive_ptrs_) {
+    grid_.getCell(primitive.second, ego_pose);
+  }
+  return occupancy_grid;
 }
 }  // namespace simple_sensor_simulator

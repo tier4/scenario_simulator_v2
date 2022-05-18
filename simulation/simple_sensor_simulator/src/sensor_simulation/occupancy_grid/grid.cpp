@@ -24,8 +24,8 @@ LineSegment::LineSegment(
 
 LineSegment::~LineSegment() {}
 
-GridCell::GridCell(const geometry_msgs::msg::Point & origin, double size)
-: origin(origin), size(size)
+GridCell::GridCell(const geometry_msgs::msg::Point & origin, double size, size_t index)
+: origin(origin), size(size), index(index)
 {
 }
 
@@ -35,16 +35,17 @@ Grid::Grid(double resolution, double height, double width)
 }
 
 std::vector<GridCell> Grid::getCell(
-  const simple_sensor_simulator::primitives::Primitive & primitive) const
+  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive,
+  const geometry_msgs::msg::Pose & sensor_pose) const
 {
   std::vector<GridCell> ret;
-  const auto x_max = primitive.getMax(simple_sensor_simulator::Axis::X);
-  const auto y_max = primitive.getMax(simple_sensor_simulator::Axis::Y);
-  const auto x_min = primitive.getMin(simple_sensor_simulator::Axis::X);
-  const auto y_min = primitive.getMin(simple_sensor_simulator::Axis::Y);
-  if (x_max && y_max && x_min && y_min) {
-    for (size_t h = 0; h < height; h++) {
-      for (size_t w = 0; w < width; w++) {
+  const auto x_max = primitive->getMax(simple_sensor_simulator::Axis::X);
+  const auto y_max = primitive->getMax(simple_sensor_simulator::Axis::Y);
+  const auto x_min = primitive->getMin(simple_sensor_simulator::Axis::X);
+  const auto y_min = primitive->getMin(simple_sensor_simulator::Axis::Y);
+  for (size_t h = 0; h < height; h++) {
+    for (size_t w = 0; w < width; w++) {
+      if (x_max && y_max && x_min && y_min) {
         geometry_msgs::msg::Point origin;
         origin.x = w - 0.5 * width;
         origin.y = h - 0.5 * height;
@@ -55,7 +56,7 @@ std::vector<GridCell> Grid::getCell(
         if (
           x_min_cell <= x_max && x_max <= x_max_cell && y_min_cell <= y_max &&
           y_max <= y_max_cell) {
-          ret.emplace_back(GridCell(origin, resolution));
+          ret.emplace_back(GridCell(origin, resolution, width * h + w));
         }
       }
     }

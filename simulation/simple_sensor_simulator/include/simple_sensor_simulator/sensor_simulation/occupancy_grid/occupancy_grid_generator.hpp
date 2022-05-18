@@ -20,6 +20,7 @@
 #include <memory>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
@@ -46,6 +47,7 @@ public:
 
 private:
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
+  Grid grid_;
 };
 }  // namespace simple_sensor_simulator
 

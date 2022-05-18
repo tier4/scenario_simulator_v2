@@ -55,6 +55,10 @@ public:
   std::vector<Triangle> getTriangles() const;
   boost::optional<double> getMax(const Axis & axis) const;
   boost::optional<double> getMin(const Axis & axis) const;
+  boost::optional<double> getMax(
+    const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
+  boost::optional<double> getMin(
+    const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
   std::vector<Vertex> transform(const geometry_msgs::msg::Pose & sensor_pose) const;
 
 protected:

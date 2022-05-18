@@ -154,5 +154,53 @@ boost::optional<double> Primitive::getMin(const Axis & axis) const
   }
   return *std::min_element(values.begin(), values.end());
 }
+
+boost::optional<double> Primitive::getMax(
+  const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
+{
+  std::vector<double> values;
+  if (vertices_.empty()) {
+    return boost::none;
+  }
+  const auto transformed_vertices = transform(sensor_pose);
+  for (const auto v : transformed_vertices) {
+    switch (axis) {
+      case Axis::X:
+        values.emplace_back(v.x);
+        break;
+      case Axis::Y:
+        values.emplace_back(v.y);
+        break;
+      case Axis::Z:
+        values.emplace_back(v.z);
+        break;
+    }
+  }
+  return *std::max_element(values.begin(), values.end());
+}
+
+boost::optional<double> Primitive::getMin(
+  const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
+{
+  std::vector<double> values;
+  if (vertices_.empty()) {
+    return boost::none;
+  }
+  const auto transformed_vertices = transform(sensor_pose);
+  for (const auto v : transformed_vertices) {
+    switch (axis) {
+      case Axis::X:
+        values.emplace_back(v.x);
+        break;
+      case Axis::Y:
+        values.emplace_back(v.y);
+        break;
+      case Axis::Z:
+        values.emplace_back(v.z);
+        break;
+    }
+  }
+  return *std::min_element(values.begin(), values.end());
+}
 }  // namespace primitives
 }  // namespace simple_sensor_simulator
