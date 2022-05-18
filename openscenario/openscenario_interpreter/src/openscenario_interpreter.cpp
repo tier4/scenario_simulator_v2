@@ -46,7 +46,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
 }
 
-Interpreter::~Interpreter() { disconnect(); }
+Interpreter::~Interpreter() { SimulatorCore::deactivate(); }
 
 auto Interpreter::currentLocalFrameRate() const -> std::chrono::milliseconds
 {
@@ -169,7 +169,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
             "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
         }
 
-        connect(shared_from_this(), makeCurrentConfiguration());
+        SimulatorCore::activate(shared_from_this(), makeCurrentConfiguration());
 
         initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
 
@@ -192,7 +192,7 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 
   publisher_of_context->on_deactivate();
 
-  disconnect();  // Deactivate traffic_simulator
+  SimulatorCore::deactivate();
 
   scenarios.pop_front();
 

@@ -17,12 +17,14 @@
 
 namespace openscenario_interpreter
 {
-std::unique_ptr<traffic_simulator::API> connection = nullptr;
+// std::unique_ptr<traffic_simulator::API> connection = nullptr;
 
-auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
-  decltype(connection->toLaneletPose(std::declval<decltype(pose)>(), false).get())>::type
+auto toLanePosition(const geometry_msgs::msg::Pose & pose) ->
+  typename std::decay<decltype(SimulatorCore::connection
+                                 ->toLaneletPose(std::declval<decltype(pose)>(), false)
+                                 .get())>::type
 {
-  const auto result = connection->toLaneletPose(pose, false);
+  const auto result = SimulatorCore::connection->toLaneletPose(pose, false);
 
   if (result) {
     return result.get();

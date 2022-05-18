@@ -23,21 +23,28 @@
 
 namespace openscenario_interpreter
 {
-extern std::unique_ptr<traffic_simulator::API> connection;
-
-template <typename... Ts>
-decltype(auto) connect(Ts &&... xs)
+struct SimulatorCore
 {
-  connection = std::make_unique<traffic_simulator::API>(std::forward<decltype(xs)>(xs)...);
-  return *connection;
-}
+  // TODO PRIVATE!
+  static inline std::unique_ptr<traffic_simulator::API> connection = nullptr;
 
-inline void disconnect() { connection.reset(); }
+  template <typename... Ts>
+  static auto activate(Ts &&... xs) -> void
+  {
+    if (not connection) {
+      connection = std::make_unique<traffic_simulator::API>(std::forward<decltype(xs)>(xs)...);
+    } else {
+      throw Error("The simulator core has already been instantiated.");
+    }
+  }
+
+  static auto deactivate() -> void { connection.reset(); }
+};
 
 template <typename... Ts>
 decltype(auto) getEntityStatus(Ts &&... xs)
 try {
-  return connection->getEntityStatus(std::forward<decltype(xs)>(xs)...);
+  return SimulatorCore::connection->getEntityStatus(std::forward<decltype(xs)>(xs)...);
 } catch (const common::scenario_simulator_exception::SimulationError & error) {
   throw SemanticError(
     error.what(), ".\n", "Possible causes:\n",
@@ -47,7 +54,7 @@ try {
 template <typename... Ts>
 auto getRelativePose(Ts &&... xs)
 try {
-  return connection->getRelativePose(std::forward<decltype(xs)>(xs)...);
+  return SimulatorCore::connection->getRelativePose(std::forward<decltype(xs)>(xs)...);
 } catch (...) {
   geometry_msgs::msg::Pose result{};
   result.position.x = std::numeric_limits<double>::quiet_NaN();
@@ -63,24 +70,26 @@ try {
 template <typename TMetric, typename... Ts>
 void addMetric(Ts &&... xs)
 {
-  connection->addMetric<TMetric>(std::forward<Ts>(xs)...);
+  SimulatorCore::connection->addMetric<TMetric>(std::forward<Ts>(xs)...);
 }
 
-auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
-  decltype(connection->toLaneletPose(std::declval<decltype(pose)>(), false).get())>::type;
+auto toLanePosition(const geometry_msgs::msg::Pose & pose) ->
+  typename std::decay<decltype(SimulatorCore::connection
+                                 ->toLaneletPose(std::declval<decltype(pose)>(), false)
+                                 .get())>::type;
 
-#define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                      \
-  template <typename... Ts>                                                        \
-  auto IDENTIFIER(Ts &&... xs)                                                     \
-  {                                                                                \
-    const auto result = connection->IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-    if (result) {                                                                  \
-      return result.get();                                                         \
-    } else {                                                                       \
-      using value_type = typename std::decay<decltype(result)>::type::value_type;  \
-      return ALTERNATE;                                                            \
-    }                                                                              \
-  }                                                                                \
+#define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                                     \
+  template <typename... Ts>                                                                       \
+  auto IDENTIFIER(Ts &&... xs)                                                                    \
+  {                                                                                               \
+    const auto result = SimulatorCore::connection->IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
+    if (result) {                                                                                 \
+      return result.get();                                                                        \
+    } else {                                                                                      \
+      using value_type = typename std::decay<decltype(result)>::type::value_type;                 \
+      return ALTERNATE;                                                                           \
+    }                                                                                             \
+  }                                                                                               \
   static_assert(true, "")
 
 STRIP_OPTIONAL(getBoundingBoxDistance, static_cast<value_type>(0));
@@ -90,12 +99,12 @@ STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
 
 #undef STRIP_OPTIONAL
 
-#define FORWARD_TO_SIMULATION_API(IDENTIFIER)                         \
-  template <typename... Ts>                                           \
-  decltype(auto) IDENTIFIER(Ts &&... xs)                              \
-  {                                                                   \
-    return connection->IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-  }                                                                   \
+#define FORWARD_TO_SIMULATION_API(IDENTIFIER)                                        \
+  template <typename... Ts>                                                          \
+  decltype(auto) IDENTIFIER(Ts &&... xs)                                             \
+  {                                                                                  \
+    return SimulatorCore::connection->IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
+  }                                                                                  \
   static_assert(true, "")
 
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
@@ -116,12 +125,12 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef FORWARD_TO_SIMULATION_API
 
-#define RENAME(TO, FROM)                                        \
-  template <typename... Ts>                                     \
-  decltype(auto) TO(Ts &&... xs)                                \
-  {                                                             \
-    return connection->FROM(std::forward<decltype(xs)>(xs)...); \
-  }                                                             \
+#define RENAME(TO, FROM)                                                       \
+  template <typename... Ts>                                                    \
+  decltype(auto) TO(Ts &&... xs)                                               \
+  {                                                                            \
+    return SimulatorCore::connection->FROM(std::forward<decltype(xs)>(xs)...); \
+  }                                                                            \
   static_assert(true, "")
 
 // NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
