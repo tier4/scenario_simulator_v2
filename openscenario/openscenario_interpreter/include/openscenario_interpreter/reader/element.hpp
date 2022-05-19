@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/type_traits/must_be_default_constructible.hpp>
 #include <pugixml.hpp>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 
@@ -90,9 +91,10 @@ auto readElement(const std::string & name, const pugi::xml_node & parent, Scope 
 
 template <typename T, typename U, typename Scope>
 auto readElement(
-  const std::string & name, const pugi::xml_node & parent, Scope & scope, const U && value)
+  const std::string & name, const pugi::xml_node & parent, Scope & scope, U && value)
 {
-  if constexpr (std::is_same<T, U>::value) {
+  using RAW_U = typename std::decay<U>::type;
+  if constexpr (std::is_same<T, RAW_U>::value) {
     // return "value" as a default value
     return value;
   } else {

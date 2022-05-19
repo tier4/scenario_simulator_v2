@@ -45,6 +45,7 @@ struct Trigger : public std::list<ConditionGroup>
   explicit Trigger(const std::list<ConditionGroup> & condition_groups)
   : std::list<ConditionGroup>(condition_groups)
   {
+    std::cout << "This Trigger constructed from default condition groups!!!!!!" << std::endl;
   }
 
   auto evaluate() -> Object;

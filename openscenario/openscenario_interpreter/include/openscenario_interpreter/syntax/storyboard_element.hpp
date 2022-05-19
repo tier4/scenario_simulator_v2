@@ -60,6 +60,12 @@ public:
   }
 
   // Event
+  explicit StoryboardElement(
+    const std::size_t maximum_execution_count, const Trigger & start_trigger)
+  : maximum_execution_count(maximum_execution_count), start_trigger(start_trigger)
+  {
+  }
+
   explicit StoryboardElement(const std::size_t maximum_execution_count = 1)
   : maximum_execution_count(maximum_execution_count)
   {

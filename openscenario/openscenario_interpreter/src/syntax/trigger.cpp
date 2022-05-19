@@ -35,13 +35,19 @@ auto Trigger::evaluate() -> Object
    *
    * ---------------------------------------------------------------------- */
   // NOTE: Don't use std::any_of; Intentionally does not short-circuit evaluation.
-  return asBoolean(
+  std::cout << "Trigger" << "===============================================================================================" << std::endl;
+  if(this->empty()){
+    std::cout << "This is an empty Trigger" << std::endl;
+  }
+  auto ret = asBoolean(
     current_value = std::accumulate(
       std::begin(*this), std::end(*this), false,
       [&](auto && lhs, ConditionGroup & condition_group) {
         const auto rhs = condition_group.evaluate();
         return lhs or rhs.as<Boolean>();
       }));
+  std::cout << "Trigger State : " << ret.as<Boolean>() << std::endl;
+  return ret;
 }
 
 auto operator<<(nlohmann::json & json, const Trigger & datum) -> nlohmann::json &
