@@ -100,6 +100,7 @@ STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
 
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
+FORWARD_TO_SIMULATION_API(attachOccupancyGridSensor);
 FORWARD_TO_SIMULATION_API(engage);
 FORWARD_TO_SIMULATION_API(getCurrentAction);
 FORWARD_TO_SIMULATION_API(getCurrentTime);

@@ -129,6 +129,7 @@ MultiServer::MultiServer(
   poller_.add(update_entity_status_sock_);
   poller_.add(attach_lidar_sensor_sock_);
   poller_.add(attach_detection_sensor_sock_);
+  poller_.add(attach_occupancy_grid_sensor_sock_);
   poller_.add(update_traffic_lights_sock_);
   thread_ = std::thread(&MultiServer::start_poll, this);
 }
@@ -225,6 +226,15 @@ void MultiServer::poll()
       toProto<simulation_api_schema::AttachDetectionSensorRequest>(request), response);
     auto msg = toZMQ(response);
     attach_detection_sensor_sock_.send(msg);
+  }
+  if (poller_.has_input(attach_occupancy_grid_sensor_sock_)) {
+    zmqpp::message request;
+    attach_occupancy_grid_sensor_sock_.receive(request);
+    simulation_api_schema::AttachOccupancyGridSensorResponse response;
+    attach_occupancy_grid_sensor_func_(
+      toProto<simulation_api_schema::AttachOccupancyGridSensorRequest>(request), response);
+    auto msg = toZMQ(response);
+    attach_occupancy_grid_sensor_sock_.send(msg);
   }
   if (poller_.has_input(update_traffic_lights_sock_)) {
     zmqpp::message request;

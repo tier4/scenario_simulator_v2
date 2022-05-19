@@ -208,9 +208,9 @@ void MultiClient::call(
 {
   if (is_running) {
     zmqpp::message message = toZMQ(req);
-    socket_attach_detection_sensor_.send(message);
+    socket_attach_occupancy_grid_sensor_.send(message);
     zmqpp::message buffer;
-    socket_attach_detection_sensor_.receive(buffer);
+    socket_attach_occupancy_grid_sensor_.receive(buffer);
     res = toProto<simulation_api_schema::AttachOccupancyGridSensorResponse>(buffer);
   }
 }
