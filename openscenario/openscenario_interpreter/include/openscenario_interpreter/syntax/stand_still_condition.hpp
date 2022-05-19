@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STAND_STILL_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STAND_STILL_CONDITION_HPP_
 
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
@@ -32,7 +33,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct StandStillCondition
+struct StandStillCondition : private SimulatorCore::ConditionEvaluation
 {
   const Double duration;
 

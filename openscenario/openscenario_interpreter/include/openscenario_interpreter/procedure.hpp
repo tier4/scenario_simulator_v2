@@ -75,28 +75,74 @@ public:
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
+    // NOTE: applySomethingAction() -> Unspecified
+
   protected:
+    template <typename... Ts>
+    static auto applyAcquirePositionAction(Ts &&... xs)
+    {
+      return connection->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto applyAddEntityAction(Ts &&... xs)
+    {
+      return connection->spawn(std::forward<decltype(xs)>(xs)...);
+    }
   };
 
   class ConditionEvaluation  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
     template <typename... Ts>
-    auto currentEntityStatus(Ts &&... xs)
+    static auto currentEntityStatus(Ts &&... xs)
     {
       return connection->getEntityStatus(std::forward<decltype(xs)>(xs)...);
     }
 
+    // NOTE: evaluateSomething() -> Number
+    //       evaluateSomethingCondition() -> bool
+
   protected:
     template <typename... Ts>
-    auto evaluateSpeed(Ts &&... xs)
+    static auto evaluateAcceleration(Ts &&... xs)
+    {
+      return currentEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.accel.linear.x;
+    }
+
+    template <typename... Ts>
+    static auto evaluateCollisionCondition(Ts &&... xs)
+    {
+      return connection->checkCollision(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto evaluateSpeed(Ts &&... xs)
     {
       return currentEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.twist.linear.x;
     }
 
     template <typename... Ts>
-    auto evaluateAcceleration(Ts &&... xs)
+    static auto evaluateStandStill(Ts &&... xs)
     {
-      return currentEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.accel.linear.x;
+      if (const auto result = connection->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
+          result) {
+        return result.get();
+      } else {
+        using value_type = typename std::decay<decltype(result)>::type::value_type;
+        return std::numeric_limits<value_type>::quiet_NaN();
+      }
+    }
+
+    template <typename... Ts>
+    static auto evaluateTimeHeadway(Ts &&... xs)
+    {
+      if (const auto result = connection->getTimeHeadway(std::forward<decltype(xs)>(xs)...);
+          result) {
+        return result.get();
+      } else {
+        using value_type = typename std::decay<decltype(result)>::type::value_type;
+        return std::numeric_limits<value_type>::quiet_NaN();
+      }
     }
   };
 };
@@ -133,8 +179,6 @@ try {
 
 STRIP_OPTIONAL(getBoundingBoxDistance, static_cast<value_type>(0));
 STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_NaN());
-STRIP_OPTIONAL(getStandStillDuration, static_cast<value_type>(0));
-STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
 
 #undef STRIP_OPTIONAL
 
@@ -174,15 +218,12 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 
 // NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
 
-RENAME(applyAcquirePositionAction, requestAcquirePosition);
-RENAME(applyAddEntityAction, spawn);
 RENAME(applyAssignControllerAction, setDriverModel);
 RENAME(applyAssignRouteAction, requestAssignRoute);
 RENAME(applyDeleteEntityAction, despawn);
 RENAME(applyLaneChangeAction, requestLaneChange);
 RENAME(applyTeleportAction, setEntityStatus);
 RENAME(applyWalkStraightAction, requestWalkStraight);
-RENAME(evaluateCollisionCondition, checkCollision);
 RENAME(evaluateCurrentEmergencyState, getEmergencyStateString);
 RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateReachPositionCondition, reachPosition);

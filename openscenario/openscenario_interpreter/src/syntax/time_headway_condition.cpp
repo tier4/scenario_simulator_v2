@@ -51,7 +51,7 @@ auto TimeHeadwayCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(getTimeHeadway(triggering_entity, entity_ref));
+    results.push_back(evaluateTimeHeadway(triggering_entity, entity_ref));
     return compare(results.back(), value);
   }));
 }

@@ -47,7 +47,7 @@ auto StandStillCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(getStandStillDuration(triggering_entity));
+    results.push_back(evaluateStandStill(triggering_entity));
     return compare(results.back(), duration);
   }));
 }
