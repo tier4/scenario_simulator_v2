@@ -18,6 +18,7 @@
 #include <limits>
 #include <memory>
 #include <openscenario_interpreter/error.hpp>
+#include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
 #include <utility>
 
@@ -48,6 +49,27 @@ public:
     static auto addMetric(Ts &&... xs) -> void
     {
       connection->addMetric<Metric>(std::forward<Ts>(xs)...);
+    }
+
+    template <
+      typename T,
+      typename std::enable_if<
+        std::is_same<T, traffic_simulator_msgs::msg::LaneletPose>::value, int>::type = 0>
+    static auto convert(const geometry_msgs::msg::Pose & pose)
+    {
+      if (const auto result = connection->toLaneletPose(pose, false); result) {
+        return result.get();
+      } else {
+        throw Error(
+          "The specified WorldPosition = [", pose.position.x, ", ", pose.position.y, ", ",
+          pose.position.z,
+          "] could not be approximated to the proper Lane. Perhaps the "
+          "WorldPosition points to a location where multiple lanes overlap, and "
+          "there are at least two or more candidates for a LanePosition that "
+          "can be approximated to that WorldPosition. This issue can be "
+          "resolved by strictly specifying the location using LanePosition "
+          "instead of WorldPosition");
+      }
     }
   };
 
@@ -94,11 +116,6 @@ try {
   result.orientation.w = 1;
   return result;
 }
-
-auto toLanePosition(const geometry_msgs::msg::Pose & pose) ->
-  typename std::decay<decltype(SimulatorCore::connection
-                                 ->toLaneletPose(std::declval<decltype(pose)>(), false)
-                                 .get())>::type;
 
 #define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                                     \
   template <typename... Ts>                                                                       \

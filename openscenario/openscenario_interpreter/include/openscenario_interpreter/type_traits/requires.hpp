@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2022 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
+#ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__REQUIRES_HPP_
+#define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__REQUIRES_HPP_
 
-namespace openscenario_interpreter
-{
-}  // namespace openscenario_interpreter
+#include <type_traits>
+
+#define REQUIRES(...) typename = typename std::enable_if<std::conjunction<__VA_ARGS__>::value>::type
+
+#endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__REQUIRES_HPP_

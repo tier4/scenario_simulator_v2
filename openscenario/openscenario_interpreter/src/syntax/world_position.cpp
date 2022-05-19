@@ -59,7 +59,8 @@ WorldPosition::operator geometry_msgs::msg::Pose() const
 
 WorldPosition::operator traffic_simulator_msgs::msg::LaneletPose() const
 {
-  return toLanePosition(static_cast<geometry_msgs::msg::Pose>(*this));
+  return convert<traffic_simulator_msgs::msg::LaneletPose>(
+    static_cast<geometry_msgs::msg::Pose>(*this));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
