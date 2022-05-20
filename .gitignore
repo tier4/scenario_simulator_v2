@@ -12,9 +12,6 @@
 
 # external packages
 external/autoware_auto_msgs
-external/doxybook2
-external/lanelet2
-external/mrt_cmake_modules
 external/tier4_msgs
 external/zmqpp_vendor
 
