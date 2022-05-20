@@ -222,6 +222,8 @@ class ScenarioTestRunner(LifecycleController):
             self.get_logger().warn("KeyboardInterrupt")
         except OSError as e:
             self.get_logger().warn("OSError: {}".format(e))
+        except Exception as e:
+            self.get_logger().error("\x1b[1;31m{}\x1b[0m".format(e))
 
     # def __del__(self):
     #     pass

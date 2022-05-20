@@ -167,7 +167,7 @@ def launch_setup(context, *args, **kwargs):
             name="openscenario_interpreter",
             output="screen",
             parameters=make_parameters(),
-            on_exit=Shutdown(),
+            # on_exit=Shutdown(),
         ),
         Node(
             package="openscenario_visualization",
