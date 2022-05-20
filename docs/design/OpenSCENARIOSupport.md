@@ -214,20 +214,15 @@ OpenSCENARIO standards.
 | ByEntityCondition.**TimeOfDayCondition**                        | Unsupported |                                    |
 | ByEntityCondition.**SimulationTimeCondition**                   |     ✔     | No                                 |
 | ByEntityCondition.**StoryboardElementStateCondition**           |     ✔     | See[here]()                           |
-| ByEntityCondition.**UserDefinedValueCondition**                 | Unsupported |                                    |
-| ByEntityCondition.**TrafficSignalCondition**                    | Unsupported |                                    |
-| ByEntityCondition.**TrafficSignalControllerCondition**          | Unsupported |                                    |
+| ByEntityCondition.**UserDefinedValueCondition**                 |     ✔     |                                    |
+| ByEntityCondition.**TrafficSignalCondition**                    |     ✔     |                                    |
+| ByEntityCondition.**TrafficSignalControllerCondition**          |     ✔     |                                    |
 
 ## Limitations
 
 ### ParameterSetAction
 
 - Currently, ParameterSetAction cannot handle `dateTime` type parameters.
-
-### TrafficSignalStateAction
-
-- The signal ID must be listed in the TrafficSignal list of the RoadNetwork.
-  In the TierIV OpenSCENARIO implementation, it is the Lanelet ID (positive integer) of the traffic light.
 
 ### SpeedAction
 
