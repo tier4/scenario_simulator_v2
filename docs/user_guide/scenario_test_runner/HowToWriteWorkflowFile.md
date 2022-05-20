@@ -9,6 +9,7 @@ The workflow file defines how to execute scenarios and its expected results.
 | expect | string | no | Only success/failure/exception values are support. Scenario writers can define the scenarios should be end with expected results. | success | [example](#expect) |
 | step_time_ms | int | yes | step_time_ms describes the step time of the simulation in milliseconds. | 2 | [example](#step_time_ms) |
 
+[//]: # (TODO: resolve example link in step_time_ms raw)
 ## Examples of writing parameters
 ### path
 

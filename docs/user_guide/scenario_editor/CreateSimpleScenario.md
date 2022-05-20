@@ -8,7 +8,7 @@ You can launch a scenario editor and open a map by following steps.
 1. "MAP" on the menu -> Select "Load map"
 1. Select osm file (Lanelet2) and click "Import" button
 
-The map opens and you can see a screen like a following figure.
+The map opens, and you can see a screen like the following figure.
 ![](screenshot00.png)
 
 You can zoom in/out with mouse wheel on the map, move the map by dragging with right mouse button, and rotate the map by dragging with left mouse button. 

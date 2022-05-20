@@ -42,7 +42,7 @@ and change to;
                 - name: isEgo
                   value: "false"
 ```
-This is the setting to let Ego vehicle run without connecting to Autoware for testing the scenario. <font color="Red"> Please note that this "isEgo" setting is only for scenario testing and you will need to revert it to "true" when you conduct the actual scenario simulation with Autoware. </font>
+This is the setting to let Ego vehicle run without connecting to Autoware for testing the scenario. <font color="Red"> Please note that this "isEgo" setting is only for scenario testing, and you will need to revert it to "true" when you conduct the actual scenario simulation with Autoware. </font>
 
 ## How to Test Single Scenario
 ```bash

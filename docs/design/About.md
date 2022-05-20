@@ -10,7 +10,7 @@ This framework is designed for executing scenario tests with Autoware.
 
 ## Simple sensor simulator
 
-If you want to know about our very very simple lidar simulator, please read [this documentation](SimpleSensorSimulator.md).
+If you want to know about our very, very simple lidar simulator, please read [this documentation](SimpleSensorSimulator.md).
 
 ## Traffic simulator
 

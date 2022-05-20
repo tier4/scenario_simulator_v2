@@ -31,7 +31,7 @@ OpenSCENARIO:
 
 This block provides features to provide parameter distribution.
 
-The parameter "name" expresses a variable. It is not case-sensitive, but its attributes must be the lower snake case and it is converted to a variable in its list during parameter distribution.
+The parameter "name" expresses a variable. It is not case-sensitive, but its attributes must be the lower snake case, and it is converted to a variable in its list during parameter distribution.
 You can find more details in the test folder of the scenario_test_runner package.
 Three parameters, "start", "stop" and "step" express theirs varied ranges.
 Initial parameter distribution is from start to finish while increasing a value.
