@@ -8,7 +8,7 @@ Behavior plugin use pluginlib and plugin class should be inherited [this base cl
 Example of the behavior plugin class is below.
 
 ```C++
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2020 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

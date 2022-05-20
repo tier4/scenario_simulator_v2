@@ -1,10 +1,10 @@
-# TierIV Scenario Format version 2.0
+# TIER IV Scenario Format version 2.0
 
-## What is TierIV Scenario Format version 2.0
+## What is TIER IV Scenario Format version 2.0
 
-The "TierIV Scenario format version 2.0" is a yaml-based scenario description format.
+The "TIER IV Scenario format version 2.0" is a yaml-based scenario description format.
 
-"TierIV Scenario format version 2.0" consists of two blocks below:
+"TIER IV Scenario format version 2.0" consists of two blocks below:
 
 ```yaml
 ScenarioModifiers:
