@@ -206,10 +206,11 @@ void ScenarioSimulator::attachLidarSensor(
 }
 
 void ScenarioSimulator::attachOccupancyGridSensor(
-  const simulation_api_schema::AttachOccupancyGridSensorRequest & /*req*/,
+  const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
   simulation_api_schema::AttachOccupancyGridSensorResponse & res)
 {
   res = simulation_api_schema::AttachOccupancyGridSensorResponse();
+  sensor_sim_.attachOccupancyGridSensor(current_time_, req.configuration(), *this);
   res.mutable_result()->set_success(true);
 }
 
