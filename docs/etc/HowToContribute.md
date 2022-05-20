@@ -7,7 +7,7 @@ If you have any questions, please feel free to contact the [maintainers](Contact
 
 ## Before you get started
 
-To avoid duplicate work, please review current [issues](https://github.com/tier4/scenario_simulator_v2-docs/issues) and [pull requests](https://github.com/tier4/scenario_simulator_v2-docs/pulls).
+To avoid duplicate work, please review current [issues](https://github.com/tier4/scenario_simulator_v2/issues) and [pull requests](https://github.com/tier4/scenario_simulator_v2/pulls).
 
 ## Contribution workflow
 
@@ -48,26 +48,26 @@ Only maintainers create the `release/` branch.
 release/prepare_(version_tag)
 ```
 
-The release branches are used only to update the release notes. An example is [here](https://github.com/tier4/scenario_simulator_v2-docs/pull/477).
+The release branches are used only to update the release notes. An example is [here](https://github.com/tier4/scenario_simulator_v2/pull/477).
 
 ## Continuous integration
 
 Your changes proposed in your pull request will be tested automatically by the following checks:
 
-| Checks                                                                                                                                                                                                 | Description                                                        |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| [![ScenarioTest](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/ScenarioTest.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/ScenarioTest.yaml)    | Build all packages and run integration tests.                      |
-| [![BuildTest](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Build.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Build.yaml)                     | Build each package independently, run linters, and run unit tests. |
-| [![Docker](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Docker.yaml)                      | Build a docker image.                                              |
-| [![Documentation](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Documentation.yaml) | Build the documentation sites.                                     |
-| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/SpellCheck.yaml)          | Run a spell checker and add warnings to the PR.                    |
+| Checks                                                                                                                                                                                            | Description                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [![ScenarioTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/ScenarioTest.yaml) | Build all packages and run integration tests.                      |
+| [![BuildTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Build.yaml)           | Build each package independently, run linters, and run unit tests. |
+| [![Docker](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Docker.yaml)            | Build a docker image.                                              |
+| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Documentation.yaml) | Build the documentation sites.                                     |
+| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/SpellCheck.yaml) | Run a spell checker and add warnings to the PR.                    |
 
 If you contribute to the documentation, your changes should pass the checks below:
 
 | Checks                                                                                                                                                                                                 | Description                                     |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
-| [![Documentation](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Documentation.yaml) | Build the documentation sites.                  |
-| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/SpellCheck.yaml)          | Run a spell checker and add warnings to the PR. |
+| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Documentation.yaml) | Build the documentation sites.                  |
+| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/SpellCheck.yaml)     | Run a spell checker and add warnings to the PR. |
 
 ## Code review
 
