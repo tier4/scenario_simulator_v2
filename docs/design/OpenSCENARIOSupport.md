@@ -8,6 +8,7 @@ If you want to know about OpenSCENARIO, refer to the link below.
 - [OpenSCENARIO 1.0.0 XSD documentation](https://releases.asam.net/OpenSCENARIO/1.0.0/Model-Documentation/index.html)
 
 ## Specific Features
+
 ---
 
 ### ROS 2 Launch-like substitution syntax
@@ -45,7 +46,7 @@ These substitution syntaxes can be nested in any rank.
 The replacement is done from the inside to the outside of the nest.
 An example is shown below.
 
-``` XML
+```XML
   <ParameterDeclarations>
     <ParameterDeclaration name="map-name" parameterType="string" value="kashiwanoha"/>
   </ParameterDeclarations>
@@ -56,6 +57,7 @@ An example is shown below.
 ```
 
 ## Implementation Dependent Behaviors
+
 ---
 
 OpenSCENARIO has the function that the detailed behavior is left to the decision of the implementation side, which is defined as "subject of a contract between simulation environment provider and scenario author".
@@ -75,6 +77,7 @@ In our interpreter, the names of the Element and Parameter are lexically scoped.
 ### CustomCommandAction
 
 This Action is specified in the standard as follows.
+
 > Used to either issue a command to the simulation environment or start an external script. Allows the user to activate custom actions in their simulation tool.
 
 For OpenSCENARIO interpreters implemented in scripting languages such as Python, this Action is often implemented as a call to an external script file written in the same language as the host language.
@@ -82,7 +85,8 @@ However, our interpreter is implemented in C++ and we cannot simply implement su
 Therefore, our interpreter treats the string given in CustomCommandAction.type as a command and executes it on a subprocess, as `sh` does.
 
 For example, the `echo` command can be written as follows:
-``` XML
+
+```XML
   <UserDefinedAction>
     <CustomCommandAction type="echo">Hello, world!</CustomCommandAction>
   </UserDefinedAction>
@@ -91,13 +95,13 @@ For example, the `echo` command can be written as follows:
 The string given to attribute `type` of CustomCommandAction and the string given to its content are concatenated with whitespace and passed to the subprocess.
 Therefore, the following two cases have the same effect.
 
-``` XML
+```XML
   <UserDefinedAction>
     <CustomCommandAction type="echo">Hello, world"</CustomCommandAction>
   </UserDefinedAction>
 ```
 
-``` XML
+```XML
   <UserDefinedAction>
     <CustomCommandAction type="echo Hello, world!"/>
   </UserDefinedAction>
@@ -113,7 +117,7 @@ Therefore, if you call a command that has a destructive effect on the system, th
 In particular, the following usages that achieve "do nothing action" are worth special mention.
 Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh` command is known by the name of the null-command.
 
-``` XML
+```XML
   <UserDefinedAction>
     <CustomCommandAction type=":"/>
   </UserDefinedAction>
@@ -121,8 +125,8 @@ Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh` co
 
 #### Built-in commands
 
-| Name        | Effect |
-|:------------|:-------|
+| Name        | Effect                                               |
+| :---------- | :--------------------------------------------------- |
 | exitSuccess | Immediately terminates the simulation as successful. |
 | exitFailure | Immediately terminates the simulation as a failure.  |
 
@@ -136,12 +140,13 @@ The terminated scenario determines the final success / failure / error by collat
 The following built-in commands are debug commands for interpreter developers, not scenario creators.
 It is unlikely that you will need these commands for normal scenario creation.
 
-| Name    | Effect |
-|:--------|:-------|
+| Name    | Effect                                                                                            |
+| :------ | :------------------------------------------------------------------------------------------------ |
 | error   | Generate internal error: Used to ensure that the simulator does not crash with an internal error. |
-| sigsegv | Access a null pointer: Used to make sure the simulator does not crash with an internal error. |
+| sigsegv | Access a null pointer: Used to make sure the simulator does not crash with an internal error.     |
 
 ## Non-Standard Extensions
+
 ---
 
 ### Success/failure judgment
@@ -152,6 +157,7 @@ Note that "error" means a flaw in the scenario, such as a syntax error, or an in
 In such cases, you will be notified of a "failure".
 
 ## Supporting Status
+
 ---
 
 Our OpenSCENARIO Interpreter does not currently support the full range of
@@ -159,64 +165,69 @@ OpenSCENARIO standards.
 
 ### Actions
 
-| Name                                                                                    | Status      | Limitations
-|:----------------------------------------------------------------------------------------|:-----------:|:------------
-| GlobalAction.**EnvironmentAction**                                                      | Unsupported |
-| GlobalAction.EntityAction.**AddEntityAction**                                           | Unsupported |
-| GlobalAction.EntityAction.**DeleteEntityAction**                                        | Unsupported |
-| GlobalAction.ParameterAction.**ParameterSetAction**                                     | ✔           | See [here](#parametersetaction)
-| GlobalAction.ParameterAction.**ParameterModifyAction**                                  | ✔           | No
-| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalControllerAction** | Unsupported |
-| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalStateAction**      | Unsupported |
-| GlobalAction.TrafficAction.**TrafficSourceAction**                                      | Unsupported |
-| GlobalAction.TrafficAction.**TrafficSinkAction**                                        | Unsupported |
-| GlobalAction.TrafficAction.**TrafficSwarmAction**                                       | Unsupported |
-| UserDefinedAction.**CustomCommandAction**                                               | ✔           | No
-| PrivateAction.LongitudinalAction.**SpeedAction**                                        | ✔           | See [here](#speedaction)
-| PrivateAction.LongitudinalAction.**LongitudinalDistanceAction**                         | Unsupported |
-| PrivateAction.LateralAction.**LaneChangeAction**                                        | ✔           | See [here](#lanechangeaction)
-| PrivateAction.LateralAction.**LaneOffsetAction**                                        | Unsupported |
-| PrivateAction.LateralAction.**LateralDistanceAction**                                   | Unsupported |
-| PrivateAction.**VisibilityAction**                                                      | Unsupported |
-| PrivateAction.**SynchronizeAction**                                                     | Unsupported |
-| PrivateAction.**ActivateControllerAction**                                              | Unsupported |
-| PrivateAction.ControllerAction.**AssignControllerAction**                               | Unsupported |
-| PrivateAction.ControllerAction.**OverrideControllerAction**                             | Unsupported |
-| PrivateAction.**TeleportAction**                                                        | ✔           | See [here](#teleportaction)
-| PrivateAction.RoutingAction.**AssignRouteAction**                                       | Unsupported |
-| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  | Unsupported |
-| PrivateAction.RoutingAction.**AcquirePositionAction**                                   | ✔           | See [here](#acquirepositionaction)
+| Name                                                                                          |   Status   | Limitations                    |
+| :-------------------------------------------------------------------------------------------- | :---------: | :----------------------------- |
+| GlobalAction.**EnvironmentAction**                                                      | Unsupported |                                |
+| GlobalAction.EntityAction.**AddEntityAction**                                           |     ✔     |                                |
+| GlobalAction.EntityAction.**DeleteEntityAction**                                        |     ✔     |                                |
+| GlobalAction.ParameterAction.**ParameterSetAction**                                     |     ✔     | See[here](#parametersetaction)    |
+| GlobalAction.ParameterAction.**ParameterModifyAction**                                  |     ✔     | No                             |
+| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalControllerAction** |     ✔     |                                |
+| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalStateAction**      |     ✔     |                                |
+| GlobalAction.TrafficAction.**TrafficSourceAction**                                      | Unsupported |                                |
+| GlobalAction.TrafficAction.**TrafficSinkAction**                                        | Unsupported |                                |
+| GlobalAction.TrafficAction.**TrafficSwarmAction**                                       | Unsupported |                                |
+| UserDefinedAction.**CustomCommandAction**                                               |     ✔     | No                             |
+| PrivateAction.LongitudinalAction.**SpeedAction**                                        |     ✔     | See[here](#speedaction)           |
+| PrivateAction.LongitudinalAction.**LongitudinalDistanceAction**                         | Unsupported |                                |
+| PrivateAction.LateralAction.**LaneChangeAction**                                        |     ✔     | See[here](#lanechangeaction)      |
+| PrivateAction.LateralAction.**LaneOffsetAction**                                        | Unsupported |                                |
+| PrivateAction.LateralAction.**LateralDistanceAction**                                   | Unsupported |                                |
+| PrivateAction.**VisibilityAction**                                                      | Unsupported |                                |
+| PrivateAction.**SynchronizeAction**                                                     | Unsupported |                                |
+| PrivateAction.**ActivateControllerAction**                                              | Unsupported |                                |
+| PrivateAction.ControllerAction.**AssignControllerAction**                               |     ✔     |                                |
+| PrivateAction.ControllerAction.**OverrideControllerAction**                             | Unsupported |                                |
+| PrivateAction.**TeleportAction**                                                        |     ✔     | See[here](#teleportaction)        |
+| PrivateAction.RoutingAction.**AssignRouteAction**                                       |     ✔     |                                |
+| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  | Unsupported |                                |
+| PrivateAction.RoutingAction.**AcquirePositionAction**                                   |     ✔     | See[here](#acquirepositionaction) |
 
 ### Conditions
 
-| Name                                                                    | Status      | Limitations
-|:------------------------------------------------------------------------|:-----------:|:------------
-| ByEntityCondition.EntityCondition.**EndOfRoadCondition**                | Unsupported |
-| ByEntityCondition.EntityCondition.**CollisionCondition**                | ✔           | See [here](#collisioncondition)
-| ByEntityCondition.EntityCondition.**OffroadCondition**                  | Unsupported |
-| ByEntityCondition.EntityCondition.**TimeHeadwayCondition**              | ✔           | See [here](#timeheadwaycondition)
-| ByEntityCondition.EntityCondition.**TimeToCollisionCondition**          | Unsupported |
-| ByEntityCondition.EntityCondition.**AccelerationCondition**             | ✔           | No
-| ByEntityCondition.EntityCondition.**StandStillCondition**               | ✔           | No
-| ByEntityCondition.EntityCondition.**SpeedCondition**                    | ✔           | No
-| ByEntityCondition.EntityCondition.**RelativeSpeedCondition**            | Unsupported |
-| ByEntityCondition.EntityCondition.**TraveledDistanceCondition**         | Unsupported |
-| ByEntityCondition.EntityCondition.**ReachPositionCondition**            | ✔           | See [here](#reachpositioncondition)
-| ByEntityCondition.EntityCondition.**DistanceCondition**                 | ✔           | See [here](#distancecondition)
-| ByEntityCondition.EntityCondition.**RelativeDistanceCondition**         | ✔           | See [here](#relativedistancecondition)
-| ByEntityCondition.**ParameterCondition**                                | ✔           |
-| ByEntityCondition.**TimeOfDayCondition**                                | Unsupported |
-| ByEntityCondition.**SimulationTimeCondition**                           | ✔           | No
-| ByEntityCondition.**StoryboardElementStateCondition**                   | ✔           | See [here](#storyboardelementstatecondition)
-| ByEntityCondition.**UserDefinedValueCondition**                         | Unsupported |
-| ByEntityCondition.**TrafficSignalCondition**                            | Unsupported |
-| ByEntityCondition.**TrafficSignalControllerCondition**                  | Unsupported |
+| Name                                                                  |   Status   | Limitations                        |
+| :-------------------------------------------------------------------- | :---------: | :--------------------------------- |
+| ByEntityCondition.EntityCondition.**EndOfRoadCondition**        | Unsupported |                                    |
+| ByEntityCondition.EntityCondition.**CollisionCondition**        |     ✔     | See[here](#collisioncondition)        |
+| ByEntityCondition.EntityCondition.**OffroadCondition**          | Unsupported |                                    |
+| ByEntityCondition.EntityCondition.**TimeHeadwayCondition**      |     ✔     | See[here](#timeheadwaycondition)      |
+| ByEntityCondition.EntityCondition.**TimeToCollisionCondition**  | Unsupported |                                    |
+| ByEntityCondition.EntityCondition.**AccelerationCondition**     |     ✔     | No                                 |
+| ByEntityCondition.EntityCondition.**StandStillCondition**       |     ✔     | No                                 |
+| ByEntityCondition.EntityCondition.**SpeedCondition**            |     ✔     | No                                 |
+| ByEntityCondition.EntityCondition.**RelativeSpeedCondition**    | Unsupported |                                    |
+| ByEntityCondition.EntityCondition.**TraveledDistanceCondition** | Unsupported |                                    |
+| ByEntityCondition.EntityCondition.**ReachPositionCondition**    |     ✔     | See[here](#reachpositioncondition)    |
+| ByEntityCondition.EntityCondition.**DistanceCondition**         |     ✔     | See[here](#distancecondition)         |
+| ByEntityCondition.EntityCondition.**RelativeDistanceCondition** |     ✔     | See[here](#relativedistancecondition) |
+| ByEntityCondition.**ParameterCondition**                        |     ✔     |                                    |
+| ByEntityCondition.**TimeOfDayCondition**                        | Unsupported |                                    |
+| ByEntityCondition.**SimulationTimeCondition**                   |     ✔     | No                                 |
+| ByEntityCondition.**StoryboardElementStateCondition**           |     ✔     | See[here]()                           |
+| ByEntityCondition.**UserDefinedValueCondition**                 | Unsupported |                                    |
+| ByEntityCondition.**TrafficSignalCondition**                    | Unsupported |                                    |
+| ByEntityCondition.**TrafficSignalControllerCondition**          | Unsupported |                                    |
 
 ## Limitations
 
 ### ParameterSetAction
 
 - Currently, ParameterSetAction cannot handle `dateTime` type parameters.
+
+### TrafficSignalStateAction
+
+- The signal ID must be listed in the TrafficSignal list of the RoadNetwork.
+  In the TierIV OpenSCENARIO implementation, it is the Lanelet ID (positive integer) of the traffic light.
 
 ### SpeedAction
 
@@ -270,45 +281,45 @@ See also section [Scoping](#scoping).
 
 - The implementation of type [DynamicsShape](#dynamicsshape) for attribute dynamicsShape is incomplete.
 
-| Name              | Type                            | Status
-|:------------------|:--------------------------------|:------:
-| dynamicsShape     | [DynamicsShape](#dynamicsshape) | Incomplete
-| value             | Double                          | ✔
-| dynamicsDimension | DynamicsDimension               | ✔
+| Name              | Type                         |   Status   |
+| :---------------- | :--------------------------- | :--------: |
+| dynamicsShape     | [DynamicsShape](#dynamicsshape) | Incomplete |
+| value             | Double                       |     ✔     |
+| dynamicsDimension | DynamicsDimension            |     ✔     |
 
 ### DynamicsShape
 
 - Currently, only `linear` and `step` are implemented for values of this enumeration.
   If you specify `cubic` and `sinusoidal`, you will get an ImplementationFault.
 
-| Value      | Status      |
-|:-----------|:-----------:|
-| linear     | ✔           |
+| Value      |   Status   |
+| :--------- | :---------: |
+| linear     |     ✔     |
 | cubic      | Unsupported |
 | sinusoidal | Unsupported |
-| step       | ✔           |
+| step       |     ✔     |
 
 ### LaneChangeTarget
 
 - Currently, only AbsoluteTargetLane is implemented for element of this type.
   If you specify RelativeTargetLane, you will get a SyntaxError.
 
-| Element            | Status      |
-|:-------------------|:-----------:|
-| AbsoluteTargetLane | ✔           |
+| Element            |   Status   |
+| :----------------- | :---------: |
+| AbsoluteTargetLane |     ✔     |
 | RelativeTargetLane | Unsupported |
 
 ### Position
 
 - Currently, only WorldPosition and LanePosition are implemented for an element of this type.
 
-| Element                | Status      |
-|:-----------------------|:-----------:|
-| WorldPosition          | ✔           |
+| Element                |   Status   |
+| :--------------------- | :---------: |
+| WorldPosition          |     ✔     |
 | RelativeWorldPosition  | Unsupported |
 | RelativeObjectPosition | Unsupported |
 | RoadPosition           | Unsupported |
 | RelativeRoadPosition   | Unsupported |
-| LanePosition           | ✔           |
+| LanePosition           |     ✔     |
 | RelativeLanePosition   | Unsupported |
 | RoutePosition          | Unsupported |
