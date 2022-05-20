@@ -65,6 +65,24 @@ public:
     }
   }
 
+  auto attachOccupancyGridSensor(
+    const double current_simulation_time,
+    const simulation_api_schema::OccupancyGridSensorConfiguration & configuration,
+    rclcpp::Node & node) -> void
+  {
+    if (configuration.architecture_type() == "awf/universe") {
+      using Message = nav_msgs::msg::OccupancyGrid;
+      occupancy_grid_sensors_.push_back(std::make_unique<OccupancyGridSensor<Message>>(
+        current_simulation_time, configuration,
+        node.create_publisher<Message>("/perception/occupancy_grid_map/map", 1)));
+    } else {
+      std::stringstream ss;
+      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
+         << " given.";
+      throw std::runtime_error(ss.str());
+    }
+  }
+
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,
     const std::vector<traffic_simulator_msgs::EntityStatus> & status);

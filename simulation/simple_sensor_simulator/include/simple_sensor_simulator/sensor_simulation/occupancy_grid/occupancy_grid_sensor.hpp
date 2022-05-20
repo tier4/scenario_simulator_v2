@@ -79,7 +79,7 @@ public:
   {
     if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
       last_update_stamp_ = current_time;
-      publisher_ptr_->publish(getOccupancyGrid(status, stamp));
+      publisher_ptr_->publish(getOccupancyGrid(status, stamp, lidar_detected_entity));
     } else {
       detected_objects_ = {};
     }
