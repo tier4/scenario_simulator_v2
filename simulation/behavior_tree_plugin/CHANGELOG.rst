@@ -2,6 +2,63 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.4 (2022-04-26)
+------------------
+* Merge pull request `#762 <https://github.com/tier4/scenario_simulator_v2/issues/762>`_ from tier4/fix/email
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* fix email address
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge pull request `#740 <https://github.com/tier4/scenario_simulator_v2/issues/740>`_ from tier4/refactor/traffic_simulator/traffic_light_manager
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#751 <https://github.com/tier4/scenario_simulator_v2/issues/751>`_ from tier4/feature/behavior_request_enum
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Switch struct `TrafficLight` to experimental version
+* change data type
+* modify reset request
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/behavior_request_enum
+* Merge branch 'feature/behavior_request_enum' into feature/reset_acecel_in_request_speed_change
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/job_system
+* fix compile errors
+* use enum
+* Merge pull request `#747 <https://github.com/tier4/scenario_simulator_v2/issues/747>`_ from tier4/fix/calculate_stop_distance
+* apply reformat
+* fix compile errors
+* fix calculateStopDistance function
+* Merge branch 'master' into fix/interpreter/interrupt
+* Remove member function `TrafficLightManager::get(Arrow|Color)`
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/object-controller
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/improve_ego_lane_matching
+* Merge pull request `#708 <https://github.com/tier4/scenario_simulator_v2/issues/708>`_ from RobotecAI/AJD-331-optimization
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/improve_ego_lane_matching
+* Merge pull request `#734 <https://github.com/tier4/scenario_simulator_v2/issues/734>`_ from tier4/fix/interpreter/global-action
+* Remove unnecessary prints from the interpreter and simulator
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* review changes: common_spline -> reference_trajectory
+* Merge branch 'master' into AJD-331-optimization
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* fix build warnings
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* clang format
+* remove spline recalculation in calculateObstacle()
+* remove spline recalculation in calculateWaypoints()
+* calculate and pass common_spline
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
 0.6.3 (2022-03-09)
 ------------------
 * Merge pull request `#714 <https://github.com/tier4/scenario_simulator_v2/issues/714>`_ from tier4/fix/get_longitudinal_distance

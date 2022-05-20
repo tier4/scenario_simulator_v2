@@ -21,6 +21,7 @@
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
+#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
@@ -67,6 +68,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
+  using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
@@ -74,6 +76,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
+  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
@@ -121,6 +124,7 @@ public:
     CONCEALER_INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
+    CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
@@ -170,5 +174,14 @@ public:
   auto update() -> void override;
 };
 }  // namespace concealer
+
+// for boost::lexical_cast
+namespace autoware_auto_system_msgs::msg
+{
+auto operator<<(std::ostream &, const autoware_auto_system_msgs::msg::EmergencyState &)
+  -> std::ostream &;
+
+auto operator>>(std::istream &, autoware_auto_system_msgs::msg::EmergencyState &) -> std::istream &;
+}  // namespace autoware_auto_system_msgs::msg
 
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_

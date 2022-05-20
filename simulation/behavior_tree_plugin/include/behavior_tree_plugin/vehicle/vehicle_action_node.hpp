@@ -22,6 +22,7 @@
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
+#include <traffic_simulator/math/catmull_rom_subspline.hpp>
 #include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
@@ -62,6 +63,7 @@ protected:
   traffic_simulator_msgs::msg::DriverModel driver_model;
   traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
   std::shared_ptr<traffic_simulator::math::CatmullRomSpline> reference_trajectory;
+  std::unique_ptr<traffic_simulator::math::CatmullRomSubspline> trajectory;
 };
 }  // namespace entity_behavior
 

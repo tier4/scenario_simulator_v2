@@ -105,21 +105,25 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
     std::vector<geometry_msgs::msg::Point> ret;
     resolution = std::fabs(resolution);
     double s = start_s;
-    while (s >= end_s) {
+    while (s > end_s) {
       auto p = getPoint(s, offset);
       ret.emplace_back(p);
       s = s - resolution;
     }
+    auto p = getPoint(end_s);
+    ret.emplace_back(p);
     return ret;
   } else {
     std::vector<geometry_msgs::msg::Point> ret;
     resolution = std::fabs(resolution);
     double s = start_s;
-    while (s <= end_s) {
+    while (s < end_s) {
       auto p = getPoint(s, offset);
       ret.emplace_back(p);
       s = s + resolution;
     }
+    auto p = getPoint(end_s);
+    ret.emplace_back(p);
     return ret;
   }
 }
@@ -131,7 +135,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   if (control_points.size() <= 2) {
     THROW_SEMANTIC_ERROR(
       control_points.size(),
-      " control points are only exists. At minimum, 2 control points are required");
+      " control points are only exists. At minimum, 3 control points are required");
   }
   for (size_t i = 0; i < n; i++) {
     if (i == 0) {

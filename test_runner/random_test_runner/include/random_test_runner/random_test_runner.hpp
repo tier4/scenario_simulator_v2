@@ -43,7 +43,6 @@ private:
 
   static TestSuiteParameters validateParameters(
     const TestSuiteParameters & test_parameters, std::shared_ptr<LaneletUtils> hdmap_utils);
-  static SimulatorType simulatorTypeFromString(const std::string & simulator_type_str);
 
   void update();
   void start();

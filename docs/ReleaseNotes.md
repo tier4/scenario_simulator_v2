@@ -4,6 +4,26 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+## Version 0.6.4
+
+Major Changes :race_car: :red_car: :blue_car:
+
 | Feature                                       | Brief summary                                                                                                                                                            | Category                                                          | Pull request                                                    | Contributor                                   |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
 | Entity label publisher                        | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`.                                                                                | `traffic_simulator`                                               | [#726](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
@@ -16,6 +36,7 @@ Major Changes :race_car: :red_car: :blue_car:
 | Traffic signals                               | Support for multiple simultaneous lights at traffic signals and addition of color information to arrow signals.                                                          | `openscenario_interpreter`, `traffic_simulator`                   | [#740](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
 | Reset acceleration after speed was changed    | reset acceleration and deceleration only while speed change was enabled.                                                                                                 | `traffic_simulator`                                               | [#752](https://github.com/tier4/scenario_simulator_v2/pull/752) | [hakuturu583](https://github.com/hakuturu583) |
 | Traffic signals                               | Thereafter, a Lanelet ID that can be interpreted as either a relation ID or a way ID is treated as a relation ID.                                                        | `traffic_simulator`                                               | [#759](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Optimization of the trajectory calculation    | Calculate a segment of trajectory spline instead of recalculating it from scratch                                                                                        | `traffic_simulator`, `behavior_tree_plugin`                       | [#710](https://github.com/tier4/scenario_simulator_v2/pull/710) | [danielm1405](https://github.com/danielm1405) |
 
 Bug Fixes:bug:
 

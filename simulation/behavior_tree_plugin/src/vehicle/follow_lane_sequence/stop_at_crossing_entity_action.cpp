@@ -16,7 +16,6 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <utility>
 #include <vector>
 
@@ -42,7 +41,7 @@ StopAtCrossingEntityAction::calculateObstacle(const traffic_simulator_msgs::msg:
   if (distance_to_stop_target_.get() < 0) {
     return boost::none;
   }
-  if (distance_to_stop_target_.get() > reference_trajectory->getLength()) {
+  if (distance_to_stop_target_.get() > trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -61,6 +60,9 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::ca
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
       entity_status.lanelet_pose.offset);
+    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSubspline>(
+      reference_trajectory, entity_status.lanelet_pose.s,
+      entity_status.lanelet_pose.s + getHorizon());
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -109,11 +111,12 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
-  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, spline);
-  auto distance_to_stopline =
-    hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-  const auto distance_to_front_entity = getDistanceToFrontEntity(spline);
+  if (trajectory == nullptr) {
+    return BT::NodeStatus::FAILURE;
+  }
+  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, *trajectory);
+  auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
+  const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stop_target_) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
