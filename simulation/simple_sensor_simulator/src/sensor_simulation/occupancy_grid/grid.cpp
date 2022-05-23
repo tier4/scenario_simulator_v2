@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 namespace simple_sensor_simulator
 {
@@ -49,10 +50,10 @@ std::vector<GridCell> Grid::getCell(
         geometry_msgs::msg::Point origin;
         origin.x = w - 0.5 * width;
         origin.y = h - 0.5 * height;
-        double x_min_cell = (origin.x - 0.5) * resolution;
-        double y_min_cell = (origin.y - 0.5) * resolution;
-        double x_max_cell = (origin.x + 0.5) * resolution;
-        double y_max_cell = (origin.y + 0.5) * resolution;
+        double x_min_cell = (origin.x - 0.5) * resolution + sensor_pose.position.x;
+        double y_min_cell = (origin.y - 0.5) * resolution + sensor_pose.position.y;
+        double x_max_cell = (origin.x + 0.5) * resolution + sensor_pose.position.x;
+        double y_max_cell = (origin.y + 0.5) * resolution + sensor_pose.position.y;
         if (
           x_min_cell <= x_max && x_max <= x_max_cell && y_min_cell <= y_max &&
           y_max <= y_max_cell) {
