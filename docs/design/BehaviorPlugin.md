@@ -123,7 +123,7 @@ Setters are named as set(Foo), such as `BehaviorPluginClass::setCurrentTime(doub
 | GoalPoses            | Goal poses of entity.                                 | `std::vector<geometry_msgs::msg::Pose>`                      |
 | HdMapUtils           | Shared pointer of HdMapUtils class.                   | `std::shared_ptr<hdmap_utils::HdMapUtils>`                   |
 | Obstacle             | Target obstacle of your NPC.                          | `boost::optional<traffic_simulator_msgs::msg::Obstacle>`     |
-| OtherEntityStatus    | Dictionary of other entity status.                     | `EntityStatusDict`                                           |
+| OtherEntityStatus    | Dictionary of other entity status.                    | `EntityStatusDict`                                           |
 | PedestrianParameters | Entity parameters for pedestrian.                     | `traffic_simulator_msgs::msg::PedestrianParameters`          |
 | Request              | Request to the NPC you want to control                | `std::string`                                                |
 | RouteLanelets        | Lanelet ids on entity route                           | `std::vector<std::int64_t>`                                  |
