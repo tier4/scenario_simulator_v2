@@ -40,12 +40,17 @@ StoryboardElementStateCondition::StoryboardElementStateCondition(
      is called. The In other words, the StoryboardElement may immediately
      transition to the next state after calling the callback function.
   */
-  local()
-    .ref<StoryboardElement>(storyboard_element_ref)
-    .callbacks[state]
-    .emplace_back([this](auto && storyboard_element) {
-      current_state = storyboard_element.state().template as<StoryboardElementState>();
-    });
+
+  auto register_callback = [this]() {
+    local()
+      .ref<StoryboardElement>(storyboard_element_ref)
+      .callbacks[state]
+      .emplace_back([this](auto && storyboard_element) {
+        current_state = storyboard_element.state().template as<StoryboardElementState>();
+      });
+  };
+
+  StoryboardElement::callback_registrations.push_back(register_callback);
 }
 
 auto StoryboardElementStateCondition::description() const -> String

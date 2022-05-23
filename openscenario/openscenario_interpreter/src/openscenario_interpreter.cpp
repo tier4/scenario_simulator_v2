@@ -115,6 +115,8 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
 
+      StoryboardElement::callback_registrations.clear();  // DIRTY HACK!!!
+
       script = std::make_shared<OpenScenario>(osc_path);
 
       if (script->category.is<ScenarioDefinition>()) {

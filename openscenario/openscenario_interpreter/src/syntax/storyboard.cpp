@@ -45,6 +45,10 @@ auto Storyboard::run() -> void
 
 auto Storyboard::start() -> void
 {
+  for (auto && register_callback : StoryboardElement::callback_registrations) {
+    register_callback();
+  }
+
   auto everyone_engageable = [this]() {
     return std::all_of(
       std::cbegin(global().entities), std::cend(global().entities), [&](const auto & each) {
