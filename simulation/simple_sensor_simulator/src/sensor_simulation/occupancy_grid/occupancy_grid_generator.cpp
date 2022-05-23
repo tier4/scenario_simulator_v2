@@ -29,7 +29,7 @@ nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
   nav_msgs::msg::OccupancyGrid occupancy_grid;
   occupancy_grid.header.stamp = stamp;
   occupancy_grid.header.frame_id = "map";
-  occupancy_grid.data = std::vector<int8_t>(configuration.height() * configuration.width());
+  occupancy_grid.data = std::vector<int8_t>(configuration.height() * configuration.width(), 0);
   occupancy_grid.info.height = configuration.height();
   occupancy_grid.info.width = configuration.width();
   occupancy_grid.info.map_load_time = stamp;
@@ -40,7 +40,9 @@ nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
   occupancy_grid.info.origin.position.y = occupancy_grid.info.origin.position.y -
                                           0.5 * configuration.width() * configuration.resolution();
   for (const auto & primitive : primitive_ptrs_) {
-    grid_.getCell(primitive.second, ego_pose);
+    for (const auto & cell : grid_.getCell(primitive.second, ego_pose)) {
+      occupancy_grid.data[cell.index] = 50;
+    }
   }
   return occupancy_grid;
 }

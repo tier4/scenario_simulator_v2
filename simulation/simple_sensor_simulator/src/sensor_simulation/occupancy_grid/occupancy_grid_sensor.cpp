@@ -79,7 +79,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   for (const auto & s : status) {
     if (configuration_.entity() != s.name()) {
       auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
-      if (result != detected_objects.end()) {
+      if (result == detected_objects.end()) {
         continue;
       }
       geometry_msgs::msg::Pose pose;
