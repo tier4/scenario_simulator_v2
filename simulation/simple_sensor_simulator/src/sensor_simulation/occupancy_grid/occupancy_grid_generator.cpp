@@ -34,7 +34,9 @@ nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
   occupancy_grid.info.width = configuration.width();
   occupancy_grid.info.map_load_time = stamp;
   occupancy_grid.info.resolution = configuration.resolution();
-  occupancy_grid.info.origin = ego_pose;
+  occupancy_grid.info.origin = ego_pose
+  occupancy_grid.info.origin.position.x = occupancy_grid.info.origin.position.x - 0.5 * configuration.height() * configuration.resolution();
+  occupancy_grid.info.origin.position.y = occupancy_grid.info.origin.position.y - 0.5 * configuration.width() * configuration.resolution();
   for (const auto & primitive : primitive_ptrs_) {
     grid_.getCell(primitive.second, ego_pose);
   }
