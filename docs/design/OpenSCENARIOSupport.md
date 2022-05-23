@@ -171,6 +171,7 @@ OpenSCENARIO standards.
 | GlobalAction.TrafficAction.**TrafficSourceAction**                                      | Unsupported |                                    |
 | GlobalAction.TrafficAction.**TrafficSinkAction**                                        | Unsupported |                                    |
 | GlobalAction.TrafficAction.**TrafficSwarmAction**                                       | Unsupported |                                    |
+| GlobalAction.TrafficAction.**TrafficStopAction**                                        | Unsupported |                                    |
 | UserDefinedAction.**CustomCommandAction**                                               |      ✔      | No                                 |
 | PrivateAction.LongitudinalAction.**SpeedAction**                                        |      ✔      | See [here](#speedaction)           |
 | PrivateAction.LongitudinalAction.**LongitudinalDistanceAction**                         | Unsupported |                                    |
@@ -181,7 +182,8 @@ OpenSCENARIO standards.
 | PrivateAction.**SynchronizeAction**                                                     | Unsupported |                                    |
 | PrivateAction.**ActivateControllerAction**                                              | Unsupported |                                    |
 | PrivateAction.ControllerAction.**AssignControllerAction**                               |      ✔      |                                    |
-| PrivateAction.ControllerAction.**OverrideControllerAction**                             | Unsupported |                                    |
+| PrivateAction.ControllerAction.**ActivateControllerAction**                             | Unsupported |                                    |
+| PrivateAction.ControllerAction.**OverrideControllerValueAction**                        | Unsupported |                                    |
 | PrivateAction.**TeleportAction**                                                        |      ✔      | See [here](#teleportaction)        |
 | PrivateAction.RoutingAction.**AssignRouteAction**                                       |      ✔      |                                    |
 | PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  | Unsupported |                                    |
