@@ -224,8 +224,9 @@ RENAME(applyDeleteEntityAction, despawn);
 RENAME(applyLaneChangeAction, requestLaneChange);
 RENAME(applyTeleportAction, setEntityStatus);
 RENAME(applyWalkStraightAction, requestWalkStraight);
-RENAME(evaluateCurrentEmergencyState, getEmergencyStateString);
+RENAME(evaluateCurrentEmergencyState, getEmergencyStateName);
 RENAME(evaluateCurrentState, getCurrentAction);
+RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandName);
 RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(toWorldPosition, toMapPose);
 
