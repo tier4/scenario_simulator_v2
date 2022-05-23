@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/assign_controller_action.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <pugixml.hpp>
 

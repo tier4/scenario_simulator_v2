@@ -67,20 +67,6 @@ auto CustomCommandAction::applyFaultInjectionAction(
   return events.size();
 }
 
-auto CustomCommandAction::applyWalkStraightAction(
-  const std::vector<std::string> & actors, const Scope & scope) -> int
-{
-  for (const auto & actor : actors) {
-    openscenario_interpreter::applyWalkStraightAction(actor);
-  }
-
-  for (const auto & actor : scope.actors) {
-    openscenario_interpreter::applyWalkStraightAction(actor);
-  }
-
-  return scope.actors.size();
-}
-
 auto CustomCommandAction::debugError(const std::vector<std::string> &, const Scope &) -> int
 {
   throw Error(__FILE__, ":", __LINE__);
@@ -133,11 +119,24 @@ auto CustomCommandAction::split(const std::string & s) -> std::vector<std::strin
 
 auto CustomCommandAction::start() const -> void
 {
+  auto apply_walk_straight_action =
+    [this](const std::vector<std::string> & actors, const Scope & scope) {
+      for (const auto & actor : actors) {
+        applyWalkStraightAction(actor);
+      }
+
+      for (const auto & actor : scope.actors) {
+        applyWalkStraightAction(actor);
+      }
+
+      return scope.actors.size();
+    };
+
   static const std::unordered_map<
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
     commands{
       std::make_pair("FaultInjectionAction", applyFaultInjectionAction),
-      std::make_pair("WalkStraightAction", applyWalkStraightAction),
+      std::make_pair("WalkStraightAction", apply_walk_straight_action),
       std::make_pair("debugError", debugError),
       std::make_pair("debugSegmentationFault", debugSegmentationFault),  // DEPRECATED
       std::make_pair("exitFailure", exitFailure),

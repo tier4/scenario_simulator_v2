@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
 
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
 
@@ -32,7 +33,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AssignRouteAction : private Scope
+struct AssignRouteAction : private Scope, private SimulatorCore::ActionApplication
 {
   Object route;
 

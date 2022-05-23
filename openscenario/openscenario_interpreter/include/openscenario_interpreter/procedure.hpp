@@ -89,6 +89,36 @@ public:
     {
       return connection->spawn(std::forward<decltype(xs)>(xs)...);
     }
+
+    template <typename... Ts>
+    static auto applyAssignRouteAction(Ts &&... xs)
+    {
+      return connection->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto applyDeleteEntityAction(Ts &&... xs)
+    {
+      return connection->despawn(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto applyLaneChangeAction(Ts &&... xs)
+    {
+      return connection->requestLaneChange(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto applyTeleportAction(Ts &&... xs)
+    {
+      return connection->setEntityStatus(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto applyWalkStraightAction(Ts &&... xs)
+    {
+      return connection->requestWalkStraight(std::forward<decltype(xs)>(xs)...);
+    }
   };
 
   class ConditionEvaluation  // OpenSCENARIO 1.1.1 Section 3.1.5
@@ -219,11 +249,6 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 // NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
 
 RENAME(applyAssignControllerAction, setDriverModel);
-RENAME(applyAssignRouteAction, requestAssignRoute);
-RENAME(applyDeleteEntityAction, despawn);
-RENAME(applyLaneChangeAction, requestLaneChange);
-RENAME(applyTeleportAction, setEntityStatus);
-RENAME(applyWalkStraightAction, requestWalkStraight);
 RENAME(evaluateCurrentEmergencyState, getEmergencyStateName);
 RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandName);

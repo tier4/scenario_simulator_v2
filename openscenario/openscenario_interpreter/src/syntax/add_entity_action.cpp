@@ -56,7 +56,7 @@ try {
               ? traffic_simulator::VehicleBehavior::autoware()
               : traffic_simulator::VehicleBehavior::defaultBehavior())) {
         TeleportAction::teleport(entity_ref, position);
-        entity.as<ScenarioObject>().object_controller.assign(entity_ref);
+        AssignControllerAction(entity.as<ScenarioObject>().object_controller)(entity_ref);
         entity.as<ScenarioObject>().activateSensors();
         entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
       }

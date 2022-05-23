@@ -53,8 +53,6 @@ struct Controller : public Scope
 
   explicit Controller(const pugi::xml_node &, Scope &);
 
-  auto assign(const EntityRef &) -> void;
-
   auto isUserDefinedController() const & -> bool;
 };
 }  // namespace syntax

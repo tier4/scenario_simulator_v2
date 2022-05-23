@@ -31,18 +31,6 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto Controller::assign(const EntityRef & entity_ref) -> void
-{
-  setVelocityLimit(
-    entity_ref, properties.get<Double>("maxSpeed", std::numeric_limits<Double::value_type>::max()));
-
-  applyAssignControllerAction(entity_ref, [&]() {
-    auto message = getDriverModel(entity_ref);
-    message.see_around = not properties.get<Boolean>("isBlind");
-    return message;
-  }());
-}
-
 auto Controller::isUserDefinedController() const & -> bool
 {
   return properties.get<Boolean>("isEgo");
