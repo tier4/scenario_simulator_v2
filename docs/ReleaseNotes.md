@@ -97,22 +97,22 @@ Minor Tweaks :oncoming_police_car:
 
 ## Version 0.5.6
 - Fix context panel to display conditions' status. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
-- Add NPC Behavior Plugin and Behavior-Tree Plugin for Vehicle and Pedestrian. ([link](https://github.com/tier4/scenario_simulator_v2-docs/pull/566))
+- Add NPC Behavior Plugin and Behavior-Tree Plugin for Vehicle and Pedestrian. ([link](https://github.com/tier4/scenario_simulator_v2/pull/566))
 - Rename package `openscenario_msgs` to `traffic_simulator_msgs`
 - Start supporting galactic environment with Docker. ([link](https://github.com/tier4/scenario_simulator_v2/pull/576))
-- Update `UserDefinedValueCondition` to subscribe ROS2 topic if path-like name given ([pull request](https://github.com/tier4/scenario_simulator_v2-docs/pull/567)).
+- Update `UserDefinedValueCondition` to subscribe ROS2 topic if path-like name given ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/567)).
 - Add new package `openscenario_msgs` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/567)).
-- Add getNearbyLaneletIds and filterLaneletIds function in HdMapUtils class. ([pull request](https://github.com/tier4/scenario_simulator_v2-docs/pull/585))
-- Fix calculating way of longitudinal distance. If forward distance and backward distance was calculated, choose smaller one. ([pull request](https://github.com/tier4/scenario_simulator_v2-docs/pull/586))
+- Add getNearbyLaneletIds and filterLaneletIds function in HdMapUtils class. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/585))
+- Fix calculating way of longitudinal distance. If forward distance and backward distance was calculated, choose smaller one. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/586))
 
 ## Version 0.5.5
-- Fix syntax `ReachPositionCondition` to not to use `API::reachPosition` ([pull request](https://github.com/tier4/scenario_simulator_v2-docs/pull/561)).
+- Fix syntax `ReachPositionCondition` to not to use `API::reachPosition` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/561)).
 
 ## Version 0.5.4
-- Revert [PR #544](https://github.com/tier4/scenario_simulator_v2/pull/544) ([link](https://github.com/tier4/scenario_simulator_v2-docs/pull/557))
+- Revert [PR #544](https://github.com/tier4/scenario_simulator_v2/pull/544) ([link](https://github.com/tier4/scenario_simulator_v2/pull/557))
 - Add context panel to display conditions' status. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
-- Add Tier IV extension `conditionEdge="sticky"` to `OpenSCENARIO-1.1.xsd` ([pull request](https://github.com/tier4/scenario_simulator_v2-docs/pull/553)).
-- Add new Controller's Property `maxSpeed` to set explicitly upper bound speed to Autoware ([pull request](https://github.com/tier4/scenario_simulator_v2-docs/pull/554)).
+- Add Tier IV extension `conditionEdge="sticky"` to `OpenSCENARIO-1.1.xsd` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/553)).
+- Add new Controller's Property `maxSpeed` to set explicitly upper bound speed to Autoware ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/554)).
 
 ## Version 0.5.3
 - Fix setStatus function in EgoEntity class. ([link](https://github.com/tier4/scenario_simulator_v2/pull/549))
@@ -127,7 +127,7 @@ Minor Tweaks :oncoming_police_car:
 - Add CollisionMetric. [Link](https://github.com/tier4/scenario_simulator_v2/pull/521)
 - Support OpenSCENARIO 1.1 `RelativeDistanceCondition` ([link](https://github.com/tier4/scenario_simulator_v2/pull/519)).
 - Fixed Action to not cause side effects during `startTransition` ([link](https://github.com/tier4/scenario_simulator_v2/pull/522)).
-- Fixed log directory cleaning behavior, cleaning all files and directories under log directory without deleting itself. ([link](https://github.com/tier4/scenario_simulator_v2-docs/pull/527)).
+- Fixed log directory cleaning behavior, cleaning all files and directories under log directory without deleting itself. ([link](https://github.com/tier4/scenario_simulator_v2/pull/527)).
 - Support new `CustomCommandAction` type `FaultInjectionAction` for ArchitectureProposal ([link](https://github.com/tier4/scenario_simulator_v2/pull/491))
 - Enable run cpp_mock_test with colcon test (with -DWITH_INTEGRATION_TEST=ON) ([link](https://github.com/tier4/scenario_simulator_v2/pull/529))
 - Support OpenSCENARIO 1.1 `DistanceCondition` ([link](https://github.com/tier4/scenario_simulator_v2/pull/533)).
@@ -142,7 +142,7 @@ Minor Tweaks :oncoming_police_car:
 - Update dependency for message types of Autoware to reference `AutowareArchitectureProposal_msgs` instead of `AutowareArchitectureProposal.iv`.
 - Add to the AutowareArchitectureProposal_api_msgs to the .repos file. [Link](https://github.com/tier4/scenario_simulator_v2/pull/496)
 - Fix rotation calculation in toMapPose function. [Link](https://github.com/tier4/scenario_simulator_v2/pull/500)
-- Simplify logics in bool API::spawn(const bool is_ego, const std::string & name, const openscenario_msgs::msg::VehicleParameters & params) [Link](https://github.com/tier4/scenario_simulator_v2-docs/pull/486) (Contribution by [Robotec.ai](https://robotec.ai/)).
+- Simplify logics in bool API::spawn(const bool is_ego, const std::string & name, const openscenario_msgs::msg::VehicleParameters & params) [Link](https://github.com/tier4/scenario_simulator_v2/pull/486) (Contribution by [Robotec.ai](https://robotec.ai/)).
 - Fix lane coordinate calculation logic for pedestrian in walk straight action. [Link](https://github.com/tier4/scenario_simulator_v2/pull/507)
 
 ## Version 0.4.5
