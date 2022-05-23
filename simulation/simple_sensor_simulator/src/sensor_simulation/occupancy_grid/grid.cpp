@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 
 namespace simple_sensor_simulator
 {
@@ -44,22 +44,24 @@ std::vector<GridCell> Grid::getCell(
   const auto y_max = primitive->getMax(simple_sensor_simulator::Axis::Y);
   const auto x_min = primitive->getMin(simple_sensor_simulator::Axis::X);
   const auto y_min = primitive->getMin(simple_sensor_simulator::Axis::Y);
-  for (size_t h = 0; h < height; h++) {
-    for (size_t w = 0; w < width; w++) {
-      if (x_max && y_max && x_min && y_min) {
-        geometry_msgs::msg::Point origin;
-        origin.x = w - 0.5 * width;
-        origin.y = h - 0.5 * height;
-        double x_min_cell = (origin.x - 0.5) * resolution + sensor_pose.position.x;
-        double y_min_cell = (origin.y - 0.5) * resolution + sensor_pose.position.y;
-        double x_max_cell = (origin.x + 0.5) * resolution + sensor_pose.position.x;
-        double y_max_cell = (origin.y + 0.5) * resolution + sensor_pose.position.y;
-        if (
-          x_min_cell <= x_max && x_max <= x_max_cell && y_min_cell <= y_max &&
-          y_max <= y_max_cell) {
-          ret.emplace_back(GridCell(origin, resolution, width * h + w));
-        }
-      }
+  if (!x_max || !y_max || !x_min || !y_min) {
+    return ret;
+  }
+  int x_min_index =
+    std::floor((x_min.get() - sensor_pose.position.x + resolution * 0.5 * height) / resolution);
+  int x_max_index =
+    std::ceil((x_max.get() - sensor_pose.position.x + resolution * 0.5 * width) / resolution);
+  int y_min_index =
+    std::floor((y_min.get() - sensor_pose.position.y + resolution * 0.5 * height) / resolution);
+  int y_max_index =
+    std::ceil((y_max.get() - sensor_pose.position.y + resolution * 0.5 * width) / resolution);
+  for (int x_index = x_min_index; x_index <= x_max_index; x_index++) {
+    for (int y_index = y_min_index; y_index <= y_max_index; y_index++) {
+      geometry_msgs::msg::Point cell_origin;
+      cell_origin.x = sensor_pose.position.x + (x_index - 0.5 * height) * resolution;
+      cell_origin.y = sensor_pose.position.y + (y_index - 0.5 * width) * resolution;
+      cell_origin.z = sensor_pose.position.z;
+      ret.emplace_back(GridCell(cell_origin, resolution, width * y_index + x_index));
     }
   }
   return ret;
