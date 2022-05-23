@@ -18,5 +18,3 @@ If you have any questions about this package, please post an issue or contact us
 <a href="https://github.com/HansRobo">
   <img align="center" src="https://github-readme-stats.vercel.app/api?username=HansRobo&show_icons=true&title_color=22A3CD&icon_color=06579E" />
 </a>
-
-[Email maintainers :fa-paper-plane:](mailto:masaya.kataoka@tier4.jp;%20tatsuya.yamasaki@tier4.jp;%20kotaro.yoshimoto@tier4.jp){ .md-button .md-button--primary }
