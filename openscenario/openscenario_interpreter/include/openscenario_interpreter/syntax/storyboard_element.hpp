@@ -168,10 +168,6 @@ protected:
   }
 
 public:
-  using Thunk = std::function<void()>;
-
-  static inline std::vector<Thunk> callback_registrations{};  // DIRTY HACK!!!
-
   std::unordered_map<
     StoryboardElementState::value_type, std::vector<std::function<void(const StoryboardElement &)>>>
     callbacks;

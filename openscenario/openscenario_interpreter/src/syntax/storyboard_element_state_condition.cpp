@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/storyboard.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state_condition.hpp>
 
@@ -50,7 +51,7 @@ StoryboardElementStateCondition::StoryboardElementStateCondition(
       });
   };
 
-  StoryboardElement::callback_registrations.push_back(register_callback);
+  Storyboard::thunks.push(register_callback);
 }
 
 auto StoryboardElementStateCondition::description() const -> String
