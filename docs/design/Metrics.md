@@ -74,32 +74,32 @@ api_.addMetric<T>("name of metric", "arguments for metric you want to check" ...
 ```
 
 ### Traveled Distance
-[//]: # (TODO : Fix "here" link)
+
 Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1TraveledDistanceMetric/#public-functions).  
 Traveled distance metric calculates the total traveled distance for a target entity.
 
 ### Momentary Stop
-[//]: # (TODO : Fix "here" link)
+
 Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1MomentaryStopMetric/).  
 Momentary stop metric enables us to check the target entity can stop in front of the crosswalk and stop line.
 
 ### Reaction Time
-[//]: # (TODO : Fix "here" link)
+
 Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1ReactionTimeMetric/).  
 Reaction time metric enables us to check the target entity follows the front entity speed.
 
 ### Out of range
-[//]: # (TODO : Fix "here" link)
+
 Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1OutOfRangeMetric/).  
 Out of range metric enables us to check the velocity, acceleration, jerk of a target entity are in the valid range or not.
 
 ### Standstill
-[//]: # (TODO : Fix "here" link)
+
 Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1StandstillMetric/).  
 Standstill metric enables us to check an entity is stacked or not.
 This metric checks the standstill duration of the target entity overs the allowed standstill duration.
 
 ### Collision
-[//]: # (TODO : Fix "here" link)
+
 Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1CollisionMetric/).
 Collision metric checks the target entity is colliding with the other entity or not.

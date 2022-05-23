@@ -9,7 +9,6 @@ This package includes very, very simple lidar simulation and send simulated dete
 
 In lidar simulation, we use intel's ray-casting library embree.
 
-[//]: # (TODO : Fix invalid embeded frame)
 <iframe 
   class="hatenablogcard" 
   style="width:100%;height:155px;max-width:450px;" 
