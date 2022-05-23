@@ -48,7 +48,7 @@ or
 [//]: # (TODO : Fix "this code" link)
 `Error` means that the test cases were failed with an error, such as some Autoware nodes were downed, failed to launch Autoware, etc.  
 All errors are thrown as errors from the API classes.
-If you want to see examples, please refer to [this code](https://github.com/tier4/scenario_simulator_v2/blob/c6d7c4da7556a593dc3d34b0a982bc[…]r/include/openscenario_interpreter/openscenario_interpreter.hpp).
+If you want to see examples, please refer to [this code](https://github.com/tier4/scenario_simulator_v2/tree/master/openscenario/openscenario_interpreter/include/openscenario_interpreter/openscenario_interpreter.hpp).
 
 #### Error Types
 
