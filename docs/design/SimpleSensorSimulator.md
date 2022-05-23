@@ -14,7 +14,7 @@ In lidar simulation, we use intel's ray-casting library embree.
   class="hatenablogcard" 
   style="width:100%;height:155px;max-width:450px;" 
   title="embree" 
-  src="https://hatenablog-parts.com/embed?url=https://software.intel.com/content/www/cn/zh/develop/videos/embree-ray-tracing-kernels-overview-and-new-features-siggraph-2018-tech-session.html" 
+  src="https://hatenablog-parts.com/embed?url=https://www.embree.org" 
   width="300" height="150" frameborder="0" scrolling="no">
 </iframe>
 

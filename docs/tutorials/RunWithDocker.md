@@ -64,10 +64,8 @@ If you have NVIDIA GPU(s) in your machine, you have to install nvidia-driver and
 In order to install nvidia-docker2 on Ubuntu, please type the commands below.
 
 ```bash
-curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | \
-  sudo apt-key add -
-distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/ubuntu20.04/nvidia-container-runtime.list | \
   sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
 sudo apt-get update
 sudo apt install -y nvidia-docker2

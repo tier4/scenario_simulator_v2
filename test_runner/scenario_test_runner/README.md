@@ -108,6 +108,3 @@ Scenario:
   - { path: $(find-pkg-share scenario_test_runner)/scenario/success.yaml, expect: success, frame-rate: 30 }
 ```
 
-### TIER IV Scenario Format version 2.0 -> OpenSCENARIO Format Separator
-
-To convert OpenSCENARIO, see the scenario test utility package [Scenario Converter](../scenario_test_utility).
