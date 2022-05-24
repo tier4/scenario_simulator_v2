@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "scenario_simulator_exception/exception.hpp"
 #include <concealer/autoware.hpp>
 #include <cstdlib>
 #include <exception>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace concealer
 {
-auto Autoware::checkAutowareProcess() const -> bool
+auto Autoware::checkAutowareProcess() -> void
 {
   if (process_id != 0) {
     int wstatus = 0;
     int ret = waitpid(process_id, &wstatus, WNOHANG);
     if (ret == 0) {
-      return true;
+      return;
     } else if (ret < 0) {
       if (errno == ECHILD) {
-        AUTOWARE_WARN_STREAM("Autoware process is already exited");
-        return false;
+        is_autoware_exited = true;
+        throw common::AutowareError("Autoware process is already terminated");
       } else {
         AUTOWARE_SYSTEM_ERROR("waitpid");
         std::exit(EXIT_FAILURE);
@@ -36,14 +38,14 @@ auto Autoware::checkAutowareProcess() const -> bool
     }
 
     if (WIFEXITED(wstatus)) {
-      AUTOWARE_WARN_STREAM("Autoware process is exit. exit code: " << WEXITSTATUS(wstatus));
-      return false;
+      is_autoware_exited = true;
+      throw common::AutowareError(
+        "Autoware process is unintentionally exited. exit code: ", WEXITSTATUS(wstatus));
     } else if (WIFSIGNALED(wstatus)) {
-      AUTOWARE_WARN_STREAM("Autoware process is killed. signal is " << WTERMSIG(wstatus));
-      return false;
+      is_autoware_exited = true;
+      throw common::AutowareError("Autoware process is killed. signal is ", WTERMSIG(wstatus));
     }
   }
-  return true;
 }
 
 void Autoware::shutdownAutoware()
@@ -51,7 +53,7 @@ void Autoware::shutdownAutoware()
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
   {
     if (spinner.joinable()) {
-      promise.set_value();
+      stopRequest();
       spinner.join();
     }
   }
@@ -121,7 +123,7 @@ void Autoware::shutdownAutoware()
 
 void Autoware::rethrow() const
 {
-  if (thrown) {
+  if (is_thrown.load(std::memory_order_acquire)) {
     std::rethrow_exception(thrown);
   }
 }

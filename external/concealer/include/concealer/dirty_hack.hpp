@@ -24,8 +24,10 @@ private:                                                                        
 public:                                                                                            \
   auto request##TYPE(const TYPE::Request::SharedPtr & request)->void                               \
   {                                                                                                \
+    static_cast<Autoware &>(*this).rethrow();                                                      \
     for (auto rate = rclcpp::WallRate(std::chrono::seconds(1));                                    \
-         not client_of_##TYPE->service_is_ready(); rate.sleep()) {                                 \
+         not client_of_##TYPE->service_is_ready();                                                 \
+         rate.sleep(), static_cast<Autoware &>(*this).rethrow()) {                                 \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(), #TYPE " service is not ready.");              \
     }                                                                                              \
@@ -72,6 +74,7 @@ private:                                                             \
 public:                                                              \
   auto set##TYPE(const TYPE & message)->decltype(auto)               \
   {                                                                  \
+    static_cast<Autoware &>(*this).rethrow();                        \
     return std::atomic_load(&publisher_of_##TYPE)->publish(message); \
   }                                                                  \
   static_assert(true, "")

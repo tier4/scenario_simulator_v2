@@ -59,13 +59,13 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 
   mutable std::mutex mutex;
 
-  std::promise<void> promise;
-
-  std::future<void> future;
+  std::atomic<bool> is_stop_requested = false;
 
   std::thread spinner;
 
   rclcpp::TimerBase::SharedPtr updater;
+
+  std::atomic<bool> is_thrown = false;
 
   std::exception_ptr thrown;
 
@@ -82,7 +82,9 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
-  auto currentFuture() -> auto & { return future; }
+  void stopRequest() noexcept { return is_stop_requested.store(true, std::memory_order_release); }
+
+  bool isStopRequested() const noexcept { return is_stop_requested.load(std::memory_order_acquire); }
 
   virtual auto update() -> void = 0;
 
@@ -96,27 +98,23 @@ protected:
 
   void resetTimerCallback();
 
-  auto checkAutowareProcess() const -> bool;
+  auto checkAutowareProcess() -> void;
 
   std::atomic<bool> is_autoware_exited = false;
 
 public:
   CONCEALER_PUBLIC explicit Autoware(pid_t pid = 0)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    future(promise.get_future()),
     spinner([this]() {
-      while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
-                                std::future_status::timeout) {
-        try {
-          if (checkAutowareProcess()) {
-            rclcpp::spin_some(get_node_base_interface());
-          } else {
-            is_autoware_exited = true;
-            rclcpp::shutdown();
-          }
-        } catch (...) {
-          thrown = std::current_exception();
+      try {
+        while (rclcpp::ok() and not isStopRequested()) {
+          checkAutowareProcess();
+          rclcpp::spin_some(get_node_base_interface());
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
+      } catch (...) {
+        thrown = std::current_exception();
+        is_thrown.store(true, std::memory_order_release);
       }
     }),
     process_id(pid)
