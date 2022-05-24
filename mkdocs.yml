@@ -16,6 +16,7 @@ extra:
     language: en
 plugins:
   - search
+  - git-revision-date-localized
 palette:
   scheme: slate
 
