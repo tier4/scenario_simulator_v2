@@ -31,6 +31,7 @@ public:
   ~LineSegment();
   const geometry_msgs::msg::Point start_point;
   const geometry_msgs::msg::Point end_point;
+  bool intersection2D(const LineSegment & l0) const;
 };
 
 class GridCell
@@ -38,15 +39,16 @@ class GridCell
 public:
   GridCell(
     const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col);
-  std::array<LineSegment, 4> getLineSegments() const;
   const geometry_msgs::msg::Pose origin;
   const double size;
   const size_t index;
   const size_t row;
   const size_t col;
+  bool intersection2D(const LineSegment & line);
 
 private:
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & point) const;
+  std::array<LineSegment, 4> getLineSegments() const;
 };
 
 class Grid

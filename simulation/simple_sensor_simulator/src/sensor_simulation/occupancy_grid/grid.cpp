@@ -26,6 +26,26 @@ LineSegment::LineSegment(
 
 LineSegment::~LineSegment() {}
 
+bool LineSegment::intersection2D(const LineSegment & l0) const
+{
+  double s, t;
+  s = (l0.start_point.x - l0.end_point.x) * (start_point.y - l0.start_point.y) -
+      (l0.start_point.y - l0.end_point.y) * (start_point.x - l0.start_point.x);
+  t = (l0.start_point.x - l0.end_point.x) * (end_point.y - l0.start_point.y) -
+      (l0.start_point.y - l0.end_point.y) * (end_point.x - l0.start_point.x);
+  if (s * t > 0) {
+    return false;
+  }
+  s = (start_point.x - end_point.x) * (l0.start_point.y - start_point.y) -
+      (start_point.y - end_point.y) * (l0.start_point.x - start_point.x);
+  t = (start_point.x - end_point.x) * (l0.end_point.y - start_point.y) -
+      (start_point.y - end_point.y) * (l0.end_point.x - start_point.x);
+  if (s * t > 0) {
+    return false;
+  }
+  return true;
+}
+
 GridCell::GridCell(
   const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col)
 : origin(origin), size(size), index(index), row(row), col(col)
@@ -72,6 +92,16 @@ geometry_msgs::msg::Point GridCell::transformToWorld(const geometry_msgs::msg::P
   ret.y = p(1);
   ret.z = p(2);
   return ret;
+}
+
+bool GridCell::intersection2D(const LineSegment & line)
+{
+  for (const auto & outside : getLineSegments()) {
+    if (outside.intersection2D(line)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 Grid::Grid(double resolution, double height, double width)
