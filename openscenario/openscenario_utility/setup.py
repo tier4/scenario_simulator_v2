@@ -7,14 +7,17 @@ from setuptools import setup, find_packages
 
 #  XXX: Dirty hack to suppress deprecation warnings
 # TODO: The deprecation warnings are caused by ROS problems,
-#       so dirty hacks should be removed once ROS fixes the problems.
-import warnings
-from setuptools._deprecation_warning import SetuptoolsDeprecationWarning
-from pkg_resources import PkgResourcesDeprecationWarning
-
-#  XXX: Dirty hack to suppress deprecation warnings
-warnings.simplefilter("ignore", SetuptoolsDeprecationWarning)
-warnings.simplefilter("ignore", PkgResourcesDeprecationWarning)
+#       so the dirty hacks should be removed when ROS fixes the problems.
+try:
+    import warnings
+    from setuptools._deprecation_warning import SetuptoolsDeprecationWarning
+    from pkg_resources import PkgResourcesDeprecationWarning
+    warnings.simplefilter("ignore", SetuptoolsDeprecationWarning)
+    warnings.simplefilter("ignore", PkgResourcesDeprecationWarning)
+except ModuleNotFoundError:
+    pass
+except ImportError:
+    pass
 
 
 package_name = "openscenario_utility"
