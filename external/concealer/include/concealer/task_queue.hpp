@@ -18,6 +18,7 @@
 #include <exception>
 #include <functional>
 #include <future>
+#include <mutex>
 #include <queue>
 #include <thread>
 
@@ -28,6 +29,8 @@ class TaskQueue
   using Thunk = std::function<void()>;
 
   std::queue<Thunk> thunks;
+
+  std::mutex mtx;
 
   std::promise<void> notifier;
 
@@ -43,7 +46,8 @@ public:
   template <typename F>
   decltype(auto) delay(F && f)
   {
-    return thunks.emplace([this, f]() {
+    std::unique_lock lk(mtx);
+    return thunks.emplace([this, f = std::forward<F>(f)]() {
       try {
         return f();
       } catch (...) {

@@ -14,6 +14,7 @@
 
 #include <chrono>
 #include <concealer/task_queue.hpp>
+#include <mutex>
 #include <rclcpp/rclcpp.hpp>
 #include <utility>
 
@@ -24,11 +25,15 @@ TaskQueue::TaskQueue()
     [this](auto notification) {
       using namespace std::literals::chrono_literals;
       while (rclcpp::ok() and notification.wait_for(1ms) == std::future_status::timeout) {
+        using namespace std::literals::chrono_literals;
+        std::unique_lock lk(mtx);
         if (not thunks.empty() and not thrown) {
-          // NOTE: To ensure that the task to be queued is completed as expected is the responsibility of the side to create a task.
-          std::thread(thunks.front()).join();
+          // NOTE: To ensure that the task to be queued is completed as expected is the
+          // responsibility of the side to create a task.
+          thunks.front()();
           thunks.pop();
         } else {
+          lk.unlock();
           std::this_thread::sleep_for(100ms);
         }
       }
