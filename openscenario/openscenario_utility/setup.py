@@ -6,6 +6,8 @@ from pathlib import Path
 from setuptools import setup, find_packages
 
 #  XXX: Dirty hack to suppress deprecation warnings
+# TODO: The deprecation warnings are caused by ROS problems,
+#       so dirty hacks should be removed once ROS fixes the problems.
 import warnings
 from setuptools._deprecation_warning import SetuptoolsDeprecationWarning
 from pkg_resources import PkgResourcesDeprecationWarning
