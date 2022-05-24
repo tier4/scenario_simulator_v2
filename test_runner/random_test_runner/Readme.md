@@ -120,20 +120,33 @@ Random test runner will load `result.yaml` file and rerun test.
 
 ## Running with unity
 
-Instruction is based on `kashiwanoha_map` Unity project but can be applied to any other projects supporting [`ZeorMQ` interface](https://tier4.github.io/scenario_simulator_v2-docs/design/ZeroMQ/). 
+TBD
 
-To run `random_test_runner` with Unity Kashiwanoha project: 
-1. Clone and run [Kashiwanoha project](https://gitlab.com/robotec.ai/tieriv/kashiwanoha).
-2. Make sure that package name in `map_name` parameter is `kashiwanoha_map`. For projects other than Kashiwanoha, make sure to change it to correct package name.  
-3. Execute `random_test_runner` launch with `simulator_type` parameter:
-```shell
-ros2 launch random_test_runner random_test.launch.py simulator_type:="unity"
-```
-|  NOTE: Since currently unity integration does not support ego vehicle, `random_test_runner` does not spawn it. |
-|----------------------------------------------------------------------------------------------------------------|
+[//]: # (Instruction is based on `kashiwanoha_map` Unity project but can be applied to any other projects supporting [`ZeorMQ` interface]&#40;https://tier4.github.io/scenario_simulator_v2-docs/design/ZeroMQ/&#41;. )
 
-|  NOTE: Kashiwanoha project is only supported on ROS2 `galactic` but simulation interfaces are distribution-independent and random tests can be executed safely on `foxy` |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+[//]: # ()
+[//]: # (To run `random_test_runner` with Unity Kashiwanoha project: )
+
+[//]: # (1. Clone and run [Kashiwanoha project]&#40;https://gitlab.com/robotec.ai/tieriv/kashiwanoha&#41;.)
+
+[//]: # (2. Make sure that package name in `map_name` parameter is `kashiwanoha_map`. For projects other than Kashiwanoha, make sure to change it to correct package name.  )
+
+[//]: # (3. Execute `random_test_runner` launch with `simulator_type` parameter:)
+
+[//]: # (```shell)
+
+[//]: # (ros2 launch random_test_runner random_test.launch.py simulator_type:="unity")
+
+[//]: # (```)
+
+[//]: # (|  NOTE: Since currently unity integration does not support ego vehicle, `random_test_runner` does not spawn it. |)
+
+[//]: # (|----------------------------------------------------------------------------------------------------------------|)
+
+[//]: # ()
+[//]: # (|  NOTE: Kashiwanoha project is only supported on ROS2 `galactic` but simulation interfaces are distribution-independent and random tests can be executed safely on `foxy` |)
+
+[//]: # (|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|)
 
 ## Launch arguments
 

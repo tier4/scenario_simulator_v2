@@ -50,8 +50,9 @@ compliant_matches = lanelet2.matching.removeNonRuleCompliantMatches(matches, tra
 
 ```
 
-have a look at the [python unittests](../lanelet2_python/test/test_lanelet2_matching.py) for more examples, also supports uncertainty
+[//]: # (have a look at the [python unittests]&#40;../lanelet2_python/test/test_lanelet2_matching.py&#41; for more examples, also supports uncertainty)
 
 
-## License
-This package is distributed under the 3-Clause BSD License, see [LICENSE](LICENSE).
+[//]: # (## License)
+
+[//]: # (This package is distributed under the 3-Clause BSD License, see [LICENSE]&#40;LICENSE&#41;.)
