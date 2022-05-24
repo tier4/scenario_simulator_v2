@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_HPP_
 
 #include <nlohmann/json.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/init.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -37,7 +38,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Storyboard : public Scope, public StoryboardElement
+struct Storyboard : public Scope, public StoryboardElement, private SimulatorCore::CustomCommand
 {
   Init init;
 

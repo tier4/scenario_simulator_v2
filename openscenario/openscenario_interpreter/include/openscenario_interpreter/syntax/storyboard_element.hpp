@@ -32,7 +32,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-class StoryboardElement
+class StoryboardElement : private SimulatorCore::ConditionEvaluation
 {
   Trigger stop_trigger;
 
@@ -235,7 +235,7 @@ public:
         *    completeState.
         *
         * ------------------------------------------------------------------- */
-        if (0 <= getCurrentTime()) {
+        if (0 <= evaluateSimulationTime()) {
           run();
         }
         return current_state = (accomplished() ? end_transition : current_state);

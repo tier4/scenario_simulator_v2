@@ -137,10 +137,10 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
             currentScenarioDefinition()->evaluate();
             publishCurrentContext();
-            return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
+            return 0 <= evaluateSimulationTime();  // Statistics only if true.
           });
 
-          if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
+          if (0 <= evaluateSimulationTime() and currentLocalFrameRate() < evaluate_time) {
             RCLCPP_WARN_STREAM(
               get_logger(),
               "Your machine is not powerful enough to run the scenario at the specified "
@@ -169,9 +169,9 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
             "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
         }
 
-        SimulatorCore::activate(shared_from_this(), makeCurrentConfiguration());
-
-        initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
+        SimulatorCore::activate(
+          shared_from_this(), makeCurrentConfiguration(), local_real_time_factor,
+          1 / local_frame_rate * local_real_time_factor);
 
         execution_timer.clear();
 
@@ -237,7 +237,7 @@ auto Interpreter::publishCurrentContext() const -> void
     nlohmann::json json;
     context.stamp = now();
     context.data = (json << *script).dump();
-    context.time = getCurrentTime();
+    context.time = evaluateSimulationTime();
   }
 
   publisher_of_context->publish(context);

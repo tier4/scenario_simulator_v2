@@ -37,7 +37,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SpeedAction : private Scope, private SimulatorCore::ConditionEvaluation
+struct SpeedAction : private Scope,
+                     private SimulatorCore::ActionApplication,
+                     private SimulatorCore::ConditionEvaluation
 {
   const TransitionDynamics speed_action_dynamics;
 

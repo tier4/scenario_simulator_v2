@@ -32,7 +32,7 @@ auto ScenarioDefinition::evaluate() -> Object
 {
   road_network.evaluate();
   storyboard.evaluate();
-  updateFrame();
+  SimulatorCore::update();
   return storyboard.current_state;
 }
 

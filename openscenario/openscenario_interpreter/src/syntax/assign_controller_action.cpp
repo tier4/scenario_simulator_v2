@@ -44,15 +44,7 @@ AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scop
 auto AssignControllerAction::operator()(const EntityRef & entity_ref) const -> void
 {
   if (is<Controller>()) {
-    setVelocityLimit(
-      entity_ref, as<Controller>().properties.get<Double>(
-                    "maxSpeed", std::numeric_limits<Double::value_type>::max()));
-
-    applyAssignControllerAction(entity_ref, [&]() {
-      auto message = getDriverModel(entity_ref);
-      message.see_around = not as<Controller>().properties.get<Boolean>("isBlind");
-      return message;
-    }());
+    applyAssignControllerAction(entity_ref, as<Controller>());
   }
 }
 }  // namespace syntax

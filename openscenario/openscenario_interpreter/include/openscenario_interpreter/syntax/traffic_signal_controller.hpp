@@ -17,6 +17,7 @@
 
 #include <boost/optional.hpp>
 #include <openscenario_interpreter/iterator/circular_iterator.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
@@ -39,7 +40,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalController
+struct TrafficSignalController : private SimulatorCore::ConditionEvaluation
 {
   // ID of the traffic signal controller in the road network.
   const String name;

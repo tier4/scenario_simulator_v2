@@ -36,7 +36,7 @@ auto LaneChangeAction::accomplished() -> bool
 {
   return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](auto && each) {
     const auto is_lane_changing = [](auto &&... xs) {
-      return getCurrentAction(std::forward<decltype(xs)>(xs)...) == "lane_change";
+      return evaluateCurrentState(std::forward<decltype(xs)>(xs)...) == "lane_change";
     };
     return each.second or (each.second = not is_lane_changing(each.first));
   });

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <iomanip>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/simulation_time_condition.hpp>
 
@@ -39,7 +38,7 @@ auto SimulationTimeCondition::description() const -> String
 
 auto SimulationTimeCondition::evaluate() -> Object
 {
-  return asBoolean(compare(result = getCurrentTime(), value));
+  return asBoolean(compare(result = evaluateSimulationTime(), value));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -18,6 +18,8 @@
 #include <limits>
 #include <memory>
 #include <openscenario_interpreter/error.hpp>
+#include <openscenario_interpreter/syntax/boolean.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
 #include <utility>
@@ -30,17 +32,21 @@ public:  // TODO PRIVATE!
   static inline std::unique_ptr<traffic_simulator::API> connection = nullptr;
 
 public:
-  template <typename... Ts>
-  static auto activate(Ts &&... xs) -> void
+  template <typename Node, typename... Ts>
+  static auto activate(
+    const Node & node, const traffic_simulator::Configuration & configuration, Ts &&... xs) -> void
   {
     if (not connection) {
-      connection = std::make_unique<traffic_simulator::API>(std::forward<decltype(xs)>(xs)...);
+      connection = std::make_unique<traffic_simulator::API>(node, configuration);
+      connection->initialize(std::forward<decltype(xs)>(xs)...);
     } else {
       throw Error("The simulator core has already been instantiated.");
     }
   }
 
   static auto deactivate() -> void { connection.reset(); }
+
+  static auto update() -> void { connection->updateFrame(); }
 
   class GeneralCommand  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
@@ -73,6 +79,16 @@ public:
     }
   };
 
+  class CustomCommand
+  {
+  protected:
+    template <typename... Ts>
+    static auto engage(Ts &&... xs)
+    {
+      return connection->engage(std::forward<decltype(xs)>(xs)...);
+    }
+  };
+
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
     // NOTE: applySomethingAction() -> Unspecified
@@ -88,6 +104,21 @@ public:
     static auto applyAddEntityAction(Ts &&... xs)
     {
       return connection->spawn(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename Controller>
+    static auto applyAssignControllerAction(
+      const std::string & entity_ref, Controller && controller) -> void
+    {
+      connection->setVelocityLimit(
+        entity_ref, controller.properties.template get<Double>(
+                      "maxSpeed", std::numeric_limits<Double::value_type>::max()));
+
+      connection->setDriverModel(entity_ref, [&]() {
+        auto message = connection->getDriverModel(entity_ref);
+        message.see_around = not controller.properties.template get<Boolean>("isBlind");
+        return message;
+      }());
     }
 
     template <typename... Ts>
@@ -106,6 +137,12 @@ public:
     static auto applyLaneChangeAction(Ts &&... xs)
     {
       return connection->requestLaneChange(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto applySpeedAction(Ts &&... xs)
+    {
+      return connection->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -140,9 +177,21 @@ public:
     }
 
     template <typename... Ts>
-    static auto evaluateCollisionCondition(Ts &&... xs)
+    static auto evaluateCollisionCondition(Ts &&... xs) -> bool
     {
       return connection->checkCollision(std::forward<decltype(xs)>(xs)...);
+    }
+
+    // template <typename... Ts>
+    // static auto evaluateReachPositionCondition(Ts &&... xs) -> bool
+    // {
+    //   return connection->reachPosition(std::forward<decltype(xs)>(xs)...);
+    // }
+
+    template <typename... Ts>
+    static auto evaluateSimulationTime(Ts &&... xs) -> double
+    {
+      return connection->getCurrentTime(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -222,19 +271,8 @@ STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_N
 
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
-FORWARD_TO_SIMULATION_API(engage);
-FORWARD_TO_SIMULATION_API(getCurrentAction);
-FORWARD_TO_SIMULATION_API(getCurrentTime);
-FORWARD_TO_SIMULATION_API(getDriverModel);
 FORWARD_TO_SIMULATION_API(getTrafficRelationReferees);
-FORWARD_TO_SIMULATION_API(initialize);
-FORWARD_TO_SIMULATION_API(isInLanelet);
 FORWARD_TO_SIMULATION_API(ready);
-FORWARD_TO_SIMULATION_API(requestLaneChange);
-FORWARD_TO_SIMULATION_API(requestSpeedChange);
-FORWARD_TO_SIMULATION_API(setEntityStatus);
-FORWARD_TO_SIMULATION_API(setVelocityLimit);
-FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef FORWARD_TO_SIMULATION_API
 
@@ -248,11 +286,9 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 
 // NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
 
-RENAME(applyAssignControllerAction, setDriverModel);
 RENAME(evaluateCurrentEmergencyState, getEmergencyStateName);
 RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandName);
-RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(toWorldPosition, toMapPose);
 
 #undef RENAME

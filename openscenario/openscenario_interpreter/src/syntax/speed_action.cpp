@@ -95,13 +95,13 @@ auto SpeedAction::start() -> void
 
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      requestSpeedChange(
+      applySpeedAction(
         std::get<0>(each), speed_action_target.as<AbsoluteTargetSpeed>().value,
         static_cast<traffic_simulator::speed_change::Transition>(
           speed_action_dynamics.dynamics_shape),
         static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics), true);
     } else {
-      requestSpeedChange(
+      applySpeedAction(
         std::get<0>(each),
         static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
           speed_action_target.as<RelativeTargetSpeed>()),

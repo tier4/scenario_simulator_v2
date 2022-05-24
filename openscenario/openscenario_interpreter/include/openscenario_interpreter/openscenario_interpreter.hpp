@@ -43,7 +43,8 @@
 
 namespace openscenario_interpreter
 {
-class Interpreter : public rclcpp_lifecycle::LifecycleNode
+class Interpreter : public rclcpp_lifecycle::LifecycleNode,
+                    private SimulatorCore::ConditionEvaluation
 {
   using Context = openscenario_interpreter_msgs::msg::Context;
 
