@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "scenario_simulator_exception/exception.hpp"
 #include <concealer/autoware.hpp>
 #include <cstdlib>
 #include <exception>

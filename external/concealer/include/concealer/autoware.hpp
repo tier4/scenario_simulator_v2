@@ -84,7 +84,10 @@ protected:
 
   void stopRequest() noexcept { return is_stop_requested.store(true, std::memory_order_release); }
 
-  bool isStopRequested() const noexcept { return is_stop_requested.load(std::memory_order_acquire); }
+  bool isStopRequested() const noexcept
+  {
+    return is_stop_requested.load(std::memory_order_acquire);
+  }
 
   virtual auto update() -> void = 0;
 
