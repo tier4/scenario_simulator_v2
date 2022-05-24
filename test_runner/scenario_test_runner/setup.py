@@ -3,6 +3,16 @@ import os
 
 from setuptools import setup
 
+#  XXX: Dirty hack to suppress deprecation warnings
+import warnings
+from setuptools._deprecation_warning import SetuptoolsDeprecationWarning
+from pkg_resources import PkgResourcesDeprecationWarning
+
+#  XXX: Dirty hack to suppress deprecation warnings
+warnings.simplefilter("ignore", SetuptoolsDeprecationWarning)
+warnings.simplefilter("ignore", PkgResourcesDeprecationWarning)
+
+
 package_name = "scenario_test_runner"
 
 setup(

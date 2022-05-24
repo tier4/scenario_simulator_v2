@@ -5,6 +5,15 @@ from glob import glob
 from pathlib import Path
 from setuptools import setup, find_packages
 
+#  XXX: Dirty hack to suppress deprecation warnings
+import warnings
+from setuptools._deprecation_warning import SetuptoolsDeprecationWarning
+from pkg_resources import PkgResourcesDeprecationWarning
+
+#  XXX: Dirty hack to suppress deprecation warnings
+warnings.simplefilter("ignore", SetuptoolsDeprecationWarning)
+warnings.simplefilter("ignore", PkgResourcesDeprecationWarning)
+
 
 package_name = "openscenario_utility"
 
