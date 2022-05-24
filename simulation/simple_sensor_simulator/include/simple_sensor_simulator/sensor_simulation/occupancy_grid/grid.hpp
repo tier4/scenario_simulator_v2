@@ -36,11 +36,14 @@ public:
 class GridCell
 {
 public:
-  GridCell(const geometry_msgs::msg::Pose & origin, double size, size_t index);
+  GridCell(
+    const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col);
   std::array<LineSegment, 4> getLineSegments() const;
   const geometry_msgs::msg::Pose origin;
   const double size;
   const size_t index;
+  const size_t row;
+  const size_t col;
 
 private:
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & point) const;
@@ -61,6 +64,10 @@ private:
   std::vector<GridCell> getOccupiedCandidates(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive,
     const geometry_msgs::msg::Pose & sensor_pose) const;
+  std::vector<GridCell> filterByRow(const std::vector<GridCell> & cells, size_t row) const;
+  std::vector<GridCell> filterByCol(const std::vector<GridCell> & cells, size_t col) const;
+  std::vector<size_t> getRows(const std::vector<GridCell> & cells);
+  std::vector<size_t> getCols(const std::vector<GridCell> & cells);
 };
 }  // namespace simple_sensor_simulator
 

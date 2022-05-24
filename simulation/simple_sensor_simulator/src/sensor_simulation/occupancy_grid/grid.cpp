@@ -26,8 +26,9 @@ LineSegment::LineSegment(
 
 LineSegment::~LineSegment() {}
 
-GridCell::GridCell(const geometry_msgs::msg::Pose & origin, double size, size_t index)
-: origin(origin), size(size), index(index)
+GridCell::GridCell(
+  const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col)
+: origin(origin), size(size), index(index), row(row), col(col)
 {
 }
 
@@ -101,9 +102,54 @@ std::vector<GridCell> Grid::getOccupiedCandidates(
       cell_origin.position.y = sensor_pose.position.y + (y_index - 0.5 * width) * resolution;
       cell_origin.position.z = sensor_pose.position.z;
       cell_origin.orientation = sensor_pose.orientation;
-      ret.emplace_back(GridCell(cell_origin, resolution, width * y_index + x_index));
+      ret.emplace_back(
+        GridCell(cell_origin, resolution, width * y_index + x_index, y_index, x_index));
     }
   }
+  return ret;
+}
+
+std::vector<GridCell> Grid::filterByRow(const std::vector<GridCell> & cells, size_t row) const
+{
+  std::vector<GridCell> ret;
+  for (const auto & cell : cells) {
+    if (cell.row == row) {
+      ret.emplace_back(cell);
+    }
+  }
+  return ret;
+}
+
+std::vector<GridCell> Grid::filterByCol(const std::vector<GridCell> & cells, size_t col) const
+{
+  std::vector<GridCell> ret;
+  for (const auto & cell : cells) {
+    if (cell.col == col) {
+      ret.emplace_back(cell);
+    }
+  }
+  return ret;
+}
+
+std::vector<size_t> Grid::getRows(const std::vector<GridCell> & cells)
+{
+  std::vector<size_t> ret;
+  for (const auto & cell : cells) {
+    ret.emplace_back(cell.row);
+  }
+  std::sort(ret.begin(), ret.end());
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+  return ret;
+}
+
+std::vector<size_t> Grid::getCols(const std::vector<GridCell> & cells)
+{
+  std::vector<size_t> ret;
+  for (const auto & cell : cells) {
+    ret.emplace_back(cell.col);
+  }
+  std::sort(ret.begin(), ret.end());
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
   return ret;
 }
 
