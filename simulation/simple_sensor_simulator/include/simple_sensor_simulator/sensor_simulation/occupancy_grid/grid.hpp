@@ -44,7 +44,8 @@ public:
   const size_t index;
   const size_t row;
   const size_t col;
-  bool intersection2D(const LineSegment & line);
+  bool intersection2D(const LineSegment & line) const;
+  bool intersection2D(const std::vector<LineSegment> & line_segments) const;
 
 private:
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & point) const;
@@ -68,6 +69,8 @@ private:
     const geometry_msgs::msg::Pose & sensor_pose) const;
   std::vector<GridCell> filterByRow(const std::vector<GridCell> & cells, size_t row) const;
   std::vector<GridCell> filterByCol(const std::vector<GridCell> & cells, size_t col) const;
+  std::vector<GridCell> filterByIntersection(
+    const std::vector<GridCell> & cells, const std::vector<LineSegment> & line_segments) const;
   std::vector<size_t> getRows(const std::vector<GridCell> & cells);
   std::vector<size_t> getCols(const std::vector<GridCell> & cells);
 };

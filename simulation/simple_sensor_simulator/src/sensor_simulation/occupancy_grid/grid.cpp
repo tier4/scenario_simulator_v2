@@ -94,10 +94,20 @@ geometry_msgs::msg::Point GridCell::transformToWorld(const geometry_msgs::msg::P
   return ret;
 }
 
-bool GridCell::intersection2D(const LineSegment & line)
+bool GridCell::intersection2D(const LineSegment & line) const
 {
   for (const auto & outside : getLineSegments()) {
     if (outside.intersection2D(line)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool GridCell::intersection2D(const std::vector<LineSegment> & line_segments) const
+{
+  for (const auto & line_segment : line_segments) {
+    if (intersection2D(line_segment)) {
       return true;
     }
   }
@@ -161,6 +171,18 @@ std::vector<GridCell> Grid::filterByCol(const std::vector<GridCell> & cells, siz
   return ret;
 }
 
+std::vector<GridCell> Grid::filterByIntersection(
+  const std::vector<GridCell> & cells, const std::vector<LineSegment> & line_segments) const
+{
+  std::vector<GridCell> ret;
+  for (const auto & cell : cells) {
+    if (cell.intersection2D(line_segments)) {
+      ret.emplace_back(cell);
+    }
+  }
+  return ret;
+}
+
 std::vector<size_t> Grid::getRows(const std::vector<GridCell> & cells)
 {
   std::vector<size_t> ret;
@@ -187,7 +209,8 @@ std::vector<GridCell> Grid::getCell(
   const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive,
   const geometry_msgs::msg::Pose & sensor_pose) const
 {
-  const auto candidates = getOccupiedCandidates(primitive, sensor_pose);
+  auto candidates = getOccupiedCandidates(primitive, sensor_pose);
+  // candidates = filterByIntersection();
   return candidates;
 }
 }  // namespace simple_sensor_simulator

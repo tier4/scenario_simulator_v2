@@ -15,6 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 #include <iostream>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
