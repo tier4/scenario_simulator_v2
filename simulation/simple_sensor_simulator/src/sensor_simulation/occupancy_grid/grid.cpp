@@ -163,8 +163,7 @@ bool GridCell::operator<(const GridCell & rhs) const { return index < rhs.index;
 bool GridCell::operator>(const GridCell & rhs) const { return rhs < *this; }
 bool GridCell::operator<=(const GridCell & rhs) const { return !(rhs > *this); }
 bool GridCell::operator>=(const GridCell & rhs) const { return !(rhs < *this); }
-
-GridCell & GridCell::operator=(const GridCell & rhs) { return *this; }
+GridCell & GridCell::operator=(const GridCell &) { return *this; }
 
 std::vector<GridCell> Grid::merge(
   const std::vector<GridCell> & cells0, const std::vector<GridCell> & cells1) const
@@ -172,6 +171,8 @@ std::vector<GridCell> Grid::merge(
   auto ret = cells0;
   std::copy(cells1.begin(), cells1.end(), std::back_inserter(ret));
   std::sort(ret.begin(), ret.end(), [](GridCell a, GridCell b) { return a.index < b.index; });
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+  return ret;
 }
 
 Grid::Grid(double resolution, double height, double width)
@@ -283,9 +284,8 @@ std::vector<GridCell> Grid::getCell(
 {
   auto candidates = getOccupiedCandidates(primitive, sensor_pose);
   const auto points = primitive->get2DConvexHull();
-  const auto candidates_intersection = filterByIntersection(candidates, getLineSegments(points));
-  const auto candidates_contain = filterByContain(candidates, points);
-  // candidates = filterByIntersection();
-  return candidates;
+  const auto ret = merge(
+    filterByIntersection(candidates, getLineSegments(points)), filterByContain(candidates, points));
+  return ret;
 }
 }  // namespace simple_sensor_simulator
