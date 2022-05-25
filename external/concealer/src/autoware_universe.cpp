@@ -85,9 +85,16 @@ auto AutowareUniverse::update() -> void
   {
     using autoware_auto_vehicle_msgs::msg::GearReport;
     current_shift.stamp = get_clock()->now();
-    current_shift.report = current_twist.linear.x >= 0 ? GearReport::DRIVE : GearReport::REVERSE;
+    current_shift.report = getGearCommand().command;
   }
   setCurrentShift(current_shift);
+
+  setCurrentTurnIndicators([this]() {
+    CurrentTurnIndicators current_turn_indicators;
+    current_turn_indicators.stamp = get_clock()->now();
+    current_turn_indicators.report = getTurnIndicatorsCommand().command;
+    return current_turn_indicators;
+  }());
 
   CurrentSteering current_steering;
   {
