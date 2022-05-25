@@ -64,10 +64,8 @@ If you have NVIDIA GPU(s) in your machine, you have to install nvidia-driver and
 In order to install nvidia-docker2 on Ubuntu, please type the commands below.
 
 ```bash
-curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | \
-  sudo apt-key add -
-distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/ubuntu20.04/nvidia-container-runtime.list | \
   sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
 sudo apt-get update
 sudo apt install -y nvidia-docker2
@@ -163,7 +161,7 @@ rocker --x11 scenario_simulator_v2 ros2 launch cpp_mock_scenarios mock_test.laun
 
 We automatically build docker images of scenario_simulator_v2 by using GitHub Actions and put them into our Docker Hub repository.
 
-[![Push Docker Image](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2-docs/actions/workflows/Docker.yaml)
+[![Push Docker Image](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)
 
 [![dockeri.co](https://dockeri.co/image/tier4/scenario_simulator_v2)](https://hub.docker.com/r/tier4/scenario_simulator_v2)
 
