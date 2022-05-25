@@ -80,6 +80,8 @@ private:
     const geometry_msgs::msg::Pose & sensor_pose) const;
   std::vector<GridCell> filterByRow(const std::vector<GridCell> & cells, size_t row) const;
   std::vector<GridCell> filterByCol(const std::vector<GridCell> & cells, size_t col) const;
+  std::vector<GridCell> filterByIndex(
+    const std::vector<GridCell> & cells, std::vector<size_t> index) const;
   std::vector<GridCell> filterByIntersection(
     const std::vector<GridCell> & cells, const std::vector<LineSegment> & line_segments) const;
   std::vector<GridCell> filterByContain(
@@ -88,6 +90,7 @@ private:
   std::vector<size_t> getCols(const std::vector<GridCell> & cells) const;
   std::vector<GridCell> merge(
     const std::vector<GridCell> & cells0, const std::vector<GridCell> & cells1) const;
+  std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
 };
 }  // namespace simple_sensor_simulator
 

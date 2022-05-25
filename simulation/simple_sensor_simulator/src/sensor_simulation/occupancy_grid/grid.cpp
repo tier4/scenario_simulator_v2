@@ -17,6 +17,7 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 
 namespace simple_sensor_simulator
@@ -170,8 +171,34 @@ std::vector<GridCell> Grid::merge(
 {
   auto ret = cells0;
   std::copy(cells1.begin(), cells1.end(), std::back_inserter(ret));
-  std::sort(ret.begin(), ret.end(), [](GridCell a, GridCell b) { return a.index < b.index; });
+  std::sort(ret.begin(), ret.end(), [](const GridCell & a, const GridCell & b) {
+    return a.index < b.index;
+  });
   ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+  return ret;
+}
+
+std::vector<size_t> Grid::getFillIndex(const std::vector<GridCell> & cells) const
+{
+  std::vector<size_t> ret;
+  const auto rows = getRows(cells);
+  for (const auto & row : rows) {
+    auto cell_in_row = filterByRow(cells, row);
+    std::sort(cell_in_row.begin(), cell_in_row.end(), [](const GridCell & a, const GridCell & b) {
+      return a.col < b.col;
+    });
+    if (cell_in_row.empty()) {
+      continue;
+    } else if (cell_in_row.size() == 1) {
+      ret.emplace_back(cell_in_row[0].index);
+    } else {
+      const size_t min_col = cell_in_row[0].col;
+      const size_t max_col = cell_in_row[cell_in_row.size() - 1].col;
+      for (size_t col = min_col; col <= max_col; col++) {
+        ret.emplace_back(col);
+      }
+    }
+  }
   return ret;
 }
 
@@ -232,6 +259,21 @@ std::vector<GridCell> Grid::filterByCol(const std::vector<GridCell> & cells, siz
   return ret;
 }
 
+std::vector<GridCell> Grid::filterByIndex(
+  const std::vector<GridCell> & cells, std::vector<size_t> index) const
+{
+  std::vector<GridCell> ret;
+  for (const auto & i : index) {
+    const auto find =
+      std::find_if(cells.begin(), cells.end(), [&](GridCell cell) { return i == cell.index; });
+    if (find != cells.end()) {
+      ret.emplace_back(*find);
+    }
+  }
+  RCLCPP_WARN_STREAM(rclcpp::get_logger("test"),index.size() << "," << ret.size());
+  return ret;
+}
+
 std::vector<GridCell> Grid::filterByIntersection(
   const std::vector<GridCell> & cells, const std::vector<LineSegment> & line_segments) const
 {
@@ -284,8 +326,10 @@ std::vector<GridCell> Grid::getCell(
 {
   auto candidates = getOccupiedCandidates(primitive, sensor_pose);
   const auto points = primitive->get2DConvexHull();
-  const auto ret = merge(
-    filterByIntersection(candidates, getLineSegments(points)), filterByContain(candidates, points));
+  const auto ret = filterByIndex(
+    candidates, getFillIndex(merge(
+                  filterByIntersection(candidates, getLineSegments(points)),
+                  filterByContain(candidates, points))));
   return ret;
 }
 }  // namespace simple_sensor_simulator
