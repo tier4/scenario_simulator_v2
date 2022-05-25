@@ -75,51 +75,51 @@ auto AutowareUniverse::engage() -> void
 
 auto AutowareUniverse::update() -> void
 {
-  setCurrentControlMode([this]() {
-    CurrentControlMode current_control_mode;
-    current_control_mode.mode = CurrentControlMode::AUTONOMOUS;
-    return current_control_mode;
+  setControlModeReport([this]() {
+    ControlModeReport message;
+    message.mode = ControlModeReport::AUTONOMOUS;
+    return message;
   }());
 
-  setCurrentShift([this]() {
-    CurrentShift current_shift;
-    current_shift.stamp = get_clock()->now();
-    current_shift.report = getGearCommand().command;
-    return current_shift;
+  setGearReport([this]() {
+    GearReport message;
+    message.stamp = get_clock()->now();
+    message.report = getGearCommand().command;
+    return message;
   }());
 
-  setCurrentTurnIndicators([this]() {
-    CurrentTurnIndicators current_turn_indicators;
-    current_turn_indicators.stamp = get_clock()->now();
-    current_turn_indicators.report = getTurnIndicatorsCommand().command;
-    return current_turn_indicators;
+  setTurnIndicatorsReport([this]() {
+    TurnIndicatorsReport message;
+    message.stamp = get_clock()->now();
+    message.report = getTurnIndicatorsCommand().command;
+    return message;
   }());
 
-  setCurrentSteering([this]() {
-    CurrentSteering current_steering;
-    current_steering.stamp = get_clock()->now();
-    current_steering.steering_tire_angle = getSteeringAngle();
-    return current_steering;
+  setSteeringReport([this]() {
+    SteeringReport message;
+    message.stamp = get_clock()->now();
+    message.steering_tire_angle = getSteeringAngle();
+    return message;
   }());
 
-  setCurrentVelocity([this]() {
-    CurrentVelocity current_velocity;
-    current_velocity.header.stamp = get_clock()->now();
-    current_velocity.header.frame_id = "base_link";
-    current_velocity.longitudinal_velocity = current_twist.linear.x;
-    current_velocity.lateral_velocity = current_twist.linear.y;
-    current_velocity.heading_rate = current_twist.angular.z;
-    return current_velocity;
+  setVelocityReport([this]() {
+    VelocityReport message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "base_link";
+    message.longitudinal_velocity = current_twist.linear.x;
+    message.lateral_velocity = current_twist.linear.y;
+    message.heading_rate = current_twist.angular.z;
+    return message;
   }());
 
-  setLocalizationOdometry([this]() {
-    LocalizationOdometry localization_odometry;
-    localization_odometry.header.stamp = get_clock()->now();
-    localization_odometry.header.frame_id = "map";
-    localization_odometry.pose.pose = current_pose;
-    localization_odometry.pose.covariance = {};
-    localization_odometry.twist.twist = current_twist;
-    return localization_odometry;
+  setOdometry([this]() {
+    Odometry message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "map";
+    message.pose.pose = current_pose;
+    message.pose.covariance = {};
+    message.twist.twist = current_twist;
+    return message;
   }());
 
   setTransform(current_pose);
