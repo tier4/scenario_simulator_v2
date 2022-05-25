@@ -48,6 +48,15 @@ public:
   const size_t col;
   bool intersection2D(const LineSegment & line) const;
   bool intersection2D(const std::vector<LineSegment> & line_segments) const;
+  bool contains(const geometry_msgs::msg::Point & p) const;
+  bool contains(const std::vector<geometry_msgs::msg::Point> & points) const;
+  bool operator==(const GridCell & rhs) const;
+  bool operator!=(const GridCell & rhs) const;
+  bool operator<(const GridCell & rhs) const;
+  bool operator>(const GridCell & rhs) const;
+  bool operator<=(const GridCell & rhs) const;
+  bool operator>=(const GridCell & rhs) const;
+  GridCell & operator=(const GridCell & rhs);
 
 private:
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & point) const;
@@ -73,8 +82,12 @@ private:
   std::vector<GridCell> filterByCol(const std::vector<GridCell> & cells, size_t col) const;
   std::vector<GridCell> filterByIntersection(
     const std::vector<GridCell> & cells, const std::vector<LineSegment> & line_segments) const;
-  std::vector<size_t> getRows(const std::vector<GridCell> & cells);
-  std::vector<size_t> getCols(const std::vector<GridCell> & cells);
+  std::vector<GridCell> filterByContain(
+    std::vector<GridCell> & cells, const std::vector<geometry_msgs::msg::Point> & points) const;
+  std::vector<size_t> getRows(const std::vector<GridCell> & cells) const;
+  std::vector<size_t> getCols(const std::vector<GridCell> & cells) const;
+  std::vector<GridCell> merge(
+    const std::vector<GridCell> & cells0, const std::vector<GridCell> & cells1) const;
 };
 }  // namespace simple_sensor_simulator
 

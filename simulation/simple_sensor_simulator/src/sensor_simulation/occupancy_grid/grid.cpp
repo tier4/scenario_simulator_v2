@@ -14,6 +14,9 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 
 namespace simple_sensor_simulator
@@ -123,6 +126,54 @@ bool GridCell::intersection2D(const std::vector<LineSegment> & line_segments) co
   return false;
 }
 
+bool GridCell::contains(const geometry_msgs::msg::Point & p) const
+{
+  const auto line_segments = getLineSegments();
+  typedef boost::geometry::model::d2::point_xy<double> boost_point;
+  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+  boost_polygon poly;
+  for (const auto & line_segment : line_segments) {
+    boost::geometry::exterior_ring(poly).push_back(
+      boost_point(line_segment.start_point.x, line_segment.start_point.y));
+  }
+  return boost::geometry::within(boost_point(p.x, p.y), poly);
+}
+
+bool GridCell::contains(const std::vector<geometry_msgs::msg::Point> & points) const
+{
+  for (const auto & point : points) {
+    if (contains(point)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool GridCell::operator==(const GridCell & rhs) const
+{
+  if (rhs.row == row && rhs.col == col && rhs.index == index) {
+    return true;
+  }
+  return false;
+}
+
+bool GridCell::operator!=(const GridCell & rhs) const { return !(*this == rhs); }
+
+bool GridCell::operator<(const GridCell & rhs) const { return index < rhs.index; }
+bool GridCell::operator>(const GridCell & rhs) const { return rhs < *this; }
+bool GridCell::operator<=(const GridCell & rhs) const { return !(rhs > *this); }
+bool GridCell::operator>=(const GridCell & rhs) const { return !(rhs < *this); }
+
+GridCell & GridCell::operator=(const GridCell & rhs) { return *this; }
+
+std::vector<GridCell> Grid::merge(
+  const std::vector<GridCell> & cells0, const std::vector<GridCell> & cells1) const
+{
+  auto ret = cells0;
+  std::copy(cells1.begin(), cells1.end(), std::back_inserter(ret));
+  std::sort(ret.begin(), ret.end(), [](GridCell a, GridCell b) { return a.index < b.index; });
+}
+
 Grid::Grid(double resolution, double height, double width)
 : resolution(resolution), height(height), width(width)
 {
@@ -192,7 +243,19 @@ std::vector<GridCell> Grid::filterByIntersection(
   return ret;
 }
 
-std::vector<size_t> Grid::getRows(const std::vector<GridCell> & cells)
+std::vector<GridCell> Grid::filterByContain(
+  std::vector<GridCell> & cells, const std::vector<geometry_msgs::msg::Point> & points) const
+{
+  std::vector<GridCell> ret;
+  for (const auto & cell : cells) {
+    if (cell.contains(points)) {
+      ret.emplace_back(cell);
+    }
+  }
+  return ret;
+}
+
+std::vector<size_t> Grid::getRows(const std::vector<GridCell> & cells) const
 {
   std::vector<size_t> ret;
   for (const auto & cell : cells) {
@@ -203,7 +266,7 @@ std::vector<size_t> Grid::getRows(const std::vector<GridCell> & cells)
   return ret;
 }
 
-std::vector<size_t> Grid::getCols(const std::vector<GridCell> & cells)
+std::vector<size_t> Grid::getCols(const std::vector<GridCell> & cells) const
 {
   std::vector<size_t> ret;
   for (const auto & cell : cells) {
@@ -219,7 +282,9 @@ std::vector<GridCell> Grid::getCell(
   const geometry_msgs::msg::Pose & sensor_pose) const
 {
   auto candidates = getOccupiedCandidates(primitive, sensor_pose);
-  candidates = filterByIntersection(candidates, getLineSegments(primitive->get2DConvexHull()));
+  const auto points = primitive->get2DConvexHull();
+  const auto candidates_intersection = filterByIntersection(candidates, getLineSegments(points));
+  const auto candidates_contain = filterByContain(candidates, points);
   // candidates = filterByIntersection();
   return candidates;
 }
