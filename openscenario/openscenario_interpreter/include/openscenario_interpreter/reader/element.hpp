@@ -90,13 +90,17 @@ auto readElement(const std::string & name, const pugi::xml_node & parent, Scope 
 }
 
 template <typename T, typename U, typename Scope>
-auto readElement(
-  const std::string & name, const pugi::xml_node & parent, Scope & scope, U && value)
+auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope, U && value)
 {
   using RAW_U = typename std::decay<U>::type;
   if constexpr (std::is_same<T, RAW_U>::value) {
-    // return "value" as a default value
-    return value;
+    // use 'value' as a default element.
+    // the default element will be used when current scope has no description about 'name'.
+    if (const auto child = parent.child(name.c_str())) {
+      return T(child, scope);
+    } else {
+      return value;
+    }
   } else {
     // use "value" as an additional arguments to the constructor
     if (const auto child = parent.child(name.c_str())) {

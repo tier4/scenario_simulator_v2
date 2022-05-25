@@ -26,15 +26,11 @@ ConditionGroup::ConditionGroup(const pugi::xml_node & node, Scope & scope) : cur
 
 auto ConditionGroup::evaluate() -> Object
 {
-  if(this->empty()){
-    std::cout << "This is an empty condition group" << std::endl;
-  }
   // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
   return asBoolean(
     current_value = std::accumulate(
       std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & condition) {
         const auto rhs = condition.evaluate();
-        std::cout << "Condition Name : " << condition.name << std::endl;
         return lhs and rhs.as<Boolean>();
       }));
 }
