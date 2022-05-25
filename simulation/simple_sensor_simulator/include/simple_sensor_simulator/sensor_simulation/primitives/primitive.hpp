@@ -53,6 +53,7 @@ public:
   unsigned int addToScene(RTCDevice device, RTCScene scene);
   std::vector<Vertex> getVertex() const;
   std::vector<Triangle> getTriangles() const;
+  std::vector<geometry_msgs::msg::Point> get2DConvexHull() const;
   boost::optional<double> getMax(const Axis & axis) const;
   boost::optional<double> getMin(const Axis & axis) const;
   boost::optional<double> getMax(

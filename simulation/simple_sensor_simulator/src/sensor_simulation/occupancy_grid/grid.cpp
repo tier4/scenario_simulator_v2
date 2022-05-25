@@ -46,6 +46,15 @@ bool LineSegment::intersection2D(const LineSegment & l0) const
   return true;
 }
 
+std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points)
+{
+  std::vector<LineSegment> seg;
+  for (size_t i = 0; i < points.size(); i++) {
+    seg.emplace_back(LineSegment(points[i], points[i + 1]));
+  }
+  return seg;
+}
+
 GridCell::GridCell(
   const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col)
 : origin(origin), size(size), index(index), row(row), col(col)
@@ -210,6 +219,7 @@ std::vector<GridCell> Grid::getCell(
   const geometry_msgs::msg::Pose & sensor_pose) const
 {
   auto candidates = getOccupiedCandidates(primitive, sensor_pose);
+  candidates = filterByIntersection(candidates, getLineSegments(primitive->get2DConvexHull()));
   // candidates = filterByIntersection();
   return candidates;
 }

@@ -15,6 +15,7 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
+#include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <iostream>
@@ -89,6 +90,31 @@ std::vector<Vertex> Primitive::transform(const geometry_msgs::msg::Pose & sensor
 std::vector<Vertex> Primitive::getVertex() const { return transform(); }
 
 std::vector<Triangle> Primitive::getTriangles() const { return triangles_; }
+
+std::vector<geometry_msgs::msg::Point> Primitive::get2DConvexHull() const
+{
+  const auto vertex = getVertex();
+  typedef boost::geometry::model::d2::point_xy<double> boost_point;
+  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+  boost_polygon poly;
+  for (const auto & p : vertex) {
+    boost::geometry::exterior_ring(poly).push_back(boost_point(p.x, p.y));
+  }
+  boost_polygon hull;
+  boost::geometry::convex_hull(poly, hull);
+  std::vector<geometry_msgs::msg::Point> polygon;
+  for (auto it = boost::begin(boost::geometry::exterior_ring(hull));
+       it != boost::end(boost::geometry::exterior_ring(hull)); ++it) {
+    double x = boost::geometry::get<0>(*it);
+    double y = boost::geometry::get<1>(*it);
+    geometry_msgs::msg::Point p;
+    p.x = x;
+    p.y = y;
+    p.z = 0.0;
+    polygon.emplace_back(p);
+  }
+  return polygon;
+}
 
 unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
 {

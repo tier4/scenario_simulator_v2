@@ -34,6 +34,8 @@ public:
   bool intersection2D(const LineSegment & l0) const;
 };
 
+std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points);
+
 class GridCell
 {
 public:
