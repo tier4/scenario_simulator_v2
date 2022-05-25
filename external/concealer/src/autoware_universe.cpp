@@ -75,19 +75,18 @@ auto AutowareUniverse::engage() -> void
 
 auto AutowareUniverse::update() -> void
 {
-  CurrentControlMode current_control_mode;
-  {
+  setCurrentControlMode([this]() {
+    CurrentControlMode current_control_mode;
     current_control_mode.mode = CurrentControlMode::AUTONOMOUS;
-  }
-  setCurrentControlMode(current_control_mode);
+    return current_control_mode;
+  }());
 
-  CurrentShift current_shift;
-  {
-    using autoware_auto_vehicle_msgs::msg::GearReport;
+  setCurrentShift([this]() {
+    CurrentShift current_shift;
     current_shift.stamp = get_clock()->now();
     current_shift.report = getGearCommand().command;
-  }
-  setCurrentShift(current_shift);
+    return current_shift;
+  }());
 
   setCurrentTurnIndicators([this]() {
     CurrentTurnIndicators current_turn_indicators;
@@ -96,32 +95,32 @@ auto AutowareUniverse::update() -> void
     return current_turn_indicators;
   }());
 
-  CurrentSteering current_steering;
-  {
+  setCurrentSteering([this]() {
+    CurrentSteering current_steering;
     current_steering.stamp = get_clock()->now();
     current_steering.steering_tire_angle = getSteeringAngle();
-  }
-  setCurrentSteering(current_steering);
+    return current_steering;
+  }());
 
-  CurrentVelocity current_velocity;
-  {
+  setCurrentVelocity([this]() {
+    CurrentVelocity current_velocity;
     current_velocity.header.stamp = get_clock()->now();
     current_velocity.header.frame_id = "base_link";
     current_velocity.longitudinal_velocity = current_twist.linear.x;
     current_velocity.lateral_velocity = current_twist.linear.y;
     current_velocity.heading_rate = current_twist.angular.z;
-  }
-  setCurrentVelocity(current_velocity);
+    return current_velocity;
+  }());
 
-  LocalizationOdometry localization_odometry;
-  {
+  setLocalizationOdometry([this]() {
+    LocalizationOdometry localization_odometry;
     localization_odometry.header.stamp = get_clock()->now();
     localization_odometry.header.frame_id = "map";
     localization_odometry.pose.pose = current_pose;
     localization_odometry.pose.covariance = {};
     localization_odometry.twist.twist = current_twist;
-  }
-  setLocalizationOdometry(localization_odometry);
+    return localization_odometry;
+  }());
 
   setTransform(current_pose);
 }
