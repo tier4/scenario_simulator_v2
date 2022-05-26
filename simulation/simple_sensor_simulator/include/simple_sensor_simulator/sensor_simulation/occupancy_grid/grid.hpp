@@ -30,6 +30,9 @@ class LineSegment
 public:
   LineSegment(
     const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point);
+  LineSegment(
+    const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Vector3 & vec,
+    double length);
   ~LineSegment();
   const geometry_msgs::msg::Point start_point;
   const geometry_msgs::msg::Point end_point;
@@ -77,6 +80,8 @@ public:
   const double height;
   const double width;
   const geometry_msgs::msg::Pose origin;
+  std::vector<GridCell> getInvisibleCell(
+    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
   std::vector<GridCell> getOccupiedCell(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
 
@@ -97,6 +102,8 @@ private:
     const std::vector<GridCell> & cells0, const std::vector<GridCell> & cells1) const;
   std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
   std::array<LineSegment, 4> getOutsideLineSegments() const;
+  std::vector<geometry_msgs::msg::Point> raycastToOutside(
+    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive);
 };
 }  // namespace simple_sensor_simulator
 

@@ -28,6 +28,20 @@ LineSegment::LineSegment(
 {
 }
 
+LineSegment::LineSegment(
+  const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Vector3 & vec,
+  double length)
+: start_point(start_point), end_point([&]() -> geometry_msgs::msg::Point {
+    geometry_msgs::msg::Point ret;
+    double vec_size = std::hypot(vec.x, vec.y, vec.z);
+    ret.x = start_point.x + vec.x / vec_size * length;
+    ret.y = start_point.y + vec.y / vec_size * length;
+    ret.z = start_point.z + vec.z / vec_size * length;
+    return ret;
+  }())
+{
+}
+
 LineSegment::~LineSegment() {}
 
 bool LineSegment::isIntersect2D(const LineSegment & l0) const
@@ -367,6 +381,11 @@ std::vector<size_t> Grid::getCols(const std::vector<GridCell> & cells) const
   return ret;
 }
 
+std::vector<GridCell> Grid::getInvisibleCell(
+  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
+{
+}
+
 std::vector<GridCell> Grid::getOccupiedCell(
   const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
 {
@@ -400,5 +419,11 @@ std::array<LineSegment, 4> Grid::getOutsideLineSegments() const
   return {
     LineSegment(left_up, left_down), LineSegment(left_down, right_down),
     LineSegment(right_down, right_up), LineSegment(right_up, left_up)};
+}
+
+std::vector<geometry_msgs::msg::Point> Grid::raycastToOutside(
+  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive)
+{
+  const auto outsides = getOutsideLineSegments();
 }
 }  // namespace simple_sensor_simulator
