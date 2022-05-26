@@ -195,7 +195,7 @@ std::vector<size_t> Grid::getFillIndex(const std::vector<GridCell> & cells) cons
       const size_t min_col = cell_in_row[0].col;
       const size_t max_col = cell_in_row[cell_in_row.size() - 1].col;
       for (size_t col = min_col; col <= max_col; col++) {
-        ret.emplace_back(col);
+        ret.emplace_back(width * row + col);
       }
     }
   }
@@ -270,7 +270,6 @@ std::vector<GridCell> Grid::filterByIndex(
       ret.emplace_back(*find);
     }
   }
-  RCLCPP_WARN_STREAM(rclcpp::get_logger("test"),index.size() << "," << ret.size());
   return ret;
 }
 
