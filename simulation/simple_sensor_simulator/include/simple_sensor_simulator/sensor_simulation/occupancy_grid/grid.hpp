@@ -103,7 +103,7 @@ private:
   std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
   std::array<LineSegment, 4> getOutsideLineSegments() const;
   std::vector<geometry_msgs::msg::Point> raycastToOutside(
-    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive);
+    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
 };
 }  // namespace simple_sensor_simulator
 

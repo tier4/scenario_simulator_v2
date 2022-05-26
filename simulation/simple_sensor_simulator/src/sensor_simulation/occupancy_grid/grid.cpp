@@ -384,6 +384,7 @@ std::vector<size_t> Grid::getCols(const std::vector<GridCell> & cells) const
 std::vector<GridCell> Grid::getInvisibleCell(
   const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
 {
+  const auto hits = raycastToOutside(primitive);
 }
 
 std::vector<GridCell> Grid::getOccupiedCell(
@@ -422,8 +423,25 @@ std::array<LineSegment, 4> Grid::getOutsideLineSegments() const
 }
 
 std::vector<geometry_msgs::msg::Point> Grid::raycastToOutside(
-  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive)
+  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
 {
+  std::vector<geometry_msgs::msg::Point> ret;
   const auto outsides = getOutsideLineSegments();
+  const auto points = primitive->get2DConvexHull();
+  for (const auto & point : points) {
+    geometry_msgs::msg::Vector3 vec;
+    vec.x = point.x - origin.position.x;
+    vec.y = point.y - origin.position.y;
+    vec.z = point.z - origin.position.z;
+    const auto ray =
+      LineSegment(origin.position, vec, std::hypot(width * resolution, height * resolution) * 2);
+    for (const auto & outside : outsides) {
+      const auto hit = outside.getIntersection2D(ray);
+      if (hit) {
+        ret.emplace_back(hit.get());
+      }
+    }
+  }
+  return ret;
 }
 }  // namespace simple_sensor_simulator
