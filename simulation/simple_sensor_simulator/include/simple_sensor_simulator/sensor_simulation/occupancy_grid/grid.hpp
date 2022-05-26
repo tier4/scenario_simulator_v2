@@ -16,8 +16,10 @@
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
 
 #include <array>
+#include <boost/optional.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <vector>
 
@@ -31,10 +33,14 @@ public:
   ~LineSegment();
   const geometry_msgs::msg::Point start_point;
   const geometry_msgs::msg::Point end_point;
-  bool intersection2D(const LineSegment & l0) const;
+  bool isIntersect2D(const LineSegment & l0) const;
+  boost::optional<geometry_msgs::msg::Point> getIntersection2D(const LineSegment & line) const;
+  geometry_msgs::msg::Vector3 getVector() const;
+  double getLength() const;
 };
 
 std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points);
+std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines);
 
 class GridCell
 {
@@ -46,8 +52,8 @@ public:
   const size_t index;
   const size_t row;
   const size_t col;
-  bool intersection2D(const LineSegment & line) const;
-  bool intersection2D(const std::vector<LineSegment> & line_segments) const;
+  bool isIntersect2D(const LineSegment & line) const;
+  bool isIntersect2D(const std::vector<LineSegment> & line_segments) const;
   bool contains(const geometry_msgs::msg::Point & p) const;
   bool contains(const std::vector<geometry_msgs::msg::Point> & points) const;
   bool operator==(const GridCell & rhs) const;
@@ -70,7 +76,7 @@ public:
   const double resolution;
   const double height;
   const double width;
-  std::vector<GridCell> getCell(
+  std::vector<GridCell> getOccupiedCell(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive,
     const geometry_msgs::msg::Pose & sensor_pose) const;
 

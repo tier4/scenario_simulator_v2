@@ -30,7 +30,7 @@ LineSegment::LineSegment(
 
 LineSegment::~LineSegment() {}
 
-bool LineSegment::intersection2D(const LineSegment & l0) const
+bool LineSegment::isIntersect2D(const LineSegment & l0) const
 {
   double s, t;
   s = (l0.start_point.x - l0.end_point.x) * (start_point.y - l0.start_point.y) -
@@ -48,6 +48,39 @@ bool LineSegment::intersection2D(const LineSegment & l0) const
     return false;
   }
   return true;
+}
+
+boost::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
+  const LineSegment & line) const
+{
+  if (!isIntersect2D(line)) {
+    return boost::none;
+  }
+  const auto det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
+                   (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
+  const auto t = ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
+                  (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
+                 det;
+  geometry_msgs::msg::Point point;
+  point.x = t * start_point.x + (1.0 - t) * end_point.x;
+  point.y = t * start_point.y + (1.0 - t) * end_point.y;
+  point.z = t * start_point.z + (1.0 - t) * end_point.z;
+  return point;
+}
+
+geometry_msgs::msg::Vector3 LineSegment::getVector() const
+{
+  geometry_msgs::msg::Vector3 vec;
+  vec.x = end_point.x - start_point.x;
+  vec.y = end_point.y - start_point.y;
+  vec.z = end_point.z - start_point.z;
+  return vec;
+}
+
+double LineSegment::getLength() const
+{
+  return std::hypot(
+    end_point.x - start_point.x, end_point.y - start_point.y, end_point.z - start_point.z);
 }
 
 std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points)
@@ -89,6 +122,22 @@ std::array<LineSegment, 4> GridCell::getLineSegments() const
   return ret;
 }
 
+std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines)
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  for (size_t i = 0; i < lines.size(); i++) {
+    for (size_t m = 0; m < lines.size(); m++) {
+      if (i < m) {
+        const auto intersection = lines[i].getIntersection2D(lines[m]);
+        if (intersection) {
+          ret.emplace_back(intersection.get());
+        }
+      }
+    }
+  }
+  return ret;
+}
+
 geometry_msgs::msg::Point GridCell::transformToWorld(const geometry_msgs::msg::Point & point) const
 {
   auto mat = quaternion_operation::getRotationMatrix(origin.orientation);
@@ -107,20 +156,20 @@ geometry_msgs::msg::Point GridCell::transformToWorld(const geometry_msgs::msg::P
   return ret;
 }
 
-bool GridCell::intersection2D(const LineSegment & line) const
+bool GridCell::isIntersect2D(const LineSegment & line) const
 {
   for (const auto & outside : getLineSegments()) {
-    if (outside.intersection2D(line)) {
+    if (outside.isIntersect2D(line)) {
       return true;
     }
   }
   return false;
 }
 
-bool GridCell::intersection2D(const std::vector<LineSegment> & line_segments) const
+bool GridCell::isIntersect2D(const std::vector<LineSegment> & line_segments) const
 {
   for (const auto & line_segment : line_segments) {
-    if (intersection2D(line_segment)) {
+    if (isIntersect2D(line_segment)) {
       return true;
     }
   }
@@ -278,7 +327,7 @@ std::vector<GridCell> Grid::filterByIntersection(
 {
   std::vector<GridCell> ret;
   for (const auto & cell : cells) {
-    if (cell.intersection2D(line_segments)) {
+    if (cell.isIntersect2D(line_segments)) {
       ret.emplace_back(cell);
     }
   }
@@ -319,7 +368,7 @@ std::vector<size_t> Grid::getCols(const std::vector<GridCell> & cells) const
   return ret;
 }
 
-std::vector<GridCell> Grid::getCell(
+std::vector<GridCell> Grid::getOccupiedCell(
   const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive,
   const geometry_msgs::msg::Pose & sensor_pose) const
 {
