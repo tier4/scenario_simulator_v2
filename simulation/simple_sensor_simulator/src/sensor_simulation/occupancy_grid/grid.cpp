@@ -251,20 +251,19 @@ std::vector<size_t> Grid::getFillIndex(const std::vector<GridCell> & cells) cons
   return ret;
 }
 
-Grid::Grid(double resolution, double height, double width)
-: resolution(resolution), height(height), width(width)
+Grid::Grid(const geometry_msgs::msg::Pose & origin, double resolution, double height, double width)
+: resolution(resolution), height(height), width(width), origin(origin)
 {
 }
 
 std::vector<GridCell> Grid::getOccupiedCandidates(
-  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive,
-  const geometry_msgs::msg::Pose & sensor_pose) const
+  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
 {
   std::vector<GridCell> ret;
-  const auto x_max = primitive->getMax(simple_sensor_simulator::Axis::X, sensor_pose);
-  const auto y_max = primitive->getMax(simple_sensor_simulator::Axis::Y, sensor_pose);
-  const auto x_min = primitive->getMin(simple_sensor_simulator::Axis::X, sensor_pose);
-  const auto y_min = primitive->getMin(simple_sensor_simulator::Axis::Y, sensor_pose);
+  const auto x_max = primitive->getMax(simple_sensor_simulator::Axis::X, origin);
+  const auto y_max = primitive->getMax(simple_sensor_simulator::Axis::Y, origin);
+  const auto x_min = primitive->getMin(simple_sensor_simulator::Axis::X, origin);
+  const auto y_min = primitive->getMin(simple_sensor_simulator::Axis::Y, origin);
   if (!x_max || !y_max || !x_min || !y_min) {
     return ret;
   }
@@ -275,10 +274,10 @@ std::vector<GridCell> Grid::getOccupiedCandidates(
   for (int x_index = x_min_index; x_index <= x_max_index; x_index++) {
     for (int y_index = y_min_index; y_index <= y_max_index; y_index++) {
       geometry_msgs::msg::Pose cell_origin;
-      cell_origin.position.x = sensor_pose.position.x + (x_index - 0.5 * height) * resolution;
-      cell_origin.position.y = sensor_pose.position.y + (y_index - 0.5 * width) * resolution;
-      cell_origin.position.z = sensor_pose.position.z;
-      cell_origin.orientation = sensor_pose.orientation;
+      cell_origin.position.x = origin.position.x + (x_index - 0.5 * height) * resolution;
+      cell_origin.position.y = origin.position.y + (y_index - 0.5 * width) * resolution;
+      cell_origin.position.z = origin.position.z;
+      cell_origin.orientation = origin.orientation;
       ret.emplace_back(
         GridCell(cell_origin, resolution, width * y_index + x_index, y_index, x_index));
     }
@@ -369,10 +368,9 @@ std::vector<size_t> Grid::getCols(const std::vector<GridCell> & cells) const
 }
 
 std::vector<GridCell> Grid::getOccupiedCell(
-  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive,
-  const geometry_msgs::msg::Pose & sensor_pose) const
+  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
 {
-  auto candidates = getOccupiedCandidates(primitive, sensor_pose);
+  auto candidates = getOccupiedCandidates(primitive);
   const auto points = primitive->get2DConvexHull();
   const auto ret = filterByIndex(
     candidates, getFillIndex(merge(
@@ -380,4 +378,6 @@ std::vector<GridCell> Grid::getOccupiedCell(
                   filterByContain(candidates, points))));
   return ret;
 }
+
+std::array<LineSegment, 4> Grid::getOutsideLineSegments() const {}
 }  // namespace simple_sensor_simulator

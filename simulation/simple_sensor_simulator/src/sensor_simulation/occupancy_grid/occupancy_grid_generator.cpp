@@ -18,14 +18,14 @@ namespace simple_sensor_simulator
 {
 OccupancyGridGenerator::OccupancyGridGenerator(
   const simulation_api_schema::OccupancyGridSensorConfiguration & configuration)
-: configuration(configuration),
-  grid_(configuration.resolution(), configuration.height(), configuration.width())
+: configuration(configuration)
 {
 }
 
 nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
   const geometry_msgs::msg::Pose & ego_pose, const rclcpp::Time & stamp) const
 {
+  Grid grid(ego_pose, configuration.resolution(), configuration.height(), configuration.width());
   nav_msgs::msg::OccupancyGrid occupancy_grid;
   occupancy_grid.header.stamp = stamp;
   occupancy_grid.header.frame_id = "map";
@@ -40,7 +40,7 @@ nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
   occupancy_grid.info.origin.position.y = occupancy_grid.info.origin.position.y -
                                           0.5 * configuration.width() * configuration.resolution();
   for (const auto & primitive : primitive_ptrs_) {
-    for (const auto & cell : grid_.getOccupiedCell(primitive.second, ego_pose)) {
+    for (const auto & cell : grid.getOccupiedCell(primitive.second)) {
       occupancy_grid.data[cell.index] = 100;
     }
   }

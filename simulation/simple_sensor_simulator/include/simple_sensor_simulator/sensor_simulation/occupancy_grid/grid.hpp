@@ -72,18 +72,17 @@ private:
 class Grid
 {
 public:
-  Grid(double resolution, double height, double width);
+  Grid(const geometry_msgs::msg::Pose & origin, double resolution, double height, double width);
   const double resolution;
   const double height;
   const double width;
+  const geometry_msgs::msg::Pose origin;
   std::vector<GridCell> getOccupiedCell(
-    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive,
-    const geometry_msgs::msg::Pose & sensor_pose) const;
+    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
 
 private:
   std::vector<GridCell> getOccupiedCandidates(
-    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive,
-    const geometry_msgs::msg::Pose & sensor_pose) const;
+    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
   std::vector<GridCell> filterByRow(const std::vector<GridCell> & cells, size_t row) const;
   std::vector<GridCell> filterByCol(const std::vector<GridCell> & cells, size_t col) const;
   std::vector<GridCell> filterByIndex(
@@ -97,6 +96,7 @@ private:
   std::vector<GridCell> merge(
     const std::vector<GridCell> & cells0, const std::vector<GridCell> & cells1) const;
   std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
+  std::array<LineSegment, 4> getOutsideLineSegments() const;
 };
 }  // namespace simple_sensor_simulator
 
