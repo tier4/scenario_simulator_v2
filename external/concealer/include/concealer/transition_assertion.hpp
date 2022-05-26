@@ -52,26 +52,26 @@ struct TransitionAssertion
   //     (current_state.empty() ? "NOT PUBLISHED YET" : current_state), ".");
   // }
 
-#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                                \
-  template <typename Thunk = void (*)()>                                                           \
-  void waitForAutowareStateToBe##STATE(                                                            \
-    Thunk thunk = []() {}, const std::chrono::seconds & interval = std::chrono::seconds(1))        \
-  {                                                                                                \
-    rclcpp::WallRate rate{interval};                                                               \
-    for (thunk(); static_cast<Autoware &>(*this).currentFuture().wait_for(                         \
-                    std::chrono::milliseconds(1)) == std::future_status::timeout and               \
-                  not static_cast<const Autoware &>(*this).is##STATE();                            \
-         rate.sleep()) {                                                                           \
-      remains -= std::chrono::duration_cast<std::chrono::seconds>(rate.period());                  \
-      RCLCPP_INFO_STREAM(                                                                          \
-        static_cast<Autoware &>(*this).get_logger(),                                               \
-        "Simulator waiting for Autoware state to be " #STATE " (" << remains.count() << ").");     \
-      thunk();                                                                                     \
-    }                                                                                              \
-    RCLCPP_INFO_STREAM(                                                                            \
-      static_cast<Autoware &>(*this).get_logger(),                                                 \
-      "Autoware is " << static_cast<const Autoware &>(*this).getAutowareStateString() << " now."); \
-  }                                                                                                \
+#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                              \
+  template <typename Thunk = void (*)()>                                                         \
+  void waitForAutowareStateToBe##STATE(                                                          \
+    Thunk thunk = []() {}, const std::chrono::seconds & interval = std::chrono::seconds(1))      \
+  {                                                                                              \
+    rclcpp::WallRate rate{interval};                                                             \
+    for (thunk(); static_cast<Autoware &>(*this).currentFuture().wait_for(                       \
+                    std::chrono::milliseconds(1)) == std::future_status::timeout and             \
+                  not static_cast<const Autoware &>(*this).is##STATE();                          \
+         rate.sleep()) {                                                                         \
+      remains -= std::chrono::duration_cast<std::chrono::seconds>(rate.period());                \
+      RCLCPP_INFO_STREAM(                                                                        \
+        static_cast<Autoware &>(*this).get_logger(),                                             \
+        "Simulator waiting for Autoware state to be " #STATE " (" << remains.count() << ").");   \
+      thunk();                                                                                   \
+    }                                                                                            \
+    RCLCPP_INFO_STREAM(                                                                          \
+      static_cast<Autoware &>(*this).get_logger(),                                               \
+      "Autoware is " << static_cast<const Autoware &>(*this).getAutowareStateName() << " now."); \
+  }                                                                                              \
   static_assert(true, "")
 
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Initializing);

@@ -10,7 +10,7 @@ This framework is designed for executing scenario tests with Autoware.
 
 ## Simple sensor simulator
 
-If you want to know about our very very simple lidar simulator, please read [this documentation](SimpleSensorSimulator.md).
+If you want to know about our very, very simple lidar simulator, please read [this documentation](SimpleSensorSimulator.md).
 
 ## Traffic simulator
 
@@ -28,9 +28,9 @@ If you want to know how we can send commands to the Autoware via simulators, ple
 
 If you want to know whole system architecture of this framework, please read [this documentation](SystemArchitecture.md).
 
-## TierIV Scenario Format Version 2.0
+## TIER IV Scenario Format Version 2.0
 
-If you want to know TierIV Scenario format Version 2.0 , which is a default scenario format of this framework, please read [this documentation](TierIVScenarioFormatVersion2.md).
+If you want to know TIER IV Scenario format Version 2.0 , which is a default scenario format of this framework, please read [this documentation](TierIVScenarioFormatVersion2.md).
 
 ## Vehicle Model
 

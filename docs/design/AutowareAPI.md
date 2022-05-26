@@ -1,7 +1,7 @@
 # Autoware API
 
 Autoware APIs provide features to control autoware easily via ROS 2 APIs.  
-AWAPI accessor is a C++ wrapper of the Autoware API, and it enables us to integrate Autoware with other tools very easily!  
+`concealer::Autoware` is a C++ wrapper of the Autoware API, and it enables us to integrate Autoware with other tools very easily!  
 We can control autoware while initialize_duration of the simulation. (current_time < 0)
 
 <font color="#065479E">*Note! Autoware APIs are now under development, and we are preparing documentation about this. The current code is not a final version, might be changed in the future.*</font>

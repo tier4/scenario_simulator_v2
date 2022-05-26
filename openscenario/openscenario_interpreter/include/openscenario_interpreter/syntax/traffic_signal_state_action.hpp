@@ -40,7 +40,7 @@ struct TrafficSignalStateAction
    *  ID of a signal in a road network. The signal ID must be listed in the
    *  TrafficSignal list of the RoadNetwork.
    *
-   *  In the TierIV OpenSCENARIO implementation, it is the Lanelet ID (positive
+   *  In the TIER IV OpenSCENARIO implementation, it is the Lanelet ID (positive
    *  integer) of the traffic light.
    *
    * ------------------------------------------------------------------------ */
