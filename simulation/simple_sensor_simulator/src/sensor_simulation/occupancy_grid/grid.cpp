@@ -379,5 +379,26 @@ std::vector<GridCell> Grid::getOccupiedCell(
   return ret;
 }
 
-std::array<LineSegment, 4> Grid::getOutsideLineSegments() const {}
+std::array<LineSegment, 4> Grid::getOutsideLineSegments() const
+{
+  geometry_msgs::msg::Point left_up;
+  left_up.x = origin.position.x + resolution * height * 0.5;
+  left_up.y = origin.position.y + resolution * height * 0.5;
+  left_up.z = origin.position.z;
+  geometry_msgs::msg::Point left_down;
+  left_down.x = origin.position.x - resolution * height * 0.5;
+  left_down.y = origin.position.y + resolution * height * 0.5;
+  left_down.z = origin.position.z;
+  geometry_msgs::msg::Point right_up;
+  right_up.x = origin.position.x + resolution * height * 0.5;
+  right_up.y = origin.position.y - resolution * height * 0.5;
+  right_up.z = origin.position.z;
+  geometry_msgs::msg::Point right_down;
+  right_down.x = origin.position.x - resolution * height * 0.5;
+  right_down.y = origin.position.y - resolution * height * 0.5;
+  right_down.z = origin.position.z;
+  return {
+    LineSegment(left_up, left_down), LineSegment(left_down, right_down),
+    LineSegment(right_down, right_up), LineSegment(right_up, left_up)};
+}
 }  // namespace simple_sensor_simulator
