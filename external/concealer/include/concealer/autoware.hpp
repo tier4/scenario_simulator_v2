@@ -67,6 +67,10 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 
   std::exception_ptr thrown;
 
+  std::atomic<bool> is_autoware_exited = false;
+
+  void checkAutowareProcess();
+
 protected:
   const pid_t process_id = 0;
 
@@ -80,7 +84,10 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
-  void stopRequest() noexcept { return is_stop_requested.store(true, std::memory_order_release); }
+  void stopRequest() noexcept
+  {
+    return is_stop_requested.store(true, std::memory_order_release);
+  }
 
   bool isStopRequested() const noexcept
   {
@@ -99,10 +106,6 @@ protected:
 
   void resetTimerCallback();
 
-  auto checkAutowareProcess() -> void;
-
-  std::atomic<bool> is_autoware_exited = false;
-
 public:
   CONCEALER_PUBLIC explicit Autoware(pid_t pid = 0)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
@@ -111,7 +114,7 @@ public:
         while (rclcpp::ok() and not isStopRequested()) {
           checkAutowareProcess();
           rclcpp::spin_some(get_node_base_interface());
-          std::this_thread::sleep_for(std::chrono::milliseconds(1));
+          std::this_thread::yield();
         }
       } catch (...) {
         thrown = std::current_exception();

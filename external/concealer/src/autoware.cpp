@@ -19,7 +19,7 @@
 
 namespace concealer
 {
-auto Autoware::checkAutowareProcess() -> void
+void Autoware::checkAutowareProcess()
 {
   if (process_id != 0) {
     int wstatus = 0;

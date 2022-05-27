@@ -35,19 +35,17 @@ public:                                                                         
     if (future.wait_for(std::chrono::seconds(1)) != std::future_status::ready) {                   \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(), #TYPE " service request has timed out.");     \
-    } else if (                                                                                    \
-      future.get()->status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {        \
+    } else if (auto result = future.get();                                                         \
+               result->status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {     \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(),                                               \
         #TYPE " service request has been accepted"                                                 \
-          << (future.get()->status.message.empty() ? "."                                           \
-                                                   : " (" + future.get()->status.message + ").")); \
+          << (result->status.message.empty() ? "." : " (" + result.get()->status.message + ").")); \
     } else {                                                                                       \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(),                                               \
         #TYPE " service request was accepted, but ineffective => Retry!"                           \
-          << (future.get()->status.message.empty() ? ""                                            \
-                                                   : " (" + future.get()->status.message + ")"));  \
+          << (result->status.message.empty() ? "" : " (" + result->status.message + ")"));         \
       rclcpp::WallRate(std::chrono::seconds(1)).sleep();                                           \
       return request##TYPE(request);                                                               \
     }                                                                                              \
