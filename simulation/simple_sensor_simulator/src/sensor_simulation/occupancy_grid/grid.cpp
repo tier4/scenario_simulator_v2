@@ -295,6 +295,30 @@ Grid::Grid(const geometry_msgs::msg::Pose & origin, double resolution, size_t he
 {
 }
 
+geometry_msgs::msg::Point Grid::transformToGrid(const geometry_msgs::msg::Point & world_point) const
+{
+  auto mat =
+    quaternion_operation::getRotationMatrix(quaternion_operation::conjugate(origin.orientation));
+  Eigen::VectorXd p(3);
+  p(0) = world_point.x;
+  p(1) = world_point.y;
+  p(2) = world_point.z;
+  p = mat * p;
+  p(0) = p(0) - origin.position.x;
+  p(1) = p(1) - origin.position.y;
+  p(2) = p(2) - origin.position.z;
+  geometry_msgs::msg::Point ret;
+  ret.x = p(0);
+  ret.y = p(1);
+  ret.z = p(2);
+  return ret;
+}
+
+LineSegment Grid::transformToGrid(const LineSegment & line) const
+{
+  return LineSegment(transformToGrid(line.start_point), transformToGrid(line.end_point));
+}
+
 std::vector<GridCell> Grid::getAllCells() const
 {
   std::vector<GridCell> ret;
@@ -380,17 +404,22 @@ std::vector<GridCell> Grid::filterByIndex(
 std::vector<GridCell> Grid::getIntersectionCandidates(const LineSegment & line_segment) const
 {
   std::vector<GridCell> ret;
+  const auto line_segment_transformed = transformToGrid(line_segment);
   int x_max_index = std::ceil(
-    (std::max(line_segment.start_point.x, line_segment.end_point.x) + resolution * 0.5 * width) /
+    (std::max(line_segment_transformed.start_point.x, line_segment_transformed.end_point.x) +
+     resolution * 0.5 * width) /
     resolution);
   int x_min_index = std::floor(
-    (std::min(line_segment.start_point.x, line_segment.end_point.x) + resolution * 0.5 * width) /
+    (std::min(line_segment_transformed.start_point.x, line_segment_transformed.end_point.x) +
+     resolution * 0.5 * width) /
     resolution);
   int y_max_index = std::ceil(
-    (std::max(line_segment.start_point.y, line_segment.end_point.y) + resolution * 0.5 * width) /
+    (std::max(line_segment_transformed.start_point.y, line_segment_transformed.end_point.y) +
+     resolution * 0.5 * width) /
     resolution);
   int y_min_index = std::floor(
-    (std::min(line_segment.start_point.y, line_segment.end_point.y) + resolution * 0.5 * width) /
+    (std::min(line_segment_transformed.start_point.y, line_segment_transformed.end_point.y) +
+     resolution * 0.5 * width) /
     resolution);
   for (int x_index = x_min_index; x_index <= x_max_index; x_index++) {
     for (int y_index = y_min_index; y_index <= y_max_index; y_index++) {
@@ -417,7 +446,6 @@ std::vector<GridCell> Grid::getIntersectionCandidates(
     const auto candidates = getIntersectionCandidates(line_segment);
     ret = merge(ret, candidates);
   }
-  // RCLCPP_ERROR_STREAM(rclcpp::get_logger("log"), ret.size());
   return ret;
 }
 

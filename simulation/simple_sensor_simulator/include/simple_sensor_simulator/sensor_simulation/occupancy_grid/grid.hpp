@@ -113,6 +113,8 @@ private:
   std::array<LineSegment, 4> getOutsideLineSegments() const;
   std::vector<geometry_msgs::msg::Point> raycastToOutside(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
+  geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
+  LineSegment transformToGrid(const LineSegment & line) const;
 };
 }  // namespace simple_sensor_simulator
 
