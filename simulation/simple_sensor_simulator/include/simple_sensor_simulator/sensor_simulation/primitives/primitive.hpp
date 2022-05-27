@@ -54,16 +54,18 @@ public:
   std::vector<Vertex> getVertex() const;
   std::vector<Triangle> getTriangles() const;
   std::vector<geometry_msgs::msg::Point> get2DConvexHull() const;
+  std::vector<geometry_msgs::msg::Point> get2DConvexHull(
+    const geometry_msgs::msg::Pose & sensor_pose) const;
   boost::optional<double> getMax(const Axis & axis) const;
   boost::optional<double> getMin(const Axis & axis) const;
   boost::optional<double> getMax(
     const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
   boost::optional<double> getMin(
     const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
-  std::vector<Vertex> transform(const geometry_msgs::msg::Pose & sensor_pose) const;
 
 protected:
   std::vector<Vertex> transform() const;
+  std::vector<Vertex> transform(const geometry_msgs::msg::Pose & sensor_pose) const;
   std::vector<Vertex> vertices_;
   std::vector<Triangle> triangles_;
 

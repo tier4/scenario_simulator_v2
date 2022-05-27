@@ -78,10 +78,10 @@ private:
 class Grid
 {
 public:
-  Grid(const geometry_msgs::msg::Pose & origin, double resolution, double height, double width);
+  Grid(const geometry_msgs::msg::Pose & origin, double resolution, size_t height, size_t width);
   const double resolution;
-  const double height;
-  const double width;
+  const size_t height;
+  const size_t width;
   const geometry_msgs::msg::Pose origin;
   std::vector<GridCell> getInvisibleCell(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
@@ -92,10 +92,14 @@ private:
   std::vector<GridCell> getAllCells() const;
   std::vector<GridCell> getOccupiedCandidates(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
+  std::vector<GridCell> getIntersectionCandidates(const LineSegment & line_segments) const;
+  std::vector<GridCell> getIntersectionCandidates(
+    const std::vector<LineSegment> & line_segments) const;
   std::vector<GridCell> filterByRow(const std::vector<GridCell> & cells, size_t row) const;
   std::vector<GridCell> filterByCol(const std::vector<GridCell> & cells, size_t col) const;
   std::vector<GridCell> filterByIndex(
     const std::vector<GridCell> & cells, std::vector<size_t> index) const;
+
   std::vector<GridCell> filterByIntersection(
     const std::vector<GridCell> & cells, const std::vector<LineSegment> & line_segments) const;
   std::vector<GridCell> filterByContain(
