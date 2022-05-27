@@ -268,10 +268,12 @@ std::vector<GridCell> Grid::merge(
   }
   auto ret = cells0;
   std::copy(cells1.begin(), cells1.end(), std::back_inserter(ret));
+  /*
   std::sort(ret.begin(), ret.end(), [](const GridCell & a, const GridCell & b) {
     return a.index < b.index;
   });
-  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+  */
+  // ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
   return ret;
 }
 
@@ -438,6 +440,11 @@ std::vector<GridCell> Grid::getIntersectionCandidates(const LineSegment & line_s
        resolution * 0.5 * width) /
       resolution)),
     static_cast<size_t>(0));
+  /*
+  RCLCPP_ERROR_STREAM(
+    rclcpp::get_logger("x,y min max"),
+    x_min_index << "," << x_max_index << "," << y_min_index << "," << y_max_index);
+*/
   for (size_t x_index = x_min_index; x_index <= x_max_index; x_index++) {
     for (size_t y_index = y_min_index; y_index <= y_max_index; y_index++) {
       geometry_msgs::msg::Pose cell_origin;
@@ -520,11 +527,8 @@ std::vector<GridCell> Grid::getInvisibleCell(
   std::copy(hits.begin(), hits.end(), std::back_inserter(poly));
   const auto hull = get2DConvexHull(poly);
   const auto candidates = getIntersectionCandidates(getLineSegments(hull));
-  const auto ret = filterByIndex(
-    candidates,
-    getFillIndex(merge(
-      filterByIntersection(candidates, getLineSegments(hull)), filterByContain(candidates, hull))));
-  return ret;
+  filterByIntersection(candidates, getLineSegments(hull));
+  return candidates;
 }
 
 std::vector<GridCell> Grid::getOccupiedCell(

@@ -43,9 +43,11 @@ nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
     for (const auto & cell : grid.getInvisibleCell(primitive.second)) {
       occupancy_grid.data[cell.index] = 50;
     }
+    /*
     for (const auto & cell : grid.getOccupiedCell(primitive.second)) {
       occupancy_grid.data[cell.index] = 100;
     }
+    */
   }
   return occupancy_grid;
 }
