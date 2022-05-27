@@ -18,6 +18,7 @@ find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
 find_package(lanelet2_matching REQUIRED)
 find_package(quaternion_operation REQUIRED)
+find_package(pluginlib REQUIRED)
 include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
