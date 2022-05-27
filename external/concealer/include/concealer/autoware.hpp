@@ -84,10 +84,7 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
-  void stopRequest() noexcept
-  {
-    return is_stop_requested.store(true, std::memory_order_release);
-  }
+  void stopRequest() noexcept { return is_stop_requested.store(true, std::memory_order_release); }
 
   bool isStopRequested() const noexcept
   {
