@@ -858,7 +858,7 @@ const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulb
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
+  for (const auto & light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
       if (
         light_string.hasAttribute("traffic_light_id") and
@@ -1232,7 +1232,7 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
   insertMarkerArray(markers, lanelet::visualization::laneletDirectionAsMarkerArray(road_lanelets));
   insertMarkerArray(
     markers,
-    lanelet::visualization::lineStringsAsMarkerArray(stop_lines, "stop_lines", cl_stoplines));
+    lanelet::visualization::lineStringsAsMarkerArray(stop_lines, "stop_lines", cl_stoplines, 0.1));
   insertMarkerArray(
     markers,
     lanelet::visualization::autowareTrafficLightsAsMarkerArray(aw_tl_reg_elems, cl_trafficlights));
@@ -1317,7 +1317,7 @@ HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<std::int64_t> lanelet_id
   for (const auto & lanelet_id : lanelet_ids) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
     const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
-    for (const auto traffic_sign : traffic_signs) {
+    for (const auto & traffic_sign : traffic_signs) {
       ret.push_back(traffic_sign);
     }
   }
@@ -1332,7 +1332,7 @@ HdMapUtils::getTrafficLightRegElementsOnPath(const std::vector<std::int64_t> & l
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
     const auto traffic_lights =
       lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
-    for (const auto traffic_light : traffic_lights) {
+    for (const auto & traffic_light : traffic_lights) {
       ret.push_back(traffic_light);
     }
   }
@@ -1361,7 +1361,7 @@ std::vector<lanelet::AutowareTrafficLightConstPtr> HdMapUtils::getTrafficLights(
   std::vector<lanelet::AutowareTrafficLightConstPtr> ret;
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
+  for (const auto & light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
@@ -1400,7 +1400,7 @@ std::vector<std::vector<geometry_msgs::msg::Point>> HdMapUtils::getTrafficLightS
     const auto stop_line = traffic_light->stopLine();
     if (stop_line) {
       auto & current_stop_line = ret.back();
-      for (const auto point : stop_line.get()) {
+      for (const auto & point : stop_line.get()) {
         geometry_msgs::msg::Point p;
         p.x = point.x();
         p.y = point.y();
@@ -1416,7 +1416,7 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(std:
 {
   std::vector<geometry_msgs::msg::Point> points;
   const auto stop_line = lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
-  for (const auto point : stop_line) {
+  for (const auto & point : stop_line) {
     geometry_msgs::msg::Point p;
     p.x = point.x();
     p.y = point.y();
@@ -1431,7 +1431,7 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIdsOnPath(
 {
   std::vector<std::int64_t> ret;
   auto traffic_lights = getTrafficLightRegElementsOnPath(route_lanelets);
-  for (const auto traffic_light : traffic_lights) {
+  for (const auto & traffic_light : traffic_lights) {
     for (auto light_string : traffic_light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();

@@ -362,7 +362,7 @@ auto EntityManager::getNumberOfEgo() const -> std::size_t
 const std::string EntityManager::getEgoName() const
 {
   const auto names = getEntityNames();
-  for (const auto name : names) {
+  for (const auto & name : names) {
     if (isEgo(name)) {
       return name;
     }
