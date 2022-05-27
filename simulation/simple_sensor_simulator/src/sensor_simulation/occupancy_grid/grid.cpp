@@ -22,6 +22,31 @@
 
 namespace simple_sensor_simulator
 {
+std::vector<geometry_msgs::msg::Point> get2DConvexHull(
+  const std::vector<geometry_msgs::msg::Point> & points)
+{
+  typedef boost::geometry::model::d2::point_xy<double> boost_point;
+  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+  boost_polygon poly;
+  for (const auto & p : points) {
+    boost::geometry::exterior_ring(poly).push_back(boost_point(p.x, p.y));
+  }
+  boost_polygon hull;
+  boost::geometry::convex_hull(poly, hull);
+  std::vector<geometry_msgs::msg::Point> polygon;
+  for (auto it = boost::begin(boost::geometry::exterior_ring(hull));
+       it != boost::end(boost::geometry::exterior_ring(hull)); ++it) {
+    double x = boost::geometry::get<0>(*it);
+    double y = boost::geometry::get<1>(*it);
+    geometry_msgs::msg::Point p;
+    p.x = x;
+    p.y = y;
+    p.z = 0.0;
+    polygon.emplace_back(p);
+  }
+  return polygon;
+}
+
 LineSegment::LineSegment(
   const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point)
 : start_point(start_point), end_point(end_point)
@@ -270,6 +295,23 @@ Grid::Grid(const geometry_msgs::msg::Pose & origin, double resolution, double he
 {
 }
 
+std::vector<GridCell> Grid::getAllCells() const
+{
+  std::vector<GridCell> ret;
+  for (int x_index = 0; x_index <= height; x_index++) {
+    for (int y_index = width; y_index <= width; y_index++) {
+      geometry_msgs::msg::Pose cell_origin;
+      cell_origin.position.x = origin.position.x + (x_index - 0.5 * height) * resolution;
+      cell_origin.position.y = origin.position.y + (y_index - 0.5 * width) * resolution;
+      cell_origin.position.z = origin.position.z;
+      cell_origin.orientation = origin.orientation;
+      ret.emplace_back(
+        GridCell(cell_origin, resolution, width * y_index + x_index, y_index, x_index));
+    }
+  }
+  return ret;
+}
+
 std::vector<GridCell> Grid::getOccupiedCandidates(
   const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
 {
@@ -348,7 +390,7 @@ std::vector<GridCell> Grid::filterByIntersection(
 }
 
 std::vector<GridCell> Grid::filterByContain(
-  std::vector<GridCell> & cells, const std::vector<geometry_msgs::msg::Point> & points) const
+  const std::vector<GridCell> & cells, const std::vector<geometry_msgs::msg::Point> & points) const
 {
   std::vector<GridCell> ret;
   for (const auto & cell : cells) {
@@ -384,7 +426,15 @@ std::vector<size_t> Grid::getCols(const std::vector<GridCell> & cells) const
 std::vector<GridCell> Grid::getInvisibleCell(
   const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
 {
-  const auto hits = raycastToOutside(primitive);
+  auto hits = raycastToOutside(primitive);
+  std::vector<geometry_msgs::msg::Point> poly = primitive->get2DConvexHull();
+  std::copy(poly.begin(), poly.end(), std::back_inserter(hits));
+  const auto hull = get2DConvexHull(poly);
+  const auto candidates = getAllCells();
+  return filterByIndex(
+    candidates,
+    getFillIndex(merge(
+      filterByIntersection(candidates, getLineSegments(hull)), filterByContain(candidates, hull))));
 }
 
 std::vector<GridCell> Grid::getOccupiedCell(
@@ -392,11 +442,10 @@ std::vector<GridCell> Grid::getOccupiedCell(
 {
   auto candidates = getOccupiedCandidates(primitive);
   const auto points = primitive->get2DConvexHull();
-  const auto ret = filterByIndex(
+  return filterByIndex(
     candidates, getFillIndex(merge(
                   filterByIntersection(candidates, getLineSegments(points)),
                   filterByContain(candidates, points))));
-  return ret;
 }
 
 std::array<LineSegment, 4> Grid::getOutsideLineSegments() const

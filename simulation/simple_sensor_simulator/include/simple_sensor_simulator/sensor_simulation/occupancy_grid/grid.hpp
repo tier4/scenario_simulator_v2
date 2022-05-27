@@ -25,6 +25,9 @@
 
 namespace simple_sensor_simulator
 {
+std::vector<geometry_msgs::msg::Point> get2DConvexHull(
+  const std::vector<geometry_msgs::msg::Point> & points);
+
 class LineSegment
 {
 public:
@@ -86,6 +89,7 @@ public:
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
 
 private:
+  std::vector<GridCell> getAllCells() const;
   std::vector<GridCell> getOccupiedCandidates(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
   std::vector<GridCell> filterByRow(const std::vector<GridCell> & cells, size_t row) const;
@@ -95,7 +99,8 @@ private:
   std::vector<GridCell> filterByIntersection(
     const std::vector<GridCell> & cells, const std::vector<LineSegment> & line_segments) const;
   std::vector<GridCell> filterByContain(
-    std::vector<GridCell> & cells, const std::vector<geometry_msgs::msg::Point> & points) const;
+    const std::vector<GridCell> & cells,
+    const std::vector<geometry_msgs::msg::Point> & points) const;
   std::vector<size_t> getRows(const std::vector<GridCell> & cells) const;
   std::vector<size_t> getCols(const std::vector<GridCell> & cells) const;
   std::vector<GridCell> merge(
