@@ -257,12 +257,25 @@ GridCell & GridCell::operator=(const GridCell &) { return *this; }
 std::vector<GridCell> Grid::merge(
   const std::vector<GridCell> & cells0, const std::vector<GridCell> & cells1) const
 {
+  if (cells0.empty() && !cells1.empty()) {
+    return cells1;
+  }
+  if (!cells0.empty() && cells1.empty()) {
+    return cells0;
+  }
+  if (!cells0.empty() && !cells1.empty()) {
+    return {};
+  }
   auto ret = cells0;
+  // RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
   std::copy(cells1.begin(), cells1.end(), std::back_inserter(ret));
+  // RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
   std::sort(ret.begin(), ret.end(), [](const GridCell & a, const GridCell & b) {
     return a.index < b.index;
   });
+  // RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
   ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+  // RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
   return ret;
 }
 
@@ -297,6 +310,10 @@ Grid::Grid(const geometry_msgs::msg::Pose & origin, double resolution, size_t he
 
 geometry_msgs::msg::Point Grid::transformToGrid(const geometry_msgs::msg::Point & world_point) const
 {
+  /*
+  RCLCPP_ERROR_STREAM(
+    rclcpp::get_logger("before"), world_point.x << "," << world_point.y << "," << world_point.z);
+  */
   auto mat =
     quaternion_operation::getRotationMatrix(quaternion_operation::conjugate(origin.orientation));
   Eigen::VectorXd p(3);
@@ -311,6 +328,7 @@ geometry_msgs::msg::Point Grid::transformToGrid(const geometry_msgs::msg::Point 
   ret.x = p(0);
   ret.y = p(1);
   ret.z = p(2);
+  // RCLCPP_ERROR_STREAM(rclcpp::get_logger("after"), p(0) << "," << p(1) << "," << p(2));
   return ret;
 }
 
@@ -348,8 +366,8 @@ std::vector<GridCell> Grid::getOccupiedCandidates(
     return ret;
   }
   int x_min_index = std::floor((x_min.get() + resolution * 0.5 * height) / resolution);
-  int x_max_index = std::ceil((x_max.get() + resolution * 0.5 * width) / resolution);
-  int y_min_index = std::floor((y_min.get() + resolution * 0.5 * height) / resolution);
+  int x_max_index = std::ceil((x_max.get() + resolution * 0.5 * height) / resolution);
+  int y_min_index = std::floor((y_min.get() + resolution * 0.5 * width) / resolution);
   int y_max_index = std::ceil((y_max.get() + resolution * 0.5 * width) / resolution);
   for (int x_index = x_min_index; x_index <= x_max_index; x_index++) {
     for (int y_index = y_min_index; y_index <= y_max_index; y_index++) {
@@ -405,24 +423,32 @@ std::vector<GridCell> Grid::getIntersectionCandidates(const LineSegment & line_s
 {
   std::vector<GridCell> ret;
   const auto line_segment_transformed = transformToGrid(line_segment);
-  int x_max_index = std::ceil(
-    (std::max(line_segment_transformed.start_point.x, line_segment_transformed.end_point.x) +
-     resolution * 0.5 * width) /
-    resolution);
-  int x_min_index = std::floor(
-    (std::min(line_segment_transformed.start_point.x, line_segment_transformed.end_point.x) +
-     resolution * 0.5 * width) /
-    resolution);
-  int y_max_index = std::ceil(
-    (std::max(line_segment_transformed.start_point.y, line_segment_transformed.end_point.y) +
-     resolution * 0.5 * width) /
-    resolution);
-  int y_min_index = std::floor(
-    (std::min(line_segment_transformed.start_point.y, line_segment_transformed.end_point.y) +
-     resolution * 0.5 * width) /
-    resolution);
-  for (int x_index = x_min_index; x_index <= x_max_index; x_index++) {
-    for (int y_index = y_min_index; y_index <= y_max_index; y_index++) {
+  size_t x_max_index = std::min(
+    static_cast<size_t>(std::ceil(
+      (std::max(line_segment_transformed.start_point.x, line_segment_transformed.end_point.x) +
+       resolution * 0.5 * height) /
+      resolution)),
+    height);
+  size_t x_min_index = std::max(
+    static_cast<size_t>(std::floor(
+      (std::min(line_segment_transformed.start_point.x, line_segment_transformed.end_point.x) +
+       resolution * 0.5 * height) /
+      resolution)),
+    static_cast<size_t>(0));
+  size_t y_max_index = std::min(
+    static_cast<size_t>(std::ceil(
+      (std::max(line_segment_transformed.start_point.y, line_segment_transformed.end_point.y) +
+       resolution * 0.5 * width) /
+      resolution)),
+    width);
+  size_t y_min_index = std::max(
+    static_cast<size_t>(std::floor(
+      (std::min(line_segment_transformed.start_point.y, line_segment_transformed.end_point.y) +
+       resolution * 0.5 * width) /
+      resolution)),
+    static_cast<size_t>(0));
+  for (size_t x_index = x_min_index; x_index <= x_max_index; x_index++) {
+    for (size_t y_index = y_min_index; y_index <= y_max_index; y_index++) {
       geometry_msgs::msg::Pose cell_origin;
       cell_origin.position.x = origin.position.x + (x_index - 0.5 * height) * resolution;
       cell_origin.position.y = origin.position.y + (y_index - 0.5 * width) * resolution;
@@ -498,16 +524,19 @@ std::vector<size_t> Grid::getCols(const std::vector<GridCell> & cells) const
 std::vector<GridCell> Grid::getInvisibleCell(
   const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
 {
-  auto hits = raycastToOutside(primitive);
+  const auto hits = raycastToOutside(primitive);
   std::vector<geometry_msgs::msg::Point> poly = primitive->get2DConvexHull();
-  std::copy(poly.begin(), poly.end(), std::back_inserter(hits));
+  std::copy(hits.begin(), hits.end(), std::back_inserter(poly));
   const auto hull = get2DConvexHull(poly);
   const auto candidates = getIntersectionCandidates(getLineSegments(hull));
+  /*
   const auto ret = filterByIndex(
     candidates,
     getFillIndex(merge(
       filterByIntersection(candidates, getLineSegments(hull)), filterByContain(candidates, hull))));
   return ret;
+  */
+  return candidates;
 }
 
 std::vector<GridCell> Grid::getOccupiedCell(
