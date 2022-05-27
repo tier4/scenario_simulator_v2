@@ -77,6 +77,6 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
    vehicle_model:=sample_vehicle
    ``` 
    
-   To modify parameters of random testing, please check documentation of ![random_test_runner](../../test_runner/random_test_runner/Readme.md)
+   To modify parameters of random testing, please check documentation of ![random_test_runner](../user_guide/random_test_runner/Readme.md)
 
 ### Troubleshooting
