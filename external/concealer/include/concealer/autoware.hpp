@@ -57,8 +57,6 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
 
-  mutable std::mutex mutex;
-
   std::atomic<bool> is_stop_requested = false;
 
   std::thread spinner;
@@ -177,8 +175,6 @@ public:
   virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   /*   */ auto initialized() const noexcept { return initialize_was_called; }
-
-  /*   */ auto lock() const { return std::unique_lock<std::mutex>(mutex); }
 
   /*   */ auto ready() const noexcept(false) -> bool;
 
