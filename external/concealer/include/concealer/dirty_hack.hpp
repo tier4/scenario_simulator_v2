@@ -63,16 +63,16 @@ public:                                                                         
   auto get##TYPE() const { return *std::atomic_load(&current_value_of_##TYPE); } \
   static_assert(true, "")
 
-#define CONCEALER_DEFINE_PUBLISHER(TYPE)                             \
-private:                                                             \
-  rclcpp::Publisher<TYPE>::SharedPtr publisher_of_##TYPE;            \
-                                                                     \
-public:                                                              \
-  auto set##TYPE(const TYPE & message)->decltype(auto)               \
-  {                                                                  \
-    static_cast<Autoware &>(*this).rethrow();                        \
-    return publisher_of_##TYPE->publish(message); \
-  }                                                                  \
+#define CONCEALER_DEFINE_PUBLISHER(TYPE)                  \
+private:                                                  \
+  rclcpp::Publisher<TYPE>::SharedPtr publisher_of_##TYPE; \
+                                                          \
+public:                                                   \
+  auto set##TYPE(const TYPE & message)->decltype(auto)    \
+  {                                                       \
+    static_cast<Autoware &>(*this).rethrow();             \
+    return publisher_of_##TYPE->publish(message);         \
+  }                                                       \
   static_assert(true, "")
 
 #define CONCEALER_INIT_CLIENT(TYPE, SERVICE_NAME)                               \
