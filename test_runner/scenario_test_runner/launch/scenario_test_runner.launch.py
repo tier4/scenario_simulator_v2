@@ -70,9 +70,9 @@ def launch_setup(context, *args, **kwargs):
     record                  = LaunchConfiguration("record",                  default=True)
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
+    sigterm_timeout         = LaunchConfiguration("sigterm_timeout",         default=8)
     vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
     workflow                = LaunchConfiguration("workflow",                default=Path("/dev/null"))
-    sigterm_timeout         = LaunchConfiguration("sigterm_timeout",         default=8)
     # fmt: on
 
     print(f"architecture_type       := {architecture_type.perform(context)}")
@@ -89,9 +89,9 @@ def launch_setup(context, *args, **kwargs):
     print(f"record                  := {record.perform(context)}")
     print(f"scenario                := {scenario.perform(context)}")
     print(f"sensor_model            := {sensor_model.perform(context)}")
+    print(f"sigterm_timeout         := {sigterm_timeout.perform(context)}")
     print(f"vehicle_model           := {vehicle_model.perform(context)}")
     print(f"workflow                := {workflow.perform(context)}")
-    print(f"sigterm_timeout         := {sigterm_timeout.perform(context)}")
 
     def make_parameters():
         parameters = [
@@ -130,9 +130,9 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("output_directory",        default_value=output_directory       ),
         DeclareLaunchArgument("scenario",                default_value=scenario               ),
         DeclareLaunchArgument("sensor_model",            default_value=sensor_model           ),
+        DeclareLaunchArgument("sigterm_timeout",         default_value=sigterm_timeout        ),
         DeclareLaunchArgument("vehicle_model",           default_value=vehicle_model          ),
         DeclareLaunchArgument("workflow",                default_value=workflow               ),
-        DeclareLaunchArgument("sigterm_timeout",         default_value=sigterm_timeout        ),
         # fmt: on
         Node(
             package="scenario_test_runner",
