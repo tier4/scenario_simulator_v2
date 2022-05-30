@@ -143,7 +143,10 @@ auto AutowareUniverse::getSteeringAngle() const -> double
 auto AutowareUniverse::getGearSign() const -> double
 {
   using autoware_auto_vehicle_msgs::msg::GearCommand;
-  return getGearCommand().command == GearCommand::REVERSE ? -1.0 : 1.0;
+  return getGearCommand().command == GearCommand::REVERSE or
+             getGearCommand().command == GearCommand::REVERSE_2
+           ? -1.0
+           : 1.0;
 }
 
 auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
