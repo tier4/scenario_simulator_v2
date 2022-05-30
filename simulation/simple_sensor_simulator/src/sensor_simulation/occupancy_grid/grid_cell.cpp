@@ -132,9 +132,10 @@ double LineSegment::getIntercept() const { return end_point.y - getSlope() * end
 std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points)
 {
   std::vector<LineSegment> seg;
-  for (size_t i = 0; i < points.size(); i++) {
+  for (size_t i = 0; i < points.size() - 1; i++) {
     seg.emplace_back(LineSegment(points[i], points[i + 1]));
   }
+  seg.emplace_back(LineSegment(points[points.size() - 1], points[0]));
   return seg;
 }
 

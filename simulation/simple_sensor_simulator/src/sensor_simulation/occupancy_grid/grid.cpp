@@ -53,6 +53,7 @@ LineSegment Grid::transformToGrid(const LineSegment & line) const
 
 geometry_msgs::msg::Point Grid::transformToPixel(const geometry_msgs::msg::Point & grid_point) const
 {
+  // RCLCPP_ERROR_STREAM(rclcpp::get_logger("logger"), grid_point.x << "," << grid_point.y);
   geometry_msgs::msg::Point p;
   p.x = (grid_point.x + height * resolution * 0.5) / resolution;
   p.y = (grid_point.y + width * resolution * 0.5) / resolution;
@@ -141,34 +142,39 @@ void Grid::fillIntersectionCell(const LineSegment & line_segment, int8_t data)
   int end_x_pixel = std::ceil(line_segment_pixel.end_point.x);
   int end_y_pixel = std::ceil(line_segment_pixel.end_point.y);
   if (start_x_pixel == end_x_pixel) {
-    fillByRow(start_x_pixel, data);
+    for (int y_pixel = end_y_pixel; y_pixel <= end_y_pixel; y_pixel++) {
+      fillByRowCol(start_x_pixel, y_pixel, data);
+    }
     return;
   }
   if (start_y_pixel == end_y_pixel) {
-    fillByCol(start_y_pixel, data);
+    for (int x_pixel = start_x_pixel; x_pixel <= end_x_pixel; x_pixel++) {
+      fillByRowCol(x_pixel, start_y_pixel, data);
+    }
     return;
   }
-  if (start_x_pixel < end_x_pixel) {
-    for (int x_pixel = start_x_pixel; x_pixel <= end_x_pixel; x_pixel++) {
-      int y_pixel = std::ceil(
-        line_segment_pixel.getSlope() * static_cast<double>(x_pixel) +
-        line_segment_pixel.getIntercept());
-      fillByRowCol(x_pixel, y_pixel, data);
-      fillByIndex(getNextRowIndex(x_pixel, y_pixel), data);
-    }
-    for (int y_pixel = end_y_pixel; y_pixel <= end_y_pixel; y_pixel++) {
-      int x_pixel = std::ceil(
-        (static_cast<double>(y_pixel) - line_segment_pixel.getIntercept()) /
-        line_segment_pixel.getSlope());
-      fillByRowCol(x_pixel, y_pixel, data);
-      fillByIndex(getNextColINdex(x_pixel, y_pixel), data);
-    }
+  for (int x_pixel = std::min(start_x_pixel, end_x_pixel);
+       x_pixel <= std::max(start_x_pixel, end_x_pixel); x_pixel++) {
+    int y_pixel = std::ceil(
+      line_segment_pixel.getSlope() * static_cast<double>(x_pixel) +
+      line_segment_pixel.getIntercept());
+    fillByRowCol(x_pixel, y_pixel, data);
+    fillByIndex(getNextRowIndex(x_pixel, y_pixel), data);
   }
+  for (int y_pixel = std::min(start_y_pixel, end_y_pixel);
+       y_pixel <= std::max(start_y_pixel, end_y_pixel); y_pixel++) {
+    int x_pixel = std::ceil(
+      (static_cast<double>(y_pixel) - line_segment_pixel.getIntercept()) /
+      line_segment_pixel.getSlope());
+    fillByRowCol(x_pixel, y_pixel, data);
+    fillByIndex(getNextColINdex(x_pixel, y_pixel), data);
+  }
+  return;
 }
 
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
-  for (const auto & line : getLineSegments(primitive->get2DConvexHull(origin))) {
+  for (const auto & line : getLineSegments(primitive->get2DConvexHull())) {
     fillIntersectionCell(line, 100);
   }
 }
