@@ -17,6 +17,11 @@
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_routing/RoutingGraph.h>
 #include <tf2/utils.h>
+#ifdef USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#else
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#endif
 
 #include <Eigen/Eigen>
 #include <deque>
