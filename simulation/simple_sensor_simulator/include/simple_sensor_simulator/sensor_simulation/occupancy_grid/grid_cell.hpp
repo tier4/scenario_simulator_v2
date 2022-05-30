@@ -41,8 +41,12 @@ public:
   const geometry_msgs::msg::Point end_point;
   bool isIntersect2D(const LineSegment & l0) const;
   boost::optional<geometry_msgs::msg::Point> getIntersection2D(const LineSegment & line) const;
+  boost::optional<geometry_msgs::msg::Point> getIntersection2DWithXAxis(double x) const;
+
   geometry_msgs::msg::Vector3 getVector() const;
   double getLength() const;
+  double getSlope() const;
+  double getIntercept() const;
 };
 
 std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points);

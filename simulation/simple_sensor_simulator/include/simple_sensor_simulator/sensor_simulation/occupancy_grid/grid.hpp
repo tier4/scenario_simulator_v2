@@ -43,6 +43,10 @@ private:
   void fillByRow(size_t row, int8_t data);
   void fillByCol(size_t col, int8_t data);
   void fillByRowCol(size_t row, size_t col, int8_t data);
+  size_t getNextRowIndex(size_t row, size_t col) const;
+  size_t getNextColINdex(size_t row, size_t col) const;
+  size_t getPreviousRowIndex(size_t row, size_t col) const;
+  size_t getPreviousColINdex(size_t row, size_t col) const;
   std::vector<GridCell> getAllCells() const;
   // std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
   void fillIntersectionCell(const LineSegment & line_segment, int8_t data);

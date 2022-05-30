@@ -122,6 +122,13 @@ double LineSegment::getLength() const
     end_point.x - start_point.x, end_point.y - start_point.y, end_point.z - start_point.z);
 }
 
+double LineSegment::getSlope() const
+{
+  return (end_point.y - start_point.y) / (end_point.x - start_point.x);
+}
+
+double LineSegment::getIntercept() const { return end_point.y - getSlope() * end_point.x; }
+
 std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points)
 {
   std::vector<LineSegment> seg;
@@ -238,8 +245,8 @@ bool GridCell::contains(const std::vector<geometry_msgs::msg::Point> & points) c
   return false;
 }
 
-int8_t GridCell::getData() const { return data_; };
-void GridCell::setData(int8_t data) { data_ = data; };
+int8_t GridCell::getData() const { return data_; }
+void GridCell::setData(int8_t data) { data_ = data; }
 
 bool GridCell::operator==(const GridCell & rhs) const
 {
