@@ -20,61 +20,12 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid_cell.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <vector>
 
 namespace simple_sensor_simulator
 {
-std::vector<geometry_msgs::msg::Point> get2DConvexHull(
-  const std::vector<geometry_msgs::msg::Point> & points);
-
-class LineSegment
-{
-public:
-  LineSegment(
-    const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point);
-  LineSegment(
-    const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Vector3 & vec,
-    double length);
-  ~LineSegment();
-  const geometry_msgs::msg::Point start_point;
-  const geometry_msgs::msg::Point end_point;
-  bool isIntersect2D(const LineSegment & l0) const;
-  boost::optional<geometry_msgs::msg::Point> getIntersection2D(const LineSegment & line) const;
-  geometry_msgs::msg::Vector3 getVector() const;
-  double getLength() const;
-};
-
-std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points);
-std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines);
-
-class GridCell
-{
-public:
-  GridCell(
-    const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col);
-  const geometry_msgs::msg::Pose origin;
-  const double size;
-  const size_t index;
-  const size_t row;
-  const size_t col;
-  bool isIntersect2D(const LineSegment & line) const;
-  bool isIntersect2D(const std::vector<LineSegment> & line_segments) const;
-  bool contains(const geometry_msgs::msg::Point & p) const;
-  bool contains(const std::vector<geometry_msgs::msg::Point> & points) const;
-  bool operator==(const GridCell & rhs) const;
-  bool operator!=(const GridCell & rhs) const;
-  bool operator<(const GridCell & rhs) const;
-  bool operator>(const GridCell & rhs) const;
-  bool operator<=(const GridCell & rhs) const;
-  bool operator>=(const GridCell & rhs) const;
-  GridCell & operator=(const GridCell & rhs);
-
-private:
-  geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & point) const;
-  std::array<LineSegment, 4> getLineSegments() const;
-};
-
 class Grid
 {
 public:
@@ -83,38 +34,25 @@ public:
   const size_t height;
   const size_t width;
   const geometry_msgs::msg::Pose origin;
-  std::vector<GridCell> getInvisibleCell(
-    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
-  std::vector<GridCell> getOccupiedCell(
-    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
+  void addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive);
+  std::vector<int8_t> getData();
 
 private:
+  std::vector<GridCell> grid_cells_;
+  void fillByIndex(size_t index, int8_t data);
+  void fillByRow(size_t row, int8_t data);
+  void fillByCol(size_t col, int8_t data);
+  void fillByRowCol(size_t row, size_t col, int8_t data);
   std::vector<GridCell> getAllCells() const;
-  std::vector<GridCell> getOccupiedCandidates(
-    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
-  std::vector<GridCell> getIntersectionCandidates(const LineSegment & line_segments) const;
-  std::vector<GridCell> getIntersectionCandidates(
-    const std::vector<LineSegment> & line_segments) const;
-  std::vector<GridCell> filterByRow(const std::vector<GridCell> & cells, size_t row) const;
-  std::vector<GridCell> filterByCol(const std::vector<GridCell> & cells, size_t col) const;
-  std::vector<GridCell> filterByIndex(
-    const std::vector<GridCell> & cells, std::vector<size_t> index) const;
-
-  std::vector<GridCell> filterByIntersection(
-    const std::vector<GridCell> & cells, const std::vector<LineSegment> & line_segments) const;
-  std::vector<GridCell> filterByContain(
-    const std::vector<GridCell> & cells,
-    const std::vector<geometry_msgs::msg::Point> & points) const;
-  std::vector<size_t> getRows(const std::vector<GridCell> & cells) const;
-  std::vector<size_t> getCols(const std::vector<GridCell> & cells) const;
-  std::vector<GridCell> merge(
-    const std::vector<GridCell> & cells0, const std::vector<GridCell> & cells1) const;
-  std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
+  // std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
+  void fillIntersectionCell(const LineSegment & line_segment, int8_t data);
   std::array<LineSegment, 4> getOutsideLineSegments() const;
   std::vector<geometry_msgs::msg::Point> raycastToOutside(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
   LineSegment transformToGrid(const LineSegment & line) const;
+  geometry_msgs::msg::Point transformToPixel(const geometry_msgs::msg::Point & grid_point) const;
+  LineSegment transformToPixel(const LineSegment & line) const;
 };
 }  // namespace simple_sensor_simulator
 
