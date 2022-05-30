@@ -53,7 +53,6 @@ LineSegment Grid::transformToGrid(const LineSegment & line) const
 
 geometry_msgs::msg::Point Grid::transformToPixel(const geometry_msgs::msg::Point & grid_point) const
 {
-  // RCLCPP_ERROR_STREAM(rclcpp::get_logger("logger"), grid_point.x << "," << grid_point.y);
   geometry_msgs::msg::Point p;
   p.x = (grid_point.x + height * resolution * 0.5) / resolution;
   p.y = (grid_point.y + width * resolution * 0.5) / resolution;
@@ -129,45 +128,43 @@ std::vector<geometry_msgs::msg::Point> Grid::raycastToOutside(
   return ret;
 }
 
+size_t Grid::getIndex(size_t row, size_t col) const { return width * col + row; }
 size_t Grid::getNextRowIndex(size_t row, size_t col) const { return width * col + (row + 1); }
-size_t Grid::getNextColINdex(size_t row, size_t col) const { return width * (col + 1) + row; }
+size_t Grid::getNextColIndex(size_t row, size_t col) const { return width * (col + 1) + row; }
 size_t Grid::getPreviousRowIndex(size_t row, size_t col) const { return width * col + (row - 1); }
-size_t Grid::getPreviousColINdex(size_t row, size_t col) const { return width * (col - 1) + row; }
+size_t Grid::getPreviousColIndex(size_t row, size_t col) const { return width * (col - 1) + row; }
 
 void Grid::fillIntersectionCell(const LineSegment & line_segment, int8_t data)
 {
   const auto line_segment_pixel = transformToPixel(transformToGrid(line_segment));
-  int start_x_pixel = std::ceil(line_segment_pixel.start_point.x);
-  int start_y_pixel = std::ceil(line_segment_pixel.start_point.y);
-  int end_x_pixel = std::ceil(line_segment_pixel.end_point.x);
-  int end_y_pixel = std::ceil(line_segment_pixel.end_point.y);
-  if (start_x_pixel == end_x_pixel) {
-    for (int y_pixel = end_y_pixel; y_pixel <= end_y_pixel; y_pixel++) {
-      fillByRowCol(start_x_pixel, y_pixel, data);
+  int start_row = std::ceil(line_segment_pixel.start_point.x);
+  int start_col = std::ceil(line_segment_pixel.start_point.y);
+  int end_row = std::ceil(line_segment_pixel.end_point.x);
+  int end_col = std::ceil(line_segment_pixel.end_point.y);
+  if (start_row == end_row) {
+    for (int col = start_col; col <= end_col; col++) {
+      fillByRowCol(start_row, col, data);
     }
     return;
   }
-  if (start_y_pixel == end_y_pixel) {
-    for (int x_pixel = start_x_pixel; x_pixel <= end_x_pixel; x_pixel++) {
-      fillByRowCol(x_pixel, start_y_pixel, data);
+  if (start_col == end_col) {
+    for (int row = start_row; row <= end_row; row++) {
+      fillByRowCol(row, start_col, data);
     }
     return;
   }
-  for (int x_pixel = std::min(start_x_pixel, end_x_pixel);
-       x_pixel <= std::max(start_x_pixel, end_x_pixel); x_pixel++) {
-    int y_pixel = std::ceil(
-      line_segment_pixel.getSlope() * static_cast<double>(x_pixel) +
-      line_segment_pixel.getIntercept());
-    fillByRowCol(x_pixel, y_pixel, data);
-    fillByIndex(getNextRowIndex(x_pixel, y_pixel), data);
+  for (int row = std::min(start_row, end_row); row <= std::max(start_row, end_row); row++) {
+    int col = std::ceil(
+      line_segment_pixel.getSlope() * static_cast<double>(row) + line_segment_pixel.getIntercept());
+    fillByRowCol(row, col, data);
+    fillByRowCol(row - 1, col, data);
   }
-  for (int y_pixel = std::min(start_y_pixel, end_y_pixel);
-       y_pixel <= std::max(start_y_pixel, end_y_pixel); y_pixel++) {
-    int x_pixel = std::ceil(
-      (static_cast<double>(y_pixel) - line_segment_pixel.getIntercept()) /
+  for (int col = std::min(start_col, end_col); col <= std::max(start_col, end_col); col++) {
+    int row = std::ceil(
+      (static_cast<double>(col) - line_segment_pixel.getIntercept()) /
       line_segment_pixel.getSlope());
-    fillByRowCol(x_pixel, y_pixel, data);
-    fillByIndex(getNextColINdex(x_pixel, y_pixel), data);
+    fillByRowCol(row, col, data);
+    fillByRowCol(row, col - 1, data);
   }
   return;
 }
@@ -197,7 +194,7 @@ void Grid::fillByIndex(size_t index, int8_t data)
 
 void Grid::fillByRowCol(size_t row, size_t col, int8_t data)
 {
-  fillByIndex(width * col + row, data);
+  fillByIndex(getIndex(row, col), data);
 }
 
 void Grid::fillByRow(size_t row, int8_t data)
