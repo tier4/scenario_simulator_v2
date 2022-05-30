@@ -133,14 +133,22 @@ size_t Grid::getNextRowIndex(size_t row, size_t col) const { return width * col 
 size_t Grid::getNextColIndex(size_t row, size_t col) const { return width * (col + 1) + row; }
 size_t Grid::getPreviousRowIndex(size_t row, size_t col) const { return width * col + (row - 1); }
 size_t Grid::getPreviousColIndex(size_t row, size_t col) const { return width * (col - 1) + row; }
+bool Grid::indexExist(size_t index) const
+{
+  if (index <= (height * width - 1)) {
+    return true;
+  }
+  return false;
+}
 
 void Grid::fillIntersectionCell(const LineSegment & line_segment, int8_t data)
 {
+  //std::vector<size_t> filled_indexes;
   const auto line_segment_pixel = transformToPixel(transformToGrid(line_segment));
-  int start_row = std::ceil(line_segment_pixel.start_point.x);
-  int start_col = std::ceil(line_segment_pixel.start_point.y);
-  int end_row = std::ceil(line_segment_pixel.end_point.x);
-  int end_col = std::ceil(line_segment_pixel.end_point.y);
+  int start_row = std::floor(line_segment_pixel.start_point.x);
+  int start_col = std::floor(line_segment_pixel.start_point.y);
+  int end_row = std::floor(line_segment_pixel.end_point.x);
+  int end_col = std::floor(line_segment_pixel.end_point.y);
   if (start_row == end_row) {
     for (int col = start_col; col <= end_col; col++) {
       fillByRowCol(start_row, col, data);
@@ -153,18 +161,24 @@ void Grid::fillIntersectionCell(const LineSegment & line_segment, int8_t data)
     }
     return;
   }
-  for (int row = std::min(start_row, end_row); row <= std::max(start_row, end_row); row++) {
-    int col = std::ceil(
+  fillByRowCol(start_row, start_col, data);
+  fillByRowCol(end_row, end_col, data);
+  for (int row = std::min(start_row, end_row) + 1; row < std::max(start_row, end_row) + 1; row++) {
+    int col = std::floor(
       line_segment_pixel.getSlope() * static_cast<double>(row) + line_segment_pixel.getIntercept());
     fillByRowCol(row, col, data);
-    fillByRowCol(row - 1, col, data);
+    if (row != std::max(start_row, end_row)) {
+      fillByRowCol(row - 1, col, data);
+    }
   }
-  for (int col = std::min(start_col, end_col); col <= std::max(start_col, end_col); col++) {
-    int row = std::ceil(
+  for (int col = std::min(start_col, end_col) + 1; col < std::max(start_col, end_col) + 1; col++) {
+    int row = std::floor(
       (static_cast<double>(col) - line_segment_pixel.getIntercept()) /
       line_segment_pixel.getSlope());
     fillByRowCol(row, col, data);
-    fillByRowCol(row, col - 1, data);
+    if (col != std::max(start_col, end_col)) {
+      fillByRowCol(row, col - 1, data);
+    }
   }
   return;
 }

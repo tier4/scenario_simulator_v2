@@ -48,6 +48,7 @@ private:
   size_t getNextColIndex(size_t row, size_t col) const;
   size_t getPreviousRowIndex(size_t row, size_t col) const;
   size_t getPreviousColIndex(size_t row, size_t col) const;
+  bool indexExist(size_t index) const;
   std::vector<GridCell> getAllCells() const;
   // std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
   void fillIntersectionCell(const LineSegment & line_segment, int8_t data);
