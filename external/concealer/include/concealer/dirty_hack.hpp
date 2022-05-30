@@ -82,7 +82,7 @@ public:                                                   \
 
 #define CONCEALER_INIT_SUBSCRIPTION(TYPE, TOPIC)                                            \
   subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
-    TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
+    TOPIC, 1, [this](const TYPE::ConstSharedPtr message) {                                       \
       std::atomic_store(&current_value_of_##TYPE, std::move(message));                      \
     }))
 
