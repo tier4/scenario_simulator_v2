@@ -216,8 +216,32 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
 std::vector<std::pair<size_t, size_t>> Grid::fillInside(
   const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data)
 {
-  for (const auto & index : row_and_cols) {
+  std::vector<std::pair<size_t, size_t>> ret;
+  const auto rows = getRows(row_and_cols);
+  for (const auto & row : rows) {
+    const auto cells_in_row = filterByRow(row_and_cols, row);
+    if (cells_in_row.size() > 1) {
+      for (auto col = cells_in_row[0].second; col <= cells_in_row[cells_in_row.size() - 1].second;
+           col++) {
+        if (fillByRowCol(row, col, data)) {
+          ret.emplace_back(std::pair<size_t, size_t>(row, col));
+        }
+      }
+    }
   }
+  const auto cols = getCols(row_and_cols);
+  for (const auto & col : cols) {
+    const auto cells_in_col = filterByCol(row_and_cols, col);
+    if (cells_in_col.size() > 1) {
+      for (auto row = cells_in_col[0].first; row <= cells_in_col[cells_in_col.size() - 1].first;
+           row++) {
+        if (fillByRowCol(row, col, data)) {
+          ret.emplace_back(std::pair<size_t, size_t>(row, col));
+        }
+      }
+    }
+  }
+  return ret;
 }
 
 std::vector<std::pair<size_t, size_t>> Grid::filterByRow(
