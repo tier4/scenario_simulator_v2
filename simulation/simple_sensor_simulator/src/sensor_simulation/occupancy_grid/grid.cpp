@@ -162,7 +162,7 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
   if (start_col == end_col) {
     for (int row = start_row; row <= end_row; row++) {
       if (fillByRowCol(row, start_col, data)) {
-        ret.emplace_back(std::pair<size_t, size_t>({start_col, row}));
+        ret.emplace_back(std::pair<size_t, size_t>({row, start_col}));
       }
     }
     sortAndUnique(ret);
@@ -248,9 +248,11 @@ std::vector<std::pair<size_t, size_t>> Grid::filterByRow(
   const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t row) const
 {
   std::vector<std::pair<size_t, size_t>> filtered;
-  std::copy_if(
-    row_and_cols.begin(), row_and_cols.end(), filtered.begin(),
-    [&](std::pair<size_t, size_t> row_and_col) { return row_and_col.first == row; });
+  for (const auto & row_and_col : row_and_cols) {
+    if (row_and_col.first == row) {
+      filtered.emplace_back(row_and_col);
+    }
+  }
   sortAndUnique(filtered);
   return filtered;
 }
@@ -259,9 +261,11 @@ std::vector<std::pair<size_t, size_t>> Grid::filterByCol(
   const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t col) const
 {
   std::vector<std::pair<size_t, size_t>> filtered;
-  std::copy_if(
-    row_and_cols.begin(), row_and_cols.end(), filtered.begin(),
-    [&](std::pair<size_t, size_t> row_and_col) { return row_and_col.second == col; });
+  for (const auto & row_and_col : row_and_cols) {
+    if (row_and_col.second == col) {
+      filtered.emplace_back(row_and_col);
+    }
+  }
   sortAndUnique(filtered);
   return filtered;
 }
@@ -289,7 +293,7 @@ std::vector<size_t> Grid::getCols(const std::vector<std::pair<size_t, size_t>> &
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
   const auto line_segments = getLineSegments(primitive->get2DConvexHull());
-  fillByIntersection(line_segments, 100);
+  fillInside(fillByIntersection(line_segments, 100), 100);
 }
 
 std::vector<int8_t> Grid::getData()
