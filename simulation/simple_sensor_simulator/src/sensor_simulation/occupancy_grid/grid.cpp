@@ -94,7 +94,9 @@ std::vector<GridCell> Grid::getAllCells() const
 
 LineSegment Grid::getInvisibleRay(const geometry_msgs::msg::Point & p) const
 {
-  return LineSegment(p, LineSegment(origin.position, p).getVector(), getDiagonalLength());
+  const auto ray =
+    LineSegment(p, LineSegment(origin.position, p).get2DVector(), getDiagonalLength());
+  return ray;
 }
 
 std::vector<LineSegment> Grid::getInvisibleRay(

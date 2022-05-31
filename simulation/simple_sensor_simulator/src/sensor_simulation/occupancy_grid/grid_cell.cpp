@@ -116,6 +116,15 @@ geometry_msgs::msg::Vector3 LineSegment::getVector() const
   return vec;
 }
 
+geometry_msgs::msg::Vector3 LineSegment::get2DVector() const
+{
+  geometry_msgs::msg::Vector3 vec;
+  vec.x = end_point.x - start_point.x;
+  vec.y = end_point.y - start_point.y;
+  vec.z = 0;
+  return vec;
+}
+
 double LineSegment::get2DLength() const
 {
   return std::hypot(end_point.x - start_point.x, end_point.y - start_point.y);

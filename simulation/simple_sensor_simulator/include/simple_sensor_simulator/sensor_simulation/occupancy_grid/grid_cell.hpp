@@ -44,6 +44,7 @@ public:
   boost::optional<geometry_msgs::msg::Point> getIntersection2DWithXAxis(double x) const;
 
   geometry_msgs::msg::Vector3 getVector() const;
+  geometry_msgs::msg::Vector3 get2DVector() const;
   double getLength() const;
   double get2DLength() const;
   double getSlope() const;
