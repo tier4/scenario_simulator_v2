@@ -51,7 +51,8 @@ void ContextPanel::onDisable()
   parentWidget()->hide();
 }
 
-void ContextPanel::contextCallback(const openscenario_interpreter_msgs::msg::Context::ConstSharedPtr msg)
+void ContextPanel::contextCallback(
+  const openscenario_interpreter_msgs::msg::Context::ConstSharedPtr msg)
 {
   context_ = msg->data;
   simulation_time_ = msg->time;
