@@ -43,16 +43,24 @@ private:
   void fillByRow(size_t row, int8_t data);
   void fillByCol(size_t col, int8_t data);
   bool fillByRowCol(size_t row, size_t col, int8_t data);
+  std::vector<std::pair<size_t, size_t>> fillByIntersection(
+    const LineSegment & line_segment, int8_t data);
+  std::vector<std::pair<size_t, size_t>> fillByIntersection(
+    const std::vector<LineSegment> & line_segments, int8_t data);
+  std::vector<std::pair<size_t, size_t>> fillInside(
+    const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data);
   size_t getIndex(size_t row, size_t col) const;
   size_t getNextRowIndex(size_t row, size_t col) const;
   size_t getNextColIndex(size_t row, size_t col) const;
   size_t getPreviousRowIndex(size_t row, size_t col) const;
   size_t getPreviousColIndex(size_t row, size_t col) const;
+  std::vector<std::pair<size_t, size_t>> filterByRow(
+    const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t row) const;
+  std::vector<std::pair<size_t, size_t>> filterByCol(
+    const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t col) const;
   bool indexExist(size_t index) const;
   std::vector<GridCell> getAllCells() const;
   // std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
-  std::vector<std::pair<size_t, size_t>> fillIntersectionCell(
-    const LineSegment & line_segment, int8_t data);
   std::array<LineSegment, 4> getOutsideLineSegments() const;
   std::vector<geometry_msgs::msg::Point> raycastToOutside(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
@@ -61,10 +69,15 @@ private:
   geometry_msgs::msg::Point transformToPixel(const geometry_msgs::msg::Point & grid_point) const;
   LineSegment transformToPixel(const LineSegment & line) const;
   template <typename T>
-  void sortAndUnique(std::vector<T> & data)
+  void sortAndUnique(std::vector<T> & data) const
   {
     std::sort(data.begin(), data.end());
     data.erase(std::unique(data.begin(), data.end()), data.end());
+  }
+  template <typename T>
+  void append(std::vector<T> & v0, const std::vector<T> & v1) const
+  {
+    v0.insert(v0.end(), v1.begin(), v1.end());
   }
 };
 }  // namespace simple_sensor_simulator

@@ -141,7 +141,7 @@ bool Grid::indexExist(size_t index) const
   return false;
 }
 
-std::vector<std::pair<size_t, size_t>> Grid::fillIntersectionCell(
+std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
   const LineSegment & line_segment, int8_t data)
 {
   std::vector<std::pair<size_t, size_t>> ret;
@@ -203,11 +203,49 @@ std::vector<std::pair<size_t, size_t>> Grid::fillIntersectionCell(
   return ret;
 }
 
+std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
+  const std::vector<LineSegment> & line_segments, int8_t data)
+{
+  std::vector<std::pair<size_t, size_t>> filled_cells = {};
+  for (const auto & line : line_segments) {
+    append(filled_cells, fillByIntersection(line, data));
+  }
+  return filled_cells;
+}
+
+std::vector<std::pair<size_t, size_t>> Grid::fillInside(
+  const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data)
+{
+  for (const auto & index : row_and_cols) {
+  }
+}
+
+std::vector<std::pair<size_t, size_t>> Grid::filterByRow(
+  const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t row) const
+{
+  std::vector<std::pair<size_t, size_t>> filtered;
+  std::copy_if(
+    row_and_cols.begin(), row_and_cols.end(), filtered.begin(),
+    [&](std::pair<size_t, size_t> row_and_col) { return row_and_col.first == row; });
+  sortAndUnique(filtered);
+  return filtered;
+}
+
+std::vector<std::pair<size_t, size_t>> Grid::filterByCol(
+  const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t col) const
+{
+  std::vector<std::pair<size_t, size_t>> filtered;
+  std::copy_if(
+    row_and_cols.begin(), row_and_cols.end(), filtered.begin(),
+    [&](std::pair<size_t, size_t> row_and_col) { return row_and_col.second == col; });
+  sortAndUnique(filtered);
+  return filtered;
+}
+
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
-  for (const auto & line : getLineSegments(primitive->get2DConvexHull())) {
-    const auto filled_cell = fillIntersectionCell(line, 100);
-  }
+  const auto line_segments = getLineSegments(primitive->get2DConvexHull());
+  fillByIntersection(line_segments, 100);
 }
 
 std::vector<int8_t> Grid::getData()
