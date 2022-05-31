@@ -29,11 +29,15 @@ namespace simple_sensor_simulator
 class Grid
 {
 public:
-  Grid(const geometry_msgs::msg::Pose & origin, double resolution, size_t height, size_t width);
+  Grid(
+    const geometry_msgs::msg::Pose & origin, double resolution, size_t height, size_t width,
+    int8_t occupied_cost = 100, int8_t invisible_cost = 50);
   const double resolution;
   const size_t height;
   const size_t width;
   const geometry_msgs::msg::Pose origin;
+  const int8_t occupied_cost;
+  const int8_t invisible_cost;
   void addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive);
   std::vector<int8_t> getData();
 

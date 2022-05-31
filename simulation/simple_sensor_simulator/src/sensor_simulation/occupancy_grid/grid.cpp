@@ -22,8 +22,16 @@
 
 namespace simple_sensor_simulator
 {
-Grid::Grid(const geometry_msgs::msg::Pose & origin, double resolution, size_t height, size_t width)
-: resolution(resolution), height(height), width(width), origin(origin), grid_cells_(getAllCells())
+Grid::Grid(
+  const geometry_msgs::msg::Pose & origin, double resolution, size_t height, size_t width,
+  int8_t occupied_cost, int8_t invisible_cost)
+: resolution(resolution),
+  height(height),
+  width(width),
+  origin(origin),
+  occupied_cost(occupied_cost),
+  invisible_cost(invisible_cost),
+  grid_cells_(getAllCells())
 {
 }
 
@@ -263,8 +271,10 @@ std::vector<size_t> Grid::getCols(const std::vector<std::pair<size_t, size_t>> &
 
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
-  const auto line_segments = getLineSegments(primitive->get2DConvexHull());
-  fillInside(fillByIntersection(line_segments, 100), 100);
+  const auto hull = primitive->get2DConvexHull();
+  const auto line_segments = getLineSegments(hull);
+  // fillInside(fillByIntersection(line_segments, occupied_cost), occupied_cost);
+  fillByIntersection(getInvisibleRay(hull), invisible_cost);
 }
 
 std::vector<int8_t> Grid::getData()
