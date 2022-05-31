@@ -45,6 +45,7 @@ public:
 
   geometry_msgs::msg::Vector3 getVector() const;
   double getLength() const;
+  double get2DLength() const;
   double getSlope() const;
   double getIntercept() const;
 };
