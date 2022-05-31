@@ -141,9 +141,10 @@ bool Grid::indexExist(size_t index) const
   return false;
 }
 
-void Grid::fillIntersectionCell(const LineSegment & line_segment, int8_t data)
+std::vector<std::pair<size_t, size_t>> Grid::fillIntersectionCell(
+  const LineSegment & line_segment, int8_t data)
 {
-  //std::vector<size_t> filled_indexes;
+  std::vector<std::pair<size_t, size_t>> ret;
   const auto line_segment_pixel = transformToPixel(transformToGrid(line_segment));
   int start_row = std::floor(line_segment_pixel.start_point.x);
   int start_col = std::floor(line_segment_pixel.start_point.y);
@@ -151,42 +152,61 @@ void Grid::fillIntersectionCell(const LineSegment & line_segment, int8_t data)
   int end_col = std::floor(line_segment_pixel.end_point.y);
   if (start_row == end_row) {
     for (int col = start_col; col <= end_col; col++) {
-      fillByRowCol(start_row, col, data);
+      if (fillByRowCol(start_row, col, data)) {
+        ret.emplace_back(std::pair<size_t, size_t>({start_row, col}));
+      }
     }
-    return;
+    sortAndUnique(ret);
+    return ret;
   }
   if (start_col == end_col) {
     for (int row = start_row; row <= end_row; row++) {
-      fillByRowCol(row, start_col, data);
+      if (fillByRowCol(row, start_col, data)) {
+        ret.emplace_back(std::pair<size_t, size_t>({start_col, row}));
+      }
     }
-    return;
+    sortAndUnique(ret);
+    return ret;
   }
-  fillByRowCol(start_row, start_col, data);
-  fillByRowCol(end_row, end_col, data);
+  if (fillByRowCol(start_row, start_col, data)) {
+    ret.emplace_back(std::pair<size_t, size_t>({start_row, start_col}));
+  }
+  if (fillByRowCol(end_row, end_col, data)) {
+    ret.emplace_back(std::pair<size_t, size_t>({end_row, end_col}));
+  }
   for (int row = std::min(start_row, end_row) + 1; row < std::max(start_row, end_row) + 1; row++) {
     int col = std::floor(
       line_segment_pixel.getSlope() * static_cast<double>(row) + line_segment_pixel.getIntercept());
-    fillByRowCol(row, col, data);
+    if (fillByRowCol(row, col, data)) {
+      ret.emplace_back(std::pair<size_t, size_t>({row, col}));
+    }
     if (row != std::max(start_row, end_row)) {
-      fillByRowCol(row - 1, col, data);
+      if (fillByRowCol(row - 1, col, data)) {
+        ret.emplace_back(std::pair<size_t, size_t>({row - 1, col}));
+      }
     }
   }
   for (int col = std::min(start_col, end_col) + 1; col < std::max(start_col, end_col) + 1; col++) {
     int row = std::floor(
       (static_cast<double>(col) - line_segment_pixel.getIntercept()) /
       line_segment_pixel.getSlope());
-    fillByRowCol(row, col, data);
+    if (fillByRowCol(row, col, data)) {
+      ret.emplace_back(std::pair<size_t, size_t>({row, col}));
+    }
     if (col != std::max(start_col, end_col)) {
-      fillByRowCol(row, col - 1, data);
+      if (fillByRowCol(row, col - 1, data)) {
+        ret.emplace_back(std::pair<size_t, size_t>({row, col - 1}));
+      }
     }
   }
-  return;
+  sortAndUnique(ret);
+  return ret;
 }
 
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
   for (const auto & line : getLineSegments(primitive->get2DConvexHull())) {
-    fillIntersectionCell(line, 100);
+    const auto filled_cell = fillIntersectionCell(line, 100);
   }
 }
 
@@ -199,16 +219,18 @@ std::vector<int8_t> Grid::getData()
   return data;
 }
 
-void Grid::fillByIndex(size_t index, int8_t data)
+bool Grid::fillByIndex(size_t index, int8_t data)
 {
   if (index < grid_cells_.size()) {
     grid_cells_[index].setData(data);
+    return true;
   }
+  return false;
 }
 
-void Grid::fillByRowCol(size_t row, size_t col, int8_t data)
+bool Grid::fillByRowCol(size_t row, size_t col, int8_t data)
 {
-  fillByIndex(getIndex(row, col), data);
+  return fillByIndex(getIndex(row, col), data);
 }
 
 void Grid::fillByRow(size_t row, int8_t data)

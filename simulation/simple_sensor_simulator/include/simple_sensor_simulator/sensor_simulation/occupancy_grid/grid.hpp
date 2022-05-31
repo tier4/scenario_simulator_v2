@@ -39,10 +39,10 @@ public:
 
 private:
   std::vector<GridCell> grid_cells_;
-  void fillByIndex(size_t index, int8_t data);
+  bool fillByIndex(size_t index, int8_t data);
   void fillByRow(size_t row, int8_t data);
   void fillByCol(size_t col, int8_t data);
-  void fillByRowCol(size_t row, size_t col, int8_t data);
+  bool fillByRowCol(size_t row, size_t col, int8_t data);
   size_t getIndex(size_t row, size_t col) const;
   size_t getNextRowIndex(size_t row, size_t col) const;
   size_t getNextColIndex(size_t row, size_t col) const;
@@ -51,7 +51,8 @@ private:
   bool indexExist(size_t index) const;
   std::vector<GridCell> getAllCells() const;
   // std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;
-  void fillIntersectionCell(const LineSegment & line_segment, int8_t data);
+  std::vector<std::pair<size_t, size_t>> fillIntersectionCell(
+    const LineSegment & line_segment, int8_t data);
   std::array<LineSegment, 4> getOutsideLineSegments() const;
   std::vector<geometry_msgs::msg::Point> raycastToOutside(
     const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
@@ -59,6 +60,12 @@ private:
   LineSegment transformToGrid(const LineSegment & line) const;
   geometry_msgs::msg::Point transformToPixel(const geometry_msgs::msg::Point & grid_point) const;
   LineSegment transformToPixel(const LineSegment & line) const;
+  template <typename T>
+  void sortAndUnique(std::vector<T> & data)
+  {
+    std::sort(data.begin(), data.end());
+    data.erase(std::unique(data.begin(), data.end()), data.end());
+  }
 };
 }  // namespace simple_sensor_simulator
 
