@@ -62,13 +62,14 @@ private:
   std::vector<size_t> getCols(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   bool indexExist(size_t index) const;
   std::vector<GridCell> getAllCells() const;
-  std::array<LineSegment, 4> getOutsideLineSegments() const;
-  std::vector<geometry_msgs::msg::Point> raycastToOutside(
-    const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const;
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
   LineSegment transformToGrid(const LineSegment & line) const;
   geometry_msgs::msg::Point transformToPixel(const geometry_msgs::msg::Point & grid_point) const;
   LineSegment transformToPixel(const LineSegment & line) const;
+  LineSegment getInvisibleRay(const geometry_msgs::msg::Point & p) const;
+  std::vector<LineSegment> getInvisibleRay(
+    const std::vector<geometry_msgs::msg::Point> & points) const;
+  double getDiagonalLength() const;
   template <typename T>
   void sortAndUnique(std::vector<T> & data) const
   {

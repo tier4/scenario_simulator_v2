@@ -27,6 +27,8 @@ Grid::Grid(const geometry_msgs::msg::Pose & origin, double resolution, size_t he
 {
 }
 
+double Grid::getDiagonalLength() const { return std::hypot(width, height) * resolution; }
+
 geometry_msgs::msg::Point Grid::transformToGrid(const geometry_msgs::msg::Point & world_point) const
 {
   auto mat =
@@ -82,48 +84,17 @@ std::vector<GridCell> Grid::getAllCells() const
   return ret;
 }
 
-std::array<LineSegment, 4> Grid::getOutsideLineSegments() const
+LineSegment Grid::getInvisibleRay(const geometry_msgs::msg::Point & p) const
 {
-  geometry_msgs::msg::Point left_up;
-  left_up.x = origin.position.x + resolution * height * 0.5;
-  left_up.y = origin.position.y + resolution * height * 0.5;
-  left_up.z = origin.position.z;
-  geometry_msgs::msg::Point left_down;
-  left_down.x = origin.position.x - resolution * height * 0.5;
-  left_down.y = origin.position.y + resolution * height * 0.5;
-  left_down.z = origin.position.z;
-  geometry_msgs::msg::Point right_up;
-  right_up.x = origin.position.x + resolution * height * 0.5;
-  right_up.y = origin.position.y - resolution * height * 0.5;
-  right_up.z = origin.position.z;
-  geometry_msgs::msg::Point right_down;
-  right_down.x = origin.position.x - resolution * height * 0.5;
-  right_down.y = origin.position.y - resolution * height * 0.5;
-  right_down.z = origin.position.z;
-  return {
-    LineSegment(left_up, left_down), LineSegment(left_down, right_down),
-    LineSegment(right_down, right_up), LineSegment(right_up, left_up)};
+  return LineSegment(p, LineSegment(origin.position, p).getVector(), getDiagonalLength());
 }
 
-std::vector<geometry_msgs::msg::Point> Grid::raycastToOutside(
-  const std::unique_ptr<simple_sensor_simulator::primitives::Primitive> & primitive) const
+std::vector<LineSegment> Grid::getInvisibleRay(
+  const std::vector<geometry_msgs::msg::Point> & points) const
 {
-  std::vector<geometry_msgs::msg::Point> ret;
-  const auto outsides = getOutsideLineSegments();
-  const auto points = primitive->get2DConvexHull();
+  std::vector<LineSegment> ret = {};
   for (const auto & point : points) {
-    geometry_msgs::msg::Vector3 vec;
-    vec.x = point.x - origin.position.x;
-    vec.y = point.y - origin.position.y;
-    vec.z = point.z - origin.position.z;
-    const auto ray =
-      LineSegment(origin.position, vec, std::hypot(width * resolution, height * resolution) * 2);
-    for (const auto & outside : outsides) {
-      const auto hit = outside.getIntersection2D(ray);
-      if (hit) {
-        ret.emplace_back(hit.get());
-      }
-    }
+    ret.emplace_back(getInvisibleRay(point));
   }
   return ret;
 }
