@@ -149,12 +149,14 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
     sortAndUnique(ret);
     return ret;
   }
+  /*
   if (fillByRowCol(start_row, start_col, data)) {
     ret.emplace_back(std::pair<size_t, size_t>({start_row, start_col}));
   }
   if (fillByRowCol(end_row, end_col, data)) {
     ret.emplace_back(std::pair<size_t, size_t>({end_row, end_col}));
   }
+  */
   for (int row = std::min(start_row, end_row) + 1; row < std::max(start_row, end_row) + 1; row++) {
     if (0 <= row && row < static_cast<int>(width)) {
       int col = std::floor(
@@ -308,6 +310,12 @@ bool Grid::fillByIndex(size_t index, int8_t data)
 
 bool Grid::fillByRowCol(size_t row, size_t col, int8_t data)
 {
+  if (row >= width) {
+    return false;
+  }
+  if (col >= height) {
+    return false;
+  }
   return fillByIndex(getIndex(row, col), data);
 }
 
