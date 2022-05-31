@@ -156,27 +156,36 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
     ret.emplace_back(std::pair<size_t, size_t>({end_row, end_col}));
   }
   for (int row = std::min(start_row, end_row) + 1; row < std::max(start_row, end_row) + 1; row++) {
-    int col = std::floor(
-      line_segment_pixel.getSlope() * static_cast<double>(row) + line_segment_pixel.getIntercept());
-    if (fillByRowCol(row, col, data)) {
-      ret.emplace_back(std::pair<size_t, size_t>({row, col}));
-    }
-    if (row != std::max(start_row, end_row)) {
-      if (fillByRowCol(row - 1, col, data)) {
-        ret.emplace_back(std::pair<size_t, size_t>({row - 1, col}));
+    if (0 <= row && row < static_cast<int>(width)) {
+      int col = std::floor(
+        line_segment_pixel.getSlope() * static_cast<double>(row) +
+        line_segment_pixel.getIntercept());
+      if (0 <= col && col < static_cast<int>(height)) {
+        if (fillByRowCol(row, col, data)) {
+          ret.emplace_back(std::pair<size_t, size_t>({row, col}));
+        }
+        if (row != std::max(start_row, end_row)) {
+          if (fillByRowCol(row - 1, col, data)) {
+            ret.emplace_back(std::pair<size_t, size_t>({row - 1, col}));
+          }
+        }
       }
     }
   }
   for (int col = std::min(start_col, end_col) + 1; col < std::max(start_col, end_col) + 1; col++) {
-    int row = std::floor(
-      (static_cast<double>(col) - line_segment_pixel.getIntercept()) /
-      line_segment_pixel.getSlope());
-    if (fillByRowCol(row, col, data)) {
-      ret.emplace_back(std::pair<size_t, size_t>({row, col}));
-    }
-    if (col != std::max(start_col, end_col)) {
-      if (fillByRowCol(row, col - 1, data)) {
-        ret.emplace_back(std::pair<size_t, size_t>({row, col - 1}));
+    if (0 <= col && col < static_cast<int>(height)) {
+      int row = std::floor(
+        (static_cast<double>(col) - line_segment_pixel.getIntercept()) /
+        line_segment_pixel.getSlope());
+      if (0 <= row && row < static_cast<int>(width)) {
+        if (fillByRowCol(row, col, data)) {
+          ret.emplace_back(std::pair<size_t, size_t>({row, col}));
+        }
+        if (col != std::max(start_col, end_col)) {
+          if (fillByRowCol(row, col - 1, data)) {
+            ret.emplace_back(std::pair<size_t, size_t>({row, col - 1}));
+          }
+        }
       }
     }
   }
