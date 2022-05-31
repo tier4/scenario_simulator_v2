@@ -122,6 +122,7 @@ void Autoware::shutdownAutoware()
 
 void Autoware::rethrow() const
 {
+  task_queue.rethrow();
   if (is_thrown.load(std::memory_order_acquire)) {
     std::rethrow_exception(thrown);
   }
@@ -129,7 +130,6 @@ void Autoware::rethrow() const
 
 bool Autoware::ready() const
 {
-  task_queue.rethrow();
   rethrow();
   return task_queue.exhausted();
 }

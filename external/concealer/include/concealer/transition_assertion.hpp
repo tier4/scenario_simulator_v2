@@ -15,7 +15,10 @@
 #ifndef CONCEALER__TRANSITION_ASSERTION_HPP_
 #define CONCEALER__TRANSITION_ASSERTION_HPP_
 
+#include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <chrono>
+#include <rclcpp/node.hpp>
+#include <rclcpp/rate.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
 namespace concealer
@@ -34,43 +37,51 @@ auto getParameter(const std::string & name, T value = {})
 template <typename Autoware>
 struct TransitionAssertion
 {
-  const std::chrono::seconds given;
+  using clock_type = std::chrono::steady_clock;
+  using rate_type = rclcpp::GenericRate<clock_type>;
 
-  std::chrono::seconds remains;
+  const clock_type::time_point start;
+  const std::chrono::seconds initialize_duration;
 
-  explicit TransitionAssertion() : given(getParameter<int>("initialize_duration")), remains(given)
+  explicit TransitionAssertion()
+  : start(clock_type::now()),
+    initialize_duration(std::chrono::seconds(getParameter<int>("initialize_duration")))
   {
   }
 
-  // auto makeTransitionError(const std::string & expected) const
-  // {
-  //   const auto current_state = static_cast<const Autoware &>(*this).getAutowareStatus().autoware_state;
-  //   return common::AutowareError(
-  //     "Simulator waited ", given.count(),
-  //     " seconds, expecting the Autoware state to transitioning to ", expected,
-  //     ", but there was no change. The current Autoware state is ",
-  //     (current_state.empty() ? "NOT PUBLISHED YET" : current_state), ".");
-  // }
+  auto makeTransitionError(const std::string & expected) const
+  {
+    const auto current_state = self().getAutowareStateName();
+    return common::AutowareError(
+      "Simulator waited for the Autoware state to transition to ", expected,
+      ", but time is up. The current Autoware state is ",
+      (current_state.empty() ? "NOT PUBLISHED YET" : current_state), ".");
+  }
 
-#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                              \
-  template <typename Thunk = void (*)()>                                                         \
-  void waitForAutowareStateToBe##STATE(                                                          \
-    Thunk thunk = []() {}, const std::chrono::seconds & interval = std::chrono::seconds(1))      \
-  {                                                                                              \
-    rclcpp::WallRate rate{interval};                                                             \
-    for (thunk(); not static_cast<Autoware &>(*this).isStopRequested() and                       \
-                  not static_cast<const Autoware &>(*this).is##STATE();                          \
-         rate.sleep()) {                                                                         \
-      remains -= std::chrono::duration_cast<std::chrono::seconds>(rate.period());                \
-      RCLCPP_INFO_STREAM(                                                                        \
-        static_cast<Autoware &>(*this).get_logger(),                                             \
-        "Simulator waiting for Autoware state to be " #STATE " (" << remains.count() << ").");   \
-      thunk();                                                                                   \
-    }                                                                                            \
-    RCLCPP_INFO_STREAM(                                                                          \
-      static_cast<Autoware &>(*this).get_logger(),                                               \
-      "Autoware is " << static_cast<const Autoware &>(*this).getAutowareStateName() << " now."); \
-  }                                                                                              \
+  auto self() -> Autoware & { return static_cast<Autoware &>(*this); }
+  auto self() const -> const Autoware & { return static_cast<const Autoware &>(*this); }
+
+#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                      \
+  template <typename Thunk = void (*)()>                                                 \
+  void waitForAutowareStateToBe##STATE(                                                  \
+    Thunk && thunk = [] {}, std::chrono::seconds interval = std::chrono::seconds(1))     \
+  {                                                                                      \
+    using namespace std::chrono;                                                         \
+    rate_type rate(interval);                                                            \
+    for (thunk(); not self().isStopRequested() and not self().is##STATE();               \
+         rate.sleep(), thunk()) {                                                        \
+      auto now = clock_type::now();                                                      \
+      if (start + initialize_duration <= now) {                                          \
+        throw makeTransitionError(#STATE);                                               \
+      }                                                                                  \
+      RCLCPP_INFO_STREAM(                                                                \
+        self().get_logger(),                                                             \
+        "Simulator waiting for Autoware state to be " #STATE " (remain: "                \
+          << duration_cast<seconds>(start + initialize_duration - now).count() << ")."); \
+    }                                                                                    \
+    RCLCPP_INFO_STREAM(                                                                  \
+      self().get_logger(), "Autoware is " << self().getAutowareStateName() << " now.");  \
+  }                                                                                      \
   static_assert(true, "")
 
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Initializing);
