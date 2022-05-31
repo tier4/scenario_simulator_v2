@@ -12,9 +12,9 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| Feature                    | Brief summary                                                                 | Category                    | Pull request                                                     | Contributor                               |
+| -------------------------- | ----------------------------------------------------------------------------- | --------------------------- | ---------------------------------------------------------------- | ----------------------------------------- |
+| Fix termination processing | Properly terminate the interpreter when the Autoware process exits abnormally |  `openscenario_interpreter` | [#750](https://github.com/tier4/scenario_simulator_v2/pull/750)  | [kyabe2718](https://github.com/kyabe2718) |
 
 Minor Tweaks :oncoming_police_car:
 
