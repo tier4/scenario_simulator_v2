@@ -58,6 +58,8 @@ private:
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t row) const;
   std::vector<std::pair<size_t, size_t>> filterByCol(
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t col) const;
+  std::vector<size_t> getRows(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
+  std::vector<size_t> getCols(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   bool indexExist(size_t index) const;
   std::vector<GridCell> getAllCells() const;
   // std::vector<size_t> getFillIndex(const std::vector<GridCell> & cells) const;

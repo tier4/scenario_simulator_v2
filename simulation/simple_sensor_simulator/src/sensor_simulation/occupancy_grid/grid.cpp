@@ -242,6 +242,26 @@ std::vector<std::pair<size_t, size_t>> Grid::filterByCol(
   return filtered;
 }
 
+std::vector<size_t> Grid::getRows(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const
+{
+  std::vector<size_t> ret;
+  for (const auto & row_and_col : row_and_cols) {
+    ret.emplace_back(row_and_col.first);
+  }
+  sortAndUnique(ret);
+  return ret;
+}
+
+std::vector<size_t> Grid::getCols(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const
+{
+  std::vector<size_t> ret;
+  for (const auto & row_and_col : row_and_cols) {
+    ret.emplace_back(row_and_col.second);
+  }
+  sortAndUnique(ret);
+  return ret;
+}
+
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
   const auto line_segments = getLineSegments(primitive->get2DConvexHull());
