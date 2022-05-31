@@ -22,7 +22,7 @@ inline namespace syntax
 {
 ByEntityCondition::ByEntityCondition(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
-  EntityCondition(readElement<EntityCondition, TriggeringEntities>(
+  EntityCondition(readElement<EntityCondition>(
     "EntityCondition", node, local(),
     readElement<TriggeringEntities>("TriggeringEntities", node, local())))
 {
