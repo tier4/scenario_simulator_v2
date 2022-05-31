@@ -357,7 +357,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC:
-        input << autoware->getAcceleration(), autoware->getSteeringAngle();
+        input << autoware->getGearSign() * autoware->getAcceleration(),
+          autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
@@ -374,6 +375,12 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       default:
         THROW_SEMANTIC_ERROR(
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
+    }
+
+    // DIRTY HACK!!!
+    if (auto autoware_universe = dynamic_cast<concealer::AutowareUniverse const *>(autoware.get());
+        autoware_universe) {
+      vehicle_model_ptr_->setGear(autoware_universe->getGearCommand().command);
     }
 
     vehicle_model_ptr_->setInput(input);
