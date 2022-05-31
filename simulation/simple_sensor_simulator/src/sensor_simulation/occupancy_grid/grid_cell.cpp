@@ -58,7 +58,7 @@ LineSegment::LineSegment(
   double length)
 : start_point(start_point), end_point([&]() -> geometry_msgs::msg::Point {
     geometry_msgs::msg::Point ret;
-    double vec_size = get2DLength();
+    double vec_size = std::hypot(vec.x, vec.y);
     ret.x = start_point.x + vec.x / vec_size * length;
     ret.y = start_point.y + vec.y / vec_size * length;
     ret.z = start_point.z + vec.z / vec_size * length;
