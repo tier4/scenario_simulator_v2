@@ -27,7 +27,6 @@ markdown_extensions:
   - codehilite: { guess_lang: false }
   - fontawesome_markdown
   - mdx_math
-#  - mdx_unimoji
   - plantuml_markdown: { server: http://www.plantuml.com/plantuml }
   - pymdownx.arithmatex
   - pymdownx.emoji: { emoji_generator: !!python/name:pymdownx.emoji.to_svg  }
