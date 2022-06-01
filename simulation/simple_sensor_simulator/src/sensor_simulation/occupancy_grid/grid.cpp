@@ -334,10 +334,10 @@ std::vector<size_t> Grid::getCols(const std::vector<std::pair<size_t, size_t>> &
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
   const auto hull = primitive->get2DConvexHull();
-  const auto line_segments = getLineSegments(hull);
+  const auto line_segments_on_hull = getLineSegments(hull);
   std::vector<LineSegment> rays_to_grid_corner = {};
-  for (const auto & ray : filterByIntersection(getRayToGridCorner(), line_segments)) {
-    for (const auto & line_segment : line_segments) {
+  for (const auto & ray : filterByIntersection(getRayToGridCorner(), line_segments_on_hull)) {
+    for (const auto & line_segment : line_segments_on_hull) {
       const auto intersection = ray.getIntersection2D(line_segment);
       if (intersection) {
         rays_to_grid_corner.emplace_back(
@@ -345,16 +345,12 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
       }
     }
   }
-  fillByIntersection(rays_to_grid_corner, invisible_cost);
-
-  // fillByIntersection(getInvisibleRay(hull), invisible_cost);
-  //
-  /*
-  fillByIntersection(
-    concat(getInvisibleRay(hull), filterByIntersection(getRayToGridCorner(), line_segments)),
+  fillInside(
+    fillByIntersection(
+      concat(line_segments_on_hull, concat(getInvisibleRay(hull), rays_to_grid_corner)),
+      invisible_cost),
     invisible_cost);
-  */
-  // fillInside(fillByIntersection(line_segments, occupied_cost), occupied_cost);
+  fillInside(fillByIntersection(line_segments_on_hull, occupied_cost), occupied_cost);
 }
 
 std::vector<int8_t> Grid::getData()
