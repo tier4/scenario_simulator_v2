@@ -15,7 +15,6 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
 
-#include <array>
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -62,15 +61,20 @@ private:
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t row) const;
   std::vector<std::pair<size_t, size_t>> filterByCol(
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t col) const;
+  std::vector<LineSegment> filterByIntersection(
+    const std::vector<LineSegment> & source_lines,
+    const std::vector<LineSegment> & fillter_lines) const;
   std::vector<size_t> getRows(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   std::vector<size_t> getCols(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   bool indexExist(size_t index) const;
   std::vector<GridCell> getAllCells() const;
+  geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & grid_point) const;
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
   LineSegment transformToGrid(const LineSegment & line) const;
   geometry_msgs::msg::Point transformToPixel(const geometry_msgs::msg::Point & grid_point) const;
   LineSegment transformToPixel(const LineSegment & line) const;
-  LineSegment getInvisibleRay(const geometry_msgs::msg::Point & p) const;
+  LineSegment getInvisibleRay(const geometry_msgs::msg::Point & point_on_polygon) const;
+  std::vector<LineSegment> getRayToGridCorner();
   std::vector<LineSegment> getInvisibleRay(
     const std::vector<geometry_msgs::msg::Point> & points) const;
   double getDiagonalLength() const;
@@ -84,6 +88,13 @@ private:
   void append(std::vector<T> & v0, const std::vector<T> & v1) const
   {
     v0.insert(v0.end(), v1.begin(), v1.end());
+  }
+  template <typename T>
+  std::vector<T> concat(const std::vector<T> & v0, const std::vector<T> & v1) const
+  {
+    std::vector<T> ret = v0;
+    ret.insert(ret.end(), v1.begin(), v1.end());
+    return ret;
   }
 };
 }  // namespace simple_sensor_simulator

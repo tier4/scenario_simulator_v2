@@ -37,6 +37,7 @@ public:
     const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Vector3 & vec,
     double length);
   ~LineSegment();
+  LineSegment & operator=(const LineSegment &);
   const geometry_msgs::msg::Point start_point;
   const geometry_msgs::msg::Point end_point;
   bool isIntersect2D(const LineSegment & l0) const;

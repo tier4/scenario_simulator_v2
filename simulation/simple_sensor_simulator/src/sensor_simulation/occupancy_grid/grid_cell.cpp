@@ -153,6 +153,8 @@ std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::P
   return seg;
 }
 
+LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
+
 GridCell::GridCell(
   const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col)
 : origin(origin), size(size), index(index), row(row), col(col), data_(0)
