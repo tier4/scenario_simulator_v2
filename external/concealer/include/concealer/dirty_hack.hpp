@@ -24,8 +24,10 @@ private:                                                                        
 public:                                                                                            \
   auto request##TYPE(const TYPE::Request::SharedPtr & request)->void                               \
   {                                                                                                \
+    static_cast<Autoware &>(*this).rethrow();                                                      \
     for (auto rate = rclcpp::WallRate(std::chrono::seconds(1));                                    \
-         not client_of_##TYPE->service_is_ready(); rate.sleep()) {                                 \
+         not client_of_##TYPE->service_is_ready();                                                 \
+         rate.sleep(), static_cast<Autoware &>(*this).rethrow()) {                                 \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(), #TYPE " service is not ready.");              \
     }                                                                                              \
@@ -33,47 +35,42 @@ public:                                                                         
     if (future.wait_for(std::chrono::seconds(1)) != std::future_status::ready) {                   \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(), #TYPE " service request has timed out.");     \
-    } else if (                                                                                    \
-      future.get()->status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {        \
+    } else if (auto result = future.get();                                                         \
+               result->status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {     \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(),                                               \
         #TYPE " service request has been accepted"                                                 \
-          << (future.get()->status.message.empty() ? "."                                           \
-                                                   : " (" + future.get()->status.message + ").")); \
+          << (result->status.message.empty() ? "." : " (" + result.get()->status.message + ").")); \
     } else {                                                                                       \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(),                                               \
         #TYPE " service request was accepted, but ineffective => Retry!"                           \
-          << (future.get()->status.message.empty() ? ""                                            \
-                                                   : " (" + future.get()->status.message + ")"));  \
+          << (result->status.message.empty() ? "" : " (" + result->status.message + ")"));         \
       rclcpp::WallRate(std::chrono::seconds(1)).sleep();                                           \
       return request##TYPE(request);                                                               \
     }                                                                                              \
   }                                                                                                \
   static_assert(true, "")
 
-#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE)                        \
-private:                                                           \
-  TYPE current_value_of_##TYPE;                                    \
-  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;    \
-                                                                   \
-public:                                                            \
-  auto get##TYPE() const->const auto &                             \
-  {                                                                \
-    const auto lock = static_cast<const Autoware &>(*this).lock(); \
-    return current_value_of_##TYPE;                                \
-  }                                                                \
+#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE)                                      \
+private:                                                                         \
+  TYPE::SharedPtr current_value_of_##TYPE{std::make_shared<TYPE>()};             \
+  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;                  \
+                                                                                 \
+public:                                                                          \
+  auto get##TYPE() const { return *std::atomic_load(&current_value_of_##TYPE); } \
   static_assert(true, "")
 
-#define CONCEALER_DEFINE_PUBLISHER(TYPE)                             \
-private:                                                             \
-  rclcpp::Publisher<TYPE>::SharedPtr publisher_of_##TYPE;            \
-                                                                     \
-public:                                                              \
-  auto set##TYPE(const TYPE & message)->decltype(auto)               \
-  {                                                                  \
-    return std::atomic_load(&publisher_of_##TYPE)->publish(message); \
-  }                                                                  \
+#define CONCEALER_DEFINE_PUBLISHER(TYPE)                  \
+private:                                                  \
+  rclcpp::Publisher<TYPE>::SharedPtr publisher_of_##TYPE; \
+                                                          \
+public:                                                   \
+  auto set##TYPE(const TYPE & message)->decltype(auto)    \
+  {                                                       \
+    static_cast<Autoware &>(*this).rethrow();             \
+    return publisher_of_##TYPE->publish(message);         \
+  }                                                       \
   static_assert(true, "")
 
 #define CONCEALER_INIT_CLIENT(TYPE, SERVICE_NAME)                               \
@@ -83,8 +80,7 @@ public:                                                              \
 #define CONCEALER_INIT_SUBSCRIPTION(TYPE, TOPIC)                                            \
   subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
     TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
-      const auto lock = static_cast<Autoware &>(*this).lock();                              \
-      current_value_of_##TYPE = *message;                                                   \
+      std::atomic_store(&current_value_of_##TYPE, std::move(message));                      \
     }))
 
 #define CONCEALER_INIT_PUBLISHER(TYPE, TOPIC) \

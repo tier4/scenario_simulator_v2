@@ -296,7 +296,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   std::vector<std::int64_t> ids = {};
   if (universe) {
     const auto points = universe->getPathWithLaneId().points;
-    for (const auto point : points) {
+    for (const auto & point : points) {
       std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }
     auto result = std::unique(ids.begin(), ids.end());
@@ -321,6 +321,7 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
+  autoware->rethrow();
   EntityBase::onUpdate(current_time, step_time);
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);

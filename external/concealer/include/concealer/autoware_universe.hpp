@@ -89,12 +89,12 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
 public:
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                              \
-  auto is##NAME() const noexcept                                         \
-  {                                                                      \
-    using autoware_auto_system_msgs::msg::AutowareState;                 \
-    return current_value_of_AutowareState.state == AutowareState::VALUE; \
-  }                                                                      \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
+  auto is##NAME() const noexcept                             \
+  {                                                          \
+    using autoware_auto_system_msgs::msg::AutowareState;     \
+    return getAutowareState().state == AutowareState::VALUE; \
+  }                                                          \
   static_assert(true, "")
 
   DEFINE_STATE_PREDICATE(Initializing, INITIALIZING);            // 1
