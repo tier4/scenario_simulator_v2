@@ -83,6 +83,13 @@ public:                                                   \
       std::atomic_store(&current_value_of_##TYPE, std::move(message));                      \
     }))
 
+#define CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(TYPE, TOPIC, CALLBACK)                    \
+  subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
+    TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
+      std::atomic_store(&current_value_of_##TYPE, std::move(message));                      \
+      CALLBACK(*current_value_of_##TYPE);                                                   \
+    }))
+
 #define CONCEALER_INIT_PUBLISHER(TYPE, TOPIC) \
   publisher_of_##TYPE(                        \
     static_cast<Node &>(*this).template create_publisher<TYPE>(TOPIC, rclcpp::QoS(1).reliable()))

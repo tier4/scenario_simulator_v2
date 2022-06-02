@@ -35,6 +35,8 @@
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
+#include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
+#include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
 namespace concealer
 {
@@ -88,6 +90,46 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   // TODO CONCEALER_DEFINE_CLIENT(InitializePose);
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
+private:  // EXPERIMENTAL RTC SUPPORTS
+  using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
+
+  // NOTE: src/autoware/ad_api_adaptor/autoware_iv_external_api_adaptor/src/rtc_controller.cpp
+  CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
+
+  using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
+
+  rclcpp::Client<CooperateCommands>::SharedPtr client_of_cooperate_commands;
+
+  auto approve(const CooperateStatusArray & cooperate_status_array)
+  {
+    auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
+    request->stamp = cooperate_status_array.stamp;
+
+    auto approvable = [](auto && cooperate_status) {
+      return cooperate_status.safe xor
+             (cooperate_status.command_status.type == tier4_rtc_msgs::msg::Command::ACTIVATE);
+    };
+
+    auto flip = [](auto && type) {
+      using Command = tier4_rtc_msgs::msg::Command;
+      return type == Command::ACTIVATE ? Command::DEACTIVATE : Command::ACTIVATE;
+    };
+
+    for (auto && cooperate_status : cooperate_status_array.statuses) {
+      if (approvable(cooperate_status)) {
+        tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
+        cooperate_command.module = cooperate_status.module;
+        cooperate_command.uuid = cooperate_status.uuid;
+        cooperate_command.command.type = flip(cooperate_status.command_status.type);
+        request->commands.push_back(cooperate_command);
+      }
+    }
+
+    if (not request->commands.empty()) {
+      client_of_cooperate_commands->async_send_request(request);
+    }
+  }
+
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
   auto is##NAME() const noexcept                             \
@@ -129,7 +171,11 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
     CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage"),
     // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
-    CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")
+    CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit"),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", approve),
+    client_of_cooperate_commands(
+      static_cast<Autoware &>(*this).template create_client<CooperateCommands>(
+        "/api/external/set/rtc_commands", rmw_qos_profile_default))
   // clang-format on
   {
     waitpid_options = 0;
