@@ -9,7 +9,7 @@ OpenSCENARIO is an **open file format** for the description of dynamic contents 
 Tier IV plans to use OpenSCENARIO for Autoware's Continuous Integration (CI), and is extending it for CI as far as the standard allows (see [Extensions](#Extensions) for details).
 
 ## Installation
-
+[//]: # (TODO : remove .Architecture Proposal)
 Place this repository in the ROS workspace with Autoware and build it in [the way Autoware specifies](https://github.com/tier4/AutowareArchitectureProposal#autoware-setup).
 
 ## Usage

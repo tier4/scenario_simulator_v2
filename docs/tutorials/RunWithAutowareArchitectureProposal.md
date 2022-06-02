@@ -1,5 +1,5 @@
 # Scenario simulator with Autoware Architecture Proposal
-
+[//]: # (TODO : remove .Architecture Proposal)
 This document contains step-by-step instruction on how to build and run [Autoware Architecture Proposal](https://github.com/tier4/AutowareArchitectureProposal.proj) with `scenario_simulator_v2`.
 
 ## Prerequisites 
