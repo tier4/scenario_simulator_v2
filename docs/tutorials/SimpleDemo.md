@@ -7,7 +7,7 @@ If you want to know how to do that, please refer to [this documentation](BuildIn
 
 ## How to run simple demo
 
-Only you have to do is type this command in your terminal.
+Only you have to do is execute this command in your terminal.
 
 ```bash
 source ~/scenario_simulator_ws/install/local_setup.bash
