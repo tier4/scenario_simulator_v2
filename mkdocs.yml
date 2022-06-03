@@ -49,7 +49,7 @@ extra_javascript:
   - https://unpkg.com/mermaid/dist/mermaid.min.js
 
 nav:
-  - Home: README.md
+  - Home: HOME.md
   - Tutorials:
       - tutorials/BuildInstructions.md
       - tutorials/SimpleDemo.md
@@ -68,20 +68,20 @@ nav:
           - user_guide/scenario_test_runner/HowToWriteWorkflowFile.md
           - user_guide/scenario_test_runner/Tips.md
   - Design:
-      - About: design/About.md
-      - design/AutowareAPI.md
-      - design/NPCBehavior.md
-      - design/BehaviorPlugin.md
-      - design/ErrorCategories.md
-      - design/OpenSCENARIOSupport.md
-      - design/SimpleSensorSimulator.md
-      - design/SystemArchitecture.md
-      - design/TrafficSimulator.md
-      - design/ZeroMQ.md
-      - design/Metrics.md
-      - design/VehicleDynamics.md
-      - design/SimulationResultFormat.md
-      - design/TierIVScenarioFormatVersion2.md
+      - About: developer_guide/About.md
+      - developer_guide/AutowareAPI.md
+      - developer_guide/NPCBehavior.md
+      - developer_guide/BehaviorPlugin.md
+      - developer_guide/ErrorCategories.md
+      - developer_guide/OpenSCENARIOSupport.md
+      - developer_guide/SimpleSensorSimulator.md
+      - developer_guide/SystemArchitecture.md
+      - developer_guide/TrafficSimulator.md
+      - developer_guide/ZeroMQ.md
+      - developer_guide/Metrics.md
+      - developer_guide/VehicleDynamics.md
+      - developer_guide/SimulationResultFormat.md
+      - developer_guide/TierIVScenarioFormatVersion2.md
   - Package Details: package/About.md
   - Release Notes: ReleaseNotes.md
   - Contact Information: etc/ContactUs.md

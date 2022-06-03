@@ -2,7 +2,7 @@
 
 You can test run (preview) the scenarios you created using the GUI scenario editor before running it with Autoware.
 
-The file you exported from the GUI scenario editor is in YAML based format called "[TIER IV Scenario Format Version 2.0](../../design/TierIVScenarioFormatVersion2.md)". Then it is converted into XML based OpenSCENARIO format.
+The file you exported from the GUI scenario editor is in YAML based format called "[TIER IV Scenario Format Version 2.0](../../developer_guide/TierIVScenarioFormatVersion2.md)". Then it is converted into XML based OpenSCENARIO format.
 The specification of this OpenSCENARIO format is found at [OpenSCENARIO](http://www.openscenario.org/) site.
 
 ## Before Testing Scenarios

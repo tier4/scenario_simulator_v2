@@ -8,7 +8,7 @@ on:
     paths-ignore:
       - "docs/**"
       - "mkdocs.yml"
-      - "README.md"
+      - "HOME.md"
       - "workflows/Docker.yaml"
       - "workflows/Documentation.yaml"
       - "workflows/NotifyFailure.yaml"
