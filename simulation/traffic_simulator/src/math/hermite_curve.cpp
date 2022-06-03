@@ -140,14 +140,14 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     double tx = (x - point0.x) / (point1.x - point0.x);
     double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
     double ty = (y - point0.y) / (point1.y - point0.y);
-    if (std::abs(tx - ty) > epsilon) {
-      if ((0 <= tx && tx <= 1) || (1 <= ty && ty <= 1)) {
+    if (std::abs(tx - ty) > epsilon || std::isnan(tx) || std::isnan(ty)) {
+      if ((0 <= tx && tx <= 1) || (0 <= ty && ty <= 1)) {
         if (0 <= solution && solution <= 1) {
           s_values.emplace_back(solution);
         }
       }
     } else {
-      if ((0 <= tx && tx <= 1) && (1 <= ty && ty <= 1)) {
+      if ((0 <= tx && tx <= 1) && (0 <= ty && ty <= 1)) {
         if (0 <= solution && solution <= 1) {
           s_values.emplace_back(solution);
         }
