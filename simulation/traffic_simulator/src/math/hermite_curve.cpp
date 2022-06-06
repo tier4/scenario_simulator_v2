@@ -135,7 +135,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
   auto solutions = solver_.solveCubicEquation(a, b, c, d);
   for (const auto solution : solutions) {
-    constexpr double epsilon = std::numeric_limits<double>::epsilon();  // 0.01;
+    constexpr double epsilon = std::numeric_limits<double>::epsilon();
     double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
     double tx = (x - point0.x) / (point1.x - point0.x);
     double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
