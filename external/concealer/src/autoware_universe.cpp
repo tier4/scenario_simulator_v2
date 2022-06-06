@@ -75,46 +75,52 @@ auto AutowareUniverse::engage() -> void
 
 auto AutowareUniverse::update() -> void
 {
-  CurrentControlMode current_control_mode;
-  {
-    current_control_mode.mode = CurrentControlMode::AUTONOMOUS;
-  }
-  setCurrentControlMode(current_control_mode);
+  setControlModeReport([this]() {
+    ControlModeReport message;
+    message.mode = ControlModeReport::AUTONOMOUS;
+    return message;
+  }());
 
-  CurrentShift current_shift;
-  {
-    using autoware_auto_vehicle_msgs::msg::GearReport;
-    current_shift.stamp = get_clock()->now();
-    current_shift.report = current_twist.linear.x >= 0 ? GearReport::DRIVE : GearReport::REVERSE;
-  }
-  setCurrentShift(current_shift);
+  setGearReport([this]() {
+    GearReport message;
+    message.stamp = get_clock()->now();
+    message.report = getGearCommand().command;
+    return message;
+  }());
 
-  CurrentSteering current_steering;
-  {
-    current_steering.stamp = get_clock()->now();
-    current_steering.steering_tire_angle = getSteeringAngle();
-  }
-  setCurrentSteering(current_steering);
+  setTurnIndicatorsReport([this]() {
+    TurnIndicatorsReport message;
+    message.stamp = get_clock()->now();
+    message.report = getTurnIndicatorsCommand().command;
+    return message;
+  }());
 
-  CurrentVelocity current_velocity;
-  {
-    current_velocity.header.stamp = get_clock()->now();
-    current_velocity.header.frame_id = "base_link";
-    current_velocity.longitudinal_velocity = current_twist.linear.x;
-    current_velocity.lateral_velocity = current_twist.linear.y;
-    current_velocity.heading_rate = current_twist.angular.z;
-  }
-  setCurrentVelocity(current_velocity);
+  setSteeringReport([this]() {
+    SteeringReport message;
+    message.stamp = get_clock()->now();
+    message.steering_tire_angle = getSteeringAngle();
+    return message;
+  }());
 
-  LocalizationOdometry localization_odometry;
-  {
-    localization_odometry.header.stamp = get_clock()->now();
-    localization_odometry.header.frame_id = "map";
-    localization_odometry.pose.pose = current_pose;
-    localization_odometry.pose.covariance = {};
-    localization_odometry.twist.twist = current_twist;
-  }
-  setLocalizationOdometry(localization_odometry);
+  setVelocityReport([this]() {
+    VelocityReport message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "base_link";
+    message.longitudinal_velocity = current_twist.linear.x;
+    message.lateral_velocity = current_twist.linear.y;
+    message.heading_rate = current_twist.angular.z;
+    return message;
+  }());
+
+  setOdometry([this]() {
+    Odometry message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "map";
+    message.pose.pose = current_pose;
+    message.pose.covariance = {};
+    message.twist.twist = current_twist;
+    return message;
+  }());
 
   setTransform(current_pose);
 }
@@ -137,7 +143,10 @@ auto AutowareUniverse::getSteeringAngle() const -> double
 auto AutowareUniverse::getGearSign() const -> double
 {
   using autoware_auto_vehicle_msgs::msg::GearCommand;
-  return getGearCommand().command == GearCommand::REVERSE ? -1.0 : 1.0;
+  return getGearCommand().command == GearCommand::REVERSE or
+             getGearCommand().command == GearCommand::REVERSE_2
+           ? -1.0
+           : 1.0;
 }
 
 auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
