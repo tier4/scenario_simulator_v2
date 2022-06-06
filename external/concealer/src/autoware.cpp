@@ -58,6 +58,19 @@ auto Autoware::getGearCommand() const -> const autoware_auto_vehicle_msgs::msg::
   return gear_command;
 }
 
+auto Autoware::getTurnIndicatorsCommand() const
+  -> const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand &
+{
+  static auto turn_indicators_command = []() {
+    autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
+    turn_indicators_command.command =
+      autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
+    return turn_indicators_command;
+  }();
+  turn_indicators_command.stamp = now();
+  return turn_indicators_command;
+}
+
 void Autoware::shutdownAutoware()
 {
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");

@@ -21,6 +21,7 @@
 #include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
+#include <boost/lexical_cast.hpp>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -307,11 +308,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 
 auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
 {
-  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
-    return boost::lexical_cast<std::string>(universe->getTurnIndicatorsCommand());
-  } else {
-    return "";
-  }
+  return boost::lexical_cast<std::string>(autoware->getTurnIndicatorsCommand());
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
