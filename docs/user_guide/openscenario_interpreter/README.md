@@ -1,4 +1,4 @@
-# Tier IV Scenario Runner - OpenSCENARIO Implementation for Autoware
+# TIER IV Scenario Runner - OpenSCENARIO Implementation for Autoware
 
 ## Overview
 

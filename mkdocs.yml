@@ -20,14 +20,13 @@ plugins:
 palette:
   scheme: slate
 
-copyright: "Copyright &copy; 2020- Tier IV, Inc."
+copyright: "Copyright &copy; 2020- TIER IV, Inc."
 
 markdown_extensions:
   - attr_list
   - codehilite: { guess_lang: false }
   - fontawesome_markdown
   - mdx_math
-#  - mdx_unimoji
   - plantuml_markdown: { server: http://www.plantuml.com/plantuml }
   - pymdownx.arithmatex
   - pymdownx.emoji: { emoji_generator: !!python/name:pymdownx.emoji.to_svg  }
@@ -50,12 +49,12 @@ extra_javascript:
 
 nav:
   - Home: HOME.md
-  - Tutorials:
-      - tutorials/BuildInstructions.md
-      - tutorials/SimpleDemo.md
-      - tutorials/RunWithDocker.md
-      - tutorials/RunTestScenarioWithDocker.md
   - User Guide:
+      - Build Instructions : user_guide/BuildInstructions.md
+      - Quick Start : user_guide/RunWithAutowareUniverse.md
+      - Cpp scenario demo : user_guide/SimpleDemo.md
+      - Run on Docker : user_guide/RunWithDocker.md
+      - Run test scenario on Docker : user_guide/RunTestScenarioWithDocker.md
       - Scenario Editor:
           - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
           - user_guide/scenario_editor/CreateSimpleScenario.md
@@ -67,12 +66,12 @@ nav:
           - user_guide/scenario_test_runner/ScenarioFormatConversion.md
           - user_guide/scenario_test_runner/HowToWriteWorkflowFile.md
           - user_guide/scenario_test_runner/Tips.md
-  - Design:
+  - Developer Guide:
       - About: developer_guide/About.md
       - developer_guide/AutowareAPI.md
       - developer_guide/NPCBehavior.md
       - developer_guide/BehaviorPlugin.md
-      - developer_guide/ErrorCategories.md
+#      - developer_guide/ErrorCategories.md
       - developer_guide/OpenSCENARIOSupport.md
       - developer_guide/SimpleSensorSimulator.md
       - developer_guide/SystemArchitecture.md
@@ -82,8 +81,9 @@ nav:
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
       - developer_guide/TierIVScenarioFormatVersion2.md
-  - Package Details: package/About.md
-  - Release Notes: ReleaseNotes.md
-  - Contact Information: etc/ContactUs.md
-  - How to Contribute: etc/HowToContribute.md
-  - LICENSE: LICENSE.md
+      - Package Details: package/About.md
+  - Etc:
+    - Release Notes: ReleaseNotes.md
+    - Contact Information: etc/ContactUs.md
+    - How to Contribute: etc/HowToContribute.md
+    - LICENSE: LICENSE.md
