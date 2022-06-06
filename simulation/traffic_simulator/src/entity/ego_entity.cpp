@@ -378,12 +378,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
-    // DIRTY HACK!!!
-    if (auto autoware_universe = dynamic_cast<concealer::AutowareUniverse const *>(autoware.get());
-        autoware_universe) {
-      vehicle_model_ptr_->setGear(autoware_universe->getGearCommand().command);
-    }
-
+    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
 

@@ -161,6 +161,8 @@ public:
 
   virtual auto getAutowareStateName() const -> std::string = 0;
 
+  virtual auto getGearCommand() const -> const autoware_auto_vehicle_msgs::msg::GearCommand &;
+
   // returns -1.0 when gear is reverse and 1.0 otherwise
   virtual auto getGearSign() const -> double = 0;
 
