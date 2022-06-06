@@ -22,7 +22,6 @@
 #include <openscenario_interpreter/type_traits/if_has_member_function_description.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_evaluate.hpp>
 #include <openscenario_interpreter/type_traits/if_has_stream_output_operator.hpp>
-#include <openscenario_interpreter/utility/pair.hpp>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>

@@ -24,7 +24,8 @@ Event::Event(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
   StoryboardElement(
     readAttribute<UnsignedInt>("maximumExecutionCount", node, local(), UnsignedInt(1)),
-    readElement<Trigger>("StartTrigger", node, local())),
+    // If there is no "StartTrigger" in the "Event", the default StartTrigger that always returns true is used.
+    readElement<Trigger>("StartTrigger", node, local(), Trigger({ConditionGroup()}))),
   priority(readAttribute<Priority>("priority", node, local()))
 {
   traverse<1, unbounded>(node, "Action", [&](auto && node) {
