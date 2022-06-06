@@ -14,9 +14,10 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature                    | Brief summary                                                                 | Category                    | Pull request                                                     | Contributor                               |
-| -------------------------- | ----------------------------------------------------------------------------- | --------------------------- | ---------------------------------------------------------------- | ----------------------------------------- |
-| Fix termination processing | Properly terminate the interpreter when the Autoware process exits abnormally |  `openscenario_interpreter` | [#750](https://github.com/tier4/scenario_simulator_v2/pull/750)  | [kyabe2718](https://github.com/kyabe2718) |
+| Feature                                    | Brief summary                                                                                         | Category                   | Pull request                                                    | Contributor                                   |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Fix termination processing                 | Properly terminate the interpreter when the Autoware process exits abnormally                         | `openscenario_interpreter` | [#750](https://github.com/tier4/scenario_simulator_v2/pull/750) | [kyabe2718](https://github.com/kyabe2718)     |
+| Fix collision2D function in `HermiteCurve` | Previous algorithm was failed to check collision when the line is almost parallel to the x and y axis | `traffic_simulator`        | [#795](https://github.com/tier4/scenario_simulator_v2/pull/795) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 
