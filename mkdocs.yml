@@ -20,7 +20,7 @@ plugins:
 palette:
   scheme: slate
 
-copyright: "Copyright &copy; 2020- TIER IV, Inc."
+copyright: "Copyright &copy; 2020 TIER IV, Inc."
 
 markdown_extensions:
   - attr_list
@@ -80,7 +80,7 @@ nav:
       - developer_guide/Metrics.md
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
-      - developer_guide/TierIVScenarioFormatVersion2.md
+      - developer_guide/TIERIVScenarioFormatVersion2.md
       - Package Details: package/About.md
   - Etc:
     - Release Notes: ReleaseNotes.md
