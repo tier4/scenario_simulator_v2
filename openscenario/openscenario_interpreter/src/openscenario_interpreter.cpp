@@ -129,31 +129,40 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  auto evaluateStoryboard = [this]() {
-    withExceptionHandler(
-      [this](auto &&...) { deactivate(); },
+  auto initializeStoryboard = [this]() {
+    return withExceptionHandler(
+      [this](auto &&...) {
+        publishCurrentContext();
+        deactivate();
+      },
       [this]() {
         if (currentScenarioDefinition()) {
-          const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
-            currentScenarioDefinition()->evaluate();
-            publishCurrentContext();
-            return 0 <= evaluateSimulationTime();  // Statistics only if true.
-          });
-
-          if (0 <= evaluateSimulationTime() and currentLocalFrameRate() < evaluate_time) {
-            RCLCPP_WARN_STREAM(
-              get_logger(),
-              "Your machine is not powerful enough to run the scenario at the specified "
-              "frame rate ("
-                << currentLocalFrameRate().count()
-                << " Hz). We recommend that you reduce the frame rate to "
-                << 1000.0 / execution_timer.getStatistics("evaluate")
-                              .max<std::chrono::milliseconds>()
-                              .count()
-                << " or less.");
-          }
+          currentScenarioDefinition()->storyboard.init.evaluate();
+          SimulatorCore::update();
         } else {
-          throw Error("No script evaluable");
+          throw Error("No script evaluable.");
+        }
+      });
+  };
+
+  auto evaluateStoryboard = [&]() {
+    withExceptionHandler(
+      [this](auto &&...) {
+        publishCurrentContext();
+        deactivate();
+      },
+      [this]() {
+        if (evaluateSimulationTime() < 0) {
+        SimulatorCore::update();
+          publishCurrentContext();
+        } else if (currentScenarioDefinition()) {
+          withTimeoutHandler(defaultTimeoutHandler(), [this]() {
+            currentScenarioDefinition()->evaluate();
+            SimulatorCore::update();
+            publishCurrentContext();
+          });
+        } else {
+          throw Error("No script evaluable.");
         }
       });
   };
@@ -173,11 +182,25 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           shared_from_this(), makeCurrentConfiguration(), local_real_time_factor,
           1 / local_frame_rate * local_real_time_factor);
 
+        /*
+           DIRTY HACK!
+
+           Since traffic_simulator is initially in an undefined internal state,
+           it will not have the necessary information to transition from
+           Autoware's INITIALIZING state to the WAITING_FOR_ROUTE state unless
+           it calls updateFrame at least once. This means that the simulation
+           cannot start at exactly zero simulation time, which is a serious
+           problem that must be solved in the future.
+        */
+        SimulatorCore::update();
+
         execution_timer.clear();
 
         publisher_of_context->on_activate();
 
         assert(publisher_of_context->is_activated());
+
+        initializeStoryboard();
 
         timer = create_wall_timer(currentLocalFrameRate(), evaluateStoryboard);
 

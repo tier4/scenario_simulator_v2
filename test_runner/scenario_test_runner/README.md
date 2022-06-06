@@ -2,7 +2,7 @@
 
 Scenario Test Runner is being developed to assist in the definitive planning
 simulation using concept of OpenSCENARIO.
-Simulations are described in a "YAML" based format called a "TierIV Scenario Format".
+Simulations are described in a "YAML" based format called a "TIER IV Scenario Format".
 Then convert the scenario into an "XML" based format called an "OpenSCENARIO". The details of the format can be found at [OpenSCENARIO](http://www.openscenario.org/).
 
 
@@ -19,7 +19,7 @@ docker import
 ```
 
 
-# TierIV Scenario Format version 2.0 -> OpenSCENARIO Format
+# TIER IV Scenario Format version 2.0 -> OpenSCENARIO Format
 
 ### Scenario Modifiers
 ScenarioModifiers and OpenSCENARIO are defined as below.
@@ -108,6 +108,3 @@ Scenario:
   - { path: $(find-pkg-share scenario_test_runner)/scenario/success.yaml, expect: success, frame-rate: 30 }
 ```
 
-### TierIV Scenario Format version 2.0 -> OpenSCENARIO Format Separator
-
-To convert OpenSCENARIO, see the scenario test utility package [Scenario Converter](../scenario_test_utility).

@@ -92,6 +92,8 @@ class ScenarioTestRunner(LifecycleController):
         None
 
         """
+        super().__init__(timeout=global_timeout)
+
         self.global_frame_rate = global_frame_rate
         self.global_real_time_factor = global_real_time_factor
         self.global_timeout = global_timeout
@@ -109,8 +111,6 @@ class ScenarioTestRunner(LifecycleController):
         self.output_directory.mkdir(parents=True, exist_ok=True)
 
         self.current_workflow = None
-
-        super().__init__()
 
     def run_workflow(self, path: Path):
         """
@@ -222,6 +222,8 @@ class ScenarioTestRunner(LifecycleController):
             self.get_logger().warn("KeyboardInterrupt")
         except OSError as e:
             self.get_logger().warn("OSError: {}".format(e))
+        except Exception as e:
+            self.get_logger().error("\x1b[1;31m{}\x1b[0m".format(e))
 
     # def __del__(self):
     #     pass

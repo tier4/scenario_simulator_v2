@@ -54,16 +54,16 @@ sequenceDiagram
 
 ### Protobuf definition
 
-The schema of protobuf is [here](https://github.com/tier4/scenario_simulator_v2-docs/blob/master/simulation/simulation_interface/proto/simulation_api_schema.proto).
-Protobuf documentation is [here](../proto_doc/protobuf.md). All data are serialized as string and sent via TCP by using ZeroMQ.
+The schema of protobuf is [here](https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/simulation_interface/proto/simulation_api_schema.proto).  
+Protobuf documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf). All data are serialized as string and sent via TCP by using ZeroMQ.
 
 ## Required APIs for co-simulation
 
 The traffic simulator and the simple sensor simulator communicate with APIs. If you want to integrate the simulators with your simulator, only you have to do is preparing the following APIs:
 
-|           API            | TCP Port |                                                                          Request                                                                          |                                                                          Response                                                                           |
-| ------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| initialize               | 5555     | [InitializeRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.InitializeRequest)                       | [InitializeResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.InitializeResponse)                       |
+|           API            | TCP Port | Request                                                                                                                                              |                                                                          Response                                                                           |
+| ------------------------ | -------- |------------------------------------------------------------------------------------------------------------------------------------------------------| ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| initialize               | 5555     | [InitializeRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.InitializeRequest)                  | [InitializeResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.InitializeResponse)                       |
 | update_frame             | 5556     | [UpdateFrameRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateFrameRequest)                     | [UpdateFrameResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateFrameResponse)                     |
 | update_sensor_frame      | 5557     | [UpdateSensorFrameRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateSensorFrameRequest)         | [UpdateSensorFrameResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateSensorFrameResponse)         |
 | spawn_vehicle_entity     | 5558     | [SpawnVehicleEntityRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.SpawnVehicleEntityRequest)       | [SpawnVehicleEntityResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.SpawnVehicleEntityResponse)       |

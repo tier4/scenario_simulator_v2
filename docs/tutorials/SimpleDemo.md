@@ -3,7 +3,7 @@
 **Note! This demo does not use Autoware. Ego Vehicle is interpreted as an NPC**
 
 Before you try to run this demo, you have to build and install scenario_simulator_v2 in your local computer.
-Do you want to know how to do that, please refer [this documentation](BuildInstructions.md).
+If you want to know how to do that, please refer to [this documentation](BuildInstructions.md).
 
 ## How to run simple demo
 

@@ -15,7 +15,7 @@ Each component has the following features:
 
 1. openscenario_interpreter  
    The test runner communicates with the openscenario_interpreter with the rclcpp lifecycle.  
-   The openscenario_interpreter is an rclcpp lifecycle component.  
+   The openscenario_interpreter is a rclcpp lifecycle component.  
    ![lifecycle](https://design.ros2.org/img/node_lifecycle/life_cycle_sm.png "lifecycle")
    When the openscenario_interpreter launched, the state of the openscenario_interpreter is "Unconfigured".  
    When the test runner launched, the test runner configures the openscenario_interpreter and the state of the openscenario_interpreter becomes "Inactive".  

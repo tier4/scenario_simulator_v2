@@ -42,7 +42,9 @@ struct Storyboard : public Scope, public StoryboardElement, private SimulatorCor
 {
   Init init;
 
-  bool engaged = false;
+  using Thunk = std::function<void()>;
+
+  static inline std::queue<Thunk> thunks{};
 
   explicit Storyboard(const pugi::xml_node &, Scope &);
 

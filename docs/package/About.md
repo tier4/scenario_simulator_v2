@@ -6,7 +6,7 @@
 Traffic simulator for scenario testing.  
 This package includes NPC logic, API etc...
 
-![traffic simulator](../../image/simple_demo.png "traffic simulator")
+![traffic simulator](../image/simple_demo.png "traffic simulator")
 
 - [Classes](/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes)
 - [Namespaces](/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Namespaces)
@@ -18,7 +18,7 @@ This package includes NPC logic, API etc...
 ### Simple Sensor Simulator Package
 Reference implementation of the simulator integrated with this package.
 
-![simple sensor simulator](../../image/simple_sensor_simulator.png "simple sensor simulator")
+![simple sensor simulator](../image/simple_sensor_simulator.png "simple sensor simulator")
 
 - [Classes](/scenario_simulator_v2-docs/package/simple_sensor_simulator/markdown/Classes)
 - [Namespaces](/scenario_simulator_v2-docs/package/simple_sensor_simulator/markdown/Namespaces)
