@@ -43,8 +43,9 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
   p.position.x = 0.1;
   p.position.y = 0;
   p.position.z = 0;
-  EXPECT_TRUE(curve.getSValue(p, true));
-  EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) && (curve.getSValue(p, true).get() < 0.101));
+  EXPECT_TRUE(curve.getSValue(p, 1, true));
+  EXPECT_TRUE(
+    (curve.getSValue(p, 1, true).get() > 0.099) && (curve.getSValue(p, 1, true).get() < 0.101));
   {
     geometry_msgs::msg::Point start;
     start.x = 0.1;
