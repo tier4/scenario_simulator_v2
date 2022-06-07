@@ -57,17 +57,19 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
 
-  mutable std::mutex mutex;
-
-  std::promise<void> promise;
-
-  std::future<void> future;
+  std::atomic<bool> is_stop_requested = false;
 
   std::thread spinner;
 
   rclcpp::TimerBase::SharedPtr updater;
 
+  std::atomic<bool> is_thrown = false;
+
   std::exception_ptr thrown;
+
+  std::atomic<bool> is_autoware_exited = false;
+
+  void checkAutowareProcess();
 
 protected:
   const pid_t process_id = 0;
@@ -82,7 +84,14 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
-  auto currentFuture() -> auto & { return future; }
+  void stopRequest() noexcept { return is_stop_requested.store(true, std::memory_order_release); }
+
+  bool isStopRequested() const noexcept
+  {
+    return is_stop_requested.load(std::memory_order_acquire);
+  }
+
+  virtual auto update() -> void = 0;
 
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
@@ -95,40 +104,27 @@ protected:
   void resetTimerCallback();
 
 public:
-  CONCEALER_PUBLIC explicit Autoware()
+  CONCEALER_PUBLIC explicit Autoware(pid_t pid = 0)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    future(std::move(promise.get_future())),
     spinner([this]() {
-      while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
-                                std::future_status::timeout) {
-        try {
+      try {
+        while (rclcpp::ok() and not isStopRequested()) {
+          checkAutowareProcess();
           rclcpp::spin_some(get_node_base_interface());
-        } catch (...) {
-          thrown = std::current_exception();
+          std::this_thread::yield();
         }
+      } catch (...) {
+        thrown = std::current_exception();
+        is_thrown.store(true, std::memory_order_release);
       }
-    })
+    }),
+    process_id(pid)
   {
   }
 
   template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
-  : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    future(std::move(promise.get_future())),
-    spinner([this]() {
-      while (rclcpp::ok() and currentFuture().wait_for(std::chrono::milliseconds(1)) ==
-                                std::future_status::timeout) {
-        try {
-          rclcpp::spin_some(get_node_base_interface());
-        } catch (...) {
-          thrown = std::current_exception();
-        }
-      }
-      RCLCPP_INFO_STREAM(
-        get_logger(),
-        "\x1b[32mShutting down Autoware: (1/3) Stopped publishing/subscribing.\x1b[0m");
-    }),
-    process_id(ros2_launch(std::forward<decltype(xs)>(xs)...))
+  : Autoware(ros2_launch(std::forward<decltype(xs)>(xs)...))
   {
   }
 
@@ -161,8 +157,6 @@ public:
    * -------------------------------------------------------------------------- */
   virtual auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void = 0;
 
-  virtual auto update() -> void = 0;
-
   virtual auto getAcceleration() const -> double = 0;
 
   virtual auto getAutowareStateName() const -> std::string = 0;
@@ -181,8 +175,6 @@ public:
   virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   /*   */ auto initialized() const noexcept { return initialize_was_called; }
-
-  /*   */ auto lock() const { return std::unique_lock<std::mutex>(mutex); }
 
   /*   */ auto ready() const noexcept(false) -> bool;
 

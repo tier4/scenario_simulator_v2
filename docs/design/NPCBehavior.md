@@ -1,6 +1,6 @@
 # NPC Behavior
 
-Behavior logic of the NPC(non-player-character) is plugable.
+Behavior logic of the NPC(non-player-character) is pluggable.
 If you want to use your own behavior, please see [this document](BehaviorPlugin.md).
 
 In this document, we describe how default behavior tree NPC works in traffic environment.

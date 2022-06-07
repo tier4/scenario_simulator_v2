@@ -54,8 +54,8 @@ sequenceDiagram
 
 ### Protobuf definition
 
-The schema of protobuf is [here](https://github.com/tier4/scenario_simulator_v2-docs/blob/master/simulation/simulation_interface/proto/simulation_api_schema.proto).
-Protobuf documentation is [here](../proto_doc/protobuf.md). All data are serialized as string and sent via TCP by using ZeroMQ.
+The schema of protobuf is [here](https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/simulation_interface/proto/simulation_api_schema.proto).  
+Protobuf documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf). All data are serialized as string and sent via TCP by using ZeroMQ.
 
 ## Required APIs for co-simulation
 

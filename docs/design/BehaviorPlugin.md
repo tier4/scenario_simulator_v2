@@ -3,12 +3,12 @@
 Behavior plugin enables support multiple type of NPC behaviors.
 Default behavior plugin implementation is [here](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/behavior_tree_plugin).
 
-Behavior plugin use pluginlib and plugin class should be inherit [this base class](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classentity__behavior_1_1BehaviorPluginBase/#typedef-entitytypedict).
+Behavior plugin use pluginlib and plugin class should be inherited [this base class](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classentity__behavior_1_1BehaviorPluginBase/#typedef-entitytypedict).
 
 Example of the behavior plugin class is below.
 
 ```C++
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2020 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ configure plugin class, this function only calls once at the start of simulation
 ```C++
 void update(double current_time, double step_time) override;
 ```
-update plugin class, this function calls once in every frames in simulaton.
+update plugin class, this function calls once in every frame in simulation.
 ```C++
 const std::string & getCurrentAction() const override;
 ```
@@ -123,7 +123,7 @@ Setters are named as set(Foo), such as `BehaviorPluginClass::setCurrentTime(doub
 | GoalPoses            | Goal poses of entity.                                 | `std::vector<geometry_msgs::msg::Pose>`                      |
 | HdMapUtils           | Shared pointer of HdMapUtils class.                   | `std::shared_ptr<hdmap_utils::HdMapUtils>`                   |
 | Obstacle             | Target obstacle of your NPC.                          | `boost::optional<traffic_simulator_msgs::msg::Obstacle>`     |
-| OtherEntityStatus    | Dictionay of other entity status.                     | `EntityStatusDict`                                           |
+| OtherEntityStatus    | Dictionary of other entity status.                    | `EntityStatusDict`                                           |
 | PedestrianParameters | Entity parameters for pedestrian.                     | `traffic_simulator_msgs::msg::PedestrianParameters`          |
 | Request              | Request to the NPC you want to control                | `std::string`                                                |
 | RouteLanelets        | Lanelet ids on entity route                           | `std::vector<std::int64_t>`                                  |

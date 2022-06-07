@@ -1,10 +1,10 @@
 # Edit an existing scenario
 
-Please go to following steps after completing [Create a simple scenario](CreateSimpleScenario 'CreateSimpleScenario').
+Please go to following steps after completing [Create a simple scenario](CreateSimpleScenario.md 'CreateSimpleScenario').
 
 ## Load a scenario
 
-You can load a scenario exported at [Create a simple scenario](CreateSimpleScenario 'CreateSimpleScenario') by following steps after launching scenario editor and opening a map.
+You can load a scenario exported at [Create a simple scenario](CreateSimpleScenario.md 'CreateSimpleScenario') by following steps after launching scenario editor and opening a map.
 
 1. "SCENARIO" on the menu -> Select "Import yaml"
 2. Select a scenario file from a displayed dialog.
@@ -19,7 +19,7 @@ You can add a Pedestrian in a scenario by following steps.
 1. "EDIT" on the menu -> "Pedestrian" -> Select "Add pedestrian"
 2. Click where you would like to add a pedestrian on the map.
 3. Adjust the pedestrian direction by dragging an arrow of the pedestrian object on the map.
-4. As same as "Velocity designation of Ego car" in [Create a simple map](CreateSimpleScenario 'CreateSimpleScenario'), designate the velocity of the pedestrian. As an example, set 0 m/s not to walk in an initial state.
+4. As same as "Velocity designation of Ego car" in [Create a simple map](CreateSimpleScenario.md 'CreateSimpleScenario'), designate the velocity of the pedestrian. As an example, set 0 m/s not to walk in an initial state.
 
 ![](screenshot04.png)
 
@@ -88,4 +88,4 @@ You can export a scenario file by following steps.
 
 The edited scenario is exported as a file. You can execute a simulator using the file.
 
-<font color="Red">Do not forget!! Please export scenario in TierIV Scenario format V2.</font>
+<font color="Red">Do not forget!! Please export scenario in TIER IV Scenario format V2.</font>
