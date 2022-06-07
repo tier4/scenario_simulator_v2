@@ -48,7 +48,7 @@ extra_javascript:
   - https://unpkg.com/mermaid/dist/mermaid.min.js
 
 nav:
-  - Home: HOME.md
+  - Home: README.md
   - User Guide:
       - Build Instructions : user_guide/BuildInstructions.md
       - Quick Start : user_guide/RunWithAutowareUniverse.md
