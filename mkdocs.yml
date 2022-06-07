@@ -82,8 +82,8 @@ nav:
       - developer_guide/SimulationResultFormat.md
       - developer_guide/TIERIVScenarioFormatVersion2.md
       - Package Details: package/About.md
-  - Etc:
-    - Release Notes: ReleaseNotes.md
+  - etc:
+    - Release Notes: etc/ReleaseNotes.md
     - Contact Information: etc/ContactUs.md
     - How to Contribute: etc/HowToContribute.md
-    - LICENSE: LICENSE.md
+    - LICENSE: etc/LICENSE.md
