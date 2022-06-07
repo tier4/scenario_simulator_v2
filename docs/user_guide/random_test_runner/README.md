@@ -2,11 +2,13 @@
 
 Random test runner allows running randomly generated scenarios to test autoware autonomy implementation.
 
-| NOTE: Currently only `Autoware.Auto` (`awf/auto`) is supported. `AutowareArchitectureProposal` (`tier4/proposal`) will be supported in the future. |
-|----------------------------------------------------------------------------------------------------------------------------------------------------|
+[//]: # (TODO : remove .Auto)
+| NOTE: Currently only `Autoware.Auto` (`awf/auto`) is supported. |
+|-----------------------------------------------------------------|
 
 ## How to build
 
+[//]: # (TODO : remove .Auto)
 ### Autoware.Auto
 
 It is assumed that you are running Autoware.Auto in ADE environment with default paths. See [Autoware.Auto documentation](https://autowarefoundation.gitlab.io/autoware.auto/AutowareAuto/installation-ade.html) for instructions how to correctly set up Autoware.Auto and ADE.
@@ -24,11 +26,6 @@ vcs import < autoware.auto.foxy.repos
 ./tools/simulation/get_scenario_simulator_v2.sh
 colcon build --packages-up-to random_test_runner scenario_simulator_launch kashiwanoha_map --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
-
-### AutowareArchitectureProposal
-
-| NOTE: AutowareArchitectureProposal is not yet supported by random testing. |
-|----------------------------------------------------------------------------|
 
 ## How to run
 

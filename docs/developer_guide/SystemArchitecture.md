@@ -1,6 +1,6 @@
 # System Architecture
 
-```plantuml source="docs/design/uml/whole_architecture.pu"
+```plantuml source="docs/developer_guide/uml/whole_architecture.pu"
 
 ```
 
@@ -29,6 +29,6 @@ Each component has the following features:
 
 ## Execution sequence of scenario testing
 
-```plantuml source="docs/design/uml/sequence.pu"
+```plantuml source="docs/developer_guide/uml/sequence.pu"
 
 ```

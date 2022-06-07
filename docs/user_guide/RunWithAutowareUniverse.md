@@ -5,8 +5,8 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
 ## Prerequisites 
 
 1. Ubuntu 20.04 machine
-2. Hardware with CUDA 11.1 capable graphics card
-3. ROS2 Galactic Geochelone desktop version [installed](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html) and sourced:
+2. Hardware with CUDA 11.4 capable graphics card
+3. ROS2 Galactic Geochelone desktop version [installed](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
 
 ## How to build
 
@@ -39,7 +39,7 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
 
    ```bash
    source /opt/ros/galactic/setup.bash
-   rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO
+   rosdep install -iry --from-paths src --rosdistro $ROS_DISTRO
    ```
 6. Build the workspace.
 
@@ -77,6 +77,6 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
    vehicle_model:=sample_vehicle
    ``` 
    
-   To modify parameters of random testing, please check documentation of ![random_test_runner](../../test_runner/random_test_runner/Readme.md)
+   To modify parameters of random testing, please check documentation of ![random_test_runner](random_test_runner/README.md)
 
-### Troubleshooting
+[//]: # (### Troubleshooting)
