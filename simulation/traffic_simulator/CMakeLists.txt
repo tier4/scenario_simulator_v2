@@ -43,6 +43,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/math/distance.cpp
   src/math/hermite_curve.cpp
   src/math/linear_algebra.cpp
+  src/math/polygon.cpp
   src/math/polynomial_solver.cpp
   src/math/transform.cpp
   src/math/uuid.cpp

@@ -198,6 +198,7 @@ public:
 
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(engage, );
+  FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getDriverModel, const);

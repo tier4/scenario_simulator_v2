@@ -96,6 +96,8 @@ public:
     return boost::none;
   }
 
+  virtual auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
+
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;

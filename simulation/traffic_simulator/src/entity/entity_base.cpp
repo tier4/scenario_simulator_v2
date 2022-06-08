@@ -18,6 +18,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/math/polygon.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -349,6 +350,56 @@ bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   status_ = status;
   status_->name = name;
   return true;
+}
+
+auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
+{
+  const auto status = getStatus();
+
+  std::vector<geometry_msgs::msg::Point> points_bbox;
+  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
+
+  p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p0.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p0.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p0);
+
+  p1.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p1.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p1.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p1);
+
+  p2.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p2.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p2.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p2);
+
+  p3.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p3.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p3.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p3);
+
+  p4.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p4.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p4.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p4);
+
+  p5.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p5.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p5.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p5);
+
+  p6.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p6.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p6.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p6);
+
+  p7.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p7.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p7.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p7);
+
+  return math::get2DConvexHull(points_bbox);
 }
 
 void EntityBase::stopAtEndOfRoad()
