@@ -18,6 +18,7 @@
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <boost/optional.hpp>
+#include <concealer/autoware.hpp>
 #include <memory>
 #include <queue>
 #include <string>
@@ -54,6 +55,8 @@ public:
 public:
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array);
 
+  virtual auto asAutoware() const -> concealer::Autoware &;
+
   virtual void engage() {}
 
   virtual auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox = 0;
@@ -85,10 +88,6 @@ public:
   virtual auto getTurnIndicatorsCommandName() const -> std::string;
 
   /*   */ auto getVisibility() { return visibility_; }
-
-  virtual auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand>;
 
   /*   */ auto getVehicleParameters() const
     -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>

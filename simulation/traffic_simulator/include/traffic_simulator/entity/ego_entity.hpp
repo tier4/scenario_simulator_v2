@@ -84,6 +84,8 @@ public:
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
 
+  auto asAutoware() const -> concealer::Autoware & override;
+
   auto engage() -> void override;
 
   auto getCurrentAction() const -> const std::string override;
@@ -102,10 +104,6 @@ public:
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 
   auto getTurnIndicatorsCommandName() const -> std::string override;
-
-  auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 

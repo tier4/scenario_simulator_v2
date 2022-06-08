@@ -37,6 +37,14 @@ void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*mark
   return;
 }
 
+auto EntityBase::asAutoware() const -> concealer::Autoware &
+{
+  throw common::Error(
+    "An operation was requested for Entity ", std::quoted(name),
+    " that is valid only for the entity controlled by Autoware, but ", std::quoted(name),
+    " is not the entity controlled by Autoware.");
+}
+
 void EntityBase::onUpdate(double, double)
 {
   job_list_.update();
@@ -278,14 +286,6 @@ void EntityBase::requestLaneChange(
     THROW_SEMANTIC_ERROR(
       "Failed to calculate absolute target lane. Please check the target lane exists.");
   }
-}
-
-auto EntityBase::getVehicleCommand() const -> std::tuple<
-  autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
-{
-  THROW_SIMULATION_ERROR(
-    "`getVehicleCommand` is not provided for ", getEntityTypename(), " type entity.");
 }
 
 void EntityBase::updateStandStillDuration(const double step_time)

@@ -196,6 +196,7 @@ public:
   }                                                                            \
   static_assert(true, "")
 
+  FORWARD_TO_ENTITY(asAutoware, const);
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(getBoundingBox, const);
@@ -208,7 +209,6 @@ public:
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTurnIndicatorsCommandName, const);
-  FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(ready, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );

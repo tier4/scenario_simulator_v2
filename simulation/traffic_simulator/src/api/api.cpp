@@ -361,7 +361,7 @@ bool API::updateEntityStatusInSim()
   simulation_api_schema::UpdateEntityStatusRequest req;
   if (entity_manager_ptr_->getNumberOfEgo() != 0) {
     simulation_interface::toProto(
-      entity_manager_ptr_->getVehicleCommand(entity_manager_ptr_->getEgoName()),
+      asAutoware(entity_manager_ptr_->getEgoName()).getVehicleCommand(),
       *req.mutable_vehicle_command());
     const auto ego_status_before_update =
       entity_manager_ptr_->getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName());

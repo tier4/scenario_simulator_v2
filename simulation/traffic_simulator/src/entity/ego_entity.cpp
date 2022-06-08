@@ -14,6 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <boost/lexical_cast.hpp>
 #include <functional>
 #include <memory>
 #include <string>
@@ -21,7 +22,6 @@
 #include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
-#include <boost/lexical_cast.hpp>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -163,14 +163,9 @@ EgoEntity::EgoEntity(
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
-void EgoEntity::engage() { autoware->engage(); }
+auto EgoEntity::asAutoware() const -> concealer::Autoware & { return *autoware; }
 
-auto EgoEntity::getVehicleCommand() const -> std::tuple<
-  autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
-{
-  return autoware->getVehicleCommand();
-}
+void EgoEntity::engage() { autoware->engage(); }
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
