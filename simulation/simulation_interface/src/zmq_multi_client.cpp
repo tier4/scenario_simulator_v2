@@ -34,6 +34,7 @@ MultiClient::MultiClient(
   socket_update_entity_status_(context_, type_),
   socket_attach_lidar_sensor_(context_, type_),
   socket_attach_detection_sensor_(context_, type_),
+  socket_attach_occupancy_grid_sensor_(context_, type_),
   socket_update_traffic_lights_(context_, type_)
 {
   socket_initialize_.connect(
@@ -56,6 +57,8 @@ MultiClient::MultiClient(
     protocol, hostname, simulation_interface::ports::attach_lidar_sensor));
   socket_attach_detection_sensor_.connect(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::attach_detection_sensor));
+  socket_attach_occupancy_grid_sensor_.connect(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::attach_occupancy_grid_sensor));
   socket_update_traffic_lights_.connect(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::update_traffic_lights));
 
@@ -74,6 +77,7 @@ MultiClient::~MultiClient()
   socket_update_entity_status_.close();
   socket_attach_lidar_sensor_.close();
   socket_attach_detection_sensor_.close();
+  socket_attach_occupancy_grid_sensor_.close();
   socket_update_traffic_lights_.close();
 }
 
@@ -197,6 +201,20 @@ void MultiClient::call(
     res = toProto<simulation_api_schema::AttachDetectionSensorResponse>(buffer);
   }
 }
+
+void MultiClient::call(
+  const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
+  simulation_api_schema::AttachOccupancyGridSensorResponse & res)
+{
+  if (is_running) {
+    zmqpp::message message = toZMQ(req);
+    socket_attach_occupancy_grid_sensor_.send(message);
+    zmqpp::message buffer;
+    socket_attach_occupancy_grid_sensor_.receive(buffer);
+    res = toProto<simulation_api_schema::AttachOccupancyGridSensorResponse>(buffer);
+  }
+}
+
 void MultiClient::call(
   const simulation_api_schema::UpdateTrafficLightsRequest & req,
   simulation_api_schema::UpdateTrafficLightsResponse & res)

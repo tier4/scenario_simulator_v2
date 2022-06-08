@@ -8,9 +8,9 @@ if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif()
 
-# Default to C++14
+# Default to C++17
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -31,13 +31,17 @@ include_directories(
 )
 
 ament_auto_add_library(simple_sensor_simulator_component SHARED
-  src/simple_sensor_simulator.cpp
-  src/sensor_simulation/primitives/primitive.cpp
-  src/sensor_simulation/primitives/box.cpp
-  src/sensor_simulation/lidar/raycaster.cpp
-  src/sensor_simulation/lidar/lidar_sensor.cpp
-  src/sensor_simulation/sensor_simulation.cpp
   src/sensor_simulation/detection_sensor/detection_sensor.cpp
+  src/sensor_simulation/lidar/lidar_sensor.cpp
+  src/sensor_simulation/lidar/raycaster.cpp
+  src/sensor_simulation/occupancy_grid/grid.cpp
+  src/sensor_simulation/occupancy_grid/grid_cell.cpp
+  src/sensor_simulation/occupancy_grid/occupancy_grid_generator.cpp
+  src/sensor_simulation/occupancy_grid/occupancy_grid_sensor.cpp
+  src/sensor_simulation/primitives/box.cpp
+  src/sensor_simulation/primitives/primitive.cpp
+  src/sensor_simulation/sensor_simulation.cpp
+  src/simple_sensor_simulator.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
   embree3

@@ -149,6 +149,8 @@ public:
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
   bool attachDetectionSensor(const std::string &);
 
+  bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
+
   bool initialize(double realtime_factor, double step_time);
 
   bool updateFrame();
