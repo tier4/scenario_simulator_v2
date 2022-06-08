@@ -264,20 +264,4 @@ bool GridCell::contains(const std::vector<geometry_msgs::msg::Point> & points) c
 
 int8_t GridCell::getData() const { return data_; }
 void GridCell::setData(int8_t data) { data_ = data; }
-
-bool GridCell::operator==(const GridCell & rhs) const
-{
-  if (rhs.row == row && rhs.col == col && rhs.index == index) {
-    return true;
-  }
-  return false;
-}
-
-bool GridCell::operator!=(const GridCell & rhs) const { return !(*this == rhs); }
-
-bool GridCell::operator<(const GridCell & rhs) const { return index < rhs.index; }
-bool GridCell::operator>(const GridCell & rhs) const { return rhs < *this; }
-bool GridCell::operator<=(const GridCell & rhs) const { return !(rhs > *this); }
-bool GridCell::operator>=(const GridCell & rhs) const { return !(rhs < *this); }
-GridCell & GridCell::operator=(const GridCell &) { return *this; }
 }  // namespace simple_sensor_simulator

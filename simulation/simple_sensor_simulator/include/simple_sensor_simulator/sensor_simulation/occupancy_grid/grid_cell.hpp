@@ -69,13 +69,6 @@ public:
   bool isIntersect2D(const std::vector<LineSegment> & line_segments) const;
   bool contains(const geometry_msgs::msg::Point & p) const;
   bool contains(const std::vector<geometry_msgs::msg::Point> & points) const;
-  bool operator==(const GridCell & rhs) const;
-  bool operator!=(const GridCell & rhs) const;
-  bool operator<(const GridCell & rhs) const;
-  bool operator>(const GridCell & rhs) const;
-  bool operator<=(const GridCell & rhs) const;
-  bool operator>=(const GridCell & rhs) const;
-  GridCell & operator=(const GridCell & rhs);
   int8_t getData() const;
   void setData(int8_t data);
 
