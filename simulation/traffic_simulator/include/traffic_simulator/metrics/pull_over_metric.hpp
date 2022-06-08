@@ -26,7 +26,16 @@ namespace metrics
 class PullOverMetric : public MetricBase
 {
 public:
-  PullOverMetric() : MetricBase("PullOver") {}
+  PullOverMetric(
+    const std::string & target_entity, std::int64_t target_lanelet_id,
+    double threshold_standstill_duration);
+  ~PullOverMetric() override = default;
+  void update() override;
+  nlohmann::json toJson();
+  bool activateTrigger() override;
+  const std::string target_entity;
+  const std::int64_t target_lanelet_id;
+  const double threshold_standstill_duration;
 };
 }  // namespace metrics
 

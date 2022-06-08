@@ -17,4 +17,26 @@
 
 namespace metrics
 {
+PullOverMetric::PullOverMetric(
+  const std::string & target_entity, std::int64_t target_lanelet_id,
+  double threshold_standstill_duration)
+: MetricBase("PullOver"),
+  target_entity(target_entity),
+  target_lanelet_id(target_lanelet_id),
+  threshold_standstill_duration(threshold_standstill_duration)
+{
+}
+
+void PullOverMetric::update() {}
+
+nlohmann::json PullOverMetric::toJson()
+{
+  nlohmann::json json = MetricBase::toBaseJson();
+  return json;
+}
+
+bool PullOverMetric::activateTrigger()
+{
+  return entity_manager_ptr_->isInLanelet(target_entity, target_lanelet_id, 1.0);
+}
 }  // namespace metrics
