@@ -23,6 +23,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/assign/list_of.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 #include <cmath>
 #include <traffic_simulator/math/distance.hpp>
 
@@ -48,6 +52,23 @@ double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::ms
 double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Pose & p1)
 {
   return getDistance(p0.position, p1.position);
+}
+
+double getDistance2D(
+  const std::vector<geometry_msgs::msg::Point> & polygon0,
+  const std::vector<geometry_msgs::msg::Point> & polygon1)
+{
+  typedef boost::geometry::model::d2::point_xy<double> boost_point;
+  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+  boost_polygon poly0;
+  for (const auto & point : polygon0) {
+    boost::geometry::exterior_ring(poly0).push_back(boost_point(point.x, point.y));
+  }
+  boost_polygon poly1;
+  for (const auto & point : polygon1) {
+    boost::geometry::exterior_ring(poly1).push_back(boost_point(point.x, point.y));
+  }
+  return boost::geometry::distance(poly0, poly1);
 }
 }  // namespace math
 }  // namespace traffic_simulator
