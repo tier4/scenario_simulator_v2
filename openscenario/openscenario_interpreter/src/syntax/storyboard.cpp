@@ -14,10 +14,12 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/global_action.hpp>
+#include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
 #include <openscenario_interpreter/syntax/storyboard.hpp>
-
+#include <openscenario_interpreter/syntax/user_defined_action.hpp>
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -28,30 +30,28 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   init(readElement<Init>("Init", node, local()))
 {
   if (not init.endsImmediately()) {
-    StoryBoardElement preprocess_vm;
+    StoryboardElement preprocess_vm;
 
-    std::remove_copy_if(std::begin(init.actions),
-                        std::end(init.actions),
-                        std::begin(preprocess_vm.elements),
-                        [](const auto & e){
-                            if (e.is<GlobalAction>()) {
-                              return not e.as<GlobalAction>().endsImmediately();
-                            } else if (e.is<UserDefinedAction>()) {
-                              return not e.as<UserDefinedAction>().endsImmediately();
-                            } else if (e.is<Private>()) {
-                              return not e.as<Private>().endsImmediately();
-                            } else {
-                              throw UNSUPPORTED_ELEMENT_SPECIFIED(e.type().name());
-                            }
-                          }});
-    elements.emplace_back(std::move(preprocess_vm));
+    std::remove_copy_if(
+      std::begin(init.actions), std::end(init.actions), std::begin(preprocess_vm.elements),
+      [this](const Object & e) {
+        if (e.is<GlobalAction>()) {
+          return not e.as<GlobalAction>().endsImmediately();
+        } else if (e.is<UserDefinedAction>()) {
+          return not e.as<UserDefinedAction>().endsImmediately();
+        } else if (e.is<Private>()) {
+          return not e.as<Private>().endsImmediately();
+        } else {
+          throw UNSUPPORTED_ELEMENT_SPECIFIED(e.type().name());
+        }
+      });
+
+    elements.emplace_back(make(preprocess_vm));
   }
 
   traverse<1, unbounded>(node, "Story", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Story>(node, local()));
   });
-
-
 
   while (not thunks.empty()) {
     std::invoke(thunks.front());
