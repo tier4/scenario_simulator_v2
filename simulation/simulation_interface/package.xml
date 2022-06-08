@@ -15,7 +15,7 @@
   <depend>autoware_auto_vehicle_msgs</depend>
   <depend>builtin_interfaces</depend>
   <depend>geometry_msgs</depend>
-  <depend>libzmqpp-dev</depend>
+  <depend>zmqpp_vendor</depend>
   <depend>protobuf-dev</depend>
   <depend>protobuf</depend>
   <depend>rclcpp</depend>

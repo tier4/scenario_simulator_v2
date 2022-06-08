@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -113,6 +113,9 @@ private:
   void attachLidarSensor(
     const simulation_api_schema::AttachLidarSensorRequest & req,
     simulation_api_schema::AttachLidarSensorResponse & res);
+  void attachOccupancyGridSensor(
+    const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
+    simulation_api_schema::AttachOccupancyGridSensorResponse & res);
   void updateSensorFrame(
     const simulation_api_schema::UpdateSensorFrameRequest & req,
     simulation_api_schema::UpdateSensorFrameResponse & res);
