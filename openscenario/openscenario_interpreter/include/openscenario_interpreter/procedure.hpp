@@ -98,6 +98,7 @@ STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
   }                                                                   \
   static_assert(true, "")
 
+FORWARD_TO_SIMULATION_API(asAutoware);
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
 FORWARD_TO_SIMULATION_API(engage);
@@ -135,8 +136,6 @@ RENAME(applyLaneChangeAction, requestLaneChange);
 RENAME(applyTeleportAction, setEntityStatus);
 RENAME(applyWalkStraightAction, requestWalkStraight);
 RENAME(evaluateCollisionCondition, checkCollision);
-RENAME(evaluateCurrentEmergencyState, getEmergencyStateName);
-RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandName);
 RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(toWorldPosition, toMapPose);

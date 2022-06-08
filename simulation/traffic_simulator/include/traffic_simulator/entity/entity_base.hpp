@@ -63,8 +63,6 @@ public:
 
   virtual auto getCurrentAction() const -> const std::string = 0;
 
-  virtual auto getEmergencyStateName() const -> std::string;
-
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>
   {
@@ -84,8 +82,6 @@ public:
   /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus;
 
   /*   */ auto getStandStillDuration() const -> boost::optional<double>;
-
-  virtual auto getTurnIndicatorsCommandName() const -> std::string;
 
   /*   */ auto getVisibility() { return visibility_; }
 

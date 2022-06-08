@@ -92,8 +92,6 @@ public:
 
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
 
-  auto getEmergencyStateName() const -> std::string override;
-
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
 
@@ -102,8 +100,6 @@ public:
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
-
-  auto getTurnIndicatorsCommandName() const -> std::string override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
