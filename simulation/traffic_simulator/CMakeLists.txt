@@ -75,7 +75,6 @@ target_link_libraries(traffic_simulator
   pugixml
   pthread
   sodium
-  zmqpp
   zmq
   stdc++fs
   Boost::filesystem
