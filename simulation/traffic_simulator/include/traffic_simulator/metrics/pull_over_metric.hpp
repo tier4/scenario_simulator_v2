@@ -28,7 +28,7 @@ class PullOverMetric : public MetricBase
 public:
   PullOverMetric(
     const std::string & target_entity, std::int64_t target_lanelet_id,
-    double threshold_standstill_duration);
+    double threshold_standstill_duration, double threshold_yaw);
   ~PullOverMetric() override = default;
   void update() override;
   nlohmann::json toJson();
@@ -36,6 +36,7 @@ public:
   const std::string target_entity;
   const std::int64_t target_lanelet_id;
   const double threshold_standstill_duration;
+  const double threshold_yaw;
 };
 }  // namespace metrics
 

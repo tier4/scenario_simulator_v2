@@ -19,15 +19,32 @@ namespace metrics
 {
 PullOverMetric::PullOverMetric(
   const std::string & target_entity, std::int64_t target_lanelet_id,
-  double threshold_standstill_duration)
+  double threshold_standstill_duration, double threshold_yaw)
 : MetricBase("PullOver"),
   target_entity(target_entity),
   target_lanelet_id(target_lanelet_id),
-  threshold_standstill_duration(threshold_standstill_duration)
+  threshold_standstill_duration(threshold_standstill_duration),
+  threshold_yaw(threshold_yaw)
 {
+  if (threshold_yaw < 0) {
+    THROW_SEMANTIC_ERROR(
+      "threshold_yaw value in PullOverMetric should be over 0, value : ", threshold_yaw);
+  }
 }
 
-void PullOverMetric::update() {}
+void PullOverMetric::update()
+{
+  if (entity_manager_ptr_->getStandStillDuration(target_entity) >= threshold_standstill_duration) {
+    const auto lanelet_pose = entity_manager_ptr_->getLaneletPose(target_entity);
+    if (lanelet_pose && std::abs(lanelet_pose->rpy.z) <= threshold_yaw) {
+    } else {
+      failure(SPECIFICATION_VIOLATION(
+        "pulling over entity : ", target_entity,
+        " was failed because of this entity stops diagonally."));
+      return;
+    }
+  }
+}
 
 nlohmann::json PullOverMetric::toJson()
 {
