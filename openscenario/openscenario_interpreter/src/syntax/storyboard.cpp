@@ -55,14 +55,18 @@ auto Storyboard::start() -> void
       std::cbegin(global().entities), std::cend(global().entities), [&](const auto & each) {
         const auto & [name, scenario_object] = each;
         return not scenario_object.template as<ScenarioObject>().is_added or
-               openscenario_interpreter::ready(name);
+               (scenario_object.template as<ScenarioObject>()
+                  .object_controller.isUserDefinedController() and
+                asAutoware(name).ready());
       });
   };
 
   auto engage_everyone = [this]() {
     for (const auto & [name, scenario_object] : global().entities) {
-      if (scenario_object.template as<ScenarioObject>().is_added) {
-        engage(name);
+      if (
+        scenario_object.template as<ScenarioObject>().is_added and
+        scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
+        asAutoware(name).engage();
       }
     }
   };

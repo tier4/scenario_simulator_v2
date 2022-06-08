@@ -165,8 +165,6 @@ EgoEntity::EgoEntity(
 
 auto EgoEntity::asAutoware() const -> concealer::Autoware & { return *autoware; }
 
-void EgoEntity::engage() { autoware->engage(); }
-
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
   const auto state = autoware->getAutowareStateName();
@@ -373,8 +371,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     previous_angular_velocity_ = vehicle_model_ptr_->getWz();
   }
 }
-
-auto EgoEntity::ready() const -> bool { return autoware->ready(); }
 
 void EgoEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)

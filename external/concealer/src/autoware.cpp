@@ -51,8 +51,7 @@ auto Autoware::getEmergencyState() const -> const autoware_auto_system_msgs::msg
 {
   static auto emergency_state = []() {
     autoware_auto_system_msgs::msg::EmergencyState emergency_state;
-    emergency_state.state =
-      autoware_auto_system_msgs::msg::EmergencyState::NORMAL;
+    emergency_state.state = autoware_auto_system_msgs::msg::EmergencyState::NORMAL;
     return emergency_state;
   }();
   emergency_state.stamp = now();

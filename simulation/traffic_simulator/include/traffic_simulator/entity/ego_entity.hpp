@@ -86,8 +86,6 @@ public:
 
   auto asAutoware() const -> concealer::Autoware & override;
 
-  auto engage() -> void override;
-
   auto getCurrentAction() const -> const std::string override;
 
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
@@ -104,8 +102,6 @@ public:
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   void onUpdate(double current_time, double step_time) override;
-
-  auto ready() const -> bool override;
 
   void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override;
 

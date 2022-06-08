@@ -57,8 +57,6 @@ public:
 
   virtual auto asAutoware() const -> concealer::Autoware &;
 
-  virtual void engage() {}
-
   virtual auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox = 0;
 
   virtual auto getCurrentAction() const -> const std::string = 0;
@@ -133,8 +131,6 @@ public:
   /*   */ auto setVisibility(const bool visibility) { return visibility_ = visibility; }
 
   virtual void onUpdate(double current_time, double step_time);
-
-  virtual auto ready() const -> bool { return static_cast<bool>(status_); }
 
   virtual void requestAcquirePosition(
     const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) = 0;
