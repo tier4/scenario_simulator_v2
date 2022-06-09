@@ -205,6 +205,7 @@ public:
   FORWARD_TO_ENTITY(getEmergencyStateName, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
+  FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
@@ -212,7 +213,6 @@ public:
   FORWARD_TO_ENTITY(getTurnIndicatorsCommandName, const);
   FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
-  FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(ready, const);
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(engage, );
