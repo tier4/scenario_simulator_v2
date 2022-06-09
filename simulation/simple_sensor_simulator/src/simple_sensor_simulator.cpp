@@ -55,6 +55,9 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
       std::placeholders::_2),
     std::bind(
+      &ScenarioSimulator::attachOccupancyGridSensor, this, std::placeholders::_1,
+      std::placeholders::_2),
+    std::bind(
       &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2))
 {
 }
@@ -199,6 +202,15 @@ void ScenarioSimulator::attachLidarSensor(
 {
   sensor_sim_.attachLidarSensor(current_time_, req.configuration(), *this);
   res = simulation_api_schema::AttachLidarSensorResponse();
+  res.mutable_result()->set_success(true);
+}
+
+void ScenarioSimulator::attachOccupancyGridSensor(
+  const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
+  simulation_api_schema::AttachOccupancyGridSensorResponse & res)
+{
+  res = simulation_api_schema::AttachOccupancyGridSensorResponse();
+  sensor_sim_.attachOccupancyGridSensor(current_time_, req.configuration(), *this);
   res.mutable_result()->set_success(true);
 }
 

@@ -18,6 +18,7 @@
 #include <embree3/rtcore.h>
 
 #include <algorithm>
+#include <boost/optional.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <string>
 #include <vector>
@@ -38,26 +39,39 @@ struct Triangle
   unsigned int v2;
 };
 
+enum class Axis { X = 0, Y = 1, Z = 2 };
+
 namespace primitives
 {
 class Primitive
 {
 public:
-  Primitive(std::string type, geometry_msgs::msg::Pose pose);
+  Primitive(std::string type, const geometry_msgs::msg::Pose & pose);
   virtual ~Primitive() = default;
   const std::string type;
   const geometry_msgs::msg::Pose pose;
   unsigned int addToScene(RTCDevice device, RTCScene scene);
   std::vector<Vertex> getVertex() const;
   std::vector<Triangle> getTriangles() const;
+  std::vector<geometry_msgs::msg::Point> get2DConvexHull() const;
+  std::vector<geometry_msgs::msg::Point> get2DConvexHull(
+    const geometry_msgs::msg::Pose & sensor_pose) const;
+  boost::optional<double> getMax(const Axis & axis) const;
+  boost::optional<double> getMin(const Axis & axis) const;
+  boost::optional<double> getMax(
+    const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
+  boost::optional<double> getMin(
+    const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
 
 protected:
   std::vector<Vertex> transform() const;
+  std::vector<Vertex> transform(const geometry_msgs::msg::Pose & sensor_pose) const;
   std::vector<Vertex> vertices_;
   std::vector<Triangle> triangles_;
 
 private:
   Vertex transform(Vertex v) const;
+  Vertex transform(Vertex v, const geometry_msgs::msg::Pose & sensor_pose) const;
 };
 }  // namespace primitives
 }  // namespace simple_sensor_simulator

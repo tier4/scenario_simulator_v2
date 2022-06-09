@@ -36,5 +36,8 @@ void SensorSimulation::updateSensorFrame(
   for (auto & sensor : detection_sensors_) {
     sensor->update(current_time, status, current_ros_time, lidar_detected_objects);
   }
+  for (auto & sensor : occupancy_grid_sensors_) {
+    sensor->update(current_time, status, current_ros_time, lidar_detected_objects);
+  }
 }
 }  // namespace simple_sensor_simulator
