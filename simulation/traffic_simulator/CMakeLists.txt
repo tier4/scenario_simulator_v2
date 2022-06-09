@@ -53,7 +53,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/metrics/metrics_manager.cpp
   src/metrics/momentary_stop_metric.cpp
   src/metrics/out_of_range_metric.cpp
-  src/metrics/pull_over_metric.cpp
   src/metrics/reaction_time_metric.cpp
   src/metrics/standstill_metric.cpp
   src/metrics/traveled_distance_metric.cpp
