@@ -205,23 +205,6 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
   return hdmap_utils_ptr_;
 }
 
-auto EntityManager::getLaneletPose(const std::string & name)
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
-{
-  const auto status = getEntityStatus(name);
-  if (!status) {
-    return boost::none;
-  }
-  if (status->lanelet_pose_valid) {
-    return status->lanelet_pose;
-  }
-  bool include_crosswalk = true;
-  if (getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    include_crosswalk = false;
-  }
-  return toLaneletPose(status->pose, getBoundingBox(name), include_crosswalk);
-}
-
 auto EntityManager::getLongitudinalDistance(
   const LaneletPose & from, const LaneletPose & to, const double max_distance)
   -> boost::optional<double>

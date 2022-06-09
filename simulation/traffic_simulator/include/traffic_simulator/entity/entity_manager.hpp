@@ -212,6 +212,7 @@ public:
   FORWARD_TO_ENTITY(getTurnIndicatorsCommandName, const);
   FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
+  FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(ready, const);
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(engage, );
@@ -285,9 +286,6 @@ public:
     -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
-
-  auto getLaneletPose(const std::string & name)
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   // clang-format off
   auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &, const double = 100) -> boost::optional<double>;

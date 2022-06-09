@@ -476,5 +476,18 @@ void EntityBase::setDecelerationLimit(double)
   THROW_SIMULATION_ERROR(
     "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
 }
+
+auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  const auto status = getStatus();
+  if (status.lanelet_pose_valid) {
+    return status.lanelet_pose;
+  }
+  if (getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
+    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
+  } else {
+    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
+  }
+}
 }  // namespace entity
 }  // namespace traffic_simulator

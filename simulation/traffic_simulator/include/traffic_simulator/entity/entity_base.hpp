@@ -74,6 +74,8 @@ public:
 
   /*   */ auto getLinearJerk() const { return linear_jerk_; }
 
+  /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
   virtual auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
@@ -102,9 +104,9 @@ public:
 
   virtual auto getDistanceToRightBound(std::int64_t lanelet_id) const -> double;
 
-  virtual auto getMapPose() const -> geometry_msgs::msg::Pose;
+  /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 
-  virtual auto getMapPose(const geometry_msgs::msg::Pose & relative_pose)
+  /*   */ auto getMapPose(const geometry_msgs::msg::Pose & relative_pose)
     -> geometry_msgs::msg::Pose;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
