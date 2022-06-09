@@ -55,7 +55,8 @@ auto Storyboard::start() -> void
       std::cbegin(global().entities), std::cend(global().entities), [&](const auto & each) {
         const auto & [name, scenario_object] = each;
         return not scenario_object.template as<ScenarioObject>().is_added or
-               not scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController() or
+               not scenario_object.template as<ScenarioObject>()
+                     .object_controller.isUserDefinedController() or
                asAutoware(name).ready();
       });
   };
