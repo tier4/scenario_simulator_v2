@@ -100,9 +100,13 @@ public:
 
   virtual auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 
-  virtual auto getDistanceToLeftBound(std::int64_t lanelet_id) const -> double;
+  /*   */ auto getDistanceToLeftBound() const -> double;
 
-  virtual auto getDistanceToRightBound(std::int64_t lanelet_id) const -> double;
+  /*   */ auto getDistanceToLeftBound(std::int64_t lanelet_id) const -> double;
+
+  /*   */ auto getDistanceToRightBound() const -> double;
+
+  /*   */ auto getDistanceToRightBound(std::int64_t lanelet_id) const -> double;
 
   /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 

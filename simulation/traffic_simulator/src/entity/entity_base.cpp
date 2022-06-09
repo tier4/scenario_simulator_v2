@@ -422,6 +422,17 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
   return math::get2DConvexHull(points_bbox);
 }
 
+auto EntityBase::getDistanceToLeftBound() const -> double
+{
+  const auto lanelet_pose = getLaneletPose();
+  if (lanelet_pose) {
+    return getDistanceToLeftBound(lanelet_pose->lanelet_id);
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate lanelet pose of entity : ", name, " please check entity position.");
+  }
+}
+
 auto EntityBase::getDistanceToLeftBound(std::int64_t lanelet_id) const -> double
 {
   const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id);
@@ -436,6 +447,17 @@ auto EntityBase::getDistanceToLeftBound(std::int64_t lanelet_id) const -> double
       " exists and it's definition");
   }
   return math::getDistance2D(bound, polygon);
+}
+
+auto EntityBase::getDistanceToRightBound() const -> double
+{
+  const auto lanelet_pose = getLaneletPose();
+  if (lanelet_pose) {
+    return getDistanceToRightBound(lanelet_pose->lanelet_id);
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate lanelet pose of entity : ", name, " please check entity position.");
+  }
 }
 
 auto EntityBase::getDistanceToRightBound(std::int64_t lanelet_id) const -> double
