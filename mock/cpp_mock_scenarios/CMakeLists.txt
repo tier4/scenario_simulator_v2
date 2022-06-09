@@ -28,7 +28,6 @@ target_link_libraries(cpp_scenario_node
   ${PROTOBUF_LIBRARY}
   pthread
   sodium
-  zmqpp
   zmq
 )
 

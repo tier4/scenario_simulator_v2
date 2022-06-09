@@ -17,6 +17,7 @@ find_package(ament_cmake_auto REQUIRED)
 find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
 find_package(lanelet2_matching REQUIRED)
+find_package(quaternion_operation REQUIRED)
 include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
@@ -38,6 +39,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/job/job_list.cpp
   src/math/bounding_box.cpp
   src/math/catmull_rom_spline.cpp
+  src/math/catmull_rom_subspline.cpp
   src/math/collision.cpp
   src/math/distance.cpp
   src/math/hermite_curve.cpp
@@ -74,7 +76,6 @@ target_link_libraries(traffic_simulator
   pugixml
   pthread
   sodium
-  zmqpp
   zmq
   stdc++fs
   Boost::filesystem

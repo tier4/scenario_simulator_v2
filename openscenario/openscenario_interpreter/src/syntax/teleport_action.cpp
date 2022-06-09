@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ auto TeleportAction::start() const -> void
 {
   for (const auto & actor : actors) {
     if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
-      AddEntityAction(local(), position)(actor);  // NOTE: Tier IV extension
+      AddEntityAction(local(), position)(actor);  // NOTE: TIER IV extension
     } else {
       return teleport(actor, position);
     }

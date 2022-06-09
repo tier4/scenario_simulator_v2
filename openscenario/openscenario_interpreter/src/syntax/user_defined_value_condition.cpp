@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -71,10 +71,16 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
 {
   std::smatch result;
 
-  if (std::regex_match(name, result, std::regex(R"(([^\.]+)\.(.+))"))) {
+  if (std::regex_match(name, result, std::regex(R"(([^.]+)\.(.+))"))) {
     const std::unordered_map<std::string, std::function<Object()>> dispatch{
       std::make_pair(
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
+      std::make_pair(
+        "currentEmergencyState",
+        [result]() { return make<String>(evaluateCurrentEmergencyState(result.str(1))); }),
+      std::make_pair(
+        "currentTurnIndicatorsState",
+        [result]() { return make<String>(evaluateCurrentTurnIndicatorsState(result.str(1))); }),
     };
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {

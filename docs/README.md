@@ -22,11 +22,11 @@ So, we are developing this package.
 <font color="#065479E">**This package is designed to easily accommodate multiple simulators and scenario description formats.**</font>
 
 This package is licensed under the Apache License, Version 2.0.
-See also [LICENSE](LICENSE).
+See also [LICENSE](etc/LICENSE.md).
 
 ## Why this framework is v2?
 
-This package re-designs the [scenario runner](https://github.com/tier4/scenario_runner.iv.universe) developed by [Tier IV, Inc.](https://tier4.jp/en/), so we named this framework as "scenario_simulator_v2"
+This package re-designs the [scenario runner](https://github.com/tier4/scenario_runner.iv.universe) developed by [TIER IV, Inc.](https://tier4.jp/en/), so we named this framework as "scenario_simulator_v2"
 
 ## How to contribute
 

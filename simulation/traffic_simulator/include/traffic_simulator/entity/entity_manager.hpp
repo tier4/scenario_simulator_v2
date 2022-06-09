@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -201,11 +201,13 @@ public:
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getDriverModel, const);
+  FORWARD_TO_ENTITY(getEmergencyStateName, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
+  FORWARD_TO_ENTITY(getTurnIndicatorsCommandName, const);
   FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(ready, const);

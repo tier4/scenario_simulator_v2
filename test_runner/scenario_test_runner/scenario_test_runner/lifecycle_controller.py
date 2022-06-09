@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2020 Tier IV, Inc. All rights reserved.
+# Copyright 2020 TIER IV, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,9 +38,12 @@ class LifecycleController(Node):
     """
 
     NODE_NAME = "openscenario_interpreter"
+    TIMEOUT_SEC_DEFAULT = 60.0
 
-    def __init__(self):
+    def __init__(self, timeout=None):
         super().__init__(node_name="lifecycle_controller", namespace="simulation")
+
+        self.timeout_sec = timeout if timeout is not None else self.TIMEOUT_SEC_DEFAULT
 
         self.client_get_state = self.create_client(
             GetState, LifecycleController.NODE_NAME + "/get_state"
@@ -114,7 +117,7 @@ class LifecycleController(Node):
         ]
 
         future = self.client_set_parameters.call_async(request)
-        rclpy.spin_until_future_complete(self, future)
+        rclpy.spin_until_future_complete(self, future, timeout_sec=self.timeout_sec)
         return future
 
     def configure_node(
@@ -230,7 +233,9 @@ class LifecycleController(Node):
         request = ChangeState.Request()
         request.transition.id = transition_id
         future = self.client_change_state.call_async(request)
-        rclpy.spin_until_future_complete(self, future, executor=self.executor)
+        rclpy.spin_until_future_complete(self, future, executor=self.executor, timeout_sec=self.timeout_sec)
+        if future.result() is None:
+            raise RuntimeError("Interpreter tried to set current lifecycle state, but failed.")
         return future.result().success
 
     def get_lifecycle_state(self):
@@ -247,7 +252,9 @@ class LifecycleController(Node):
 
         """
         future = self.client_get_state.call_async(GetState.Request())
-        rclpy.spin_until_future_complete(self, future, executor=self.executor)
+        rclpy.spin_until_future_complete(self, future, executor=self.executor, timeout_sec=self.timeout_sec)
+        if future.result() is None:
+            raise RuntimeError("Interpreter tried to get current lifecycle state, but failed.")
         return future.result().current_state.label
 
 

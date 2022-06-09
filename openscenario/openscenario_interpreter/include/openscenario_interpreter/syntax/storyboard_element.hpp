@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <openscenario_interpreter/syntax/trigger.hpp>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 
@@ -94,7 +95,7 @@ private:
   virtual auto accomplished() const -> bool
   {
     return std::all_of(std::begin(elements), std::end(elements), [](auto && element) {
-      assert(element.template is<StoryboardElement>());
+      assert(element.template is_also<StoryboardElement>());
       return element.template as<StoryboardElement>()
         .template is<StoryboardElementState::completeState>();
     });
@@ -103,7 +104,7 @@ private:
   virtual auto run() -> void
   {
     for (auto && element : elements) {
-      assert(element.is<StoryboardElement>());
+      assert(element.is_also<StoryboardElement>());
       element.evaluate();
     }
   }
@@ -113,7 +114,7 @@ private:
   virtual auto stop() -> void
   {
     for (auto && element : elements) {
-      assert(element.is<StoryboardElement>());
+      assert(element.is_also<StoryboardElement>());
       element.as<StoryboardElement>().override();
       element.evaluate();
     }
@@ -128,7 +129,11 @@ protected:
 
   std::unordered_set<std::string> names;
 
-  auto unique(const std::string & name) { return cdr(names.emplace(name)); }
+  auto unique(const std::string & name)
+  {
+    [[maybe_unused]] auto [iter, success] = names.emplace(name);
+    return success;
+  }
 
   template <typename U, typename Node, typename... Ts>
   auto readStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
@@ -163,6 +168,18 @@ protected:
   }
 
 public:
+  std::unordered_map<
+    StoryboardElementState::value_type, std::vector<std::function<void(const StoryboardElement &)>>>
+    callbacks;
+
+  auto transitionTo(const Object & state)
+  {
+    current_state = state;
+    for (auto && callback : callbacks[current_state.as<StoryboardElementState>()]) {
+      callback(std::as_const(*this));
+    }
+  }
+
   auto evaluate()
   {
     if (stop_trigger.evaluate().as<Boolean>()) {
@@ -171,6 +188,10 @@ public:
 
     // NOTE: https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
 
+    // NOTE: The fooTransition state must not return from case fooTransition
+    // because it is a waypoint in the transition to barState.
+
+  dispatch:
     switch (state().as<StoryboardElementState>()) {
       case StoryboardElementState::standbyState: /* ----------------------------
         *
@@ -182,8 +203,12 @@ public:
         *  Story element instantaneously transitions into the runningState.
         *
         * ------------------------------------------------------------------- */
-        return current_state =
-                 (start_trigger.evaluate().as<Boolean>() ? start_transition : current_state);
+        if (start_trigger.evaluate().as<Boolean>()) {
+          transitionTo(start_transition);
+          goto dispatch;
+        } else {
+          return current_state;
+        }
 
       case StoryboardElementState::startTransition: /* -------------------------
         *
@@ -194,7 +219,8 @@ public:
         * ------------------------------------------------------------------- */
         start();
         ++current_execution_count;
-        return current_state = running_state;
+        transitionTo(running_state);
+        goto dispatch;
 
       case StoryboardElementState::runningState: /* ----------------------------
         *
@@ -235,10 +261,12 @@ public:
         *    completeState.
         *
         * ------------------------------------------------------------------- */
-        if (0 <= getCurrentTime()) {
-          run();
+        if (run(), accomplished()) {
+          transitionTo(end_transition);
+          goto dispatch;
+        } else {
+          return current_state;
         }
-        return current_state = (accomplished() ? end_transition : current_state);
 
       case StoryboardElementState::endTransition: /* ---------------------------
         *
@@ -250,9 +278,9 @@ public:
         *  be used in conditions to trigger based on this transition.
         *
         * -------------------------------------------------------------------- */
-        return current_state =
-                 (current_execution_count < maximum_execution_count ? standby_state
-                                                                    : complete_state);
+        transitionTo(
+          current_execution_count < maximum_execution_count ? standby_state : complete_state);
+        goto dispatch;
 
       case StoryboardElementState::completeState: /* ---------------------------
         *
@@ -285,7 +313,7 @@ public:
         *  used in conditions to trigger based on this transition.
         *
         * ------------------------------------------------------------------- */
-        return current_state;
+        throw Error("UNIMPLEMENTED!");
 
       default:
       case StoryboardElementState::stopTransition: /* --------------------------
@@ -304,10 +332,10 @@ public:
         * ------------------------------------------------------------------- */
         if (not accomplished()) {
           stop();
-          return current_state;
-        } else {
-          return current_state = complete_state;
         }
+
+        transitionTo(complete_state);
+        goto dispatch;
     }
   }
 };

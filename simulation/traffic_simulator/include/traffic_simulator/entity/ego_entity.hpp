@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
+#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <concealer/autoware_universe.hpp>
@@ -89,6 +90,8 @@ public:
 
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
 
+  auto getEmergencyStateName() const -> std::string override;
+
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
 
@@ -97,6 +100,8 @@ public:
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
+
+  auto getTurnIndicatorsCommandName() const -> std::string override;
 
   auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
