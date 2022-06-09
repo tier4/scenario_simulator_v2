@@ -196,22 +196,25 @@ public:
   }                                                                            \
   static_assert(true, "")
 
-  FORWARD_TO_ENTITY(cancelRequest, );
-  FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
+  FORWARD_TO_ENTITY(getDistanceToLeftBound, const);
+  FORWARD_TO_ENTITY(getDistanceToRightBound, const);
   FORWARD_TO_ENTITY(getDriverModel, const);
   FORWARD_TO_ENTITY(getEmergencyStateName, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
+  FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTurnIndicatorsCommandName, const);
   FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(ready, const);
+  FORWARD_TO_ENTITY(cancelRequest, );
+  FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
@@ -292,11 +295,6 @@ public:
   auto getLongitudinalDistance(const std::string &, const LaneletPose &, const double = 100) -> boost::optional<double>;
   auto getLongitudinalDistance(const std::string &, const std::string &, const double = 100) -> boost::optional<double>;
   // clang-format on
-
-  auto getMapPose(const std::string & entity_name) -> geometry_msgs::msg::Pose;
-  auto getMapPose(
-    const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose)
-    -> geometry_msgs::msg::Pose;
 
   auto getNumberOfEgo() const -> std::size_t;
 

@@ -320,38 +320,6 @@ bool EntityManager::laneMatchingSucceed(const std::string & name)
   return false;
 }
 
-/**
- * @brief
- *
- * @param from from entity name
- * @param to to entity name
- * @retval boost::none bounding box is intersects
- * @retval 0 <= distance between two bounding box
- */
-geometry_msgs::msg::Pose EntityManager::getMapPose(const std::string & entity_name)
-{
-  const auto status = getEntityStatus(entity_name);
-  if (!status) {
-    THROW_SEMANTIC_ERROR("entity : ", entity_name, " status is empty");
-  }
-  return status->pose;
-}
-
-geometry_msgs::msg::Pose EntityManager::getMapPose(
-  const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose)
-{
-  const auto ref_status = getEntityStatus(reference_entity_name);
-  if (!ref_status) {
-    THROW_SEMANTIC_ERROR("entity : ", reference_entity_name, " status is empty");
-  }
-  tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(ref_status->pose, ref_transform);
-  tf2::fromMsg(relative_pose, relative_transform);
-  geometry_msgs::msg::Pose ret;
-  tf2::toMsg(ref_transform * relative_transform, ret);
-  return ret;
-}
-
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {

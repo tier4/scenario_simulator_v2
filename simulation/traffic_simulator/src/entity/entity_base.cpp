@@ -18,7 +18,9 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/math/distance.hpp>
 #include <traffic_simulator/math/polygon.hpp>
+#include <traffic_simulator/math/transform.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -352,6 +354,24 @@ bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   return true;
 }
 
+auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose
+{
+  const auto status = getStatus();
+  return status.pose;
+}
+
+auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
+  -> geometry_msgs::msg::Pose
+{
+  const auto ref_status = getStatus();
+  tf2::Transform ref_transform, relative_transform;
+  tf2::fromMsg(ref_status.pose, ref_transform);
+  tf2::fromMsg(relative_pose, relative_transform);
+  geometry_msgs::msg::Pose ret;
+  tf2::toMsg(ref_transform * relative_transform, ret);
+  return ret;
+}
+
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
   const auto status = getStatus();
@@ -400,6 +420,39 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
   points_bbox.emplace_back(p7);
 
   return math::get2DConvexHull(points_bbox);
+}
+
+auto EntityBase::getDistanceToLeftBound(std::int64_t lanelet_id) const -> double
+{
+  const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id);
+  if (bound.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
+  }
+  const auto polygon = math::transformPoints(getMapPose(), get2DPolygon());
+  if (polygon.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
+      " exists and it's definition");
+  }
+  return math::getDistance2D(bound, polygon);
+}
+
+auto EntityBase::getDistanceToRightBound(std::int64_t lanelet_id) const -> double
+{
+  const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id);
+  if (bound.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
+      " please check lanelet map.");
+  }
+  const auto polygon = math::transformPoints(getMapPose(), get2DPolygon());
+  if (polygon.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
+      " exists and it's definition");
+  }
+  return math::getDistance2D(bound, polygon);
 }
 
 void EntityBase::stopAtEndOfRoad()
