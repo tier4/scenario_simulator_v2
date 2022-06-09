@@ -422,7 +422,7 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
   return math::get2DConvexHull(points_bbox);
 }
 
-auto EntityBase::getDistanceToLeftBound() const -> double
+auto EntityBase::getDistanceToLeftBound() -> double
 {
   return getDistanceToLeftBound(getRouteLanelets());
 }
@@ -453,7 +453,7 @@ auto EntityBase::getDistanceToLeftBound(const std::vector<std::int64_t> & lanele
   return *std::min_element(distances.begin(), distances.end());
 }
 
-auto EntityBase::getDistanceToRightBound() const -> double
+auto EntityBase::getDistanceToRightBound() -> double
 {
   return getDistanceToRightBound(getRouteLanelets());
 }

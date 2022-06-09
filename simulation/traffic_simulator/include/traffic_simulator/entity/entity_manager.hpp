@@ -196,10 +196,14 @@ public:
   }                                                                            \
   static_assert(true, "")
 
+  FORWARD_TO_ENTITY(cancelRequest, );
+  FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
+  FORWARD_TO_ENTITY(getDistanceToLeftBound, );
   FORWARD_TO_ENTITY(getDistanceToLeftBound, const);
+  FORWARD_TO_ENTITY(getDistanceToRightBound, );
   FORWARD_TO_ENTITY(getDistanceToRightBound, const);
   FORWARD_TO_ENTITY(getDriverModel, const);
   FORWARD_TO_ENTITY(getEmergencyStateName, const);
@@ -214,8 +218,6 @@ public:
   FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(ready, const);
-  FORWARD_TO_ENTITY(cancelRequest, );
-  FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
