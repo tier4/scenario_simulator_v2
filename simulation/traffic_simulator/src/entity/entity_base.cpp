@@ -424,13 +424,7 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 
 auto EntityBase::getDistanceToLeftBound() const -> double
 {
-  const auto lanelet_pose = getLaneletPose();
-  if (lanelet_pose) {
-    return getDistanceToLeftBound(lanelet_pose->lanelet_id);
-  } else {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate lanelet pose of entity : ", name, " please check entity position.");
-  }
+  return getDistanceToLeftBound(getRouteLanelets());
 }
 
 auto EntityBase::getDistanceToLeftBound(std::int64_t lanelet_id) const -> double
@@ -449,15 +443,19 @@ auto EntityBase::getDistanceToLeftBound(std::int64_t lanelet_id) const -> double
   return math::getDistance2D(bound, polygon);
 }
 
+auto EntityBase::getDistanceToLeftBound(const std::vector<std::int64_t> & lanelet_ids) const
+  -> double
+{
+  std::vector<double> distances;
+  std::transform(
+    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
+    [this](std::int64_t lanelet_id) { return getDistanceToLeftBound(lanelet_id); });
+  return *std::min_element(distances.begin(), distances.end());
+}
+
 auto EntityBase::getDistanceToRightBound() const -> double
 {
-  const auto lanelet_pose = getLaneletPose();
-  if (lanelet_pose) {
-    return getDistanceToRightBound(lanelet_pose->lanelet_id);
-  } else {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate lanelet pose of entity : ", name, " please check entity position.");
-  }
+  return getDistanceToRightBound(getRouteLanelets());
 }
 
 auto EntityBase::getDistanceToRightBound(std::int64_t lanelet_id) const -> double
@@ -475,6 +473,16 @@ auto EntityBase::getDistanceToRightBound(std::int64_t lanelet_id) const -> doubl
       " exists and it's definition");
   }
   return math::getDistance2D(bound, polygon);
+}
+
+auto EntityBase::getDistanceToRightBound(const std::vector<std::int64_t> & lanelet_ids) const
+  -> double
+{
+  std::vector<double> distances;
+  std::transform(
+    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
+    [this](std::int64_t lanelet_id) { return getDistanceToLeftBound(lanelet_id); });
+  return *std::min_element(distances.begin(), distances.end());
 }
 
 void EntityBase::stopAtEndOfRoad()

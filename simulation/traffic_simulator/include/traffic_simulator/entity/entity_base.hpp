@@ -104,9 +104,15 @@ public:
 
   /*   */ auto getDistanceToLeftBound(std::int64_t lanelet_id) const -> double;
 
+  /*   */ auto getDistanceToLeftBound(const std::vector<std::int64_t> & lanelet_ids) const
+    -> double;
+
   /*   */ auto getDistanceToRightBound() const -> double;
 
   /*   */ auto getDistanceToRightBound(std::int64_t lanelet_id) const -> double;
+
+  /*   */ auto getDistanceToRightBound(const std::vector<std::int64_t> & lanelet_ids) const
+    -> double;
 
   /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 
