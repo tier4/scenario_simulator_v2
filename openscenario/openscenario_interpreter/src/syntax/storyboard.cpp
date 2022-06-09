@@ -46,7 +46,7 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
         }
       });
 
-    elements.emplace_back(make(preprocess_vm));
+    elements.emplace_back(make(std::move(preprocess_vm)));
   }
 
   traverse<1, unbounded>(node, "Story", [&](auto && node) {
