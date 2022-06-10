@@ -47,7 +47,7 @@ private:
     }
     const auto distance = api_.getDistanceToLaneBound("ego");
     // LCOV_EXCL_START
-    if (distance >= 0.52) {
+    if (distance <= 0.4 && distance >= 0.52) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
