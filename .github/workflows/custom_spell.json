@@ -9,6 +9,10 @@
     "timeheadwaycondition",
     "reachpositioncondition",
     "distancecondition",
-    "relativedistancecondition"
+    "relativedistancecondition",
+    "storyboardelementstatecondition",
+    "transitiondynamics",
+    "lanechangetarget",
+    "dynamicsshape"
   ]
 }
