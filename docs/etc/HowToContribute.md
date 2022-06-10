@@ -3,7 +3,7 @@
 Thank you for your interest in improving scenario_simulator_v2.
 This contributor guidelines will help you get started.
 
-If you have any questions, please feel free to contact the [maintainers](ContactUs.md).
+If you have any questions, please feel free to make GitHub issues for asking your question.
 
 ## Before you get started
 
@@ -79,3 +79,18 @@ If you want to force-push the commit during the review, please contact the maint
 
 If more than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
 Your contribution will be recorded in the [release note](ReleaseNotes.md).
+
+
+## License
+
+Any contribution that you make to this repository will
+be under the Apache 2 License, as dictated by that
+[license](http://www.apache.org/licenses/LICENSE-2.0.html):
+
+> 5. Submission of Contributions. Unless You explicitly state otherwise,
+     >    any Contribution intentionally submitted for inclusion in the Work
+     >    by You to the Licensor shall be under the terms and conditions of
+     >    this License, without any additional terms or conditions.
+     >    Notwithstanding the above, nothing herein shall supersede or modify
+     >    the terms of any separate license agreement you may have executed
+     >    with Licensor regarding such Contributions.

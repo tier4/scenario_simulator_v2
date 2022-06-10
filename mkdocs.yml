@@ -20,7 +20,7 @@ plugins:
 palette:
   scheme: slate
 
-copyright: "Copyright &copy; 2020 TIER IV, Inc."
+copyright: "Copyright &copy; 2022 TIER IV, Inc."
 
 markdown_extensions:
   - attr_list
@@ -84,6 +84,4 @@ nav:
       - Package Details: package/About.md
   - etc:
     - Release Notes: etc/ReleaseNotes.md
-    - Contact Information: etc/ContactUs.md
     - How to Contribute: etc/HowToContribute.md
-    - LICENSE: etc/LICENSE.md
