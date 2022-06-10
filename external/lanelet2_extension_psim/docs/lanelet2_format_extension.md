@@ -120,7 +120,7 @@ Following image illustrates how "light_bulbs" LineString should be created.
 
 <img src="./light_bulbs.png" width="400">
 
-Here is an exmaple of osm syntax for light_bulb object:
+Here is an example of osm syntax for light_bulb object:
 ```
 <node id=1 version='1' lat='49.00541994701' lon='8.41565013855'>
   <tag k='ele' v='5'/>
