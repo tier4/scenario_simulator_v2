@@ -100,18 +100,25 @@ public:
 
   virtual auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 
-  /*   */ auto getDistanceToLeftBound() -> double;
+  /*   */ auto getDistanceToLaneBound() -> double;
 
-  /*   */ auto getDistanceToLeftBound(std::int64_t lanelet_id) const -> double;
+  /*   */ auto getDistanceToLaneBound(std::int64_t lanelet_id) const -> double;
 
-  /*   */ auto getDistanceToLeftBound(const std::vector<std::int64_t> & lanelet_ids) const
+  /*   */ auto getDistanceToLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
     -> double;
 
-  /*   */ auto getDistanceToRightBound() -> double;
+  /*   */ auto getDistanceToLeftLaneBound() -> double;
 
-  /*   */ auto getDistanceToRightBound(std::int64_t lanelet_id) const -> double;
+  /*   */ auto getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double;
 
-  /*   */ auto getDistanceToRightBound(const std::vector<std::int64_t> & lanelet_ids) const
+  /*   */ auto getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+    -> double;
+
+  /*   */ auto getDistanceToRightLaneBound() -> double;
+
+  /*   */ auto getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double;
+
+  /*   */ auto getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
     -> double;
 
   /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;

@@ -201,10 +201,12 @@ public:
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
-  FORWARD_TO_ENTITY(getDistanceToLeftBound, );
-  FORWARD_TO_ENTITY(getDistanceToLeftBound, const);
-  FORWARD_TO_ENTITY(getDistanceToRightBound, );
-  FORWARD_TO_ENTITY(getDistanceToRightBound, const);
+  FORWARD_TO_ENTITY(getDistanceToLaneBound, );
+  FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
+  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
+  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, const);
+  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
+  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getDriverModel, const);
   FORWARD_TO_ENTITY(getEmergencyStateName, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);

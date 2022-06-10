@@ -422,12 +422,29 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
   return math::get2DConvexHull(points_bbox);
 }
 
-auto EntityBase::getDistanceToLeftBound() -> double
+auto EntityBase::getDistanceToLaneBound() -> double
 {
-  return getDistanceToLeftBound(getRouteLanelets());
+  return std::min(getDistanceToLeftLaneBound(), getDistanceToRightLaneBound());
 }
 
-auto EntityBase::getDistanceToLeftBound(std::int64_t lanelet_id) const -> double
+auto EntityBase::getDistanceToLaneBound(std::int64_t lanelet_id) const -> double
+{
+  return std::min(getDistanceToLeftLaneBound(lanelet_id), getDistanceToRightLaneBound(lanelet_id));
+}
+
+auto EntityBase::getDistanceToLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+  -> double
+{
+  return std::min(
+    getDistanceToLeftLaneBound(lanelet_ids), getDistanceToRightLaneBound(lanelet_ids));
+}
+
+auto EntityBase::getDistanceToLeftLaneBound() -> double
+{
+  return getDistanceToLeftLaneBound(getRouteLanelets());
+}
+
+auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double
 {
   const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id);
   if (bound.empty()) {
@@ -443,22 +460,22 @@ auto EntityBase::getDistanceToLeftBound(std::int64_t lanelet_id) const -> double
   return math::getDistance2D(bound, polygon);
 }
 
-auto EntityBase::getDistanceToLeftBound(const std::vector<std::int64_t> & lanelet_ids) const
+auto EntityBase::getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
   -> double
 {
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [this](std::int64_t lanelet_id) { return getDistanceToLeftBound(lanelet_id); });
+    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
   return *std::min_element(distances.begin(), distances.end());
 }
 
-auto EntityBase::getDistanceToRightBound() -> double
+auto EntityBase::getDistanceToRightLaneBound() -> double
 {
-  return getDistanceToRightBound(getRouteLanelets());
+  return getDistanceToRightLaneBound(getRouteLanelets());
 }
 
-auto EntityBase::getDistanceToRightBound(std::int64_t lanelet_id) const -> double
+auto EntityBase::getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double
 {
   const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id);
   if (bound.empty()) {
@@ -475,13 +492,13 @@ auto EntityBase::getDistanceToRightBound(std::int64_t lanelet_id) const -> doubl
   return math::getDistance2D(bound, polygon);
 }
 
-auto EntityBase::getDistanceToRightBound(const std::vector<std::int64_t> & lanelet_ids) const
+auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
   -> double
 {
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [this](std::int64_t lanelet_id) { return getDistanceToLeftBound(lanelet_id); });
+    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
   return *std::min_element(distances.begin(), distances.end());
 }
 
