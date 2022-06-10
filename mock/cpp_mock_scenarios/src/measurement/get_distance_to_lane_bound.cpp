@@ -45,25 +45,9 @@ private:
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    const auto distance_to_front = api_.getLongitudinalDistance("ego", "front");
-    const auto distance_to_behind = api_.getLongitudinalDistance("ego", "behind");
+    const auto distance = api_.getDistanceToLaneBound("ego");
+    RCLCPP_ERROR_STREAM(get_logger(),"distance => " << distance);
     // LCOV_EXCL_START
-    if (!distance_to_front) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-      return;
-    }
-    if (distance_to_front.get() >= 5.1 || 4.9 >= distance_to_front.get()) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-      return;
-    }
-    if (!distance_to_behind) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-      return;
-    }
-    if (distance_to_behind.get() >= -4.9 || -5.1 >= distance_to_behind.get()) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-      return;
-    }
     // LCOV_EXCL_STOP
   }
   void onInitialize() override
