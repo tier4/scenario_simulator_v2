@@ -78,7 +78,7 @@ To keep the commit hashes consistent, **please DO NOT force-push the commit to y
 If you want to force-push the commit during the review, please contact the maintainers for approval in advance.
 
 If more than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
-Your contribution will be recorded in the [release note](ReleaseNotes.md).
+Your contribution will be recorded in the [release note](../ReleaseNotes.md).
 
 
 ## License

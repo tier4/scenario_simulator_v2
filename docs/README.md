@@ -30,4 +30,4 @@ This package re-designs the [scenario runner](https://github.com/tier4/scenario_
 
 ## How to contribute
 
-Please refer to the [contributor guidelines](etc/HowToContribute.md).
+Please refer to the [contributor guidelines](developer_guide/HowToContribute.md).

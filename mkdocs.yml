@@ -52,6 +52,7 @@ extra_javascript:
 
 nav:
   - Home: README.md
+  - Release Note: ReleaseNotes.md
   - User Guide:
       - Build Instructions : user_guide/BuildInstructions.md
       - Quick Start : user_guide/RunWithAutowareUniverse.md
@@ -84,7 +85,5 @@ nav:
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
       - developer_guide/TIERIVScenarioFormatVersion2.md
+      - developer_guide/HowToContribute.md
       - Package Details: package/About.md
-  - etc:
-    - Release Notes: etc/ReleaseNotes.md
-    - How to Contribute: etc/HowToContribute.md
