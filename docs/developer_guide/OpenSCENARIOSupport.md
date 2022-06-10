@@ -141,6 +141,15 @@ It is unlikely that you will need these commands for normal scenario creation.
 | error   | Generate internal error: Used to ensure that the simulator does not crash with an internal error. |
 | sigsegv | Access a null pointer: Used to make sure the simulator does not crash with an internal error.     |
 
+### UserDefinedValueCondition
+#### Built-in conditions
+
+| Name                       | description                                         | Reference                                                                                                           |
+|:---------------------------|:----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| currentState               | returns Autoware's state                            | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/AutowareState.idl)  |
+| currentEmergencyState      | return Autoware's emergency state.                  | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/EmergencyState.idl) |
+| currentTurnIndicatorsState | return turn indicators state controlled by Autoware | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/msg/TurnIndicatorsCommand.idl)                                                                                                             |
+
 ## Non-Standard Extensions
 ---
 
@@ -156,6 +165,148 @@ In such cases, you will be notified of a "failure".
 
 Our OpenSCENARIO Interpreter does not currently support the full range of
 OpenSCENARIO standards.
+
+
+### Syntax
+- [x] OpenSCENARIO
+  - [x] FileHeader
+  - [x] ParameterDeclarations
+  - [ ] CatalogLocations
+  - [x] RoadNetwork
+    - [x] LogicFile
+    - [x] SceneGraphFile
+    - [ ] TrafficSignalController
+  - [x] Entities
+  - [x] Storyboard
+    - [x] Init
+      - [x] InitActions
+        - [x] GlobalAction
+        - [x] UserDefinedAction
+        - [x] Private
+          - [x] PrivateAction
+    - [x] Story
+      - [x] ParameterDeclarations
+      - [x] Act
+        - [x] ManeuverGroup
+          - [x] Actors
+            - [x] EntityRef
+          - [ ] CatalogReference
+          - [x] Maneuver
+            - [x] ParameterDeclarations
+            - [x] Event
+              - [x] Action
+                - [x] GlobalAction
+                - [x] UserDefinedAction
+                - [x] PrivateAction
+              - [x] StartTrigger
+        - [x] StartTrigger
+        - [x] StopTrigger
+    - [x] StopTrigger
+  - [x] Catalog
+
+---
+
+- [x] FileHeader
+  - [x] revMajor
+  - [x] revMinor
+  - [x] date
+  - [x] description
+  - [x] author
+
+---
+
+- [x] ParameterDeclaration
+  - [x] name
+  - [x] parameterType
+    - [x] integer
+    - [x] double
+    - [x] string
+    - [x] unsignedInt
+    - [x] unsignedShort
+    - [x] boolean
+    - [x] dateTime
+  - [x] value
+
+---
+
+- [ ] CatalogLocations
+  - [ ] VehicleCatalog
+  - [ ] ControllerCatalog
+  - [ ] PedestrianCatalog
+  - [ ] MiscObjectCatalog
+  - [ ] EnvironmentCatalog
+  - [ ] ManeuverCatalog
+  - [ ] TrajectoryCatalog
+  - [ ] RouteCatalog
+
+---
+
+- [x] RoadNetwork
+  - [x] LogicFile
+  - [x] SceneGraphFile
+  - [ ] TrafficSignalController
+    - [ ] name
+    - [ ] delay
+    - [ ] reference
+    - [ ] Phase
+      - [ ] name
+      - [ ] duration
+      - [ ] TrafficSignalState
+        - [ ] trafficSignalId
+        - [ ] state
+
+---
+
+- [x] Entities
+  - [x] ScenarioObject
+    - [x] name
+    - [x] EntityObject
+      - [ ] CatalogReference
+      - [x] Vehicle
+      - [x] Pedestrian
+      - [ ] MiscObject
+    - [ ] ObjectController
+  - [ ] EntitySelection
+
+---
+
+- [x] Vehicle
+  - [x] name
+  - [x] vehicleCategory
+    - [x] car
+    - [ ] van
+    - [ ] truck
+    - [ ] trailer
+    - [ ] semitrailer
+    - [ ] bus
+    - [ ] motorbike
+    - [ ] bicycle
+    - [ ] train
+    - [ ] tram
+  - [x] ParameterDeclarations
+  - [x] BoundingBox
+    - [x] ...
+  - [x] Performance
+    - [x] ...
+  - [x] Axles
+    - [x] ...
+  - [ ] Properties
+
+---
+
+- [x] Pedestrian
+  - [x] name
+  - [x] model
+  - [x] mass
+  - [x] pedestrianCategory
+    - [x] pedestrian
+    - [ ] wheelchair
+    - [ ] animal
+  - [x] ParameterDeclarations
+    - [x] ...
+  - [x] BoundingBox
+    - [x] ...
+  - [ ] Properties
 
 ### Actions
 
