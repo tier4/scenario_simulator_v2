@@ -457,6 +457,14 @@ auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> do
       "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
       " exists and it's definition");
   }
+  /*
+  for (const auto & p : bound) {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("bound"), p.x << "," << p.y << "," << p.z);
+  }
+  for (const auto & p : polygon) {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("polygon"), p.x << "," << p.y << "," << p.z);
+  }
+  */
   return math::getDistance2D(bound, polygon);
 }
 

@@ -1753,7 +1753,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::toPolygon(
     point.x = p.x();
     point.y = p.y();
     point.z = p.z();
-    ret.emplace_back();
+    ret.emplace_back(point);
   }
   return ret;
 }
