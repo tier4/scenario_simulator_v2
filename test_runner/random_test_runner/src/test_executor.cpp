@@ -95,7 +95,7 @@ void TestExecutor::initialize()
     api_->requestAssignRoute(
       ego_name_,
       std::vector<traffic_simulator_msgs::msg::LaneletPose>{test_description_.ego_goal_position});
-    api_->engage(ego_name_);
+    api_->asAutoware(ego_name_).engage();
 
     goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
   }

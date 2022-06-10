@@ -51,7 +51,6 @@ target_link_libraries(random_test_runner
   ${YAML_CPP_LIBRARIES}
   pthread
   sodium
-  zmqpp
   zmq
   fmt
 )
