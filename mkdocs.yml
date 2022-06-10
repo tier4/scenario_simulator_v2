@@ -22,8 +22,6 @@ extra:
 plugins:
   - search
   - git-revision-date-localized
-palette:
-  scheme: slate
 
 copyright: "Copyright &copy; 2022 TIER IV, Inc."
 
