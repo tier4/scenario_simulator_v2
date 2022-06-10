@@ -22,9 +22,9 @@ Bug Fixes:bug:
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| Feature                          | Brief summary                                                                                                                                                                   | Category            | Pull request                                                    | Contributor                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Accessor to the class `Autoware` | A new member function `asAutoware` has been added to access the class `Autoware`, and instead the member functions specific to `EgoEntity` have been removed from `EntityBase`. | `traffic_simulator` | [#796](https://github.com/tier4/scenario_simulator_v2/pull/796) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.4
 

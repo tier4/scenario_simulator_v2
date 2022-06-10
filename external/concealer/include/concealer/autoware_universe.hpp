@@ -74,11 +74,11 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
-  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState);
-  CONCEALER_DEFINE_SUBSCRIPTION(GearCommand);
+  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
+  CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
-  CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
+  CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
 
   using Engage = tier4_external_api_msgs::srv::Engage;
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;

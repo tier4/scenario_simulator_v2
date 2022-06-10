@@ -18,6 +18,7 @@
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <boost/optional.hpp>
+#include <concealer/autoware.hpp>
 #include <memory>
 #include <queue>
 #include <string>
@@ -54,13 +55,11 @@ public:
 public:
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array);
 
-  virtual void engage() {}
+  virtual auto asAutoware() const -> concealer::Autoware &;
 
   virtual auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox = 0;
 
   virtual auto getCurrentAction() const -> const std::string = 0;
-
-  virtual auto getEmergencyStateName() const -> std::string;
 
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>
@@ -82,13 +81,7 @@ public:
 
   /*   */ auto getStandStillDuration() const -> boost::optional<double>;
 
-  virtual auto getTurnIndicatorsCommandName() const -> std::string;
-
   /*   */ auto getVisibility() { return visibility_; }
-
-  virtual auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand>;
 
   /*   */ auto getVehicleParameters() const
     -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
@@ -138,8 +131,6 @@ public:
   /*   */ auto setVisibility(const bool visibility) { return visibility_ = visibility; }
 
   virtual void onUpdate(double current_time, double step_time);
-
-  virtual auto ready() const -> bool { return static_cast<bool>(status_); }
 
   virtual void requestAcquirePosition(
     const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) = 0;
