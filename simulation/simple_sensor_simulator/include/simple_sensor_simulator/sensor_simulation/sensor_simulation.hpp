@@ -74,7 +74,7 @@ public:
       using Message = nav_msgs::msg::OccupancyGrid;
       occupancy_grid_sensors_.push_back(std::make_unique<OccupancyGridSensor<Message>>(
         current_simulation_time, configuration,
-        node.create_publisher<Message>("/perception/occupancy_grid_map/map/dummy", 1)));
+        node.create_publisher<Message>("/perception/occupancy_grid_map/map", 1)));
     } else {
       std::stringstream ss;
       ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
