@@ -46,8 +46,10 @@ private:
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     const auto distance = api_.getDistanceToLaneBound("ego");
-    RCLCPP_ERROR_STREAM(get_logger(),"distance => " << distance);
     // LCOV_EXCL_START
+    if (distance >= 0.52) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
     // LCOV_EXCL_STOP
   }
   void onInitialize() override
