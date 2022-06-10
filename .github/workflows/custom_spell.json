@@ -13,6 +13,15 @@
     "storyboardelementstatecondition",
     "transitiondynamics",
     "lanechangetarget",
-    "dynamicsshape"
+    "dynamicsshape",
+    "npcs",
+    "protos",
+    "Utaro",
+    "DWITH_INTEGRATION_TEST",
+    "kyabe",
+    "Petrich",
+    "ITSC",
+    ""
+
   ]
 }
