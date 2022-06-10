@@ -17,22 +17,25 @@ jobs:
             --output .github/workflows/autoware.json \
             https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/cspell/.cspell.json
 
-      - name: Merge words array
-        uses: sergeysova/jq-action@v2
-        with:
-          cmd: 'jq -n ''{ words: [ inputs.words ] | add }'' .github/workflows/autoware.json .github/workflows/custom_spell.json > .github/workflows/words.json'
+      - name: Merge ignorePaths array
+          uses: sergeysova/jq-action@v2
+          with:
+            cmd: 'jq -n ''{ ignorePaths: [ inputs.ignorePaths ] | add }'' .github/workflows/autoware.json .github/workflows/custom_spell.json > .github/workflows/ignore_paths.json'
 
-      - name: Merge config
+      - name: Merge word config
         uses: sergeysova/jq-action@v2
         with:
           cmd: 'jq -s ''add'' .github/workflows/autoware.json .github/workflows/words.json > .github/workflows/.cspell.json'
+
+      - name: Merge ignore_paths config
+        uses: sergeysova/jq-action@v2
+        with:
+          cmd: 'jq -s ''add'' .github/workflows/.cspell.json .github/workflows/ignore_paths.json > .github/workflows/.cspell.json'
 
       - uses: streetsidesoftware/cspell-action@v1
         with:
           files: |
             **/*.{c,cpp,h,hpp,xml,yaml,yml,md,txt,sh,repos,py}
-            !external/lanelet2_extension_psim/**/*.{cpp,hpp,md,xml,txt}
-            !external/lanelet2_matching/**/*.{cpp,hpp,md,xml,txt}
           config: ".github/workflows/.cspell.json"
           incremental_files_only: false
           strict: true
