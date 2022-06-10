@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public:
 
   virtual auto getCurrentAction() const -> const std::string = 0;
 
-  virtual auto getEmergencyStateString() const -> std::string;
+  virtual auto getEmergencyStateName() const -> std::string;
 
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>
@@ -81,6 +81,8 @@ public:
   /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus;
 
   /*   */ auto getStandStillDuration() const -> boost::optional<double>;
+
+  virtual auto getTurnIndicatorsCommandName() const -> std::string;
 
   /*   */ auto getVisibility() { return visibility_; }
 

@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -75,46 +75,52 @@ auto AutowareUniverse::engage() -> void
 
 auto AutowareUniverse::update() -> void
 {
-  CurrentControlMode current_control_mode;
-  {
-    current_control_mode.mode = CurrentControlMode::AUTONOMOUS;
-  }
-  setCurrentControlMode(current_control_mode);
+  setControlModeReport([this]() {
+    ControlModeReport message;
+    message.mode = ControlModeReport::AUTONOMOUS;
+    return message;
+  }());
 
-  CurrentShift current_shift;
-  {
-    using autoware_auto_vehicle_msgs::msg::GearReport;
-    current_shift.stamp = get_clock()->now();
-    current_shift.report = current_twist.linear.x >= 0 ? GearReport::DRIVE : GearReport::REVERSE;
-  }
-  setCurrentShift(current_shift);
+  setGearReport([this]() {
+    GearReport message;
+    message.stamp = get_clock()->now();
+    message.report = getGearCommand().command;
+    return message;
+  }());
 
-  CurrentSteering current_steering;
-  {
-    current_steering.stamp = get_clock()->now();
-    current_steering.steering_tire_angle = getSteeringAngle();
-  }
-  setCurrentSteering(current_steering);
+  setTurnIndicatorsReport([this]() {
+    TurnIndicatorsReport message;
+    message.stamp = get_clock()->now();
+    message.report = getTurnIndicatorsCommand().command;
+    return message;
+  }());
 
-  CurrentVelocity current_velocity;
-  {
-    current_velocity.header.stamp = get_clock()->now();
-    current_velocity.header.frame_id = "base_link";
-    current_velocity.longitudinal_velocity = current_twist.linear.x;
-    current_velocity.lateral_velocity = current_twist.linear.y;
-    current_velocity.heading_rate = current_twist.angular.z;
-  }
-  setCurrentVelocity(current_velocity);
+  setSteeringReport([this]() {
+    SteeringReport message;
+    message.stamp = get_clock()->now();
+    message.steering_tire_angle = getSteeringAngle();
+    return message;
+  }());
 
-  LocalizationOdometry localization_odometry;
-  {
-    localization_odometry.header.stamp = get_clock()->now();
-    localization_odometry.header.frame_id = "map";
-    localization_odometry.pose.pose = current_pose;
-    localization_odometry.pose.covariance = {};
-    localization_odometry.twist.twist = current_twist;
-  }
-  setLocalizationOdometry(localization_odometry);
+  setVelocityReport([this]() {
+    VelocityReport message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "base_link";
+    message.longitudinal_velocity = current_twist.linear.x;
+    message.lateral_velocity = current_twist.linear.y;
+    message.heading_rate = current_twist.angular.z;
+    return message;
+  }());
+
+  setOdometry([this]() {
+    Odometry message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "map";
+    message.pose.pose = current_pose;
+    message.pose.covariance = {};
+    message.twist.twist = current_twist;
+    return message;
+  }());
 
   setTransform(current_pose);
 }
@@ -137,7 +143,10 @@ auto AutowareUniverse::getSteeringAngle() const -> double
 auto AutowareUniverse::getGearSign() const -> double
 {
   using autoware_auto_vehicle_msgs::msg::GearCommand;
-  return getGearCommand().command == GearCommand::REVERSE ? -1.0 : 1.0;
+  return getGearCommand().command == GearCommand::REVERSE or
+             getGearCommand().command == GearCommand::REVERSE_2
+           ? -1.0
+           : 1.0;
 }
 
 auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
@@ -157,7 +166,7 @@ auto AutowareUniverse::restrictTargetSpeed(double value) const -> double
   return value;
 }
 
-auto AutowareUniverse::getAutowareStateString() const -> std::string
+auto AutowareUniverse::getAutowareStateName() const -> std::string
 {
   using autoware_auto_system_msgs::msg::AutowareState;
 
@@ -208,11 +217,8 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 
 namespace autoware_auto_system_msgs::msg
 {
-std::ostream & operator<<(
-  std::ostream & out, const autoware_auto_system_msgs::msg::EmergencyState & message)
+auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostream &
 {
-  using autoware_auto_system_msgs::msg::EmergencyState;
-
 #define CASE(IDENTIFIER)           \
   case EmergencyState::IDENTIFIER: \
     out << #IDENTIFIER;            \
@@ -234,10 +240,8 @@ std::ostream & operator<<(
 #undef CASE
 }
 
-std::istream & operator>>(
-  std::istream & is, autoware_auto_system_msgs::msg::EmergencyState & message)
+auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
 {
-  using autoware_auto_system_msgs::msg::EmergencyState;
 #define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
 
   std::unordered_map<std::string, std::uint8_t> state_dictionary{
@@ -259,3 +263,52 @@ std::istream & operator>>(
   return is;
 }
 }  // namespace autoware_auto_system_msgs::msg
+
+namespace autoware_auto_vehicle_msgs::msg
+{
+auto operator<<(std::ostream & out, const TurnIndicatorsCommand & message) -> std::ostream &
+{
+#define CASE(IDENTIFIER)                  \
+  case TurnIndicatorsCommand::IDENTIFIER: \
+    out << #IDENTIFIER;                   \
+    break
+
+  switch (message.command) {
+    CASE(DISABLE);
+    CASE(ENABLE_LEFT);
+    CASE(ENABLE_RIGHT);
+    CASE(NO_COMMAND);
+
+    default:
+      throw common::Error(
+        "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
+  }
+
+  return out;
+#undef CASE
+}
+auto operator>>(std::istream & is, TurnIndicatorsCommand & message) -> std::istream &
+{
+#define STATE(IDENTIFIER) {#IDENTIFIER, TurnIndicatorsCommand::IDENTIFIER}
+
+  std::unordered_map<std::string, std::uint8_t> state_dictionary{
+    STATE(DISABLE),
+    STATE(ENABLE_LEFT),
+    STATE(ENABLE_RIGHT),
+    STATE(NO_COMMAND),
+  };
+
+#undef STATE
+
+  std::string command_string;
+  is >> command_string;
+
+  if (auto iter = state_dictionary.find(command_string); iter != state_dictionary.end()) {
+    message.set__command(iter->second);
+  } else {
+    throw common::Error("Unsupported TurnIndicatorsCommand::command : ", command_string.c_str());
+  }
+
+  return is;
+}
+}  // namespace autoware_auto_vehicle_msgs::msg

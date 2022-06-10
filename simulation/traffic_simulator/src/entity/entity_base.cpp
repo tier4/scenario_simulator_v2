@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ void EntityBase::onUpdate(double, double)
   status_before_update_ = status_;
 }
 
-auto EntityBase::getEmergencyStateString() const -> std::string
+auto EntityBase::getEmergencyStateName() const -> std::string
 {
   throw common::Error(
     "Inquiry of emergency state is valid query to only Autoware.Universe-controlled entity.",
@@ -51,6 +51,14 @@ auto EntityBase::getEmergencyStateString() const -> std::string
 }
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
+
+auto EntityBase::getTurnIndicatorsCommandName() const -> std::string
+{
+  throw common::Error(
+    "Inquiry of turn indicators command is valid query to only Autoware.Universe-controlled "
+    "entity. But the target entity ",
+    std::quoted(name.c_str()), " is not controlled by Autoware.Universe");
+}
 
 void EntityBase::requestSpeedChange(
   const double target_speed, const speed_change::Transition transition,

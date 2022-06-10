@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ inline namespace syntax
  *    </xsd:union>
  *  </xsd:simpleType>
  *
- *  Tier IV Extension:
+ *  TIER IV Extension:
  *    - Add enumeration <xsd.enumeration value="sticky"/>
  *
  * -------------------------------------------------------------------------- */
@@ -95,7 +95,7 @@ struct ConditionEdge
      *  time t. This edge is provided for simply defining assertions such as
      *  "Did the Ego car pass over checkpoint X?
      *
-     *  This is NOT an OpenSCENARIO 1.0.0 standard feature (Tier IV extension).
+     *  This is NOT an OpenSCENARIO 1.0.0 standard feature (TIER IV extension).
      *
      * ---------------------------------------------------------------------- */
     sticky,

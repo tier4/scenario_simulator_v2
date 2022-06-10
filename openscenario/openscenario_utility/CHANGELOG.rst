@@ -88,7 +88,7 @@ Changelog for package openscenario_utility
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
 * Merge pull request `#553 <https://github.com/tier4/scenario_simulator_v2/issues/553>`_ from tier4/fix/interpreter/condition-edge
-* Add Tier IV extension `conditionEdge="sticky"` to `1.1.xsd`
+* Add TIER IV extension `conditionEdge="sticky"` to `1.1.xsd`
 * Contributors: Masaya Kataoka, yamacir-kit
 
 0.5.3 (2021-10-07)

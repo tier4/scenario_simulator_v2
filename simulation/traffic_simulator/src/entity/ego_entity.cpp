@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -173,7 +173,7 @@ auto EgoEntity::getVehicleCommand() const -> std::tuple<
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  const auto state = autoware->getAutowareStateString();
+  const auto state = autoware->getAutowareStateName();
   return state.empty() ? "Launching" : state;
 }
 
@@ -187,6 +187,15 @@ auto EgoEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverMod
   model.acceleration = 0;
   model.deceleration = 0;
   return model;
+}
+
+auto EgoEntity::getEmergencyStateName() const -> std::string
+{
+  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
+    return boost::lexical_cast<std::string>(universe->getEmergencyState());
+  } else {
+    return "";
+  }
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
@@ -287,7 +296,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   std::vector<std::int64_t> ids = {};
   if (universe) {
     const auto points = universe->getPathWithLaneId().points;
-    for (const auto point : points) {
+    for (const auto & point : points) {
       std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }
     auto result = std::unique(ids.begin(), ids.end());
@@ -296,12 +305,13 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   return ids;
 }
 
-auto EgoEntity::getEmergencyStateString() const -> std::string
+auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
 {
   if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
-    return boost::lexical_cast<std::string>(universe->getEmergencyState());
+    return boost::lexical_cast<std::string>(universe->getTurnIndicatorsCommand());
+  } else {
+    return "";
   }
-  return "";
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
@@ -311,6 +321,7 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
+  autoware->rethrow();
   EntityBase::onUpdate(current_time, step_time);
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
@@ -347,7 +358,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC:
-        input << autoware->getAcceleration(), autoware->getSteeringAngle();
+        input << autoware->getGearSign() * autoware->getAcceleration(),
+          autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
@@ -364,6 +376,12 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       default:
         THROW_SEMANTIC_ERROR(
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
+    }
+
+    // DIRTY HACK!!!
+    if (auto autoware_universe = dynamic_cast<concealer::AutowareUniverse const *>(autoware.get());
+        autoware_universe) {
+      vehicle_model_ptr_->setGear(autoware_universe->getGearCommand().command);
     }
 
     vehicle_model_ptr_->setInput(input);

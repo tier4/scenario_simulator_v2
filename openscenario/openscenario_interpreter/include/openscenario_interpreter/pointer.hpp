@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <openscenario_interpreter/type_traits/if_has_member_function_description.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_evaluate.hpp>
 #include <openscenario_interpreter/type_traits/if_has_stream_output_operator.hpp>
-#include <openscenario_interpreter/utility/pair.hpp>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>

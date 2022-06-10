@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,21 +13,53 @@
 // limitations under the License.
 
 #include <concealer/autoware.hpp>
+#include <cstdlib>
 #include <exception>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace concealer
 {
+void Autoware::checkAutowareProcess()
+{
+  if (process_id != 0) {
+    int wstatus = 0;
+    int ret = waitpid(process_id, &wstatus, WNOHANG);
+    if (ret == 0) {
+      return;
+    } else if (ret < 0) {
+      if (errno == ECHILD) {
+        is_autoware_exited = true;
+        throw common::AutowareError("Autoware process is already terminated");
+      } else {
+        AUTOWARE_SYSTEM_ERROR("waitpid");
+        std::exit(EXIT_FAILURE);
+      }
+    }
+
+    if (WIFEXITED(wstatus)) {
+      is_autoware_exited = true;
+      throw common::AutowareError(
+        "Autoware process is unintentionally exited. exit code: ", WEXITSTATUS(wstatus));
+    } else if (WIFSIGNALED(wstatus)) {
+      is_autoware_exited = true;
+      throw common::AutowareError("Autoware process is killed. signal is ", WTERMSIG(wstatus));
+    }
+  }
+}
+
 void Autoware::shutdownAutoware()
 {
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
   {
     if (spinner.joinable()) {
-      promise.set_value();
+      stopRequest();
       spinner.join();
     }
   }
 
-  if (process_id != 0) {
+  if (process_id != 0 && not is_autoware_exited) {
+    is_autoware_exited = true;
+
     AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
     {
       sendSIGINT();
@@ -77,8 +109,12 @@ void Autoware::shutdownAutoware()
       int status = 0;
 
       if (waitpid(process_id, &status, waitpid_options) < 0) {
-        AUTOWARE_SYSTEM_ERROR("waitpid");
-        std::exit(EXIT_FAILURE);
+        if (errno == ECHILD) {
+          AUTOWARE_WARN_STREAM("Try to wait for the autoware process but it was already exited.");
+        } else {
+          AUTOWARE_SYSTEM_ERROR("waitpid");
+          std::exit(EXIT_FAILURE);
+        }
       }
     }
   }
@@ -86,7 +122,7 @@ void Autoware::shutdownAutoware()
 
 void Autoware::rethrow() const
 {
-  if (thrown) {
+  if (is_thrown.load(std::memory_order_acquire)) {
     std::rethrow_exception(thrown);
   }
 }

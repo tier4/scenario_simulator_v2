@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <utility>
 #include <vector>
 
@@ -42,7 +41,7 @@ StopAtStopLineAction::calculateObstacle(const traffic_simulator_msgs::msg::Waypo
   if (distance_to_stopline_.get() < 0) {
     return boost::none;
   }
-  if (distance_to_stopline_.get() > reference_trajectory->getLength()) {
+  if (distance_to_stopline_.get() > trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -63,6 +62,8 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculat
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
+    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSubspline>(
+      reference_trajectory, entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon);
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -105,10 +106,12 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_stopline_ = hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
-  const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets, spline);
-  const auto distance_to_front_entity = getDistanceToFrontEntity(spline);
+  if (trajectory == nullptr) {
+    return BT::NodeStatus::FAILURE;
+  }
+  distance_to_stopline_ = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
+  const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets, *trajectory);
+  const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stopline_) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;

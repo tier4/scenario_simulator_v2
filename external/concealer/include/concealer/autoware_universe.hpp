@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,26 +45,24 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   bool is_ready = false;
 
   using Checkpoint = geometry_msgs::msg::PoseStamped;
-  using CurrentControlMode = autoware_auto_vehicle_msgs::msg::ControlModeReport;
-  using CurrentShift = autoware_auto_vehicle_msgs::msg::GearReport;
-  using CurrentSteering = autoware_auto_vehicle_msgs::msg::SteeringReport;
-  using CurrentTurnIndicators = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
-  using CurrentTwist = geometry_msgs::msg::TwistStamped;
-  using CurrentVelocity = autoware_auto_vehicle_msgs::msg::VelocityReport;
+  using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
+  using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
   using GoalPose = geometry_msgs::msg::PoseStamped;
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
-  using LocalizationOdometry = nav_msgs::msg::Odometry;
+  using Odometry = nav_msgs::msg::Odometry;
+  using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
+  using TurnIndicatorsReport = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
+  using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
 
   CONCEALER_DEFINE_PUBLISHER(Checkpoint);
-  CONCEALER_DEFINE_PUBLISHER(CurrentControlMode);
-  CONCEALER_DEFINE_PUBLISHER(CurrentShift);
-  CONCEALER_DEFINE_PUBLISHER(CurrentSteering);
-  CONCEALER_DEFINE_PUBLISHER(CurrentTurnIndicators);
-  CONCEALER_DEFINE_PUBLISHER(CurrentTwist);
-  CONCEALER_DEFINE_PUBLISHER(CurrentVelocity);
+  CONCEALER_DEFINE_PUBLISHER(ControlModeReport);
+  CONCEALER_DEFINE_PUBLISHER(GearReport);
   CONCEALER_DEFINE_PUBLISHER(GoalPose);
   CONCEALER_DEFINE_PUBLISHER(InitialPose);
-  CONCEALER_DEFINE_PUBLISHER(LocalizationOdometry);
+  CONCEALER_DEFINE_PUBLISHER(Odometry);
+  CONCEALER_DEFINE_PUBLISHER(SteeringReport);
+  CONCEALER_DEFINE_PUBLISHER(TurnIndicatorsReport);
+  CONCEALER_DEFINE_PUBLISHER(VelocityReport);
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
@@ -91,12 +89,12 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
 public:
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                              \
-  auto is##NAME() const noexcept                                         \
-  {                                                                      \
-    using autoware_auto_system_msgs::msg::AutowareState;                 \
-    return current_value_of_AutowareState.state == AutowareState::VALUE; \
-  }                                                                      \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
+  auto is##NAME() const noexcept                             \
+  {                                                          \
+    using autoware_auto_system_msgs::msg::AutowareState;     \
+    return getAutowareState().state == AutowareState::VALUE; \
+  }                                                          \
   static_assert(true, "")
 
   DEFINE_STATE_PREDICATE(Initializing, INITIALIZING);            // 1
@@ -114,14 +112,14 @@ public:
   : Autoware(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     CONCEALER_INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
-    CONCEALER_INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    CONCEALER_INIT_PUBLISHER(CurrentShift, "/vehicle/status/gear_status"),
-    CONCEALER_INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering_status"),
-    CONCEALER_INIT_PUBLISHER(CurrentTurnIndicators, "/vehicle/status/turn_indicators_status"),
-    CONCEALER_INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity_status"),
+    CONCEALER_INIT_PUBLISHER(ControlModeReport, "/vehicle/status/control_mode"),
+    CONCEALER_INIT_PUBLISHER(GearReport, "/vehicle/status/gear_status"),
     CONCEALER_INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     CONCEALER_INIT_PUBLISHER(InitialPose, "/initialpose"),
-    CONCEALER_INIT_PUBLISHER(LocalizationOdometry, "/localization/kinematic_state"),
+    CONCEALER_INIT_PUBLISHER(Odometry, "/localization/kinematic_state"),
+    CONCEALER_INIT_PUBLISHER(SteeringReport, "/vehicle/status/steering_status"),
+    CONCEALER_INIT_PUBLISHER(TurnIndicatorsReport, "/vehicle/status/turn_indicators_status"),
+    CONCEALER_INIT_PUBLISHER(VelocityReport, "/vehicle/status/velocity_status"),
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
     CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
@@ -145,7 +143,7 @@ public:
 
   auto getAcceleration() const -> double override;
 
-  auto getAutowareStateString() const -> std::string override;
+  auto getAutowareStateName() const -> std::string override;
 
   auto getGearSign() const -> double override;
 
@@ -178,10 +176,16 @@ public:
 // for boost::lexical_cast
 namespace autoware_auto_system_msgs::msg
 {
-auto operator<<(std::ostream &, const autoware_auto_system_msgs::msg::EmergencyState &)
-  -> std::ostream &;
+auto operator<<(std::ostream &, const EmergencyState &) -> std::ostream &;
 
-auto operator>>(std::istream &, autoware_auto_system_msgs::msg::EmergencyState &) -> std::istream &;
+auto operator>>(std::istream &, EmergencyState &) -> std::istream &;
 }  // namespace autoware_auto_system_msgs::msg
+
+namespace autoware_auto_vehicle_msgs::msg
+{
+auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
+
+auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
+}  // namespace autoware_auto_vehicle_msgs::msg
 
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_

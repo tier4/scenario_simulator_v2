@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,9 @@ struct Storyboard : public Scope, public StoryboardElement
 {
   Init init;
 
-  bool engaged = false;
+  using Thunk = std::function<void()>;
+
+  static inline std::queue<Thunk> thunks{};
 
   explicit Storyboard(const pugi::xml_node &, Scope &);
 

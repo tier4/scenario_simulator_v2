@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ namespace simple_sensor_simulator
 {
 namespace primitives
 {
-Box::Box(float depth, float width, float height, geometry_msgs::msg::Pose pose)
+Box::Box(float depth, float width, float height, const geometry_msgs::msg::Pose & pose)
 : Primitive("Box", pose), depth(depth), width(width), height(height)
 {
   vertices_ = std::vector<Vertex>(8);
