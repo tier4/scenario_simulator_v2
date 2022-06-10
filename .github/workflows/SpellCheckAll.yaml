@@ -27,14 +27,7 @@ jobs:
         with:
           cmd: 'jq -s ''add'' .github/workflows/autoware.json .github/workflows/words.json > .github/workflows/.cspell.json'
 
-      - name: Check spelling
-        run: |
-          # The cspell-action might not be able to exclude specific files.
-          # So use cspell package directly instead.
-          # How to exclude specific files:
-          #   Ex. "**/!(*.osm|*.svg|CHANGELOG.rst)"
-          npm install cspell
-          ./node_modules/.bin/cspell \
-            --config .github/workflows/.cspell.json \
-            "**/!(CHANGELOG.rst)" \
-            2> /dev/null || true
+      - uses: streetsidesoftware/cspell-action@v1
+        with:
+          config: ".github/workflows/.cspell.json"
+          strict: true
