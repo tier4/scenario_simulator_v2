@@ -32,4 +32,5 @@ jobs:
           files: |
              **/*.{c,cpp,h,hpp,xml,yaml,yml,md,txt,sh,repos,py}
           config: ".github/workflows/.cspell.json"
+          incremental_files_only: false
           strict: true
