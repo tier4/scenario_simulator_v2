@@ -1,5 +1,14 @@
 {
   "words": [
-    "test"
+    "parametersetaction",
+    "speedaction",
+    "lanechangeaction",
+    "teleportaction",
+    "acquirepositionaction",
+    "collisioncondition",
+    "timeheadwaycondition",
+    "reachpositioncondition",
+    "distancecondition",
+    "relativedistancecondition"
   ]
 }
