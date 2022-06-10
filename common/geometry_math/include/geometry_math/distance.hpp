@@ -23,15 +23,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MATH__DISTANCE_HPP_
-#define TRAFFIC_SIMULATOR__MATH__DISTANCE_HPP_
+#ifndef GEOMETRY_MATH__DISTANCE_HPP_
+#define GEOMETRY_MATH__DISTANCE_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1);
 double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Point & p1);
@@ -40,7 +38,6 @@ double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg
 double getDistance2D(
   const std::vector<geometry_msgs::msg::Point> & polygon0,
   const std::vector<geometry_msgs::msg::Point> & polygon1);
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math
 
-#endif  // TRAFFIC_SIMULATOR__MATH__DISTANCE_HPP_
+#endif  // GEOMETRY_MATH__DISTANCE_HPP_

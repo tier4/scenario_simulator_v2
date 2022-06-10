@@ -14,7 +14,7 @@
 
 #include <gtest/gtest.h>
 
-#include <traffic_simulator/math/linear_algebra.hpp>
+#include <geometry_math/linear_algebra.hpp>
 
 #include "../expect_eq_macros.hpp"
 

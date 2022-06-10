@@ -14,16 +14,14 @@
 
 #include <algorithm>
 #include <cmath>
+#include <geometry_math/bounding_box.hpp>
+#include <geometry_math/hermite_curve.hpp>
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/math/bounding_box.hpp>
-#include <traffic_simulator/math/hermite_curve.hpp>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 HermiteCurve::HermiteCurve(
   double ax, double bx, double cx, double dx, double ay, double by, double cy, double dy, double az,
@@ -169,7 +167,7 @@ boost::optional<double> HermiteCurve::getSValue(
   geometry_msgs::msg::Point p0, p1;
   p0.y = threshold_distance;
   p1.y = -threshold_distance;
-  const auto line = math::transformPoints(pose, {p0, p1});
+  const auto line = geometry_math::transformPoints(pose, {p0, p1});
   const auto s = getCollisionPointIn2D(line[0], line[1], false);
   if (!s) {
     return boost::none;
@@ -333,5 +331,4 @@ const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale)
 
   return p;
 }
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math

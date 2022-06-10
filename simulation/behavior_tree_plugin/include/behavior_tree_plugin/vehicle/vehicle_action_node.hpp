@@ -21,8 +21,8 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
-#include <traffic_simulator/math/catmull_rom_subspline.hpp>
+#include <geometry_math/catmull_rom_spline.hpp>
+#include <geometry_math/catmull_rom_subspline.hpp>
 #include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
@@ -42,7 +42,7 @@ public:
     BT::PortsList ports = {
       BT::InputPort<traffic_simulator_msgs::msg::DriverModel>("driver_model"),
       BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::math::CatmullRomSpline>>(
+      BT::InputPort<std::shared_ptr<geometry_math::CatmullRomSpline>>(
         "reference_trajectory")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
@@ -62,7 +62,7 @@ public:
 protected:
   traffic_simulator_msgs::msg::DriverModel driver_model;
   traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
-  std::shared_ptr<traffic_simulator::math::CatmullRomSpline> reference_trajectory;
+  std::shared_ptr<geometry_math::CatmullRomSpline> reference_trajectory;
   std::unique_ptr<traffic_simulator::math::CatmullRomSubspline> trajectory;
 };
 }  // namespace entity_behavior

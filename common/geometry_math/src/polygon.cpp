@@ -17,12 +17,10 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <geometry_math/polygon.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/math/polygon.hpp>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 std::vector<geometry_msgs::msg::Point> get2DConvexHull(
   const std::vector<geometry_msgs::msg::Point> & points)
@@ -49,5 +47,4 @@ std::vector<geometry_msgs::msg::Point> get2DConvexHull(
   return polygon;
 }
 
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math

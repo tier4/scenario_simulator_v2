@@ -12,22 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MATH__COLLISION_HPP_
-#define TRAFFIC_SIMULATOR__MATH__COLLISION_HPP_
+#ifndef GEOMETRY_MATH__POLYGON_HPP_
+#define GEOMETRY_MATH__POLYGON_HPP_
 
-#include <geometry_msgs/msg/pose.hpp>
-#include <traffic_simulator/math/bounding_box.hpp>
-#include <traffic_simulator_msgs/msg/bounding_box.hpp>
-#include <vector>
+#include <geometry_msgs/msg/point.hpp>
 
-namespace traffic_simulator
+namespace geometry_math
 {
-namespace math
-{
-bool checkCollision2D(
-  geometry_msgs::msg::Pose pose0, traffic_simulator_msgs::msg::BoundingBox bbox0,
-  geometry_msgs::msg::Pose pose1, traffic_simulator_msgs::msg::BoundingBox bbox1);
-}  // namespace math
-}  // namespace traffic_simulator
+std::vector<geometry_msgs::msg::Point> get2DConvexHull(
+  const std::vector<geometry_msgs::msg::Point> & points);
+}  // namespace geometry_math
 
-#endif  // TRAFFIC_SIMULATOR__MATH__COLLISION_HPP_
+#endif  // GEOMETRY_MATH__POLYGON_HPP_

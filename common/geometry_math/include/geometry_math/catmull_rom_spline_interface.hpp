@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
-#define TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
+#ifndef GEOMETRY_MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
+#define GEOMETRY_MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
 
 #include <boost/optional.hpp>
 #include <exception>
@@ -22,9 +22,7 @@
 #include <utility>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 class CatmullRomSplineInterface
 {
@@ -34,7 +32,6 @@ public:
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const = 0;
 };
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math
 
-#endif  // TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
+#endif  // GEOMETRY_MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_

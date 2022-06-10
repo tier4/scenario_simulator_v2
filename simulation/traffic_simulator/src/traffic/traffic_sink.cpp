@@ -27,7 +27,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <traffic_simulator/math/distance.hpp>
+#include <geometry_math/distance.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <vector>
 

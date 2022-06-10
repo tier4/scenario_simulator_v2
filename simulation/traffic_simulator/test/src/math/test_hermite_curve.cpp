@@ -14,7 +14,7 @@
 
 #include <gtest/gtest.h>
 
-#include <traffic_simulator/math/hermite_curve.hpp>
+#include <geometry_math/hermite_curve.hpp>
 
 TEST(HermiteCurveTest, CheckCollisionToLine)
 {

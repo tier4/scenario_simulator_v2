@@ -12,27 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SUBSPLINE_HPP_
-#define TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SUBSPLINE_HPP_
+#ifndef GEOMETRY_MATH__CATMULL_ROM_SUBSPLINE_HPP_
+#define GEOMETRY_MATH__CATMULL_ROM_SUBSPLINE_HPP_
 
 #include <exception>
+#include <geometry_math/catmull_rom_spline.hpp>
+#include <geometry_math/catmull_rom_spline_interface.hpp>
+#include <geometry_math/hermite_curve.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
-#include <traffic_simulator/math/catmull_rom_spline_interface.hpp>
-#include <traffic_simulator/math/hermite_curve.hpp>
 #include <utility>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 class CatmullRomSubspline : public CatmullRomSplineInterface
 {
 public:
   explicit CatmullRomSubspline(
-    std::shared_ptr<traffic_simulator::math::CatmullRomSpline> spline, double start_s, double end_s)
+    std::shared_ptr<geometry_math::CatmullRomSpline> spline, double start_s, double end_s)
   : spline_(spline), start_s_(start_s), end_s_(end_s)
   {
   }
@@ -44,11 +42,10 @@ public:
     bool close_start_end = true) const override;
 
 private:
-  std::shared_ptr<traffic_simulator::math::CatmullRomSpline> spline_;
+  std::shared_ptr<geometry_math::CatmullRomSpline> spline_;
   double start_s_;
   double end_s_;
 };
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math
 
-#endif  // TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SUBSPLINE_HPP_
+#endif  // GEOMETRY_MATH__CATMULL_ROM_SUBSPLINE_HPP_

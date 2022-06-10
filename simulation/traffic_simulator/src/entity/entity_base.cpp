@@ -18,9 +18,9 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/math/distance.hpp>
-#include <traffic_simulator/math/polygon.hpp>
-#include <traffic_simulator/math/transform.hpp>
+#include <geometry_math/distance.hpp>
+#include <geometry_math/polygon.hpp>
+#include <geometry_math/transform.hpp>
 #include <unordered_map>
 #include <vector>
 

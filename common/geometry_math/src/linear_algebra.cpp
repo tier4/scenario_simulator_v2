@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/math/linear_algebra.hpp>
+#include <geometry_math/linear_algebra.hpp>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 double innerProduct(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
 {
@@ -31,9 +28,11 @@ double getInternalAngle(
   if (-1 <= val && val <= 1) {
     return std::acos(val);
   }
+  /*
   THROW_SIMULATION_ERROR(
     "value of v0*v1/(size(v0)*size(v1)) in vector v0 : \n", v0, " and v1 : \n", v1,
     "is out of range, value = ", val);
+*/
 }
 
 geometry_msgs::msg::Vector3 vector3(double x, double y, double z)
@@ -54,18 +53,19 @@ geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec)
 {
   double size = getSize(vec);
   if (std::fabs(size) <= std::numeric_limits<double>::epsilon()) {
+    /*
     THROW_SIMULATION_ERROR(
       "size of vector (", vec.x, ",", vec.y, ",", vec.z, ") is, ", size,
       " size of the vector you want to normalize should be over ",
       std::numeric_limits<double>::epsilon());
+*/
   }
   vec.x = vec.x / size;
   vec.y = vec.y / size;
   vec.z = vec.z / size;
   return vec;
 }
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math
 
 geometry_msgs::msg::Vector3 operator*(const geometry_msgs::msg::Vector3 & vec, double value)
 {

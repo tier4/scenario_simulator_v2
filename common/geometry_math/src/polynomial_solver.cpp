@@ -13,15 +13,13 @@
 // limitations under the License.
 
 #include <cmath>
+#include <geometry_math/polynomial_solver.hpp>
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/math/polynomial_solver.hpp>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 double PolynomialSolver::linearFunction(double a, double b, double t) const { return a * t + b; }
 
@@ -183,5 +181,4 @@ double PolynomialSolver::root3(double x) const
     return 0.;
   }
 }
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math

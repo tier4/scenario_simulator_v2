@@ -22,7 +22,7 @@
 #include <boost/optional.hpp>
 #include <memory>
 #include <string>
-#include <traffic_simulator/math/hermite_curve.hpp>
+#include <geometry_math/hermite_curve.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <vector>
 

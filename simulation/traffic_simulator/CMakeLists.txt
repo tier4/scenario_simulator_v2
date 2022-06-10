@@ -37,16 +37,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/helper/helper.cpp
   src/job/job_list.cpp
   src/job/job.cpp
-  src/math/bounding_box.cpp
-  src/math/catmull_rom_spline.cpp
-  src/math/catmull_rom_subspline.cpp
-  src/math/collision.cpp
-  src/math/distance.cpp
-  src/math/hermite_curve.cpp
-  src/math/linear_algebra.cpp
-  src/math/polygon.cpp
-  src/math/polynomial_solver.cpp
-  src/math/transform.cpp
   src/math/uuid.cpp
   src/metrics/collision_metric.cpp
   src/metrics/metric_base.cpp

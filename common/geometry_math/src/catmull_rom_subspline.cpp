@@ -13,12 +13,10 @@
 // limitations under the License.
 
 #include <boost/optional.hpp>
-#include <traffic_simulator/math/catmull_rom_subspline.hpp>
+#include <geometry_math/catmull_rom_subspline.hpp>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 double CatmullRomSubspline::getLength() const { return end_s_ - start_s_; }
 
@@ -39,5 +37,4 @@ boost::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
   return s.get() - start_s_;
 }
 
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math

@@ -50,7 +50,7 @@
 #include <openscenario_visualization/openscenario_visualization_component.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
+#include <geometry_math/catmull_rom_spline.hpp>
 #include <vector>
 
 namespace openscenario_visualization
@@ -396,7 +396,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   ret.markers.emplace_back(text_action);
 
   if (waypoints.waypoints.size() > 2) {
-    traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
+    geometry_math::CatmullRomSpline spline(waypoints.waypoints);
 
     /**
      * @brief generate marker for waypoints

@@ -19,8 +19,8 @@
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
-#include <traffic_simulator/math/transform.hpp>
+#include <geometry_math/catmull_rom_spline.hpp>
+#include <geometry_math/transform.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -62,7 +62,7 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
       std::vector<geometry_msgs::msg::Point> center_points =
         hdmap_utils->getCenterPoints(following_lanelets);
       // DIFFERENT SPLINE - recalculation needed
-      traffic_simulator::math::CatmullRomSpline spline(center_points);
+      geometry_math::CatmullRomSpline spline(center_points);
       const auto straight_waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
       waypoints.waypoints = straight_waypoints;
       const auto curve_waypoints = curve_->getTrajectory(current_s_, l, 1.0, true);

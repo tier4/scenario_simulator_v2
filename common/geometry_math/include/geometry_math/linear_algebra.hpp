@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MATH__LINEAR_ALGEBRA_HPP_
-#define TRAFFIC_SIMULATOR__MATH__LINEAR_ALGEBRA_HPP_
+#ifndef GEOMETRY_MATH__LINEAR_ALGEBRA_HPP_
+#define GEOMETRY_MATH__LINEAR_ALGEBRA_HPP_
 
 #include <math.h>
 
@@ -22,9 +22,7 @@
 #include <limits>
 #include <scenario_simulator_exception/exception.hpp>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 geometry_msgs::msg::Vector3 vector3(double x, double y, double z);
 double getSize(geometry_msgs::msg::Vector3 vec);
@@ -32,8 +30,7 @@ geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec);
 double innerProduct(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
 double getInternalAngle(
   const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math
 
 geometry_msgs::msg::Vector3 operator*(const geometry_msgs::msg::Vector3 & vec, double value);
 geometry_msgs::msg::Vector3 operator*(double value, const geometry_msgs::msg::Vector3 & vec);
@@ -51,4 +48,4 @@ geometry_msgs::msg::Point operator-(
   const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1);
 bool operator==(const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1);
 bool operator==(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
-#endif  // TRAFFIC_SIMULATOR__MATH__LINEAR_ALGEBRA_HPP_
+#endif  // GEOMETRY_MATH__LINEAR_ALGEBRA_HPP_

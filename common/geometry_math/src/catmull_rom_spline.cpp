@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry_math/catmull_rom_spline.hpp>
+#include <geometry_math/linear_algebra.hpp>
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
-#include <traffic_simulator/math/linear_algebra.hpp>
 #include <utility>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
   double width, size_t num_points, double z_offset)
@@ -433,5 +431,4 @@ bool CatmullRomSpline::equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::
   }
   return true;
 }
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math

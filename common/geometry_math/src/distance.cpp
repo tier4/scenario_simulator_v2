@@ -28,11 +28,9 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <cmath>
-#include <traffic_simulator/math/distance.hpp>
+#include <geometry_math/distance.hpp>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1)
 {
@@ -70,5 +68,4 @@ double getDistance2D(
   }
   return boost::geometry::distance(poly0, poly1);
 }
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math

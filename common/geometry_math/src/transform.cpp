@@ -16,11 +16,9 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-#include <traffic_simulator/math/transform.hpp>
+#include <geometry_math/transform.hpp>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 const geometry_msgs::msg::Pose getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
@@ -89,5 +87,4 @@ std::vector<geometry_msgs::msg::Point> transformPoints(
   }
   return ret;
 }
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math

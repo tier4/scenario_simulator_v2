@@ -22,9 +22,9 @@
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/math/bounding_box.hpp>
-#include <traffic_simulator/math/collision.hpp>
-#include <traffic_simulator/math/transform.hpp>
+#include <geometry_math/bounding_box.hpp>
+#include <geometry_math/collision.hpp>
+#include <geometry_math/transform.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -134,7 +134,7 @@ auto EntityManager::getDistanceToCrosswalk(
   if (getWaypoints(name).waypoints.empty()) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
+  geometry_math::CatmullRomSpline spline(getWaypoints(name).waypoints);
   auto polygon = hdmap_utils_ptr_->getLaneletPolygon(target_crosswalk_id);
   return spline.getCollisionPointIn2D(polygon);
 }
@@ -149,7 +149,7 @@ auto EntityManager::getDistanceToStopLine(
   if (getWaypoints(name).waypoints.empty()) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
+  geometry_math::CatmullRomSpline spline(getWaypoints(name).waypoints);
   auto polygon = hdmap_utils_ptr_->getStopLinePolygon(target_stop_line_id);
   return spline.getCollisionPointIn2D(polygon);
 }

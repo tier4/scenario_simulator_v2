@@ -14,16 +14,14 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <traffic_simulator/math/bounding_box.hpp>
+#include <geometry_math/bounding_box.hpp>
 
 // headers in Eigen
 #define EIGEN_MPL2_ONLY
 #include <Eigen/Core>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 /**
  * @brief Get the Polygon Distance object
@@ -94,5 +92,4 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   points.emplace_back(p3);
   return points;
 }
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math

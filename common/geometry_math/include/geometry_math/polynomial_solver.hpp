@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MATH__POLYNOMIAL_SOLVER_HPP_
-#define TRAFFIC_SIMULATOR__MATH__POLYNOMIAL_SOLVER_HPP_
+#ifndef GEOMETRY_MATH__POLYNOMIAL_SOLVER_HPP_
+#define GEOMETRY_MATH__POLYNOMIAL_SOLVER_HPP_
 
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 class PolynomialSolver
 {
@@ -101,7 +99,6 @@ private:
   double _root3(double x) const;
   double root3(double x) const;
 };
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math
 
-#endif  // TRAFFIC_SIMULATOR__MATH__POLYNOMIAL_SOLVER_HPP_
+#endif  // GEOMETRY_MATH__POLYNOMIAL_SOLVER_HPP_

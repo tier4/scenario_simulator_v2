@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MATH__BOUNDING_BOX_HPP_
-#define TRAFFIC_SIMULATOR__MATH__BOUNDING_BOX_HPP_
+#ifndef GEOMETRY_MATH__BOUNDING_BOX_HPP_
+#define GEOMETRY_MATH__BOUNDING_BOX_HPP_
 
 #include <boost/assert.hpp>
 #include <boost/assign/list_of.hpp>
@@ -22,14 +22,12 @@
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/optional.hpp>
+#include <geometry_math/transform.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-#include <traffic_simulator/math/transform.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 boost::optional<double> getPolygonDistance(
   const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
@@ -40,7 +38,6 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   traffic_simulator_msgs::msg::BoundingBox bbox, double width_extension_right = 0.0,
   double width_extension_left = 0.0, double length_extension_front = 0.0,
   double length_extension_rear = 0.0);
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math
 
-#endif  // TRAFFIC_SIMULATOR__MATH__BOUNDING_BOX_HPP_
+#endif  // GEOMETRY_MATH__BOUNDING_BOX_HPP_

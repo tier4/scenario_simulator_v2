@@ -11,20 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SPLINE_HPP_
-#define TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SPLINE_HPP_
+#ifndef GEOMETRY_MATH__CATMULL_ROM_SPLINE_HPP_
+#define GEOMETRY_MATH__CATMULL_ROM_SPLINE_HPP_
 
 #include <exception>
+#include <geometry_math/catmull_rom_spline_interface.hpp>
+#include <geometry_math/hermite_curve.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline_interface.hpp>
-#include <traffic_simulator/math/hermite_curve.hpp>
 #include <utility>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 class CatmullRomSpline : public CatmullRomSplineInterface
 {
@@ -74,7 +72,6 @@ private:
   double total_length_;
   const std::vector<geometry_msgs::msg::Point> control_points;
 };
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math
 
-#endif  // TRAFFIC_SIMULATOR__MATH__CATMULL_ROM_SPLINE_HPP_
+#endif  // GEOMETRY_MATH__CATMULL_ROM_SPLINE_HPP_

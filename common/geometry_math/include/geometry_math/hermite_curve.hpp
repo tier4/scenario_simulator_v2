@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_
-#define TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_
+#ifndef GEOMETRY_MATH__HERMITE_CURVE_HPP_
+#define GEOMETRY_MATH__HERMITE_CURVE_HPP_
 
 #include <gtest/gtest.h>
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/optional.hpp>
+#include <geometry_math/polynomial_solver.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <traffic_simulator/math/polynomial_solver.hpp>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace math
+namespace geometry_math
 {
 class HermiteCurve
 {
@@ -36,7 +34,7 @@ private:
   double ax_, bx_, cx_, dx_;
   double ay_, by_, cy_, dy_;
   double az_, bz_, cz_, dz_;
-  traffic_simulator::math::PolynomialSolver solver_;
+  geometry_math::PolynomialSolver solver_;
 
 public:
   HermiteCurve(
@@ -74,7 +72,6 @@ private:
   std::pair<double, double> get2DMinMaxCurvatureValue() const;
   double length_;
 };
-}  // namespace math
-}  // namespace traffic_simulator
+}  // namespace geometry_math
 
-#endif  // TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_
+#endif  // GEOMETRY_MATH__HERMITE_CURVE_HPP_

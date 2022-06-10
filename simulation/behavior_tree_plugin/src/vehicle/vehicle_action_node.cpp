@@ -36,7 +36,7 @@ void VehicleActionNode::getBlackBoardValues()
         "vehicle_parameters", vehicle_parameters)) {
     THROW_SIMULATION_ERROR("failed to get input vehicle_parameters in VehicleActionNode");
   }
-  if (!getInput<std::shared_ptr<traffic_simulator::math::CatmullRomSpline>>(
+  if (!getInput<std::shared_ptr<geometry_math::CatmullRomSpline>>(
         "reference_trajectory", reference_trajectory)) {
     THROW_SIMULATION_ERROR("failed to get input reference_trajectory in VehicleActionNode");
   }
