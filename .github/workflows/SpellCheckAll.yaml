@@ -31,8 +31,8 @@ jobs:
         with:
           files: |
             **/*.{c,cpp,h,hpp,xml,yaml,yml,md,txt,sh,repos,py}
-            !external/lanelet2_extension_psim/**/*
-            !external/lanelet2_matching/**/*
+            !external/lanelet2_extension_psim/
+            !external/lanelet2_matching/
           config: ".github/workflows/.cspell.json"
           incremental_files_only: false
           strict: true
