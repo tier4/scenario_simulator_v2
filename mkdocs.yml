@@ -14,6 +14,11 @@ extra:
     code: "Consolas"
   search:
     language: en
+  social:
+    - icon: fontawesome/solid/bug
+      link: https://github.com/tier4/scenario_simulator_v2/issues
+    - icon: fontawesome/solid/code-pull-request
+      link: https://github.com/tier4/scenario_simulator_v2/pulls
 plugins:
   - search
   - git-revision-date-localized
