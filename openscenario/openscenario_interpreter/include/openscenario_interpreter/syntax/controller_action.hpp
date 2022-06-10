@@ -51,6 +51,9 @@ struct ControllerAction : private Scope
 
   static auto endsImmediately() noexcept -> bool;
 
+  // NOTE : Dummy implementation
+  static auto evaluate() noexcept -> Object;
+
   static auto run() noexcept -> void;
 
   /*  */ auto start() const -> void;

@@ -38,6 +38,11 @@ auto ControllerAction::endsImmediately() noexcept -> bool  //
   return true;
 }
 
+auto ControllerAction::evaluate() noexcept -> Object
+{
+  return unspecified;
+}
+
 auto ControllerAction::run() noexcept -> void {}
 
 auto ControllerAction::start() const -> void

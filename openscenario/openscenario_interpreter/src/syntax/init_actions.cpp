@@ -41,10 +41,72 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto InitActions::evaluate() const -> Object
+auto InitActions::evaluateInstantly() const -> Object
 {
-  for (auto && each : *this) {
-    each.evaluate();
+  for (auto e : *this) {
+    if (e.is<GlobalAction>()) {
+      apply<void>(
+        [](auto && action) {
+          if (action.endsImmediately()) {
+            action.evaluate();
+          }
+        },
+        e.as<GlobalAction>());
+    } else if (e.is<UserDefinedAction>()) {
+      if (UserDefinedAction::endsImmediately()) {
+        e.as<UserDefinedAction>().evaluate();
+      }
+    } else if (e.is<Private>()) {
+      for (auto private_action : e.as<Private>().private_actions) {
+        apply<void>(
+          [](auto && action) {
+            if (action.endsImmediately()) {
+              action.evaluate();
+            }
+          },
+          private_action);
+      }
+    }
+  }
+
+  return unspecified;
+}
+
+auto InitActions::evaluateNonInstantly() const -> Object
+{
+  bool accomplished = false;
+  while(not accomplished) {
+    bool has_evaluated = false;
+    for (auto e : *this) {
+
+      if (e.is<GlobalAction>()) {
+        apply<void>(
+          [&has_evaluated](auto && action) {
+            if (not action.endsImmediately() or not action.accomplished()) {
+              action.evaluate();
+              has_evaluated = true;
+            }
+          },
+          e.as<GlobalAction>());
+      } else if (e.is<UserDefinedAction>()) {
+        if (not UserDefinedAction::endsImmediately() or e->accomplished()) {
+          e.as<UserDefinedAction>().evaluate();
+          has_evaluated = true;
+        }
+      } else if (e.is<Private>()) {
+        for (auto private_action : e.as<Private>().private_actions) {
+          apply<void>(
+            [&has_evaluated](auto && action) {
+              if (not action.endsImmediately() or not action.accomplished()) {
+                action.evaluate();
+                has_evaluated = true;
+              }
+            },
+            private_action);
+        }
+      }
+    }
+    accomplished = not has_evaluated;
   }
 
   return unspecified;
