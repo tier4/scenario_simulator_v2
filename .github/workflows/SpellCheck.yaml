@@ -31,5 +31,7 @@ jobs:
       - uses: streetsidesoftware/cspell-action@v1
         with:
           config: ".github/workflows/.cspell.json"
+          files: |
+            **/*.{c,cpp,h,hpp,xml,yaml,yml,md,txt,sh,repos,py}
           incremental_files_only: true
           strict: true
