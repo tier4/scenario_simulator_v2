@@ -62,7 +62,7 @@ protected:
   traffic_simulator_msgs::msg::DriverModel driver_model;
   traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
   std::shared_ptr<geometry_math::CatmullRomSpline> reference_trajectory;
-  std::unique_ptr<traffic_simulator::math::CatmullRomSubspline> trajectory;
+  std::unique_ptr<geometry_math::CatmullRomSubspline> trajectory;
 };
 }  // namespace entity_behavior
 

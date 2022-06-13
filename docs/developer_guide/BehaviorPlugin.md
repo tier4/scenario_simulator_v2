@@ -69,7 +69,7 @@ public:
   DEFINE_GETTER_SETTER(PedestrianParameters, traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(Request, std::string)
   DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
-  DEFINE_GETTER_SETTER(ReferenceTrajectory, std::shared_ptr<traffic_simulator::math::CatmullRomSpline>)
+  DEFINE_GETTER_SETTER(ReferenceTrajectory, std::shared_ptr<geometry_math::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(StepTime, double)
   DEFINE_GETTER_SETTER(TargetSpeed, boost::optional<double>)
   DEFINE_GETTER_SETTER(ToLaneletId, std::int64_t)
@@ -127,7 +127,7 @@ Setters are named as set(Foo), such as `BehaviorPluginClass::setCurrentTime(doub
 | PedestrianParameters | Entity parameters for pedestrian.                     | `traffic_simulator_msgs::msg::PedestrianParameters`          |
 | Request              | Request to the NPC you want to control                | `std::string`                                                |
 | RouteLanelets        | Lanelet ids on entity route                           | `std::vector<std::int64_t>`                                  |
-| ReferenceTrajectory  | Trajectory precalculated for RouteLanelets.           | `std::shared_ptr<traffic_simulator::math::CatmullRomSpline>` |
+| ReferenceTrajectory  | Trajectory precalculated for RouteLanelets.           | `std::shared_ptr<geometry_math::CatmullRomSpline>` |
 | StepTime             | Step time of the simulation.                          | `double`                                                     |
 | TargetSpeed          | Target speed of the NPC you want to control           | `boost::optional<double>`                                    |
 | ToLaneletId          | Goal lanelet ID                                       | `std::int64_t`                                               |

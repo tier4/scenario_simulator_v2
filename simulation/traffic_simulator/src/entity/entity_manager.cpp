@@ -85,7 +85,7 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   }
   auto bbox0 = getBoundingBox(name0);
   auto bbox1 = getBoundingBox(name1);
-  return traffic_simulator::math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
+  return geometry_math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
@@ -336,7 +336,7 @@ auto EntityManager::getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const
   -> geometry_msgs::msg::Pose
 {
-  return traffic_simulator::math::getRelativePose(from, to);
+  return geometry_math::getRelativePose(from, to);
 }
 
 auto EntityManager::getRelativePose(const geometry_msgs::msg::Pose & from, const std::string & to)

@@ -123,10 +123,10 @@ public:
     std::int64_t lanelet_id, double s, std::vector<std::int64_t> lanelet_ids,
     double forward_distance = 20);
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
-  boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
+  boost::optional<std::pair<geometry_math::HermiteCurve, double>> getLaneChangeTrajectory(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter);
-  boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
+  boost::optional<std::pair<geometry_math::HermiteCurve, double>> getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter,
     double maximum_curvature_threshold, double target_trajectory_length,
@@ -186,7 +186,7 @@ public:
   auto getTrafficRelation(const LaneletId) const -> lanelet::TrafficLight::Ptr;
 
 private:
-  traffic_simulator::math::HermiteCurve getLaneChangeTrajectory(
+  geometry_math::HermiteCurve getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator_msgs::msg::LaneletPose & to_pose,
     const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
