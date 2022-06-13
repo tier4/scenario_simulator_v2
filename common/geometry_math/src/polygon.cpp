@@ -82,8 +82,6 @@ std::vector<double> filterByAxis(
         [](const geometry_msgs::msg::Point & point) { return point.z; });
       break;
     }
-    default: {
-    }
   }
   return ret;
 }
