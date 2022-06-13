@@ -24,18 +24,23 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        rosdistro: [galactic]
+        rosdistro: [galactic, humble]
+        include:
+          # Galactic Geochelone (May 2021 - November 2022)
+          - docker_image: rostooling/setup-ros-docker:ubuntu-focal-ros-galactic-ros-base-latest
+            rosdistro: galactic
+          # Humble Hawksbill (May 2022 - May 2027)
+          - docker_image: rostooling/setup-ros-docker:ubuntu-jammy-ros-humble-ros-base-latest
+            rosdistro: humble
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
+    container:
+      image: ${{ matrix.docker_image }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup ROS2 ${{ matrix.rosdistro }} environment
-        uses: ros-tooling/setup-ros@v0.2
-        with:
-          required-ros-distributions: ${{ matrix.rosdistro }}
       - name: Search packages in this repository
         id: list_packages
         run: |
