@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <boost/optional.hpp>
-#include <geometry_math/catmull_rom_subspline.hpp>
+#include <geometry_math/spline/catmull_rom_subspline.hpp>
 #include <vector>
 
 namespace geometry_math

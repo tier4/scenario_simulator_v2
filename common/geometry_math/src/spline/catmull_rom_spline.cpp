@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <geometry_math/catmull_rom_spline.hpp>
 #include <geometry_math/linear_algebra.hpp>
+#include <geometry_math/spline/catmull_rom_spline.hpp>
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>

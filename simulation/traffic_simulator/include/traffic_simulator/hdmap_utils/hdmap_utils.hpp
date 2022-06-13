@@ -33,9 +33,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
-#include <geometry_math/catmull_rom_spline.hpp>
-#include <geometry_math/catmull_rom_spline_interface.hpp>
-#include <geometry_math/hermite_curve.hpp>
+#include <geometry_math/spline/catmull_rom_spline.hpp>
+#include <geometry_math/spline/catmull_rom_spline_interface.hpp>
+#include <geometry_math/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
 #include <lanelet2_extension_psim/utility/query.hpp>

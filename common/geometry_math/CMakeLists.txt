@@ -12,14 +12,14 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(geometry_math SHARED
   src/bounding_box.cpp
-  src/catmull_rom_spline.cpp
-  src/catmull_rom_subspline.cpp
   src/collision.cpp
   src/distance.cpp
-  src/hermite_curve.cpp
   src/linear_algebra.cpp
   src/polygon.cpp
   src/polynomial_solver.cpp
+  src/spline/catmull_rom_spline.cpp
+  src/spline/catmull_rom_subspline.cpp
+  src/spline/hermite_curve.cpp
   src/transform.cpp
 )
 

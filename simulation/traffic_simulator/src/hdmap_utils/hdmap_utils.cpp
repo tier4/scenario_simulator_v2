@@ -27,8 +27,8 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <deque>
-#include <geometry_math/catmull_rom_spline.hpp>
-#include <geometry_math/hermite_curve.hpp>
+#include <geometry_math/spline/catmull_rom_spline.hpp>
+#include <geometry_math/spline/hermite_curve.hpp>
 #include <geometry_math/linear_algebra.hpp>
 #include <geometry_math/transform.hpp>
 #include <lanelet2_extension_psim/io/autoware_osm_parser.hpp>

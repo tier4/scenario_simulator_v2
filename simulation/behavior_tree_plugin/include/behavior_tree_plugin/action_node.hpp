@@ -18,7 +18,7 @@
 #include <behaviortree_cpp_v3/action_node.h>
 
 #include <boost/algorithm/clamp.hpp>
-#include <geometry_math/catmull_rom_spline.hpp>
+#include <geometry_math/spline/catmull_rom_spline.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/data_type/data_types.hpp>

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__CATMULL_ROM_SUBSPLINE_HPP_
-#define GEOMETRY_MATH__CATMULL_ROM_SUBSPLINE_HPP_
+#ifndef GEOMETRY_MATH__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_
+#define GEOMETRY_MATH__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_
 
 #include <exception>
-#include <geometry_math/catmull_rom_spline.hpp>
-#include <geometry_math/catmull_rom_spline_interface.hpp>
-#include <geometry_math/hermite_curve.hpp>
+#include <geometry_math/spline/catmull_rom_spline.hpp>
+#include <geometry_math/spline/catmull_rom_spline_interface.hpp>
+#include <geometry_math/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <string>
 #include <utility>
@@ -48,4 +48,4 @@ private:
 };
 }  // namespace geometry_math
 
-#endif  // GEOMETRY_MATH__CATMULL_ROM_SUBSPLINE_HPP_
+#endif  // GEOMETRY_MATH__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_

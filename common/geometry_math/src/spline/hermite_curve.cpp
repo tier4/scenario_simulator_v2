@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <geometry_math/bounding_box.hpp>
-#include <geometry_math/hermite_curve.hpp>
+#include <geometry_math/spline/hermite_curve.hpp>
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>

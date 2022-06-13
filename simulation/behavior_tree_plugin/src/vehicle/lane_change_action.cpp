@@ -16,7 +16,7 @@
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <boost/algorithm/clamp.hpp>
-#include <geometry_math/catmull_rom_spline.hpp>
+#include <geometry_math/spline/catmull_rom_spline.hpp>
 #include <geometry_math/transform.hpp>
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
