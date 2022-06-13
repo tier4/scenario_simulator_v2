@@ -16,7 +16,7 @@ ament_auto_add_library(geometry_math SHARED
   src/distance.cpp
   src/linear_algebra.cpp
   src/polygon.cpp
-  src/polynomial_solver.cpp
+  src/solver/polynomial_solver.cpp
   src/spline/catmull_rom_spline.cpp
   src/spline/catmull_rom_subspline.cpp
   src/spline/hermite_curve.cpp
