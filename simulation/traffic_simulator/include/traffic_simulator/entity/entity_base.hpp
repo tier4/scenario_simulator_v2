@@ -73,6 +73,8 @@ public:
 
   /*   */ auto getLinearJerk() const { return linear_jerk_; }
 
+  /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
   virtual auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
@@ -88,6 +90,34 @@ public:
   {
     return boost::none;
   }
+
+  virtual auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
+
+  /*   */ auto getDistanceToLaneBound() -> double;
+
+  /*   */ auto getDistanceToLaneBound(std::int64_t lanelet_id) const -> double;
+
+  /*   */ auto getDistanceToLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+    -> double;
+
+  /*   */ auto getDistanceToLeftLaneBound() -> double;
+
+  /*   */ auto getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double;
+
+  /*   */ auto getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+    -> double;
+
+  /*   */ auto getDistanceToRightLaneBound() -> double;
+
+  /*   */ auto getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double;
+
+  /*   */ auto getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+    -> double;
+
+  /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
+
+  /*   */ auto getMapPose(const geometry_msgs::msg::Pose & relative_pose)
+    -> geometry_msgs::msg::Pose;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
