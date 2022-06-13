@@ -22,9 +22,9 @@ Bug Fixes:bug:
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| Feature      | Brief summary                                                                                            | Category    | Pull request                                                    | Contributor                                                                             |
+| ------------ | -------------------------------------------------------------------------------------------------------- | ----------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Autoware API | Changed the engagement service to Autoware from `/api/autoware/set/engage` to `/api/external/set/engage` | `concealer` | [#804](https://github.com/tier4/scenario_simulator_v2/pull/804) | [yn-mrse](https://github.com/yn-mrse) and [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.4
 
