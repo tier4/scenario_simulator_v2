@@ -40,28 +40,21 @@ void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*mark
   return;
 }
 
+auto EntityBase::asAutoware() const -> concealer::Autoware &
+{
+  throw common::Error(
+    "An operation was requested for Entity ", std::quoted(name),
+    " that is valid only for the entity controlled by Autoware, but ", std::quoted(name),
+    " is not the entity controlled by Autoware.");
+}
+
 void EntityBase::onUpdate(double, double)
 {
   job_list_.update();
   status_before_update_ = status_;
 }
 
-auto EntityBase::getEmergencyStateName() const -> std::string
-{
-  throw common::Error(
-    "Inquiry of emergency state is valid query to only Autoware.Universe-controlled entity.",
-    "But the target entity ", std::quoted(name.c_str()), " is not controlled by Autoware.Universe");
-}
-
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
-
-auto EntityBase::getTurnIndicatorsCommandName() const -> std::string
-{
-  throw common::Error(
-    "Inquiry of turn indicators command is valid query to only Autoware.Universe-controlled "
-    "entity. But the target entity ",
-    std::quoted(name.c_str()), " is not controlled by Autoware.Universe");
-}
 
 void EntityBase::requestSpeedChange(
   const double target_speed, const speed_change::Transition transition,
@@ -281,14 +274,6 @@ void EntityBase::requestLaneChange(
     THROW_SEMANTIC_ERROR(
       "Failed to calculate absolute target lane. Please check the target lane exists.");
   }
-}
-
-auto EntityBase::getVehicleCommand() const -> std::tuple<
-  autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
-{
-  THROW_SIMULATION_ERROR(
-    "`getVehicleCommand` is not provided for ", getEntityTypename(), " type entity.");
 }
 
 void EntityBase::updateStandStillDuration(const double step_time)
