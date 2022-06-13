@@ -85,5 +85,5 @@ nav:
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
       - developer_guide/TIERIVScenarioFormatVersion2.md
-      - developer_guide/HowToContribute.md
+      - developer_guide/CONTRIBUTING.md
       - Package Details: package/About.md
