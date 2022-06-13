@@ -27,6 +27,7 @@
 #define TRAFFIC_SIMULATOR__MATH__DISTANCE_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -36,6 +37,9 @@ double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::ms
 double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Point & p1);
 double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Pose & p1);
 double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Pose & p1);
+double getDistance2D(
+  const std::vector<geometry_msgs::msg::Point> & polygon0,
+  const std::vector<geometry_msgs::msg::Point> & polygon1);
 }  // namespace math
 }  // namespace traffic_simulator
 
