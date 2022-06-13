@@ -404,7 +404,7 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
   p7.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p7);
 
-  return math::get2DConvexHull(points_bbox);
+  return geometry_math::get2DConvexHull(points_bbox);
 }
 
 auto EntityBase::getDistanceToLaneBound() -> double
@@ -436,21 +436,13 @@ auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> do
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
   }
-  const auto polygon = math::transformPoints(getMapPose(), get2DPolygon());
+  const auto polygon = geometry_math::transformPoints(getMapPose(), get2DPolygon());
   if (polygon.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
       " exists and it's definition");
   }
-  /*
-  for (const auto & p : bound) {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("bound"), p.x << "," << p.y << "," << p.z);
-  }
-  for (const auto & p : polygon) {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("polygon"), p.x << "," << p.y << "," << p.z);
-  }
-  */
-  return math::getDistance2D(bound, polygon);
+  return geometry_math::getDistance2D(bound, polygon);
 }
 
 auto EntityBase::getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
@@ -476,13 +468,13 @@ auto EntityBase::getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> d
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
   }
-  const auto polygon = math::transformPoints(getMapPose(), get2DPolygon());
+  const auto polygon = geometry_math::transformPoints(getMapPose(), get2DPolygon());
   if (polygon.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
       " exists and it's definition");
   }
-  return math::getDistance2D(bound, polygon);
+  return geometry_math::getDistance2D(bound, polygon);
 }
 
 auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const

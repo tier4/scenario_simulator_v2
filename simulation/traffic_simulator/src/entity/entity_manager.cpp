@@ -119,7 +119,7 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
   const auto pose0 = getMapPose(from);
   const auto bbox1 = getBoundingBox(to);
   const auto pose1 = getMapPose(to);
-  return math::getPolygonDistance(pose0, bbox0, pose1, bbox1);
+  return geometry_math::getPolygonDistance(pose0, bbox0, pose1, bbox1);
 }
 
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
