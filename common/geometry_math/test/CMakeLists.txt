@@ -1,20 +1,16 @@
-ament_add_gtest(test_polynomial_solver test_polynomial_solver.cpp)
-target_link_libraries(test_polynomial_solver geometry_math)
-
-ament_add_gtest(test_hermite_curve test_hermite_curve.cpp)
-target_link_libraries(test_hermite_curve geometry_math)
-
-ament_add_gtest(test_catmull_rom_spline test_catmull_rom_spline.cpp)
-target_link_libraries(test_catmull_rom_spline geometry_math)
-
 ament_add_gtest(test_bounding_box test_bounding_box.cpp)
-target_link_libraries(test_bounding_box geometry_math)
-
-ament_add_gtest(test_distance test_distance.cpp)
-target_link_libraries(test_distance geometry_math)
-
+ament_add_gtest(test_catmull_rom_spline test_catmull_rom_spline.cpp)
 ament_add_gtest(test_collision test_collision.cpp)
-target_link_libraries(test_collision geometry_math)
-
+ament_add_gtest(test_distance test_distance.cpp)
+ament_add_gtest(test_hermite_curve test_hermite_curve.cpp)
 ament_add_gtest(test_linear_algebra test_linear_algebra.cpp)
+ament_add_gtest(test_polygon test_polygon.cpp)
+ament_add_gtest(test_polynomial_solver test_polynomial_solver.cpp)
+target_link_libraries(test_bounding_box geometry_math)
+target_link_libraries(test_catmull_rom_spline geometry_math)
+target_link_libraries(test_collision geometry_math)
+target_link_libraries(test_distance geometry_math)
+target_link_libraries(test_hermite_curve geometry_math)
 target_link_libraries(test_linear_algebra geometry_math)
+target_link_libraries(test_polygon geometry_math)
+target_link_libraries(test_polynomial_solver geometry_math)
