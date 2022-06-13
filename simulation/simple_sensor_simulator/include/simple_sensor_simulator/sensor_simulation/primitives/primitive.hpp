@@ -33,7 +33,9 @@ struct Vertex
 };
 
 Vertex toVertex(const geometry_msgs::msg::Point & point);
+std::vector<Vertex> toVertex(const std::vector<geometry_msgs::msg::Point> & points);
 geometry_msgs::msg::Point toPoint(const Vertex & v);
+std::vector<geometry_msgs::msg::Point> toPoints(const std::vector<Vertex> & v);
 
 struct Triangle
 {

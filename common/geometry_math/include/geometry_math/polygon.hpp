@@ -19,6 +19,11 @@
 
 namespace geometry_math
 {
+enum class Axis { X = 0, Y = 1, Z = 2 };
+double getMaxValue(const std::vector<geometry_msgs::msg::Point> & points, const Axis & axis);
+double getMinValue(const std::vector<geometry_msgs::msg::Point> & points, const Axis & axis);
+std::vector<double> filterByAxis(
+  const std::vector<geometry_msgs::msg::Point> & points, const Axis & axis);
 std::vector<geometry_msgs::msg::Point> get2DConvexHull(
   const std::vector<geometry_msgs::msg::Point> & points);
 }  // namespace geometry_math
