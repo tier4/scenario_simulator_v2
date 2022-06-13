@@ -14,8 +14,8 @@
 
 #include <gtest/gtest.h>
 
-#include <scenario_simulator_exception/exception.hpp>
 #include <geometry_math/bounding_box.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 TEST(BoundingBox, GetPolygonDistanceWithCollision)
 {

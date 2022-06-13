@@ -33,6 +33,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
+#include <geometry_math/catmull_rom_spline.hpp>
+#include <geometry_math/catmull_rom_spline_interface.hpp>
+#include <geometry_math/hermite_curve.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
 #include <lanelet2_extension_psim/utility/query.hpp>
@@ -43,9 +46,6 @@
 #include <string>
 #include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
-#include <geometry_math/catmull_rom_spline.hpp>
-#include <geometry_math/catmull_rom_spline_interface.hpp>
-#include <geometry_math/hermite_curve.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
@@ -118,8 +118,7 @@ public:
   std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::vector<std::int64_t> lanelet_ids);
-  std::shared_ptr<geometry_math::CatmullRomSpline> getCenterPointsSpline(
-    std::int64_t lanelet_id);
+  std::shared_ptr<geometry_math::CatmullRomSpline> getCenterPointsSpline(std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(
     std::int64_t lanelet_id, double s, std::vector<std::int64_t> lanelet_ids,
     double forward_distance = 20);

@@ -24,10 +24,10 @@
 // limitations under the License.
 
 #include <functional>
+#include <geometry_math/distance.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <geometry_math/distance.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <vector>
 

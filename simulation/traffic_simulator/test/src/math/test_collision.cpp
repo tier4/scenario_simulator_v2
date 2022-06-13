@@ -14,8 +14,8 @@
 
 #include <gtest/gtest.h>
 
-#include <scenario_simulator_exception/exception.hpp>
 #include <geometry_math/collision.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 TEST(Collision, DifferentHeight)
 {

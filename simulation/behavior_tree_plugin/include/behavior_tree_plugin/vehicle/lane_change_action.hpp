@@ -20,9 +20,9 @@
 
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
 #include <boost/optional.hpp>
+#include <geometry_math/hermite_curve.hpp>
 #include <memory>
 #include <string>
-#include <geometry_math/hermite_curve.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <vector>
 

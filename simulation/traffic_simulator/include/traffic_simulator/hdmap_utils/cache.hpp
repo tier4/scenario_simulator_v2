@@ -16,10 +16,10 @@
 #define TRAFFIC_SIMULATOR__HDMAP_UTILS__CACHE_HPP_
 
 #include <boost/optional.hpp>
+#include <geometry_math/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <mutex>
 #include <scenario_simulator_exception/exception.hpp>
-#include <geometry_math/catmull_rom_spline.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -79,8 +79,7 @@ public:
     std::lock_guard<std::mutex> lock(mutex_);
     return data_.at(lanelet_id);
   }
-  std::shared_ptr<geometry_math::CatmullRomSpline> getCenterPointsSpline(
-    std::int64_t lanelet_id)
+  std::shared_ptr<geometry_math::CatmullRomSpline> getCenterPointsSpline(std::int64_t lanelet_id)
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
@@ -97,8 +96,7 @@ public:
 
 private:
   std::unordered_map<std::int64_t, std::vector<geometry_msgs::msg::Point>> data_;
-  std::unordered_map<std::int64_t, std::shared_ptr<geometry_math::CatmullRomSpline>>
-    splines_;
+  std::unordered_map<std::int64_t, std::shared_ptr<geometry_math::CatmullRomSpline>> splines_;
   std::mutex mutex_;
 };
 

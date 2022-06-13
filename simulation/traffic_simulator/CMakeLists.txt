@@ -37,7 +37,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/helper/helper.cpp
   src/job/job_list.cpp
   src/job/job.cpp
-  src/math/uuid.cpp
   src/metrics/collision_metric.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <geometry_math/linear_algebra.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace geometry_math
 {
@@ -28,11 +29,9 @@ double getInternalAngle(
   if (-1 <= val && val <= 1) {
     return std::acos(val);
   }
-  /*
   THROW_SIMULATION_ERROR(
-    "value of v0*v1/(size(v0)*size(v1)) in vector v0 : \n", v0, " and v1 : \n", v1,
-    "is out of range, value = ", val);
-*/
+    "value of v0*v1/(size(v0)*size(v1)) in vector v0 : ", v0.x, ",", v0.y, ",", v0.z,
+    " and v1 : ", v1.x, ",", v1.y, ",", v1.z, "is out of range, value = ", val);
 }
 
 geometry_msgs::msg::Vector3 vector3(double x, double y, double z)
@@ -53,12 +52,10 @@ geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec)
 {
   double size = getSize(vec);
   if (std::fabs(size) <= std::numeric_limits<double>::epsilon()) {
-    /*
     THROW_SIMULATION_ERROR(
       "size of vector (", vec.x, ",", vec.y, ",", vec.z, ") is, ", size,
       " size of the vector you want to normalize should be over ",
       std::numeric_limits<double>::epsilon());
-*/
   }
   vec.x = vec.x / size;
   vec.y = vec.y / size;

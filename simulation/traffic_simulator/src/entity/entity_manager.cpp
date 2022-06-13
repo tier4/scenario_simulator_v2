@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include <cstdint>
+#include <geometry_math/bounding_box.hpp>
+#include <geometry_math/collision.hpp>
+#include <geometry_math/transform.hpp>
 #include <limits>
 #include <memory>
 #include <queue>
@@ -22,9 +25,6 @@
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <geometry_math/bounding_box.hpp>
-#include <geometry_math/collision.hpp>
-#include <geometry_math/transform.hpp>
 #include <unordered_map>
 #include <vector>
 

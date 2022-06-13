@@ -18,11 +18,11 @@
 #include <behaviortree_cpp_v3/action_node.h>
 
 #include <behavior_tree_plugin/action_node.hpp>
+#include <geometry_math/catmull_rom_spline.hpp>
+#include <geometry_math/catmull_rom_subspline.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <geometry_math/catmull_rom_spline.hpp>
-#include <geometry_math/catmull_rom_subspline.hpp>
 #include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
@@ -42,8 +42,7 @@ public:
     BT::PortsList ports = {
       BT::InputPort<traffic_simulator_msgs::msg::DriverModel>("driver_model"),
       BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters"),
-      BT::InputPort<std::shared_ptr<geometry_math::CatmullRomSpline>>(
-        "reference_trajectory")};
+      BT::InputPort<std::shared_ptr<geometry_math::CatmullRomSpline>>("reference_trajectory")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);

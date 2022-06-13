@@ -16,12 +16,12 @@
 
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
+#include <geometry_math/bounding_box.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
-#include <geometry_math/bounding_box.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>

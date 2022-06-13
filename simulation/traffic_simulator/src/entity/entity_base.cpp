@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry_math/distance.hpp>
+#include <geometry_math/polygon.hpp>
+#include <geometry_math/transform.hpp>
 #include <limits>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <geometry_math/distance.hpp>
-#include <geometry_math/polygon.hpp>
-#include <geometry_math/transform.hpp>
 #include <unordered_map>
 #include <vector>
 

@@ -27,6 +27,10 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <deque>
+#include <geometry_math/catmull_rom_spline.hpp>
+#include <geometry_math/hermite_curve.hpp>
+#include <geometry_math/linear_algebra.hpp>
+#include <geometry_math/transform.hpp>
 #include <lanelet2_extension_psim/io/autoware_osm_parser.hpp>
 #include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
@@ -40,10 +44,6 @@
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <geometry_math/catmull_rom_spline.hpp>
-#include <geometry_math/hermite_curve.hpp>
-#include <geometry_math/linear_algebra.hpp>
-#include <geometry_math/transform.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
