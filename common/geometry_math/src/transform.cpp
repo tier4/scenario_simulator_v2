@@ -78,13 +78,47 @@ const geometry_msgs::msg::Point transformPoint(
   return transformed;
 }
 
+const geometry_msgs::msg::Point transformPoint(
+  const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Pose & sensor_pose,
+  const geometry_msgs::msg::Point & point)
+{
+  auto mat = quaternion_operation::getRotationMatrix(
+    quaternion_operation::getRotation(sensor_pose.orientation, pose.orientation));
+  Eigen::VectorXd v(3);
+  v(0) = point.x;
+  v(1) = point.y;
+  v(2) = point.z;
+  v = mat * v;
+  v(0) = v(0) + pose.position.x - sensor_pose.position.x;
+  v(1) = v(1) + pose.position.y - sensor_pose.position.y;
+  v(2) = v(2) + pose.position.z - sensor_pose.position.z;
+  geometry_msgs::msg::Point ret;
+  ret.x = v(0);
+  ret.y = v(1);
+  ret.z = v(2);
+  return ret;
+}
+
 std::vector<geometry_msgs::msg::Point> transformPoints(
   const geometry_msgs::msg::Pose & pose, const std::vector<geometry_msgs::msg::Point> & points)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  for (const auto & point : points) {
-    ret.emplace_back(transformPoint(pose, point));
-  }
+  std::transform(
+    points.begin(), points.end(), std::back_inserter(ret),
+    [pose](const geometry_msgs::msg::Point & point) { return transformPoint(pose, point); });
+  return ret;
+}
+
+std::vector<geometry_msgs::msg::Point> transformPoints(
+  const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Pose & sensor_pose,
+  const std::vector<geometry_msgs::msg::Point> & points)
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  std::transform(
+    points.begin(), points.end(), std::back_inserter(ret),
+    [pose, sensor_pose](const geometry_msgs::msg::Point & point) {
+      return transformPoint(pose, sensor_pose, point);
+    });
   return ret;
 }
 }  // namespace geometry_math

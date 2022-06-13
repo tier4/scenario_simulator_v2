@@ -18,6 +18,7 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <geometry_math/transform.hpp>
 #include <iostream>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
@@ -25,6 +26,24 @@
 
 namespace simple_sensor_simulator
 {
+Vertex toVertex(const geometry_msgs::msg::Point & point)
+{
+  Vertex v;
+  v.x = point.x;
+  v.y = point.y;
+  v.z = point.z;
+  return v;
+}
+
+geometry_msgs::msg::Point toPoint(const Vertex & v)
+{
+  geometry_msgs::msg::Point p;
+  p.x = v.x;
+  p.y = v.y;
+  p.z = v.z;
+  return p;
+}
+
 namespace primitives
 {
 Primitive::Primitive(std::string type, const geometry_msgs::msg::Pose & pose)
@@ -32,25 +51,12 @@ Primitive::Primitive(std::string type, const geometry_msgs::msg::Pose & pose)
 {
 }
 
-Vertex Primitive::transform(Vertex v) const
+Vertex Primitive::transform(const Vertex & v) const
 {
-  auto mat = quaternion_operation::getRotationMatrix(pose.orientation);
-  Eigen::VectorXd point(3);
-  point(0) = v.x;
-  point(1) = v.y;
-  point(2) = v.z;
-  point = mat * point;
-  point(0) = point(0) + pose.position.x;
-  point(1) = point(1) + pose.position.y;
-  point(2) = point(2) + pose.position.z;
-  Vertex ret;
-  ret.x = point(0);
-  ret.y = point(1);
-  ret.z = point(2);
-  return ret;
+  return toVertex(geometry_math::transformPoint(pose, toPoint(v)));
 }
 
-Vertex Primitive::transform(Vertex v, const geometry_msgs::msg::Pose & sensor_pose) const
+Vertex Primitive::transform(const Vertex & v, const geometry_msgs::msg::Pose & sensor_pose) const
 {
   auto mat = quaternion_operation::getRotationMatrix(
     quaternion_operation::getRotation(sensor_pose.orientation, pose.orientation));

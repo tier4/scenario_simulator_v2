@@ -32,6 +32,9 @@ struct Vertex
   float z;
 };
 
+Vertex toVertex(const geometry_msgs::msg::Point & point);
+geometry_msgs::msg::Point toPoint(const Vertex & v);
+
 struct Triangle
 {
   unsigned int v0;
@@ -70,8 +73,8 @@ protected:
   std::vector<Triangle> triangles_;
 
 private:
-  Vertex transform(Vertex v) const;
-  Vertex transform(Vertex v, const geometry_msgs::msg::Pose & sensor_pose) const;
+  Vertex transform(const Vertex & v) const;
+  Vertex transform(const Vertex & v, const geometry_msgs::msg::Pose & sensor_pose) const;
 };
 }  // namespace primitives
 }  // namespace simple_sensor_simulator
