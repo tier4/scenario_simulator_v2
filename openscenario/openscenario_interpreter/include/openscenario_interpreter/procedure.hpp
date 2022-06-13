@@ -98,17 +98,16 @@ STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
   }                                                                   \
   static_assert(true, "")
 
+FORWARD_TO_SIMULATION_API(asAutoware);
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
 FORWARD_TO_SIMULATION_API(attachOccupancyGridSensor);
-FORWARD_TO_SIMULATION_API(engage);
 FORWARD_TO_SIMULATION_API(getCurrentAction);
 FORWARD_TO_SIMULATION_API(getCurrentTime);
 FORWARD_TO_SIMULATION_API(getDriverModel);
 FORWARD_TO_SIMULATION_API(getTrafficRelationReferees);
 FORWARD_TO_SIMULATION_API(initialize);
 FORWARD_TO_SIMULATION_API(isInLanelet);
-FORWARD_TO_SIMULATION_API(ready);
 FORWARD_TO_SIMULATION_API(requestLaneChange);
 FORWARD_TO_SIMULATION_API(requestSpeedChange);
 FORWARD_TO_SIMULATION_API(setEntityStatus);
@@ -136,8 +135,6 @@ RENAME(applyLaneChangeAction, requestLaneChange);
 RENAME(applyTeleportAction, setEntityStatus);
 RENAME(applyWalkStraightAction, requestWalkStraight);
 RENAME(evaluateCollisionCondition, checkCollision);
-RENAME(evaluateCurrentEmergencyState, getEmergencyStateName);
-RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandName);
 RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(toWorldPosition, toMapPose);

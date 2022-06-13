@@ -4,14 +4,16 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature                                  | Brief summary                                                                                               | Category                   | Pull request                                                    | Contributor                                   |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
-| OpenSCENARIO `UserDefinedValueCondition` | Add condition to determine the state of the turn indicators. (unique to Autoware.Universe)                  | `openscenario_interpreter` | [#777](https://github.com/tier4/scenario_simulator_v2/pull/777) | [HansRobo](https://github.com/HansRobo)       |
-| OpenSCENARIO `UserDefinedValueCondition` | Add condition to determine the emergency state of the Autoware.Universe                                     | `openscenario_interpreter` | [#760](https://github.com/tier4/scenario_simulator_v2/pull/760) | [HansRobo](https://github.com/HansRobo)       |
-| OpenSCENARIO `Storyboard`                | The state transition of StoryboardElement no longer consumes simulation time.                               | `openscenario_interpreter` | [#758](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
-| `EgoEntity`'s Simulation model           | Fixed EgoEntity's simulation model to properly set gear information.                                        | `traffic_simulator`        | [#792](https://github.com/tier4/scenario_simulator_v2/pull/792) | [yamacir-kit](https://github.com/yamacir-kit) |
-| OpenSCENARIO `Event`                     | Allows the omission of Event.StartTrigger. if it is omitted, interpreter uses one which always returns True | `openscenario_interpreter` | [#774](https://github.com/tier4/scenario_simulator_v2/pull/774) | [HansRobo](https://github.com/HansRobo)       |
-| Add `OccupancyGridSensor`                | Add `OccupancyGridSensor` for publishing nav_msgs/msg/OccupancyGrid to the Autoware.                        | `simple_sensor_simulator`  | [#795](https://github.com/tier4/scenario_simulator_v2/pull/797) | [hakuturu583](https://github.com/hakuturu583) |
+|                   Feature                    |                                                Brief summary                                                |          Category          |                          Pull request                           |                  Contributor                  |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `UserDefinedValueCondition`     | Add condition to determine the state of the turn indicators. (unique to Autoware.Universe)                  | `openscenario_interpreter` | [#777](https://github.com/tier4/scenario_simulator_v2/pull/777) | [HansRobo](https://github.com/HansRobo)       |
+| OpenSCENARIO `UserDefinedValueCondition`     | Add condition to determine the emergency state of the Autoware.Universe                                     | `openscenario_interpreter` | [#760](https://github.com/tier4/scenario_simulator_v2/pull/760) | [HansRobo](https://github.com/HansRobo)       |
+| OpenSCENARIO `Storyboard`                    | The state transition of StoryboardElement no longer consumes simulation time.                               | `openscenario_interpreter` | [#758](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
+| `EgoEntity`'s Simulation model               | Fixed EgoEntity's simulation model to properly set gear information.                                        | `traffic_simulator`        | [#792](https://github.com/tier4/scenario_simulator_v2/pull/792) | [yamacir-kit](https://github.com/yamacir-kit) |
+| OpenSCENARIO `Event`                         | Allows the omission of Event.StartTrigger. if it is omitted, interpreter uses one which always returns True | `openscenario_interpreter` | [#774](https://github.com/tier4/scenario_simulator_v2/pull/774) | [HansRobo](https://github.com/HansRobo)       |
+| Add `OccupancyGridSensor`                    | Add `OccupancyGridSensor` for publishing nav_msgs/msg/OccupancyGrid to the Autoware.                        | `simple_sensor_simulator`  | [#795](https://github.com/tier4/scenario_simulator_v2/pull/797) | [hakuturu583](https://github.com/hakuturu583) |
+| Add `API::getDistanceToLaneBound()` function | Add `API::getDistanceToLaneBound()` function for getting distance from entity polygon to lane boundary.     | `traffic_simulator`        | [#795](https://github.com/tier4/scenario_simulator_v2/pull/807) | [hakuturu583](https://github.com/hakuturu583) |
+
 
 Bug Fixes:bug:
 
@@ -22,9 +24,9 @@ Bug Fixes:bug:
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| Feature                          | Brief summary                                                                                                                                                                   | Category            | Pull request                                                    | Contributor                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Accessor to the class `Autoware` | A new member function `asAutoware` has been added to access the class `Autoware`, and instead the member functions specific to `EgoEntity` have been removed from `EntityBase`. | `traffic_simulator` | [#796](https://github.com/tier4/scenario_simulator_v2/pull/796) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.4
 

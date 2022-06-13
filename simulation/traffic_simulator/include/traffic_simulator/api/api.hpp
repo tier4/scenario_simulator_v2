@@ -184,9 +184,9 @@ public:
   }                                                                        \
   static_assert(true, "")
 
+  FORWARD_TO_ENTITY_MANAGER(asAutoware);
   FORWARD_TO_ENTITY_MANAGER(cancelRequest);
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
-  FORWARD_TO_ENTITY_MANAGER(engage);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
@@ -195,7 +195,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getDistanceToRightLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getDriverModel);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
-  FORWARD_TO_ENTITY_MANAGER(getEmergencyStateName);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
@@ -204,10 +203,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
-  FORWARD_TO_ENTITY_MANAGER(getTurnIndicatorsCommandName);
-  FORWARD_TO_ENTITY_MANAGER(getVehicleCommand);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
-  FORWARD_TO_ENTITY_MANAGER(ready);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);

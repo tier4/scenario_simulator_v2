@@ -196,8 +196,8 @@ public:
   }                                                                            \
   static_assert(true, "")
 
+  FORWARD_TO_ENTITY(asAutoware, const);
   FORWARD_TO_ENTITY(cancelRequest, );
-  FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
@@ -208,7 +208,6 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getDriverModel, const);
-  FORWARD_TO_ENTITY(getEmergencyStateName, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
@@ -216,10 +215,7 @@ public:
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getTurnIndicatorsCommandName, const);
-  FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
-  FORWARD_TO_ENTITY(ready, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
