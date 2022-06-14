@@ -19,9 +19,9 @@ jobs:
             https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/cspell/.cspell.json
 
       - name: Merge ignorePaths array
-          uses: sergeysova/jq-action@v2
-          with:
-            cmd: 'jq -n ''{ ignorePaths: [ inputs.ignorePaths ] | add }'' .github/workflows/autoware.json .github/workflows/custom_spell.json > .github/workflows/ignore_paths.json'
+        uses: sergeysova/jq-action@v2
+        with:
+          cmd: 'jq -n ''{ ignorePaths: [ inputs.ignorePaths ] | add }'' .github/workflows/autoware.json .github/workflows/custom_spell.json > .github/workflows/ignore_paths.json'
 
       - name: Merge word config
         uses: sergeysova/jq-action@v2
