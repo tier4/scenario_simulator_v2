@@ -17,6 +17,7 @@ find_package(ament_cmake_auto REQUIRED)
 find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
 find_package(lanelet2_matching REQUIRED)
+find_package(quaternion_operation REQUIRED)
 include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
@@ -34,8 +35,8 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/vehicle_entity.cpp
   src/hdmap_utils/hdmap_utils.cpp
   src/helper/helper.cpp
-  src/job/job.cpp
   src/job/job_list.cpp
+  src/job/job.cpp
   src/math/bounding_box.cpp
   src/math/catmull_rom_spline.cpp
   src/math/catmull_rom_subspline.cpp
@@ -43,6 +44,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/math/distance.cpp
   src/math/hermite_curve.cpp
   src/math/linear_algebra.cpp
+  src/math/polygon.cpp
   src/math/polynomial_solver.cpp
   src/math/transform.cpp
   src/math/uuid.cpp
@@ -55,15 +57,15 @@ ament_auto_add_library(traffic_simulator SHARED
   src/metrics/standstill_metric.cpp
   src/metrics/traveled_distance_metric.cpp
   src/simulation_clock/simulation_clock.cpp
+  src/traffic_lights/traffic_light_manager.cpp
+  src/traffic_lights/traffic_light.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
-  src/traffic_lights/traffic_light.cpp
-  src/traffic_lights/traffic_light_manager.cpp
-  src/vehicle_model/sim_model_delay_steer_acc.cpp
   src/vehicle_model/sim_model_delay_steer_acc_geared.cpp
+  src/vehicle_model/sim_model_delay_steer_acc.cpp
   src/vehicle_model/sim_model_delay_steer_vel.cpp
-  src/vehicle_model/sim_model_ideal_steer_acc.cpp
   src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc.cpp
   src/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_model/sim_model_interface.cpp
   src/vehicle_model/sim_model_time_delay.cpp
@@ -75,7 +77,6 @@ target_link_libraries(traffic_simulator
   pugixml
   pthread
   sodium
-  zmqpp
   zmq
   stdc++fs
   Boost::filesystem

@@ -4,26 +4,25 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
         - /Sensing1/LiDAR1/ConcatenatePointCloud1/Autocompute Value Bounds1
         - /Planning1/MissionPlanning1
         - /Planning1/ScenarioPlanning1
         - /Planning1/ScenarioPlanning1/LaneDriving1
         - /Simulation1
         - /Simulation1/Lanelet Marker1/Topic1
-      split Ratio: 0.4971751272678375
+      Splitter Ratio: 0.5
     Tree Height: 651
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
     Expanded: ~
     Name: Tool Properties
-    split Ratio: 0.5886790156364441
+    Splitter Ratio: 0.5
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
     Name: Views
-    split Ratio: 0.5
+    Splitter Ratio: 0.5
   - Class: autoware_localization_rviz_plugin/InitialPoseButtonPanel
     Name: InitialPoseButtonPanel
 Visualization Manager:
@@ -138,11 +137,61 @@ Visualization Manager:
                   Show Axes: false
                   Show Trail: false
                   Value: true
-                livox_front_center:
+                camera0/camera_link:
                   Alpha: 1
                   Show Axes: false
                   Show Trail: false
-                livox_front_center_base_link:
+                  Value: true
+                camera0/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera1/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera1/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera2/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera2/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera3/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera3/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera4/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera4/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera5/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera5/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                gnss_link:
                   Alpha: 1
                   Show Axes: false
                   Show Trail: false
@@ -169,6 +218,59 @@ Visualization Manager:
                   Alpha: 1
                   Show Axes: false
                   Show Trail: false
+                tamagawa/imu_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                traffic_light_left_camera/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                traffic_light_left_camera/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                traffic_light_right_camera/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                traffic_light_right_camera/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                velodyne_left:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_left_base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_rear:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_rear_base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_right:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_right_base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
                 velodyne_top:
                   Alpha: 1
                   Show Axes: false
@@ -648,7 +750,6 @@ Visualization Manager:
               Topic:
                 Depth: 5
                 Durability Policy: Volatile
-                Filter size: 10
                 History Policy: Keep Last
                 Reliability Policy: Reliable
                 Value: /perception/traffic_light_recognition/debug/rois
@@ -852,13 +953,7 @@ Visualization Manager:
                       Enabled: true
                       Name: OcclusionSpot
                       Namespaces:
-                        collision_point: true
-                        info_obstacle: true
-                        obstacle: true
-                        occlusion spot arrow: true
-                        occlusion spot slow down: true
-                        sidewalk: true
-                        slow factor_text: true
+                        {}
                       Topic:
                         Depth: 5
                         Durability Policy: Volatile
@@ -1194,6 +1289,27 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /simulation/traffic_light/marker
           Value: true
+        - Alpha: 0.699999988079071
+          Class: rviz_default_plugins/Map
+          Color Scheme: map
+          Draw Behind: false
+          Enabled: false
+          Name: Map
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            Filter size: 10
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /perception/occupancy_grid_map/map
+          Update Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /perception/occupancy_grid_map/map_updates
+          Use Timestamp: false
+          Value: false
       Enabled: true
       Name: Simulation
   Enabled: true
@@ -1228,7 +1344,9 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /planning/mission_planning/goal
     - Class: rviz_plugins/PedestrianInitialPoseTool
+      Interactive: false
       Pose Topic: /simulation/dummy_perception_publisher/object_info
+      Target Frame: <Fixed Frame>
       Theta std deviation: 0.0872664600610733
       Velocity: 0
       X std deviation: 0.029999999329447746
@@ -1236,7 +1354,9 @@ Visualization Manager:
       Z position: 1
       Z std deviation: 0.029999999329447746
     - Class: rviz_plugins/CarInitialPoseTool
+      Interactive: false
       Pose Topic: /simulation/dummy_perception_publisher/object_info
+      Target Frame: <Fixed Frame>
       Theta std deviation: 0.0872664600610733
       Velocity: 3
       X std deviation: 0.029999999329447746
@@ -1267,7 +1387,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 20
+      Scale: 25
       Target Frame: ego
       Value: TopDownOrtho (rviz_default_plugins)
       X: 0
@@ -1316,7 +1436,7 @@ Window Geometry:
   Hide Right Dock: false
   InitialPoseButtonPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002c600000513fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000002c8000000c900fffffffc0000030b00000245000000c10100001cfa000000000100000002fb0000000a0056006900650077007301000000000000033c0000010000fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff0000009d00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000007700fffffffb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d0061006700650000000462000000ee0000002800ffffff000000010000015f000006fffc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d00650100000000000004500000000000000000000007100000051300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000032d00000513fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000002c8000000c900fffffffc0000030b00000245000000c10100001cfa000000000100000002fb0000000a0056006900650077007301000000000000033c0000010000fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff0000009d00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000006e00fffffffb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d0061006700650000000462000000ee0000002800ffffff000000010000015f000006fffc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d00650100000000000004500000000000000000000006cd0000051300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RecognitionResultOnImage:
     collapsed: false
   Selection:
@@ -1325,6 +1445,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 2524
-  X: 2596
+  Width: 2560
+  X: 2560
   Y: 27

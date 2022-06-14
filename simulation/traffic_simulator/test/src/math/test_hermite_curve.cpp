@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,8 +43,9 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
   p.position.x = 0.1;
   p.position.y = 0;
   p.position.z = 0;
-  EXPECT_TRUE(curve.getSValue(p, true));
-  EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) && (curve.getSValue(p, true).get() < 0.101));
+  EXPECT_TRUE(curve.getSValue(p, 1, true));
+  EXPECT_TRUE(
+    (curve.getSValue(p, 1, true).get() > 0.099) && (curve.getSValue(p, 1, true).get() < 0.101));
   {
     geometry_msgs::msg::Point start;
     start.x = 0.1;

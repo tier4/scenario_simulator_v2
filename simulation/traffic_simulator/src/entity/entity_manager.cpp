@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -205,23 +205,6 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
   return hdmap_utils_ptr_;
 }
 
-auto EntityManager::getLaneletPose(const std::string & name)
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
-{
-  const auto status = getEntityStatus(name);
-  if (!status) {
-    return boost::none;
-  }
-  if (status->lanelet_pose_valid) {
-    return status->lanelet_pose;
-  }
-  bool include_crosswalk = true;
-  if (getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    include_crosswalk = false;
-  }
-  return toLaneletPose(status->pose, getBoundingBox(name), include_crosswalk);
-}
-
 auto EntityManager::getLongitudinalDistance(
   const LaneletPose & from, const LaneletPose & to, const double max_distance)
   -> boost::optional<double>
@@ -318,38 +301,6 @@ bool EntityManager::laneMatchingSucceed(const std::string & name)
     return true;
   }
   return false;
-}
-
-/**
- * @brief
- *
- * @param from from entity name
- * @param to to entity name
- * @retval boost::none bounding box is intersects
- * @retval 0 <= distance between two bounding box
- */
-geometry_msgs::msg::Pose EntityManager::getMapPose(const std::string & entity_name)
-{
-  const auto status = getEntityStatus(entity_name);
-  if (!status) {
-    THROW_SEMANTIC_ERROR("entity : ", entity_name, " status is empty");
-  }
-  return status->pose;
-}
-
-geometry_msgs::msg::Pose EntityManager::getMapPose(
-  const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose)
-{
-  const auto ref_status = getEntityStatus(reference_entity_name);
-  if (!ref_status) {
-    THROW_SEMANTIC_ERROR("entity : ", reference_entity_name, " status is empty");
-  }
-  tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(ref_status->pose, ref_transform);
-  tf2::fromMsg(relative_pose, relative_transform);
-  geometry_msgs::msg::Pose ret;
-  tf2::toMsg(ref_transform * relative_transform, ret);
-  return ret;
 }
 
 auto EntityManager::getNumberOfEgo() const -> std::size_t

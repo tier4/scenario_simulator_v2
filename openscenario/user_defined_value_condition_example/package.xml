@@ -4,7 +4,7 @@
 <package format="3">
   <name>user_defined_value_condition_example</name>
   <version>0.6.4</version>
-  <description>Example package for Tier IV OpenSCENARIO Interpreter's UserDefinedValueCondition</description>
+  <description>Example package for TIER IV OpenSCENARIO Interpreter's UserDefinedValueCondition</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 

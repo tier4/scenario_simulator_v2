@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -919,6 +919,16 @@ traffic_simulator_msgs::msg::LaneletPose HdMapUtils::getAlongLaneletPose(
   return along_pose;
 }
 
+std::vector<geometry_msgs::msg::Point> HdMapUtils::getLeftBound(std::int64_t lanelet_id) const
+{
+  return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).leftBound());
+}
+
+std::vector<geometry_msgs::msg::Point> HdMapUtils::getRightBound(std::int64_t lanelet_id) const
+{
+  return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).rightBound());
+}
+
 boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
@@ -1732,5 +1742,19 @@ auto HdMapUtils::getTrafficRelation(const LaneletId lanelet_id) const -> lanelet
   assert(isTrafficRelation(lanelet_id));
   return std::dynamic_pointer_cast<lanelet::TrafficLight>(
     lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+}
+
+std::vector<geometry_msgs::msg::Point> HdMapUtils::toPolygon(
+  const lanelet::ConstLineString3d & line_string) const
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  for (const auto & p : line_string) {
+    geometry_msgs::msg::Point point;
+    point.x = p.x();
+    point.y = p.y();
+    point.z = p.z();
+    ret.emplace_back(point);
+  }
+  return ret;
 }
 }  // namespace hdmap_utils

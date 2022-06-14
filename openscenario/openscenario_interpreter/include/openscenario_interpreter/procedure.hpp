@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,11 +82,6 @@ public:
   class CustomCommand
   {
   protected:
-    template <typename... Ts>
-    static auto engage(Ts &&... xs)
-    {
-      return connection->engage(std::forward<decltype(xs)>(xs)...);
-    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
@@ -269,10 +264,23 @@ STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_N
   }                                                                                  \
   static_assert(true, "")
 
+FORWARD_TO_SIMULATION_API(asAutoware);
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
+FORWARD_TO_SIMULATION_API(attachOccupancyGridSensor);
 FORWARD_TO_SIMULATION_API(getTrafficRelationReferees);
-FORWARD_TO_SIMULATION_API(ready);
+// FORWARD_TO_SIMULATION_API(ready);
+// FORWARD_TO_SIMULATION_API(getCurrentAction);
+// FORWARD_TO_SIMULATION_API(getCurrentTime);
+// FORWARD_TO_SIMULATION_API(getDriverModel);
+// FORWARD_TO_SIMULATION_API(getTrafficRelationReferees);
+// FORWARD_TO_SIMULATION_API(initialize);
+// FORWARD_TO_SIMULATION_API(isInLanelet);
+// FORWARD_TO_SIMULATION_API(requestLaneChange);
+// FORWARD_TO_SIMULATION_API(requestSpeedChange);
+// FORWARD_TO_SIMULATION_API(setEntityStatus);
+// FORWARD_TO_SIMULATION_API(setVelocityLimit);
+// FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef FORWARD_TO_SIMULATION_API
 
@@ -286,9 +294,18 @@ FORWARD_TO_SIMULATION_API(ready);
 
 // NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
 
-RENAME(evaluateCurrentEmergencyState, getEmergencyStateName);
+// RENAME(evaluateCurrentEmergencyState, getEmergencyStateName);
+// RENAME(applyAcquirePositionAction, requestAcquirePosition);
+// RENAME(applyAddEntityAction, spawn);
+// RENAME(applyAssignControllerAction, setDriverModel);
+// RENAME(applyAssignRouteAction, requestAssignRoute);
+// RENAME(applyDeleteEntityAction, despawn);
+// RENAME(applyLaneChangeAction, requestLaneChange);
+// RENAME(applyTeleportAction, setEntityStatus);
+// RENAME(applyWalkStraightAction, requestWalkStraight);
+// RENAME(evaluateCollisionCondition, checkCollision);
 RENAME(evaluateCurrentState, getCurrentAction);
-RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandName);
+// RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandName);
 RENAME(toWorldPosition, toMapPose);
 
 #undef RENAME

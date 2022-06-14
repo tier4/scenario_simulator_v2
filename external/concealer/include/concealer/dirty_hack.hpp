@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,18 +47,20 @@ public:                                                                         
         #TYPE " service request was accepted, but ineffective => Retry!"                           \
           << (result->status.message.empty() ? "" : " (" + result->status.message + ")"));         \
       rclcpp::WallRate(std::chrono::seconds(1)).sleep();                                           \
-      return request##TYPE(request);                                                               \
     }                                                                                              \
   }                                                                                                \
   static_assert(true, "")
 
-#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE)                                      \
-private:                                                                         \
-  TYPE::SharedPtr current_value_of_##TYPE{std::make_shared<TYPE>()};             \
-  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;                  \
-                                                                                 \
-public:                                                                          \
-  auto get##TYPE() const { return *std::atomic_load(&current_value_of_##TYPE); } \
+#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE, ...)                      \
+private:                                                              \
+  TYPE::SharedPtr current_value_of_##TYPE = std::make_shared<TYPE>(); \
+  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;       \
+                                                                      \
+public:                                                               \
+  auto get##TYPE() const->const TYPE & __VA_ARGS__                    \
+  {                                                                   \
+    return *std::atomic_load(&current_value_of_##TYPE);               \
+  }                                                                   \
   static_assert(true, "")
 
 #define CONCEALER_DEFINE_PUBLISHER(TYPE)                  \

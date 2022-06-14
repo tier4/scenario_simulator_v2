@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -177,6 +177,8 @@ public:
     const std::vector<std::int64_t> & route_lanelets) const;
   traffic_simulator_msgs::msg::LaneletPose getAlongLaneletPose(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along);
+  std::vector<geometry_msgs::msg::Point> getLeftBound(std::int64_t lanelet_id) const;
+  std::vector<geometry_msgs::msg::Point> getRightBound(std::int64_t lanelet_id) const;
 
   using LaneletId = std::int64_t;
 
@@ -227,6 +229,8 @@ private:
   lanelet::BasicPoint2d toPoint2d(const geometry_msgs::msg::Point & point) const;
   lanelet::BasicPolygon2d absoluteHull(
     const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const;
+  std::vector<geometry_msgs::msg::Point> toPolygon(
+    const lanelet::ConstLineString3d & line_string) const;
 };
 }  // namespace hdmap_utils
 
