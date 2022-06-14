@@ -192,7 +192,7 @@ public:
   try {                                                                        \
     return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);  \
   } catch (const std::out_of_range &) {                                        \
-    THROW_SEMANTIC_ERROR("entity : ", name, " does not exist");                 \
+    THROW_SEMANTIC_ERROR("entity : ", name, " does not exist");                \
   }                                                                            \
   static_assert(true, "")
 
