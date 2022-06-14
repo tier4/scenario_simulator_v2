@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ROUTE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ROUTE_HPP_
 
+#include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/waypoint.hpp>
 #include <pugixml.hpp>
@@ -45,6 +46,8 @@ struct Route : public Scope
   std::list<Waypoint> waypoints;
 
   explicit Route(const pugi::xml_node &, Scope &);
+
+  explicit Route(const pugi::xml_node &, Scope &, const ParameterAssignments &);
 
   explicit operator std::vector<traffic_simulator_msgs::msg::LaneletPose>() const;
 };

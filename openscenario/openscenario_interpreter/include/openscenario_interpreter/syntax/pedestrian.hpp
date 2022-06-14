@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
+#include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/pedestrian_category.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
@@ -57,6 +58,9 @@ struct Pedestrian : public Scope
   const Properties properties;
 
   explicit Pedestrian(const pugi::xml_node &, Scope &);
+
+  explicit Pedestrian(
+    const pugi::xml_node &, Scope &, const ParameterAssignments & parameter_assignments);
 
   explicit operator traffic_simulator_msgs::msg::PedestrianParameters() const;
 };

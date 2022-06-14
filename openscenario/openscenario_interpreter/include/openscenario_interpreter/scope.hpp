@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 #include <unordered_map>
 #include <utility>
@@ -175,6 +176,8 @@ public:
   Scope(Scope &&) noexcept = default;
 
   explicit Scope(const std::string &, const Scope &);
+
+  explicit Scope(const std::string &, const Scope &, const ParameterAssignments &);
 
   explicit Scope(const boost::filesystem::path &);
 

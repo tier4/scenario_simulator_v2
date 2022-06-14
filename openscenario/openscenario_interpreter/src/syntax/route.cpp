@@ -29,6 +29,16 @@ Route::Route(const pugi::xml_node & node, Scope & scope)
     node, "Waypoint", [&](auto && node) { return waypoints.emplace_back(node, local()); });
 }
 
+Route::Route(
+  const pugi::xml_node & node, Scope & scope, const ParameterAssignments & parameter_assignments)
+: Scope(readAttribute<String>("name", node, scope), scope, parameter_assignments),
+  closed(readAttribute<Boolean>("closed", node, local(), Boolean())),
+  parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
+{
+  traverse<2, unbounded>(
+    node, "Waypoint", [&](auto && node) { return waypoints.emplace_back(node, local()); });
+}
+
 Route::operator std::vector<traffic_simulator_msgs::msg::LaneletPose>() const
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> lanelet_poses{};

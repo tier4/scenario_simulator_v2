@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_HPP_
 
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <pugixml.hpp>
@@ -52,6 +53,9 @@ struct Controller : public Scope
   Properties properties;  // Describing properties for the controller.
 
   explicit Controller(const pugi::xml_node &, Scope &);
+
+  explicit Controller(
+    const pugi::xml_node &, Scope &, const ParameterAssignments & parameter_assignments);
 
   auto assign(const EntityRef &) -> void;
 

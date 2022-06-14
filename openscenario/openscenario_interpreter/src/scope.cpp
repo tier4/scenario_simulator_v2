@@ -100,6 +100,16 @@ Scope::Scope(const std::string & name, const Scope & outer)
 {
 }
 
+Scope::Scope(
+  const std::string & name, const Scope & outer, const ParameterAssignments & parameter_assignments)
+: frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
+  global_environment(outer.global_environment),
+  name(name),
+  actors(outer.actors)
+{
+  parameter_assignments.apply(*this);
+}
+
 auto Scope::global() const -> const GlobalEnvironment &
 {
   assert(global_environment);

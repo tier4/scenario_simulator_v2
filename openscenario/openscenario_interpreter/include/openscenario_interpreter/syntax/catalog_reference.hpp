@@ -47,7 +47,7 @@ struct CatalogReference
   {
     auto result = CatalogReference::make(node, scope);
 
-    if (fold_right(std::logical_or<void>(), result.is_also<Ts>()...)) {
+    if (fold_right(std::logical_or<void>(), result.is<Ts>()...)) {
       return result;
     } else {
       std::stringstream what;

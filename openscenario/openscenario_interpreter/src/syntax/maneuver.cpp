@@ -29,6 +29,16 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
   });
 }
 
+Maneuver::Maneuver(
+  const pugi::xml_node & node, Scope & scope, const ParameterAssignments & parameter_assignments)
+: Scope(readAttribute<String>("name", node, scope), scope, parameter_assignments),
+  parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
+{
+  traverse<1, unbounded>(node, "Event", [&](auto && node) {
+    return elements.push_back(readStoryboardElement<Event>(node, local()));
+  });
+}
+
 auto operator<<(nlohmann::json & json, const Maneuver & maneuver) -> nlohmann::json &
 {
   json["name"] = maneuver.name;

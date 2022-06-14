@@ -17,6 +17,7 @@
 
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <pugixml.hpp>
@@ -41,6 +42,9 @@ struct Maneuver : public Scope, public StoryboardElement
   const ParameterDeclarations parameter_declarations;
 
   explicit Maneuver(const pugi::xml_node &, Scope &);
+
+  explicit Maneuver(
+    const pugi::xml_node &, Scope &, const ParameterAssignments & parameter_assignments);
 };
 
 auto operator<<(nlohmann::json &, const Maneuver &) -> nlohmann::json &;

@@ -32,6 +32,19 @@ Pedestrian::Pedestrian(const pugi::xml_node & node, Scope & scope)
 {
 }
 
+Pedestrian::Pedestrian(
+  const pugi::xml_node & node, Scope & scope, const ParameterAssignments & parameter_assignments)
+: Scope(readAttribute<String>("name", node, scope), scope, parameter_assignments),
+  mass(readAttribute<Double>("mass", node, local())),
+  model(readAttribute<String>("model", node, local())),
+  pedestrian_category(readAttribute<PedestrianCategory>("pedestrianCategory", node, local())),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, local())),
+  properties(readElement<Properties>("Properties", node, local()))
+{
+}
+
 Pedestrian::operator traffic_simulator_msgs::msg::PedestrianParameters() const
 {
   traffic_simulator_msgs::msg::PedestrianParameters parameter;

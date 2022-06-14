@@ -61,6 +61,8 @@ struct MiscObject : public Scope
 
   explicit MiscObject(const pugi::xml_node &, Scope &);
 
+  explicit MiscObject(const pugi::xml_node &, Scope &, const ParameterAssignments &);
+
   explicit operator traffic_simulator_msgs::msg::MiscObjectParameters() const;
 };
 }  // namespace syntax

@@ -32,6 +32,19 @@ Vehicle::Vehicle(const pugi::xml_node & node, Scope & scope)
 {
 }
 
+Vehicle::Vehicle(
+  const pugi::xml_node & node, Scope & scope, const ParameterAssignments & parameter_assignments)
+: Scope(readAttribute<String>("name", node, scope), scope, parameter_assignments),
+  vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, local())),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, local())),
+  performance(readElement<Performance>("Performance", node, local())),
+  axles(readElement<Axles>("Axles", node, local())),
+  properties(readElement<Properties>("Properties", node, local()))
+{
+}
+
 Vehicle::operator traffic_simulator_msgs::msg::VehicleParameters() const
 {
   traffic_simulator_msgs::msg::VehicleParameters parameter;

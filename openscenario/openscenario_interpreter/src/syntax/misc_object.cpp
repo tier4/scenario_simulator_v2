@@ -31,6 +31,18 @@ MiscObject::MiscObject(const pugi::xml_node & node, Scope & scope)
 {
 }
 
+MiscObject::MiscObject(
+  const pugi::xml_node & node, Scope & scope, const ParameterAssignments & parameter_assignments)
+: Scope(readAttribute<String>("name", node, scope), scope, parameter_assignments),
+  mass(readAttribute<Double>("mass", node, local())),
+  misc_object_category(readAttribute<MiscObjectCategory>("miscObjectCategory", node, local())),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, local())),
+  properties(readElement<Properties>("Properties", node, local()))
+{
+}
+
 MiscObject::operator traffic_simulator_msgs::msg::MiscObjectParameters() const
 {
   traffic_simulator_msgs::msg::MiscObjectParameters misc_object_parameters;

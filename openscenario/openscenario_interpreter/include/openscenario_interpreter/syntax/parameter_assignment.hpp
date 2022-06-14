@@ -15,12 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ASSIGNMENT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ASSIGNMENT_HPP_
 
-#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
+
+struct Scope;
+
 inline namespace syntax
 {
 /* ---- ParameterAssignment--------------------------------------------------
@@ -33,12 +35,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ParameterAssignment
 {
-  explicit ParameterAssignment(const pugi::xml_node & node, Scope & scope)
-  : parameterRef(readAttribute<std::string>("parameterRef", node, scope)),
-    value(readAttribute<std::string>("value", node, scope))
-  {
-    scope.insert(parameterRef, make<std::string>(value));
-  }
+  explicit ParameterAssignment(const pugi::xml_node & node, Scope & scope);
+
+  void apply(Scope & scope) const;
 
   const std::string parameterRef;
   const std::string value;

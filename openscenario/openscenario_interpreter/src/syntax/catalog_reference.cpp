@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
+#include <openscenario_interpreter/syntax/route.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
@@ -72,29 +73,11 @@ auto choice_by_attribute(const pugi::xml_node & node, const std::string & attrib
   return iter->second(iter->first);
 }
 
-template <typename Derived>
-struct CatalogInstance : public Derived
+auto CatalogReference::make(const pugi::xml_node & node, Scope & scope) -> Object
 {
-  Scope scope;
+  auto catalog_name = readAttribute<std::string>("catalogName", node, scope);
 
-  ParameterAssignments parameter_assignments;
-
-  CatalogInstance(
-    const pugi::xml_node & node,                         //
-    Scope & scope,                                       //
-    const ParameterAssignments & parameter_assignments)  //
-  : Derived(node, scope), scope(scope), parameter_assignments(parameter_assignments)
-  {
-  }
-};
-
-auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) -> Object
-{
-  auto catalog_name = readAttribute<std::string>("catalogName", node, outer_scope);
-
-  auto entry_name = readAttribute<std::string>("entryName", node, outer_scope);
-
-  auto scope = Scope("", outer_scope);  // anonymous namespace
+  auto entry_name = readAttribute<std::string>("entryName", node, scope);
 
   auto parameter_assignments =
     readElement<ParameterAssignments>("ParameterAssignments", node, scope);
@@ -111,14 +94,14 @@ auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) ->
 
         std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
           // clang-format off
-          std::make_pair("Vehicle",     [&](auto && node) { return make<CatalogInstance<Vehicle>>   (node, scope, parameter_assignments); }),
-          std::make_pair("Controller",  [&](auto && node) { return make<CatalogInstance<Controller>>(node, scope, parameter_assignments); }),
-          std::make_pair("Pedestrian",  [&](auto && node) { return make<CatalogInstance<Pedestrian>>(node, scope, parameter_assignments); }),
-          std::make_pair("MiscObject",  [&](auto && node) { return make<CatalogInstance<MiscObject>>(node, scope, parameter_assignments); }),
+          std::make_pair("Vehicle",     [&](auto && node) { return make<Vehicle>   (node, scope, parameter_assignments); }),
+          std::make_pair("Controller",  [&](auto && node) { return make<Controller>(node, scope, parameter_assignments); }),
+          std::make_pair("Pedestrian",  [&](auto && node) { return make<Pedestrian>(node, scope, parameter_assignments); }),
+          std::make_pair("MiscObject",  [&](auto && node) { return make<MiscObject>(node, scope, parameter_assignments); }),
           std::make_pair("Environment", [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
-          std::make_pair("Maneuver",    [&](auto && node) { return make<CatalogInstance<Maneuver>>  (node, scope, parameter_assignments); }),
+          std::make_pair("Maneuver",    [&](auto && node) { return make<Maneuver>  (node, scope, parameter_assignments); }),
           std::make_pair("Trajectory",  [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
-          std::make_pair("Route",       [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;})
+          std::make_pair("Route",       [&](auto && node) { return make<Route>     (node, scope, parameter_assignments); })
           // clang-format on
         };
 

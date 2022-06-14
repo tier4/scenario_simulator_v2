@@ -31,6 +31,15 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 {
 }
 
+Controller::Controller(
+  const pugi::xml_node & node, Scope & scope, const ParameterAssignments & parameter_assignments)
+: Scope(readAttribute<String>("name", node, scope), scope, parameter_assignments),
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
+  properties(readElement<Properties>("Properties", node, local()))
+{
+}
+
 auto Controller::assign(const EntityRef & entity_ref) -> void
 {
   setVelocityLimit(

@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/axles.hpp>
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
+#include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/performance.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
@@ -59,6 +60,8 @@ struct Vehicle : public Scope  // for ParameterDeclarations
   Properties properties;  // Additional properties as name value pairs.
 
   explicit Vehicle(const pugi::xml_node &, Scope &);
+
+  explicit Vehicle(const pugi::xml_node &, Scope &, const ParameterAssignments &);
 
   explicit operator traffic_simulator_msgs::msg::VehicleParameters() const;
 };
