@@ -48,68 +48,85 @@ auto InitActions::evaluateInstantly() const -> Object
       apply<void>(
         [](auto && action) {
           if (action.endsImmediately()) {
-            action.evaluate();
+            action.start();
+            action.run();
+          } else {
+            RCLCPP_INFO(
+              rclcpp::get_logger("InitActions"),
+              "skip a global action because it's non instantaneous action");
           }
         },
         e.as<GlobalAction>());
     } else if (e.is<UserDefinedAction>()) {
       if (UserDefinedAction::endsImmediately()) {
         e.as<UserDefinedAction>().evaluate();
+      } else {
+        RCLCPP_INFO(
+          rclcpp::get_logger("InitActions"),
+          "skip a user defined action because it's non instantaneous action");
       }
     } else if (e.is<Private>()) {
       for (auto private_action : e.as<Private>().private_actions) {
         apply<void>(
           [](auto && action) {
             if (action.endsImmediately()) {
-              action.evaluate();
+              action.start();
+              action.run();
+            } else {
+              RCLCPP_INFO(
+                rclcpp::get_logger("InitActions"),
+                "skip a private action because it's non instantaneous action");
             }
           },
           private_action);
       }
     }
   }
-
   return unspecified;
 }
 
-auto InitActions::evaluateNonInstantly() const -> Object
+auto InitActions::evaluateNonInstantly() const -> bool
 {
   bool accomplished = false;
-  while(not accomplished) {
-    bool has_evaluated = false;
-    for (auto e : *this) {
-
-      if (e.is<GlobalAction>()) {
-        apply<void>(
-          [&has_evaluated](auto && action) {
-            if (not action.endsImmediately() or not action.accomplished()) {
-              action.evaluate();
-              has_evaluated = true;
+  for (auto e : *this) {
+    if (e.is<GlobalAction>()) {
+      apply<void>(
+        [&accomplished](auto && action) {
+          if (not action.endsImmediately()) {
+            action.start();
+            action.run();
+            std::cout << "global" << std::endl;
+            if (!action.accomplished()) {
+              accomplished = false;
             }
-          },
-          e.as<GlobalAction>());
-      } else if (e.is<UserDefinedAction>()) {
-        if (not UserDefinedAction::endsImmediately() or e->accomplished()) {
-          e.as<UserDefinedAction>().evaluate();
-          has_evaluated = true;
-        }
-      } else if (e.is<Private>()) {
-        for (auto private_action : e.as<Private>().private_actions) {
-          apply<void>(
-            [&has_evaluated](auto && action) {
-              if (not action.endsImmediately() or not action.accomplished()) {
-                action.evaluate();
-                has_evaluated = true;
-              }
-            },
-            private_action);
+          }
+        },
+        e.as<GlobalAction>());
+    } else if (e.is<UserDefinedAction>()) {
+      if (not UserDefinedAction::endsImmediately()) {
+        e.as<UserDefinedAction>().evaluate();
+        std::cout << "user" << std::endl;
+        if (not e.as<UserDefinedAction>().accomplished()) {
+          accomplished = false;
         }
       }
+    } else if (e.is<Private>()) {
+      for (auto private_action : e.as<Private>().private_actions) {
+        apply<void>(
+          [&accomplished](auto && action) {
+            if (not action.endsImmediately()) {
+              action.start();
+              action.run();
+              if (not action.accomplished()) {
+                accomplished = false;
+              }
+            }
+          },
+          private_action);
+      }
     }
-    accomplished = not has_evaluated;
   }
-
-  return unspecified;
+  return accomplished;
 }
 
 auto InitActions::endsImmediately() const -> bool

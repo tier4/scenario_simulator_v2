@@ -41,7 +41,9 @@ struct Init
 
   auto endsImmediately() const -> bool;
 
-  auto evaluate() -> Object;
+  auto evaluateInstantly() -> Object;
+
+  auto evaluateNonInstantly() -> bool;
 };
 
 auto operator<<(nlohmann::json &, const Init &) -> nlohmann::json &;

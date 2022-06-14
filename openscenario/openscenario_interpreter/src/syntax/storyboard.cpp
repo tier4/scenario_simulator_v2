@@ -41,9 +41,6 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 
 auto Storyboard::run() -> void
 {
-  std::cout << "Start non instant init actions " << std::endl;
-  init.actions.evaluateNonInstantly();
-  std::cout << "Finish non instant init actions " << std::endl;
   for (auto && story : elements) {
     story.evaluate();
   }
