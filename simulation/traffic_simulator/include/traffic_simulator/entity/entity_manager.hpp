@@ -198,12 +198,21 @@ public:
 
   FORWARD_TO_ENTITY(asAutoware, const);
   FORWARD_TO_ENTITY(cancelRequest, );
+  FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
+  FORWARD_TO_ENTITY(getDistanceToLaneBound, );
+  FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
+  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
+  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, const);
+  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
+  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getDriverModel, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
+  FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
+  FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
@@ -278,20 +287,12 @@ public:
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
-  auto getLaneletPose(const std::string & name)
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
-
   // clang-format off
   auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &, const double = 100) -> boost::optional<double>;
   auto getLongitudinalDistance(const LaneletPose &, const std::string &, const double = 100) -> boost::optional<double>;
   auto getLongitudinalDistance(const std::string &, const LaneletPose &, const double = 100) -> boost::optional<double>;
   auto getLongitudinalDistance(const std::string &, const std::string &, const double = 100) -> boost::optional<double>;
   // clang-format on
-
-  auto getMapPose(const std::string & entity_name) -> geometry_msgs::msg::Pose;
-  auto getMapPose(
-    const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose)
-    -> geometry_msgs::msg::Pose;
 
   auto getNumberOfEgo() const -> std::size_t;
 
