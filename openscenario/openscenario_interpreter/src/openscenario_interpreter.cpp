@@ -153,7 +153,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [this]() {
         if (evaluateSimulationTime() < 0) {
-        SimulatorCore::update();
+          SimulatorCore::update();
           publishCurrentContext();
         } else if (currentScenarioDefinition()) {
           withTimeoutHandler(defaultTimeoutHandler(), [this]() {
