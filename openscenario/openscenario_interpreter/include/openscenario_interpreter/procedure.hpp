@@ -79,11 +79,6 @@ public:
     }
   };
 
-  class CustomCommand
-  {
-  protected:
-  };
-
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
     // NOTE: applySomethingAction() -> Unspecified
@@ -219,6 +214,22 @@ public:
       }
     }
   };
+
+  class NonStandardOperation
+  {
+  protected:
+    template <typename... Ts>
+    static auto asAutoware(Ts &&... xs) -> decltype(auto)
+    {
+      return connection->asAutoware(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto evaluateCurrentState(Ts &&... xs) -> decltype(auto)
+    {
+      return connection->getCurrentAction(std::forward<decltype(xs)>(xs)...);
+    }
+  };
 };
 
 template <typename... Ts>
@@ -264,7 +275,6 @@ STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_N
   }                                                                                  \
   static_assert(true, "")
 
-FORWARD_TO_SIMULATION_API(asAutoware);
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
 FORWARD_TO_SIMULATION_API(attachOccupancyGridSensor);
@@ -282,7 +292,6 @@ FORWARD_TO_SIMULATION_API(getTrafficRelationReferees);
 
 // NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
 
-RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(toWorldPosition, toMapPose);
 
 #undef RENAME

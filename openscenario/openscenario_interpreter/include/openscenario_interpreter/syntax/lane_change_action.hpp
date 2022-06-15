@@ -40,7 +40,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct LaneChangeAction : private Scope, private SimulatorCore::ActionApplication
+struct LaneChangeAction : private Scope,
+                          private SimulatorCore::ActionApplication,
+                          private SimulatorCore::NonStandardOperation
 {
   const Double target_lane_offset;
 
