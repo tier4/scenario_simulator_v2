@@ -47,7 +47,6 @@ public:                                                                         
         #TYPE " service request was accepted, but ineffective => Retry!"                           \
           << (result->status.message.empty() ? "" : " (" + result->status.message + ")"));         \
       rclcpp::WallRate(std::chrono::seconds(1)).sleep();                                           \
-      return request##TYPE(request);                                                               \
     }                                                                                              \
   }                                                                                                \
   static_assert(true, "")
