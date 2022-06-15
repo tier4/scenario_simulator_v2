@@ -373,6 +373,38 @@ auto EntityManager::getRelativePose(const std::string & from, const std::string 
   return getRelativePose(from_status->pose, to_status->pose);
 }
 
+auto EntityManager::getRelativePose(
+  const geometry_msgs::msg::Pose & from, const LaneletPose & to) const -> geometry_msgs::msg::Pose
+{
+  return getRelativePose(from, toMapPose(to));
+}
+
+auto EntityManager::getRelativePose(
+  const LaneletPose & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose
+{
+  return getRelativePose(toMapPose(from), to);
+}
+
+auto EntityManager::getRelativePose(const std::string & from, const LaneletPose & to) const
+  -> geometry_msgs::msg::Pose
+{
+  const auto from_status = getEntityStatus(from);
+  if (!from_status) {
+    THROW_SEMANTIC_ERROR("entity : " + from + " status is empty");
+  }
+  return getRelativePose(from_status->pose, to);
+}
+
+auto EntityManager::getRelativePose(const LaneletPose & from, const std::string & to) const
+  -> geometry_msgs::msg::Pose
+{
+  const auto to_status = getEntityStatus(to);
+  if (!to_status) {
+    THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
+  }
+  return getRelativePose(from, to_status->pose);
+}
+
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
 auto EntityManager::getWaypoints(const std::string & name)
