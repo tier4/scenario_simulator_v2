@@ -339,8 +339,8 @@ auto EntityManager::getRelativePose(
   return traffic_simulator::math::getRelativePose(from, to);
 }
 
-auto EntityManager::getRelativePose(const geometry_msgs::msg::Pose & from, const std::string & to)
-  -> geometry_msgs::msg::Pose
+auto EntityManager::getRelativePose(
+  const geometry_msgs::msg::Pose & from, const std::string & to) const -> geometry_msgs::msg::Pose
 {
   const auto to_status = getEntityStatus(to);
   if (!to_status) {
@@ -349,8 +349,8 @@ auto EntityManager::getRelativePose(const geometry_msgs::msg::Pose & from, const
   return getRelativePose(from, to_status->pose);
 }
 
-auto EntityManager::getRelativePose(const std::string & from, const geometry_msgs::msg::Pose & to)
-  -> geometry_msgs::msg::Pose
+auto EntityManager::getRelativePose(
+  const std::string & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose
 {
   const auto from_status = getEntityStatus(from);
   if (!from_status) {
@@ -359,7 +359,7 @@ auto EntityManager::getRelativePose(const std::string & from, const geometry_msg
   return getRelativePose(from_status->pose, to);
 }
 
-auto EntityManager::getRelativePose(const std::string & from, const std::string & to)
+auto EntityManager::getRelativePose(const std::string & from, const std::string & to) const
   -> geometry_msgs::msg::Pose
 {
   const auto from_status = getEntityStatus(from);
