@@ -24,7 +24,7 @@ namespace common
 {
 inline namespace scenario_simulator_exception
 {
-auto concatenate = [](auto &&... xs) {
+inline auto concatenate = [](auto &&... xs) {
   auto write = [](auto && os, auto && x) {
     os.get() << std::forward<decltype(x)>(x);
     return std::forward<decltype(os)>(os);

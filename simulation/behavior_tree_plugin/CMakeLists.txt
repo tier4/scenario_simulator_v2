@@ -40,6 +40,13 @@ target_include_directories(
   include
 )
 
+# workaround to allow deprecated header to build on both galactic and humble
+if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
+  target_compile_definitions(behavior_tree_plugin PUBLIC
+    USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
+  )
+endif()
+
 ament_target_dependencies(behavior_tree_plugin
   rclcpp
   traffic_simulator

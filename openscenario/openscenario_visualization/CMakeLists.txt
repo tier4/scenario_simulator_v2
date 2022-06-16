@@ -104,6 +104,7 @@ ament_target_dependencies(openscenario_visualization_rviz_plugin
   pluginlib
   rclcpp
   openscenario_interpreter_msgs
+  rviz_common
 )
 target_include_directories(openscenario_visualization_rviz_plugin PRIVATE "${OGRE_PREFIX_DIR}/include")
 

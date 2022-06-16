@@ -63,7 +63,7 @@ private:
   bool selected_ = false;
   rclcpp::Subscription<openscenario_interpreter_msgs::msg::Context>::SharedPtr context_sub_;
   void startSubscription();
-  void contextCallback(const openscenario_interpreter_msgs::msg::Context::SharedPtr msg);
+  void contextCallback(const openscenario_interpreter_msgs::msg::Context::ConstSharedPtr msg);
   void spin();
   std::string context_;
   double simulation_time_;
