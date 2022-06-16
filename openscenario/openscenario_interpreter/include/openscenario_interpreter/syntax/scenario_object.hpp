@@ -46,8 +46,6 @@ struct ScenarioObject : public Scope, public EntityObject, private SimulatorCore
   explicit ScenarioObject(const pugi::xml_node &, Scope &);
 
   auto activateOutOfRangeMetric(const Vehicle &) const -> bool;
-
-  auto activateSensors() -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

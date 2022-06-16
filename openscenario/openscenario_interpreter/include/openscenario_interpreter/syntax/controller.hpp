@@ -53,6 +53,13 @@ struct Controller : public Scope
 
   explicit Controller(const pugi::xml_node &, Scope &);
 
+  /*
+     NOTE: The term "controller" in OpenSCENARIO is a concept equivalent to
+     "the person driving the car. Here, Autoware is considered anthropomorphic.
+     In other words, the sensor performance of Autoware in a simulation is
+     described in ScenarioObject.ObjectController.Controller.Properties as
+     "characteristics of the person driving the car.
+  */
   auto isUserDefinedController() const & -> bool;
 };
 }  // namespace syntax

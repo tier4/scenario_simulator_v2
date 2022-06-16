@@ -109,6 +109,37 @@ public:
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
         return message;
       }());
+
+      if (controller.isUserDefinedController()) {
+        connection->attachLidarSensor(entity_ref);
+
+        connection->attachDetectionSensor([&]() {
+          simulation_api_schema::DetectionSensorConfiguration configuration;
+          configuration.set_entity(entity_ref);
+          configuration.set_architecture_type(
+            getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_update_duration(0.1);
+          configuration.set_range(300);
+          configuration.set_filter_by_range(
+            controller.properties.template get<Boolean>("isClairvoyant"));
+          return configuration;
+        }());
+
+        connection->attachOccupancyGridSensor([&]() {
+          simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+          configuration.set_entity(entity_ref);
+          configuration.set_architecture_type(
+            getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_update_duration(0.1);
+          configuration.set_resolution(0.5);
+          configuration.set_width(200);
+          configuration.set_height(200);
+          configuration.set_range(300);
+          configuration.set_filter_by_range(
+            controller.properties.template get<Boolean>("isClairvoyant"));
+          return configuration;
+        }());
+      }
     }
 
     template <typename... Ts>
@@ -275,9 +306,6 @@ STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_N
   }                                                                                  \
   static_assert(true, "")
 
-FORWARD_TO_SIMULATION_API(attachDetectionSensor);
-FORWARD_TO_SIMULATION_API(attachLidarSensor);
-FORWARD_TO_SIMULATION_API(attachOccupancyGridSensor);
 FORWARD_TO_SIMULATION_API(getTrafficRelationReferees);
 
 #undef FORWARD_TO_SIMULATION_API
