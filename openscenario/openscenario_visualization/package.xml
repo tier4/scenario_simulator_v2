@@ -18,6 +18,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>rviz2</depend>
+  <depend>rviz_common</depend>
   <depend>traffic_simulator</depend>
   <depend>traffic_simulator_msgs</depend>
   <depend>visualization_msgs</depend>

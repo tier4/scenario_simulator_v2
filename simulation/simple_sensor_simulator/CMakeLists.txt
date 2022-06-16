@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(simple_sensor_simulator)
 
-add_compile_options(-std=c++14)
+add_compile_options(-std=c++17)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
