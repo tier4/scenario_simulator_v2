@@ -2,8 +2,8 @@
 Changelog for package lanelet2_matching
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.5 (2022-06-16)
+------------------
 * Merge branch 'master' into feature/occupancy_grid_sensor
 * Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into build/add_missing_depend
 * Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision

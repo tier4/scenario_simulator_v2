@@ -2,8 +2,8 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.5 (2022-06-16)
+------------------
 * Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
 * Merge remote-tracking branch 'origin/master' into feature/change_engage_api_name
 * fix(random_test_runner): modify build error in both galactic and humble
