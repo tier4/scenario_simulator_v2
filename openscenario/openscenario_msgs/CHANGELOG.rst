@@ -2,8 +2,8 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.5 (2022-06-16)
+------------------
 * Merge branch 'master' into fix/interpreter/missing_autoware_launch
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
 * Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage

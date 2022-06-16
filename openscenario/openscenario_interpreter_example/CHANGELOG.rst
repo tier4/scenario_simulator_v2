@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.5 (2022-06-16)
+------------------
 * Merge branch 'master' into feature/change_engage_api_name
 * Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor

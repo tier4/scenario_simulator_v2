@@ -2,8 +2,8 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.5 (2022-06-16)
+------------------
 * Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
 * fix(lanelet2_extension_psim): modify build error in humble
 * Merge branch 'master' into feature/change_engage_api_name
