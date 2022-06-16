@@ -11,7 +11,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>pugixml-dev</depend>
-  <depend>libboost-dev</depend>
+  <depend>boost</depend>
   <depend>ament_index_cpp</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
