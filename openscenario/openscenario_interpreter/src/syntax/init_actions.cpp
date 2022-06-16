@@ -27,9 +27,9 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
 {
   std::unordered_map<std::string, std::function<void(const pugi::xml_node & node)>> dispatcher{
     // clang-format off
-    std::make_pair("GlobalAction",      [&](auto && node) { return push_back(make<GlobalAction>     (node, scope)); }),
-    std::make_pair("UserDefinedAction", [&](auto && node) { return push_back(make<UserDefinedAction>(node, scope)); }),
-    std::make_pair("Private",           [&](auto && node) { return push_back(make<Private>          (node, scope)); })
+    std::make_pair("GlobalAction",      [&](auto && node) { return all_elements.push_back(make<GlobalAction>     (node, scope)); }),
+    std::make_pair("UserDefinedAction", [&](auto && node) { return all_elements.push_back(make<UserDefinedAction>(node, scope)); }),
+    std::make_pair("Private",           [&](auto && node) { return all_elements.push_back(make<Private>          (node, scope)); })
     // clang-format on
   };
 
@@ -39,20 +39,72 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
       std::get<1> (*iter)(each);
     }
   }
+
+  for (auto e : all_elements) {
+    if (e.is<GlobalAction>()) {
+      apply<void>(
+        [&](auto && action) {
+          if (action.endsImmediately()) {
+            instant_elements.push_back(action);
+          } else {
+            non_instant_elements.push_back(action);
+          }
+        },
+        e.as<GlobalAction>());
+    } else if (e.is<UserDefinedAction>()) {
+      auto action = e.as<UserDefinedAction>();
+      if (action.endsImmediately()) {
+        instant_elements.push_back(action);
+      } else {
+        non_instant_elements.push_back(action);
+      }
+    } else if (e.is<Private>()) {
+      for (auto private_action : e.as<Private>().private_actions) {
+        apply<void>(
+          [&](auto && action) {
+            if (action.endsImmediately()) {
+              instant_elements.push_back(make(action));
+            } else {
+              non_instant_elements.push_back(make(action));
+            }
+          },
+          private_action);
+      }
+    }
+  }
+  std::cout << "Instatnt Init Actions : " << instant_elements.size() << std::endl;
+  std::cout << "Non Instatnt Actions : " << non_instant_elements.size() << std::endl;
 }
 
 auto InitActions::evaluate() const -> Object
 {
-  for (auto && each : *this) {
+  //  for (auto && each : *this) {
+  //    each.evaluate();
+  //  }
+  evaluateInstantly();
+
+  return unspecified;
+}
+
+auto InitActions::evaluateInstantly() const -> Object
+{
+  for (auto && each : instant_elements) {
     each.evaluate();
   }
+  return unspecified;
+}
 
+auto InitActions::evaluateNonInstantly() const -> Object
+{
+  for (auto && each : instant_elements) {
+    each.evaluate();
+  }
   return unspecified;
 }
 
 auto InitActions::endsImmediately() const -> bool
 {
-  return std::all_of(begin(), end(), [=](const Object & e) {
+  return std::all_of(all_elements.begin(), all_elements.end(), [=](const Object & e) {
     if (e.is<GlobalAction>()) {
       return e.as<GlobalAction>().endsImmediately();
     } else if (e.is<UserDefinedAction>()) {
@@ -69,7 +121,7 @@ auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nloh
 {
   json["GlobalAction"] = nlohmann::json::array();
 
-  for (const auto & init_action : init_actions) {
+  for (const auto & init_action : init_actions.all_elements) {
     if (init_action.is<GlobalAction>()) {
       nlohmann::json action;
       action["type"] = makeTypename(init_action.as<GlobalAction>().type());
@@ -79,7 +131,7 @@ auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nloh
 
   json["UserDefinedAction"] = nlohmann::json::array();
 
-  for (const auto & init_action : init_actions) {
+  for (const auto & init_action : init_actions.all_elements) {
     if (init_action.is<UserDefinedAction>()) {
       nlohmann::json action;
       action["type"] = makeTypename(init_action.as<UserDefinedAction>().type());
@@ -89,7 +141,7 @@ auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nloh
 
   json["Private"] = nlohmann::json::array();
 
-  for (const auto & init_action : init_actions) {
+  for (const auto & init_action : init_actions.all_elements) {
     if (init_action.is<Private>()) {
       nlohmann::json action;
       action << init_action.as<Private>();

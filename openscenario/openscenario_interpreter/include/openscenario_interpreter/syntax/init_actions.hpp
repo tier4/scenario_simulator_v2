@@ -34,13 +34,21 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct InitActions : public Elements
+struct InitActions
 {
   explicit InitActions(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 
   auto evaluate() const -> Object;
+
+  auto evaluateInstantly() const -> Object;
+
+  auto evaluateNonInstantly() const -> Object;
+
+  Elements all_elements;
+  Elements instant_elements;
+  Elements non_instant_elements;
 };
 
 auto operator<<(nlohmann::json &, const InitActions &) -> nlohmann::json &;
