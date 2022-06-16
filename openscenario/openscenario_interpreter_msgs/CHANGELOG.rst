@@ -2,6 +2,13 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Contributors: Daniel Marczak, kyabe2718, yamacir-kit
+
 0.6.4 (2022-04-26)
 ------------------
 * Merge branch 'tier4:master' into feature/awf_universe_instruction

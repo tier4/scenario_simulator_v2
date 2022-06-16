@@ -2,6 +2,31 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
+* apply clang format
+* fix(openscenario_visualization): modify build error in humble
+* more build fixes
+* Merge branch 'master' into feature/change_engage_api_name
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Merge branch 'master' into feature/occupancy_grid_sensor
+* Fix licence
+* Fix Licence
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into build/add_missing_depend
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' into feature/zmqpp_vendor
+* Merge pull request `#785 <https://github.com/tier4/scenario_simulator_v2/issues/785>`_ from tier4/doc/improve
+* Fix broken links
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Contributors: Adam Krawczyk, Daisuke Nishimatsu, Daniel Marczak, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, Yuma Nihei, kyabe2718, wep21, yamacir-kit
+
 0.6.4 (2022-04-26)
 ------------------
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
