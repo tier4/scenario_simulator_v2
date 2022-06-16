@@ -37,15 +37,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ScenarioObject : public Scope, public EntityObject, private SimulatorCore::GeneralCommand
+struct ScenarioObject : public Scope, public EntityObject
 {
   ObjectController object_controller;  // Controller of the EntityObject instance.
 
   bool is_added = false;  // NOTE: Is applied AddEntityAction?
 
   explicit ScenarioObject(const pugi::xml_node &, Scope &);
-
-  auto activateOutOfRangeMetric(const Vehicle &) const -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

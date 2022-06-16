@@ -29,29 +29,5 @@ ScenarioObject::ScenarioObject(const pugi::xml_node & node, Scope & scope)
   object_controller(readElement<ObjectController>("ObjectController", node, local()))
 {
 }
-
-auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> bool
-{
-  metrics::OutOfRangeMetric::Config configuration;
-
-  configuration.target_entity = name;
-  configuration.min_velocity = -vehicle.performance.max_speed;
-  configuration.max_velocity = +vehicle.performance.max_speed;
-  configuration.min_acceleration = -vehicle.performance.max_deceleration;
-  configuration.max_acceleration = +vehicle.performance.max_acceleration;
-  configuration.min_jerk =
-    object_controller.is<Controller>()
-      ? object_controller.as<Controller>().properties.get<Double>("minJerk", Double::lowest())
-      : Double::lowest();
-  configuration.max_jerk =
-    object_controller.is<Controller>()
-      ? object_controller.as<Controller>().properties.get<Double>("maxJerk", Double::max())
-      : Double::max();
-  configuration.jerk_topic = "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
-
-  addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);
-
-  return true;
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
