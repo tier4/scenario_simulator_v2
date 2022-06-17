@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>

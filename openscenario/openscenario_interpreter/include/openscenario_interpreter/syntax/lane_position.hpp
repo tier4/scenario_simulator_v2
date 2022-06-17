@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_POSITION_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/orientation.hpp>

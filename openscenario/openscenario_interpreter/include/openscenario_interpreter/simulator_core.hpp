@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
-#define OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
+#define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -342,4 +342,4 @@ STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_N
 #undef STRIP_OPTIONAL
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
