@@ -86,7 +86,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
-    return getBoundingBoxDistance(triggering_entity, entity_ref);
+    return evaluateFreespaceEuclideanDistance(triggering_entity, entity_ref);
   } else {
     return Double::nan();
   }

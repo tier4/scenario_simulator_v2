@@ -261,7 +261,7 @@ public:
     }
   };
 
-  class ConditionEvaluation  // OpenSCENARIO 1.1.1 Section 3.1.5
+  class ConditionEvaluation : protected GeneralCommand  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
   protected:
     template <typename... Ts>
@@ -275,6 +275,18 @@ public:
     static auto evaluateCollisionCondition(Ts &&... xs) -> bool
     {
       return connection->checkCollision(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto evaluateFreespaceEuclideanDistance(Ts &&... xs)  // for RelativeDistanceCondition
+    {
+      if (const auto result = connection->getBoundingBoxDistance(std::forward<decltype(xs)>(xs)...);
+          result) {
+        return result.get();
+      } else {
+        using value_type = typename std::decay<decltype(result)>::type::value_type;
+        return std::numeric_limits<value_type>::quiet_NaN();
+      }
     }
 
     template <typename... Ts>
@@ -351,24 +363,6 @@ public:
     }
   };
 };
-
-#define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                                     \
-  template <typename... Ts>                                                                       \
-  auto IDENTIFIER(Ts &&... xs)                                                                    \
-  {                                                                                               \
-    const auto result = SimulatorCore::connection->IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-    if (result) {                                                                                 \
-      return result.get();                                                                        \
-    } else {                                                                                      \
-      using value_type = typename std::decay<decltype(result)>::type::value_type;                 \
-      return ALTERNATE;                                                                           \
-    }                                                                                             \
-  }                                                                                               \
-  static_assert(true, "")
-
-STRIP_OPTIONAL(getBoundingBoxDistance, static_cast<value_type>(0));
-
-#undef STRIP_OPTIONAL
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_

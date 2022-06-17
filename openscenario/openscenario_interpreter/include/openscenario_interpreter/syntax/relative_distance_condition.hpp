@@ -44,7 +44,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeDistanceCondition : private Scope, private SimulatorCore::GeneralCommand
+struct RelativeDistanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity".
   const CoordinateSystem coordinate_system;
