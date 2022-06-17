@@ -43,11 +43,15 @@ public:
   bool contains(const std::vector<geometry_msgs::msg::Point> & points) const;
   int8_t getData() const;
   void setData(int8_t data);
+  geometry_msgs::msg::Point getLeftUpPoint() const;
+  geometry_msgs::msg::Point getLeftDownPoint() const;
+  geometry_msgs::msg::Point getRightUpPoint() const;
+  geometry_msgs::msg::Point getRightDownPoint() const;
 
 private:
   int8_t data_;
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & point) const;
-  std::array<geometry_math::LineSegment, 4> getLineSegments() const;
+  std::vector<geometry_msgs::msg::Point> getPolygon() const;
 };
 }  // namespace simple_sensor_simulator
 

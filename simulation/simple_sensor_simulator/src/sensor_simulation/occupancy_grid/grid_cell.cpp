@@ -14,9 +14,8 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
+#include <geometry_math/polygon/polygon.hpp>
+#include <geometry_math/intersection/collision.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 
@@ -28,30 +27,45 @@ GridCell::GridCell(
 {
 }
 
-std::array<geometry_math::LineSegment, 4> GridCell::getLineSegments() const
+geometry_msgs::msg::Point GridCell::getLeftUpPoint() const
 {
   geometry_msgs::msg::Point left_up;
   left_up.x = size * 0.5;
   left_up.y = size * 0.5;
   left_up = transformToWorld(left_up);
+  return left_up;
+}
+
+geometry_msgs::msg::Point GridCell::getLeftDownPoint() const
+{
   geometry_msgs::msg::Point left_down;
   left_down.x = size * 0.5;
   left_down.y = -size * 0.5;
   left_down = transformToWorld(left_down);
+  return left_down;
+}
+
+geometry_msgs::msg::Point GridCell::getRightUpPoint() const
+{
   geometry_msgs::msg::Point right_up;
   right_up.x = -size * 0.5;
   right_up.y = size * 0.5;
   right_up = transformToWorld(right_up);
+  return right_up;
+}
+
+geometry_msgs::msg::Point GridCell::getRightDownPoint() const
+{
   geometry_msgs::msg::Point right_down;
   right_down.x = -size * 0.5;
   right_down.y = -size * 0.5;
   right_down = transformToWorld(right_down);
-  std::array<geometry_math::LineSegment, 4> ret = {
-    geometry_math::LineSegment(left_up, left_down),
-    geometry_math::LineSegment(left_down, right_down),
-    geometry_math::LineSegment(right_down, right_up),
-    geometry_math::LineSegment(right_up, left_up)};
-  return ret;
+  return right_down;
+}
+
+std::vector<geometry_msgs::msg::Point> GridCell::getPolygon() const
+{
+  return {getLeftUpPoint(), getLeftDownPoint(), getRightDownPoint(), getRightUpPoint()};
 }
 
 geometry_msgs::msg::Point GridCell::transformToWorld(const geometry_msgs::msg::Point & point) const
@@ -74,15 +88,7 @@ geometry_msgs::msg::Point GridCell::transformToWorld(const geometry_msgs::msg::P
 
 bool GridCell::contains(const geometry_msgs::msg::Point & p) const
 {
-  const auto line_segments = getLineSegments();
-  typedef boost::geometry::model::d2::point_xy<double> boost_point;
-  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
-  boost_polygon poly;
-  for (const auto & line_segment : line_segments) {
-    boost::geometry::exterior_ring(poly).push_back(
-      boost_point(line_segment.start_point.x, line_segment.start_point.y));
-  }
-  return boost::geometry::within(boost_point(p.x, p.y), poly);
+  return geometry_math::contains(getPolygon(), p);
 }
 
 bool GridCell::contains(const std::vector<geometry_msgs::msg::Point> & points) const

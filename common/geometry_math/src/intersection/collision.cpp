@@ -45,6 +45,18 @@ bool checkCollision2D(
   if (bg::disjoint(poly0, poly1)) {
     return false;
   }
-  return true;  // LCOV_EXCL_LINE
+  return true;
+}
+
+bool contains(
+  const std::vector<geometry_msgs::msg::Point> & polygon, const geometry_msgs::msg::Point & point)
+{
+  typedef boost::geometry::model::d2::point_xy<double> boost_point;
+  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+  boost_polygon poly;
+  for (const auto & p : polygon) {
+    boost::geometry::exterior_ring(poly).push_back(boost_point(p.x, p.y));
+  }
+  return boost::geometry::within(boost_point(point.x, point.y), poly);
 }
 }  // namespace geometry_math
