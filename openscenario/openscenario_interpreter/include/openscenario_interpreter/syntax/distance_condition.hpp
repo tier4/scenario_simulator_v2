@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DISTANCE_CONDITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -56,7 +57,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DistanceCondition : private Scope
+struct DistanceCondition : private Scope, private SimulatorCore::GeneralCommand
 {
   // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity". If set, "alongRoute" is ignored.
   const CoordinateSystem coordinate_system;

@@ -14,8 +14,8 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
 
 namespace openscenario_interpreter

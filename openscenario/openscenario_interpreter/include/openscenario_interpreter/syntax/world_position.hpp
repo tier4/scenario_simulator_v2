@@ -17,8 +17,8 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <pugixml.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>

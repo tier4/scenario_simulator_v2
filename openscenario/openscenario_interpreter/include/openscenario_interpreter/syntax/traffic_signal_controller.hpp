@@ -17,8 +17,8 @@
 
 #include <boost/optional.hpp>
 #include <openscenario_interpreter/iterator/circular_iterator.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>

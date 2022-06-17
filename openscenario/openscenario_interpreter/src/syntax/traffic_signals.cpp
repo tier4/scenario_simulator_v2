@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/error.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/traffic_signals.hpp>
 
 namespace openscenario_interpreter

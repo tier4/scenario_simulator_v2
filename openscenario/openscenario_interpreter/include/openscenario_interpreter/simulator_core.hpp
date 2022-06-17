@@ -56,6 +56,8 @@ public:
   protected:
     using NativeWorldPosition = geometry_msgs::msg::Pose;
 
+    using NativeRelativeWorldPosition = geometry_msgs::msg::Pose;
+
     using NativeLanePosition = traffic_simulator_msgs::msg::LaneletPose;
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
@@ -108,6 +110,24 @@ public:
           return vector;
         }());
       return native_world_position;
+    }
+
+    template <typename... Ts>
+    static auto makeNativeRelativeWorldPosition(Ts &&... xs)
+    {
+      try {
+        return SimulatorCore::connection->getRelativePose(std::forward<decltype(xs)>(xs)...);
+      } catch (...) {
+        geometry_msgs::msg::Pose result{};
+        result.position.x = std::numeric_limits<double>::quiet_NaN();
+        result.position.y = std::numeric_limits<double>::quiet_NaN();
+        result.position.z = std::numeric_limits<double>::quiet_NaN();
+        result.orientation.x = 0;
+        result.orientation.y = 0;
+        result.orientation.z = 0;
+        result.orientation.w = 1;
+        return result;
+      }
     }
 
     template <typename... Ts>
@@ -305,22 +325,6 @@ public:
     }
   };
 };
-
-template <typename... Ts>
-auto getRelativePose(Ts &&... xs)
-try {
-  return SimulatorCore::connection->getRelativePose(std::forward<decltype(xs)>(xs)...);
-} catch (...) {
-  geometry_msgs::msg::Pose result{};
-  result.position.x = std::numeric_limits<double>::quiet_NaN();
-  result.position.y = std::numeric_limits<double>::quiet_NaN();
-  result.position.z = std::numeric_limits<double>::quiet_NaN();
-  result.orientation.x = 0;
-  result.orientation.y = 0;
-  result.orientation.z = 0;
-  result.orientation.w = 1;
-  return result;
-}
 
 #define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                                     \
   template <typename... Ts>                                                                       \

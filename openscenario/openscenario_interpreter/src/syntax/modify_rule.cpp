@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/modify_rule.hpp>
 #include <openscenario_interpreter/syntax/parameter_add_value_rule.hpp>
 #include <openscenario_interpreter/syntax/parameter_multiply_by_value_rule.hpp>

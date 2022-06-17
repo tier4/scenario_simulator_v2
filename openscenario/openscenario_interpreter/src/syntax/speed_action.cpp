@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/functional/equal_to.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
 
 namespace openscenario_interpreter

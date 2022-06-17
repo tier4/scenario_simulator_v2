@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>

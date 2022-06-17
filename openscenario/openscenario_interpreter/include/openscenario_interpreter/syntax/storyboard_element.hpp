@@ -17,9 +17,9 @@
 
 #include <cstddef>
 #include <limits>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <openscenario_interpreter/syntax/trigger.hpp>
