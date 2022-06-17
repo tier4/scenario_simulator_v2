@@ -109,12 +109,16 @@ public:
         }());
       return native_world_position;
     }
+
+    template <typename... Ts>
+    static auto toWayIDs(Ts &&... xs) -> decltype(auto)
+    {
+      return connection->getTrafficRelationReferees(std::forward<decltype(xs)>(xs)...);
+    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
-    // NOTE: applySomethingAction() -> Unspecified
-
   protected:
     template <typename... Ts>
     static auto applyAcquirePositionAction(Ts &&... xs)
@@ -213,9 +217,6 @@ public:
 
   class ConditionEvaluation  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
-    // NOTE: evaluateSomething() -> Number
-    //       evaluateSomethingCondition() -> bool
-
   protected:
     template <typename... Ts>
     static auto evaluateAcceleration(Ts &&... xs)
@@ -339,18 +340,6 @@ STRIP_OPTIONAL(getBoundingBoxDistance, static_cast<value_type>(0));
 STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_NaN());
 
 #undef STRIP_OPTIONAL
-
-#define FORWARD_TO_SIMULATION_API(IDENTIFIER)                                        \
-  template <typename... Ts>                                                          \
-  decltype(auto) IDENTIFIER(Ts &&... xs)                                             \
-  {                                                                                  \
-    return SimulatorCore::connection->IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-  }                                                                                  \
-  static_assert(true, "")
-
-FORWARD_TO_SIMULATION_API(getTrafficRelationReferees);
-
-#undef FORWARD_TO_SIMULATION_API
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_

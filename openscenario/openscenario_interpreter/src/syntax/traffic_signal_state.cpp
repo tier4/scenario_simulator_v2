@@ -28,7 +28,7 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 
 auto TrafficSignalState::evaluate() const -> Object
 {
-  for (traffic_simulator::TrafficLight & traffic_light : getTrafficRelationReferees(id())) {
+  for (traffic_simulator::TrafficLight & traffic_light : toWayIDs(id())) {
     traffic_light.clear();
     traffic_light.set(state);
   };

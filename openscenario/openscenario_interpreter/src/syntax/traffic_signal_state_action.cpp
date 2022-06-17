@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state_action.hpp>
 
@@ -34,7 +33,7 @@ auto TrafficSignalStateAction::run() noexcept -> void {}
 
 auto TrafficSignalStateAction::start() const -> void
 {
-  for (traffic_simulator::TrafficLight & traffic_light : getTrafficRelationReferees(id())) {
+  for (traffic_simulator::TrafficLight & traffic_light : toWayIDs(id())) {
     traffic_light.clear();
     traffic_light.set(state);
   };
