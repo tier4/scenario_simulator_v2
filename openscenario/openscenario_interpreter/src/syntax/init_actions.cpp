@@ -59,28 +59,29 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
         non_instant_elements.push_back(action);
       }
     } else if (e.is<Private>()) {
-      for (auto private_action : e.as<Private>().private_actions) {
-        apply<void>(
-          [&](auto && action) {
-            if (action.endsImmediately()) {
-              instant_elements.push_back(make(action));
-            } else {
-              non_instant_elements.push_back(make(action));
-            }
-          },
-          private_action);
-      }
+      auto push_back_specific_private =
+        [&](Elements & elements, std::function<bool(const PrivateAction &)> remove_func) {
+          Private local_private = e.as<Private>();
+          local_private.private_actions.erase(
+            std::remove_if(
+              std::begin(local_private.private_actions), std::end(local_private.private_actions),
+              remove_func),
+            local_private.private_actions.end());
+          if (not local_private.private_actions.empty()) {
+            elements.push_back(make(local_private));
+          }
+        };
+
+      push_back_specific_private(
+        instant_elements, [](const PrivateAction & e) { return not e.endsImmediately(); });
+      push_back_specific_private(
+        non_instant_elements, [](const PrivateAction & e) { return e.endsImmediately(); });
     }
   }
-  std::cout << "Instatnt Init Actions : " << instant_elements.size() << std::endl;
-  std::cout << "Non Instatnt Actions : " << non_instant_elements.size() << std::endl;
 }
 
 auto InitActions::evaluate() const -> Object
 {
-  //  for (auto && each : *this) {
-  //    each.evaluate();
-  //  }
   evaluateInstantly();
 
   return unspecified;
@@ -96,7 +97,7 @@ auto InitActions::evaluateInstantly() const -> Object
 
 auto InitActions::evaluateNonInstantly() const -> Object
 {
-  for (auto && each : instant_elements) {
+  for (auto && each : non_instant_elements) {
     each.evaluate();
   }
   return unspecified;

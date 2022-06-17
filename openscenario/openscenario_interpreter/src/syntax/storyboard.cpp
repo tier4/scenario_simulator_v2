@@ -29,28 +29,6 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   StoryboardElement(readElement<Trigger>("StopTrigger", node, local())),
   init(readElement<Init>("Init", node, local()))
 {
-  //  if (not init.endsImmediately()) {
-  //    StoryboardElement preprocess_vm;
-  //
-  //    nlohmann::json json;
-  //
-  ////    std::remove_copy_if(
-  ////      std::begin(init.actions), std::end(init.actions), std::begin(preprocess_vm.elements),
-  ////      [this](const Object & e) {
-  ////        if (e.is<GlobalAction>()) {
-  ////          return not e.as<GlobalAction>().endsImmediately();
-  ////        } else if (e.is<UserDefinedAction>()) {
-  ////          return not e.as<UserDefinedAction>().endsImmediately();
-  ////        } else if (e.is<Private>()) {
-  ////          return not e.as<Private>().endsImmediately();
-  ////        } else {
-  ////          throw UNSUPPORTED_ELEMENT_SPECIFIED(e.type().name());
-  ////        }
-  ////      });
-  //
-  //    elements.emplace_back(make(std::move(preprocess_vm)));
-  //  }
-
   traverse<1, unbounded>(node, "Story", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Story>(node, local()));
   });
