@@ -16,6 +16,7 @@
 #define GEOMETRY_MATH__POLYGON__LINE_SEGMENT_
 
 #include <boost/optional.hpp>
+#include <geometry_math/polygon/polygon.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 

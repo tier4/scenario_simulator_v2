@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__COLLISION_HPP_
-#define GEOMETRY_MATH__COLLISION_HPP_
+#ifndef GEOMETRY_MATH__COLLISION__COLLISION_HPP_
+#define GEOMETRY_MATH__COLLISION__COLLISION_HPP_
 
 #include <geometry_math/bounding_box.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -27,4 +27,4 @@ bool checkCollision2D(
   geometry_msgs::msg::Pose pose1, traffic_simulator_msgs::msg::BoundingBox bbox1);
 }  // namespace geometry_math
 
-#endif  // GEOMETRY_MATH__COLLISION_HPP_
+#endif  // GEOMETRY_MATH__COLLISION__COLLISION_HPP_

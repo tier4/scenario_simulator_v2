@@ -12,8 +12,9 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(geometry_math SHARED
   src/bounding_box.cpp
-  src/collision.cpp
   src/distance.cpp
+  src/intersection/collision.cpp
+  src/intersection/intersection.cpp
   src/linear_algebra.cpp
   src/polygon/line_segment.cpp
   src/polygon/polygon.cpp

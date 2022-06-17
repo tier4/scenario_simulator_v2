@@ -21,7 +21,7 @@
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <geometry_math/bounding_box.hpp>
-#include <geometry_math/collision.hpp>
+#include <geometry_math/intersection/collision.hpp>
 #include <vector>
 
 namespace geometry_math

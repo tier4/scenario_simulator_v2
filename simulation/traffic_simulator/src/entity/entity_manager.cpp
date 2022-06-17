@@ -14,7 +14,7 @@
 
 #include <cstdint>
 #include <geometry_math/bounding_box.hpp>
-#include <geometry_math/collision.hpp>
+#include <geometry_math/intersection/collision.hpp>
 #include <geometry_math/transform.hpp>
 #include <limits>
 #include <memory>
