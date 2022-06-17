@@ -181,24 +181,27 @@ auto DistanceCondition::distance<  //
     overload(
       [&](const WorldPosition & position) {
         if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
-          return getLongitudinalDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
+          return makeNativeRelativeLanePosition(
+                   triggering_entity, static_cast<NativeLanePosition>(position))
+            .s;
         } else {
           return std::numeric_limits<double>::quiet_NaN();
         }
       },
       [&](const RelativeWorldPosition & position) {
         if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
-          return getLongitudinalDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
+          return makeNativeRelativeLanePosition(
+                   triggering_entity, static_cast<NativeLanePosition>(position))
+            .s;
         } else {
           return std::numeric_limits<double>::quiet_NaN();
         }
       },
       [&](const LanePosition & position) {
         if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
-          return getLongitudinalDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
+          return makeNativeRelativeLanePosition(
+                   triggering_entity, static_cast<NativeLanePosition>(position))
+            .s;
         } else {
           return std::numeric_limits<double>::quiet_NaN();
         }

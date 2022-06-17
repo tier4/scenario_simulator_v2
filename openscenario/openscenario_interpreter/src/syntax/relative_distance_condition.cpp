@@ -116,7 +116,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
-    return getLongitudinalDistance(triggering_entity, entity_ref);
+    return makeNativeRelativeLanePosition(triggering_entity, entity_ref).s;
   } else {
     return Double::nan();
   }

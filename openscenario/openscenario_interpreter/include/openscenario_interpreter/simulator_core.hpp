@@ -56,9 +56,11 @@ public:
   protected:
     using NativeWorldPosition = geometry_msgs::msg::Pose;
 
-    using NativeRelativeWorldPosition = geometry_msgs::msg::Pose;
+    using NativeRelativeWorldPosition = NativeWorldPosition;
 
     using NativeLanePosition = traffic_simulator_msgs::msg::LaneletPose;
+
+    using NativeRelativeLanePosition = NativeLanePosition;
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const geometry_msgs::msg::Pose & pose)
@@ -128,6 +130,30 @@ public:
         result.orientation.w = 1;
         return result;
       }
+    }
+
+    template <typename... Ts>
+    static auto makeNativeRelativeLanePosition(Ts &&... xs)  // DUMMY IMPLEMENTATION!!!
+    {
+      auto s = [](auto &&... xs) {
+        if (const auto result =
+              connection->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
+            result) {
+          return result.get();
+        } else {
+          using value_type = typename std::decay<decltype(result)>::type::value_type;
+          return std::numeric_limits<value_type>::quiet_NaN();
+        }
+      };
+
+      NativeRelativeLanePosition position;
+      position.lanelet_id = std::numeric_limits<std::int64_t>::max();
+      position.s = s(std::forward<decltype(xs)>(xs)...);
+      position.offset = std::numeric_limits<double>::quiet_NaN();
+      position.rpy.x = std::numeric_limits<double>::quiet_NaN();
+      position.rpy.y = std::numeric_limits<double>::quiet_NaN();
+      position.rpy.z = std::numeric_limits<double>::quiet_NaN();
+      return position;
     }
 
     template <typename... Ts>
@@ -341,7 +367,6 @@ public:
   static_assert(true, "")
 
 STRIP_OPTIONAL(getBoundingBoxDistance, static_cast<value_type>(0));
-STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_NaN());
 
 #undef STRIP_OPTIONAL
 }  // namespace openscenario_interpreter
