@@ -15,6 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
 #define OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
 
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <limits>
 #include <memory>
 #include <openscenario_interpreter/error.hpp>
@@ -22,6 +24,7 @@
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -51,10 +54,11 @@ public:
   class GeneralCommand  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
   protected:
-    template <
-      typename T,
-      typename std::enable_if<
-        std::is_same<T, traffic_simulator_msgs::msg::LaneletPose>::value, int>::type = 0>
+    using NativeWorldPosition = geometry_msgs::msg::Pose;
+
+    using NativeLanePosition = traffic_simulator_msgs::msg::LaneletPose;
+
+    template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const geometry_msgs::msg::Pose & pose)
     {
       if (const auto result = connection->toLaneletPose(pose, false); result) {
@@ -70,6 +74,40 @@ public:
           "resolved by strictly specifying the location using LanePosition "
           "instead of WorldPosition");
       }
+    }
+
+    template <
+      typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
+    static auto convert(const NativeLanePosition & native_lane_position)
+    {
+      return connection->toMapPose(native_lane_position);
+    }
+
+    template <typename OSCLanePosition>
+    static auto makeNativeLanePosition(const OSCLanePosition & osc_lane_position)
+    {
+      return traffic_simulator::helper::constructLaneletPose(
+        boost::lexical_cast<std::int64_t>(osc_lane_position.lane_id), osc_lane_position.s,
+        osc_lane_position.offset, osc_lane_position.orientation.r, osc_lane_position.orientation.p,
+        osc_lane_position.orientation.h);
+    }
+
+    template <typename OSCWorldPosition>
+    static auto makeNativeWorldPosition(const OSCWorldPosition & osc_world_position)
+    {
+      NativeWorldPosition native_world_position;
+      native_world_position.position.x = osc_world_position.x;
+      native_world_position.position.y = osc_world_position.y;
+      native_world_position.position.z = osc_world_position.z;
+      native_world_position.orientation =
+        quaternion_operation::convertEulerAngleToQuaternion([&]() {
+          geometry_msgs::msg::Vector3 vector;
+          vector.x = osc_world_position.r;
+          vector.y = osc_world_position.p;
+          vector.z = osc_world_position.h;
+          return vector;
+        }());
+      return native_world_position;
     }
   };
 
@@ -175,12 +213,6 @@ public:
 
   class ConditionEvaluation  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
-    template <typename... Ts>
-    static auto currentEntityStatus(Ts &&... xs)
-    {
-      return connection->getEntityStatus(std::forward<decltype(xs)>(xs)...);
-    }
-
     // NOTE: evaluateSomething() -> Number
     //       evaluateSomethingCondition() -> bool
 
@@ -188,7 +220,8 @@ public:
     template <typename... Ts>
     static auto evaluateAcceleration(Ts &&... xs)
     {
-      return currentEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.accel.linear.x;
+      return connection->getEntityStatus(std::forward<decltype(xs)>(xs)...)
+        .action_status.accel.linear.x;
     }
 
     template <typename... Ts>
@@ -196,12 +229,6 @@ public:
     {
       return connection->checkCollision(std::forward<decltype(xs)>(xs)...);
     }
-
-    // template <typename... Ts>
-    // static auto evaluateReachPositionCondition(Ts &&... xs) -> bool
-    // {
-    //   return connection->reachPosition(std::forward<decltype(xs)>(xs)...);
-    // }
 
     template <typename... Ts>
     static auto evaluateSimulationTime(Ts &&... xs) -> double
@@ -212,7 +239,8 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return currentEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.twist.linear.x;
+      return connection->getEntityStatus(std::forward<decltype(xs)>(xs)...)
+        .action_status.twist.linear.x;
     }
 
     template <typename... Ts>
@@ -323,20 +351,6 @@ STRIP_OPTIONAL(getLongitudinalDistance, std::numeric_limits<value_type>::quiet_N
 FORWARD_TO_SIMULATION_API(getTrafficRelationReferees);
 
 #undef FORWARD_TO_SIMULATION_API
-
-#define RENAME(TO, FROM)                                                       \
-  template <typename... Ts>                                                    \
-  decltype(auto) TO(Ts &&... xs)                                               \
-  {                                                                            \
-    return SimulatorCore::connection->FROM(std::forward<decltype(xs)>(xs)...); \
-  }                                                                            \
-  static_assert(true, "")
-
-// NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
-
-RENAME(toWorldPosition, toMapPose);
-
-#undef RENAME
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_

@@ -45,9 +45,9 @@ struct WorldPosition : private SimulatorCore::GeneralCommand
 
   explicit WorldPosition(const pugi::xml_node &, Scope &);
 
-  explicit operator geometry_msgs::msg::Pose() const;
+  explicit operator NativeLanePosition() const;
 
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
+  explicit operator NativeWorldPosition() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

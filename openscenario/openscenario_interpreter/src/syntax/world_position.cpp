@@ -32,35 +32,11 @@ WorldPosition::WorldPosition(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-WorldPosition::operator geometry_msgs::msg::Pose() const
+WorldPosition::operator NativeLanePosition() const
 {
-  geometry_msgs::msg::Vector3 vector;
-  {
-    vector.x = r;
-    vector.y = p;
-    vector.z = h;
-  }
-
-  geometry_msgs::msg::Point point;
-  {
-    point.x = x;
-    point.y = y;
-    point.z = z;
-  }
-
-  geometry_msgs::msg::Pose pose;
-  {
-    pose.position = point;
-    pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(vector);
-  }
-
-  return pose;
+  return convert<NativeLanePosition>(static_cast<NativeWorldPosition>(*this));
 }
 
-WorldPosition::operator traffic_simulator_msgs::msg::LaneletPose() const
-{
-  return convert<traffic_simulator_msgs::msg::LaneletPose>(
-    static_cast<geometry_msgs::msg::Pose>(*this));
-}
+WorldPosition::operator NativeWorldPosition() const { return makeNativeWorldPosition(*this); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

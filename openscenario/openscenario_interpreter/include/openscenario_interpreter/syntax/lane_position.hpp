@@ -16,12 +16,12 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_POSITION_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/orientation.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,7 +40,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct LanePosition
+struct LanePosition : private SimulatorCore::GeneralCommand
 {
   const String road_id, lane_id;
 
@@ -50,9 +50,9 @@ struct LanePosition
 
   explicit LanePosition(const pugi::xml_node &, Scope &);
 
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
+  explicit operator NativeLanePosition() const;
 
-  explicit operator geometry_msgs::msg::Pose() const;
+  explicit operator NativeWorldPosition() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
