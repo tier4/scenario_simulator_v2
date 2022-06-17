@@ -1,4 +1,4 @@
-# Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+# Copyright 2015 TIER IV, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Co-developed by Tier IV, Inc. and Robotec.AI sp. z o.o.
+# Co-developed by TIER IV, Inc. and Robotec.AI sp. z o.o.
 
 cmake_minimum_required(VERSION 3.5)
 project(random_test_runner)
@@ -51,10 +51,16 @@ target_link_libraries(random_test_runner
   ${YAML_CPP_LIBRARIES}
   pthread
   sodium
-  zmqpp
   zmq
   fmt
 )
+
+# workaround to allow deprecated header to build on both galactic and humble
+if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
+  target_compile_definitions(random_test_runner PUBLIC
+    USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
+  )
+endif()
 
 install(
   DIRECTORY launch rviz include param

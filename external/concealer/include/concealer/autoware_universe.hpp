@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,11 +74,11 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
-  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState);
-  CONCEALER_DEFINE_SUBSCRIPTION(GearCommand);
+  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
+  CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
-  CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
+  CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
 
   using Engage = tier4_external_api_msgs::srv::Engage;
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
@@ -127,7 +127,7 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
-    CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage"),
+    CONCEALER_INIT_CLIENT(Engage, "/api/external/set/engage"),
     // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
     CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")
   // clang-format on

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace primitives
 class Box : public Primitive
 {
 public:
-  explicit Box(float depth, float width, float height, geometry_msgs::msg::Pose pose);
+  explicit Box(float depth, float width, float height, const geometry_msgs::msg::Pose & pose);
   ~Box() = default;
   const float depth;
   const float width;

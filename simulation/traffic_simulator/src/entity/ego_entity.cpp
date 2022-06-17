@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <boost/lexical_cast.hpp>
 #include <functional>
 #include <memory>
 #include <string>
@@ -162,14 +163,7 @@ EgoEntity::EgoEntity(
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
-void EgoEntity::engage() { autoware->engage(); }
-
-auto EgoEntity::getVehicleCommand() const -> std::tuple<
-  autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
-{
-  return autoware->getVehicleCommand();
-}
+auto EgoEntity::asAutoware() const -> concealer::Autoware & { return *autoware; }
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
@@ -187,15 +181,6 @@ auto EgoEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverMod
   model.acceleration = 0;
   model.deceleration = 0;
   return model;
-}
-
-auto EgoEntity::getEmergencyStateName() const -> std::string
-{
-  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
-    return boost::lexical_cast<std::string>(universe->getEmergencyState());
-  } else {
-    return "";
-  }
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
@@ -305,15 +290,6 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   return ids;
 }
 
-auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
-{
-  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
-    return boost::lexical_cast<std::string>(universe->getTurnIndicatorsCommand());
-  } else {
-    return "";
-  }
-}
-
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   return autoware->getWaypoints();
@@ -378,12 +354,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
-    // DIRTY HACK!!!
-    if (auto autoware_universe = dynamic_cast<concealer::AutowareUniverse const *>(autoware.get());
-        autoware_universe) {
-      vehicle_model_ptr_->setGear(autoware_universe->getGearCommand().command);
-    }
-
+    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
 
@@ -400,8 +371,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     previous_angular_velocity_ = vehicle_model_ptr_->getWz();
   }
 }
-
-auto EgoEntity::ready() const -> bool { return autoware->ready(); }
 
 void EgoEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)

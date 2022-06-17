@@ -1,6 +1,6 @@
 # Run test scenario with Docker
 
-Before you try this documentation, please check [this document](RunWithDocker.md) and setup docker and run scenario_simulator_v2 inside docker.
+Before you try this documentation, please setup docker following [this document](RunWithDocker.md).
 
 ## Run test scenarios in docker
 

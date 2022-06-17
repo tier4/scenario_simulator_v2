@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
 }
 
 void OpenscenarioVisualizationComponent::entityStatusCallback(
-  const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg)
+  const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::ConstSharedPtr msg)
 {
   visualization_msgs::msg::MarkerArray current_marker;
   std::vector<std::string> entity_name_lists;
