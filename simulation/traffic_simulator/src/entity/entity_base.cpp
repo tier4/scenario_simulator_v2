@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <geometry_math/distance.hpp>
-#include <geometry_math/polygon.hpp>
+#include <geometry_math/polygon/polygon.hpp>
 #include <geometry_math/transform.hpp>
 #include <limits>
 #include <queue>

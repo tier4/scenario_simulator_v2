@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__POLYGON_HPP_
-#define GEOMETRY_MATH__POLYGON_HPP_
+#ifndef GEOMETRY_MATH__POLYGON__POLYGON_HPP_
+#define GEOMETRY_MATH__POLYGON__POLYGON_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
 
@@ -28,4 +28,4 @@ std::vector<geometry_msgs::msg::Point> get2DConvexHull(
   const std::vector<geometry_msgs::msg::Point> & points);
 }  // namespace geometry_math
 
-#endif  // GEOMETRY_MATH__POLYGON_HPP_
+#endif  // GEOMETRY_MATH__POLYGON__POLYGON_HPP_

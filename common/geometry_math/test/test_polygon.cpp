@@ -14,7 +14,7 @@
 
 #include <gtest/gtest.h>
 
-#include <geometry_math/polygon.hpp>
+#include <geometry_math/polygon/polygon.hpp>
 
 #include "expect_eq_macros.hpp"
 

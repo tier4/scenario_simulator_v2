@@ -18,7 +18,7 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
-#include <geometry_math/polygon.hpp>
+#include <geometry_math/polygon/polygon.hpp>
 #include <geometry_math/transform.hpp>
 #include <iostream>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
