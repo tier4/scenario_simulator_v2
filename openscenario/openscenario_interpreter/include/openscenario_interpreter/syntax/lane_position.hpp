@@ -40,7 +40,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct LanePosition : private SimulatorCore::GeneralCommand
+struct LanePosition : private SimulatorCore::CoordinateSystemConversion
 {
   const String road_id, lane_id;
 

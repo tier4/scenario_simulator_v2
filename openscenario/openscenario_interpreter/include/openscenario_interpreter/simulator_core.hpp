@@ -32,26 +32,26 @@ namespace openscenario_interpreter
 class SimulatorCore
 {
 public:  // TODO PRIVATE!
-  static inline std::unique_ptr<traffic_simulator::API> connection = nullptr;
+  static inline std::unique_ptr<traffic_simulator::API> core = nullptr;
 
 public:
   template <typename Node, typename... Ts>
   static auto activate(
     const Node & node, const traffic_simulator::Configuration & configuration, Ts &&... xs) -> void
   {
-    if (not connection) {
-      connection = std::make_unique<traffic_simulator::API>(node, configuration);
-      connection->initialize(std::forward<decltype(xs)>(xs)...);
+    if (not core) {
+      core = std::make_unique<traffic_simulator::API>(node, configuration);
+      core->initialize(std::forward<decltype(xs)>(xs)...);
     } else {
       throw Error("The simulator core has already been instantiated.");
     }
   }
 
-  static auto deactivate() -> void { connection.reset(); }
+  static auto deactivate() -> void { core.reset(); }
 
-  static auto update() -> void { connection->updateFrame(); }
+  static auto update() -> void { core->updateFrame(); }
 
-  class GeneralCommand  // OpenSCENARIO 1.1.1 Section 3.1.5
+  class CoordinateSystemConversion
   {
   protected:
     using NativeWorldPosition = geometry_msgs::msg::Pose;
@@ -65,7 +65,7 @@ public:
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const geometry_msgs::msg::Pose & pose)
     {
-      if (const auto result = connection->toLaneletPose(pose, false); result) {
+      if (const auto result = core->toLaneletPose(pose, false); result) {
         return result.get();
       } else {
         throw Error(
@@ -84,16 +84,21 @@ public:
       typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
     static auto convert(const NativeLanePosition & native_lane_position)
     {
-      return connection->toMapPose(native_lane_position);
+      return core->toMapPose(native_lane_position);
     }
 
     template <typename OSCLanePosition>
     static auto makeNativeLanePosition(const OSCLanePosition & osc_lane_position)
     {
-      return traffic_simulator::helper::constructLaneletPose(
-        boost::lexical_cast<std::int64_t>(osc_lane_position.lane_id), osc_lane_position.s,
-        osc_lane_position.offset, osc_lane_position.orientation.r, osc_lane_position.orientation.p,
-        osc_lane_position.orientation.h);
+      NativeLanePosition native_lane_position;
+      native_lane_position.lanelet_id =
+        boost::lexical_cast<std::int64_t>(osc_lane_position.lane_id);
+      native_lane_position.s = osc_lane_position.s;
+      native_lane_position.offset = osc_lane_position.offset;
+      native_lane_position.rpy.x = osc_lane_position.orientation.r;
+      native_lane_position.rpy.y = osc_lane_position.orientation.p;
+      native_lane_position.rpy.z = osc_lane_position.orientation.h;
+      return native_lane_position;
     }
 
     template <typename OSCWorldPosition>
@@ -118,7 +123,7 @@ public:
     static auto makeNativeRelativeWorldPosition(Ts &&... xs)
     {
       try {
-        return SimulatorCore::connection->getRelativePose(std::forward<decltype(xs)>(xs)...);
+        return SimulatorCore::core->getRelativePose(std::forward<decltype(xs)>(xs)...);
       } catch (...) {
         geometry_msgs::msg::Pose result{};
         result.position.x = std::numeric_limits<double>::quiet_NaN();
@@ -136,8 +141,7 @@ public:
     static auto makeNativeRelativeLanePosition(Ts &&... xs)  // DUMMY IMPLEMENTATION!!!
     {
       auto s = [](auto &&... xs) {
-        if (const auto result =
-              connection->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
+        if (const auto result = core->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
             result) {
           return result.get();
         } else {
@@ -159,7 +163,7 @@ public:
     template <typename... Ts>
     static auto toWayIDs(Ts &&... xs) -> decltype(auto)
     {
-      return connection->getTrafficRelationReferees(std::forward<decltype(xs)>(xs)...);
+      return core->getTrafficRelationReferees(std::forward<decltype(xs)>(xs)...);
     }
   };
 
@@ -169,33 +173,33 @@ public:
     template <typename... Ts>
     static auto applyAcquirePositionAction(Ts &&... xs)
     {
-      return connection->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      return core->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyAddEntityAction(Ts &&... xs)
     {
-      return connection->spawn(std::forward<decltype(xs)>(xs)...);
+      return core->spawn(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename Controller>
     static auto applyAssignControllerAction(
       const std::string & entity_ref, Controller && controller) -> void
     {
-      connection->setVelocityLimit(
+      core->setVelocityLimit(
         entity_ref, controller.properties.template get<Double>(
                       "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
-      connection->setDriverModel(entity_ref, [&]() {
-        auto message = connection->getDriverModel(entity_ref);
+      core->setDriverModel(entity_ref, [&]() {
+        auto message = core->getDriverModel(entity_ref);
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
         return message;
       }());
 
       if (controller.isUserDefinedController()) {
-        connection->attachLidarSensor(entity_ref);
+        core->attachLidarSensor(entity_ref);
 
-        connection->attachDetectionSensor([&]() {
+        core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
           configuration.set_entity(entity_ref);
           configuration.set_architecture_type(
@@ -207,7 +211,7 @@ public:
           return configuration;
         }());
 
-        connection->attachOccupancyGridSensor([&]() {
+        core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
           configuration.set_entity(entity_ref);
           configuration.set_architecture_type(
@@ -227,60 +231,60 @@ public:
     template <typename... Ts>
     static auto applyAssignRouteAction(Ts &&... xs)
     {
-      return connection->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+      return core->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyDeleteEntityAction(Ts &&... xs)
     {
-      return connection->despawn(std::forward<decltype(xs)>(xs)...);
+      return core->despawn(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyLaneChangeAction(Ts &&... xs)
     {
-      return connection->requestLaneChange(std::forward<decltype(xs)>(xs)...);
+      return core->requestLaneChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applySpeedAction(Ts &&... xs)
     {
-      return connection->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
+      return core->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyTeleportAction(Ts &&... xs)
     {
-      return connection->setEntityStatus(std::forward<decltype(xs)>(xs)...);
+      return core->setEntityStatus(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyWalkStraightAction(Ts &&... xs)
     {
-      return connection->requestWalkStraight(std::forward<decltype(xs)>(xs)...);
+      return core->requestWalkStraight(std::forward<decltype(xs)>(xs)...);
     }
   };
 
-  class ConditionEvaluation : protected GeneralCommand  // OpenSCENARIO 1.1.1 Section 3.1.5
+  // OpenSCENARIO 1.1.1 Section 3.1.5
+  class ConditionEvaluation : protected CoordinateSystemConversion
   {
   protected:
     template <typename... Ts>
     static auto evaluateAcceleration(Ts &&... xs)
     {
-      return connection->getEntityStatus(std::forward<decltype(xs)>(xs)...)
-        .action_status.accel.linear.x;
+      return core->getEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.accel.linear.x;
     }
 
     template <typename... Ts>
     static auto evaluateCollisionCondition(Ts &&... xs) -> bool
     {
-      return connection->checkCollision(std::forward<decltype(xs)>(xs)...);
+      return core->checkCollision(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto evaluateFreespaceEuclideanDistance(Ts &&... xs)  // for RelativeDistanceCondition
     {
-      if (const auto result = connection->getBoundingBoxDistance(std::forward<decltype(xs)>(xs)...);
+      if (const auto result = core->getBoundingBoxDistance(std::forward<decltype(xs)>(xs)...);
           result) {
         return result.get();
       } else {
@@ -292,20 +296,19 @@ public:
     template <typename... Ts>
     static auto evaluateSimulationTime(Ts &&... xs) -> double
     {
-      return connection->getCurrentTime(std::forward<decltype(xs)>(xs)...);
+      return core->getCurrentTime(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return connection->getEntityStatus(std::forward<decltype(xs)>(xs)...)
-        .action_status.twist.linear.x;
+      return core->getEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.twist.linear.x;
     }
 
     template <typename... Ts>
     static auto evaluateStandStill(Ts &&... xs)
     {
-      if (const auto result = connection->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
+      if (const auto result = core->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
           result) {
         return result.get();
       } else {
@@ -317,8 +320,7 @@ public:
     template <typename... Ts>
     static auto evaluateTimeHeadway(Ts &&... xs)
     {
-      if (const auto result = connection->getTimeHeadway(std::forward<decltype(xs)>(xs)...);
-          result) {
+      if (const auto result = core->getTimeHeadway(std::forward<decltype(xs)>(xs)...); result) {
         return result.get();
       } else {
         using value_type = typename std::decay<decltype(result)>::type::value_type;
@@ -335,7 +337,7 @@ public:
       const std::string & entity_ref, const Performance & performance,
       const Properties & properties)
     {
-      connection->addMetric<metrics::OutOfRangeMetric>(entity_ref + "-out-of-range", [&]() {
+      core->addMetric<metrics::OutOfRangeMetric>(entity_ref + "-out-of-range", [&]() {
         metrics::OutOfRangeMetric::Config configuration;
         configuration.target_entity = entity_ref;
         configuration.min_velocity = -performance.max_speed;
@@ -353,13 +355,13 @@ public:
     template <typename... Ts>
     static auto asAutoware(Ts &&... xs) -> decltype(auto)
     {
-      return connection->asAutoware(std::forward<decltype(xs)>(xs)...);
+      return core->asAutoware(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto evaluateCurrentState(Ts &&... xs) -> decltype(auto)
     {
-      return connection->getCurrentAction(std::forward<decltype(xs)>(xs)...);
+      return core->getCurrentAction(std::forward<decltype(xs)>(xs)...);
     }
   };
 };

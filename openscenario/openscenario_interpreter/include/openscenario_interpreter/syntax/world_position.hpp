@@ -39,7 +39,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct WorldPosition : private SimulatorCore::GeneralCommand
+struct WorldPosition : private SimulatorCore::CoordinateSystemConversion
 {
   const Double x, y, z, h, p, r;
 

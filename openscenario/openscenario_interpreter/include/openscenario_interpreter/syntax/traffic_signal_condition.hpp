@@ -37,7 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalCondition : private SimulatorCore::GeneralCommand
+struct TrafficSignalCondition : private SimulatorCore::CoordinateSystemConversion
 {
   const String name;
 

@@ -34,7 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalStateAction : private SimulatorCore::GeneralCommand
+struct TrafficSignalStateAction : private SimulatorCore::CoordinateSystemConversion
 {
   /* ---- NOTE -----------------------------------------------------------------
    *
