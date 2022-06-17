@@ -31,7 +31,6 @@ namespace openscenario_interpreter
 {
 class SimulatorCore
 {
-public:  // TODO PRIVATE!
   static inline std::unique_ptr<traffic_simulator::API> core = nullptr;
 
 public:
