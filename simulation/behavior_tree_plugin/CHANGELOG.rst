@@ -2,6 +2,38 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.5 (2022-06-16)
+------------------
+* Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
+* fix(behavior_tree_plugin): modify build error in both galactic and humble
+* Merge branch 'master' into feature/change_engage_api_name
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Fix Licence
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge pull request `#710 <https://github.com/tier4/scenario_simulator_v2/issues/710>`_ from RobotecAI/AJD-331-optimization-2nd-stage
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* rename CatmullRomInterface -> CatmullRomSplineInterface
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/emergency_state_for_fault_injection
+* Merge branch 'master' into AJD-331-optimization-2nd-stage
+* Refactor
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* apply clang format
+* check if trajectory is nullptr before dereferencing it
+* reformat
+* no recalculation in follow front entity
+* cleanup comments
+* rename subspline -> trajectory
+* calculate subspline from spline; hdmap_utils use spline instead of recalculating it
+* Contributors: Daisuke Nishimatsu, Daniel Marczak, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yuma Nihei, danielm1405, kyabe2718, yamacir-kit
+
 0.6.4 (2022-04-26)
 ------------------
 * Merge pull request `#762 <https://github.com/tier4/scenario_simulator_v2/issues/762>`_ from tier4/fix/email
