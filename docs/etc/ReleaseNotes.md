@@ -2,6 +2,27 @@
 
 ## Difference between the latest release and master
 
+
+Major Changes :race_car: :red_car: :blue_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+## Version 0.6.5
+
 Major Changes :race_car: :red_car: :blue_car:
 
 |                   Feature                    |                                                Brief summary                                                |          Category          |                          Pull request                           |                  Contributor                  |
@@ -13,7 +34,7 @@ Major Changes :race_car: :red_car: :blue_car:
 | OpenSCENARIO `Event`                         | Allows the omission of Event.StartTrigger. if it is omitted, interpreter uses one which always returns True | `openscenario_interpreter` | [#774](https://github.com/tier4/scenario_simulator_v2/pull/774) | [HansRobo](https://github.com/HansRobo)       |
 | Add `OccupancyGridSensor`                    | Add `OccupancyGridSensor` for publishing nav_msgs/msg/OccupancyGrid to the Autoware.                        | `simple_sensor_simulator`  | [#795](https://github.com/tier4/scenario_simulator_v2/pull/797) | [hakuturu583](https://github.com/hakuturu583) |
 | Add `API::getDistanceToLaneBound()` function | Add `API::getDistanceToLaneBound()` function for getting distance from entity polygon to lane boundary.     | `traffic_simulator`        | [#795](https://github.com/tier4/scenario_simulator_v2/pull/807) | [hakuturu583](https://github.com/hakuturu583) |
-
+| Support Humble distribution                  | Support new ROS 2 LTS distribution, Humble Hawksbill.                                                       |                            | [#792](https://github.com/tier4/scenario_simulator_v2/pull/793) | [wep21](https://github.com/wep21)             |
 
 Bug Fixes:bug:
 

@@ -89,7 +89,7 @@ private:
    * @param msg entity status array message from openscenario interpreter.
    */
   void entityStatusCallback(
-    const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg);
+    const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::ConstSharedPtr msg);
   /**
    * @brief generate delete marker for target namespace.
    * @param ns namespace of the marker which you want to delete.

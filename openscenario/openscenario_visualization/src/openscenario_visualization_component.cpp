@@ -68,7 +68,7 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
 }
 
 void OpenscenarioVisualizationComponent::entityStatusCallback(
-  const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg)
+  const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::ConstSharedPtr msg)
 {
   visualization_msgs::msg::MarkerArray current_marker;
   std::vector<std::string> entity_name_lists;
