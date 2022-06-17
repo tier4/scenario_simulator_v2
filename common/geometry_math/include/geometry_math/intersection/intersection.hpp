@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__COLLISION__COLLISION_HPP_
-#define GEOMETRY_MATH__COLLISION__COLLISION_HPP_
+#ifndef GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_
+#define GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_
 
-#include <geometry_math/bounding_box.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <traffic_simulator_msgs/msg/bounding_box.hpp>
+#include <boost/optional.hpp>
+#include <geometry_math/polygon/line_segment.hpp>
+#include <geometry_msgs/msg/point.hpp>
 #include <vector>
 
 namespace geometry_math
 {
-bool checkCollision2D(
-  geometry_msgs::msg::Pose pose0, traffic_simulator_msgs::msg::BoundingBox bbox0,
-  geometry_msgs::msg::Pose pose1, traffic_simulator_msgs::msg::BoundingBox bbox1);
+bool isIntersect2D(const LineSegment & line0, const LineSegment & line1);
+bool isIntersect2D(const std::vector<LineSegment> & lines);
+boost::optional<geometry_msgs::msg::Point> getIntersection2D(
+  const LineSegment & line0, const LineSegment & line1);
+std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines);
 }  // namespace geometry_math
 
-#endif  // GEOMETRY_MATH__COLLISION__COLLISION_HPP_
+#endif  // GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_

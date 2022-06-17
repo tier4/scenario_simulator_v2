@@ -39,8 +39,6 @@ public:
   const size_t index;
   const size_t row;
   const size_t col;
-  bool isIntersect2D(const geometry_math::LineSegment & line) const;
-  bool isIntersect2D(const std::vector<geometry_math::LineSegment> & line_segments) const;
   bool contains(const geometry_msgs::msg::Point & p) const;
   bool contains(const std::vector<geometry_msgs::msg::Point> & points) const;
   int8_t getData() const;
