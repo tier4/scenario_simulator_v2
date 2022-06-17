@@ -15,6 +15,7 @@ ament_auto_add_library(geometry_math SHARED
   src/collision.cpp
   src/distance.cpp
   src/linear_algebra.cpp
+  src/polygon/line_segment.cpp
   src/polygon/polygon.cpp
   src/solver/polynomial_solver.cpp
   src/spline/catmull_rom_spline.cpp
