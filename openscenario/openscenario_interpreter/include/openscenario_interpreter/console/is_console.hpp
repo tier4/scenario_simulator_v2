@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace console
 {
-auto is_console = [](const auto & os) {
+inline auto is_console = [](const auto & os) {
   if (os.rdbuf() == std::cout.rdbuf()) {
     static const auto result{static_cast<bool>(::isatty(STDOUT_FILENO))};
     return result;

@@ -388,7 +388,7 @@ bool API::updateEntityStatusInSim()
     }
   }
   const auto names = entity_manager_ptr_->getEntityNames();
-  for (const auto name : names) {
+  for (const auto & name : names) {
     auto status = entity_manager_ptr_->getEntityStatus(name);
     if (status) {
       traffic_simulator_msgs::EntityStatus proto;
@@ -399,7 +399,7 @@ bool API::updateEntityStatusInSim()
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
-  for (const auto status : res.status()) {
+  for (const auto & status : res.status()) {
     auto entity_status = entity_manager_ptr_->getEntityStatus(status.name());
     if (!entity_status) {
       continue;

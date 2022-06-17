@@ -29,7 +29,7 @@ auto & escape_sequence(std::basic_ostream<Ts...> & os, const std::string & code)
 }
 
 #define BOILERPLATE(CODE, NAME) \
-  auto NAME = [](std::ostream & os) -> decltype(auto) { return escape_sequence(os, CODE); }
+  inline auto NAME = [](std::ostream & os) -> decltype(auto) { return escape_sequence(os, CODE); }
 
 BOILERPLATE("[0m", reset);
 BOILERPLATE("[1m", bold);

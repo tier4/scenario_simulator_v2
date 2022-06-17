@@ -2,6 +2,118 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.5 (2022-06-16)
+------------------
+* Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
+* fix dependency
+* Merge branch 'master' into fix/build-error-humble
+* Merge remote-tracking branch 'origin/master' into feature/change_engage_api_name
+* Merge pull request `#807 <https://github.com/tier4/scenario_simulator_v2/issues/807>`_ from tier4/feature/get_distance_to_lane_bound
+* fix(traffic_simulator): modify build error in humble
+* fixed const-non-reference warror
+* traffic simulator pluginlib dependency
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_distance_to_lane_bound
+* Merge pull request `#803 <https://github.com/tier4/scenario_simulator_v2/issues/803>`_ from tier4/feature/replace_dummy_ogm_map
+* Merge pull request `#796 <https://github.com/tier4/scenario_simulator_v2/issues/796>`_ from tier4/refactor/concealer/virtual-functions
+* fix problem in push back
+* add getDistanceToLaneBound function
+* remove const
+* update get distance to bound function
+* enable call without specify lanelet id
+* add definition to manager class
+* add getLaneletPose function to the base class
+* add definition in API class
+* add getLeft/Right bound function to entity base class
+* remove metric
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pull_over_metrics
+* Merge branch 'master' into feature/change_engage_api_name
+* Fix local function `everyone_engageable`
+* Merge pull request `#779 <https://github.com/tier4/scenario_simulator_v2/issues/779>`_ from adamkrawczyk/build/add_missing_depend
+* feat!: replace dummy ogm
+* add judge algorithum for pull over metric
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* enable check yaw angle
+* Remove member function `API::engage` and `API::ready`
+* add activateTrigger function
+* add getLeftBound/getRightBound function
+* Remove some member functions for Autoware.Universe from API
+* Merge pull request `#797 <https://github.com/tier4/scenario_simulator_v2/issues/797>`_ from tier4/feature/occupancy_grid_sensor
+* Add new member function `asAutoware`
+* add pull over metric class
+* Merge pull request `#778 <https://github.com/tier4/scenario_simulator_v2/issues/778>`_ from tier4/feature/zmqpp_vendor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Merge branch 'master' into feature/occupancy_grid_sensor
+* Merge remote-tracking branch 'origin/master' into doc/arrange_docs_and_fix_copyright
+* Merge pull request `#795 <https://github.com/tier4/scenario_simulator_v2/issues/795>`_ from tier4/fix/lane_matching_logic
+* remove unused comment
+* Merge remote-tracking branch 'origin/master' into doc/arrange_docs_and_fix_copyright
+* Fix misses
+* Fix Licence
+* Add virtual function `getTurnIndicatorsCommand` to class `Autoware`
+* Add virtual function `getGearCommand` to class `Autoware`
+* add nan check
+* change logics for checking solution
+* Merge pull request `#750 <https://github.com/tier4/scenario_simulator_v2/issues/750>`_ from tier4/fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* Merge pull request `#792 <https://github.com/tier4/scenario_simulator_v2/issues/792>`_ from tier4/fix/autoware/reverse-gear
+* Fix Autoware.Universe to accept `GearCommand` correctly
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into build/add_missing_depend
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/missing_autoware_launch
+* add autoware->rethrow() in EgoEntity::onUpdate()
+* Merge branch 'master' into feature/zmqpp_vendor
+* Merge pull request `#785 <https://github.com/tier4/scenario_simulator_v2/issues/785>`_ from tier4/doc/improve
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge remote-tracking branch 'origin/master' into doc/improve
+* apply reformat
+* rename topic
+* Fix old "TierIV" annotation
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge pull request `#777 <https://github.com/tier4/scenario_simulator_v2/issues/777>`_ from tier4/feature/indicator_condition
+* Add traffic sim missing depend
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* add client tot the API class
+* Refactor
+* Rename **StateString to **StateName
+* modify CMakeLists.txt
+* Implement TurnIndicatorsState as an UserDefinedValueCondition
+* Merge pull request `#710 <https://github.com/tier4/scenario_simulator_v2/issues/710>`_ from RobotecAI/AJD-331-optimization-2nd-stage
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* rename CatmullRomInterface -> CatmullRomSplineInterface
+* Merge pull request `#760 <https://github.com/tier4/scenario_simulator_v2/issues/760>`_ from tier4/feature/emergency_state_for_fault_injection
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/emergency_state_for_fault_injection
+* Revised the scope of responsibility for each getEmergencyStateString function
+* Merge branch 'master' into AJD-331-optimization-2nd-stage
+* Do check dynamic_cast to EgoEntity in isEgo function
+* Add getEmergencyStateString function to EntityBase class
+* Add dynamic_cast check to EntityManager::isEgo function
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* refactor
+* Use common::Error instead of SEMANTIC_ERROR
+* Refactor
+* Add EmergencyStateString interface to traffic_simulator API
+* Add EmergencyStateString interface on EntityManager
+* Fix compile errors
+* [WIP] add EmenrgencyState interface on EgoEntity
+* Add semantic error
+* Add shift operator overload for EmergencyState to correspond boost::lexical_cast
+* Merge branch 'master' into AJD-331-optimization-2nd-stage
+* Refactor
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* cleanup comments
+* fix catmull rom spline unit tests
+* calculate subspline from spline; hdmap_utils use spline instead of recalculating it
+* create getSubspline() method for CatmullRomSpline
+* Contributors: Adam Krawczyk, Daisuke Nishimatsu, Daniel Marczak, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, Yuma Nihei, danielm1405, kyabe2718, taikitanaka3, tanaka3, wep21, yamacir-kit
+
 0.6.4 (2022-04-26)
 ------------------
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
