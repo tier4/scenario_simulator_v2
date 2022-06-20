@@ -24,7 +24,7 @@ void OutOfRangeMetric::setEntityManager(
   if (jerk_topic) {
     jerk_callback_ptr_ = entity_manager_ptr_->createSubscription<JerkMessageType>(
       *jerk_topic, rclcpp::SensorDataQoS(),
-      [this](const JerkMessageType::SharedPtr msg) { linear_jerk_ = msg->data; });
+      [this](const JerkMessageType::ConstSharedPtr msg) { linear_jerk_ = msg->data; });
   }
 }
 

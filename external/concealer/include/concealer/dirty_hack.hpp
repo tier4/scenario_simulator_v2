@@ -47,18 +47,20 @@ public:                                                                         
         #TYPE " service request was accepted, but ineffective => Retry!"                           \
           << (result->status.message.empty() ? "" : " (" + result->status.message + ")"));         \
       rclcpp::WallRate(std::chrono::seconds(1)).sleep();                                           \
-      return request##TYPE(request);                                                               \
     }                                                                                              \
   }                                                                                                \
   static_assert(true, "")
 
-#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE)                                      \
-private:                                                                         \
-  TYPE::SharedPtr current_value_of_##TYPE{std::make_shared<TYPE>()};             \
-  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;                  \
-                                                                                 \
-public:                                                                          \
-  auto get##TYPE() const { return *std::atomic_load(&current_value_of_##TYPE); } \
+#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE, ...)                      \
+private:                                                              \
+  TYPE::SharedPtr current_value_of_##TYPE = std::make_shared<TYPE>(); \
+  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;       \
+                                                                      \
+public:                                                               \
+  auto get##TYPE() const->const TYPE & __VA_ARGS__                    \
+  {                                                                   \
+    return *std::atomic_load(&current_value_of_##TYPE);               \
+  }                                                                   \
   static_assert(true, "")
 
 #define CONCEALER_DEFINE_PUBLISHER(TYPE)                  \
@@ -77,10 +79,10 @@ public:                                                   \
   client_of_##TYPE(static_cast<Autoware &>(*this).template create_client<TYPE>( \
     SERVICE_NAME, rmw_qos_profile_default))
 
-#define CONCEALER_INIT_SUBSCRIPTION(TYPE, TOPIC)                                            \
-  subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
-    TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
-      std::atomic_store(&current_value_of_##TYPE, std::move(message));                      \
+#define CONCEALER_INIT_SUBSCRIPTION(TYPE, TOPIC)                                                \
+  subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>(     \
+    TOPIC, 1, [this](const TYPE::ConstSharedPtr message) {                                      \
+      std::atomic_store(&current_value_of_##TYPE, std::move(std::make_shared<TYPE>(*message))); \
     }))
 
 #define CONCEALER_INIT_PUBLISHER(TYPE, TOPIC) \
