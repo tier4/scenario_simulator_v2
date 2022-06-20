@@ -73,6 +73,9 @@ boost::optional<double> StopAtTrafficLightAction::calculateTargetSpeed(double cu
   if (!distance_to_stop_target_) {
     return boost::none;
   }
+  /**
+   * @brief hard coded parameter!! 1.0 is a stop margin
+   */
   double rest_distance =
     distance_to_stop_target_.get() - vehicle_parameters.bounding_box.dimensions.x * 0.5;
   if (rest_distance < calculateStopDistance(driver_model.deceleration)) {
