@@ -16,11 +16,11 @@
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <boost/algorithm/clamp.hpp>
+#include <geometry_math/spline/catmull_rom_spline.hpp>
+#include <geometry_math/transform.hpp>
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <geometry_math/catmull_rom_spline.hpp>
-#include <geometry_math/transform.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -107,7 +107,7 @@ BT::NodeStatus LaneChangeAction::tick()
             entity_status.lanelet_pose.lanelet_id, lane_change_parameters_->target.lanelet_id)) {
         return BT::NodeStatus::FAILURE;
       }
-      boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> traj_with_goal;
+      boost::optional<std::pair<geometry_math::HermiteCurve, double>> traj_with_goal;
       traffic_simulator_msgs::msg::LaneletPose along_pose, goal_pose;
       switch (lane_change_parameters_->constraint.type) {
         case traffic_simulator::lane_change::Constraint::Type::NONE:
@@ -144,7 +144,7 @@ BT::NodeStatus LaneChangeAction::tick()
         goal_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
         goal_pose.s = traj_with_goal->second;
         double offset = std::fabs(
-          traffic_simulator::math::getRelativePose(
+          geometry_math::getRelativePose(
             hdmap_utils->toMapPose(along_pose).pose, hdmap_utils->toMapPose(goal_pose).pose)
             .position.y);
         switch (lane_change_parameters_->constraint.type) {

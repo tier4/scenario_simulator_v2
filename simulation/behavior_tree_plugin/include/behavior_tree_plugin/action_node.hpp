@@ -18,13 +18,13 @@
 #include <behaviortree_cpp_v3/action_node.h>
 
 #include <boost/algorithm/clamp.hpp>
+#include <geometry_math/spline/catmull_rom_spline.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/data_type/data_types.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <geometry_math/catmull_rom_spline.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
@@ -103,10 +103,9 @@ public:
   std::vector<std::int64_t> route_lanelets;
   traffic_simulator_msgs::msg::EntityStatus getEntityStatus(const std::string target_name) const;
   boost::optional<double> getDistanceToTargetEntityPolygon(
-    const geometry_math::CatmullRomSplineInterface & spline,
-    const std::string target_name, double width_extension_right = 0.0,
-    double width_extension_left = 0.0, double length_extension_front = 0.0,
-    double length_extension_rear = 0.0);
+    const geometry_math::CatmullRomSplineInterface & spline, const std::string target_name,
+    double width_extension_right = 0.0, double width_extension_left = 0.0,
+    double length_extension_front = 0.0, double length_extension_rear = 0.0);
 
 private:
   boost::optional<double> getDistanceToTargetEntityOnCrosswalk(

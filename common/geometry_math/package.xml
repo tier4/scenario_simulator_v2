@@ -4,7 +4,7 @@
   <name>geometry_math</name>
   <version>0.6.4</version>
   <description>geometry math library for scenario_simulator_v2 application</description>
-  <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
+  <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -15,6 +15,7 @@
   <depend>quaternion_operation</depend>
   <depend>scenario_simulator_exception</depend>
   <depend>traffic_simulator_msgs</depend>
+  <depend>tf2_geometry_msgs</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>

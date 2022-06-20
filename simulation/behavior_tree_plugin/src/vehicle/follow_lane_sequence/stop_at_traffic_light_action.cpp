@@ -59,7 +59,7 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtTrafficLightAction::calc
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
       entity_status.lanelet_pose.offset);
-    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSubspline>(
+    trajectory = std::make_unique<geometry_math::CatmullRomSubspline>(
       reference_trajectory, entity_status.lanelet_pose.s,
       entity_status.lanelet_pose.s + getHorizon());
     return waypoints;

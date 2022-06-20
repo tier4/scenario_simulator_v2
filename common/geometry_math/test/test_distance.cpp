@@ -14,50 +14,50 @@
 
 #include <gtest/gtest.h>
 
-#include <scenario_simulator_exception/exception.hpp>
 #include <geometry_math/bounding_box.hpp>
 #include <geometry_math/distance.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 TEST(Distance, PointToPoint)
 {
   geometry_msgs::msg::Point p0, p1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 0);
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), 0);
   p1.x = 1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 1);
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), 1);
   p0.y = 1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), std::sqrt(2));
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), std::sqrt(2));
 }
 
 TEST(Distance, PoseToPose)
 {
   geometry_msgs::msg::Pose p0, p1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 0);
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), 0);
   p1.position.x = 1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 1);
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), 1);
   p0.position.y = 1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), std::sqrt(2));
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), std::sqrt(2));
 }
 
 TEST(Distance, PointToPose)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Pose p1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 0);
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), 0);
   p1.position.x = 1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 1);
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), 1);
   p0.y = 1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), std::sqrt(2));
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), std::sqrt(2));
 }
 
 TEST(Distance, PoseToPoint)
 {
   geometry_msgs::msg::Pose p0;
   geometry_msgs::msg::Point p1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 0);
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), 0);
   p1.x = 1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 1);
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), 1);
   p0.position.y = 1;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), std::sqrt(2));
+  EXPECT_DOUBLE_EQ(geometry_math::getDistance(p0, p1), std::sqrt(2));
 }
 
 int main(int argc, char ** argv)

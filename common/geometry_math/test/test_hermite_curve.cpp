@@ -14,7 +14,7 @@
 
 #include <gtest/gtest.h>
 
-#include <geometry_math/hermite_curve.hpp>
+#include <geometry_math/spline/hermite_curve.hpp>
 
 TEST(HermiteCurveTest, CheckCollisionToLine)
 {
@@ -23,7 +23,7 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
   goal_pose.position.x = 1;
   start_vec.x = 1;
   goal_vec.x = 1;
-  traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
+  geometry_math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
   EXPECT_DOUBLE_EQ(curve.getLength(), 1);
   EXPECT_DOUBLE_EQ(curve.get2DCurvature(0, true), 0);
   EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.1, true), 0);
@@ -91,7 +91,7 @@ TEST(HermiteCurveTest, CheckNormalVector)
     start_vec.y = 0;
     goal_vec.x = 0;
     goal_vec.y = 1;
-    traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
+    geometry_math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
     double norm = std::sqrt(
       curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
       curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
@@ -111,7 +111,7 @@ TEST(HermiteCurveTest, CheckNormalVector)
     start_vec.y = 0;
     goal_vec.x = 0;
     goal_vec.y = -1;
-    traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
+    geometry_math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
     double norm = std::sqrt(
       curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
       curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
@@ -131,7 +131,7 @@ TEST(HermiteCurveTest, CheckNormalVector)
     start_vec.y = -1;
     goal_vec.x = -1;
     goal_vec.y = 0;
-    traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
+    geometry_math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
     double norm = std::sqrt(
       curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
       curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
@@ -151,7 +151,7 @@ TEST(HermiteCurveTest, CheckNormalVector)
     start_vec.y = 1;
     goal_vec.x = -1;
     goal_vec.y = 0;
-    traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
+    geometry_math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
     double norm = std::sqrt(
       curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
       curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);

@@ -14,9 +14,9 @@
 
 #include <gtest/gtest.h>
 
+#include <geometry_math/solver/polynomial_solver.hpp>
+#include <geometry_math/spline/hermite_curve.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <geometry_math/hermite_curve.hpp>
-#include <geometry_math/polynomial_solver.hpp>
 
 bool checkValueWithTolerance(double value, double expected, double tolerance)
 {

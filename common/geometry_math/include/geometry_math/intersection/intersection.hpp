@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV.inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,29 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_
+#define GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_
+
 #include <boost/optional.hpp>
-#include <geometry_math/catmull_rom_subspline.hpp>
+#include <geometry_math/polygon/line_segment.hpp>
+#include <geometry_msgs/msg/point.hpp>
 #include <vector>
 
 namespace geometry_math
 {
-double CatmullRomSubspline::getLength() const { return end_s_ - start_s_; }
-
-boost::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
-  bool close_start_end) const
-{
-  auto s = spline_->getCollisionPointIn2D(polygon, search_backward, close_start_end);
-
-  if (!s) {
-    return boost::none;
-  }
-
-  if (s.get() < start_s_ || end_s_ < s.get()) {
-    return boost::none;
-  }
-
-  return s.get() - start_s_;
-}
-
+bool isIntersect2D(const LineSegment & line0, const LineSegment & line1);
+bool isIntersect2D(const std::vector<LineSegment> & lines);
+boost::optional<geometry_msgs::msg::Point> getIntersection2D(
+  const LineSegment & line0, const LineSegment & line1);
+std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines);
 }  // namespace geometry_math
+
+#endif  // GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_

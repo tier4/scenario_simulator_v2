@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include <cstdint>
+#include <geometry_math/bounding_box.hpp>
+#include <geometry_math/intersection/collision.hpp>
+#include <geometry_math/transform.hpp>
 #include <limits>
 #include <memory>
 #include <queue>
@@ -22,9 +25,6 @@
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <geometry_math/bounding_box.hpp>
-#include <geometry_math/collision.hpp>
-#include <geometry_math/transform.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -85,7 +85,7 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   }
   auto bbox0 = getBoundingBox(name0);
   auto bbox1 = getBoundingBox(name1);
-  return traffic_simulator::math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
+  return geometry_math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
@@ -119,7 +119,7 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
   const auto pose0 = getMapPose(from);
   const auto bbox1 = getBoundingBox(to);
   const auto pose1 = getMapPose(to);
-  return math::getPolygonDistance(pose0, bbox0, pose1, bbox1);
+  return geometry_math::getPolygonDistance(pose0, bbox0, pose1, bbox1);
 }
 
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
@@ -336,7 +336,7 @@ auto EntityManager::getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const
   -> geometry_msgs::msg::Pose
 {
-  return traffic_simulator::math::getRelativePose(from, to);
+  return geometry_math::getRelativePose(from, to);
 }
 
 auto EntityManager::getRelativePose(

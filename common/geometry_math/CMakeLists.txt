@@ -12,20 +12,30 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(geometry_math SHARED
   src/bounding_box.cpp
-  src/catmull_rom_spline.cpp
-  src/catmull_rom_subspline.cpp
-  src/collision.cpp
   src/distance.cpp
-  src/hermite_curve.cpp
+  src/intersection/collision.cpp
+  src/intersection/intersection.cpp
   src/linear_algebra.cpp
-  src/polygon.cpp
-  src/polynomial_solver.cpp
+  src/polygon/line_segment.cpp
+  src/polygon/polygon.cpp
+  src/solver/polynomial_solver.cpp
+  src/spline/catmull_rom_spline.cpp
+  src/spline/catmull_rom_subspline.cpp
+  src/spline/hermite_curve.cpp
   src/transform.cpp
 )
+
+# workaround to allow deprecated header to build on both galactic and humble
+if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
+  target_compile_definitions(geometry_math PUBLIC
+    USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
+  )
+endif()
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+  add_subdirectory(test)
 endif()
 
-ament_package()
+ament_auto_package()

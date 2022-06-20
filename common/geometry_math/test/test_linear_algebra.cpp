@@ -16,44 +16,44 @@
 
 #include <geometry_math/linear_algebra.hpp>
 
-#include "../expect_eq_macros.hpp"
+#include "expect_eq_macros.hpp"
 
 TEST(LINEAR_ALGEBRA, GET_SIZE)
 {
   geometry_msgs::msg::Vector3 vec;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getSize(vec), 0.0);
+  EXPECT_DOUBLE_EQ(geometry_math::getSize(vec), 0.0);
   vec.x = 1.0;
   vec.y = 0.0;
   vec.z = 3.0;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getSize(vec), std::sqrt(10.0));
+  EXPECT_DOUBLE_EQ(geometry_math::getSize(vec), std::sqrt(10.0));
 }
 
 TEST(LINEAR_ALGEBRA, NORMALIZE)
 {
   geometry_msgs::msg::Vector3 vec;
-  EXPECT_THROW(traffic_simulator::math::normalize(vec), common::SimulationError);
+  EXPECT_THROW(geometry_math::normalize(vec), common::SimulationError);
   vec.x = 1.0;
   vec.y = 0.0;
   vec.z = 3.0;
-  vec = traffic_simulator::math::normalize(vec);
+  vec = geometry_math::normalize(vec);
   EXPECT_DOUBLE_EQ(vec.x, 0.31622776601683794);
   EXPECT_DOUBLE_EQ(vec.y, 0.0);
   EXPECT_DOUBLE_EQ(vec.z, 0.94868329805051377);
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::getSize(vec), 1.0);
+  EXPECT_DOUBLE_EQ(geometry_math::getSize(vec), 1.0);
 }
 
 TEST(LINEAR_ALGEBRA, MULTIPLY)
 {
-  geometry_msgs::msg::Vector3 vec = traffic_simulator::math::vector3(0, 3, 1);
+  geometry_msgs::msg::Vector3 vec = geometry_math::vector3(0, 3, 1);
   vec * 1.0;
-  EXPECT_VECTOR3_EQ((vec * 1.0), traffic_simulator::math::vector3(0, 3, 1));
-  EXPECT_VECTOR3_EQ((vec * 2.0), traffic_simulator::math::vector3(0, 6, 2));
+  EXPECT_VECTOR3_EQ((vec * 1.0), geometry_math::vector3(0, 3, 1));
+  EXPECT_VECTOR3_EQ((vec * 2.0), geometry_math::vector3(0, 6, 2));
   EXPECT_VECTOR3_EQ((vec * 2.0), (2.0 * vec));
 }
 
 TEST(LINEAR_ALGEBRA, ADDITION)
 {
-  geometry_msgs::msg::Vector3 vec = traffic_simulator::math::vector3(0, 3, 1);
+  geometry_msgs::msg::Vector3 vec = geometry_math::vector3(0, 3, 1);
   EXPECT_VECTOR3_EQ((vec + vec), (2.0 * vec));
   geometry_msgs::msg::Point p;
   p.x = 0;
@@ -64,7 +64,7 @@ TEST(LINEAR_ALGEBRA, ADDITION)
 
 TEST(LINEAR_ALGEBRA, SUBTRACTION)
 {
-  geometry_msgs::msg::Vector3 vec = traffic_simulator::math::vector3(0, 3, 1);
+  geometry_msgs::msg::Vector3 vec = geometry_math::vector3(0, 3, 1);
   EXPECT_VECTOR3_EQ((vec - vec), geometry_msgs::msg::Vector3());
   geometry_msgs::msg::Point p;
   p.x = 0;

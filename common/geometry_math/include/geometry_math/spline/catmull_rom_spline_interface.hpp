@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
-#define GEOMETRY_MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
+#ifndef GEOMETRY_MATH__SPLINE__CATMULL_ROM_SPLINE_INTERFACE_HPP_
+#define GEOMETRY_MATH__SPLINE__CATMULL_ROM_SPLINE_INTERFACE_HPP_
 
 #include <boost/optional.hpp>
 #include <exception>
@@ -34,4 +34,4 @@ public:
 };
 }  // namespace geometry_math
 
-#endif  // GEOMETRY_MATH__CATMULL_ROM_SPLINE_INTERFACE_HPP_
+#endif  // GEOMETRY_MATH__SPLINE__CATMULL_ROM_SPLINE_INTERFACE_HPP_

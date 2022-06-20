@@ -16,6 +16,7 @@
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
 
 #include <boost/optional.hpp>
+#include <geometry_math/polygon/line_segment.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
@@ -47,9 +48,9 @@ private:
   void fillByCol(size_t col, int8_t data);
   bool fillByRowCol(size_t row, size_t col, int8_t data);
   std::vector<std::pair<size_t, size_t>> fillByIntersection(
-    const LineSegment & line_segment, int8_t data);
+    const geometry_math::LineSegment & line_segment, int8_t data);
   std::vector<std::pair<size_t, size_t>> fillByIntersection(
-    const std::vector<LineSegment> & line_segments, int8_t data);
+    const std::vector<geometry_math::LineSegment> & line_segments, int8_t data);
   std::vector<std::pair<size_t, size_t>> fillInside(
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data);
   size_t getIndex(size_t row, size_t col) const;
@@ -61,21 +62,22 @@ private:
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t row) const;
   std::vector<std::pair<size_t, size_t>> filterByCol(
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t col) const;
-  std::vector<LineSegment> filterByIntersection(
-    const std::vector<LineSegment> & source_lines,
-    const std::vector<LineSegment> & fillter_lines) const;
+  std::vector<geometry_math::LineSegment> filterByIntersection(
+    const std::vector<geometry_math::LineSegment> & source_lines,
+    const std::vector<geometry_math::LineSegment> & fillter_lines) const;
   std::vector<size_t> getRows(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   std::vector<size_t> getCols(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   bool indexExist(size_t index) const;
   std::vector<GridCell> getAllCells() const;
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & grid_point) const;
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
-  LineSegment transformToGrid(const LineSegment & line) const;
+  geometry_math::LineSegment transformToGrid(const geometry_math::LineSegment & line) const;
   geometry_msgs::msg::Point transformToPixel(const geometry_msgs::msg::Point & grid_point) const;
-  LineSegment transformToPixel(const LineSegment & line) const;
-  LineSegment getInvisibleRay(const geometry_msgs::msg::Point & point_on_polygon) const;
-  std::vector<LineSegment> getRayToGridCorner();
-  std::vector<LineSegment> getInvisibleRay(
+  geometry_math::LineSegment transformToPixel(const geometry_math::LineSegment & line) const;
+  geometry_math::LineSegment getInvisibleRay(
+    const geometry_msgs::msg::Point & point_on_polygon) const;
+  std::vector<geometry_math::LineSegment> getRayToGridCorner();
+  std::vector<geometry_math::LineSegment> getInvisibleRay(
     const std::vector<geometry_msgs::msg::Point> & points) const;
   double getDiagonalLength() const;
   template <typename T>

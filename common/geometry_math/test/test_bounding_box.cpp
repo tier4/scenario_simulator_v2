@@ -14,8 +14,8 @@
 
 #include <gtest/gtest.h>
 
-#include <scenario_simulator_exception/exception.hpp>
 #include <geometry_math/bounding_box.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 TEST(BoundingBox, GetPolygonDistanceWithCollision)
 {
@@ -29,7 +29,7 @@ TEST(BoundingBox, GetPolygonDistanceWithCollision)
   bbox1.dimensions.x = 1;
   bbox1.dimensions.y = 1;
   bbox1.dimensions.z = 1;
-  EXPECT_EQ(traffic_simulator::math::getPolygonDistance(pose0, bbox0, pose1, bbox1), boost::none);
+  EXPECT_EQ(geometry_math::getPolygonDistance(pose0, bbox0, pose1, bbox1), boost::none);
 }
 
 TEST(BoundingBox, GetPolygonDistanceWithoutCollision)
@@ -45,9 +45,8 @@ TEST(BoundingBox, GetPolygonDistanceWithoutCollision)
   bbox1.dimensions.x = 1;
   bbox1.dimensions.y = 1;
   bbox1.dimensions.z = 1;
-  EXPECT_TRUE(traffic_simulator::math::getPolygonDistance(pose0, bbox0, pose1, bbox1));
-  EXPECT_DOUBLE_EQ(
-    traffic_simulator::math::getPolygonDistance(pose0, bbox0, pose1, bbox1).get(), 3.0);
+  EXPECT_TRUE(geometry_math::getPolygonDistance(pose0, bbox0, pose1, bbox1));
+  EXPECT_DOUBLE_EQ(geometry_math::getPolygonDistance(pose0, bbox0, pose1, bbox1).get(), 3.0);
 }
 
 int main(int argc, char ** argv)

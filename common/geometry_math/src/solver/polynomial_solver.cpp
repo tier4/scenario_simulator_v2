@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <cmath>
-#include <geometry_math/polynomial_solver.hpp>
+#include <geometry_math/solver/polynomial_solver.hpp>
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>

@@ -14,10 +14,10 @@
 
 #include <gtest/gtest.h>
 
+#include <geometry_math/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <geometry_math/catmull_rom_spline.hpp>
 
-#include "../expect_eq_macros.hpp"
+#include "expect_eq_macros.hpp"
 
 TEST(CatmullRomSpline, GetCollisionPointIn2D)
 {

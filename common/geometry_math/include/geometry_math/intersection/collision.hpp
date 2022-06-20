@@ -12,15 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__POLYGON_HPP_
-#define GEOMETRY_MATH__POLYGON_HPP_
+#ifndef GEOMETRY_MATH__INTERSECTION__COLLISION_HPP_
+#define GEOMETRY_MATH__INTERSECTION__COLLISION_HPP_
 
-#include <geometry_msgs/msg/point.hpp>
+#include <geometry_math/bounding_box.hpp>
+#include <geometry_math/polygon/polygon.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
+#include <vector>
 
 namespace geometry_math
 {
-std::vector<geometry_msgs::msg::Point> get2DConvexHull(
-  const std::vector<geometry_msgs::msg::Point> & points);
+bool checkCollision2D(
+  geometry_msgs::msg::Pose pose0, traffic_simulator_msgs::msg::BoundingBox bbox0,
+  geometry_msgs::msg::Pose pose1, traffic_simulator_msgs::msg::BoundingBox bbox1);
+bool contains(
+  const std::vector<geometry_msgs::msg::Point> & polygon, const geometry_msgs::msg::Point & point);
 }  // namespace geometry_math
 
-#endif  // GEOMETRY_MATH__POLYGON_HPP_
+#endif  // GEOMETRY_MATH__INTERSECTION__COLLISION_HPP_

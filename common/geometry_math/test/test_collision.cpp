@@ -14,8 +14,8 @@
 
 #include <gtest/gtest.h>
 
+#include <geometry_math/intersection/collision.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <geometry_math/collision.hpp>
 
 TEST(Collision, DifferentHeight)
 {
@@ -26,7 +26,7 @@ TEST(Collision, DifferentHeight)
   box.dimensions.y = 1.0;
   box.dimensions.z = 1.0;
   pose1.position.z = 30.0;
-  EXPECT_FALSE(traffic_simulator::math::checkCollision2D(pose0, box, pose1, box));
+  EXPECT_FALSE(geometry_math::checkCollision2D(pose0, box, pose1, box));
 }
 
 TEST(Collision, SamePosition)
@@ -37,7 +37,7 @@ TEST(Collision, SamePosition)
   box.dimensions.x = 1.0;
   box.dimensions.y = 1.0;
   box.dimensions.z = 1.0;
-  EXPECT_TRUE(traffic_simulator::math::checkCollision2D(pose0, box, pose1, box));
+  EXPECT_TRUE(geometry_math::checkCollision2D(pose0, box, pose1, box));
 }
 
 TEST(Collision, SameHeightNoCollision)
@@ -49,7 +49,7 @@ TEST(Collision, SameHeightNoCollision)
   box.dimensions.y = 1.0;
   box.dimensions.z = 1.0;
   pose0.position.x = 30;
-  EXPECT_FALSE(traffic_simulator::math::checkCollision2D(pose0, box, pose1, box));
+  EXPECT_FALSE(geometry_math::checkCollision2D(pose0, box, pose1, box));
 }
 
 int main(int argc, char ** argv)

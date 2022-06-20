@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__HERMITE_CURVE_HPP_
-#define GEOMETRY_MATH__HERMITE_CURVE_HPP_
+#ifndef GEOMETRY_MATH__SPLINE__HERMITE_CURVE_HPP_
+#define GEOMETRY_MATH__SPLINE__HERMITE_CURVE_HPP_
 
 #include <gtest/gtest.h>
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/optional.hpp>
-#include <geometry_math/polynomial_solver.hpp>
+#include <geometry_math/solver/polynomial_solver.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
@@ -74,4 +74,4 @@ private:
 };
 }  // namespace geometry_math
 
-#endif  // GEOMETRY_MATH__HERMITE_CURVE_HPP_
+#endif  // GEOMETRY_MATH__SPLINE__HERMITE_CURVE_HPP_
