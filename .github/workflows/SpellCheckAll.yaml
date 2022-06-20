@@ -17,6 +17,11 @@ jobs:
             --output .github/workflows/autoware.json \
             https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/cspell/.cspell.json
 
+      - name: Merge words array
+        uses: sergeysova/jq-action@v2
+        with:
+          cmd: 'jq -n ''{ words: [ inputs.words ] | add }'' .github/workflows/autoware.json .github/workflows/custom_spell.json > .github/workflows/words.json'
+
       - name: Merge ignorePaths array
         uses: sergeysova/jq-action@v2
         with:
