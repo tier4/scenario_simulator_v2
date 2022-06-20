@@ -37,6 +37,9 @@ jobs:
         with:
           cmd: 'jq -s ''add'' .github/workflows/.cspell.json .github/workflows/ignore_paths.json > .github/workflows/.cspell.json'
 
+      - name: show settings
+        run: cat .github/workflows/.cspell.json
+
       - uses: streetsidesoftware/cspell-action@v1
         with:
           config: ".github/workflows/.cspell.json"
