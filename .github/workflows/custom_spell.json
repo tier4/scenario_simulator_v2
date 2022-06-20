@@ -55,6 +55,7 @@
     "Naumann",
     "Breuel",
     "mahalanobis",
+    "maha",
     "NOLINTNEXTLINE",
     "ARGN",
     "AUTO_RCC",
@@ -65,6 +66,12 @@
     "Uncorr",
     "refline",
     "classname",
-    "Deps"
+    "Deps",
+    "DEPENDEND",
+    "gpgs",
+    "northp",
+    "nosetests",
+    "rosdoc",
+    "Khanh"
   ]
 }

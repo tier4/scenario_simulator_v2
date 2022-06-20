@@ -679,7 +679,7 @@ visualization_msgs::msg::MarkerArray visualization::trafficLightsAsTriangleMarke
   const rclcpp::Duration duration, const double scale)
 {
   // convert to to an array of linestrings and publish as marker array using
-  // exisiting function
+  // existing function
 
   int tl_count = 0;
   std::vector<lanelet::ConstLineString3d> line_strings;
