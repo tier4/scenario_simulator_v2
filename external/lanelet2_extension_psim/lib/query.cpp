@@ -56,7 +56,7 @@ namespace lanelet
 namespace utils
 {
 // returns all lanelets in laneletLayer - don't know how to convert
-// PrimitveLayer<Lanelets> -> std::vector<Lanelets>
+// PrimitiveLayer<Lanelets> -> std::vector<Lanelets>
 lanelet::ConstLanelets query::laneletLayer(const lanelet::LaneletMapConstPtr & ll_map)
 {
   lanelet::ConstLanelets lanelets;

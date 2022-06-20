@@ -1,4 +1,4 @@
-# Lannnelet2 Matching Module
+# Lanelet2 Matching Module
 
 This module provides functions to determine in which lanelet an object is/could be currently located.
 
