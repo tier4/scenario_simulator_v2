@@ -23,9 +23,9 @@ jobs:
           cmd: 'jq -n ''{ words: [ inputs.words ] | add }'' .github/workflows/autoware.json .github/workflows/custom_spell.json > .github/workflows/words.json'
 
       - name: Merge ignorePaths array
-        uses: sergeysova/jq-action@v2
-        with:
-          cmd: 'jq -n ''{ ignorePaths: [ inputs.ignorePaths ] | add }'' .github/workflows/autoware.json .github/workflows/custom_spell.json > .github/workflows/ignore_paths.json'
+          uses: sergeysova/jq-action@v2
+          with:
+            cmd: 'jq -n ''{ ignorePaths: [ inputs.ignorePaths ] | add }'' .github/workflows/autoware.json .github/workflows/custom_spell.json > .github/workflows/ignore_paths.json'
 
       - name: Merge word config
         uses: sergeysova/jq-action@v2
@@ -39,8 +39,8 @@ jobs:
 
       - uses: streetsidesoftware/cspell-action@v1
         with:
+          config: ".github/workflows/.cspell.json"
           files: |
             **/*.{c,cpp,h,hpp,xml,yaml,yml,md,txt,sh,repos,py}
-          config: ".github/workflows/.cspell.json"
           incremental_files_only: false
           strict: true
