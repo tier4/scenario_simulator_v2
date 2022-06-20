@@ -142,7 +142,23 @@ It is unlikely that you will need these commands for normal scenario creation.
 | sigsegv | Access a null pointer: Used to make sure the simulator does not crash with an internal error.     |
 
 ### UserDefinedValueCondition
+
+This condition enables us to import external values and compare them with a specific value.    
+The boolean value of  the comparison result can be used as a condition to control the scenario.
+In scenario_simulator_v2, we use `UserDefinedValueCondition` to control the progress of the scenario by Autoware's state.  
+
+```XML
+  <ByValueCondition>
+     <UserDefinedValueCondition name="ego.currentState" rule="equalTo" value="ARRIVED_GOAL" />
+  </ByValueCondition>
+
+```
 #### Built-in conditions
+
+You can use Autoware related conditions via UserDefinedValueCondition.  
+Like "ego.currentState", you can specify the entity by name and refer to its status.  
+The following built-in conditions return a string that represents the state.   
+See Reference for specific strings.  
 
 | Name                       | description                                         | Reference                                                                                                           |
 |:---------------------------|:----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
@@ -168,6 +184,10 @@ OpenSCENARIO standards.
 
 
 ### Syntax
+| Name         |             | Support Status | Limitations                        | OpenSCENARIO changes |
+|:-------------|-------------|:--------------:|:-----------------------------------|----------------------|
+| OpenSCENARIO |             |                |                                    |                      |
+| - FileHeader |     |                |                                    |                      |
 - [x] OpenSCENARIO
   - [x] FileHeader
   - [x] ParameterDeclarations
