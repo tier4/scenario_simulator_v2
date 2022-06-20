@@ -7,7 +7,6 @@ on:
 jobs:
   spellcheck:
     runs-on: ubuntu-latest
-    allow-failure: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
