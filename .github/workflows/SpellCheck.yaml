@@ -31,12 +31,12 @@ jobs:
       - name: Merge word config
         uses: sergeysova/jq-action@v2
         with:
-          cmd: 'jq -s ''add'' .github/workflows/autoware.json .github/workflows/words.json > .github/workflows/.cspell.json'
+          cmd: 'jq -s ''add'' .github/workflows/autoware.json .github/workflows/words.json > .github/workflows/.cspell_wip.json'
 
       - name: Merge ignore_paths config
         uses: sergeysova/jq-action@v2
         with:
-          cmd: 'jq -s ''add'' .github/workflows/.cspell.json .github/workflows/ignore_paths.json > .github/workflows/.cspell.json'
+          cmd: 'jq -s ''add'' .github/workflows/.cspell_wip.json .github/workflows/ignore_paths.json > .github/workflows/.cspell.json'
 
       - uses: streetsidesoftware/cspell-action@v1
         with:
