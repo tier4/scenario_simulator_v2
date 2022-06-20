@@ -447,7 +447,7 @@ std::vector<lanelet::ConstLineString3d> query::stopLinesLanelet(const lanelet::C
     ll.regulatoryElementsAs<const lanelet::RightOfWay>();
 
   if (right_of_way_reg_elems.size() > 0) {
-    // lanelet has a right of way elem elemet n
+    // lanelet has a right of way elem element n
     for (auto j = right_of_way_reg_elems.begin(); j < right_of_way_reg_elems.end(); j++) {
       if ((*j)->getManeuver(ll) == lanelet::ManeuverType::Yield) {
         // lanelet has a yield reg. elem.
@@ -464,7 +464,7 @@ std::vector<lanelet::ConstLineString3d> query::stopLinesLanelet(const lanelet::C
     ll.regulatoryElementsAs<const lanelet::TrafficLight>();
 
   if (traffic_light_reg_elems.size() > 0) {
-    // lanelet has a traffic light elem elemet n
+    // lanelet has a traffic light elem element n
     for (auto j = traffic_light_reg_elems.begin(); j < traffic_light_reg_elems.end(); j++) {
       lanelet::Optional<lanelet::ConstLineString3d> traffic_light_stopline_opt = (*j)->stopLine();
       if (!!traffic_light_stopline_opt) {
