@@ -86,4 +86,5 @@ nav:
       - developer_guide/SimulationResultFormat.md
       - developer_guide/TIERIVScenarioFormatVersion2.md
       - developer_guide/CONTRIBUTING.md
+      - developer_guide/Communication.md
       - Package Details: package/About.md
