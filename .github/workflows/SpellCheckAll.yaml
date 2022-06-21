@@ -43,4 +43,4 @@ jobs:
           files: |
             **/*.{c,cpp,h,hpp,xml,yaml,yml,md,txt,sh,repos,py}
           incremental_files_only: false
-          strict: true
+          strict: false
