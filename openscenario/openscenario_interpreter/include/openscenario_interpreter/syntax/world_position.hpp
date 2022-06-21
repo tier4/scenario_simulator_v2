@@ -18,6 +18,7 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <pugixml.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -38,15 +39,15 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct WorldPosition
+struct WorldPosition : private SimulatorCore::CoordinateSystemConversion
 {
   const Double x, y, z, h, p, r;
 
   explicit WorldPosition(const pugi::xml_node &, Scope &);
 
-  explicit operator geometry_msgs::msg::Pose() const;
+  explicit operator NativeLanePosition() const;
 
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
+  explicit operator NativeWorldPosition() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

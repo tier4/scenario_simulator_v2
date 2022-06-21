@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
@@ -59,7 +58,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
+    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
   } else {
     return Double::nan();
   }
@@ -73,7 +72,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(getRelativePose(triggering_entity, entity_ref).position.y);
+    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
   } else {
     return Double::nan();
   }
@@ -87,7 +86,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
-    return getBoundingBoxDistance(triggering_entity, entity_ref);
+    return evaluateFreespaceEuclideanDistance(triggering_entity, entity_ref);
   } else {
     return Double::nan();
   }
@@ -102,8 +101,8 @@ auto RelativeDistanceCondition::distance<
     global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
     return std::hypot(
-      getRelativePose(triggering_entity, entity_ref).position.x,
-      getRelativePose(triggering_entity, entity_ref).position.y);
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
   } else {
     return Double::nan();
   }
@@ -117,7 +116,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities.at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities.at(entity_ref).as<ScenarioObject>().is_added) {
-    return getLongitudinalDistance(triggering_entity, entity_ref);
+    return makeNativeRelativeLanePosition(triggering_entity, entity_ref).s;
   } else {
     return Double::nan();
   }
