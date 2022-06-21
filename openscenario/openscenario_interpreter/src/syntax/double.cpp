@@ -46,6 +46,16 @@ auto Double::nan() noexcept -> Double
   return static_cast<Double>(std::numeric_limits<value_type>::quiet_NaN());
 }
 
+auto Double::max() noexcept -> Double
+{
+  return static_cast<Double>(std::numeric_limits<value_type>::max());
+}
+
+auto Double::lowest() noexcept -> Double
+{
+  return static_cast<Double>(std::numeric_limits<value_type>::lowest());
+}
+
 auto Double::operator=(const value_type & rhs) noexcept -> Double &
 {
   data = rhs;
