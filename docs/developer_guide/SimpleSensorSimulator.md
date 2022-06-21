@@ -54,7 +54,13 @@ This enables us to reduce computational resources when we want to test Autoware'
 | `traffic_simulator::API::attachOccupancyGridSensor` | C++ traffic simulator API interface    |                                                                                            |
 | `attach_occupancy_grid_sensor`                       | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](/docs/developer_guide/ZeroMQ.md)<br/>TCP Port : 5565 |  
 
+### Occupancy Grid Values
 
+| grid type      | value | description                                                         |
+|----------------|-------|---------------------------------------------------------------------|
+| occupied grid  | 100   | a grid determined by a simulated lidar sensor that an object exists |
+| empty grid     | 0     | an empty grid proved by a simulated ray-cast passing through        |    
+| invisible grid | 50    | a grid that is out of range or occlusion of simulated lidar sensor  |
 
 
 ### Configuration
