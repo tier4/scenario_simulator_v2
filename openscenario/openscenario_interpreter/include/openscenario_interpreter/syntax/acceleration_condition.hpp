@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACCELERATION_CONDITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
@@ -33,7 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AccelerationCondition
+struct AccelerationCondition : private SimulatorCore::ConditionEvaluation
 {
   const Double value;
 

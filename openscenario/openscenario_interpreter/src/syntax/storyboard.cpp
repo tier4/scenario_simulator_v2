@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/global_action.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
 #include <openscenario_interpreter/syntax/storyboard.hpp>
 #include <openscenario_interpreter/syntax/user_defined_action.hpp>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax

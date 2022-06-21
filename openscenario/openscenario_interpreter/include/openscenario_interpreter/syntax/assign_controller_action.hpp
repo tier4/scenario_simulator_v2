@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_CONTROLLER_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <pugixml.hpp>
 
@@ -37,9 +38,11 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AssignControllerAction : public ComplexType
+struct AssignControllerAction : public ComplexType, private SimulatorCore::ActionApplication
 {
   explicit AssignControllerAction();
+
+  explicit AssignControllerAction(const ComplexType &);
 
   explicit AssignControllerAction(const pugi::xml_node &, Scope &);
 

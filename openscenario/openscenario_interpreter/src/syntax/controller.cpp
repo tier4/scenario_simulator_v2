@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -29,18 +29,6 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
     readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
   properties(readElement<Properties>("Properties", node, local()))
 {
-}
-
-auto Controller::assign(const EntityRef & entity_ref) -> void
-{
-  setVelocityLimit(
-    entity_ref, properties.get<Double>("maxSpeed", std::numeric_limits<Double::value_type>::max()));
-
-  applyAssignControllerAction(entity_ref, [&]() {
-    auto message = getDriverModel(entity_ref);
-    message.see_around = not properties.get<Boolean>("isBlind");
-    return message;
-  }());
 }
 
 auto Controller::isUserDefinedController() const & -> bool

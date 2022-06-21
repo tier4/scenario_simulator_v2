@@ -47,8 +47,6 @@ struct ObjectController : public ComplexType
 
   ~ObjectController();
 
-  auto assign(const EntityRef &) -> void;
-
   auto isUserDefinedController() const & -> bool;
 };
 }  // namespace syntax
