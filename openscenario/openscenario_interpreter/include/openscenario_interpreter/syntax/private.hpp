@@ -42,13 +42,15 @@ struct Private : public Scope
 
   explicit Private(const pugi::xml_node &, Scope &);
 
+  auto accomplished() const -> bool;
+
   auto endsImmediately() const -> bool;
 
   auto run() -> void;
 
-  auto runInstantaneousActions() -> Object;
+  auto runInstantaneousActions() -> void;
 
-  auto runNonInstantaneousActions() -> Object;
+  auto runNonInstantaneousActions() -> void;
 
   auto start() -> void;
 

@@ -84,15 +84,20 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
 
 auto InitActions::accomplished() const -> bool
 {
-  // TODO: implement
+  auto global_actions_accomplished = std::all_of(
+    global_actions.begin(), global_actions.end(),
+    [=](const Object & e) { return e.as<GlobalAction>().accomplished(); });
+  auto user_defined_actions_accomplished = std::all_of(
+    user_defined_actions.begin(), user_defined_actions.end(),
+    [=](const Object & e) { return e.as<UserDefinedAction>().accomplished(); });
+  auto privates_accomplished = std::all_of(privates.begin(), privates.end(), [=](const Object & e) {
+    return e.as<Private>().accomplished();
+  });
+
+  return global_actions_accomplished and user_defined_actions_accomplished and
+         privates_accomplished;
   return false;
 }
-//auto InitActions::evaluate() const -> Object
-//{
-//  evaluateInstantly();
-//
-//  return unspecified;
-//}
 
 auto InitActions::evaluateInstantly() const -> void
 {

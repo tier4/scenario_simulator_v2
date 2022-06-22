@@ -31,6 +31,13 @@ Private::Private(const pugi::xml_node & node, Scope & scope)
   });
 }
 
+auto Private::accomplished() const -> bool
+{
+  return std::all_of(
+    private_actions.begin(), private_actions.end(),
+    [](const PrivateAction & private_action) { return private_action.accomplished(); });
+}
+
 auto Private::endsImmediately() const -> bool
 {
   return std::all_of(
@@ -38,19 +45,8 @@ auto Private::endsImmediately() const -> bool
     [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
 }
 
-//auto Private::evaluate() -> Object
-//{
-//  for (auto && private_action : private_actions) {
-//    if (not has_started) {
-//      private_action.start();
-//    }
-//    private_action.run();
-//  }
-//  has_started = true;
-//  return unspecified;
-//}
-
 auto Private::run() -> void { runNonInstantaneousActions(); }
+
 auto Private::runInstantaneousActions() -> void
 {
   for (auto && private_action : private_actions) {
