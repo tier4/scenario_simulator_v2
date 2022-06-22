@@ -49,10 +49,10 @@ This enables us to reduce computational resources when we want to test Autoware'
 
 ### Interfaces
 
-| interface                                   | type                                   | note                                                                                       |
-|---------------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------------|
+| interface                                           | type                                   | note                                                                                       |
+|-----------------------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------------|
 | `traffic_simulator::API::attachOccupancyGridSensor` | C++ traffic simulator API interface    |                                                                                            |
-| `attach_occupancy_grid_sensor`                       | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](/docs/developer_guide/ZeroMQ.md)<br/>TCP Port : 5565 |  
+| `attach_occupancy_grid_sensor`                      | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](/docs/developer_guide/ZeroMQ.md)<br/>TCP Port : 5565 |  
 
 ### Occupancy Grid Values
 
@@ -82,8 +82,8 @@ This also enables you to reduce computational resources when you want to test Au
 
 ### Interfaces
 
-| interface                                   | type                                   | note                                                                                       |
-|---------------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------------|
+| interface                                       | type                                   | note                                                                                       |
+|-------------------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------------|
 | `traffic_simulator::API::attachDetectionSensor` | C++ traffic simulator API interface    |                                                                                            |
 | `attach_detection_sensor`                       | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](/docs/developer_guide/ZeroMQ.md)<br/>TCP Port : 5564 |  
 

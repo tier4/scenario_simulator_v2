@@ -160,11 +160,11 @@ Like "ego.currentState", you can specify the entity by name and refer to its sta
 The following built-in conditions return a string that represents the state.   
 See Reference for specific strings.  
 
-| Name                       | description                                         | Reference                                                                                                           |
-|:---------------------------|:----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
-| currentState               | returns Autoware's state                            | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/AutowareState.idl)  |
-| currentEmergencyState      | return Autoware's emergency state.                  | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/EmergencyState.idl) |
-| currentTurnIndicatorsState | return turn indicators state controlled by Autoware | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/msg/TurnIndicatorsCommand.idl)                                                                                                             |
+| Name                       | description                                         | Reference                                                                                                                   |
+|:---------------------------|:----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| currentState               | returns Autoware's state                            | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/AutowareState.idl)          |
+| currentEmergencyState      | return Autoware's emergency state.                  | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/EmergencyState.idl)         |
+| currentTurnIndicatorsState | return turn indicators state controlled by Autoware | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/msg/TurnIndicatorsCommand.idl) |
 
 ## Non-Standard Extensions
 ---
@@ -200,10 +200,10 @@ OpenSCENARIO standards.
 | GlobalAction.VariableAction.**VariableSetAction**                                       |  Unsupported   |                                    | created in v1.2      |
 | GlobalAction.VariableAction.**VariableModifyAction**                                    |  Unsupported   |                                    | created in v1.2      |
 | UserDefinedAction.**CustomCommandAction**                                               |       ✔        | No                                 |                      |
-| PrivateAction.AppearanceAction.**AnimationAction**                                      |  Unsupported   |                                    | created in v1.2                     |
-| PrivateAction.AppearanceAction.**LightStateAction**                                     |  Unsupported   |                                    | created in v1.2                     |
+| PrivateAction.AppearanceAction.**AnimationAction**                                      |  Unsupported   |                                    | created in v1.2      |
+| PrivateAction.AppearanceAction.**LightStateAction**                                     |  Unsupported   |                                    | created in v1.2      |
 | PrivateAction.LongitudinalAction.**SpeedAction**                                        |       ✔        | See [here](#speedaction)           |                      |
-| PrivateAction.LongitudinalAction.**SpeedProfileAction**                                 |  Unsupported   |                                    | created in v1.2                     |
+| PrivateAction.LongitudinalAction.**SpeedProfileAction**                                 |  Unsupported   |                                    | created in v1.2      |
 | PrivateAction.LongitudinalAction.**LongitudinalDistanceAction**                         |  Unsupported   |                                    |                      |
 | PrivateAction.LateralAction.**LaneChangeAction**                                        |       ✔        | See [here](#lanechangeaction)      |                      |
 | PrivateAction.LateralAction.**LaneOffsetAction**                                        |  Unsupported   |                                    |                      |
