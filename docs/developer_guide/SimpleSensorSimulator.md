@@ -25,7 +25,7 @@ With this simulation, we can get lidar point-cloud data based on simple ray-cast
 
 ### Configuration
 
-See [the LidarConfigulation documentation](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#lidarconfiguration)
+See [the Lidar Configuration documentation](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#lidarconfiguration)
 
 ### Acknowledgments
 In lidar simulation, we use intel's ray-casting library embree.
