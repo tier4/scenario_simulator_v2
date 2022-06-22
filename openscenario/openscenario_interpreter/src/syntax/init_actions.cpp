@@ -99,7 +99,6 @@ auto InitActions::evaluateInstantly() const -> void
   for (auto && each : instant_elements) {
     each.evaluate();
   }
-  return unspecified;
 }
 
 auto InitActions::evaluateNonInstantly() const -> void
@@ -107,7 +106,6 @@ auto InitActions::evaluateNonInstantly() const -> void
   for (auto && each : non_instant_elements) {
     each.evaluate();
   }
-  return unspecified;
 }
 
 auto InitActions::endsImmediately() const -> bool

@@ -39,6 +39,8 @@ struct InitActions : public StoryboardElement
 {
   explicit InitActions(const pugi::xml_node &, Scope &);
 
+  auto accomplished() const -> bool override;
+
   auto endsImmediately() const -> bool;
 
   auto evaluateInstantly() const -> void;
