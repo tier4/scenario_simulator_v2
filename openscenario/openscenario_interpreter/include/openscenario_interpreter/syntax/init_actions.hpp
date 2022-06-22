@@ -46,7 +46,11 @@ struct InitActions
 
   auto evaluateNonInstantly() const -> Object;
 
-  Elements all_elements;
+  auto start() -> void override;
+
+  Elements global_actions;
+  Elements user_defined_actions;
+  Elements privates;
   Elements instant_elements;
   Elements non_instant_elements;
 };

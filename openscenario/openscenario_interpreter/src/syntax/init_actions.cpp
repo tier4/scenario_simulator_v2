@@ -27,9 +27,9 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
 {
   std::unordered_map<std::string, std::function<void(const pugi::xml_node & node)>> dispatcher{
     // clang-format off
-    std::make_pair("GlobalAction",      [&](auto && node) { return all_elements.push_back(make<GlobalAction>     (node, scope)); }),
-    std::make_pair("UserDefinedAction", [&](auto && node) { return all_elements.push_back(make<UserDefinedAction>(node, scope)); }),
-    std::make_pair("Private",           [&](auto && node) { return all_elements.push_back(make<Private>          (node, scope)); })
+    std::make_pair("GlobalAction",      [&](auto && node) { return global_actions.push_back(make<GlobalAction>     (node, scope)); }),
+    std::make_pair("UserDefinedAction", [&](auto && node) { return user_defined_actions.push_back(make<UserDefinedAction>(node, scope)); }),
+    std::make_pair("Private",           [&](auto && node) { return privates.push_back(make<Private>          (node, scope)); })
     // clang-format on
   };
 
@@ -40,51 +40,52 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
     }
   }
 
-  for (auto e : all_elements) {
-    if (e.is<GlobalAction>()) {
-      apply<void>(
-        [&](auto && action) {
-          if (action.endsImmediately()) {
-            instant_elements.push_back(action);
-          } else {
-            non_instant_elements.push_back(action);
-          }
-        },
-        e.as<GlobalAction>());
-    } else if (e.is<UserDefinedAction>()) {
-      auto action = e.as<UserDefinedAction>();
-      if (action.endsImmediately()) {
-        instant_elements.push_back(action);
-      } else {
-        non_instant_elements.push_back(action);
-      }
-    } else if (e.is<Private>()) {
-      auto push_back_specific_private =
-        [&](Elements & elements, std::function<bool(const PrivateAction &)> remove_func) {
-          Private local_private = e.as<Private>();
-          local_private.private_actions.erase(
-            std::remove_if(
-              std::begin(local_private.private_actions), std::end(local_private.private_actions),
-              remove_func),
-            local_private.private_actions.end());
-          if (not local_private.private_actions.empty()) {
-            elements.push_back(make(local_private));
-          }
-        };
+  for (auto e : global_actions) {
+    apply<void>(
+      [&](auto && action) {
+        if (action.endsImmediately()) {
+          instant_elements.push_back(action);
+        } else {
+          non_instant_elements.push_back(action);
+        }
+      },
+      e.as<GlobalAction>());
+  }
 
-      push_back_specific_private(
-        instant_elements, [](const PrivateAction & e) { return not e.endsImmediately(); });
-      push_back_specific_private(
-        non_instant_elements, [](const PrivateAction & e) { return e.endsImmediately(); });
+  for (auto e : user_defined_actions) {
+    auto action = e.as<UserDefinedAction>();
+    if (action.endsImmediately()) {
+      instant_elements.push_back(action);
+    } else {
+      non_instant_elements.push_back(action);
     }
+  }
+
+  for (auto e : privates) {
+    auto push_back_specific_private =
+      [&](Elements & elements, std::function<bool(const PrivateAction &)> remove_func) {
+        Private local_private = e.as<Private>();
+        local_private.private_actions.erase(
+          std::remove_if(
+            std::begin(local_private.private_actions), std::end(local_private.private_actions),
+            remove_func),
+          local_private.private_actions.end());
+        if (not local_private.private_actions.empty()) {
+          elements.push_back(make(local_private));
+        }
+      };
+
+    push_back_specific_private(
+      instant_elements, [](const PrivateAction & e) { return not e.endsImmediately(); });
+    push_back_specific_private(
+      non_instant_elements, [](const PrivateAction & e) { return e.endsImmediately(); });
   }
 }
 
-auto InitActions::evaluate() const -> Object
+auto InitActions::accomplished() const -> bool
 {
-  evaluateInstantly();
-
-  return unspecified;
+  // TODO: implement
+  return false;
 }
 
 auto InitActions::evaluateInstantly() const -> Object
@@ -105,49 +106,44 @@ auto InitActions::evaluateNonInstantly() const -> Object
 
 auto InitActions::endsImmediately() const -> bool
 {
-  return std::all_of(all_elements.begin(), all_elements.end(), [=](const Object & e) {
-    if (e.is<GlobalAction>()) {
-      return e.as<GlobalAction>().endsImmediately();
-    } else if (e.is<UserDefinedAction>()) {
-      return e.as<UserDefinedAction>().endsImmediately();
-    } else if (e.is<Private>()) {
-      return e.as<Private>().endsImmediately();
-    } else {
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(e.type().name());
-    }
-  });
+  auto global_ends_immediately = std::all_of(
+    global_actions.begin(), global_actions.end(),
+    [=](const Object & e) { return e.as<GlobalAction>().endsImmediately(); });
+  auto user_defined_actions_ends_immediately = std::all_of(
+    user_defined_actions.begin(), user_defined_actions.end(),
+    [=](const Object & e) { return e.as<UserDefinedAction>().endsImmediately(); });
+  auto private_actions_ends_immediately = std::all_of(
+    privates.begin(), privates.end(),
+    [=](const Object & e) { return e.as<Private>().endsImmediately(); });
+
+  return global_ends_immediately and user_defined_actions_ends_immediately and
+         private_actions_ends_immediately;
 }
 
 auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nlohmann::json &
 {
   json["GlobalAction"] = nlohmann::json::array();
 
-  for (const auto & init_action : init_actions.all_elements) {
-    if (init_action.is<GlobalAction>()) {
-      nlohmann::json action;
-      action["type"] = makeTypename(init_action.as<GlobalAction>().type());
-      json["GlobalAction"].push_back(action);
-    }
+  for (const auto & init_action : init_actions.global_actions) {
+    nlohmann::json action;
+    action["type"] = makeTypename(init_action.as<GlobalAction>().type());
+    json["GlobalAction"].push_back(action);
   }
 
   json["UserDefinedAction"] = nlohmann::json::array();
 
-  for (const auto & init_action : init_actions.all_elements) {
-    if (init_action.is<UserDefinedAction>()) {
-      nlohmann::json action;
-      action["type"] = makeTypename(init_action.as<UserDefinedAction>().type());
-      json["UserDefinedAction"].push_back(action);
-    }
+  for (const auto & init_action : init_actions.user_defined_actions) {
+    nlohmann::json action;
+    action["type"] = makeTypename(init_action.as<UserDefinedAction>().type());
+    json["UserDefinedAction"].push_back(action);
   }
 
   json["Private"] = nlohmann::json::array();
 
-  for (const auto & init_action : init_actions.all_elements) {
-    if (init_action.is<Private>()) {
-      nlohmann::json action;
-      action << init_action.as<Private>();
-      json["Private"].push_back(action);
-    }
+  for (const auto & init_action : init_actions.privates) {
+    nlohmann::json action;
+    action << init_action.as<Private>();
+    json["Private"].push_back(action);
   }
 
   return json;
