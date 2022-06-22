@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 
 #include <cstddef>
 #include <limits>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <openscenario_interpreter/syntax/trigger.hpp>
@@ -33,7 +33,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-class StoryboardElement
+class StoryboardElement : private SimulatorCore::ConditionEvaluation
 {
   Trigger stop_trigger;
 

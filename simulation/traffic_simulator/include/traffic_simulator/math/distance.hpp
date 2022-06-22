@@ -5,11 +5,11 @@
  * @version 0.1
  * @date 2021-04-01
  *
- * @copyright Copyright(c) Tier IV.Inc {2015-2021}
+ * @copyright Copyright(c) TIER IV.Inc {2015}
  *
  */
 
-// Copyright 2015-2020 TIER IV.inc. All rights reserved.
+// Copyright 2015 TIER IV.inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #define TRAFFIC_SIMULATOR__MATH__DISTANCE_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -36,6 +37,9 @@ double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::ms
 double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Point & p1);
 double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Pose & p1);
 double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Pose & p1);
+double getDistance2D(
+  const std::vector<geometry_msgs::msg::Point> & polygon0,
+  const std::vector<geometry_msgs::msg::Point> & polygon1);
 }  // namespace math
 }  // namespace traffic_simulator
 

@@ -2,27 +2,53 @@
 
 ## Difference between the latest release and master
 
+
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature                                  | Brief summary                                                                                               | Category                   | Pull request                                                    | Contributor                                   |
-|------------------------------------------|-------------------------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|-----------------------------------------------|
-| OpenSCENARIO `UserDefinedValueCondition` | Add condition to determine the state of the turn indicators. (unique to Autoware.Universe)                  | `openscenario_interpreter` | [#777](https://github.com/tier4/scenario_simulator_v2/pull/777) | [HansRobo](https://github.com/HansRobo)       |
-| OpenSCENARIO `UserDefinedValueCondition` | Add condition to determine the emergency state of the Autoware.Universe                                     | `openscenario_interpreter` | [#760](https://github.com/tier4/scenario_simulator_v2/pull/760) | [HansRobo](https://github.com/HansRobo)       |
-| OpenSCENARIO `Storyboard`                | The state transition of StoryboardElement no longer consumes simulation time.                               | `openscenario_interpreter` | [#758](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
-| `EgoEntity`'s Simulation model           | Fixed EgoEntity's simulation model to properly set gear information.                                        | `traffic_simulator`        | [#792](https://github.com/tier4/scenario_simulator_v2/pull/792) | [yamacir-kit](https://github.com/yamacir-kit) |
-| OpenSCENARIO `Event`                     | Allows the omission of Event.StartTrigger. if it is omitted, interpreter uses one which always returns True | `openscenario_interpreter` | [#774](https://github.com/tier4/scenario_simulator_v2/pull/774) | [HansRobo](https://github.com/HansRobo)       |
+|                      Feature                       |                                            Brief summary                                             |      Category       |                          Pull request                           |                  Contributor                  |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Add `API::getRelativePose()` argument for function | Add `API::getRelativePose()` argument for getting relative distance between lanalet pose and entity. | `traffic_simulator` | [#809](https://github.com/tier4/scenario_simulator_v2/pull/809) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
-
-| Feature                    | Brief summary                                                                 | Category                    | Pull request                                                     | Contributor                               |
-| -------------------------- | ----------------------------------------------------------------------------- | --------------------------- | ---------------------------------------------------------------- | ----------------------------------------- |
-| Fix termination processing | Properly terminate the interpreter when the Autoware process exits abnormally |  `openscenario_interpreter` | [#750](https://github.com/tier4/scenario_simulator_v2/pull/750)  | [kyabe2718](https://github.com/kyabe2718) |
-
-Minor Tweaks :oncoming_police_car:
 
 | Feature | Brief summary | Category | Pull request | Contributor |
 | ------- | ------------- | -------- | ------------ | ----------- |
 |         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature                     | Brief summary                                                                                                        | Category                   | Pull request                                                    | Contributor                                   |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO simulator core | Changed to treat traffic_simulator as "Simulator Core" based on OpenSCENARIO standard Basic architecture components. | `openscenario_interpreter` | [#783](https://github.com/tier4/scenario_simulator_v2/pull/783) | [yamacir-kit](https://github.com/yamacir-kit) |
+
+## Version 0.6.5
+
+Major Changes :race_car: :red_car: :blue_car:
+
+|                   Feature                    |                                                Brief summary                                                |          Category          |                          Pull request                           |                  Contributor                  |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `UserDefinedValueCondition`     | Add condition to determine the state of the turn indicators. (unique to Autoware.Universe)                  | `openscenario_interpreter` | [#777](https://github.com/tier4/scenario_simulator_v2/pull/777) | [HansRobo](https://github.com/HansRobo)       |
+| OpenSCENARIO `UserDefinedValueCondition`     | Add condition to determine the emergency state of the Autoware.Universe                                     | `openscenario_interpreter` | [#760](https://github.com/tier4/scenario_simulator_v2/pull/760) | [HansRobo](https://github.com/HansRobo)       |
+| OpenSCENARIO `Storyboard`                    | The state transition of StoryboardElement no longer consumes simulation time.                               | `openscenario_interpreter` | [#758](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
+| `EgoEntity`'s Simulation model               | Fixed EgoEntity's simulation model to properly set gear information.                                        | `traffic_simulator`        | [#792](https://github.com/tier4/scenario_simulator_v2/pull/792) | [yamacir-kit](https://github.com/yamacir-kit) |
+| OpenSCENARIO `Event`                         | Allows the omission of Event.StartTrigger. if it is omitted, interpreter uses one which always returns True | `openscenario_interpreter` | [#774](https://github.com/tier4/scenario_simulator_v2/pull/774) | [HansRobo](https://github.com/HansRobo)       |
+| Add `OccupancyGridSensor`                    | Add `OccupancyGridSensor` for publishing nav_msgs/msg/OccupancyGrid to the Autoware.                        | `simple_sensor_simulator`  | [#795](https://github.com/tier4/scenario_simulator_v2/pull/797) | [hakuturu583](https://github.com/hakuturu583) |
+| Add `API::getDistanceToLaneBound()` function | Add `API::getDistanceToLaneBound()` function for getting distance from entity polygon to lane boundary.     | `traffic_simulator`        | [#795](https://github.com/tier4/scenario_simulator_v2/pull/807) | [hakuturu583](https://github.com/hakuturu583) |
+| Support Humble distribution                  | Support new ROS 2 LTS distribution, Humble Hawksbill.                                                       |                            | [#792](https://github.com/tier4/scenario_simulator_v2/pull/793) | [wep21](https://github.com/wep21)             |
+
+Bug Fixes:bug:
+
+| Feature                                    | Brief summary                                                                                         | Category                   | Pull request                                                    | Contributor                                   |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Fix termination processing                 | Properly terminate the interpreter when the Autoware process exits abnormally                         | `openscenario_interpreter` | [#750](https://github.com/tier4/scenario_simulator_v2/pull/750) | [kyabe2718](https://github.com/kyabe2718)     |
+| Fix collision2D function in `HermiteCurve` | Previous algorithm was failed to check collision when the line is almost parallel to the x and y axis | `traffic_simulator`        | [#795](https://github.com/tier4/scenario_simulator_v2/pull/795) | [hakuturu583](https://github.com/hakuturu583) |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature                          | Brief summary                                                                                                                                                                   | Category            | Pull request                                                    | Contributor                                                                             |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Accessor to the class `Autoware` | A new member function `asAutoware` has been added to access the class `Autoware`, and instead the member functions specific to `EgoEntity` have been removed from `EntityBase`. | `traffic_simulator` | [#796](https://github.com/tier4/scenario_simulator_v2/pull/796) | [yamacir-kit](https://github.com/yamacir-kit)                                           |
+| Autoware API                     | Changed the engagement service to Autoware from `/api/autoware/set/engage` to `/api/external/set/engage`.                                                                       | `concealer`         | [#804](https://github.com/tier4/scenario_simulator_v2/pull/804) | [yn-mrse](https://github.com/yn-mrse) and [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.4
 
@@ -115,7 +141,7 @@ Minor Tweaks :oncoming_police_car:
 ## Version 0.5.4
 - Revert [PR #544](https://github.com/tier4/scenario_simulator_v2/pull/544) ([link](https://github.com/tier4/scenario_simulator_v2/pull/557))
 - Add context panel to display conditions' status. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
-- Add Tier IV extension `conditionEdge="sticky"` to `OpenSCENARIO-1.1.xsd` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/553)).
+- Add TIER IV extension `conditionEdge="sticky"` to `OpenSCENARIO-1.1.xsd` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/553)).
 - Add new Controller's Property `maxSpeed` to set explicitly upper bound speed to Autoware ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/554)).
 
 ## Version 0.5.3
@@ -226,4 +252,4 @@ Minor Tweaks :oncoming_police_car:
 ## Version 0.0.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.0.1) on GitHub :fa-github:
 - Partially support OpenSCENARIO 1.0.0 format.
-- Support Tier IV Scenario Format v2.
+- Support TIER IV Scenario Format v2.

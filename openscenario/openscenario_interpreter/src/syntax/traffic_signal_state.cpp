@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 
 namespace openscenario_interpreter
@@ -28,7 +28,7 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 
 auto TrafficSignalState::evaluate() const -> Object
 {
-  for (traffic_simulator::TrafficLight & traffic_light : getTrafficRelationReferees(id())) {
+  for (traffic_simulator::TrafficLight & traffic_light : toWayIDs(id())) {
     traffic_light.clear();
     traffic_light.set(state);
   };

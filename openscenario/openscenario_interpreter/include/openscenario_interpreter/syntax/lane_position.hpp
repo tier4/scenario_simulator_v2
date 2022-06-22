@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/orientation.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,7 +40,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct LanePosition
+struct LanePosition : private SimulatorCore::CoordinateSystemConversion
 {
   const String road_id, lane_id;
 
@@ -50,9 +50,9 @@ struct LanePosition
 
   explicit LanePosition(const pugi::xml_node &, Scope &);
 
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
+  explicit operator NativeLanePosition() const;
 
-  explicit operator geometry_msgs::msg::Pose() const;
+  explicit operator NativeWorldPosition() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
