@@ -85,11 +85,11 @@ public:                                                   \
       std::atomic_store(&current_value_of_##TYPE, std::move(std::make_shared<TYPE>(*message))); \
     }))
 
-#define CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(TYPE, TOPIC, CALLBACK)                    \
-  subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
-    TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
-      std::atomic_store(&current_value_of_##TYPE, std::move(message));                      \
-      CALLBACK(*current_value_of_##TYPE);                                                   \
+#define CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(TYPE, TOPIC, CALLBACK)                        \
+  subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>(     \
+    TOPIC, 1, [this](const TYPE::ConstSharedPtr message) {                                      \
+      std::atomic_store(&current_value_of_##TYPE, std::move(std::make_shared<TYPE>(*message))); \
+      CALLBACK(*current_value_of_##TYPE);                                                       \
     }))
 
 #define CONCEALER_INIT_PUBLISHER(TYPE, TOPIC) \
