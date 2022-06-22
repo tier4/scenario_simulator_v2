@@ -51,6 +51,8 @@ struct InitActions : public StoryboardElement
 
   auto start() -> void override;
 
+  auto startInstantaneousActions() -> void;
+
   Elements global_actions;
   Elements user_defined_actions;
   Elements privates;

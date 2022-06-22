@@ -129,9 +129,32 @@ auto InitActions::endsImmediately() const -> bool
          private_actions_ends_immediately;
 }
 
-auto InitActions::start() -> void {}
+// this function should be called by StoryboardElement
+auto InitActions::start() -> void
+{
+  for (auto && e : privates) {
+    e.as<Private>().start();
+  }
+}
 
-auto InitActions::run() -> void { evaluateNonInstantly(); }
+// this function should be called before simulation time starts
+auto InitActions::startInstantaneousActions() -> void
+{
+  for (auto && e : global_actions) {
+    e.as<GlobalAction>().start();
+  }
+  for (auto && e : privates) {
+    e.as<Private>().startInstantaneousActions();
+  }
+}
+
+// this function should be called by StoryboardElement
+auto InitActions::run() -> void
+{
+  for (auto && e : privates) {
+    e.as<Private>().run();
+  }
+}
 
 auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nlohmann::json &
 {
