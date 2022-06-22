@@ -45,6 +45,7 @@ markdown_extensions:
 extra_css:
   - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
   - stylesheet/tierivcolor.css
+  - stylesheet/extra.css
   - https://unpkg.com/mermaid@8.0.0/dist/mermaid.css
 extra_javascript:
   - http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
