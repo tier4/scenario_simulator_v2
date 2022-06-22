@@ -19,9 +19,9 @@ message Result {
  **/
 message LidarConfiguration {
   string entity = 1;                   // Name of the entity which you want to attach lidar.
-  double horizontal_resolution = 2;    // Horizontal resolutions of the lidar.
-  repeated double vertical_angles = 3; // Vertical resolutions of the lidar.
-  double scan_duration = 4;            // Scan duration of the lidar.
+  double horizontal_resolution = 2;    // Horizontal resolutions of the lidar. (unit : radian)
+  repeated double vertical_angles = 3; // Vertical resolutions of the lidar. (unit : radian)
+  double scan_duration = 4;            // Scan duration of the lidar. (unit: second)
   string architecture_type = 5;        // Autoware architecture type.
 }
 
@@ -30,8 +30,8 @@ message LidarConfiguration {
  **/
 message DetectionSensorConfiguration {
   string entity = 1;            // Name of the entity which you want to attach detection sensor.
-  double update_duration = 2;   // Update duration of the detection sensor.
-  double range = 3;             // Sensor detection range.
+  double update_duration = 2;   // Update duration of the detection sensor. (unit : second)
+  double range = 3;             // Sensor detection range. (unit : meter)
   string architecture_type = 4; // Autoware architecture type.
   bool filter_by_range = 5;     // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
 }
@@ -41,12 +41,12 @@ message DetectionSensorConfiguration {
  **/
 message OccupancyGridSensorConfiguration {
   string entity = 1;            // Name of the entity which you want to attach detection sensor.
-  double update_duration = 2;   // Update duration of the detection sensor.
-  double resolution = 3;        // Resolution of the occupancy grid.
-  uint32 width = 4;             // Width of the occupancy grid.
-  uint32 height = 5;            // Height of the occupancy grid.
+  double update_duration = 2;   // Update duration of the detection sensor. (unit : second)
+  double resolution = 3;        // Resolution of the occupancy grid. (unit : meter)
+  uint32 width = 4;             // Width of the occupancy grid. (unit : pixel)
+  uint32 height = 5;            // Height of the occupancy grid. (unit : pixel)
   string architecture_type = 6; // Autoware architecture type.
-  double range = 7;             // Sensor detection range.
+  double range = 7;             // Sensor detection range. (unit : meter)
   bool filter_by_range = 8;     // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
 }
 

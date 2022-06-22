@@ -160,7 +160,7 @@ std::vector<lanelet::ConstLineString3d> stopLinesLanelets(const lanelet::ConstLa
 std::vector<lanelet::ConstLineString3d> stopLinesLanelet(const lanelet::ConstLanelet ll);
 
 /**
- * [stopSignes extracts stoplines that are associated with stopsignes]
+ * [stopSigns extracts stoplines that are associated with stopsigns]
  * @param lanelets     [input lanelets]
  * @param stop_sign_id [sign id of stop sign]
  * @return             [array of stoplines]
