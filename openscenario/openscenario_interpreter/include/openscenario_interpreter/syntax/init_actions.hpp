@@ -43,15 +43,17 @@ struct InitActions : public StoryboardElement
 
   auto endsImmediately() const -> bool;
 
-  auto evaluateInstantly() const -> void;
-
-  auto evaluateNonInstantly() const -> void;
-
   auto run() -> void override;
+
+  auto runInstantaneousActions() -> void;
+
+  auto runNonInstantaneousActions() -> void;
 
   auto start() -> void override;
 
   auto startInstantaneousActions() -> void;
+
+  auto startNonInstantaneousActions() -> void;
 
   Elements global_actions;
   Elements user_defined_actions;

@@ -96,22 +96,10 @@ auto InitActions::accomplished() const -> bool
 
   return global_actions_accomplished and user_defined_actions_accomplished and
          privates_accomplished;
-  return false;
 }
 
-auto InitActions::evaluateInstantly() const -> void
-{
-  for (auto && each : instant_elements) {
-    each.evaluate();
-  }
-}
-
-auto InitActions::evaluateNonInstantly() const -> void
-{
-  for (auto && each : non_instant_elements) {
-    each.evaluate();
-  }
-}
+// this function should be called by StoryboardElement
+auto InitActions::run() -> void { runNonInstantaneousActions(); }
 
 auto InitActions::endsImmediately() const -> bool
 {
@@ -130,12 +118,7 @@ auto InitActions::endsImmediately() const -> bool
 }
 
 // this function should be called by StoryboardElement
-auto InitActions::start() -> void
-{
-  for (auto && e : privates) {
-    e.as<Private>().start();
-  }
-}
+auto InitActions::start() -> void { startNonInstantaneousActions(); }
 
 // this function should be called before simulation time starts
 auto InitActions::startInstantaneousActions() -> void
@@ -143,16 +126,45 @@ auto InitActions::startInstantaneousActions() -> void
   for (auto && e : global_actions) {
     e.as<GlobalAction>().start();
   }
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (user_defined_action.endsImmediately()) {
+      user_defined_action.start();
+    }
+  }
   for (auto && e : privates) {
     e.as<Private>().startInstantaneousActions();
   }
 }
 
-// this function should be called by StoryboardElement
-auto InitActions::run() -> void
+auto InitActions::startNonInstantaneousActions() -> void
 {
+  // we don't call global actions here, because they are all instantaneous actions
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (not user_defined_action.endsImmediately()) {
+      user_defined_action.run();
+    }
+  }
   for (auto && e : privates) {
-    e.as<Private>().run();
+    e.as<Private>().runNonInstantaneousActions();
+  }
+}
+
+// this function should be called before simulation time starts and after executing startInstantaneousActions()
+auto InitActions::runInstantaneousActions() -> void
+{
+  for (auto && e : global_actions) {
+    e.as<GlobalAction>().run();
+  }
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (user_defined_action.endsImmediately()) {
+      user_defined_action.run();
+    }
+  }
+  for (auto && e : privates) {
+    e.as<Private>().startInstantaneousActions();
   }
 }
 
