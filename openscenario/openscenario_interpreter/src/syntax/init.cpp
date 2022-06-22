@@ -28,6 +28,17 @@ auto Init::endsImmediately() const -> bool { return actions.endsImmediately(); }
 
 auto Init::evaluate() -> Object { return actions.evaluate(); }
 
+auto Init::evaluateInstantaneousElements() -> Object
+{
+  actions.startInstantaneousActions();
+  actions.runInstantaneousActions();
+  return unspecified;
+}
+
+auto Init::runNonInstantaneousElements() -> void { actions.runNonInstantaneousActions(); }
+
+auto Init::startNonInstantaneousElements() -> void { actions.startNonInstantaneousActions(); }
+
 auto operator<<(nlohmann::json & json, const Init & datum) -> nlohmann::json &
 {
   json["Actions"] << datum.actions;
