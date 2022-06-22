@@ -55,7 +55,7 @@ The release branches are used only to update the release notes. An example is [h
 Your changes proposed in your pull request will be tested automatically by the following checks:
 
 | Checks                                                                                                                                                                                                 | Description                                                        |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ------------------------------------------------------------------ |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | [![ScenarioTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml)    | Build all packages and run integration tests.                      |
 | [![BuildTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml)                     | Build each package independently, run linters, and run unit tests. |
 | [![Docker](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)                      | Build a docker image.                                              |
@@ -64,10 +64,10 @@ Your changes proposed in your pull request will be tested automatically by the f
 
 If you contribute to the documentation, your changes should pass the checks below:
 
-| Checks                                                                                                                                                                                            | Description                                     |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Checks                                                                                                                                                                                                 | Description                                     |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
 | [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml) | Build the documentation sites.                  |
-| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)     | Run a spell checker and add warnings to the PR. |
+| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)          | Run a spell checker and add warnings to the PR. |
 
 ## Code review
 
@@ -78,7 +78,7 @@ To keep the commit hashes consistent, **please DO NOT force-push the commit to y
 If you want to force-push the commit during the review, please contact the maintainers for approval in advance.
 
 If more than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
-Your contribution will be recorded in the [release note](../ReleaseNotes.md).
+Your contribution will be recorded in the [release note](https://tier4.github.io/scenario_simulator_v2-docs/ReleaseNotes/).
 
 
 ## License

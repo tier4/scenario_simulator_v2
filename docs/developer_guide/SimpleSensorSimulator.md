@@ -59,8 +59,9 @@ This enables us to reduce computational resources when we want to test Autoware'
 | grid type      | value | description                                                         |
 |----------------|-------|---------------------------------------------------------------------|
 | occupied grid  | 100   | a grid determined by a simulated lidar sensor that an object exists |
-| empty grid     | 0     | an empty grid proved by a simulated ray-cast passing through        |    
 | invisible grid | 50    | a grid that is out of range or occlusion of simulated lidar sensor  |
+| empty grid     | 0     | an empty grid proved by a simulated ray-cast passing through        |    
+
 
 
 ### Configuration
