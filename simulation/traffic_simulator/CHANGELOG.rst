@@ -1134,7 +1134,7 @@ Changelog for package traffic_simulator
 * fix login in follow front entity action
 * remove launch install line
 * remove moc directory
-* move to mock pacakge
+* move to mock package
 * Merge remote-tracking branch 'origin/master' into feature/autoware/pose-with-covariance
 * Contributors: Masaya Kataoka, yamacir-kit
 

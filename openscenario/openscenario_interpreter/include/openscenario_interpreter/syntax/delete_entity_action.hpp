@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_
 
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 
 namespace openscenario_interpreter
@@ -26,7 +27,7 @@ inline namespace syntax
  *  <xsd:complexType name="DeleteEntityAction"/>
  *
  * -------------------------------------------------------------------------- */
-struct DeleteEntityAction
+struct DeleteEntityAction : private SimulatorCore::ActionApplication
 {
   template <typename... Ts>
   explicit DeleteEntityAction(Ts &&...)

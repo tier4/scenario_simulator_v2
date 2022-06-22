@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/stand_still_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -47,7 +47,7 @@ auto StandStillCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(getStandStillDuration(triggering_entity));
+    results.push_back(evaluateStandStill(triggering_entity));
     return compare(results.back(), duration);
   }));
 }

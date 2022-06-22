@@ -113,8 +113,8 @@ You can get unique key for each data by calling `BehaviorPluginBase::get(FOO)Key
 Getter are named as get(FOO), such as `BehaviorPluginClass::getCurrentTime();`.  
 Setters are named as set(Foo), such as `BehaviorPluginClass::setCurrentTime(double value);`.
 
-|         Name         |                      Description                      |                           Type                               |
-| -------------------- | ----------------------------------------------------- | ------------------------------------------------------------ |
+| Name                 | Description                                           | Type                                                         |
+|----------------------|-------------------------------------------------------|--------------------------------------------------------------|
 | CurrentTime          | Elapsed time in simulation                            | `double`                                                     |
 | DebugMarker          | Rviz marker for debugging NPC behavior                | `std::vector<visualization_msgs::msg::Marker>`               |
 | DriverModel          | Driver behavior parameters                            | `traffic_simulator_msgs::msg::DriverModel`                   |
