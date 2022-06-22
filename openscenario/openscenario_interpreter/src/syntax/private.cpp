@@ -38,16 +38,55 @@ auto Private::endsImmediately() const -> bool
     [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
 }
 
-auto Private::evaluate() -> Object
+//auto Private::evaluate() -> Object
+//{
+//  for (auto && private_action : private_actions) {
+//    if (not has_started) {
+//      private_action.start();
+//    }
+//    private_action.run();
+//  }
+//  has_started = true;
+//  return unspecified;
+//}
+
+auto Private::run() -> void { runNonInstantaneousActions(); }
+auto Private::runInstantaneousActions() -> void
 {
   for (auto && private_action : private_actions) {
-    if (not has_started) {
+    if (private_action.endsImmediately()) {
+      private_action.run();
+    }
+  }
+}
+
+auto Private::runNonInstantaneousActions() -> void
+{
+  for (auto && private_action : private_actions) {
+    if (not private_action.endsImmediately()) {
+      private_action.run();
+    }
+  }
+}
+
+auto Private::start() -> void { startNonInstantaneousActions(); }
+
+auto Private::startInstantaneousActions() -> void
+{
+  for (auto && private_action : private_actions) {
+    if (private_action.endsImmediately()) {
       private_action.start();
     }
-    private_action.run();
   }
-  has_started = true;
-  return unspecified;
+}
+
+auto Private::startNonInstantaneousActions() -> void
+{
+  for (auto && private_action : private_actions) {
+    if (not private_action.endsImmediately()) {
+      private_action.start();
+    }
+  }
 }
 
 auto operator<<(nlohmann::json & json, const Private & datum) -> nlohmann::json &

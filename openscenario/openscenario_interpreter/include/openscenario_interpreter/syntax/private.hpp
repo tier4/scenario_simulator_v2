@@ -44,7 +44,17 @@ struct Private : public Scope
 
   auto endsImmediately() const -> bool;
 
-  auto evaluate() -> Object;
+  auto run() -> void;
+
+  auto runInstantaneousActions() -> Object;
+
+  auto runNonInstantaneousActions() -> Object;
+
+  auto start() -> void;
+
+  auto startInstantaneousActions() -> void;
+
+  auto startNonInstantaneousActions() -> void;
 
   bool has_started = false;
 };
