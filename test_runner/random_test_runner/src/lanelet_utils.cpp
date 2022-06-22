@@ -24,8 +24,8 @@
 #include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
 
 #include "geographic_msgs/msg/geo_point.hpp"
-#include "traffic_simulator/hdmap_utils/hdmap_utils.hpp"
 #include "geometry_math/linear_algebra.hpp"
+#include "traffic_simulator/hdmap_utils/hdmap_utils.hpp"
 
 LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 {
