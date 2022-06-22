@@ -17,6 +17,7 @@
 
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -34,17 +35,17 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct InitActions
+struct InitActions : public StoryboardElement
 {
   explicit InitActions(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 
-  auto evaluate() const -> Object;
+  auto evaluateInstantly() const -> void;
 
-  auto evaluateInstantly() const -> Object;
+  auto evaluateNonInstantly() const -> void;
 
-  auto evaluateNonInstantly() const -> Object;
+  auto run() -> void override;
 
   auto start() -> void override;
 

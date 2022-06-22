@@ -87,8 +87,14 @@ auto InitActions::accomplished() const -> bool
   // TODO: implement
   return false;
 }
+//auto InitActions::evaluate() const -> Object
+//{
+//  evaluateInstantly();
+//
+//  return unspecified;
+//}
 
-auto InitActions::evaluateInstantly() const -> Object
+auto InitActions::evaluateInstantly() const -> void
 {
   for (auto && each : instant_elements) {
     each.evaluate();
@@ -96,7 +102,7 @@ auto InitActions::evaluateInstantly() const -> Object
   return unspecified;
 }
 
-auto InitActions::evaluateNonInstantly() const -> Object
+auto InitActions::evaluateNonInstantly() const -> void
 {
   for (auto && each : non_instant_elements) {
     each.evaluate();
@@ -119,6 +125,10 @@ auto InitActions::endsImmediately() const -> bool
   return global_ends_immediately and user_defined_actions_ends_immediately and
          private_actions_ends_immediately;
 }
+
+auto InitActions::start() -> void {}
+
+auto InitActions::run() -> void { evaluateNonInstantly(); }
 
 auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nlohmann::json &
 {
