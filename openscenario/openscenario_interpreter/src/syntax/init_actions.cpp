@@ -27,9 +27,9 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
 {
   std::unordered_map<std::string, std::function<void(const pugi::xml_node & node)>> dispatcher{
     // clang-format off
-    std::make_pair("GlobalAction",      [&](auto && node) { return global_actions.push_back(make<GlobalAction>     (node, scope)); }),
+    std::make_pair("GlobalAction",      [&](auto && node) { return global_actions.push_back(make<GlobalAction>(node, scope)); }),
     std::make_pair("UserDefinedAction", [&](auto && node) { return user_defined_actions.push_back(make<UserDefinedAction>(node, scope)); }),
-    std::make_pair("Private",           [&](auto && node) { return privates.push_back(make<Private>          (node, scope)); })
+    std::make_pair("Private",           [&](auto && node) { return privates.push_back(make<Private>(node, scope)); })
     // clang-format on
   };
 
@@ -38,47 +38,6 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
     if (iter != std::end(dispatcher)) {
       std::get<1> (*iter)(each);
     }
-  }
-
-  for (auto e : global_actions) {
-    apply<void>(
-      [&](auto && action) {
-        if (action.endsImmediately()) {
-          instant_elements.push_back(action);
-        } else {
-          non_instant_elements.push_back(action);
-        }
-      },
-      e.as<GlobalAction>());
-  }
-
-  for (auto e : user_defined_actions) {
-    auto action = e.as<UserDefinedAction>();
-    if (action.endsImmediately()) {
-      instant_elements.push_back(action);
-    } else {
-      non_instant_elements.push_back(action);
-    }
-  }
-
-  for (auto e : privates) {
-    auto push_back_specific_private =
-      [&](Elements & elements, std::function<bool(const PrivateAction &)> remove_func) {
-        Private local_private = e.as<Private>();
-        local_private.private_actions.erase(
-          std::remove_if(
-            std::begin(local_private.private_actions), std::end(local_private.private_actions),
-            remove_func),
-          local_private.private_actions.end());
-        if (not local_private.private_actions.empty()) {
-          elements.push_back(make(local_private));
-        }
-      };
-
-    push_back_specific_private(
-      instant_elements, [](const PrivateAction & e) { return not e.endsImmediately(); });
-    push_back_specific_private(
-      non_instant_elements, [](const PrivateAction & e) { return e.endsImmediately(); });
   }
 }
 

@@ -90,6 +90,9 @@ auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::js
 
   for (const auto & story : datum.elements) {
     nlohmann::json each;
+    if (story.is<InitActions>()) {
+      continue;
+    }
     each << story.as<Story>();
     json["Story"].push_back(each);
   }

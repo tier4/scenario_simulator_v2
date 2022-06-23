@@ -58,8 +58,6 @@ struct InitActions : public StoryboardElement
   Elements global_actions;
   Elements user_defined_actions;
   Elements privates;
-  Elements instant_elements;
-  Elements non_instant_elements;
 };
 
 auto operator<<(nlohmann::json &, const InitActions &) -> nlohmann::json &;
