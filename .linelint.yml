@@ -1,0 +1,16 @@
+rules:
+  # checks if file ends in a newline character
+  end-of-file:
+    # set to true to enable this rule
+    enable: true
+
+    # set to true to disable autofix (if enabled globally)
+    disable-autofix: false
+
+    # will be ignored only by this rule
+    ignore:
+      - docs/image/inter_process_communication.drawio
+      - docs/image/what_is_scenario_testing_framework.drawio
+
+    # if true also checks if file ends in a single newline character
+    single-new-line: true
