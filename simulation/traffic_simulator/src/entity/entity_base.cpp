@@ -526,5 +526,9 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
     return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
   }
 }
+
+bool EntityBase::isNpcLogicReady() const { return npc_logic_ready_; }
+
+void EntityBase::startNpcLogic() const { npc_logic_ready_ = true; }
 }  // namespace entity
 }  // namespace traffic_simulator
