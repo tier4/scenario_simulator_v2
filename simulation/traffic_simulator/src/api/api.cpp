@@ -432,6 +432,12 @@ bool API::updateFrame()
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
+    /**
+     * @brief Currently, start all NPC logics when the simulation time overs 0.
+     */
+    if (clock_.getCurrentSimulationTime() >= 0) {
+      startNpcLogic();
+    }
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(clock_.getCurrentSimulationTime());
     simulation_interface::toProto(
@@ -459,6 +465,12 @@ bool API::updateFrame()
     metrics_manager_.calculate();
     return true;
   }
+}
+
+void API::startNpcLogic()
+{
+  entity_manager_ptr_->startNpcLogic();
+  clock_.onNpcLogicStart();
 }
 
 void API::requestLaneChange(const std::string & name, const std::int64_t & lanelet_id)

@@ -21,7 +21,8 @@ SimulationClock::SimulationClock(rcl_clock_type_t clock_type, bool use_raw_clock
 : rclcpp::Clock(clock_type),
   use_raw_clock(use_raw_clock),
   step_time_duration_(rclcpp::Duration::from_seconds(0)),
-  initialized_(false)
+  initialized_(false),
+  is_npc_logic_started_(false)
 {
 }
 
@@ -61,5 +62,23 @@ const rclcpp::Time SimulationClock::getCurrentRosTime()
     return time_on_initialize_ +
            rclcpp::Duration::from_seconds(current_simulation_time_ - initial_simulation_time_);
   }
+}
+
+void SimulationClock::onNpcLogicStart()
+{
+  if (is_npc_logic_started_) {
+    THROW_SIMULATION_ERROR(
+      "npc logic is already started. Please check simulation clock instance was destroyed.");
+  }
+  is_npc_logic_started_ = true;
+  scenario_time_offset_ = getCurrentSimulationTime();
+}
+
+double SimulationClock::getCurrentScenarioTime() const
+{
+  if (!is_npc_logic_started_) {
+    THROW_SIMULATION_ERROR("Npc logics have not started yet.");
+  }
+  return getCurrentSimulationTime() - scenario_time_offset_;
 }
 }  // namespace traffic_simulator

@@ -34,7 +34,7 @@ EntityBase::EntityBase(
   status_(boost::none),
   verbose_(true),
   visibility_(true),
-  npc_logic_ready_(false),
+  npc_logic_started_(false),
   entity_subtype_(subtype)
 {
   status_ = boost::none;
@@ -527,8 +527,8 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
   }
 }
 
-bool EntityBase::isNpcLogicReady() const { return npc_logic_ready_; }
+bool EntityBase::isNpcLogicStarted() const { return npc_logic_started_; }
 
-void EntityBase::startNpcLogic() const { npc_logic_ready_ = true; }
+void EntityBase::startNpcLogic() const { npc_logic_started_ = true; }
 }  // namespace entity
 }  // namespace traffic_simulator

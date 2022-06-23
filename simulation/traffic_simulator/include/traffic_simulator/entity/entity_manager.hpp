@@ -85,6 +85,8 @@ class EntityManager
 
   double current_time_;
 
+  bool npc_logic_started_;
+
   using EntityStatusWithTrajectoryArray =
     traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray;
   const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
@@ -142,6 +144,7 @@ public:
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
     current_time_(0),
+    npc_logic_started_(false),
     entity_status_array_pub_ptr_(rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
       node, "entity/status", EntityMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
@@ -355,6 +358,9 @@ public:
     if (result.second) {
       result.first->second->setHdMapUtils(hdmap_utils_ptr_);
       result.first->second->setTrafficLightManager(traffic_light_manager_ptr_);
+      if (npc_logic_started_) {
+        result.first->second->startNpcLogic();
+      }
       return result.second;
     } else {
       THROW_SEMANTIC_ERROR("entity : ", name, " is already exists.");
@@ -380,6 +386,8 @@ public:
   void update(const double current_time, const double step_time);
 
   void updateHdmapMarker();
+
+  void startNpcLogic();
 };
 }  // namespace entity
 }  // namespace traffic_simulator

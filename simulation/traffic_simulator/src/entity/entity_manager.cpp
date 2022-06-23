@@ -724,5 +724,15 @@ void EntityManager::updateHdmapMarker()
   }
   lanelet_marker_pub_ptr_->publish(markers);
 }
+
+void EntityManager::startNpcLogic()
+{
+  npc_logic_started_ = true;
+  for (auto it = entities_.begin(); it != entities_.end(); it++) {
+    if (!it->second->isEgo()) {
+      it->second->startNpcLogic();
+    }
+  }
+}
 }  // namespace entity
 }  // namespace traffic_simulator

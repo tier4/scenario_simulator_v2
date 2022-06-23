@@ -157,6 +157,8 @@ public:
 
   double getCurrentTime() const noexcept { return clock_.getCurrentSimulationTime(); }
 
+  void startNpcLogic();
+
   void requestLaneChange(const std::string & name, const std::int64_t & lanelet_id);
 
   void requestLaneChange(
