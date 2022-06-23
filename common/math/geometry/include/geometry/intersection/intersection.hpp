@@ -20,13 +20,16 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 bool isIntersect2D(const LineSegment & line0, const LineSegment & line1);
 bool isIntersect2D(const std::vector<LineSegment> & lines);
 boost::optional<geometry_msgs::msg::Point> getIntersection2D(
   const LineSegment & line0, const LineSegment & line1);
 std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines);
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_

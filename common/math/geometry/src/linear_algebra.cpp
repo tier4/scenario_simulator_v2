@@ -15,7 +15,9 @@
 #include <geometry/linear_algebra.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 double innerProduct(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
 {
@@ -62,7 +64,8 @@ geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec)
   vec.z = vec.z / size;
   return vec;
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 geometry_msgs::msg::Vector3 operator*(const geometry_msgs::msg::Vector3 & vec, double value)
 {

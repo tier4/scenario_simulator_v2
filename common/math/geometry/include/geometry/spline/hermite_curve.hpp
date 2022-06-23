@@ -25,7 +25,9 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 class HermiteCurve
 {
@@ -72,6 +74,7 @@ private:
   std::pair<double, double> get2DMinMaxCurvatureValue() const;
   double length_;
 };
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__SPLINE__HERMITE_CURVE_HPP_

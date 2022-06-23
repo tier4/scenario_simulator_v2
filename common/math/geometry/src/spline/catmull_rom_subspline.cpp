@@ -16,7 +16,9 @@
 #include <geometry/spline/catmull_rom_subspline.hpp>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 double CatmullRomSubspline::getLength() const { return end_s_ - start_s_; }
 
@@ -36,5 +38,5 @@ boost::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
 
   return s.get() - start_s_;
 }
-
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

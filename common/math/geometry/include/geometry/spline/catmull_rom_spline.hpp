@@ -22,7 +22,9 @@
 #include <utility>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 class CatmullRomSpline : public CatmullRomSplineInterface
 {
@@ -72,6 +74,7 @@ private:
   double total_length_;
   const std::vector<geometry_msgs::msg::Point> control_points;
 };
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__SPLINE__CATMULL_ROM_SPLINE_HPP_

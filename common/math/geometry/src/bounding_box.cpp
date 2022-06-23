@@ -21,7 +21,9 @@
 #include <Eigen/Core>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 /**
  * @brief Get the Polygon Distance object
@@ -92,4 +94,5 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   points.emplace_back(p3);
   return points;
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

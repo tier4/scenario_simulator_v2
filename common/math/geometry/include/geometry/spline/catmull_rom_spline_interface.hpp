@@ -22,7 +22,9 @@
 #include <utility>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 class CatmullRomSplineInterface
 {
@@ -32,6 +34,7 @@ public:
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const = 0;
 };
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__SPLINE__CATMULL_ROM_SPLINE_INTERFACE_HPP_

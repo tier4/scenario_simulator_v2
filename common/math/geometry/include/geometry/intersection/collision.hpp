@@ -21,13 +21,17 @@
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 bool checkCollision2D(
   geometry_msgs::msg::Pose pose0, traffic_simulator_msgs::msg::BoundingBox bbox0,
   geometry_msgs::msg::Pose pose1, traffic_simulator_msgs::msg::BoundingBox bbox1);
 bool contains(
   const std::vector<geometry_msgs::msg::Point> & polygon, const geometry_msgs::msg::Point & point);
-}  // namespace geometry_math
+}  // namespace geometry
+
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__INTERSECTION__COLLISION_HPP_

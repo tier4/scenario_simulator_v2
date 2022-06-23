@@ -20,7 +20,9 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 class LineSegment
 {
@@ -47,6 +49,7 @@ public:
 };
 
 std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points);
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__POLYGON__LINE_SEGMENT_

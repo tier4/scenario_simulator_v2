@@ -22,7 +22,9 @@
 
 #include <geometry/transform.hpp>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 const geometry_msgs::msg::Pose getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
@@ -125,4 +127,5 @@ std::vector<geometry_msgs::msg::Point> transformPoints(
     });
   return ret;
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

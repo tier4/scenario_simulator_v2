@@ -17,7 +17,9 @@
 
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 class PolynomialSolver
 {
@@ -99,6 +101,7 @@ private:
   double _root3(double x) const;
   double root3(double x) const;
 };
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__SOLVER__POLYNOMIAL_SOLVER_HPP_

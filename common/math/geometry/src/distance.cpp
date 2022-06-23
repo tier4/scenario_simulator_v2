@@ -30,7 +30,9 @@
 #include <cmath>
 #include <geometry/distance.hpp>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1)
 {
@@ -68,4 +70,5 @@ double getDistance2D(
   }
   return boost::geometry::distance(poly0, poly1);
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

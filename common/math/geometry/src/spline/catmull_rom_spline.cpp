@@ -22,7 +22,9 @@
 #include <utility>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
   double width, size_t num_points, double z_offset)
@@ -431,4 +433,5 @@ bool CatmullRomSpline::equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::
   }
   return true;
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

@@ -14,7 +14,9 @@
 
 #include <geometry/intersection/intersection.hpp>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 bool isIntersect2D(const LineSegment & line0, const LineSegment & line1)
 {
@@ -83,4 +85,5 @@ std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineS
   }
   return ret;
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

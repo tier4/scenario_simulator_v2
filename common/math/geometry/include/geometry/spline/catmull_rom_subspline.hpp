@@ -24,7 +24,9 @@
 #include <utility>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 class CatmullRomSubspline : public CatmullRomSplineInterface
 {
@@ -46,6 +48,7 @@ private:
   double start_s_;
   double end_s_;
 };
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_

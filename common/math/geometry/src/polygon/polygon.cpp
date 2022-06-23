@@ -20,7 +20,9 @@
 #include <geometry/polygon/polygon.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 std::vector<geometry_msgs::msg::Point> get2DConvexHull(
   const std::vector<geometry_msgs::msg::Point> & points)
@@ -85,5 +87,5 @@ std::vector<double> filterByAxis(
   }
   return ret;
 }
-
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

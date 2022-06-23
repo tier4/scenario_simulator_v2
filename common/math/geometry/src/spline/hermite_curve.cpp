@@ -21,7 +21,9 @@
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 HermiteCurve::HermiteCurve(
   double ax, double bx, double cx, double dx, double ay, double by, double cy, double dy, double az,
@@ -331,4 +333,5 @@ const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale)
 
   return p;
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

@@ -15,7 +15,9 @@
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 LineSegment::LineSegment(
   const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point)
@@ -124,4 +126,5 @@ std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::P
   seg.emplace_back(LineSegment(points[points.size() - 1], points[0]));
   return seg;
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

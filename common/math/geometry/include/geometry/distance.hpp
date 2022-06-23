@@ -29,7 +29,9 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1);
 double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Point & p1);
@@ -38,6 +40,7 @@ double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg
 double getDistance2D(
   const std::vector<geometry_msgs::msg::Point> & polygon0,
   const std::vector<geometry_msgs::msg::Point> & polygon1);
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__DISTANCE_HPP_

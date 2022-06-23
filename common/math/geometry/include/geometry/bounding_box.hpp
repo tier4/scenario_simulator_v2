@@ -27,7 +27,9 @@
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 boost::optional<double> getPolygonDistance(
   const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
@@ -38,6 +40,7 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   traffic_simulator_msgs::msg::BoundingBox bbox, double width_extension_right = 0.0,
   double width_extension_left = 0.0, double length_extension_front = 0.0,
   double length_extension_rear = 0.0);
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__BOUNDING_BOX_HPP_

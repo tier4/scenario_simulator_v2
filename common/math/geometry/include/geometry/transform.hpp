@@ -17,7 +17,9 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 /**
  * @brief Get the relative pose between two poses.
@@ -62,6 +64,7 @@ std::vector<geometry_msgs::msg::Point> transformPoints(
 std::vector<geometry_msgs::msg::Point> transformPoints(
   const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Pose & sensor_pose,
   const std::vector<geometry_msgs::msg::Point> & points);
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__TRANSFORM_HPP_

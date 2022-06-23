@@ -24,7 +24,9 @@
 #include <geometry/intersection/collision.hpp>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 bool checkCollision2D(
   geometry_msgs::msg::Pose pose0, traffic_simulator_msgs::msg::BoundingBox bbox0,
@@ -59,4 +61,5 @@ bool contains(
   }
   return boost::geometry::within(boost_point(point.x, point.y), poly);
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math

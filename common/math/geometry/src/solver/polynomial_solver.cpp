@@ -19,7 +19,9 @@
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
 
-namespace geometry_math
+namespace math
+{
+namespace geometry
 {
 double PolynomialSolver::linearFunction(double a, double b, double t) const { return a * t + b; }
 
@@ -181,4 +183,5 @@ double PolynomialSolver::root3(double x) const
     return 0.;
   }
 }
-}  // namespace geometry_math
+}  // namespace geometry
+}  // namespace math
