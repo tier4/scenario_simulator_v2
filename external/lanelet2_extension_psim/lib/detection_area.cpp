@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ void DetectionArea::setStopLine(const LineString3d & stopLine)
 void DetectionArea::removeStopLine() { parameters()[RoleName::RefLine] = {}; }
 
 #if __cplusplus < 201703L
-constexpr char DetectionArea::RuleName[];  // instanciate string in cpp file
+constexpr char DetectionArea::RuleName[];  // instantiate string in cpp file
 #endif
 
 }  // namespace autoware

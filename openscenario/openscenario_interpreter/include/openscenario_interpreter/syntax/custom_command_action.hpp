@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -42,7 +43,7 @@ struct SpecialAction : public std::integral_constant<int, Value>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct CustomCommandAction : private Scope
+struct CustomCommandAction : private Scope, private SimulatorCore::ActionApplication
 {
   const String type;
 
@@ -53,8 +54,6 @@ struct CustomCommandAction : private Scope
   static auto accomplished() noexcept -> bool;
 
   static auto applyFaultInjectionAction(const std::vector<std::string> &, const Scope &) -> int;
-
-  static auto applyWalkStraightAction(const std::vector<std::string> &, const Scope &) -> int;
 
   static auto debugError(const std::vector<std::string> &, const Scope &) -> int;
 

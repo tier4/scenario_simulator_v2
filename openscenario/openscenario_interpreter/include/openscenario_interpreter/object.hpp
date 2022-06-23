@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 
-#include <boost/mpl/and.hpp>
 #include <list>
 #include <openscenario_interpreter/expression.hpp>
-#include <type_traits>
+#include <openscenario_interpreter/type_traits/requires.hpp>
 #include <typeindex>
 #include <utility>
-
-#define REQUIRES(...) typename = typename std::enable_if<boost::mpl::and_<__VA_ARGS__>::value>::type
 
 namespace openscenario_interpreter
 {

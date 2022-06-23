@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,10 +47,10 @@
 #include <algorithm>
 #include <cmath>
 #include <color_names/color_names.hpp>
+#include <geometry/spline/catmull_rom_spline.hpp>
 #include <openscenario_visualization/openscenario_visualization_component.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <vector>
 
 namespace openscenario_visualization
@@ -68,7 +68,7 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
 }
 
 void OpenscenarioVisualizationComponent::entityStatusCallback(
-  const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg)
+  const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::ConstSharedPtr msg)
 {
   visualization_msgs::msg::MarkerArray current_marker;
   std::vector<std::string> entity_name_lists;
@@ -396,7 +396,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   ret.markers.emplace_back(text_action);
 
   if (waypoints.waypoints.size() > 2) {
-    traffic_simulator::math::CatmullRomSpline spline(waypoints.waypoints);
+    math::geometry::CatmullRomSpline spline(waypoints.waypoints);
 
     /**
      * @brief generate marker for waypoints

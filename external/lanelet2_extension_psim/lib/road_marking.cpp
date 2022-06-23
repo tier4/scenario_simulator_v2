@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ void RoadMarking::setRoadMarking(const LineString3d & road_marking)
 void RoadMarking::removeRoadMarking() { parameters()[RoleName::Refers] = {}; }
 
 #if __cplusplus < 201703L
-constexpr char RoadMarking::RuleName[];  // instanciate string in cpp file
+constexpr char RoadMarking::RuleName[];  // instantiate string in cpp file
 #endif
 
 }  // namespace autoware

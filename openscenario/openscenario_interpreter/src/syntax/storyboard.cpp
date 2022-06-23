@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
 #include <openscenario_interpreter/syntax/storyboard.hpp>
@@ -34,36 +34,50 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   if (not init.endsImmediately()) {
     throw SemanticError("Init.Actions should end immediately");
   }
+
+  while (not thunks.empty()) {
+    std::invoke(thunks.front());
+    thunks.pop();
+  }
 }
 
 auto Storyboard::run() -> void
 {
-  if (engaged) {
-    for (auto && story : elements) {
-      story.evaluate();
-    }
-  } else if (std::all_of(  // XXX DIRTY HACK!!!
-               std::cbegin(global().entities), std::cend(global().entities),
-               [&](const auto & each) {
-                 return not std::get<1>(each).template as<ScenarioObject>().is_added or
-                        openscenario_interpreter::ready(std::get<0>(each));
-               })) {
-    for (const auto & each : global().entities) {
-      if (std::get<1>(each).template as<ScenarioObject>().is_added) {
-        engage(std::get<0>(each));
-      }
-    }
-    engaged = true;
-  } else {
-    throw common::AutowareError(
-      "Autoware did not reach an engageable state within the specified time "
-      "(initialize_duration).");
+  for (auto && story : elements) {
+    story.evaluate();
   }
 }
 
 auto Storyboard::start() -> void
 {
-  init.evaluate();  // NOTE RENAME TO 'start'?
+  auto everyone_engageable = [this]() {
+    return std::all_of(
+      std::cbegin(global().entities), std::cend(global().entities), [&](const auto & each) {
+        const auto & [name, scenario_object] = each;
+        return not scenario_object.template as<ScenarioObject>().is_added or
+               not scenario_object.template as<ScenarioObject>()
+                     .object_controller.isUserDefinedController() or
+               asAutoware(name).ready();
+      });
+  };
+
+  auto engage_everyone = [this]() {
+    for (const auto & [name, scenario_object] : global().entities) {
+      if (
+        scenario_object.template as<ScenarioObject>().is_added and
+        scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
+        asAutoware(name).engage();
+      }
+    }
+  };
+
+  if (everyone_engageable()) {
+    return engage_everyone();
+  } else {
+    throw common::AutowareError(
+      "Autoware did not reach an engageable state within the specified time "
+      "(initialize_duration).");
+  }
 }
 
 auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::json &

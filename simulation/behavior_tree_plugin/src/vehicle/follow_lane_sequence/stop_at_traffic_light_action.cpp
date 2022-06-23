@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtTrafficLightAction::calc
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
       entity_status.lanelet_pose.offset);
-    trajectory = std::make_unique<traffic_simulator::math::CatmullRomSubspline>(
+    trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
       reference_trajectory, entity_status.lanelet_pose.s,
       entity_status.lanelet_pose.s + getHorizon());
     return waypoints;

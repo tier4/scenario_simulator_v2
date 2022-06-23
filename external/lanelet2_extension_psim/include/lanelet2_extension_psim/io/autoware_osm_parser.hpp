@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public:
    * OsmParser, but it will overwrite x and y value with local_x and local_y
    * tags if present]
    * @param  filename [path to osm file]
-   * @param  errors   [any errors catched during parsing]
+   * @param  errors   [any errors caught during parsing]
    * @return          [returns LaneletMap]
    */
   std::unique_ptr<LaneletMap> parse(

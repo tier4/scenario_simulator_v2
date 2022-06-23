@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace common
 {
 inline namespace scenario_simulator_exception
 {
-auto concatenate = [](auto &&... xs) {
+inline auto concatenate = [](auto &&... xs) {
   auto write = [](auto && os, auto && x) {
     os.get() << std::forward<decltype(x)>(x);
     return std::forward<decltype(os)>(os);

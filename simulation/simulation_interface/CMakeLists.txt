@@ -49,7 +49,6 @@ target_link_libraries(simulation_interface
   ${PROTOBUF_LIBRARY}
   pthread
   sodium
-  zmqpp
   zmq
 )
 

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
+#include <geometry/bounding_box.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
-#include <traffic_simulator/math/bounding_box.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -162,7 +162,7 @@ std::vector<traffic_simulator_msgs::msg::EntityStatus> ActionNode::getRightOfWay
 
 boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const traffic_simulator::math::CatmullRomSplineInterface & spline)
+  const math::geometry::CatmullRomSplineInterface & spline)
 {
   const auto traffic_light_ids = hdmap_utils->getTrafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.empty()) {
@@ -196,7 +196,7 @@ boost::optional<double> ActionNode::getDistanceToStopLine(
 }
 
 boost::optional<double> ActionNode::getDistanceToFrontEntity(
-  const traffic_simulator::math::CatmullRomSplineInterface & spline)
+  const math::geometry::CatmullRomSplineInterface & spline)
 {
   auto name = getFrontEntityName(spline);
   if (!name) {
@@ -206,7 +206,7 @@ boost::optional<double> ActionNode::getDistanceToFrontEntity(
 }
 
 boost::optional<std::string> ActionNode::getFrontEntityName(
-  const traffic_simulator::math::CatmullRomSplineInterface & spline)
+  const math::geometry::CatmullRomSplineInterface & spline)
 {
   std::vector<double> distances;
   std::vector<std::string> entities;
@@ -238,7 +238,7 @@ boost::optional<std::string> ActionNode::getFrontEntityName(
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
-  const traffic_simulator::math::CatmullRomSplineInterface & spline,
+  const math::geometry::CatmullRomSplineInterface & spline,
   const traffic_simulator_msgs::msg::EntityStatus & status)
 {
   if (status.lanelet_pose_valid) {
@@ -258,7 +258,7 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::getEntityStatus(
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
-  const traffic_simulator::math::CatmullRomSplineInterface & spline, const std::string target_name,
+  const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
   double width_extension_right, double width_extension_left, double length_extension_front,
   double length_extension_rear)
 {
@@ -272,13 +272,13 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
-  const traffic_simulator::math::CatmullRomSplineInterface & spline,
+  const math::geometry::CatmullRomSplineInterface & spline,
   const traffic_simulator_msgs::msg::EntityStatus & status, double width_extension_right,
   double width_extension_left, double length_extension_front, double length_extension_rear)
 {
   if (status.lanelet_pose_valid) {
-    const auto polygon = traffic_simulator::math::transformPoints(
-      status.pose, traffic_simulator::math::getPointsFromBbox(
+    const auto polygon = math::geometry::transformPoints(
+      status.pose, math::geometry::getPointsFromBbox(
                      status.bounding_box, width_extension_right, width_extension_left,
                      length_extension_front, length_extension_rear));
     return spline.getCollisionPointIn2D(polygon, false, true);
@@ -288,7 +288,7 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
 
 boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & route_lanelets,
-  const traffic_simulator::math::CatmullRomSplineInterface & spline)
+  const math::geometry::CatmullRomSplineInterface & spline)
 {
   auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets);
   auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets);

@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_condition.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
@@ -39,8 +38,7 @@ auto TrafficSignalCondition::description() const -> String
 
 auto TrafficSignalCondition::evaluate() -> Object
 {
-  if (auto && traffic_relation =
-        getTrafficRelationReferees(boost::lexical_cast<std::int64_t>(name));
+  if (auto && traffic_relation = toWayIDs(boost::lexical_cast<std::int64_t>(name));
       state == "none") {
     current_state = "none";
     return asBoolean(std::all_of(

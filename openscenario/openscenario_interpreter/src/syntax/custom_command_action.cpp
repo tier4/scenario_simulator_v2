@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 #include <iterator>  // std::distance
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <unordered_map>
 
@@ -65,20 +65,6 @@ auto CustomCommandAction::applyFaultInjectionAction(
   publisher().publish(makeFaultInjectionEvents(events));
 
   return events.size();
-}
-
-auto CustomCommandAction::applyWalkStraightAction(
-  const std::vector<std::string> & actors, const Scope & scope) -> int
-{
-  for (const auto & actor : actors) {
-    openscenario_interpreter::applyWalkStraightAction(actor);
-  }
-
-  for (const auto & actor : scope.actors) {
-    openscenario_interpreter::applyWalkStraightAction(actor);
-  }
-
-  return scope.actors.size();
 }
 
 auto CustomCommandAction::debugError(const std::vector<std::string> &, const Scope &) -> int
@@ -133,11 +119,24 @@ auto CustomCommandAction::split(const std::string & s) -> std::vector<std::strin
 
 auto CustomCommandAction::start() const -> void
 {
+  auto apply_walk_straight_action =
+    [this](const std::vector<std::string> & actors, const Scope & scope) {
+      for (const auto & actor : actors) {
+        applyWalkStraightAction(actor);
+      }
+
+      for (const auto & actor : scope.actors) {
+        applyWalkStraightAction(actor);
+      }
+
+      return scope.actors.size();
+    };
+
   static const std::unordered_map<
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
     commands{
       std::make_pair("FaultInjectionAction", applyFaultInjectionAction),
-      std::make_pair("WalkStraightAction", applyWalkStraightAction),
+      std::make_pair("WalkStraightAction", apply_walk_straight_action),
       std::make_pair("debugError", debugError),
       std::make_pair("debugSegmentationFault", debugSegmentationFault),  // DEPRECATED
       std::make_pair("exitFailure", exitFailure),

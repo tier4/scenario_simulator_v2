@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,8 @@ const unsigned int despawn_entity = 5561;
 const unsigned int update_entity_status = 5562;
 const unsigned int attach_lidar_sensor = 5563;
 const unsigned int attach_detection_sensor = 5564;
-const unsigned int update_traffic_lights = 5565;
+const unsigned int attach_occupancy_grid_sensor = 5565;
+const unsigned int update_traffic_lights = 5566;
 }  // namespace ports
 
 std::string getEndPoint(

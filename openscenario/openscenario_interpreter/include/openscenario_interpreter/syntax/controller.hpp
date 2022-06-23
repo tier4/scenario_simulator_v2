@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,8 +53,13 @@ struct Controller : public Scope
 
   explicit Controller(const pugi::xml_node &, Scope &);
 
-  auto assign(const EntityRef &) -> void;
-
+  /*
+     NOTE: The term "controller" in OpenSCENARIO is a concept equivalent to
+     "the person driving the car. Here, Autoware is considered anthropomorphic.
+     In other words, the sensor performance of Autoware in a simulation is
+     described in ScenarioObject.ObjectController.Controller.Properties as
+     "characteristics of the person driving the car.
+  */
   auto isUserDefinedController() const & -> bool;
 };
 }  // namespace syntax

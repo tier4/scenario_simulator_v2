@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,8 +58,7 @@ struct TransitionAssertion
     Thunk thunk = []() {}, const std::chrono::seconds & interval = std::chrono::seconds(1))      \
   {                                                                                              \
     rclcpp::WallRate rate{interval};                                                             \
-    for (thunk(); static_cast<Autoware &>(*this).currentFuture().wait_for(                       \
-                    std::chrono::milliseconds(1)) == std::future_status::timeout and             \
+    for (thunk(); not static_cast<Autoware &>(*this).isStopRequested() and                       \
                   not static_cast<const Autoware &>(*this).is##STATE();                          \
          rate.sleep()) {                                                                         \
       remains -= std::chrono::duration_cast<std::chrono::seconds>(rate.period());                \

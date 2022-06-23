@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <deque>
+#include <geometry/linear_algebra.hpp>
+#include <geometry/spline/catmull_rom_spline.hpp>
+#include <geometry/spline/hermite_curve.hpp>
+#include <geometry/transform.hpp>
 #include <lanelet2_extension_psim/io/autoware_osm_parser.hpp>
 #include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
@@ -40,10 +44,6 @@
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
-#include <traffic_simulator/math/hermite_curve.hpp>
-#include <traffic_simulator/math/linear_algebra.hpp>
-#include <traffic_simulator/math/transform.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -437,7 +437,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   if (M_PI * yaw_threshold < std::fabs(rpy.z) && std::fabs(rpy.z) < M_PI * (1 - yaw_threshold)) {
     return boost::none;
   }
-  double inner_prod = traffic_simulator::math::innerProduct(
+  double inner_prod = math::geometry::innerProduct(
     spline->getNormalVector(s.get()), spline->getSquaredDistanceVector(pose.position, s.get()));
   if (inner_prod < 0) {
     offset = offset * -1;
@@ -712,7 +712,7 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
   return ret;
 }
 
-std::shared_ptr<traffic_simulator::math::CatmullRomSpline> HdMapUtils::getCenterPointsSpline(
+std::shared_ptr<math::geometry::CatmullRomSpline> HdMapUtils::getCenterPointsSpline(
   std::int64_t lanelet_id)
 {
   getCenterPoints(lanelet_id);
@@ -858,7 +858,7 @@ const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulb
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
+  for (const auto & light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
       if (
         light_string.hasAttribute("traffic_light_id") and
@@ -919,7 +919,17 @@ traffic_simulator_msgs::msg::LaneletPose HdMapUtils::getAlongLaneletPose(
   return along_pose;
 }
 
-boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
+std::vector<geometry_msgs::msg::Point> HdMapUtils::getLeftBound(std::int64_t lanelet_id) const
+{
+  return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).leftBound());
+}
+
+std::vector<geometry_msgs::msg::Point> HdMapUtils::getRightBound(std::int64_t lanelet_id) const
+{
+  return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).rightBound());
+}
+
+boost::optional<std::pair<math::geometry::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter)
@@ -969,7 +979,7 @@ HdMapUtils::getLaneChangeTrajectory(
   return std::make_pair(traj, collision_point.get());
 }
 
-boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
+boost::optional<std::pair<math::geometry::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter,
@@ -978,12 +988,12 @@ HdMapUtils::getLaneChangeTrajectory(
 {
   double to_length = getLaneletLength(lane_change_parameter.target.lanelet_id);
   std::vector<double> evaluation, target_s;
-  std::vector<traffic_simulator::math::HermiteCurve> curves;
+  std::vector<math::geometry::HermiteCurve> curves;
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
     auto goal_pose = toMapPose(lane_change_parameter.target.lanelet_id, to_s, 0);
     if (
-      traffic_simulator::math::getRelativePose(from_pose, goal_pose.pose).position.x <=
+      math::geometry::getRelativePose(from_pose, goal_pose.pose).position.x <=
       forward_distance_threshold) {
       continue;
     }
@@ -1011,7 +1021,7 @@ HdMapUtils::getLaneChangeTrajectory(
   return std::make_pair(curves[min_index], target_s[min_index]);
 }
 
-traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
+math::geometry::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
@@ -1044,7 +1054,7 @@ traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
   goal_vec.x = goal_vec.x * tangent_vector_size;
   goal_vec.y = goal_vec.y * tangent_vector_size;
   goal_vec.z = goal_vec.z * tangent_vector_size;
-  traffic_simulator::math::HermiteCurve curve(from_pose, goal_pose, start_vec, goal_vec);
+  math::geometry::HermiteCurve curve(from_pose, goal_pose, start_vec, goal_vec);
   return curve;
 }
 
@@ -1091,7 +1101,7 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   const auto spline = getCenterPointsSpline(lanelet_id);
   ret.pose = spline->getPose(s);
   const auto normal_vec = spline->getNormalVector(s);
-  const auto diff = traffic_simulator::math::normalize(normal_vec) * offset;
+  const auto diff = math::geometry::normalize(normal_vec) * offset;
   ret.pose.position = ret.pose.position + diff;
   const auto tangent_vec = spline->getTangentVector(s);
   geometry_msgs::msg::Vector3 rpy;
@@ -1317,7 +1327,7 @@ HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<std::int64_t> lanelet_id
   for (const auto & lanelet_id : lanelet_ids) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
     const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
-    for (const auto traffic_sign : traffic_signs) {
+    for (const auto & traffic_sign : traffic_signs) {
       ret.push_back(traffic_sign);
     }
   }
@@ -1332,7 +1342,7 @@ HdMapUtils::getTrafficLightRegElementsOnPath(const std::vector<std::int64_t> & l
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
     const auto traffic_lights =
       lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
-    for (const auto traffic_light : traffic_lights) {
+    for (const auto & traffic_light : traffic_lights) {
       ret.push_back(traffic_light);
     }
   }
@@ -1361,7 +1371,7 @@ std::vector<lanelet::AutowareTrafficLightConstPtr> HdMapUtils::getTrafficLights(
   std::vector<lanelet::AutowareTrafficLightConstPtr> ret;
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
+  for (const auto & light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
@@ -1400,7 +1410,7 @@ std::vector<std::vector<geometry_msgs::msg::Point>> HdMapUtils::getTrafficLightS
     const auto stop_line = traffic_light->stopLine();
     if (stop_line) {
       auto & current_stop_line = ret.back();
-      for (const auto point : stop_line.get()) {
+      for (const auto & point : stop_line.get()) {
         geometry_msgs::msg::Point p;
         p.x = point.x();
         p.y = point.y();
@@ -1416,7 +1426,7 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(std:
 {
   std::vector<geometry_msgs::msg::Point> points;
   const auto stop_line = lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
-  for (const auto point : stop_line) {
+  for (const auto & point : stop_line) {
     geometry_msgs::msg::Point p;
     p.x = point.x();
     p.y = point.y();
@@ -1431,7 +1441,7 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIdsOnPath(
 {
   std::vector<std::int64_t> ret;
   auto traffic_lights = getTrafficLightRegElementsOnPath(route_lanelets);
-  for (const auto traffic_light : traffic_lights) {
+  for (const auto & traffic_light : traffic_lights) {
     for (auto light_string : traffic_light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
@@ -1467,7 +1477,7 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
 
 const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const traffic_simulator::math::CatmullRomSplineInterface & spline) const
+  const math::geometry::CatmullRomSplineInterface & spline) const
 {
   auto traffic_light_ids = getTrafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.size() == 0) {
@@ -1493,7 +1503,7 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   if (waypoints.empty()) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(waypoints);
+  math::geometry::CatmullRomSpline spline(waypoints);
   const auto stop_lines = getTrafficLightStopLinesPoints(traffic_light_id);
   for (const auto & stop_line : stop_lines) {
     const auto collision_point = spline.getCollisionPointIn2D(stop_line);
@@ -1505,7 +1515,7 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
 }
 
 const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
-  const traffic_simulator::math::CatmullRomSplineInterface & spline,
+  const math::geometry::CatmullRomSplineInterface & spline,
   const std::int64_t & traffic_light_id) const
 {
   if (spline.getLength() <= 0) {
@@ -1532,7 +1542,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
   if (waypoints.empty()) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(waypoints);
+  math::geometry::CatmullRomSpline spline(waypoints);
   const auto stop_lines = getStopLinesOnPath({route_lanelets});
   for (const auto & stop_line : stop_lines) {
     std::vector<geometry_msgs::msg::Point> stop_line_points;
@@ -1556,7 +1566,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const traffic_simulator::math::CatmullRomSplineInterface & spline)
+  const math::geometry::CatmullRomSplineInterface & spline)
 {
   if (spline.getLength() <= 0) {
     return boost::none;
@@ -1732,5 +1742,19 @@ auto HdMapUtils::getTrafficRelation(const LaneletId lanelet_id) const -> lanelet
   assert(isTrafficRelation(lanelet_id));
   return std::dynamic_pointer_cast<lanelet::TrafficLight>(
     lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+}
+
+std::vector<geometry_msgs::msg::Point> HdMapUtils::toPolygon(
+  const lanelet::ConstLineString3d & line_string) const
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  for (const auto & p : line_string) {
+    geometry_msgs::msg::Point point;
+    point.x = p.x();
+    point.y = p.y();
+    point.z = p.z();
+    ret.emplace_back(point);
+  }
+  return ret;
 }
 }  // namespace hdmap_utils

@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ void trafficLight2TriangleMarker(
  * boundaries of lanelets]
  * @param  lanelets       [input lanelets]
  * @param  c              [color of the boundary]
- * @param  viz_centerline [flag to visuazlize centerline or not]
+ * @param  viz_centerline [flag to visualize centerline or not]
  * @return                [created marker array]
  */
 visualization_msgs::msg::MarkerArray laneletsBoundaryAsMarkerArray(

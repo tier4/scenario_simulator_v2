@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,6 +44,16 @@ auto Double::infinity() noexcept -> Double
 auto Double::nan() noexcept -> Double
 {
   return static_cast<Double>(std::numeric_limits<value_type>::quiet_NaN());
+}
+
+auto Double::max() noexcept -> Double
+{
+  return static_cast<Double>(std::numeric_limits<value_type>::max());
+}
+
+auto Double::lowest() noexcept -> Double
+{
+  return static_cast<Double>(std::numeric_limits<value_type>::lowest());
 }
 
 auto Double::operator=(const value_type & rhs) noexcept -> Double &

@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ auto convertScenario(
           << " --output " << output_dir;
 
   if (std::system(command.str().c_str()) != 0) {
-    THROW_SYNTAX_ERROR("failed to convert sceanrio: " + yaml_path.string());
+    THROW_SYNTAX_ERROR("failed to convert scenario: " + yaml_path.string());
   } else {
     return output_dir / yaml_path.filename().stem().replace_extension(".xosc");
   }

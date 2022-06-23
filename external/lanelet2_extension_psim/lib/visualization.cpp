@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -472,7 +472,7 @@ visualization_msgs::msg::MarkerArray visualization::autowareTrafficLightsAsMarke
 
     const auto lights = tl->trafficLights();
     for (const auto & lsp : lights) {
-      if (lsp.isLineString()) {  // traffic ligths can either polygons or
+      if (lsp.isLineString()) {  // traffic lights can either polygons or
                                  // linestrings
         lanelet::ConstLineString3d ls = static_cast<lanelet::ConstLineString3d>(lsp);
 
@@ -679,7 +679,7 @@ visualization_msgs::msg::MarkerArray visualization::trafficLightsAsTriangleMarke
   const rclcpp::Duration duration, const double scale)
 {
   // convert to to an array of linestrings and publish as marker array using
-  // exisitng function
+  // existing function
 
   int tl_count = 0;
   std::vector<lanelet::ConstLineString3d> line_strings;
@@ -691,7 +691,7 @@ visualization_msgs::msg::MarkerArray visualization::trafficLightsAsTriangleMarke
 
     auto lights = tl->trafficLights();
     for (auto lsp : lights) {
-      if (lsp.isLineString()) {  // traffic ligths can either polygons or
+      if (lsp.isLineString()) {  // traffic lights can either polygons or
                                  // linestrings
         lanelet::ConstLineString3d ls = static_cast<lanelet::ConstLineString3d>(lsp);
 
