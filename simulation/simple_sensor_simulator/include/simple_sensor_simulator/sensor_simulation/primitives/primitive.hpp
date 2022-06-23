@@ -19,7 +19,7 @@
 
 #include <algorithm>
 #include <boost/optional.hpp>
-#include <geometry_math/polygon/polygon.hpp>
+#include <geometry/polygon/polygon.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <string>
 #include <vector>

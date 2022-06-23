@@ -11,7 +11,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
-  <depend>geometry_math</depend>
+  <depend>geometry</depend>
 
   <build_depend>geometry_msgs</build_depend>
   <build_depend>rclcpp</build_depend>

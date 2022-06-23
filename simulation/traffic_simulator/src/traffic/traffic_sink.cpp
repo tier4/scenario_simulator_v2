@@ -24,7 +24,7 @@
 // limitations under the License.
 
 #include <functional>
-#include <geometry_math/distance.hpp>
+#include <geometry/distance.hpp>
 #include <iostream>
 #include <memory>
 #include <string>

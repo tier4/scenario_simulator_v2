@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <cstdint>
-#include <geometry_math/bounding_box.hpp>
-#include <geometry_math/intersection/collision.hpp>
-#include <geometry_math/transform.hpp>
+#include <geometry/bounding_box.hpp>
+#include <geometry/intersection/collision.hpp>
+#include <geometry/transform.hpp>
 #include <limits>
 #include <memory>
 #include <queue>

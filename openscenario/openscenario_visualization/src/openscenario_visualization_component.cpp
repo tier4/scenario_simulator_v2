@@ -47,7 +47,7 @@
 #include <algorithm>
 #include <cmath>
 #include <color_names/color_names.hpp>
-#include <geometry_math/spline/catmull_rom_spline.hpp>
+#include <geometry/spline/catmull_rom_spline.hpp>
 #include <openscenario_visualization/openscenario_visualization_component.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>

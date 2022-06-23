@@ -14,8 +14,8 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <geometry_math/intersection/collision.hpp>
-#include <geometry_math/polygon/polygon.hpp>
+#include <geometry/intersection/collision.hpp>
+#include <geometry/polygon/polygon.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 

@@ -16,7 +16,7 @@
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
 
 #include <boost/optional.hpp>
-#include <geometry_math/polygon/line_segment.hpp>
+#include <geometry/polygon/line_segment.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>

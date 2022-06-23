@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <geometry_math/distance.hpp>
-#include <geometry_math/polygon/polygon.hpp>
-#include <geometry_math/transform.hpp>
+#include <geometry/distance.hpp>
+#include <geometry/polygon/polygon.hpp>
+#include <geometry/transform.hpp>
 #include <limits>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
