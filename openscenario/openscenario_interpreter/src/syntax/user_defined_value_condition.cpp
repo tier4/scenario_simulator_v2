@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/error.hpp>
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/parameter_condition.hpp>
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
@@ -77,10 +78,16 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
       std::make_pair(
         "currentEmergencyState",
-        [result]() { return make<String>(evaluateCurrentEmergencyState(result.str(1))); }),
+        [result]() {
+          return make<String>(
+            boost::lexical_cast<String>(asAutoware(result.str(1)).getEmergencyState()));
+        }),
       std::make_pair(
         "currentTurnIndicatorsState",
-        [result]() { return make<String>(evaluateCurrentTurnIndicatorsState(result.str(1))); }),
+        [result]() {
+          return make<String>(
+            boost::lexical_cast<String>(asAutoware(result.str(1)).getTurnIndicatorsCommand()));
+        }),
     };
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {

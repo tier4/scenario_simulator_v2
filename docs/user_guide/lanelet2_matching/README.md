@@ -30,7 +30,7 @@ auto compliantDetMatches = removeNonRuleCompliantMatches(detMatches, trafficRule
 auto compliantProbMatches = removeNonRuleCompliantMatches(probMatches, trafficRulesPtr);
 ```
 
-have a look at the [C++ unittests](../../../external/lanelet2_matching/test/lanelet2_matching.cpp) for more examples
+have a look at the [C++ unittests](https://github.com/tier4/scenario_simulator_v2/blob/master/external/lanelet2_matching/test/lanelet2_matching.cpp) for more examples
 
 ### Python
 

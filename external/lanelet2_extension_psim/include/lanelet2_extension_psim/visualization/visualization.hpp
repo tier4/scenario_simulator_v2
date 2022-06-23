@@ -89,7 +89,7 @@ void trafficLight2TriangleMarker(
  * boundaries of lanelets]
  * @param  lanelets       [input lanelets]
  * @param  c              [color of the boundary]
- * @param  viz_centerline [flag to visuazlize centerline or not]
+ * @param  viz_centerline [flag to visualize centerline or not]
  * @return                [created marker array]
  */
 visualization_msgs::msg::MarkerArray laneletsBoundaryAsMarkerArray(

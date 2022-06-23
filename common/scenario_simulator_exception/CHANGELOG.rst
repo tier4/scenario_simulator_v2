@@ -2,6 +2,21 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.5 (2022-06-16)
+------------------
+* Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
+* use c++17 for scenario simulator exception
+* inline auto
+* Merge branch 'master' into feature/change_engage_api_name
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Fix Licence
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Contributors: Daisuke Nishimatsu, Daniel Marczak, Kotaro Yoshimoto, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, Yuma Nihei, kyabe2718, yamacir-kit
+
 0.6.4 (2022-04-26)
 ------------------
 * Merge branch 'tier4:master' into feature/awf_universe_instruction

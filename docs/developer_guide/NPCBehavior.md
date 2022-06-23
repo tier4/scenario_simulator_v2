@@ -34,8 +34,8 @@ graph TD
     click L "https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/behavior_tree_plugin/src/vehicle/follow_lane_sequence/move_backward_action.cpp"
 ```
 
-|        Action        |                      Behavior                       |                      Success                       |                                         Failure                                         |
-| -------------------- | --------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Action               | Behavior                                            | Success                                            | Failure                                                                                 |
+|----------------------|-----------------------------------------------------|----------------------------------------------------|-----------------------------------------------------------------------------------------|
 | LaneChange           | Changing to target lane.                            | Moved to target lane.                              | Failed to calculate lane change trajectory.                                             |
 | FollowLane           | Following lane and moving to goal.                  |                                                    | Lane change was requested, traffic light, stop sing, conflicting entities are detected. |
 | FollowFrontEntity    | Following target entity in front of the NPC.        | Target entity was disappeared in front of the NPC. |                                                                                         |
@@ -54,15 +54,15 @@ You can send request with these parameters.
 
 ##### Target
 
-|     Value      |                                                 Meaning                                                 |
-| -------------- | ------------------------------------------------------------------------------------------------------- |
+| Value          | Meaning                                                                                                 |
+|----------------|---------------------------------------------------------------------------------------------------------|
 | AbsoluteTarget | Changing lanes to the exact target lanelet. You have to specify `lanelet_id`, `offset`                  |
 | RelativeTarget | Changing lanes to the relative target lanelet. You have to specify `entity_name`, `shift`, `direction`. |
 
 ###### AbsoluteTarget
 
-|   Value    |                     Meaning                      | Default |
-| ---------- | ------------------------------------------------ | ------- |
+| Value      | Meaning                                          | Default |
+|------------|--------------------------------------------------|---------|
 | lanelet_id | Lanelet id, which you want to changing lanes to. |         |
 | offset     | Target offset you want to changing lanes.        | 0       |
 
@@ -70,16 +70,16 @@ You can send request with these parameters.
 
 ###### RelativeTarget
 
-|    Value    |                       Meaning                       | Default |
-| ----------- | --------------------------------------------------- | ------- |
+| Value       | Meaning                                             | Default |
+|-------------|-----------------------------------------------------|---------|
 | entity_name | Reference entity name.                              |         |
 | shift       | Number of lanes counted from reference entity name. | 0       |
 | offset      | Target offset you want to changing lanes.           | 0       |
 
 ##### TrajectoryShape
 
-| Value  |                   Meaning                    |      Default       |
-| ------ | -------------------------------------------- | ------------------ |
+| Value  | Meaning                                      | Default            |
+|--------|----------------------------------------------|--------------------|
 | CUBIC  | Changing lanes with cubic spline trajectory. | :heavy_check_mark: |
 | LINEAR | Changing lanes with linear trajectory.       |                    |
 
@@ -107,8 +107,8 @@ You can send request with these parameters.
 
 ##### Constraint
 
-|         Value         |                      Meaning                      |      Default       |
-| --------------------- | ------------------------------------------------- | ------------------ |
+| Value                 | Meaning                                           | Default            |
+|-----------------------|---------------------------------------------------|--------------------|
 | NONE                  | Just changing lanes if possible.                  | :heavy_check_mark: |
 | LATERAL_VELOCITY      | Changing lanes with target lateral velocity.      |                    |
 | LONGITUDINAL_DISTANCE | Changing lanes with target longitudinal distance. |                    |
@@ -116,7 +116,7 @@ You can send request with these parameters.
 
 ##### Policy
 
-|    Value    |                                   Meaning                                   |      Default       |
-| ----------- | --------------------------------------------------------------------------- | ------------------ |
+| Value       | Meaning                                                                     | Default            |
+|-------------|-----------------------------------------------------------------------------|--------------------|
 | FORCE       | Changing lanes and fulfilling constraints ignoring dynamics.                | :heavy_check_mark: |
 | BEST_EFFORT | Changing lanes and trying to fulfill constraints without ignoring dynamics. |                    |

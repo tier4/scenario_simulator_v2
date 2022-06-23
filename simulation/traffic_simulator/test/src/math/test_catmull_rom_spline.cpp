@@ -175,7 +175,7 @@ TEST(CatmullRomSpline, GetTrajectory)
   EXPECT_DECIMAL_EQ(trajectory[3].x, 0, 0.00001);
 }
 
-TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointisAreNotEnough)
+TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointsAreNotEnough)
 {
   EXPECT_THROW(
     traffic_simulator::math::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),

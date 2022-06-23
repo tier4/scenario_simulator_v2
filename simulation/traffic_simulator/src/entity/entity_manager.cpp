@@ -205,23 +205,6 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
   return hdmap_utils_ptr_;
 }
 
-auto EntityManager::getLaneletPose(const std::string & name)
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
-{
-  const auto status = getEntityStatus(name);
-  if (!status) {
-    return boost::none;
-  }
-  if (status->lanelet_pose_valid) {
-    return status->lanelet_pose;
-  }
-  bool include_crosswalk = true;
-  if (getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    include_crosswalk = false;
-  }
-  return toLaneletPose(status->pose, getBoundingBox(name), include_crosswalk);
-}
-
 auto EntityManager::getLongitudinalDistance(
   const LaneletPose & from, const LaneletPose & to, const double max_distance)
   -> boost::optional<double>
@@ -320,38 +303,6 @@ bool EntityManager::laneMatchingSucceed(const std::string & name)
   return false;
 }
 
-/**
- * @brief
- *
- * @param from from entity name
- * @param to to entity name
- * @retval boost::none bounding box is intersects
- * @retval 0 <= distance between two bounding box
- */
-geometry_msgs::msg::Pose EntityManager::getMapPose(const std::string & entity_name)
-{
-  const auto status = getEntityStatus(entity_name);
-  if (!status) {
-    THROW_SEMANTIC_ERROR("entity : ", entity_name, " status is empty");
-  }
-  return status->pose;
-}
-
-geometry_msgs::msg::Pose EntityManager::getMapPose(
-  const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose)
-{
-  const auto ref_status = getEntityStatus(reference_entity_name);
-  if (!ref_status) {
-    THROW_SEMANTIC_ERROR("entity : ", reference_entity_name, " status is empty");
-  }
-  tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(ref_status->pose, ref_transform);
-  tf2::fromMsg(relative_pose, relative_transform);
-  geometry_msgs::msg::Pose ret;
-  tf2::toMsg(ref_transform * relative_transform, ret);
-  return ret;
-}
-
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
@@ -362,7 +313,7 @@ auto EntityManager::getNumberOfEgo() const -> std::size_t
 const std::string EntityManager::getEgoName() const
 {
   const auto names = getEntityNames();
-  for (const auto name : names) {
+  for (const auto & name : names) {
     if (isEgo(name)) {
       return name;
     }
@@ -388,8 +339,8 @@ auto EntityManager::getRelativePose(
   return traffic_simulator::math::getRelativePose(from, to);
 }
 
-auto EntityManager::getRelativePose(const geometry_msgs::msg::Pose & from, const std::string & to)
-  -> geometry_msgs::msg::Pose
+auto EntityManager::getRelativePose(
+  const geometry_msgs::msg::Pose & from, const std::string & to) const -> geometry_msgs::msg::Pose
 {
   const auto to_status = getEntityStatus(to);
   if (!to_status) {
@@ -398,8 +349,8 @@ auto EntityManager::getRelativePose(const geometry_msgs::msg::Pose & from, const
   return getRelativePose(from, to_status->pose);
 }
 
-auto EntityManager::getRelativePose(const std::string & from, const geometry_msgs::msg::Pose & to)
-  -> geometry_msgs::msg::Pose
+auto EntityManager::getRelativePose(
+  const std::string & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose
 {
   const auto from_status = getEntityStatus(from);
   if (!from_status) {
@@ -408,7 +359,7 @@ auto EntityManager::getRelativePose(const std::string & from, const geometry_msg
   return getRelativePose(from_status->pose, to);
 }
 
-auto EntityManager::getRelativePose(const std::string & from, const std::string & to)
+auto EntityManager::getRelativePose(const std::string & from, const std::string & to) const
   -> geometry_msgs::msg::Pose
 {
   const auto from_status = getEntityStatus(from);
@@ -420,6 +371,38 @@ auto EntityManager::getRelativePose(const std::string & from, const std::string 
     THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
   }
   return getRelativePose(from_status->pose, to_status->pose);
+}
+
+auto EntityManager::getRelativePose(
+  const geometry_msgs::msg::Pose & from, const LaneletPose & to) const -> geometry_msgs::msg::Pose
+{
+  return getRelativePose(from, toMapPose(to));
+}
+
+auto EntityManager::getRelativePose(
+  const LaneletPose & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose
+{
+  return getRelativePose(toMapPose(from), to);
+}
+
+auto EntityManager::getRelativePose(const std::string & from, const LaneletPose & to) const
+  -> geometry_msgs::msg::Pose
+{
+  const auto from_status = getEntityStatus(from);
+  if (!from_status) {
+    THROW_SEMANTIC_ERROR("entity : " + from + " status is empty");
+  }
+  return getRelativePose(from_status->pose, to);
+}
+
+auto EntityManager::getRelativePose(const LaneletPose & from, const std::string & to) const
+  -> geometry_msgs::msg::Pose
+{
+  const auto to_status = getEntityStatus(to);
+  if (!to_status) {
+    THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
+  }
+  return getRelativePose(from, to_status->pose);
 }
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
