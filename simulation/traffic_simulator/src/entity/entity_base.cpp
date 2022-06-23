@@ -30,7 +30,12 @@ namespace entity
 {
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-: name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
+: name(name),
+  status_(boost::none),
+  verbose_(true),
+  visibility_(true),
+  npc_logic_ready_(false),
+  entity_subtype_(subtype)
 {
   status_ = boost::none;
 }
