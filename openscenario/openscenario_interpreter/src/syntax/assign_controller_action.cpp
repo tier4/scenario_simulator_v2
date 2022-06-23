@@ -26,6 +26,11 @@ AssignControllerAction::AssignControllerAction()  //
 {
 }
 
+AssignControllerAction::AssignControllerAction(const ComplexType & controller)
+: ComplexType(controller)
+{
+}
+
 AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
@@ -39,7 +44,7 @@ AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scop
 auto AssignControllerAction::operator()(const EntityRef & entity_ref) const -> void
 {
   if (is<Controller>()) {
-    as<Controller>().assign(entity_ref);
+    applyAssignControllerAction(entity_ref, as<Controller>());
   }
 }
 }  // namespace syntax

@@ -119,7 +119,7 @@ Random test runner will load `result.yaml` file and rerun test.
 
 TBD
 
-[//]: # (Instruction is based on `kashiwanoha_map` Unity project but can be applied to any other projects supporting [`ZeorMQ` interface]&#40;https://tier4.github.io/scenario_simulator_v2-docs/design/ZeroMQ/&#41;. )
+[//]: # (Instruction is based on `kashiwanoha_map` Unity project but can be applied to any other projects supporting [`ZeroMQ` interface]&#40;https://tier4.github.io/scenario_simulator_v2-docs/design/ZeroMQ/&#41;. )
 
 [//]: # ()
 [//]: # (To run `random_test_runner` with Unity Kashiwanoha project: )

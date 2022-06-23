@@ -33,7 +33,7 @@ auto convertScenario(
           << " --output " << output_dir;
 
   if (std::system(command.str().c_str()) != 0) {
-    THROW_SYNTAX_ERROR("failed to convert sceanrio: " + yaml_path.string());
+    THROW_SYNTAX_ERROR("failed to convert scenario: " + yaml_path.string());
   } else {
     return output_dir / yaml_path.filename().stem().replace_extension(".xosc");
   }

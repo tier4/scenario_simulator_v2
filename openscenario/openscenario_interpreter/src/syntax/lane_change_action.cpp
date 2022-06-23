@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
 #include <openscenario_interpreter/syntax/relative_target_lane.hpp>
@@ -36,7 +36,7 @@ auto LaneChangeAction::accomplished() -> bool
 {
   return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](auto && each) {
     const auto is_lane_changing = [](auto &&... xs) {
-      return getCurrentAction(std::forward<decltype(xs)>(xs)...) == "lane_change";
+      return evaluateCurrentState(std::forward<decltype(xs)>(xs)...) == "lane_change";
     };
     return each.second or (each.second = not is_lane_changing(each.first));
   });
@@ -56,13 +56,13 @@ auto LaneChangeAction::start() -> void
 
   for (const auto & accomplishment : accomplishments) {
     if (lane_change_target.is<AbsoluteTargetLane>()) {
-      return requestLaneChange(
+      return applyLaneChangeAction(
         accomplishment.first, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
         static_cast<traffic_simulator::lane_change::TrajectoryShape>(
           lane_change_action_dynamics.dynamics_shape),
         static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
     } else {
-      return requestLaneChange(
+      return applyLaneChangeAction(
         accomplishment.first, static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
         static_cast<traffic_simulator::lane_change::TrajectoryShape>(
           lane_change_action_dynamics.dynamics_shape),

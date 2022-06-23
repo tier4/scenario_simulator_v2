@@ -14,7 +14,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/error.hpp>
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/parameter_condition.hpp>
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>

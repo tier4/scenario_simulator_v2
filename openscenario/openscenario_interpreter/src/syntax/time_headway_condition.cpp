@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -51,7 +51,7 @@ auto TimeHeadwayCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(getTimeHeadway(triggering_entity, entity_ref));
+    results.push_back(evaluateTimeHeadway(triggering_entity, entity_ref));
     return compare(results.back(), value);
   }));
 }
