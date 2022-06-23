@@ -226,5 +226,3 @@ Test case parameters. Currently, only randomization seed.
 | Parameter name  | Default value | Description                                                       |
 |-----------------|---------------|-------------------------------------------------------------------|
 | `seed`          |   `-1`        | Randomization seed. If `-1`, seed will be generated for each test |
-
-
