@@ -43,15 +43,15 @@ TEST(Polygon, filterByAxis)
   }
   points.emplace_back(p2);
   std::vector<double> values;
-  values = geometry_math::filterByAxis(points, geometry_math::Axis::X);
+  values = math::geometryfilterByAxis(points, math::geometryAxis::X);
   EXPECT_DOUBLE_EQ(values[0], 5);
   EXPECT_DOUBLE_EQ(values[1], 1);
   EXPECT_DOUBLE_EQ(values[2], -1);
-  values = geometry_math::filterByAxis(points, geometry_math::Axis::Y);
+  values = math::geometryfilterByAxis(points, math::geometryAxis::Y);
   EXPECT_DOUBLE_EQ(values[0], 2);
   EXPECT_DOUBLE_EQ(values[1], 4);
   EXPECT_DOUBLE_EQ(values[2], 2);
-  values = geometry_math::filterByAxis(points, geometry_math::Axis::Z);
+  values = math::geometryfilterByAxis(points, math::geometryAxis::Z);
   EXPECT_DOUBLE_EQ(values[0], 3);
   EXPECT_DOUBLE_EQ(values[1], 5);
   EXPECT_DOUBLE_EQ(values[2], -3);
@@ -81,12 +81,12 @@ TEST(Polygon, GetMinMaxValue)
     p2.z = -3.0;
   }
   points.emplace_back(p2);
-  EXPECT_DOUBLE_EQ(geometry_math::getMaxValue(points, geometry_math::Axis::X), 5);
-  EXPECT_DOUBLE_EQ(geometry_math::getMinValue(points, geometry_math::Axis::X), -1);
-  EXPECT_DOUBLE_EQ(geometry_math::getMaxValue(points, geometry_math::Axis::Y), 4);
-  EXPECT_DOUBLE_EQ(geometry_math::getMinValue(points, geometry_math::Axis::Y), 2);
-  EXPECT_DOUBLE_EQ(geometry_math::getMaxValue(points, geometry_math::Axis::Z), 5);
-  EXPECT_DOUBLE_EQ(geometry_math::getMinValue(points, geometry_math::Axis::Z), -3);
+  EXPECT_DOUBLE_EQ(math::geometrygetMaxValue(points, math::geometryAxis::X), 5);
+  EXPECT_DOUBLE_EQ(math::geometrygetMinValue(points, math::geometryAxis::X), -1);
+  EXPECT_DOUBLE_EQ(math::geometrygetMaxValue(points, math::geometryAxis::Y), 4);
+  EXPECT_DOUBLE_EQ(math::geometrygetMinValue(points, math::geometryAxis::Y), 2);
+  EXPECT_DOUBLE_EQ(math::geometrygetMaxValue(points, math::geometryAxis::Z), 5);
+  EXPECT_DOUBLE_EQ(math::geometrygetMinValue(points, math::geometryAxis::Z), -3);
 }
 
 TEST(Polygon, get2DConvexHull)
@@ -120,7 +120,7 @@ TEST(Polygon, get2DConvexHull)
     p3.z = 0.0;
   }
   points.emplace_back(p3);
-  const auto hull = geometry_math::get2DConvexHull(points);
+  const auto hull = math::geometryget2DConvexHull(points);
   EXPECT_EQ(hull.size(), static_cast<size_t>(4));
   EXPECT_POINT_EQ(hull[0], p2);
   EXPECT_POINT_EQ(hull[1], p1);

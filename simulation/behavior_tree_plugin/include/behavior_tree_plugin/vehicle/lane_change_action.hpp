@@ -51,7 +51,7 @@ public:
   void getBlackBoardValues();
 
 private:
-  boost::optional<geometry_math::HermiteCurve> curve_;
+  boost::optional<math::geometryHermiteCurve> curve_;
   double current_s_;
   double target_s_;
   double lane_change_velocity_;

@@ -42,7 +42,7 @@ public:
     BT::PortsList ports = {
       BT::InputPort<traffic_simulator_msgs::msg::DriverModel>("driver_model"),
       BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters"),
-      BT::InputPort<std::shared_ptr<geometry_math::CatmullRomSpline>>("reference_trajectory")};
+      BT::InputPort<std::shared_ptr<math::geometryCatmullRomSpline>>("reference_trajectory")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
@@ -61,8 +61,8 @@ public:
 protected:
   traffic_simulator_msgs::msg::DriverModel driver_model;
   traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
-  std::shared_ptr<geometry_math::CatmullRomSpline> reference_trajectory;
-  std::unique_ptr<geometry_math::CatmullRomSubspline> trajectory;
+  std::shared_ptr<math::geometryCatmullRomSpline> reference_trajectory;
+  std::unique_ptr<math::geometryCatmullRomSubspline> trajectory;
 };
 }  // namespace entity_behavior
 

@@ -60,12 +60,12 @@ public:
   std::vector<geometry_msgs::msg::Point> get2DConvexHull() const;
   std::vector<geometry_msgs::msg::Point> get2DConvexHull(
     const geometry_msgs::msg::Pose & sensor_pose) const;
-  boost::optional<double> getMax(const geometry_math::Axis & axis) const;
-  boost::optional<double> getMin(const geometry_math::Axis & axis) const;
+  boost::optional<double> getMax(const math::geometryAxis & axis) const;
+  boost::optional<double> getMin(const math::geometryAxis & axis) const;
   boost::optional<double> getMax(
-    const geometry_math::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
+    const math::geometryAxis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
   boost::optional<double> getMin(
-    const geometry_math::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
+    const math::geometryAxis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
 
 protected:
   std::vector<Vertex> transform() const;

@@ -169,7 +169,7 @@ boost::optional<double> HermiteCurve::getSValue(
   geometry_msgs::msg::Point p0, p1;
   p0.y = threshold_distance;
   p1.y = -threshold_distance;
-  const auto line = geometry_math::transformPoints(pose, {p0, p1});
+  const auto line = math::geometrytransformPoints(pose, {p0, p1});
   const auto s = getCollisionPointIn2D(line[0], line[1], false);
   if (!s) {
     return boost::none;

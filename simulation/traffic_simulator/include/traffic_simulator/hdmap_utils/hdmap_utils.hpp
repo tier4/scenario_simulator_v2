@@ -105,7 +105,7 @@ public:
     const std::vector<geometry_msgs::msg::Point> & waypoints);
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
-    const geometry_math::CatmullRomSplineInterface & spline);
+    const math::geometryCatmullRomSplineInterface & spline);
   double getLaneletLength(std::int64_t lanelet_id);
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
@@ -122,15 +122,15 @@ public:
   std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::vector<std::int64_t> lanelet_ids);
-  std::shared_ptr<geometry_math::CatmullRomSpline> getCenterPointsSpline(std::int64_t lanelet_id);
+  std::shared_ptr<math::geometryCatmullRomSpline> getCenterPointsSpline(std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(
     std::int64_t lanelet_id, double s, std::vector<std::int64_t> lanelet_ids,
     double forward_distance = 20);
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
-  boost::optional<std::pair<geometry_math::HermiteCurve, double>> getLaneChangeTrajectory(
+  boost::optional<std::pair<math::geometryHermiteCurve, double>> getLaneChangeTrajectory(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter);
-  boost::optional<std::pair<geometry_math::HermiteCurve, double>> getLaneChangeTrajectory(
+  boost::optional<std::pair<math::geometryHermiteCurve, double>> getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter,
     double maximum_curvature_threshold, double target_trajectory_length,
@@ -168,14 +168,14 @@ public:
     const std::vector<geometry_msgs::msg::Point> & waypoints,
     const std::int64_t & traffic_light_id) const;
   const boost::optional<double> getDistanceToTrafficLightStopLine(
-    const geometry_math::CatmullRomSplineInterface & spline,
+    const math::geometryCatmullRomSplineInterface & spline,
     const std::int64_t & traffic_light_id) const;
   const boost::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
   const boost::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
-    const geometry_math::CatmullRomSplineInterface & spline) const;
+    const math::geometryCatmullRomSplineInterface & spline) const;
   const std::vector<std::int64_t> getTrafficLightIdsOnPath(
     const std::vector<std::int64_t> & route_lanelets) const;
   traffic_simulator_msgs::msg::LaneletPose getAlongLaneletPose(
@@ -190,7 +190,7 @@ public:
   auto getTrafficRelation(const LaneletId) const -> lanelet::TrafficLight::Ptr;
 
 private:
-  geometry_math::HermiteCurve getLaneChangeTrajectory(
+  math::geometryHermiteCurve getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator_msgs::msg::LaneletPose & to_pose,
     const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,

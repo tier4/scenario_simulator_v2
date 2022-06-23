@@ -27,7 +27,7 @@ TEST(CatmullRomSpline, GetCollisionPointIn2D)
   geometry_msgs::msg::Point p2;
   p2.x = 2;
   auto points = {p0, p1, p2};
-  auto spline = geometry_math::CatmullRomSpline(points);
+  auto spline = math::geometryCatmullRomSpline(points);
   EXPECT_DOUBLE_EQ(spline.getLength(), 2);
   geometry_msgs::msg::Point start;
   start.x = 0.1;
@@ -65,8 +65,8 @@ TEST(CatmullRomSpline, Maximum2DCurvature)
   p2.x = 2;
   p2.y = 6;
   auto points = {p0, p1, p2};
-  EXPECT_NO_THROW(auto spline = geometry_math::CatmullRomSpline(points));
-  auto spline = geometry_math::CatmullRomSpline(points);
+  EXPECT_NO_THROW(auto spline = math::geometryCatmullRomSpline(points));
+  auto spline = math::geometryCatmullRomSpline(points);
   EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0);
 }
 
@@ -83,7 +83,7 @@ TEST(CatmullRomSpline, Interpolate3Points)
   p3.x = 4;
   p3.y = 6;
   auto points = {p0, p1, p2, p3};
-  EXPECT_NO_THROW(auto spline = geometry_math::CatmullRomSpline(points));
+  EXPECT_NO_THROW(auto spline = math::geometryCatmullRomSpline(points));
 }
 
 TEST(CatmullRomSpline, Interpolate4Points)
@@ -102,7 +102,7 @@ TEST(CatmullRomSpline, Interpolate4Points)
   p4.x = 4;
   p4.y = 10;
   auto points = {p0, p1, p2, p3, p4};
-  EXPECT_NO_THROW(auto spline = geometry_math::CatmullRomSpline(points));
+  EXPECT_NO_THROW(auto spline = math::geometryCatmullRomSpline(points));
 }
 
 TEST(CatmullRomSpline, GetPoint)
@@ -117,7 +117,7 @@ TEST(CatmullRomSpline, GetPoint)
   geometry_msgs::msg::Point p4;
   p4.x = 4;
   auto points = {p0, p1, p2, p3, p4};
-  auto spline = geometry_math::CatmullRomSpline(points);
+  auto spline = math::geometryCatmullRomSpline(points);
   EXPECT_DOUBLE_EQ(spline.getLength(), 4);
   auto point = spline.getPoint(3);
   EXPECT_DOUBLE_EQ(point.x, 3);
@@ -135,7 +135,7 @@ TEST(CatmullRomSpline, GetSValue)
   geometry_msgs::msg::Point p3;
   p3.x = 4;
   auto points = {p0, p1, p2, p3};
-  auto spline = geometry_math::CatmullRomSpline(points);
+  auto spline = math::geometryCatmullRomSpline(points);
   geometry_msgs::msg::Pose p;
   p.position.x = 0.1;
   p.position.y = 0;
@@ -160,7 +160,7 @@ TEST(CatmullRomSpline, GetTrajectory)
   geometry_msgs::msg::Point p3;
   p3.x = 3;
   auto points = {p0, p1, p2, p3};
-  auto spline = geometry_math::CatmullRomSpline(points);
+  auto spline = math::geometryCatmullRomSpline(points);
   auto trajectory = spline.getTrajectory(0, 3, 1.0);
   EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
   EXPECT_DECIMAL_EQ(trajectory[0].x, 0, 0.00001);
@@ -178,10 +178,10 @@ TEST(CatmullRomSpline, GetTrajectory)
 TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointsAreNotEnough)
 {
   EXPECT_THROW(
-    geometry_math::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
+    math::geometryCatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
     common::SemanticError);
   EXPECT_THROW(
-    geometry_math::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(1)),
+    math::geometryCatmullRomSpline(std::vector<geometry_msgs::msg::Point>(1)),
     common::SemanticError);
 }
 

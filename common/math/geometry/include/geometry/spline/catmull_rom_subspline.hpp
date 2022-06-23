@@ -32,7 +32,7 @@ class CatmullRomSubspline : public CatmullRomSplineInterface
 {
 public:
   explicit CatmullRomSubspline(
-    std::shared_ptr<geometry_math::CatmullRomSpline> spline, double start_s, double end_s)
+    std::shared_ptr<math::geometryCatmullRomSpline> spline, double start_s, double end_s)
   : spline_(spline), start_s_(start_s), end_s_(end_s)
   {
   }
@@ -44,7 +44,7 @@ public:
     bool close_start_end = true) const override;
 
 private:
-  std::shared_ptr<geometry_math::CatmullRomSpline> spline_;
+  std::shared_ptr<math::geometryCatmullRomSpline> spline_;
   double start_s_;
   double end_s_;
 };
