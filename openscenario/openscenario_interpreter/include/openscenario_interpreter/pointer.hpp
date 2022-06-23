@@ -111,7 +111,8 @@ public:
     if (const auto bound = std::dynamic_pointer_cast<U>(*this)) {
       return *bound;
     } else {
-      throw SemanticError("Can't treat ", makeTypename(binding().type()), " as ", typeid(U).name());
+      throw SemanticError(
+        "Can't treat ", makeTypename(binding().type()), " as ", makeTypename(typeid(U)));
     }
   }
 
