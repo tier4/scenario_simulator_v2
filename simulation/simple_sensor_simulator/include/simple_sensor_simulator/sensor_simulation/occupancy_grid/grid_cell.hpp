@@ -17,6 +17,7 @@
 
 #include <array>
 #include <boost/optional.hpp>
+#include <geometry/polygon/line_segment.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
@@ -25,35 +26,8 @@
 
 namespace simple_sensor_simulator
 {
-std::vector<geometry_msgs::msg::Point> get2DConvexHull(
-  const std::vector<geometry_msgs::msg::Point> & points);
-
-class LineSegment
-{
-public:
-  LineSegment(
-    const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point);
-  LineSegment(
-    const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Vector3 & vec,
-    double length);
-  ~LineSegment();
-  LineSegment & operator=(const LineSegment &);
-  const geometry_msgs::msg::Point start_point;
-  const geometry_msgs::msg::Point end_point;
-  bool isIntersect2D(const LineSegment & l0) const;
-  boost::optional<geometry_msgs::msg::Point> getIntersection2D(const LineSegment & line) const;
-  boost::optional<geometry_msgs::msg::Point> getIntersection2DWithXAxis(double x) const;
-
-  geometry_msgs::msg::Vector3 getVector() const;
-  geometry_msgs::msg::Vector3 get2DVector() const;
-  double getLength() const;
-  double get2DLength() const;
-  double getSlope() const;
-  double getIntercept() const;
-};
-
-std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points);
-std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines);
+std::vector<geometry_msgs::msg::Point> getIntersection2D(
+  const std::vector<math::geometry::LineSegment> & lines);
 
 class GridCell
 {
@@ -65,17 +39,19 @@ public:
   const size_t index;
   const size_t row;
   const size_t col;
-  bool isIntersect2D(const LineSegment & line) const;
-  bool isIntersect2D(const std::vector<LineSegment> & line_segments) const;
   bool contains(const geometry_msgs::msg::Point & p) const;
   bool contains(const std::vector<geometry_msgs::msg::Point> & points) const;
   int8_t getData() const;
   void setData(int8_t data);
+  geometry_msgs::msg::Point getLeftUpPoint() const;
+  geometry_msgs::msg::Point getLeftDownPoint() const;
+  geometry_msgs::msg::Point getRightUpPoint() const;
+  geometry_msgs::msg::Point getRightDownPoint() const;
 
 private:
   int8_t data_;
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & point) const;
-  std::array<LineSegment, 4> getLineSegments() const;
+  std::vector<geometry_msgs::msg::Point> getPolygon() const;
 };
 }  // namespace simple_sensor_simulator
 
