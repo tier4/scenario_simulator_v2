@@ -30,6 +30,7 @@
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <concealer/autoware.hpp>
+#include <concealer/cooperate_policy.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
@@ -100,6 +101,8 @@ private:  // EXPERIMENTAL RTC SUPPORTS
 
   rclcpp::Client<CooperateCommands>::SharedPtr client_of_cooperate_commands;
 
+  CooperatePolicy current_cooperate_policy = CooperatePolicy::automatic;
+
   auto approve(const CooperateStatusArray & cooperate_status_array)
   {
     auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
@@ -127,6 +130,17 @@ private:  // EXPERIMENTAL RTC SUPPORTS
 
     if (not request->commands.empty()) {
       client_of_cooperate_commands->async_send_request(request);
+    }
+  }
+
+  auto cooperate(const CooperateStatusArray & cooperate_status_array)
+  {
+    switch (current_cooperate_policy) {
+      case CooperatePolicy::automatic:
+        return approve(cooperate_status_array);
+
+      default:
+        return;
     }
   }
 
@@ -172,7 +186,7 @@ public:
     CONCEALER_INIT_CLIENT(Engage, "/api/external/set/engage"),
     // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
     CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit"),
-    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", approve),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
     client_of_cooperate_commands(
       static_cast<Autoware &>(*this).template create_client<CooperateCommands>(
         "/api/external/set/rtc_commands", rmw_qos_profile_default))
@@ -212,6 +226,11 @@ public:
   auto restrictTargetSpeed(double) const -> double override;
 
   auto sendSIGINT() -> void override;
+
+  auto setCooperatePolicy(const std::string & policy) -> void override
+  {
+    current_cooperate_policy = boost::lexical_cast<CooperatePolicy>(policy);
+  }
 
   auto setVelocityLimit(double) -> void override;
 
