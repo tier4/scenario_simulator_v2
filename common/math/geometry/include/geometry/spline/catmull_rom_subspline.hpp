@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_
-#define GEOMETRY_MATH__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_
+#ifndef GEOMETRY__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_
+#define GEOMETRY__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_
 
 #include <exception>
 #include <geometry/spline/catmull_rom_spline.hpp>
@@ -51,4 +51,4 @@ private:
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY_MATH__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_
+#endif  // GEOMETRY__SPLINE__CATMULL_ROM_SUBSPLINE_HPP_

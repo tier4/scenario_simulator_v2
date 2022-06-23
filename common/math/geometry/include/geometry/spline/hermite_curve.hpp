@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__SPLINE__HERMITE_CURVE_HPP_
-#define GEOMETRY_MATH__SPLINE__HERMITE_CURVE_HPP_
+#ifndef GEOMETRY__SPLINE__HERMITE_CURVE_HPP_
+#define GEOMETRY__SPLINE__HERMITE_CURVE_HPP_
 
 #include <gtest/gtest.h>
 #include <quaternion_operation/quaternion_operation.h>
@@ -77,4 +77,4 @@ private:
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY_MATH__SPLINE__HERMITE_CURVE_HPP_
+#endif  // GEOMETRY__SPLINE__HERMITE_CURVE_HPP_

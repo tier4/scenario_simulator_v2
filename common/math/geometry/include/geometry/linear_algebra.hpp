@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__LINEAR_ALGEBRA_HPP_
-#define GEOMETRY_MATH__LINEAR_ALGEBRA_HPP_
+#ifndef GEOMETRY__LINEAR_ALGEBRA_HPP_
+#define GEOMETRY__LINEAR_ALGEBRA_HPP_
 
 #include <math.h>
 
@@ -51,4 +51,4 @@ geometry_msgs::msg::Point operator-(
   const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1);
 bool operator==(const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1);
 bool operator==(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
-#endif  // GEOMETRY_MATH__LINEAR_ALGEBRA_HPP_
+#endif  // GEOMETRY__LINEAR_ALGEBRA_HPP_

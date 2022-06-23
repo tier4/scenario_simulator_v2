@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__POLYGON__LINE_SEGMENT_
-#define GEOMETRY_MATH__POLYGON__LINE_SEGMENT_
+#ifndef GEOMETRY__POLYGON__LINE_SEGMENT_
+#define GEOMETRY__POLYGON__LINE_SEGMENT_
 
 #include <boost/optional.hpp>
 #include <geometry/polygon/polygon.hpp>
@@ -52,4 +52,4 @@ std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::P
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY_MATH__POLYGON__LINE_SEGMENT_
+#endif  // GEOMETRY__POLYGON__LINE_SEGMENT_

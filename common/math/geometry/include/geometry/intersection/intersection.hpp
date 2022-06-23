@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_
-#define GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_
+#ifndef GEOMETRY__INTERSECTION__INTERSECTION_HPP_
+#define GEOMETRY__INTERSECTION__INTERSECTION_HPP_
 
 #include <boost/optional.hpp>
 #include <geometry/polygon/line_segment.hpp>
@@ -32,4 +32,4 @@ std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineS
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY_MATH__INTERSECTION__INTERSECTION_HPP_
+#endif  // GEOMETRY__INTERSECTION__INTERSECTION_HPP_

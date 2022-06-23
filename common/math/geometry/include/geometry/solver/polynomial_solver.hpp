@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__SOLVER__POLYNOMIAL_SOLVER_HPP_
-#define GEOMETRY_MATH__SOLVER__POLYNOMIAL_SOLVER_HPP_
+#ifndef GEOMETRY__SOLVER__POLYNOMIAL_SOLVER_HPP_
+#define GEOMETRY__SOLVER__POLYNOMIAL_SOLVER_HPP_
 
 #include <vector>
 
@@ -104,4 +104,4 @@ private:
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY_MATH__SOLVER__POLYNOMIAL_SOLVER_HPP_
+#endif  // GEOMETRY__SOLVER__POLYNOMIAL_SOLVER_HPP_

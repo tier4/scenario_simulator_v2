@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__BOUNDING_BOX_HPP_
-#define GEOMETRY_MATH__BOUNDING_BOX_HPP_
+#ifndef GEOMETRY__BOUNDING_BOX_HPP_
+#define GEOMETRY__BOUNDING_BOX_HPP_
 
 #include <boost/assert.hpp>
 #include <boost/assign/list_of.hpp>
@@ -43,4 +43,4 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY_MATH__BOUNDING_BOX_HPP_
+#endif  // GEOMETRY__BOUNDING_BOX_HPP_

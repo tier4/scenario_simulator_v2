@@ -23,8 +23,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__DISTANCE_HPP_
-#define GEOMETRY_MATH__DISTANCE_HPP_
+#ifndef GEOMETRY__DISTANCE_HPP_
+#define GEOMETRY__DISTANCE_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <vector>
@@ -43,4 +43,4 @@ double getDistance2D(
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY_MATH__DISTANCE_HPP_
+#endif  // GEOMETRY__DISTANCE_HPP_

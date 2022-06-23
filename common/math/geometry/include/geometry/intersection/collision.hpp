@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY_MATH__INTERSECTION__COLLISION_HPP_
-#define GEOMETRY_MATH__INTERSECTION__COLLISION_HPP_
+#ifndef GEOMETRY__INTERSECTION__COLLISION_HPP_
+#define GEOMETRY__INTERSECTION__COLLISION_HPP_
 
 #include <geometry/bounding_box.hpp>
 #include <geometry/polygon/polygon.hpp>
@@ -34,4 +34,4 @@ bool contains(
 
 }  // namespace math
 
-#endif  // GEOMETRY_MATH__INTERSECTION__COLLISION_HPP_
+#endif  // GEOMETRY__INTERSECTION__COLLISION_HPP_
