@@ -17,7 +17,9 @@
 
 #include <geometry_msgs/msg/point.hpp>
 
-namespace math namespace geometry
+namespace math
+{
+namespace geometry
 {
 enum class Axis { X = 0, Y = 1, Z = 2 };
 double getMaxValue(const std::vector<geometry_msgs::msg::Point> & points, const Axis & axis);
@@ -27,6 +29,6 @@ std::vector<double> filterByAxis(
 std::vector<geometry_msgs::msg::Point> get2DConvexHull(
   const std::vector<geometry_msgs::msg::Point> & points);
 }  // namespace geometry
-}
+}  // namespace math
 
 #endif  // GEOMETRY_MATH__POLYGON__POLYGON_HPP_
