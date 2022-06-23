@@ -35,18 +35,17 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Init
 {
-  const InitActions actions;
+  InitActions actions;
 
   explicit Init(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 
-  auto evaluate() -> Object;
+  auto evaluateInstantaneousActions() -> Object;
 
-  auto evaluateInstantaneousElements() -> Object;
+  auto runNonInstantaneousActionss() -> void;
 
-  auto runNonInstantaneousElements() -> void;
-  auto startNonInstantaneousElements() -> void;
+  auto startNonInstantaneousActions() -> void;
 };
 
 auto operator<<(nlohmann::json &, const Init &) -> nlohmann::json &;

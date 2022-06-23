@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/global_action.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
 #include <openscenario_interpreter/syntax/storyboard.hpp>

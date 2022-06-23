@@ -168,6 +168,20 @@ auto InitActions::runInstantaneousActions() -> void
   }
 }
 
+auto InitActions::runNonInstantaneousActions() -> void
+{
+  // we don't call global actions here, because they are all instantaneous actions
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (not user_defined_action.endsImmediately()) {
+      user_defined_action.run();
+    }
+  }
+  for (auto && e : privates) {
+    e.as<Private>().runNonInstantaneousActions();
+  }
+}
+
 auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nlohmann::json &
 {
   json["GlobalAction"] = nlohmann::json::array();
