@@ -220,7 +220,7 @@ public:
 
   /*   */ bool isNpcLogicStarted() const;
 
-  virtual void startNpcLogic() const;
+  virtual void startNpcLogic();
 
 protected:
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> next_waypoint_;

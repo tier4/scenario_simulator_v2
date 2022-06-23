@@ -134,7 +134,7 @@ public:
 
   auto setVelocityLimit(double) -> void override;
 
-  auto startNpcLogic() const -> void override;
+  auto startNpcLogic() -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

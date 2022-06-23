@@ -520,7 +520,7 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
   autoware->setVelocityLimit(value);
 }
 
-auto EgoEntity::startNpcLogic() const -> void
+auto EgoEntity::startNpcLogic() -> void
 {
   THROW_SIMULATION_ERROR("startNpcLogic only allowed in non-ego entity.");
 }

@@ -529,6 +529,6 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
 
 bool EntityBase::isNpcLogicStarted() const { return npc_logic_started_; }
 
-void EntityBase::startNpcLogic() const { npc_logic_started_ = true; }
+void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 }  // namespace entity
 }  // namespace traffic_simulator

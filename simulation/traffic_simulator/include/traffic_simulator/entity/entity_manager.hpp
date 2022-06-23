@@ -358,7 +358,7 @@ public:
     if (result.second) {
       result.first->second->setHdMapUtils(hdmap_utils_ptr_);
       result.first->second->setTrafficLightManager(traffic_light_manager_ptr_);
-      if (npc_logic_started_) {
+      if (npc_logic_started_ && !isEgo(name)) {
         result.first->second->startNpcLogic();
       }
       return result.second;
