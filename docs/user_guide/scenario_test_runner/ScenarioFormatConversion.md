@@ -54,4 +54,3 @@ attention or int
 - if step is one, only parameter of start is used
 - if step is zero, it returns error
 - the number of simulation is factorial to number of  steps
-

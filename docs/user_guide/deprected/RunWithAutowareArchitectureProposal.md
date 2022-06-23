@@ -95,5 +95,3 @@ During scenario execution you should be able to see `rviz` view similar to the o
 ![scenario_simulator_with_aap](../../image/scenario_simulator_with_autoware_architecture_proposal.png)
 
 The chosen scenario will be executed 3 times.
-
-

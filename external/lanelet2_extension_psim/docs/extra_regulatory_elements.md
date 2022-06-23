@@ -58,4 +58,3 @@ This regulatory element specifies related road markings to a lanelet as shown be
 refers: linestring with type attribute. Type explains the what road marking it represents (e.g. stopline). 
 
 <img src="./road_mark.png" width="400">
-
