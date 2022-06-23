@@ -29,7 +29,7 @@ TEST(BoundingBox, GetPolygonDistanceWithCollision)
   bbox1.dimensions.x = 1;
   bbox1.dimensions.y = 1;
   bbox1.dimensions.z = 1;
-  EXPECT_EQ(math::geometrygetPolygonDistance(pose0, bbox0, pose1, bbox1), boost::none);
+  EXPECT_EQ(math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1), boost::none);
 }
 
 TEST(BoundingBox, GetPolygonDistanceWithoutCollision)
@@ -45,8 +45,8 @@ TEST(BoundingBox, GetPolygonDistanceWithoutCollision)
   bbox1.dimensions.x = 1;
   bbox1.dimensions.y = 1;
   bbox1.dimensions.z = 1;
-  EXPECT_TRUE(math::geometrygetPolygonDistance(pose0, bbox0, pose1, bbox1));
-  EXPECT_DOUBLE_EQ(math::geometrygetPolygonDistance(pose0, bbox0, pose1, bbox1).get(), 3.0);
+  EXPECT_TRUE(math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1));
+  EXPECT_DOUBLE_EQ(math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1).get(), 3.0);
 }
 
 int main(int argc, char ** argv)

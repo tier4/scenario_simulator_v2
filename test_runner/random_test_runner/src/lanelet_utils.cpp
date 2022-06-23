@@ -115,7 +115,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOppos
   perpendicular_vector.x = tangent_vector->y;
   perpendicular_vector.y = -tangent_vector->x;
   perpendicular_vector.z = 0.0;
-  perpendicular_vector = math::geometrynormalize(perpendicular_vector);
+  perpendicular_vector = math::geometry::normalize(perpendicular_vector);
 
   geometry_msgs::msg::Point global_position_p = toMapPose(pose).pose.position;
   geometry_msgs::msg::Vector3 global_position;

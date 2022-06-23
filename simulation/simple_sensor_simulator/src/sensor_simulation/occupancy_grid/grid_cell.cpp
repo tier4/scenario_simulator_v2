@@ -88,7 +88,7 @@ geometry_msgs::msg::Point GridCell::transformToWorld(const geometry_msgs::msg::P
 
 bool GridCell::contains(const geometry_msgs::msg::Point & p) const
 {
-  return math::geometrycontains(getPolygon(), p);
+  return math::geometry::contains(getPolygon(), p);
 }
 
 bool GridCell::contains(const std::vector<geometry_msgs::msg::Point> & points) const

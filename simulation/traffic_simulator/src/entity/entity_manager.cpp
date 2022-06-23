@@ -85,7 +85,7 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   }
   auto bbox0 = getBoundingBox(name0);
   auto bbox1 = getBoundingBox(name1);
-  return math::geometrycheckCollision2D(status0->pose, bbox0, status1->pose, bbox1);
+  return math::geometry::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
@@ -119,7 +119,7 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
   const auto pose0 = getMapPose(from);
   const auto bbox1 = getBoundingBox(to);
   const auto pose1 = getMapPose(to);
-  return math::geometrygetPolygonDistance(pose0, bbox0, pose1, bbox1);
+  return math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1);
 }
 
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
@@ -134,7 +134,7 @@ auto EntityManager::getDistanceToCrosswalk(
   if (getWaypoints(name).waypoints.empty()) {
     return boost::none;
   }
-  math::geometryCatmullRomSpline spline(getWaypoints(name).waypoints);
+  math::geometry::CatmullRomSpline spline(getWaypoints(name).waypoints);
   auto polygon = hdmap_utils_ptr_->getLaneletPolygon(target_crosswalk_id);
   return spline.getCollisionPointIn2D(polygon);
 }
@@ -149,7 +149,7 @@ auto EntityManager::getDistanceToStopLine(
   if (getWaypoints(name).waypoints.empty()) {
     return boost::none;
   }
-  math::geometryCatmullRomSpline spline(getWaypoints(name).waypoints);
+  math::geometry::CatmullRomSpline spline(getWaypoints(name).waypoints);
   auto polygon = hdmap_utils_ptr_->getStopLinePolygon(target_stop_line_id);
   return spline.getCollisionPointIn2D(polygon);
 }
@@ -336,7 +336,7 @@ auto EntityManager::getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const
   -> geometry_msgs::msg::Pose
 {
-  return math::geometrygetRelativePose(from, to);
+  return math::geometry::getRelativePose(from, to);
 }
 
 auto EntityManager::getRelativePose(

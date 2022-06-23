@@ -62,7 +62,7 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
       std::vector<geometry_msgs::msg::Point> center_points =
         hdmap_utils->getCenterPoints(following_lanelets);
       // DIFFERENT SPLINE - recalculation needed
-      math::geometryCatmullRomSpline spline(center_points);
+      math::geometry::CatmullRomSpline spline(center_points);
       const auto straight_waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
       waypoints.waypoints = straight_waypoints;
       const auto curve_waypoints = curve_->getTrajectory(current_s_, l, 1.0, true);
@@ -107,7 +107,7 @@ BT::NodeStatus LaneChangeAction::tick()
             entity_status.lanelet_pose.lanelet_id, lane_change_parameters_->target.lanelet_id)) {
         return BT::NodeStatus::FAILURE;
       }
-      boost::optional<std::pair<math::geometryHermiteCurve, double>> traj_with_goal;
+      boost::optional<std::pair<math::geometry::HermiteCurve, double>> traj_with_goal;
       traffic_simulator_msgs::msg::LaneletPose along_pose, goal_pose;
       switch (lane_change_parameters_->constraint.type) {
         case traffic_simulator::lane_change::Constraint::Type::NONE:
@@ -144,7 +144,7 @@ BT::NodeStatus LaneChangeAction::tick()
         goal_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
         goal_pose.s = traj_with_goal->second;
         double offset = std::fabs(
-          math::geometrygetRelativePose(
+          math::geometry::getRelativePose(
             hdmap_utils->toMapPose(along_pose).pose, hdmap_utils->toMapPose(goal_pose).pose)
             .position.y);
         switch (lane_change_parameters_->constraint.type) {

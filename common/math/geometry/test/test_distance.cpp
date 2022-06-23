@@ -21,43 +21,43 @@
 TEST(Distance, PointToPoint)
 {
   geometry_msgs::msg::Point p0, p1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), 0);
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), 0);
   p1.x = 1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), 1);
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), 1);
   p0.y = 1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), std::sqrt(2));
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), std::sqrt(2));
 }
 
 TEST(Distance, PoseToPose)
 {
   geometry_msgs::msg::Pose p0, p1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), 0);
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), 0);
   p1.position.x = 1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), 1);
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), 1);
   p0.position.y = 1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), std::sqrt(2));
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), std::sqrt(2));
 }
 
 TEST(Distance, PointToPose)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Pose p1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), 0);
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), 0);
   p1.position.x = 1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), 1);
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), 1);
   p0.y = 1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), std::sqrt(2));
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), std::sqrt(2));
 }
 
 TEST(Distance, PoseToPoint)
 {
   geometry_msgs::msg::Pose p0;
   geometry_msgs::msg::Point p1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), 0);
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), 0);
   p1.x = 1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), 1);
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), 1);
   p0.position.y = 1;
-  EXPECT_DOUBLE_EQ(math::geometrygetDistance(p0, p1), std::sqrt(2));
+  EXPECT_DOUBLE_EQ(math::geometry::getDistance(p0, p1), std::sqrt(2));
 }
 
 int main(int argc, char ** argv)

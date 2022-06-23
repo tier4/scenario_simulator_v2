@@ -21,39 +21,39 @@
 TEST(LINEAR_ALGEBRA, GET_SIZE)
 {
   geometry_msgs::msg::Vector3 vec;
-  EXPECT_DOUBLE_EQ(math::geometrygetSize(vec), 0.0);
+  EXPECT_DOUBLE_EQ(math::geometry::getSize(vec), 0.0);
   vec.x = 1.0;
   vec.y = 0.0;
   vec.z = 3.0;
-  EXPECT_DOUBLE_EQ(math::geometrygetSize(vec), std::sqrt(10.0));
+  EXPECT_DOUBLE_EQ(math::geometry::getSize(vec), std::sqrt(10.0));
 }
 
 TEST(LINEAR_ALGEBRA, NORMALIZE)
 {
   geometry_msgs::msg::Vector3 vec;
-  EXPECT_THROW(math::geometrynormalize(vec), common::SimulationError);
+  EXPECT_THROW(math::geometry::normalize(vec), common::SimulationError);
   vec.x = 1.0;
   vec.y = 0.0;
   vec.z = 3.0;
-  vec = math::geometrynormalize(vec);
+  vec = math::geometry::normalize(vec);
   EXPECT_DOUBLE_EQ(vec.x, 0.31622776601683794);
   EXPECT_DOUBLE_EQ(vec.y, 0.0);
   EXPECT_DOUBLE_EQ(vec.z, 0.94868329805051377);
-  EXPECT_DOUBLE_EQ(math::geometrygetSize(vec), 1.0);
+  EXPECT_DOUBLE_EQ(math::geometry::getSize(vec), 1.0);
 }
 
 TEST(LINEAR_ALGEBRA, MULTIPLY)
 {
-  geometry_msgs::msg::Vector3 vec = math::geometryvector3(0, 3, 1);
+  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
   vec * 1.0;
-  EXPECT_VECTOR3_EQ((vec * 1.0), math::geometryvector3(0, 3, 1));
-  EXPECT_VECTOR3_EQ((vec * 2.0), math::geometryvector3(0, 6, 2));
+  EXPECT_VECTOR3_EQ((vec * 1.0), math::geometry::vector3(0, 3, 1));
+  EXPECT_VECTOR3_EQ((vec * 2.0), math::geometry::vector3(0, 6, 2));
   EXPECT_VECTOR3_EQ((vec * 2.0), (2.0 * vec));
 }
 
 TEST(LINEAR_ALGEBRA, ADDITION)
 {
-  geometry_msgs::msg::Vector3 vec = math::geometryvector3(0, 3, 1);
+  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
   EXPECT_VECTOR3_EQ((vec + vec), (2.0 * vec));
   geometry_msgs::msg::Point p;
   p.x = 0;
@@ -64,7 +64,7 @@ TEST(LINEAR_ALGEBRA, ADDITION)
 
 TEST(LINEAR_ALGEBRA, SUBTRACTION)
 {
-  geometry_msgs::msg::Vector3 vec = math::geometryvector3(0, 3, 1);
+  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
   EXPECT_VECTOR3_EQ((vec - vec), geometry_msgs::msg::Vector3());
   geometry_msgs::msg::Point p;
   p.x = 0;

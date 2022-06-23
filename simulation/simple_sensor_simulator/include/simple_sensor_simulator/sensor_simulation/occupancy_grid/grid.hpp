@@ -48,9 +48,9 @@ private:
   void fillByCol(size_t col, int8_t data);
   bool fillByRowCol(size_t row, size_t col, int8_t data);
   std::vector<std::pair<size_t, size_t>> fillByIntersection(
-    const math::geometryLineSegment & line_segment, int8_t data);
+    const math::geometry::LineSegment & line_segment, int8_t data);
   std::vector<std::pair<size_t, size_t>> fillByIntersection(
-    const std::vector<math::geometryLineSegment> & line_segments, int8_t data);
+    const std::vector<math::geometry::LineSegment> & line_segments, int8_t data);
   std::vector<std::pair<size_t, size_t>> fillInside(
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data);
   size_t getIndex(size_t row, size_t col) const;
@@ -62,22 +62,22 @@ private:
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t row) const;
   std::vector<std::pair<size_t, size_t>> filterByCol(
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t col) const;
-  std::vector<math::geometryLineSegment> filterByIntersection(
-    const std::vector<math::geometryLineSegment> & source_lines,
-    const std::vector<math::geometryLineSegment> & fillter_lines) const;
+  std::vector<math::geometry::LineSegment> filterByIntersection(
+    const std::vector<math::geometry::LineSegment> & source_lines,
+    const std::vector<math::geometry::LineSegment> & fillter_lines) const;
   std::vector<size_t> getRows(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   std::vector<size_t> getCols(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   bool indexExist(size_t index) const;
   std::vector<GridCell> getAllCells() const;
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & grid_point) const;
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
-  math::geometryLineSegment transformToGrid(const math::geometryLineSegment & line) const;
+  math::geometry::LineSegment transformToGrid(const math::geometry::LineSegment & line) const;
   geometry_msgs::msg::Point transformToPixel(const geometry_msgs::msg::Point & grid_point) const;
-  math::geometryLineSegment transformToPixel(const math::geometryLineSegment & line) const;
-  math::geometryLineSegment getInvisibleRay(
+  math::geometry::LineSegment transformToPixel(const math::geometry::LineSegment & line) const;
+  math::geometry::LineSegment getInvisibleRay(
     const geometry_msgs::msg::Point & point_on_polygon) const;
-  std::vector<math::geometryLineSegment> getRayToGridCorner();
-  std::vector<math::geometryLineSegment> getInvisibleRay(
+  std::vector<math::geometry::LineSegment> getRayToGridCorner();
+  std::vector<math::geometry::LineSegment> getInvisibleRay(
     const std::vector<geometry_msgs::msg::Point> & points) const;
   double getDiagonalLength() const;
   template <typename T>

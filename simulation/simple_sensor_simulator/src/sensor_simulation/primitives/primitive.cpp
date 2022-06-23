@@ -72,12 +72,12 @@ Primitive::Primitive(std::string type, const geometry_msgs::msg::Pose & pose)
 
 Vertex Primitive::transform(const Vertex & v) const
 {
-  return toVertex(math::geometrytransformPoint(pose, toPoint(v)));
+  return toVertex(math::geometry::transformPoint(pose, toPoint(v)));
 }
 
 Vertex Primitive::transform(const Vertex & v, const geometry_msgs::msg::Pose & sensor_pose) const
 {
-  return toVertex(math::geometrytransformPoint(pose, sensor_pose, toPoint(v)));
+  return toVertex(math::geometry::transformPoint(pose, sensor_pose, toPoint(v)));
 }
 
 std::vector<Vertex> Primitive::transform() const
@@ -105,12 +105,12 @@ std::vector<Triangle> Primitive::getTriangles() const { return triangles_; }
 std::vector<geometry_msgs::msg::Point> Primitive::get2DConvexHull(
   const geometry_msgs::msg::Pose & sensor_pose) const
 {
-  return math::geometryget2DConvexHull(toPoints(transform(sensor_pose)));
+  return math::geometry::get2DConvexHull(toPoints(transform(sensor_pose)));
 }
 
 std::vector<geometry_msgs::msg::Point> Primitive::get2DConvexHull() const
 {
-  return math::geometryget2DConvexHull(toPoints(transform()));
+  return math::geometry::get2DConvexHull(toPoints(transform()));
 }
 
 unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
@@ -134,38 +134,38 @@ unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
   return geometry_id;
 }
 
-boost::optional<double> Primitive::getMax(const math::geometryAxis & axis) const
+boost::optional<double> Primitive::getMax(const math::geometry::Axis & axis) const
 {
   if (vertices_.empty()) {
     return boost::none;
   }
-  return math::geometrygetMaxValue(toPoints(transform()), axis);
+  return math::geometry::getMaxValue(toPoints(transform()), axis);
 }
 
-boost::optional<double> Primitive::getMin(const math::geometryAxis & axis) const
+boost::optional<double> Primitive::getMin(const math::geometry::Axis & axis) const
 {
   if (vertices_.empty()) {
     return boost::none;
   }
-  return math::geometrygetMinValue(toPoints(transform()), axis);
+  return math::geometry::getMinValue(toPoints(transform()), axis);
 }
 
 boost::optional<double> Primitive::getMax(
-  const math::geometryAxis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
+  const math::geometry::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
 {
   if (vertices_.empty()) {
     return boost::none;
   }
-  return math::geometrygetMaxValue(toPoints(transform(sensor_pose)), axis);
+  return math::geometry::getMaxValue(toPoints(transform(sensor_pose)), axis);
 }
 
 boost::optional<double> Primitive::getMin(
-  const math::geometryAxis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
+  const math::geometry::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
 {
   if (vertices_.empty()) {
     return boost::none;
   }
-  return math::geometrygetMinValue(toPoints(transform(sensor_pose)), axis);
+  return math::geometry::getMinValue(toPoints(transform(sensor_pose)), axis);
 }
 }  // namespace primitives
 }  // namespace simple_sensor_simulator

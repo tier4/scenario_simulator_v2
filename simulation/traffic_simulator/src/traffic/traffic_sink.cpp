@@ -54,7 +54,7 @@ void TrafficSink::execute()
   const auto names = get_entity_names_function();
   for (const auto & name : names) {
     const auto pose = get_entity_pose_function(name);
-    if (math::geometrygetDistance(position, pose) <= radius) {
+    if (math::geometry::getDistance(position, pose) <= radius) {
       despawn_function(name);
     }
   }

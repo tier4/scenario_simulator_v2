@@ -396,7 +396,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   ret.markers.emplace_back(text_action);
 
   if (waypoints.waypoints.size() > 2) {
-    math::geometryCatmullRomSpline spline(waypoints.waypoints);
+    math::geometry::CatmullRomSpline spline(waypoints.waypoints);
 
     /**
      * @brief generate marker for waypoints

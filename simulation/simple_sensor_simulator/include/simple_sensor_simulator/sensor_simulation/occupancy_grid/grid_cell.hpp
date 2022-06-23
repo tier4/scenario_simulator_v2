@@ -27,7 +27,7 @@
 namespace simple_sensor_simulator
 {
 std::vector<geometry_msgs::msg::Point> getIntersection2D(
-  const std::vector<math::geometryLineSegment> & lines);
+  const std::vector<math::geometry::LineSegment> & lines);
 
 class GridCell
 {

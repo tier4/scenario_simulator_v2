@@ -437,7 +437,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
   if (M_PI * yaw_threshold < std::fabs(rpy.z) && std::fabs(rpy.z) < M_PI * (1 - yaw_threshold)) {
     return boost::none;
   }
-  double inner_prod = math::geometryinnerProduct(
+  double inner_prod = math::geometry::innerProduct(
     spline->getNormalVector(s.get()), spline->getSquaredDistanceVector(pose.position, s.get()));
   if (inner_prod < 0) {
     offset = offset * -1;
@@ -712,7 +712,7 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
   return ret;
 }
 
-std::shared_ptr<math::geometryCatmullRomSpline> HdMapUtils::getCenterPointsSpline(
+std::shared_ptr<math::geometry::CatmullRomSpline> HdMapUtils::getCenterPointsSpline(
   std::int64_t lanelet_id)
 {
   getCenterPoints(lanelet_id);
@@ -929,7 +929,8 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getRightBound(std::int64_t la
   return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).rightBound());
 }
 
-boost::optional<std::pair<math::geometryHermiteCurve, double>> HdMapUtils::getLaneChangeTrajectory(
+boost::optional<std::pair<math::geometry::HermiteCurve, double>>
+HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter)
 {
@@ -978,7 +979,8 @@ boost::optional<std::pair<math::geometryHermiteCurve, double>> HdMapUtils::getLa
   return std::make_pair(traj, collision_point.get());
 }
 
-boost::optional<std::pair<math::geometryHermiteCurve, double>> HdMapUtils::getLaneChangeTrajectory(
+boost::optional<std::pair<math::geometry::HermiteCurve, double>>
+HdMapUtils::getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter,
   double maximum_curvature_threshold, double target_trajectory_length,
@@ -986,12 +988,12 @@ boost::optional<std::pair<math::geometryHermiteCurve, double>> HdMapUtils::getLa
 {
   double to_length = getLaneletLength(lane_change_parameter.target.lanelet_id);
   std::vector<double> evaluation, target_s;
-  std::vector<math::geometryHermiteCurve> curves;
+  std::vector<math::geometry::HermiteCurve> curves;
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
     auto goal_pose = toMapPose(lane_change_parameter.target.lanelet_id, to_s, 0);
     if (
-      math::geometrygetRelativePose(from_pose, goal_pose.pose).position.x <=
+      math::geometry::getRelativePose(from_pose, goal_pose.pose).position.x <=
       forward_distance_threshold) {
       continue;
     }
@@ -1019,7 +1021,7 @@ boost::optional<std::pair<math::geometryHermiteCurve, double>> HdMapUtils::getLa
   return std::make_pair(curves[min_index], target_s[min_index]);
 }
 
-math::geometryHermiteCurve HdMapUtils::getLaneChangeTrajectory(
+math::geometry::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
@@ -1052,7 +1054,7 @@ math::geometryHermiteCurve HdMapUtils::getLaneChangeTrajectory(
   goal_vec.x = goal_vec.x * tangent_vector_size;
   goal_vec.y = goal_vec.y * tangent_vector_size;
   goal_vec.z = goal_vec.z * tangent_vector_size;
-  math::geometryHermiteCurve curve(from_pose, goal_pose, start_vec, goal_vec);
+  math::geometry::HermiteCurve curve(from_pose, goal_pose, start_vec, goal_vec);
   return curve;
 }
 
@@ -1099,7 +1101,7 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   const auto spline = getCenterPointsSpline(lanelet_id);
   ret.pose = spline->getPose(s);
   const auto normal_vec = spline->getNormalVector(s);
-  const auto diff = math::geometrynormalize(normal_vec) * offset;
+  const auto diff = math::geometry::normalize(normal_vec) * offset;
   ret.pose.position = ret.pose.position + diff;
   const auto tangent_vec = spline->getTangentVector(s);
   geometry_msgs::msg::Vector3 rpy;
@@ -1475,7 +1477,7 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
 
 const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const math::geometryCatmullRomSplineInterface & spline) const
+  const math::geometry::CatmullRomSplineInterface & spline) const
 {
   auto traffic_light_ids = getTrafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.size() == 0) {
@@ -1501,7 +1503,7 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   if (waypoints.empty()) {
     return boost::none;
   }
-  math::geometryCatmullRomSpline spline(waypoints);
+  math::geometry::CatmullRomSpline spline(waypoints);
   const auto stop_lines = getTrafficLightStopLinesPoints(traffic_light_id);
   for (const auto & stop_line : stop_lines) {
     const auto collision_point = spline.getCollisionPointIn2D(stop_line);
@@ -1513,7 +1515,7 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
 }
 
 const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
-  const math::geometryCatmullRomSplineInterface & spline,
+  const math::geometry::CatmullRomSplineInterface & spline,
   const std::int64_t & traffic_light_id) const
 {
   if (spline.getLength() <= 0) {
@@ -1540,7 +1542,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
   if (waypoints.empty()) {
     return boost::none;
   }
-  math::geometryCatmullRomSpline spline(waypoints);
+  math::geometry::CatmullRomSpline spline(waypoints);
   const auto stop_lines = getStopLinesOnPath({route_lanelets});
   for (const auto & stop_line : stop_lines) {
     std::vector<geometry_msgs::msg::Point> stop_line_points;
@@ -1564,7 +1566,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const math::geometryCatmullRomSplineInterface & spline)
+  const math::geometry::CatmullRomSplineInterface & spline)
 {
   if (spline.getLength() <= 0) {
     return boost::none;

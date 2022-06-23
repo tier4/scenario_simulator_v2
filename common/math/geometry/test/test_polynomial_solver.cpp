@@ -31,7 +31,7 @@ bool checkValueWithTolerance(double value, double expected, double tolerance)
 
 TEST(PolynomialSolverTest, LinearFunction)
 {
-  math::geometryPolynomialSolver solver;
+  math::geometry::PolynomialSolver solver;
   EXPECT_DOUBLE_EQ(solver.linearFunction(1, 1, 2), 3);
   EXPECT_DOUBLE_EQ(solver.linearFunction(1, 0, 2), 2);
   EXPECT_DOUBLE_EQ(solver.linearFunction(0, 0, 2), 0);
@@ -39,7 +39,7 @@ TEST(PolynomialSolverTest, LinearFunction)
 
 TEST(PolynomialSolverTest, SolveLinearEquation)
 {
-  math::geometryPolynomialSolver solver;
+  math::geometry::PolynomialSolver solver;
   for (double a = -20; a < 20; a = a + 0.1) {
     for (double b = -20; b < 20; b = b + 0.1) {
       auto ret = solver.solveLinearEquation(a, b, 0, 1);
@@ -52,7 +52,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
 
 TEST(PolynomialSolverTest, QuadraticFunction)
 {
-  math::geometryPolynomialSolver solver;
+  math::geometry::PolynomialSolver solver;
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 0, 2), 6);
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(0, 0, 0, 2), 0);
@@ -60,7 +60,7 @@ TEST(PolynomialSolverTest, QuadraticFunction)
 
 TEST(PolynomialSolverTest, SolveQuadraticEquation)
 {
-  math::geometryPolynomialSolver solver;
+  math::geometry::PolynomialSolver solver;
   for (int a = -20; a < 20; a = a + 1) {
     for (int b = -20; b < 20; b = b + 1) {
       for (int c = -20; c < 20; c = c + 1) {
@@ -79,7 +79,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
 
 TEST(PolynomialSolverTest, SolveCubicEquation)
 {
-  math::geometryPolynomialSolver solver;
+  math::geometry::PolynomialSolver solver;
   for (int a = -10; a < 10; a = a + 1) {
     for (int b = -10; b < 10; b = b + 1) {
       for (int c = -10; c < 10; c = c + 1) {

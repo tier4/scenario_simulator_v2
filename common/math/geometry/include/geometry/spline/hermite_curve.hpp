@@ -36,7 +36,7 @@ private:
   double ax_, bx_, cx_, dx_;
   double ay_, by_, cy_, dy_;
   double az_, bz_, cz_, dz_;
-  math::geometryPolynomialSolver solver_;
+  math::geometry::PolynomialSolver solver_;
 
 public:
   HermiteCurve(

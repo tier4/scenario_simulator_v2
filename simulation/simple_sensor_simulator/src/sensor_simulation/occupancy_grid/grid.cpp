@@ -56,9 +56,9 @@ geometry_msgs::msg::Point Grid::transformToGrid(const geometry_msgs::msg::Point 
   return ret;
 }
 
-math::geometryLineSegment Grid::transformToGrid(const math::geometryLineSegment & line) const
+math::geometry::LineSegment Grid::transformToGrid(const math::geometry::LineSegment & line) const
 {
-  return math::geometryLineSegment(
+  return math::geometry::LineSegment(
     transformToGrid(line.start_point), transformToGrid(line.end_point));
 }
 
@@ -89,9 +89,9 @@ geometry_msgs::msg::Point Grid::transformToPixel(const geometry_msgs::msg::Point
   return p;
 }
 
-math::geometryLineSegment Grid::transformToPixel(const math::geometryLineSegment & line) const
+math::geometry::LineSegment Grid::transformToPixel(const math::geometry::LineSegment & line) const
 {
-  return math::geometryLineSegment(
+  return math::geometry::LineSegment(
     transformToPixel(line.start_point), transformToPixel(line.end_point));
 }
 
@@ -112,25 +112,25 @@ std::vector<GridCell> Grid::getAllCells() const
   return ret;
 }
 
-math::geometryLineSegment Grid::getInvisibleRay(
+math::geometry::LineSegment Grid::getInvisibleRay(
   const geometry_msgs::msg::Point & point_on_polygon) const
 {
-  return math::geometryLineSegment(
-    point_on_polygon, math::geometryLineSegment(origin.position, point_on_polygon).get2DVector(),
+  return math::geometry::LineSegment(
+    point_on_polygon, math::geometry::LineSegment(origin.position, point_on_polygon).get2DVector(),
     getDiagonalLength());
 }
 
-std::vector<math::geometryLineSegment> Grid::getInvisibleRay(
+std::vector<math::geometry::LineSegment> Grid::getInvisibleRay(
   const std::vector<geometry_msgs::msg::Point> & points) const
 {
-  std::vector<math::geometryLineSegment> ret = {};
+  std::vector<math::geometry::LineSegment> ret = {};
   for (const auto & point : points) {
     ret.emplace_back(getInvisibleRay(point));
   }
   return ret;
 }
 
-std::vector<math::geometryLineSegment> Grid::getRayToGridCorner()
+std::vector<math::geometry::LineSegment> Grid::getRayToGridCorner()
 {
   geometry_msgs::msg::Point left_up;
   left_up.x = static_cast<double>(width) * resolution * 0.5;
@@ -149,10 +149,10 @@ std::vector<math::geometryLineSegment> Grid::getRayToGridCorner()
   right_down.y = -static_cast<double>(height) * resolution * 0.5;
   right_down = transformToWorld(right_down);
   return {
-    math::geometryLineSegment(origin.position, left_up),
-    math::geometryLineSegment(origin.position, left_down),
-    math::geometryLineSegment(origin.position, right_down),
-    math::geometryLineSegment(origin.position, right_up)};
+    math::geometry::LineSegment(origin.position, left_up),
+    math::geometry::LineSegment(origin.position, left_down),
+    math::geometry::LineSegment(origin.position, right_down),
+    math::geometry::LineSegment(origin.position, right_up)};
 }
 
 size_t Grid::getIndex(size_t row, size_t col) const { return width * col + row; }
@@ -169,7 +169,7 @@ bool Grid::indexExist(size_t index) const
 }
 
 std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
-  const math::geometryLineSegment & line_segment, int8_t data)
+  const math::geometry::LineSegment & line_segment, int8_t data)
 {
   std::vector<std::pair<size_t, size_t>> ret;
   const auto line_segment_pixel = transformToPixel(transformToGrid(line_segment));
@@ -234,7 +234,7 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
 }
 
 std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
-  const std::vector<math::geometryLineSegment> & line_segments, int8_t data)
+  const std::vector<math::geometry::LineSegment> & line_segments, int8_t data)
 {
   std::vector<std::pair<size_t, size_t>> filled_cells = {};
   for (const auto & line : line_segments) {
@@ -300,11 +300,11 @@ std::vector<std::pair<size_t, size_t>> Grid::filterByCol(
   return filtered;
 }
 
-std::vector<math::geometryLineSegment> Grid::filterByIntersection(
-  const std::vector<math::geometryLineSegment> & source_lines,
-  const std::vector<math::geometryLineSegment> & filter_lines) const
+std::vector<math::geometry::LineSegment> Grid::filterByIntersection(
+  const std::vector<math::geometry::LineSegment> & source_lines,
+  const std::vector<math::geometry::LineSegment> & filter_lines) const
 {
-  std::vector<math::geometryLineSegment> filtered_lines;
+  std::vector<math::geometry::LineSegment> filtered_lines;
   for (const auto & source_line : source_lines) {
     for (const auto & filter_line : filter_lines) {
       if (source_line.getIntersection2D(filter_line)) {
@@ -339,14 +339,14 @@ std::vector<size_t> Grid::getCols(const std::vector<std::pair<size_t, size_t>> &
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
   const auto hull = primitive->get2DConvexHull();
-  const auto line_segments_on_hull = math::geometrygetLineSegments(hull);
-  std::vector<math::geometryLineSegment> rays_to_grid_corner = {};
+  const auto line_segments_on_hull = math::geometry::getLineSegments(hull);
+  std::vector<math::geometry::LineSegment> rays_to_grid_corner = {};
   for (const auto & ray : filterByIntersection(getRayToGridCorner(), line_segments_on_hull)) {
     for (const auto & line_segment : line_segments_on_hull) {
       const auto intersection = ray.getIntersection2D(line_segment);
       if (intersection) {
         rays_to_grid_corner.emplace_back(
-          math::geometryLineSegment(intersection.get(), ray.get2DVector(), getDiagonalLength()));
+          math::geometry::LineSegment(intersection.get(), ray.get2DVector(), getDiagonalLength()));
       }
     }
   }

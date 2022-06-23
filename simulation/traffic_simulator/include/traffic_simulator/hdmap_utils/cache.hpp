@@ -79,7 +79,7 @@ public:
     std::lock_guard<std::mutex> lock(mutex_);
     return data_.at(lanelet_id);
   }
-  std::shared_ptr<math::geometryCatmullRomSpline> getCenterPointsSpline(std::int64_t lanelet_id)
+  std::shared_ptr<math::geometry::CatmullRomSpline> getCenterPointsSpline(std::int64_t lanelet_id)
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
@@ -91,12 +91,12 @@ public:
   {
     std::lock_guard<std::mutex> lock(mutex_);
     data_[lanelet_id] = route;
-    splines_[lanelet_id] = std::make_shared<math::geometryCatmullRomSpline>(route);
+    splines_[lanelet_id] = std::make_shared<math::geometry::CatmullRomSpline>(route);
   }
 
 private:
   std::unordered_map<std::int64_t, std::vector<geometry_msgs::msg::Point>> data_;
-  std::unordered_map<std::int64_t, std::shared_ptr<math::geometryCatmullRomSpline>> splines_;
+  std::unordered_map<std::int64_t, std::shared_ptr<math::geometry::CatmullRomSpline>> splines_;
   std::mutex mutex_;
 };
 
