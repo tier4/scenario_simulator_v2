@@ -11,9 +11,9 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-|---------|---------------|----------|--------------|-------------|
-|         |               |          |              |             |
+| Feature                                         | Brief summary                                                                      | Category            | Pull request                                                    | Contributor                                   |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Change the stop position of the vehicle entity. | Change the stop position of the vehicle entity at the stop line and traffic light. | `traffic_simulator` | [#822](https://github.com/tier4/scenario_simulator_v2/pull/822) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 
