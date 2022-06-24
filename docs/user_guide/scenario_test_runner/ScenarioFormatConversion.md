@@ -3,9 +3,9 @@
 
 To convert OpenSCENARIO, use these arguments
 
-| Input | Required  | Description                                                                                                                                         |
-| ----- | --------- |-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| input | yes       | TIER IV format version2 yaml files in a specified directory, reference directory is relative to the current directory.                              |
+| Input  | Required | Description                                                                                                                                           |
+|--------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| input  | yes      | TIER IV format version2 yaml files in a specified directory, reference directory is relative to the current directory.                                |
 | output | no       | TIER IV parameter distributed OpenSCENARIO .xosc files are generated in a specified directory. Default is under the current directory converted_xosc. |
 
 You can execute scenario conversion by using ros2 command
@@ -54,4 +54,3 @@ attention or int
 - if step is one, only parameter of start is used
 - if step is zero, it returns error
 - the number of simulation is factorial to number of  steps
-

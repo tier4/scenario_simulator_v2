@@ -227,7 +227,7 @@ protected:
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
-  std::shared_ptr<traffic_simulator::math::CatmullRomSpline> spline_;
+  std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 
   bool verbose_;
   bool visibility_;

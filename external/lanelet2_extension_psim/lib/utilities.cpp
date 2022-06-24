@@ -46,7 +46,7 @@ namespace
  * search_point]
  * @param  lanelet_map   [pointer to lanelet]
  * @param  trafficRules  [traffic rules to ignore lanelets that are not
- * traversible]
+ * traversable]
  * @param  search_point  [2D point used for searching]
  * @param  contacting_lanelet_ids [array of lanelet ids that is contacting with
  * search_point]

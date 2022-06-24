@@ -24,10 +24,10 @@
 // limitations under the License.
 
 #include <functional>
+#include <geometry/distance.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <traffic_simulator/math/distance.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <vector>
 
@@ -54,7 +54,7 @@ void TrafficSink::execute()
   const auto names = get_entity_names_function();
   for (const auto & name : names) {
     const auto pose = get_entity_pose_function(name);
-    if (traffic_simulator::math::getDistance(position, pose) <= radius) {
+    if (math::geometry::getDistance(position, pose) <= radius) {
       despawn_function(name);
     }
   }

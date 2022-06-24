@@ -416,7 +416,7 @@ Changelog for package cpp_mock_scenarios
 * apply reformat
 * Merge pull request `#418 <https://github.com/tier4/scenario_simulator_v2/issues/418>`_ from tier4/feature/add_cpp_scenario_node
 * update docs
-* move to mock pacakge
+* move to mock package
 * rename entity
 * apply reformat and with_rviz argument
 * remove view_kashiwanoha scenario
