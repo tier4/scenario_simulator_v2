@@ -102,11 +102,11 @@ auto InitActions::startNonInstantaneousActions() -> void
   for (auto && e : user_defined_actions) {
     auto & user_defined_action = e.as<UserDefinedAction>();
     if (not user_defined_action.endsImmediately()) {
-      user_defined_action.run();
+      user_defined_action.start();
     }
   }
   for (auto && e : privates) {
-    e.as<Private>().runNonInstantaneousActions();
+    e.as<Private>().startNonInstantaneousActions();
   }
 }
 
@@ -123,7 +123,7 @@ auto InitActions::runInstantaneousActions() -> void
     }
   }
   for (auto && e : privates) {
-    e.as<Private>().startInstantaneousActions();
+    e.as<Private>().runInstantaneousActions();
   }
 }
 
