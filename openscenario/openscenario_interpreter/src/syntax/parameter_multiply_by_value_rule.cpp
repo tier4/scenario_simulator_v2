@@ -66,7 +66,7 @@ auto ParameterMultiplyByValueRule::operator()(const Object & target) const -> Ob
     throw SyntaxError(
       "The parameter specified by attribute 'parameterRef' of type 'ParameterAction' must be "
       "numeric type (double, integer, unsignedInteger or unsignedShort), but ",
-      target, " (type ", demangle(target.type()), ") specified");
+      target, " (type ", makeTypename(target.type()), ") specified");
   }
 }
 }  // namespace syntax

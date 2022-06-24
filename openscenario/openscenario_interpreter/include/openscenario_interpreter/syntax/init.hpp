@@ -43,7 +43,7 @@ struct Init
 
   auto evaluateInstantaneousActions() -> Object;
 
-  auto runNonInstantaneousActionss() -> void;
+  auto runNonInstantaneousActions() -> void;
 
   auto startNonInstantaneousActions() -> void;
 };

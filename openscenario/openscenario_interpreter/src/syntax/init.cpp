@@ -33,7 +33,7 @@ auto Init::evaluateInstantaneousActions() -> Object
   return unspecified;
 }
 
-auto Init::runNonInstantaneousActionss() -> void { actions.runNonInstantaneousActions(); }
+auto Init::runNonInstantaneousActions() -> void { actions.runNonInstantaneousActions(); }
 
 auto Init::startNonInstantaneousActions() -> void { actions.startNonInstantaneousActions(); }
 
