@@ -227,8 +227,7 @@ public:
         }());
 
         core->asAutoware(entity_ref)
-          .setCooperator(
-            controller.properties.template get<String>("cooperator", "simulator"));
+          .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
       }
     }
 
