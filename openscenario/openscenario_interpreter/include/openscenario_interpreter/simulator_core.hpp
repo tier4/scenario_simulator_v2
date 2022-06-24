@@ -227,8 +227,8 @@ public:
         }());
 
         core->asAutoware(entity_ref)
-          .setCooperatePolicy(
-            controller.properties.template get<String>("cooperatePolicy", "automatic"));
+          .setCooperator(
+            controller.properties.template get<String>("cooperator", "simulator"));
       }
     }
 

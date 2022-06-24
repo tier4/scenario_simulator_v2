@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__COOPERATE_POCILY_HPP_
-#define CONCEALER__COOPERATE_POCILY_HPP_
+#ifndef CONCEALER__COOPERATOR_HPP_
+#define CONCEALER__COOPERATOR_HPP_
 
 #include <boost/lexical_cast.hpp>
 #include <istream>
@@ -21,14 +21,14 @@
 
 namespace concealer
 {
-enum class CooperatePolicy {
-  automatic,  // DEFAULT
-  manual,
+enum class Cooperator {
+  simulator,  // DEFAULT
+  scenario,
 };
 
-auto operator>>(std::istream & is, CooperatePolicy & cooperate_policy) -> std::istream &;
+auto operator>>(std::istream &, Cooperator &) -> std::istream &;
 
-auto operator<<(std::ostream & os, const CooperatePolicy & cooperate_policy) -> std::ostream &;
+auto operator<<(std::ostream &, const Cooperator &) -> std::ostream &;
 }  // namespace concealer
 
-#endif  // CONCEALER__COOPERATE_POCILY_HPP_
+#endif  // CONCEALER__COOPERATOR_HPP_

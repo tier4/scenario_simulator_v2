@@ -12,39 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <concealer/cooperate_policy.hpp>
+#include <concealer/cooperator.hpp>
 
 namespace concealer
 {
-auto operator>>(std::istream & is, CooperatePolicy & cooperate_policy) -> std::istream &
+auto operator>>(std::istream & is, Cooperator & cooperator) -> std::istream &
 {
   std::string token;
 
   is >> token;
 
-  static const std::unordered_map<std::string, CooperatePolicy> table{
-    {"automatic", CooperatePolicy::automatic},
-    {"manual", CooperatePolicy::manual},
+  static const std::unordered_map<std::string, Cooperator> table{
+    {"simulator", Cooperator::simulator},
+    {"scenario", Cooperator::scenario},
   };
 
   if (auto iter = table.find(token); iter != std::end(table)) {
-    cooperate_policy = (*iter).second;
+    cooperator = (*iter).second;
   } else {
-    cooperate_policy = CooperatePolicy::automatic;
+    cooperator = Cooperator::simulator;
   }
 
   return is;
 }
 
-auto operator<<(std::ostream & os, const CooperatePolicy & cooperate_policy) -> std::ostream &
+auto operator<<(std::ostream & os, const Cooperator & cooperator) -> std::ostream &
 {
-  switch (cooperate_policy) {
+  switch (cooperator) {
     default:
-    case CooperatePolicy::automatic:
-      return os << "automatic";
+    case Cooperator::simulator:
+      return os << "simulator";
 
-    case CooperatePolicy::manual:
-      return os << "manual";
+    case Cooperator::scenario:
+      return os << "scenario";
   }
 }
 }  // namespace concealer

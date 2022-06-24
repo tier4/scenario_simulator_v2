@@ -30,7 +30,7 @@
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <concealer/autoware.hpp>
-#include <concealer/cooperate_policy.hpp>
+#include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
@@ -96,7 +96,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
 private:  // EXPERIMENTAL RTC SUPPORTS
-  CooperatePolicy current_cooperate_policy = CooperatePolicy::automatic;
+  Cooperator current_cooperator = Cooperator::simulator;
 
   auto approve(const CooperateStatusArray &) -> void;
 
@@ -183,9 +183,9 @@ public:
 
   auto sendSIGINT() -> void override;
 
-  auto setCooperatePolicy(const std::string & policy) -> void override
+  auto setCooperator(const std::string & cooperator) -> void override
   {
-    current_cooperate_policy = boost::lexical_cast<CooperatePolicy>(policy);
+    current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
   }
 
   auto setVelocityLimit(double) -> void override;

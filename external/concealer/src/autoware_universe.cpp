@@ -51,8 +51,8 @@ auto AutowareUniverse::approve(const CooperateStatusArray & cooperate_status_arr
 
 auto AutowareUniverse::cooperate(const CooperateStatusArray & cooperate_status_array) -> void
 {
-  switch (current_cooperate_policy) {
-    case CooperatePolicy::automatic:
+  switch (current_cooperator) {
+    case Cooperator::simulator:
       return approve(cooperate_status_array);
 
     default:
