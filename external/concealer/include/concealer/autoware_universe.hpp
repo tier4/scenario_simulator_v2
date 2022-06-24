@@ -69,6 +69,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
+  using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
@@ -77,72 +78,29 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
+  CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
   CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
   CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
 
+  using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
   using Engage = tier4_external_api_msgs::srv::Engage;
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
   using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
 
+  CONCEALER_DEFINE_CLIENT_SIMPLE(CooperateCommands);
   CONCEALER_DEFINE_CLIENT(Engage);
   // TODO CONCEALER_DEFINE_CLIENT(InitializePose);
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
 private:  // EXPERIMENTAL RTC SUPPORTS
-  using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
-
-  // NOTE: src/autoware/ad_api_adaptor/autoware_iv_external_api_adaptor/src/rtc_controller.cpp
-  CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
-
-  using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
-
-  rclcpp::Client<CooperateCommands>::SharedPtr client_of_cooperate_commands;
-
   CooperatePolicy current_cooperate_policy = CooperatePolicy::automatic;
 
-  auto approve(const CooperateStatusArray & cooperate_status_array)
-  {
-    auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
-    request->stamp = cooperate_status_array.stamp;
+  auto approve(const CooperateStatusArray &) -> void;
 
-    auto approvable = [](auto && cooperate_status) {
-      return cooperate_status.safe xor
-             (cooperate_status.command_status.type == tier4_rtc_msgs::msg::Command::ACTIVATE);
-    };
-
-    auto flip = [](auto && type) {
-      using Command = tier4_rtc_msgs::msg::Command;
-      return type == Command::ACTIVATE ? Command::DEACTIVATE : Command::ACTIVATE;
-    };
-
-    for (auto && cooperate_status : cooperate_status_array.statuses) {
-      if (approvable(cooperate_status)) {
-        tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
-        cooperate_command.module = cooperate_status.module;
-        cooperate_command.uuid = cooperate_status.uuid;
-        cooperate_command.command.type = flip(cooperate_status.command_status.type);
-        request->commands.push_back(cooperate_command);
-      }
-    }
-
-    if (not request->commands.empty()) {
-      client_of_cooperate_commands->async_send_request(request);
-    }
-  }
-
-  auto cooperate(const CooperateStatusArray & cooperate_status_array)
-  {
-    switch (current_cooperate_policy) {
-      case CooperatePolicy::automatic:
-        return approve(cooperate_status_array);
-
-      default:
-        return;
-    }
-  }
+  auto cooperate(const CooperateStatusArray &) -> void;
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
@@ -178,18 +136,16 @@ public:
     CONCEALER_INIT_PUBLISHER(VelocityReport, "/vehicle/status/velocity_status"),
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
     CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
+    CONCEALER_INIT_CLIENT(CooperateCommands, "/api/external/set/rtc_commands"),
     CONCEALER_INIT_CLIENT(Engage, "/api/external/set/engage"),
     // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
-    CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit"),
-    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
-    client_of_cooperate_commands(
-      static_cast<Autoware &>(*this).template create_client<CooperateCommands>(
-        "/api/external/set/rtc_commands", rmw_qos_profile_default))
+    CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")
   // clang-format on
   {
     waitpid_options = 0;

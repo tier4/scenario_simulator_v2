@@ -17,6 +17,30 @@
 
 #include <utility>
 
+#define CONCEALER_DEFINE_CLIENT_SIMPLE(TYPE)                                                   \
+private:                                                                                       \
+  rclcpp::Client<TYPE>::SharedPtr client_of_##TYPE;                                            \
+                                                                                               \
+public:                                                                                        \
+  auto request##TYPE(const TYPE::Request::SharedPtr & request)                                 \
+  {                                                                                            \
+    static_cast<Autoware &>(*this).rethrow();                                                  \
+                                                                                               \
+    for (auto rate = rclcpp::WallRate(std::chrono::seconds(1));                                \
+         not client_of_##TYPE->service_is_ready();                                             \
+         rate.sleep(), static_cast<Autoware &>(*this).rethrow()) {                             \
+      RCLCPP_INFO_STREAM(                                                                      \
+        static_cast<Autoware &>(*this).get_logger(), #TYPE " service is not ready.");          \
+    }                                                                                          \
+                                                                                               \
+    if (auto future = client_of_##TYPE->async_send_request(request);                           \
+        future.wait_for(std::chrono::seconds(1)) != std::future_status::ready) {               \
+      RCLCPP_ERROR_STREAM(                                                                     \
+        static_cast<Autoware &>(*this).get_logger(), #TYPE " service request has timed out."); \
+    }                                                                                          \
+  }                                                                                            \
+  static_assert(true, "")
+
 #define CONCEALER_DEFINE_CLIENT(TYPE)                                                              \
 private:                                                                                           \
   rclcpp::Client<TYPE>::SharedPtr client_of_##TYPE;                                                \
@@ -25,15 +49,17 @@ public:                                                                         
   auto request##TYPE(const TYPE::Request::SharedPtr & request)->void                               \
   {                                                                                                \
     static_cast<Autoware &>(*this).rethrow();                                                      \
+                                                                                                   \
     for (auto rate = rclcpp::WallRate(std::chrono::seconds(1));                                    \
          not client_of_##TYPE->service_is_ready();                                                 \
          rate.sleep(), static_cast<Autoware &>(*this).rethrow()) {                                 \
       RCLCPP_INFO_STREAM(                                                                          \
         static_cast<Autoware &>(*this).get_logger(), #TYPE " service is not ready.");              \
     }                                                                                              \
-    auto future = client_of_##TYPE->async_send_request(request);                                   \
-    if (future.wait_for(std::chrono::seconds(1)) != std::future_status::ready) {                   \
-      RCLCPP_INFO_STREAM(                                                                          \
+                                                                                                   \
+    if (auto future = client_of_##TYPE->async_send_request(request);                               \
+        future.wait_for(std::chrono::seconds(1)) != std::future_status::ready) {                   \
+      RCLCPP_ERROR_STREAM(                                                                         \
         static_cast<Autoware &>(*this).get_logger(), #TYPE " service request has timed out.");     \
     } else if (auto result = future.get();                                                         \
                result->status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {     \
@@ -42,11 +68,10 @@ public:                                                                         
         #TYPE " service request has been accepted"                                                 \
           << (result->status.message.empty() ? "." : " (" + result.get()->status.message + ").")); \
     } else {                                                                                       \
-      RCLCPP_INFO_STREAM(                                                                          \
+      RCLCPP_ERROR_STREAM(                                                                         \
         static_cast<Autoware &>(*this).get_logger(),                                               \
-        #TYPE " service request was accepted, but ineffective => Retry!"                           \
+        #TYPE " service request was accepted, but ResponseStatus is FAILURE"                       \
           << (result->status.message.empty() ? "" : " (" + result->status.message + ")"));         \
-      rclcpp::WallRate(std::chrono::seconds(1)).sleep();                                           \
     }                                                                                              \
   }                                                                                                \
   static_assert(true, "")
