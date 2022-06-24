@@ -72,7 +72,7 @@ auto InitActions::endsImmediately() const -> bool
     privates.begin(), privates.end(),
     [=](const Object & e) { return e.as<Private>().endsImmediately(); });
 
-  return global_ends_immediately and user_defined_actions_ends_immediately and
+  return global_ends_immediately or user_defined_actions_ends_immediately or
          private_actions_ends_immediately;
 }
 
