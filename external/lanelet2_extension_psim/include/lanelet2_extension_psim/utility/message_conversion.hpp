@@ -94,7 +94,7 @@ void toGeomMsgPoly(
  * [toGeomMsgPt32 converts Eigen::Vector3d(lanelet:BasicPoint3d to
  * geometry_msgs::Point32)]
  * @param src [input point]
- * @param dst [conveted point]
+ * @param dst [converted point]
  */
 void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * dst);
 

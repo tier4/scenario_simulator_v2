@@ -248,7 +248,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     }
 
     if (lanelet_pose) {
-      traffic_simulator::math::CatmullRomSpline spline(
+      math::geometry::CatmullRomSpline spline(
         hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
       if (const auto s_value = spline.getSValue(status.pose)) {
         status.pose.position.z = spline.getPoint(s_value.get()).z;
