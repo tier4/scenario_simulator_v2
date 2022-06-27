@@ -137,7 +137,8 @@ auto CustomCommandAction::start() const -> void
   if (type == ":") {
     return;
   } else if (
-    std::regex_match(type, result, FunctionCallExpression::pattern()) and commands.find(result[1]) != std::end(commands)) {
+    std::regex_match(type, result, FunctionCallExpression::pattern()) and
+    commands.find(result[1]) != std::end(commands)) {
     commands.at(result[1])(FunctionCallExpression::splitParameters(result[3]), local());
   } else {
     fork_exec(type, content);

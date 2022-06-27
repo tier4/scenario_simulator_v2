@@ -15,6 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__REGEX__FUNCTION_CALL_EXPRESSION_HPP_
 #define OPENSCENARIO_INTERPRETER__REGEX__FUNCTION_CALL_EXPRESSION_HPP_
 
+#include <regex>
+
 namespace openscenario_interpreter
 {
 inline namespace regex
@@ -33,7 +35,8 @@ struct FunctionCallExpression
    * ---------------------------------------------------------------------- */
   static auto pattern() -> const auto &
   {
-    static const auto pattern = std::regex(R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)");
+    static const auto pattern =
+      std::regex(R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)");
     return pattern;
   }
 
@@ -43,13 +46,13 @@ struct FunctionCallExpression
 
     std::vector<std::string> args;
 
-    for (auto iter = std::sregex_iterator(std::begin(s), std::end(s), pattern); iter != std::sregex_iterator(); ++iter) {
+    for (auto iter = std::sregex_iterator(std::begin(s), std::end(s), pattern);
+         iter != std::sregex_iterator(); ++iter) {
       args.emplace_back((*iter)[1]);
     }
 
     return args;
   }
-
 };
 }  // namespace regex
 }  // namespace openscenario_interpreter
