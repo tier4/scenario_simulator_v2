@@ -74,10 +74,10 @@ void SimulationClock::onNpcLogicStart()
   scenario_time_offset_ = getCurrentSimulationTime();
 }
 
-double SimulationClock::getCurrentScenarioTime() const
+boost::optional<double> SimulationClock::getCurrentScenarioTime() const
 {
   if (!is_npc_logic_started_) {
-    THROW_SIMULATION_ERROR("Npc logics have not started yet.");
+    return boost::none;
   }
   return getCurrentSimulationTime() - scenario_time_offset_;
 }
