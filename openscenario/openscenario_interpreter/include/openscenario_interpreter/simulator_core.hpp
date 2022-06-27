@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -224,6 +225,9 @@ public:
             controller.properties.template get<Boolean>("isClairvoyant"));
           return configuration;
         }());
+
+        core->asAutoware(entity_ref)
+          .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
       }
     }
 

@@ -9,18 +9,20 @@ Major Changes :race_car: :red_car: :blue_car:
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------------------------------- |
 | Add `API::getRelativePose()` argument for function | Add `API::getRelativePose()` argument for getting relative distance between lanelet pose and entity. | `traffic_simulator` | [#809](https://github.com/tier4/scenario_simulator_v2/pull/809) | [hakuturu583](https://github.com/hakuturu583) |
 | Add `API::startNpcLogic()` function                | Add `API::startNpcLogic()` for manually starting npc logics.                                         | `traffic_simulator` | [#809](https://github.com/tier4/scenario_simulator_v2/pull/823) | [hakuturu583](https://github.com/hakuturu583) |
+| RTC (Request to Cooperate)                         | Experimental support for automatic approval of requests to cooperate from Autoware.Universe.         | `concealer`         | [#818](https://github.com/tier4/scenario_simulator_v2/pull/818) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-|---------|---------------|----------|--------------|-------------|
-|         |               |          |              |             |
+| Feature                                         | Brief summary                                                                      | Category            | Pull request                                                    | Contributor                                   |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Change the stop position of the vehicle entity. | Change the stop position of the vehicle entity at the stop line and traffic light. | `traffic_simulator` | [#822](https://github.com/tier4/scenario_simulator_v2/pull/822) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature                     | Brief summary                                                                                                        | Category                   | Pull request                                                    | Contributor                                   |
-|-----------------------------|----------------------------------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|-----------------------------------------------|
-| OpenSCENARIO simulator core | Changed to treat traffic_simulator as "Simulator Core" based on OpenSCENARIO standard Basic architecture components. | `openscenario_interpreter` | [#783](https://github.com/tier4/scenario_simulator_v2/pull/783) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Feature                     | Brief summary                                                                                                                                           | Category                   | Pull request                                                    | Contributor                                   |
+|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| OpenSCENARIO simulator core | Changed to treat `traffic_simulator` as "Simulator Core" based on OpenSCENARIO standard Basic architecture components.                                  | `openscenario_interpreter` | [#783](https://github.com/tier4/scenario_simulator_v2/pull/783) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Option `--record`           | Exclude a too large topic `/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/intersection` from bag recording. | `openscenario_interpreter` | [#829](https://github.com/tier4/scenario_simulator_v2/pull/829) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.5
 
