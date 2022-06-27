@@ -57,8 +57,6 @@ struct Private : public Scope
   auto startInstantaneousActions() -> void;
 
   auto startNonInstantaneousActions() -> void;
-
-  bool has_started = false;
 };
 
 auto operator<<(nlohmann::json &, const Private &) -> nlohmann::json &;
