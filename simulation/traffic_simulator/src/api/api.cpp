@@ -428,16 +428,16 @@ bool API::updateEntityStatusInSim()
 bool API::updateFrame()
 {
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = boost::none;
+  /**
+    * @brief Currently, start all NPC logics when the simulation time overs 0.
+    */
+  if (!isNpcLogicStarted() && clock_.getCurrentSimulationTime() >= 0) {
+    startNpcLogic();
+  }
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
-    /**
-     * @brief Currently, start all NPC logics when the simulation time overs 0.
-     */
-    if (clock_.getCurrentSimulationTime() >= 0) {
-      startNpcLogic();
-    }
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(clock_.getCurrentSimulationTime());
     simulation_interface::toProto(

@@ -157,6 +157,8 @@ public:
 
   double getCurrentTime() const noexcept { return clock_.getCurrentSimulationTime(); }
 
+  double getCurrentScenarioTime() const { return clock_.getCurrentScenarioTime(); }
+
   void startNpcLogic();
 
   void requestLaneChange(const std::string & name, const std::int64_t & lanelet_id);
@@ -206,6 +208,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
+  FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);

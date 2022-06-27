@@ -388,6 +388,8 @@ public:
   void updateHdmapMarker();
 
   void startNpcLogic();
+
+  auto isNpcLogicStarted() const { return npc_logic_started_; }
 };
 }  // namespace entity
 }  // namespace traffic_simulator
