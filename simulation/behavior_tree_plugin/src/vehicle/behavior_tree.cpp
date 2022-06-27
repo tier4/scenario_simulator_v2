@@ -66,17 +66,16 @@ const std::string & VehicleBehaviorTree::getCurrentAction() const
   return logging_event_ptr_->getCurrentAction();
 }
 
-void VehicleBehaviorTree::update(double current_time, double step_time)
+void VehicleBehaviorTree::update(double step_time)
 {
-  tickOnce(current_time, step_time);
+  tickOnce(step_time);
   while (getCurrentAction() == "root") {
-    tickOnce(current_time, step_time);
+    tickOnce(step_time);
   }
 }
 
-BT::NodeStatus VehicleBehaviorTree::tickOnce(double current_time, double step_time)
+BT::NodeStatus VehicleBehaviorTree::tickOnce(double step_time)
 {
-  setCurrentTime(current_time);
   setStepTime(step_time);
   const auto ret = tree_.rootNode()->executeTick();
   return ret;
