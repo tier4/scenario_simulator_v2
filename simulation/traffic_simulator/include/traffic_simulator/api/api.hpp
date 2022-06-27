@@ -157,7 +157,7 @@ public:
 
   double getCurrentTime() const noexcept { return clock_.getCurrentSimulationTime(); }
 
-  double getCurrentScenarioTime() const { return clock_.getCurrentScenarioTime(); }
+  boost::optional<double> getCurrentScenarioTime() const { return clock_.getCurrentScenarioTime(); }
 
   void startNpcLogic();
 
