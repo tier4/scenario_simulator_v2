@@ -632,8 +632,8 @@ traffic_simulator_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
 
 void EntityManager::update(const double current_time, const double step_time)
 {
-  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(__func__);
-  stop_watch_update.start();
+  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
+    "EntityManager::update", configuration.verbose);
   step_time_ = step_time;
   current_time_ = current_time;
   setVerbose(configuration.verbose);
