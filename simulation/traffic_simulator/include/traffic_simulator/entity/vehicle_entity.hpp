@@ -126,6 +126,9 @@ public:
 
   const traffic_simulator_msgs::msg::WaypointsArray getWaypoints() override
   {
+    if (!npc_logic_started_) {
+      return traffic_simulator_msgs::msg::WaypointsArray();
+    }
     try {
       return behavior_plugin_ptr_->getWaypoints();
     } catch (const std::runtime_error & e) {

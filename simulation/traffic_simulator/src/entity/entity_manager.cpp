@@ -25,6 +25,7 @@
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/helper/stop_watch.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -326,7 +327,7 @@ const std::string EntityManager::getEgoName() const
 auto EntityManager::getObstacle(const std::string & name)
   -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  if (current_time_ < 0) {
+  if (!npc_logic_started_) {
     return boost::none;
   }
   return entities_.at(name)->getObstacle();
@@ -410,7 +411,7 @@ auto EntityManager::getStepTime() const noexcept -> double { return step_time_; 
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  if (current_time_ < 0) {
+  if (!npc_logic_started_) {
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
   return entities_.at(name)->getWaypoints();
@@ -419,7 +420,7 @@ auto EntityManager::getWaypoints(const std::string & name)
 void EntityManager::getGoalPoses(
   const std::string & name, std::vector<traffic_simulator_msgs::msg::LaneletPose> & goals)
 {
-  if (current_time_ < 0) {
+  if (!npc_logic_started_) {
     goals = std::vector<traffic_simulator_msgs::msg::LaneletPose>();
   }
   goals = entities_.at(name)->getGoalPoses();
@@ -429,7 +430,7 @@ void EntityManager::getGoalPoses(
   const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals)
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> lanelet_poses;
-  if (current_time_ < 0) {
+  if (!npc_logic_started_) {
     goals = std::vector<geometry_msgs::msg::Pose>();
   }
   getGoalPoses(name, lanelet_poses);
@@ -631,21 +632,18 @@ traffic_simulator_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
 
 void EntityManager::update(const double current_time, const double step_time)
 {
-  std::chrono::system_clock::time_point start, end;
-  start = std::chrono::system_clock::now();
+  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(__func__);
+  stop_watch_update.start();
   step_time_ = step_time;
   current_time_ = current_time;
-  if (configuration.verbose) {
-    std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
-    std::cout << "current_time : " << current_time_ << std::endl;
-  }
+  setVerbose(configuration.verbose);
   if (getNumberOfEgo() >= 2) {
     THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
   }
-  if (current_time_ >= 0) {
-    traffic_light_manager_ptr_->update(step_time_);
+  if (!npc_logic_started_) {
+    return;
   }
-  setVerbose(configuration.verbose);
+  traffic_light_manager_ptr_->update(step_time_);
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
@@ -706,10 +704,9 @@ void EntityManager::update(const double current_time, const double step_time)
     status_array_msg.data.emplace_back(status_with_traj);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
-  end = std::chrono::system_clock::now();
-  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+  stop_watch_update.stop();
   if (configuration.verbose) {
-    std::cout << "elapsed " << elapsed / 1000 << " seconds in update function." << std::endl;
+    stop_watch_update.print();
   }
 }
 
