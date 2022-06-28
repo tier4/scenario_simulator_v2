@@ -163,7 +163,7 @@ OpenSCENARIO:
                                     UserDefinedValueCondition:
                                       name: RelativeHeadingCondition(ego, 34507, 50)
                                       rule: lessThan
-                                      value: 1.0
+                                      value: 0.1
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none

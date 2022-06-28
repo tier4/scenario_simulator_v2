@@ -23,7 +23,7 @@ template <typename F>
 auto curry2(F && f) -> decltype(auto)
 {
   return [f](auto &&... xs) {
-    return [f, xs = std::forward_as_tuple(xs...)](auto &&... ys) {
+    return [f, xs = std::make_tuple(std::forward<decltype(xs)>(xs)...)](auto &&... ys) {
       return std::apply(
         [&](auto &&... xs) {
           return f(std::forward<decltype(xs)>(xs)..., std::forward<decltype(ys)>(ys)...);
