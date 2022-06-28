@@ -74,7 +74,6 @@ public:
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::InputPort<traffic_simulator_msgs::msg::EntityStatus>("entity_status"),
-      BT::InputPort<double>("current_time"),
       BT::InputPort<double>("step_time"),
       BT::InputPort<boost::optional<double>>("target_speed"),
       BT::OutputPort<traffic_simulator_msgs::msg::EntityStatus>("updated_status"),
