@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <iomanip>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/simulation_time_condition.hpp>
 
@@ -39,7 +38,7 @@ auto SimulationTimeCondition::description() const -> String
 
 auto SimulationTimeCondition::evaluate() -> Object
 {
-  return asBoolean(compare(result = getCurrentTime(), value));
+  return asBoolean(compare(result = evaluateSimulationTime(), value));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

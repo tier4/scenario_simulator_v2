@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,6 +53,9 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       &ScenarioSimulator::attachLidarSensor, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
       &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
+      std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::attachOccupancyGridSensor, this, std::placeholders::_1,
       std::placeholders::_2),
     std::bind(
       &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2))
@@ -199,6 +202,15 @@ void ScenarioSimulator::attachLidarSensor(
 {
   sensor_sim_.attachLidarSensor(current_time_, req.configuration(), *this);
   res = simulation_api_schema::AttachLidarSensorResponse();
+  res.mutable_result()->set_success(true);
+}
+
+void ScenarioSimulator::attachOccupancyGridSensor(
+  const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
+  simulation_api_schema::AttachOccupancyGridSensorResponse & res)
+{
+  res = simulation_api_schema::AttachOccupancyGridSensorResponse();
+  sensor_sim_.attachOccupancyGridSensor(current_time_, req.configuration(), *this);
   res.mutable_result()->set_success(true);
 }
 

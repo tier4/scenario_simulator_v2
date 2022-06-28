@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,6 +45,41 @@ void Autoware::checkAutowareProcess()
       throw common::AutowareError("Autoware process is killed. signal is ", WTERMSIG(wstatus));
     }
   }
+}
+
+auto Autoware::getEmergencyState() const -> const autoware_auto_system_msgs::msg::EmergencyState &
+{
+  static auto emergency_state = []() {
+    autoware_auto_system_msgs::msg::EmergencyState emergency_state;
+    emergency_state.state = autoware_auto_system_msgs::msg::EmergencyState::NORMAL;
+    return emergency_state;
+  }();
+  emergency_state.stamp = now();
+  return emergency_state;
+}
+
+auto Autoware::getGearCommand() const -> const autoware_auto_vehicle_msgs::msg::GearCommand &
+{
+  static auto gear_command = []() {
+    autoware_auto_vehicle_msgs::msg::GearCommand gear_command;
+    gear_command.command = autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE;
+    return gear_command;
+  }();
+  gear_command.stamp = now();
+  return gear_command;
+}
+
+auto Autoware::getTurnIndicatorsCommand() const
+  -> const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand &
+{
+  static auto turn_indicators_command = []() {
+    autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
+    turn_indicators_command.command =
+      autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
+    return turn_indicators_command;
+  }();
+  turn_indicators_command.stamp = now();
+  return turn_indicators_command;
 }
 
 void Autoware::shutdownAutoware()

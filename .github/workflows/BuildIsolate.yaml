@@ -42,18 +42,29 @@ jobs:
             traffic_simulator_msgs,
             user_defined_value_condition_example,
           ]
-        rosdistro: [galactic]
+        rosdistro: [galactic, humble]
+        include:
+          # Galactic Geochelone (May 2021 - November 2022)
+          - docker_image: rostooling/setup-ros-docker:ubuntu-focal-ros-galactic-ros-base-latest
+            rosdistro: galactic
+          # Humble Hawksbill (May 2022 - May 2027)
+          - docker_image: rostooling/setup-ros-docker:ubuntu-jammy-ros-humble-ros-base-latest
+            rosdistro: humble
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
+    container:
+      image: ${{ matrix.docker_image }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup ROS2 ${{ matrix.rosdistro }} environment
-        uses: ros-tooling/setup-ros@v0.2
-        with:
-          required-ros-distributions: ${{ matrix.rosdistro }}
+      - name: workaround for jammy
+        if: ${{ matrix.rosdistro == 'humble' }}
+        run: |
+          apt remove libunwind-14-dev -y
+          apt install python3-nose -y
+          pip uninstall nose -y
       - name: Run build test for ${{ matrix.package }} package
         uses: ros-tooling/action-ros-ci@v0.2
         with:

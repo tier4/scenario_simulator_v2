@@ -2,6 +2,98 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.5 (2022-06-16)
+------------------
+* Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
+* Merge remote-tracking branch 'origin/master' into feature/change_engage_api_name
+* standard to 17
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_distance_to_lane_bound
+* Merge pull request `#803 <https://github.com/tier4/scenario_simulator_v2/issues/803>`_ from tier4/feature/replace_dummy_ogm_map
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pull_over_metrics
+* Merge branch 'master' into feature/change_engage_api_name
+* feat!: replace dummy ogm
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* Merge pull request `#797 <https://github.com/tier4/scenario_simulator_v2/issues/797>`_ from tier4/feature/occupancy_grid_sensor
+* add white lines at EOF
+* remove unused operators
+* Merge pull request `#778 <https://github.com/tier4/scenario_simulator_v2/issues/778>`_ from tier4/feature/zmqpp_vendor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Fix Licence
+* enable fill occupied cell
+* use static_cast in position calculation
+* add check in fillByRowCol
+* filter row and col index
+* fix length calculation
+* add get2DVector get2DLength function
+* add get2D Length function
+* enable fill intersection cell
+* add getInvisibleRay function
+* remove unused function
+* fix problems in fillByIntersection function
+* add fillInside function
+* add get rows and cols function
+* add filter by row and col fuinction
+* add sortAndUnique function
+* fix problem in floor
+* enable fill value
+* fix intersection calculation algorithum
+* enable generate faster
+* change architecture
+* remove sort and erase
+* comment out invisible cell
+* add debug line
+* enable extract candidate
+* add transform
+* fill invisible cell
+* implement raycastToOutside function
+* add constructor
+* addgetOutsideLineSegments function
+* modify constructor
+* add getIntersection2D function
+* remove debug message
+* add filterByIndex function
+* add merge function
+* fix compile error
+* enable filter by intersection
+* add filterByIntersection function
+* add intersection2D function
+* add getCols/Rows function
+* add transformToWorld function
+* fill with extra cell
+* enable get cell
+* fix logic
+* apply reformat
+* rename topic
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* call attachOccupancyGridSensor function in server
+* fix compile errors
+* generate occupancy grid data
+* add index infomation to the cell class
+* add transform function
+* use const &
+* add generate step
+* update ego_pose_north_up logic
+* fix compile errors
+* fix reorder warnings
+* add add primitive line
+* add getMin and Max function
+* add Grid class
+* add intersection2D function
+* add primitive
+* add generator class
+* add bounding box generation step
+* add occupancy grid sensor class
+* add nav_msgs to the depends
+* attach occupancy grid sensor function to the simulator
+* modify CMakeLists.txt
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Merge branch 'master' into AJD-331-optimization-2nd-stage
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Contributors: Daniel Marczak, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, Yuma Nihei, kyabe2718, taikitanaka3, tanaka3, yamacir-kit
+
 0.6.4 (2022-04-26)
 ------------------
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe

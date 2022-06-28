@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -160,7 +160,7 @@ std::vector<lanelet::ConstLineString3d> stopLinesLanelets(const lanelet::ConstLa
 std::vector<lanelet::ConstLineString3d> stopLinesLanelet(const lanelet::ConstLanelet ll);
 
 /**
- * [stopSignes extracts stoplines that are associated with stopsignes]
+ * [stopSigns extracts stoplines that are associated with stopsigns]
  * @param lanelets     [input lanelets]
  * @param stop_sign_id [sign id of stop sign]
  * @return             [array of stoplines]

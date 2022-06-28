@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,11 +30,14 @@
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <concealer/autoware.hpp>
+#include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
+#include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
+#include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
 namespace concealer
 {
@@ -66,6 +69,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
+  using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
@@ -74,19 +78,29 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
-  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState);
-  CONCEALER_DEFINE_SUBSCRIPTION(GearCommand);
+  CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
+  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
+  CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
-  CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand);
+  CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
 
+  using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
   using Engage = tier4_external_api_msgs::srv::Engage;
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
   using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
 
+  CONCEALER_DEFINE_CLIENT_SIMPLE(CooperateCommands);
   CONCEALER_DEFINE_CLIENT(Engage);
   // TODO CONCEALER_DEFINE_CLIENT(InitializePose);
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
+
+private:  // EXPERIMENTAL RTC SUPPORTS
+  Cooperator current_cooperator = Cooperator::simulator;
+
+  auto approve(const CooperateStatusArray &) -> void;
+
+  auto cooperate(const CooperateStatusArray &) -> void;
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
@@ -122,12 +136,14 @@ public:
     CONCEALER_INIT_PUBLISHER(VelocityReport, "/vehicle/status/velocity_status"),
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
     CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
-    CONCEALER_INIT_CLIENT(Engage, "/api/autoware/set/engage"),
+    CONCEALER_INIT_CLIENT(CooperateCommands, "/api/external/set/rtc_commands"),
+    CONCEALER_INIT_CLIENT(Engage, "/api/external/set/engage"),
     // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
     CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")
   // clang-format on
@@ -166,6 +182,11 @@ public:
   auto restrictTargetSpeed(double) const -> double override;
 
   auto sendSIGINT() -> void override;
+
+  auto setCooperator(const std::string & cooperator) -> void override
+  {
+    current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
+  }
 
   auto setVelocityLimit(double) -> void override;
 

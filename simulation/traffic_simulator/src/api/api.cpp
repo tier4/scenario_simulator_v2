@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -305,6 +305,20 @@ bool API::attachDetectionSensor(const std::string & entity_name)
     entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1, 300, false));
 }
 
+bool API::attachOccupancyGridSensor(
+  const simulation_api_schema::OccupancyGridSensorConfiguration & sensor_configuration)
+{
+  if (configuration.standalone_mode) {
+    return true;
+  } else {
+    simulation_api_schema::AttachOccupancyGridSensorRequest req;
+    simulation_api_schema::AttachOccupancyGridSensorResponse res;
+    *req.mutable_configuration() = sensor_configuration;
+    zeromq_client_.call(req, res);
+    return res.result().success();
+  }
+}
+
 bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
 {
   if (configuration.standalone_mode) {
@@ -361,7 +375,7 @@ bool API::updateEntityStatusInSim()
   simulation_api_schema::UpdateEntityStatusRequest req;
   if (entity_manager_ptr_->getNumberOfEgo() != 0) {
     simulation_interface::toProto(
-      entity_manager_ptr_->getVehicleCommand(entity_manager_ptr_->getEgoName()),
+      asAutoware(entity_manager_ptr_->getEgoName()).getVehicleCommand(),
       *req.mutable_vehicle_command());
     const auto ego_status_before_update =
       entity_manager_ptr_->getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName());
@@ -374,7 +388,7 @@ bool API::updateEntityStatusInSim()
     }
   }
   const auto names = entity_manager_ptr_->getEntityNames();
-  for (const auto name : names) {
+  for (const auto & name : names) {
     auto status = entity_manager_ptr_->getEntityStatus(name);
     if (status) {
       traffic_simulator_msgs::EntityStatus proto;
@@ -385,7 +399,7 @@ bool API::updateEntityStatusInSim()
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
-  for (const auto status : res.status()) {
+  for (const auto & status : res.status()) {
     auto entity_status = entity_manager_ptr_->getEntityStatus(status.name());
     if (!entity_status) {
       continue;

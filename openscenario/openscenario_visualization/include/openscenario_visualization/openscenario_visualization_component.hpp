@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ private:
    * @param msg entity status array message from openscenario interpreter.
    */
   void entityStatusCallback(
-    const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg);
+    const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::ConstSharedPtr msg);
   /**
    * @brief generate delete marker for target namespace.
    * @param ns namespace of the marker which you want to delete.

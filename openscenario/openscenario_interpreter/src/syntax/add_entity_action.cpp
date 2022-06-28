@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
+#include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/teleport_action.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -49,17 +50,19 @@ try {
 
   const auto add_entity = overload(
     [&](const Vehicle & vehicle) {
-      if (applyAddEntityAction(
-            entity_ref,                                                            //
-            static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),  //
-            entity.as<ScenarioObject>().object_controller.isUserDefinedController()
-              ? traffic_simulator::VehicleBehavior::autoware()
-              : traffic_simulator::VehicleBehavior::defaultBehavior())) {
-        TeleportAction::teleport(entity_ref, position);
-        entity.as<ScenarioObject>().object_controller.assign(entity_ref);
-        entity.as<ScenarioObject>().activateSensors();
-        entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
-      }
+      applyAddEntityAction(
+        entity_ref,                                                            //
+        static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),  //
+        entity.as<ScenarioObject>().object_controller.isUserDefinedController()
+          ? traffic_simulator::VehicleBehavior::autoware()
+          : traffic_simulator::VehicleBehavior::defaultBehavior());
+      TeleportAction::teleport(entity_ref, position);
+      AssignControllerAction(entity.as<ScenarioObject>().object_controller)(entity_ref);
+      activatePerformanceAssertion(
+        entity_ref, vehicle.performance,
+        entity.as<ScenarioObject>().object_controller.is<Controller>()
+          ? entity.as<ScenarioObject>().object_controller.as<Controller>().properties
+          : Properties());
     },
     [&](const Pedestrian & pedestrian) {
       applyAddEntityAction(

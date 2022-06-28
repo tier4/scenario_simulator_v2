@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/teleport_action.hpp>
@@ -44,7 +44,7 @@ auto TeleportAction::start() const -> void
 {
   for (const auto & actor : actors) {
     if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
-      AddEntityAction(local(), position)(actor);  // NOTE: Tier IV extension
+      AddEntityAction(local(), position)(actor);  // NOTE: TIER IV extension
     } else {
       return teleport(actor, position);
     }

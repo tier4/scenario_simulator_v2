@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_HPP_
 
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/speed_action_target.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -36,7 +37,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SpeedAction : private Scope
+struct SpeedAction : private Scope,
+                     private SimulatorCore::ActionApplication,
+                     private SimulatorCore::ConditionEvaluation
 {
   const TransitionDynamics speed_action_dynamics;
 

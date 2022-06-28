@@ -24,18 +24,29 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        rosdistro: [galactic]
+        rosdistro: [galactic, humble]
+        include:
+          # Galactic Geochelone (May 2021 - November 2022)
+          - docker_image: rostooling/setup-ros-docker:ubuntu-focal-ros-galactic-ros-base-latest
+            rosdistro: galactic
+          # Humble Hawksbill (May 2022 - May 2027)
+          - docker_image: rostooling/setup-ros-docker:ubuntu-jammy-ros-humble-ros-base-latest
+            rosdistro: humble
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
+    container:
+      image: ${{ matrix.docker_image }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup ROS2 ${{ matrix.rosdistro }} environment
-        uses: ros-tooling/setup-ros@v0.2
-        with:
-          required-ros-distributions: ${{ matrix.rosdistro }}
+      - name: workaround for jammy
+        if: ${{ matrix.rosdistro == 'humble' }}
+        run: |
+          apt remove libunwind-14-dev -y
+          apt install python3-nose -y
+          pip uninstall nose -y
       - name: Search packages in this repository
         id: list_packages
         run: |
@@ -65,7 +76,7 @@ jobs:
       - name: show failure test result
         if: always()
         run : |
-          cd /home/runner/work/scenario_simulator_v2/scenario_simulator_v2/ros_ws
+          cd /__w/scenario_simulator_v2/scenario_simulator_v2/ros_ws
           colcon test-result --verbose
       - name: publish codecov result
         uses: codecov/codecov-action@v1.2.1
@@ -78,7 +89,7 @@ jobs:
       - name: collect test result
         if: always()
         run: |
-          cd /home/runner/work/scenario_simulator_v2/scenario_simulator_v2/ros_ws/build
+          cd /__w/scenario_simulator_v2/scenario_simulator_v2/ros_ws/build
           find -name test_results | xargs -i cp -r -p {} .
       - uses: actions/upload-artifact@v2
         if: always()

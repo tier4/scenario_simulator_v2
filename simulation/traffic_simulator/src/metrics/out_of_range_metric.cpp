@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ void OutOfRangeMetric::setEntityManager(
   if (jerk_topic) {
     jerk_callback_ptr_ = entity_manager_ptr_->createSubscription<JerkMessageType>(
       *jerk_topic, rclcpp::SensorDataQoS(),
-      [this](const JerkMessageType::SharedPtr msg) { linear_jerk_ = msg->data; });
+      [this](const JerkMessageType::ConstSharedPtr msg) { linear_jerk_ = msg->data; });
   }
 }
 

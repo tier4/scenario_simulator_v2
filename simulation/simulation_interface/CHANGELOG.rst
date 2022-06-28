@@ -2,6 +2,34 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.5 (2022-06-16)
+------------------
+* Merge pull request `#813 <https://github.com/tier4/scenario_simulator_v2/issues/813>`_ from tier4/fix/boost_depend
+* use boost
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pull_over_metrics
+* Merge branch 'master' into feature/change_engage_api_name
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* Merge pull request `#797 <https://github.com/tier4/scenario_simulator_v2/issues/797>`_ from tier4/feature/occupancy_grid_sensor
+* Merge pull request `#778 <https://github.com/tier4/scenario_simulator_v2/issues/778>`_ from tier4/feature/zmqpp_vendor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Fix Licence
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* fix problems in server
+* fix compile errors
+* fix reorder warnings
+* add occupancy grid sensor API to the server
+* add client impl
+* update proto
+* modify CMakeLists.txt
+* modify depends
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Contributors: Daniel Marczak, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yuma Nihei, kyabe2718, yamacir-kit
+
 0.6.4 (2022-04-26)
 ------------------
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe

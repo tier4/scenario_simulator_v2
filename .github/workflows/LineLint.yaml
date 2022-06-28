@@ -1,0 +1,12 @@
+name: LineLint
+on: 
+  workflow_dispatch:
+  push:
+
+jobs:
+  linelint:
+    runs-on: ubuntu-latest
+    name: Check if all files end in newline
+    steps:
+      - uses: actions/checkout@v2
+      - uses: fernandrone/linelint@0.0.4

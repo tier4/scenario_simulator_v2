@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ public:
   DEFINE_GETTER_SETTER(PedestrianParameters, "pedestrian_parameters", traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(Request, "request", traffic_simulator::behavior::Request)
   DEFINE_GETTER_SETTER(RouteLanelets, "route_lanelets", std::vector<std::int64_t>)
-  DEFINE_GETTER_SETTER(ReferenceTrajectory, "reference_trajectory", std::shared_ptr<traffic_simulator::math::CatmullRomSpline>)
+  DEFINE_GETTER_SETTER(ReferenceTrajectory, "reference_trajectory", std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(StepTime, "step_time", double)
   DEFINE_GETTER_SETTER(TargetSpeed, "target_speed", boost::optional<double>)
   DEFINE_GETTER_SETTER(LaneChangeParameters, "lane_change_parameters", traffic_simulator::lane_change::Parameter)
