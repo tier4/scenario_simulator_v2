@@ -37,7 +37,7 @@ class BehaviorPluginBase
 public:
   virtual ~BehaviorPluginBase() = default;
   virtual void configure(const rclcpp::Logger & logger) = 0;
-  virtual void update(double step_time) = 0;
+  virtual void update(double current_time, double step_time) = 0;
   virtual const std::string & getCurrentAction() const = 0;
 
   typedef std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> EntityTypeDict;
@@ -50,6 +50,7 @@ public:
   const std::string get##NAME##Key() const { return KEY; };
 
   // clang-format off
+  DEFINE_GETTER_SETTER(CurrentTime, "current_time", double)
   DEFINE_GETTER_SETTER(DebugMarker, "debug_marker", std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DriverModel, "driver_model", traffic_simulator_msgs::msg::DriverModel)
   DEFINE_GETTER_SETTER(EntityStatus, "entity_status", traffic_simulator_msgs::msg::EntityStatus)

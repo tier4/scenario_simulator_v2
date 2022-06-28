@@ -42,16 +42,17 @@ const std::string & PedestrianBehaviorTree::getCurrentAction() const
   return logging_event_ptr_->getCurrentAction();
 }
 
-void PedestrianBehaviorTree::update(double step_time)
+void PedestrianBehaviorTree::update(double current_time, double step_time)
 {
-  tickOnce(step_time);
+  tickOnce(current_time, step_time);
   while (getCurrentAction() == "root") {
-    tickOnce(step_time);
+    tickOnce(current_time, step_time);
   }
 }
 
-BT::NodeStatus PedestrianBehaviorTree::tickOnce(double step_time)
+BT::NodeStatus PedestrianBehaviorTree::tickOnce(double current_time, double step_time)
 {
+  setCurrentTime(current_time);
   setStepTime(step_time);
   return tree_.rootNode()->executeTick();
 }

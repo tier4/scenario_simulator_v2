@@ -38,7 +38,7 @@ class PedestrianBehaviorTree : public BehaviorPluginBase
 {
 public:
   void configure(const rclcpp::Logger & logger) override;
-  void update(double step_time) override;
+  void update(double current_time, double step_time) override;
   const std::string & getCurrentAction() const override;
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \
@@ -48,6 +48,7 @@ public:
   }
 
   // clang-format off
+  DEFINE_GETTER_SETTER(CurrentTime, double)
   DEFINE_GETTER_SETTER(DebugMarker, std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DriverModel, traffic_simulator_msgs::msg::DriverModel)
   DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
@@ -72,7 +73,7 @@ public:
 #undef DEFINE_GETTER_SETTER
 
 private:
-  BT::NodeStatus tickOnce(double step_time);
+  BT::NodeStatus tickOnce(double current_time, double step_time);
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
   std::unique_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;
