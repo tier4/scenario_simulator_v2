@@ -45,6 +45,10 @@ private:
     if (api_.isInLanelet("ego", 34507, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
+    const auto lanelet_pose = api_.getLaneletPose("ego");
+    if (!lanelet_pose || std::abs(lanelet_pose.get().offset) <= 2.8) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
   }
   void onInitialize() override
   {
