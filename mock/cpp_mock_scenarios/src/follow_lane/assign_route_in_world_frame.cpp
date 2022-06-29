@@ -31,8 +31,9 @@ class AcquireRouteInWorldFrame : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit AcquireRouteInWorldFrame(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "idiot_npc", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option)
+      "assign_route_in_world_frame",
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
+      __FILE__, false, option)
   {
     start();
   }
