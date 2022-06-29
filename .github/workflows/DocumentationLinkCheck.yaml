@@ -18,6 +18,6 @@ jobs:
         uses: lycheeverse/lychee-action@v1.5.0
         with:
           fail: true
-          args: "--verbose --no-progress './**/*.md' './**/*.html' --timeout 10"
+          args: "--verbose --no-progress './**/*.md' './**/*.html' --timeout 100"
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
