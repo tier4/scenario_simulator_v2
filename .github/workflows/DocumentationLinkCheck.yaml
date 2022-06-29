@@ -1,16 +1,22 @@
 name: DocumentationLinkCheck
 
 on:
+  repository_dispatch:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 * * *
   pull_request:
 
 jobs:
-  pre-commit-optional:
+  linkChecker:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Run pre-commit
-        uses: autowarefoundation/autoware-github-actions/pre-commit@v1
+      - name: Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@v1.5.0
         with:
-          pre-commit-config: .github/workflows/.pre-commit-config-optional.yaml
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
