@@ -13,4 +13,4 @@ jobs:
       - name: Run pre-commit
         uses: autowarefoundation/autoware-github-actions/pre-commit@v1
         with:
-          pre-commit-config: https://raw.githubusercontent.com/autowarefoundation/autoware.universe/main/.pre-commit-config-optional.yaml
+          pre-commit-config: .github/workflows/.pre-commit-config-optional.yaml
