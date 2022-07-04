@@ -81,6 +81,7 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     rayhit.ray.org_x = origin.position.x;
     rayhit.ray.org_y = origin.position.y;
     rayhit.ray.org_z = origin.position.z;
+    rayhit.ray.mask = -1;
     rayhit.ray.tfar = max_distance;
     rayhit.ray.tnear = min_distance;
     rayhit.ray.flags = false;
