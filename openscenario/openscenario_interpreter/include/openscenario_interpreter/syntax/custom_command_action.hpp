@@ -69,8 +69,6 @@ struct CustomCommandAction : private Scope, private SimulatorCore::ActionApplica
 
   static auto publisher() -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &;
 
-  static auto split(const std::string &) -> std::vector<std::string>;
-
   /*  */ auto start() const -> void;
 
   static auto test(const std::vector<std::string> &, const Scope &) -> int;

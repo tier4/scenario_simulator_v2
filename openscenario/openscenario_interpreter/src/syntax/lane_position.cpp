@@ -30,6 +30,13 @@ LanePosition::LanePosition(const pugi::xml_node & node, Scope & scope)
 {
 }
 
+LanePosition::LanePosition(
+  const String & road_id, const String & lane_id, const Double & offset, const Double & s,
+  const Orientation & orientation)
+: road_id(road_id), lane_id(lane_id), offset(offset), s(s), orientation(orientation)
+{
+}
+
 LanePosition::operator NativeLanePosition() const { return makeNativeLanePosition(*this); }
 
 LanePosition::operator NativeWorldPosition() const
