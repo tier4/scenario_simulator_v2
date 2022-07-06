@@ -141,7 +141,7 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
                  "sensor_model:=" + getParameter<std::string>("sensor_model"),
                  "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + configuration.rviz_config_path.string(),
+                 "rviz_config:=" + getParameter<std::string>("rviz_config", ""),
                  "scenario_simulation:=true", "perception/enable_traffic_light:=false")
              : std::make_unique<concealer::AutowareUniverse>();
   } else {
