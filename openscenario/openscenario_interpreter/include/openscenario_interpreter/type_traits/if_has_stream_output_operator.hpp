@@ -28,7 +28,7 @@ struct IfHasStreamOutputOperator
 {
   static auto invoke(std::ostream & os, const T &) -> std::ostream &
   {
-    return os << "<" << makeTypename(typeid(T).name()) << "/>";
+    return os << "<" << makeTypename(typeid(T)) << "/>";
   }
 };
 
