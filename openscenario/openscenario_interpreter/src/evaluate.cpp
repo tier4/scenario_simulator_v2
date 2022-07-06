@@ -61,6 +61,7 @@ struct Value
 
   auto type_name() const
   {
+    // replace with makeTypename()?
     return boost::core::demangle(visit([](auto v) { return typeid(v).name(); }, data));
   }
 
