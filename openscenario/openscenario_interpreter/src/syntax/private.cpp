@@ -31,6 +31,13 @@ Private::Private(const pugi::xml_node & node, Scope & scope)
   });
 }
 
+auto Private::accomplished() const -> bool
+{
+  return std::all_of(
+    private_actions.begin(), private_actions.end(),
+    [](const PrivateAction & private_action) { return private_action.accomplished(); });
+}
+
 auto Private::endsImmediately() const -> bool
 {
   return std::all_of(
@@ -38,14 +45,44 @@ auto Private::endsImmediately() const -> bool
     [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
 }
 
-auto Private::evaluate() -> Object
+auto Private::run() -> void { runNonInstantaneousActions(); }
+
+auto Private::runInstantaneousActions() -> void
 {
-  assert(endsImmediately());  // NOTE: Called from `InitActions::evaluate`
   for (auto && private_action : private_actions) {
-    private_action.start();
-    private_action.run();
+    if (private_action.endsImmediately()) {
+      private_action.run();
+    }
   }
-  return unspecified;
+}
+
+auto Private::runNonInstantaneousActions() -> void
+{
+  for (auto && private_action : private_actions) {
+    if (not private_action.endsImmediately()) {
+      private_action.run();
+    }
+  }
+}
+
+auto Private::start() -> void { startNonInstantaneousActions(); }
+
+auto Private::startInstantaneousActions() -> void
+{
+  for (auto && private_action : private_actions) {
+    if (private_action.endsImmediately()) {
+      private_action.start();
+    }
+  }
+}
+
+auto Private::startNonInstantaneousActions() -> void
+{
+  for (auto && private_action : private_actions) {
+    if (not private_action.endsImmediately()) {
+      private_action.start();
+    }
+  }
 }
 
 auto operator<<(nlohmann::json & json, const Private & datum) -> nlohmann::json &

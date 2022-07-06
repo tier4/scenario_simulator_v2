@@ -1314,7 +1314,9 @@ const std::vector<std::int64_t> HdMapUtils::getRightOfWayLaneletIds(std::int64_t
   for (const auto & right_of_way : right_of_ways) {
     const auto right_of_Way_lanelets = right_of_way->rightOfWayLanelets();
     for (const auto & ll : right_of_Way_lanelets) {
-      ret.emplace_back(ll.id());
+      if (lanelet_id != ll.id()) {
+        ret.emplace_back(ll.id());
+      }
     }
   }
   return ret;

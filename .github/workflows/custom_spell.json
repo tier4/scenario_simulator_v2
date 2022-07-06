@@ -72,6 +72,7 @@
     "northp",
     "nosetests",
     "rosdoc",
-    "Khanh"
+    "Khanh",
+    "approvable"
   ]
 }

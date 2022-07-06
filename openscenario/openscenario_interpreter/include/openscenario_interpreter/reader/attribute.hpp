@@ -132,7 +132,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
     } catch (const boost::bad_lexical_cast &) {
       throw SyntaxError(
         "Value ", std::quoted(s), " specified for attribute ", std::quoted(name),
-        " is invalid (Is not value of type ", typeid(T).name(), ")");
+        " is invalid (Is not value of type ", makeTypename(typeid(T)), ")");
     }
   };
 

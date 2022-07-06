@@ -27,9 +27,9 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
 {
   std::unordered_map<std::string, std::function<void(const pugi::xml_node & node)>> dispatcher{
     // clang-format off
-    std::make_pair("GlobalAction",      [&](auto && node) { return push_back(make<GlobalAction>     (node, scope)); }),
-    std::make_pair("UserDefinedAction", [&](auto && node) { return push_back(make<UserDefinedAction>(node, scope)); }),
-    std::make_pair("Private",           [&](auto && node) { return push_back(make<Private>          (node, scope)); })
+    std::make_pair("GlobalAction",      [&](auto && node) { return global_actions.push_back(make<GlobalAction>(node, scope)); }),
+    std::make_pair("UserDefinedAction", [&](auto && node) { return user_defined_actions.push_back(make<UserDefinedAction>(node, scope)); }),
+    std::make_pair("Private",           [&](auto && node) { return privates.push_back(make<Private>(node, scope)); })
     // clang-format on
   };
 
@@ -41,60 +41,132 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto InitActions::evaluate() const -> Object
+auto InitActions::accomplished() const -> bool
 {
-  for (auto && each : *this) {
-    each.evaluate();
-  }
+  auto global_actions_accomplished = std::all_of(
+    global_actions.begin(), global_actions.end(),
+    [=](const Object & e) { return e.as<GlobalAction>().accomplished(); });
+  auto user_defined_actions_accomplished = std::all_of(
+    user_defined_actions.begin(), user_defined_actions.end(),
+    [=](const Object & e) { return e.as<UserDefinedAction>().accomplished(); });
+  auto privates_accomplished = std::all_of(privates.begin(), privates.end(), [=](const Object & e) {
+    return e.as<Private>().accomplished();
+  });
 
-  return unspecified;
+  return global_actions_accomplished and user_defined_actions_accomplished and
+         privates_accomplished;
 }
+
+// this function should be called by StoryboardElement
+auto InitActions::run() -> void { runNonInstantaneousActions(); }
 
 auto InitActions::endsImmediately() const -> bool
 {
-  return std::all_of(begin(), end(), [=](const Object & e) {
-    if (e.is<GlobalAction>()) {
-      return e.as<GlobalAction>().endsImmediately();
-    } else if (e.is<UserDefinedAction>()) {
-      return e.as<UserDefinedAction>().endsImmediately();
-    } else if (e.is<Private>()) {
-      return e.as<Private>().endsImmediately();
-    } else {
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(e.type().name());
+  auto global_ends_immediately = std::all_of(
+    global_actions.begin(), global_actions.end(),
+    [=](const Object & e) { return e.as<GlobalAction>().endsImmediately(); });
+  // In this class, there are some implementations that assume all global actions are instantaneous actions.
+  assert(global_ends_immediately);
+  auto user_defined_actions_ends_immediately = std::all_of(
+    user_defined_actions.begin(), user_defined_actions.end(),
+    [=](const Object & e) { return e.as<UserDefinedAction>().endsImmediately(); });
+  auto private_actions_ends_immediately = std::all_of(
+    privates.begin(), privates.end(),
+    [=](const Object & e) { return e.as<Private>().endsImmediately(); });
+
+  return global_ends_immediately or user_defined_actions_ends_immediately or
+         private_actions_ends_immediately;
+}
+
+// this function should be called by StoryboardElement
+auto InitActions::start() -> void { startNonInstantaneousActions(); }
+
+// this function should be called before simulation time starts
+auto InitActions::startInstantaneousActions() -> void
+{
+  for (auto && e : global_actions) {
+    e.as<GlobalAction>().start();
+  }
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (user_defined_action.endsImmediately()) {
+      user_defined_action.start();
     }
-  });
+  }
+  for (auto && e : privates) {
+    e.as<Private>().startInstantaneousActions();
+  }
+}
+
+auto InitActions::startNonInstantaneousActions() -> void
+{
+  // we don't call global actions here, because they are all instantaneous actions
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (not user_defined_action.endsImmediately()) {
+      user_defined_action.start();
+    }
+  }
+  for (auto && e : privates) {
+    e.as<Private>().startNonInstantaneousActions();
+  }
+}
+
+// this function should be called before simulation time starts and after executing startInstantaneousActions()
+auto InitActions::runInstantaneousActions() -> void
+{
+  for (auto && e : global_actions) {
+    e.as<GlobalAction>().run();
+  }
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (user_defined_action.endsImmediately()) {
+      user_defined_action.run();
+    }
+  }
+  for (auto && e : privates) {
+    e.as<Private>().runInstantaneousActions();
+  }
+}
+
+auto InitActions::runNonInstantaneousActions() -> void
+{
+  // we don't call global actions here, because they are all instantaneous actions
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (not user_defined_action.endsImmediately()) {
+      user_defined_action.run();
+    }
+  }
+  for (auto && e : privates) {
+    e.as<Private>().runNonInstantaneousActions();
+  }
 }
 
 auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nlohmann::json &
 {
   json["GlobalAction"] = nlohmann::json::array();
 
-  for (const auto & init_action : init_actions) {
-    if (init_action.is<GlobalAction>()) {
-      nlohmann::json action;
-      action["type"] = makeTypename(init_action.as<GlobalAction>().type());
-      json["GlobalAction"].push_back(action);
-    }
+  for (const auto & init_action : init_actions.global_actions) {
+    nlohmann::json action;
+    action["type"] = makeTypename(init_action.as<GlobalAction>().type());
+    json["GlobalAction"].push_back(action);
   }
 
   json["UserDefinedAction"] = nlohmann::json::array();
 
-  for (const auto & init_action : init_actions) {
-    if (init_action.is<UserDefinedAction>()) {
-      nlohmann::json action;
-      action["type"] = makeTypename(init_action.as<UserDefinedAction>().type());
-      json["UserDefinedAction"].push_back(action);
-    }
+  for (const auto & init_action : init_actions.user_defined_actions) {
+    nlohmann::json action;
+    action["type"] = makeTypename(init_action.as<UserDefinedAction>().type());
+    json["UserDefinedAction"].push_back(action);
   }
 
   json["Private"] = nlohmann::json::array();
 
-  for (const auto & init_action : init_actions) {
-    if (init_action.is<Private>()) {
-      nlohmann::json action;
-      action << init_action.as<Private>();
-      json["Private"].push_back(action);
-    }
+  for (const auto & init_action : init_actions.privates) {
+    nlohmann::json action;
+    action << init_action.as<Private>();
+    json["Private"].push_back(action);
   }
 
   return json;
