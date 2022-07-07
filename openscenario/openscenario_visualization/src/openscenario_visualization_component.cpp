@@ -376,6 +376,12 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
                        "\ns:" + std::to_string(status.lanelet_pose.s) +
                        "\noffset:" + std::to_string(status.lanelet_pose.offset);
   }
+  const auto & velocity = status.action_status.twist.linear;
+  double speed =
+    std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z) * 3600. /
+    1000.;
+  text_action.text += "\n" + std::to_string(speed) + "km/h";
+
   text_action.color = color_names::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text_action);
 
