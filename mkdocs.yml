@@ -60,6 +60,7 @@ nav:
       - Cpp scenario demo : user_guide/SimpleDemo.md
       - Run on Docker : user_guide/RunWithDocker.md
       - Run test scenario on Docker : user_guide/RunTestScenarioWithDocker.md
+      - Scenario Writing Tips : user_guide/ScenarioTips.md
       - Scenario Editor:
           - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
           - user_guide/scenario_editor/CreateSimpleScenario.md
