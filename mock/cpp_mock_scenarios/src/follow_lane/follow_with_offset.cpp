@@ -26,40 +26,37 @@
 #include <string>
 #include <vector>
 
-class CancelRequest : public cpp_mock_scenarios::CppScenarioNode
+class FollowLaneWithOffset : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit CancelRequest(const rclcpp::NodeOptions & option)
+  explicit FollowLaneWithOffset(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "cancel_request", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option)
+      "follow_lane_with_offset",
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
+      __FILE__, false, option)
   {
     start();
   }
 
 private:
-  bool canceled = false;
+  bool requested = false;
   void onUpdate() override
   {
-    if (api_.reachPosition(
-          "ego", traffic_simulator::helper::constructLaneletPose(34513, 30, 0, 0, 0, 0), 3.0)) {
-      api_.cancelRequest("ego");
-      canceled = true;
-    }
     if (api_.isInLanelet("ego", 34507, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
+    }
+    const auto lanelet_pose = api_.getLaneletPose("ego");
+    if (!lanelet_pose || std::abs(lanelet_pose.get().offset) <= 2.8) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
   void onInitialize() override
   {
     api_.spawn("ego", getVehicleParameters());
     api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
-      traffic_simulator::helper::constructActionStatus(7));
-    api_.requestSpeedChange("ego", 7, true);
-    const geometry_msgs::msg::Pose goal_pose =
-      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 0, 0, 0, 0, 0));
-    api_.requestAcquirePosition("ego", goal_pose);
+      "ego", traffic_simulator::helper::constructLaneletPose(34513, 0, 3, 0, 0, 0),
+      traffic_simulator::helper::constructActionStatus(10));
+    api_.requestSpeedChange("ego", 10, true);
   }
 };
 
@@ -67,7 +64,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<CancelRequest>(options);
+  auto component = std::make_shared<FollowLaneWithOffset>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
