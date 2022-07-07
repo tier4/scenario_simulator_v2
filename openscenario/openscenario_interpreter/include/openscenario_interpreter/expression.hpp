@@ -27,7 +27,7 @@ struct Expression  // NOTE: Member functions are lexicographically sorted.
 
   virtual auto evaluate(const Pointer<Expression> &) -> Pointer<Expression>
   {
-    throw SemanticError("No viable evaluation for class ", type().name());
+    throw SemanticError("No viable evaluation for class ", makeTypename(type()));
   }
 
   virtual auto type() const noexcept -> const std::type_info & { return typeid(Expression); }

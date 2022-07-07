@@ -196,6 +196,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getDriverModel);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
+  FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);

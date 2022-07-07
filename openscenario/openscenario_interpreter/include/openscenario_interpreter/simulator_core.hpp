@@ -332,7 +332,7 @@ public:
     }
   };
 
-  class NonStandardOperation
+  class NonStandardOperation : private CoordinateSystemConversion
   {
   protected:
     template <typename Performance, typename Properties>
@@ -365,6 +365,18 @@ public:
     static auto evaluateCurrentState(Ts &&... xs) -> decltype(auto)
     {
       return core->getCurrentAction(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename OSCLanePosition>
+    static auto evaluateRelativeHeading(
+      const String & entity_ref, const OSCLanePosition & osc_lane_position)
+    {
+      NativeRelativeWorldPosition position =
+        core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position));
+
+      const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(position.orientation);
+
+      return std::abs(rpy.z);
     }
   };
 };

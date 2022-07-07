@@ -42,9 +42,21 @@ struct Private : public Scope
 
   explicit Private(const pugi::xml_node &, Scope &);
 
+  auto accomplished() const -> bool;
+
   auto endsImmediately() const -> bool;
 
-  auto evaluate() -> Object;
+  auto run() -> void;
+
+  auto runInstantaneousActions() -> void;
+
+  auto runNonInstantaneousActions() -> void;
+
+  auto start() -> void;
+
+  auto startInstantaneousActions() -> void;
+
+  auto startNonInstantaneousActions() -> void;
 };
 
 auto operator<<(nlohmann::json &, const Private &) -> nlohmann::json &;

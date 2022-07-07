@@ -110,7 +110,7 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
       ret.emplace_back(p);
       s = s - resolution;
     }
-    auto p = getPoint(end_s);
+    auto p = getPoint(end_s, offset);
     ret.emplace_back(p);
     return ret;
   } else {
@@ -122,7 +122,7 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
       ret.emplace_back(p);
       s = s + resolution;
     }
-    auto p = getPoint(end_s);
+    auto p = getPoint(end_s, offset);
     ret.emplace_back(p);
     return ret;
   }

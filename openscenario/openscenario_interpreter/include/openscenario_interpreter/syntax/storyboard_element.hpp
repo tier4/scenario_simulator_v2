@@ -147,7 +147,7 @@ protected:
     } else {
       throw SyntaxError(
         "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
-        typeid(U).name(), ")");
+        makeTypename(typeid(U)), ")");
     }
   }
 
@@ -160,7 +160,7 @@ protected:
     if (not unique(name)) {
       throw SyntaxError(
         "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
-        typeid(U).name(), ")");
+        makeTypename(typeid(U)), ")");
     }
 
     inner_scope.insert(name, element);
