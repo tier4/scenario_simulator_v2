@@ -132,6 +132,12 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
   const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
   if (architecture_type == "awf/universe") {
+    // import rviz_config if the parameter is set in launch file
+    auto rviz_config = getParameter<std::string>("rviz_config", "");
+    if (rviz_config != "") {
+      configuration.rviz_config_path = rviz_config;
+    }
+    "rviz_config:=" + getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
                  getParameter<std::string>("autoware_launch_package"),
@@ -141,7 +147,7 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
                  "sensor_model:=" + getParameter<std::string>("sensor_model"),
                  "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + getParameter<std::string>("rviz_config", ""),
+                 "rviz_config:=" + configuration.rviz_config_path.string(),
                  "scenario_simulation:=true", "perception/enable_traffic_light:=false")
              : std::make_unique<concealer::AutowareUniverse>();
   } else {

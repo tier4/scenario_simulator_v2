@@ -68,7 +68,7 @@ def launch_setup(context, *args, **kwargs):
     output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
     port                    = LaunchConfiguration("port",                    default=8080)
     record                  = LaunchConfiguration("record",                  default=True)
-    rviz_config             = LaunchConfiguration("rviz_config",             default=Path(get_package_share_directory("traffic_simulator"), "config/scenario_simulator_v2.rviz"))
+    rviz_config             = LaunchConfiguration("rviz_config",             default="")
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
     sigterm_timeout         = LaunchConfiguration("sigterm_timeout",         default=8)
@@ -188,7 +188,7 @@ def launch_setup(context, *args, **kwargs):
             condition=IfCondition(launch_rviz),
             arguments=[
                 "-d",
-                rviz_config,
+                Path(get_package_share_directory("traffic_simulator"), "config/scenario_simulator_v2.rviz"),
             ],
         ),
     ]

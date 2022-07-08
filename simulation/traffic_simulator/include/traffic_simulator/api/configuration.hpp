@@ -65,7 +65,9 @@ struct Configuration
 
   Pathname metrics_log_path = "/tmp/metrics.json";
 
-  Pathname rviz_config_path = "";
+  Pathname rviz_config_path =  //
+    ament_index_cpp::get_package_share_directory("traffic_simulator") +
+    "/config/scenario_simulator_v2.rviz";
 
   explicit Configuration(const Pathname & map_path)  //
   : map_path(assertMapPath(map_path)),
