@@ -161,6 +161,14 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     UserDefinedValueCondition:
+                                      name: RelativeHeadingCondition(ego, 34507, 50)
+                                      rule: lessThan
+                                      value: 0.1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
                                       name: ego.currentState
                                       rule: equalTo
                                       value: ARRIVED_GOAL

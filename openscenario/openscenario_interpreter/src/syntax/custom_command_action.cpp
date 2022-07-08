@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
+#include <openscenario_interpreter/regex/function_call_expression.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <unordered_map>
@@ -104,19 +105,6 @@ auto CustomCommandAction::publisher()
 
 auto CustomCommandAction::run() noexcept -> void {}
 
-auto CustomCommandAction::split(const std::string & s) -> std::vector<std::string>
-{
-  static const std::regex pattern{R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"};
-
-  std::vector<std::string> args{};
-
-  for (std::sregex_iterator iter{std::begin(s), std::end(s), pattern}, end; iter != end; ++iter) {
-    args.emplace_back((*iter)[1]);
-  }
-
-  return args;
-}
-
 auto CustomCommandAction::start() const -> void
 {
   auto apply_walk_straight_action =
@@ -144,25 +132,14 @@ auto CustomCommandAction::start() const -> void
       std::make_pair("test", test),
     };
 
-  /* ---- NOTE ---------------------------------------------------------------
-   *
-   *  <CustomCommandAction type="function(foo, &quot;hello, world!&quot;, 3.14)"/>
-   *
-   *    result[0] = function(foo, "hello, world!", 3.14)
-   *    result[1] = function
-   *    result[2] =         (foo, "hello, world!", 3.14)
-   *    result[3] =          foo, "hello, world!", 3.14
-   *
-   * ---------------------------------------------------------------------- */
-  static const std::regex pattern{R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)"};
-
   std::smatch result{};
 
   if (type == ":") {
     return;
   } else if (
-    std::regex_match(type, result, pattern) and commands.find(result[1]) != std::end(commands)) {
-    commands.at(result[1])(split(result[3]), local());
+    std::regex_match(type, result, FunctionCallExpression::pattern()) and
+    commands.find(result[1]) != std::end(commands)) {
+    commands.at(result[1])(FunctionCallExpression::splitParameters(result[3]), local());
   } else {
     fork_exec(type, content);
   }
