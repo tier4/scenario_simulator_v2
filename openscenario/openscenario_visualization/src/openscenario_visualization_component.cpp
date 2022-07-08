@@ -123,7 +123,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints,
   const traffic_simulator_msgs::msg::Obstacle & obstacle, bool obstacle_find)
 {
-  constexpr auto DEFAULT_QUATERNION = rosidl_runtime_cpp::MessageInitialization::DEFAULTS_ONLY;
+  constexpr auto default_quaternion = rosidl_runtime_cpp::MessageInitialization::DEFAULTS_ONLY;
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
   std_msgs::msg::ColorRGBA color;
@@ -169,7 +169,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
         goal_pose_text_marker.pose.position.x = goal_pose[i].position.x;
         goal_pose_text_marker.pose.position.y = goal_pose[i].position.y;
         goal_pose_text_marker.pose.position.z = goal_pose[i].position.z + 1.0;
-        goal_pose_text_marker.pose.orientation = geometry_msgs::msg::Quaternion(DEFAULT_QUATERNION);
+        goal_pose_text_marker.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
         goal_pose_text_marker.type = goal_pose_text_marker.TEXT_VIEW_FACING;
         goal_pose_text_marker.scale.x = 0.0;
         goal_pose_text_marker.scale.y = 0.0;
@@ -211,7 +211,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   bbox.ns = status.name;
   bbox.id = 0;
   bbox.action = bbox.ADD;
-  bbox.pose.orientation = geometry_msgs::msg::Quaternion(DEFAULT_QUATERNION);
+  bbox.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
   bbox.type = bbox.LINE_LIST;
   bbox.lifetime = rclcpp::Duration::from_seconds(0.1);
   geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
@@ -312,7 +312,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.pose.position.y = status.bounding_box.center.y;
   text.pose.position.z =
     status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5 + 1.0;
-  text.pose.orientation = geometry_msgs::msg::Quaternion(DEFAULT_QUATERNION);
+  text.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
   text.type = text.TEXT_VIEW_FACING;
   text.scale.x = 0.0;
   text.scale.y = 0.0;
@@ -348,7 +348,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   pr.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
   arrow.points = {pf, pl, pr};
   arrow.colors = {color};
-  arrow.pose.orientation = geometry_msgs::msg::Quaternion(DEFAULT_QUATERNION);
+  arrow.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
   arrow.type = arrow.TRIANGLE_LIST;
   arrow.scale.x = 1.0;
   arrow.scale.y = 1.0;
@@ -364,7 +364,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.id = 3;
   text_action.action = text_action.ADD;
   text_action.pose.position = status.bounding_box.center;
-  text_action.pose.orientation = geometry_msgs::msg::Quaternion(DEFAULT_QUATERNION);
+  text_action.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
   text_action.type = text_action.TEXT_VIEW_FACING;
   text_action.scale.x = 0.0;
   text_action.scale.y = 0.0;
