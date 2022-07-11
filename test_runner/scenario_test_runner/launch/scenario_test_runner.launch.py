@@ -188,7 +188,10 @@ def launch_setup(context, *args, **kwargs):
             condition=IfCondition(launch_rviz),
             arguments=[
                 "-d",
-                Path(get_package_share_directory("traffic_simulator"), "config/scenario_simulator_v2.rviz"),
+                str(
+                    Path(get_package_share_directory("traffic_simulator"))
+                    / "config/scenario_simulator_v2.rviz"
+                ),
             ],
         ),
     ]
