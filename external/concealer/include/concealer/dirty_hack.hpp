@@ -57,7 +57,7 @@ private:                                                              \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;       \
                                                                       \
 public:                                                               \
-  auto get##TYPE() const->const TYPE & __VA_ARGS__                    \
+  auto get##TYPE() const-> TYPE __VA_ARGS__                           \
   {                                                                   \
     return *std::atomic_load(&current_value_of_##TYPE);               \
   }                                                                   \
