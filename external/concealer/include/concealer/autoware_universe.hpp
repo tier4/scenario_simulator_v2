@@ -76,17 +76,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
   CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
-
-private:
-  PathWithLaneId::SharedPtr current_value_of_PathWithLaneId = std::make_shared<PathWithLaneId>();
-  rclcpp::Subscription<PathWithLaneId>::SharedPtr subscription_of_PathWithLaneId;
-
-public:
-  auto getPathWithLaneId() const -> PathWithLaneId
-  {
-      return *std::atomic_load(&current_value_of_PathWithLaneId);
-  }
-
+  CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
   CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
 
@@ -134,13 +124,7 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
     CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
-    subscription_of_PathWithLaneId(static_cast<Autoware &>(*this).template create_subscription<PathWithLaneId>(
-            "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", 1,
-            [this](const PathWithLaneId::ConstSharedPtr message) {
-                std::atomic_store(&current_value_of_PathWithLaneId, std::move(std::make_shared<PathWithLaneId>(*message)));
-            }
-            )
-    ),
+    CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
     CONCEALER_INIT_CLIENT(Engage, "/api/external/set/engage"),
