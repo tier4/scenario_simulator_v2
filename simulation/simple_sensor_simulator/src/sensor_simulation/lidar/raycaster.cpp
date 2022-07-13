@@ -77,10 +77,12 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   RTCIntersectContext context;
   rtcInitIntersectContext(&context);
   for (const auto & direction : directions) {
-    RTCRayHit rayhit;
+    RTCRayHit rayhit = {};
     rayhit.ray.org_x = origin.position.x;
     rayhit.ray.org_y = origin.position.y;
     rayhit.ray.org_z = origin.position.z;
+    // make raycast interact with all objects
+    rayhit.ray.mask = 0b11111111'11111111'11111111'11111111;
     rayhit.ray.tfar = max_distance;
     rayhit.ray.tnear = min_distance;
     rayhit.ray.flags = false;
