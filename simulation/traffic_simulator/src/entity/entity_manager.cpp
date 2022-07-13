@@ -640,10 +640,9 @@ void EntityManager::update(const double current_time, const double step_time)
   if (getNumberOfEgo() >= 2) {
     THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
   }
-  if (!npc_logic_started_) {
-    return;
+  if (npc_logic_started_) {
+    traffic_light_manager_ptr_->update(step_time_);
   }
-  traffic_light_manager_ptr_->update(step_time_);
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
