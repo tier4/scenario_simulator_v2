@@ -14,7 +14,7 @@ on:
 jobs:
   generate:
     name: Generate Documentation
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2-beta
       - uses: docker-practice/actions-setup-docker@master
