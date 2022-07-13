@@ -79,3 +79,19 @@ Event:
           CustomCommandAction:
             type: exitFailure
 ```
+
+## Use custom topic content in scenario
+In `UserDefinedValueCondition`, you can treat ros2 topic content by writing the name of topic in the name field.  
+Caution: this function supports `openscenario_msgs::msg::ParameterDeclaration` type only  
+The example below is using the value from `/count_up` topic.
+```yaml
+Condition:
+- name: ''
+  delay: 0
+  conditionEdge: none
+  ByValueCondition:
+    UserDefinedValueCondition:
+      name: /count_up
+      value: 500
+      rule: greaterThan
+```
