@@ -128,6 +128,8 @@ unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
   for (size_t i = 0; i < triangles_.size(); i++) {
     triangles[i] = triangles_[i];
   }
+  // enable raycasting
+  rtcSetGeometryMask(mesh, 0b11111111'11111111'11111111'11111111);
   rtcCommitGeometry(mesh);
   unsigned int geometry_id = rtcAttachGeometry(scene, mesh);
   rtcReleaseGeometry(mesh);
