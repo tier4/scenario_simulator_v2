@@ -26,5 +26,56 @@ Action:
               value: 1
 ```
 
+
 ![](../image/lane_change.gif)
 
+
+## Exit with Success when Autoware reaches the target
+
+When the state of Autoware becomes `ARRIVED_GOAL`, execute `exitSuccess` of `CustomCommandAction`.  
+If you have set multiple destinations, it is a good idea to use `DistanceCondition` to check if the Autoware have arrived at the correct destination.
+```yaml
+Event:
+  - name: ''
+    priority: parallel
+    StartTrigger:
+      ConditionGroup:
+        - Condition:
+            - name: ''
+              delay: 0
+              conditionEdge: none
+              ByValueCondition:
+                UserDefinedValueCondition:
+                  name: ego.currentState
+                  rule: equalTo
+                  value: ARRIVED_GOAL
+    Action:
+      - name: ''
+        UserDefinedAction:
+          CustomCommandAction:
+            type: exitSuccess
+```
+
+## Exit with failure when scenario has timed out
+It's important to have a timeout in case the scenario or Autoware doesn't work as intended.  
+The example below is written to time out after 3 minutes(180 seconds).
+```yaml
+Event:
+  - name: ''
+    priority: parallel
+    StartTrigger:
+      ConditionGroup:
+        - Condition:
+            - name: ''
+              delay: 0
+              conditionEdge: none
+              ByValueCondition:
+                SimulationTimeCondition:
+                  value: 180
+                  rule: greaterThan
+    Action:
+      - name: ''
+        UserDefinedAction:
+          CustomCommandAction:
+            type: exitFailure
+```
