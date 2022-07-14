@@ -38,57 +38,45 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-namespace lanelet
-{
-namespace matching
-{
-using Pose2d = Eigen::Transform<double, 2, Eigen::Isometry, Eigen::DontAlign>;  //!< a 2d pose
-using PositionCovariance2d =
-  Eigen::Matrix<double, 2, 2, Eigen::DontAlign>;  //!< a covariance of a 2d position
-using Hull2d = BasicPolygon2d;                    //!< a hull of 2d-points, as
-                                                  //! objects are usually closed rings,
-                                                  //! closing the ring by
-                                                  //! appending the first point
-                                                  //! of the polygon as last
-                                                  //! point again is suggested
+namespace lanelet {
+namespace matching {
 
-struct Object2d
-{
+using Pose2d = Eigen::Transform<double, 2, Eigen::Isometry, Eigen::DontAlign>;  //!< a 2d pose
+using PositionCovariance2d = Eigen::Matrix<double, 2, 2, Eigen::DontAlign>;     //!< a covariance of a 2d position
+using Hull2d = BasicPolygon2d;                                                  //!< a hull of 2d-points, as
+                                                                                //! objects are usually closed rings,
+                                                                                //! closing the ring by
+                                                                                //! appending the first point
+                                                                                //! of the polygon as last
+                                                                                //! point again is suggested
+
+struct Object2d {
   Id objectId{InvalId};             //!< Id as convenience for the user, not used by this library
   Pose2d pose{Pose2d::Identity()};  //!< Pose of the object in map coordinates
-  Hull2d
-    absoluteHull;  //!< Hull of the object in map coordinates, position is used for matching when hull is empty
+  Hull2d absoluteHull;  //!< Hull of the object in map coordinates, position is used for matching when hull is empty
 };
 
-struct ObjectWithCovariance2d : Object2d
-{
+struct ObjectWithCovariance2d : Object2d {
   PositionCovariance2d positionCovariance{PositionCovariance2d::Zero()};
-  double vonMisesKappa{
-    0.};  //!< kappa as defined in https://en.wikipedia.org/wiki/Von_Mises_distribution
+  double vonMisesKappa{0.};  //!< kappa as defined in https://en.wikipedia.org/wiki/Von_Mises_distribution
 };
 
-struct LaneletMatch
-{
+struct LaneletMatch {
   Lanelet lanelet;
   double distance{0.};  //!< euclidean distance to lanelet
 };
 
-struct ConstLaneletMatch
-{
+struct ConstLaneletMatch {
   ConstLanelet lanelet;
   double distance{0.};  //!< euclidean distance to lanelet
 };
 
-struct LaneletMatchProbabilistic : LaneletMatch
-{
-  double mahalanobisDistSq{
-    0.};  //!< squared Mahalanobis distance to closest point on centerline of lanelet
+struct LaneletMatchProbabilistic : LaneletMatch {
+  double mahalanobisDistSq{0.};  //!< squared Mahalanobis distance to closest point on centerline of lanelet
 };
 
-struct ConstLaneletMatchProbabilistic : ConstLaneletMatch
-{
-  double mahalanobisDistSq{
-    0.};  //!< squared Mahalanobis distance to closest point on centerline of lanelet
+struct ConstLaneletMatchProbabilistic : ConstLaneletMatch {
+  double mahalanobisDistSq{0.};  //!< squared Mahalanobis distance to closest point on centerline of lanelet
 };
 
 }  // namespace matching
