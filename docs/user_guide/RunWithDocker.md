@@ -147,55 +147,24 @@ You can see the same result with NVIDIA GPU.
 </details>
 
 
-[//]: # (## Build docker image locally &#40;optional&#41;)
-
-[//]: # ()
-[//]: # (If you want to build a docker image in your local machine, please execute the commands below in your terminal.)
-
-[//]: # ()
-[//]: # (```bash)
-
-[//]: # (cd &#40;path_to_scenario_simulator_v2&#41;)
-
-[//]: # (docker build -t scenario_simulator_v2 . --build-arg ROS_DISTRO=galactic)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (## Running Simulation with docker.)
-
-[//]: # ()
-[//]: # (### Running with docker image in your machine.)
-
-[//]: # ()
-[//]: # (Please execute this commands and run [simple demo]&#40;deprected/SimpleDemo.md&#41; in your local terminal.)
-
-[//]: # ()
-[//]: # (If your local machine has NVIDIA GPU&#40;s&#41;,)
-
-[//]: # ()
-[//]: # (```bash)
-
-[//]: # (rocker --nvidia --x11 scenario_simulator_v2 ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60.0)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (If your local machine does not have NVIDIA GPU&#40;s&#41;,)
-
-[//]: # ()
-[//]: # (```bash)
-
-[//]: # (rocker --x11 scenario_simulator_v2 ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60.0)
-
-[//]: # (```)
-
-### Run sample scenario with Docker
+## Run sample scenario with Docker
 You can run the sample scenarios easily by using our pre-built docker image.
 
 [//]: # (We automatically build docker images of scenario_simulator_v2 by using GitHub Actions and put them into our Docker Hub repository.)
 
 [![dockeri.co](https://dockeri.co/image/tier4/scenario_simulator_v2)](https://hub.docker.com/r/tier4/scenario_simulator_v2)
+
+<details>
+<summary>Optional : Build docker image locally</summary>
+If you want to build a docker image in your local machine, please execute the commands below in your terminal.
+```bash
+cd path/to/scenario_simulator_v2
+docker build -t scenario_simulator_v2 . --build-arg ROS_DISTRO=galactic
+```
+Please replace the docker image name (e.g. "tier4/scenario_simulator_v2:galactic" ) with "scenario_simulator_v2" <br/>
+to use your built docker image in the launching commands. 
+
+</details>
 
 If your local machine has NVIDIA GPU(s), you can launch scenario_simulator_v2 with test scenarios
     ```bash
@@ -220,9 +189,9 @@ If your local machine does NOT have NVIDIA GPU(s), you can launch scenario_simul
 </video>
 
 
-### Run your custom scenario with Docker
+## Run your custom scenario with Docker
 
-#### Preparation 
+### Preparation 
 Please check `isEgo` value is set to `false` before running this script.<br/>
 For example, like below.
 
@@ -235,7 +204,8 @@ ObjectController:
         - { name: isEgo, value: 'false' }
 ```
 
-Replace `$PWD/path/to/your/scenario.yaml` in two places with your custom scenario and execute the command below
+Replace `$PWD/path/to/your/scenario.yaml` in two places with your custom scenario, <br/>
+and execute the command below
 
 ```
 rocker --x11 --oyr-mount $PWD/path/to/your/scenario.yaml \
