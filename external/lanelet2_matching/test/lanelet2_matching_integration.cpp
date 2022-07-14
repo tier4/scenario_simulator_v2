@@ -38,11 +38,13 @@
 
 using namespace lanelet;
 
-namespace {
+namespace
+{
 template <typename MatchVectorT>
-std::string toString(const MatchVectorT& matchVector) {
+std::string toString(const MatchVectorT & matchVector)
+{
   std::string out;
-  for (auto& match : matchVector) {
+  for (auto & match : matchVector) {
     out += std::to_string(match.lanelet.id());
     if (match.lanelet.inverted()) {
       out += "inv";
@@ -52,26 +54,31 @@ std::string toString(const MatchVectorT& matchVector) {
   return out;
 }
 
-inline BasicPolygon2d absoluteHull(const BasicPolygon2d& relativeHull, const matching::Pose2d& pose) {
+inline BasicPolygon2d absoluteHull(
+  const BasicPolygon2d & relativeHull, const matching::Pose2d & pose)
+{
   BasicPolygon2d hullPoints;
   hullPoints.reserve(relativeHull.size());
-  for (const auto& hullPt : relativeHull) {
+  for (const auto & hullPt : relativeHull) {
     hullPoints.push_back(pose * hullPt);
   }
   return hullPoints;
 }
 }  // namespace
 
-class MatchingIntegrationTest : public ::testing::Test {
- public:
-  MatchingIntegrationTest() {
+class MatchingIntegrationTest : public ::testing::Test
+{
+public:
+  MatchingIntegrationTest()
+  {
     map = load(exampleMapPath, projector);
 
     obj.pose.translation() = map->pointLayer.get(41656).basicPoint2d();
     obj.pose.linear() = Eigen::Rotation2D<double>(150. / 180. * M_PI).matrix();
     obj.absoluteHull = absoluteHull(
-        matching::Hull2d{BasicPoint2d{-1, -0.9}, BasicPoint2d{2, -0.9}, BasicPoint2d{2, 0.9}, BasicPoint2d{1, 0.9}},
-        obj.pose);
+      matching::Hull2d{
+        BasicPoint2d{-1, -0.9}, BasicPoint2d{2, -0.9}, BasicPoint2d{2, 0.9}, BasicPoint2d{1, 0.9}},
+      obj.pose);
     obj.positionCovariance = matching::PositionCovariance2d::Identity() * 2.;
     obj.vonMisesKappa = 1. / (10. / 180. * M_PI);  // covariance of 10 degrees
   }
@@ -81,17 +88,19 @@ class MatchingIntegrationTest : public ::testing::Test {
   LaneletMapPtr map;
 };
 
-TEST_F(MatchingIntegrationTest, fixtureSetupSuccessful) {  // NOLINT
+TEST_F(MatchingIntegrationTest, fixtureSetupSuccessful)
+{  // NOLINT
   EXPECT_TRUE(map->laneletLayer.exists(42440));
 }
 
-TEST_F(MatchingIntegrationTest, deterministicNonConst) {  // NOLINT
+TEST_F(MatchingIntegrationTest, deterministicNonConst)
+{  // NOLINT
   using namespace lanelet::matching;
   auto matches = getDeterministicMatches(*map, obj, 4.);
   for (size_t i = 1; i < matches.size(); i++) {
     EXPECT_TRUE(matches.at(i).distance >= matches.at(i - 1).distance)
-        << "Not sorted: at i=" << i - 1 << " dist = " << matches.at(i - 1).distance << "at i=" << i
-        << " dist = " << matches.at(i).distance;
+      << "Not sorted: at i=" << i - 1 << " dist = " << matches.at(i - 1).distance << "at i=" << i
+      << " dist = " << matches.at(i).distance;
   }
   EXPECT_EQ(14ul, matches.size());
   EXPECT_NEAR(0.69, matches.at(8).distance, 0.1);
@@ -100,19 +109,22 @@ TEST_F(MatchingIntegrationTest, deterministicNonConst) {  // NOLINT
   EXPECT_EQ(45330, matches.at(9).lanelet.id());
 }
 
-TEST_F(MatchingIntegrationTest, deterministicConst) {  // NOLINT
+TEST_F(MatchingIntegrationTest, deterministicConst)
+{  // NOLINT
   using namespace lanelet::matching;
-  const LaneletMap& constMap = *map;
+  const LaneletMap & constMap = *map;
   auto matches = getDeterministicMatches(constMap, obj, 4.);
   EXPECT_EQ(14ul, matches.size());
 }
 
-TEST_F(MatchingIntegrationTest, probabilisticNonConst) {  // NOLINT
+TEST_F(MatchingIntegrationTest, probabilisticNonConst)
+{  // NOLINT
   using namespace lanelet::matching;
   auto matches = getProbabilisticMatches(*map, obj, 4.);
   // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDelete)
   for (size_t i = 1; i < matches.size(); i++) {
-    EXPECT_TRUE(matches.at(i).mahalanobisDistSq >= matches.at(i - 1).mahalanobisDistSq) << "Not sorted at i=" << i;
+    EXPECT_TRUE(matches.at(i).mahalanobisDistSq >= matches.at(i - 1).mahalanobisDistSq)
+      << "Not sorted at i=" << i;
   }
   EXPECT_NEAR(0.288177, matches.at(0).mahalanobisDistSq, 0.001);
   EXPECT_EQ(45334, matches.at(0).lanelet.id());
@@ -120,14 +132,16 @@ TEST_F(MatchingIntegrationTest, probabilisticNonConst) {  // NOLINT
   EXPECT_EQ(14ul, matches.size());
 }
 
-TEST_F(MatchingIntegrationTest, probabilisticConst) {  // NOLINT
+TEST_F(MatchingIntegrationTest, probabilisticConst)
+{  // NOLINT
   using namespace lanelet::matching;
-  const LaneletMap& constMap = *map;
+  const LaneletMap & constMap = *map;
   auto matches = getProbabilisticMatches(constMap, obj, 4.);
   EXPECT_EQ(14ul, matches.size());
 }
 
-TEST_F(MatchingIntegrationTest, isCloseTo) {  // NOLINT
+TEST_F(MatchingIntegrationTest, isCloseTo)
+{  // NOLINT
   using namespace lanelet::matching;
 
   LaneletLayer emptyLayer;
@@ -142,28 +156,34 @@ TEST_F(MatchingIntegrationTest, isCloseTo) {  // NOLINT
   EXPECT_TRUE(matching::isCloseTo(map->laneletLayer, objWithEmptyHull, 1.));
 }
 
-TEST_F(MatchingIntegrationTest, filterNonCompliantProbabilistic) {  // NOLINT
+TEST_F(MatchingIntegrationTest, filterNonCompliantProbabilistic)
+{  // NOLINT
   using namespace lanelet::matching;
   auto matches = getProbabilisticMatches(*map, obj, 4.);
   EXPECT_EQ(14ul, matches.size());
-  EXPECT_EQ("45334 45356inv 45358inv 45328inv 45332 45344 45330 45344inv 45330inv 45332inv 45328 45356 45358 45334inv ",
-            toString(matches));
+  EXPECT_EQ(
+    "45334 45356inv 45358inv 45328inv 45332 45344 45330 45344inv 45330inv 45332inv 45328 45356 "
+    "45358 45334inv ",
+    toString(matches));
 
   lanelet::traffic_rules::TrafficRulesPtr trafficRulesPtr =
-      lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, lanelet::Participants::Vehicle);
+    lanelet::traffic_rules::TrafficRulesFactory::create(
+      lanelet::Locations::Germany, lanelet::Participants::Vehicle);
   auto compliantMatches = removeNonRuleCompliantMatches(matches, trafficRulesPtr);
-  EXPECT_EQ(8ul, compliantMatches.size())
-      << "see list below: should exclude zebra crossing (pedestrian only) and inverted one way lanelets";
+  EXPECT_EQ(8ul, compliantMatches.size()) << "see list below: should exclude zebra crossing "
+                                             "(pedestrian only) and inverted one way lanelets";
   EXPECT_EQ("45334 45356inv 45358inv 45332 45330 45328 45356 45358 ", toString(compliantMatches));
 }
 
-TEST_F(MatchingIntegrationTest, filterNonCompliantDeterminstic) {  // NOLINT
+TEST_F(MatchingIntegrationTest, filterNonCompliantDeterminstic)
+{  // NOLINT
   using namespace lanelet::matching;
   auto matches = getDeterministicMatches(*map, obj, 4.);
   EXPECT_EQ(14ul, matches.size());
 
   lanelet::traffic_rules::TrafficRulesPtr trafficRulesPtr =
-      lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, lanelet::Participants::Vehicle);
+    lanelet::traffic_rules::TrafficRulesFactory::create(
+      lanelet::Locations::Germany, lanelet::Participants::Vehicle);
   auto compliantMatches = removeNonRuleCompliantMatches(matches, trafficRulesPtr);
   EXPECT_EQ(8ul, compliantMatches.size()) << "filterNonCompliantProbabilistic for details";
 }

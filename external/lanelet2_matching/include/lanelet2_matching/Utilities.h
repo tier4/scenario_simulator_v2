@@ -37,18 +37,22 @@
 #include "Exceptions.h"
 #include "Types.h"
 
-namespace lanelet {
-namespace matching {
-namespace utils {
-
+namespace lanelet
+{
+namespace matching
+{
+namespace utils
+{
 /**
  * @brief Find all primitives as close as or closer than maxDist to an object
  */
 template <typename LayerT>
-auto findWithin(LayerT& map, const Object2d& obj, double maxDist)
-    -> std::vector<std::pair<double, traits::LayerPrimitiveType<LayerT>>> {
+auto findWithin(LayerT & map, const Object2d & obj, double maxDist)
+  -> std::vector<std::pair<double, traits::LayerPrimitiveType<LayerT>>>
+{
   if (obj.absoluteHull.empty()) {
-    return lanelet::geometry::findWithin2d(map, lanelet::BasicPoint2d{obj.pose.translation()}, maxDist);
+    return lanelet::geometry::findWithin2d(
+      map, lanelet::BasicPoint2d{obj.pose.translation()}, maxDist);
   }
   return lanelet::geometry::findWithin2d(map, lanelet::BasicPolygon2d{obj.absoluteHull}, maxDist);
 }
@@ -65,7 +69,7 @@ auto findWithin(LayerT& map, const Object2d& obj, double maxDist)
  *
  * uses approximation orientationCovariance = 1./obj.vonMisesKappa
  */
-double getMahalanobisDistSq(const ConstLanelet& lanelet, const ObjectWithCovariance2d& obj);
+double getMahalanobisDistSq(const ConstLanelet & lanelet, const ObjectWithCovariance2d & obj);
 
 }  // namespace utils
 }  // namespace matching

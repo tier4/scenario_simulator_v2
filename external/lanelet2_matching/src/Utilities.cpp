@@ -35,11 +35,12 @@
 
 #include <cmath>
 
-namespace {
-
+namespace
+{
 // from https://github.com/coincar-sim/util_eigen_geometry/blob/release/src/util_eigen_geometry.cpp
 // Result is always positive; not similar to fmod()
-double positiveFloatModulo(double x, double y) {
+double positiveFloatModulo(double x, double y)
+{
   double fmod = std::fmod(x, y);
   if (fmod > 0.) {
     return fmod;
@@ -50,27 +51,35 @@ double positiveFloatModulo(double x, double y) {
 }
 
 // from https://github.com/coincar-sim/util_eigen_geometry/blob/release/src/util_eigen_geometry.cpp
-double normalizeAngleRadians(double x) { return positiveFloatModulo((x + M_PI), 2.0 * M_PI) - M_PI; }
+double normalizeAngleRadians(double x)
+{
+  return positiveFloatModulo((x + M_PI), 2.0 * M_PI) - M_PI;
+}
 
 // from https://github.com/coincar-sim/util_eigen_geometry/blob/release/src/util_eigen_geometry.cpp
-double angleDifference(double targetAngle, double sourceAngle) {
+double angleDifference(double targetAngle, double sourceAngle)
+{
   double angleDiff = targetAngle - sourceAngle;
   return normalizeAngleRadians(angleDiff);
 }
 
 // from https://github.com/coincar-sim/util_eigen_geometry/blob/release/src/util_eigen_geometry.cpp
-double yawFromIsometry2d(const Eigen::Isometry2d& pose) {
+double yawFromIsometry2d(const Eigen::Isometry2d & pose)
+{
   Eigen::Rotation2D<double> rot;
   rot.fromRotationMatrix(pose.linear());
   return rot.smallestAngle();
 }
 }  // namespace
 
-namespace lanelet {
-namespace matching {
-namespace utils {
-
-double getMahalanobisDistSq(const ConstLanelet& lanelet, const ObjectWithCovariance2d& obj) {
+namespace lanelet
+{
+namespace matching
+{
+namespace utils
+{
+double getMahalanobisDistSq(const ConstLanelet & lanelet, const ObjectWithCovariance2d & obj)
+{
   if (obj.positionCovariance.isZero()) {
     throw MatchingError("Covariance must not be zero");
   }
@@ -81,8 +90,9 @@ double getMahalanobisDistSq(const ConstLanelet& lanelet, const ObjectWithCovaria
   ArcCoordinates closestOnCenter = geometry::toArcCoordinates(centerline2d, obj.pose.translation());
   BasicPoint2d pAt = geometry::interpolatedPointAtDistance(centerline2d, closestOnCenter.length);
   BasicPoint2d pBefore =
-      geometry::interpolatedPointAtDistance(centerline2d, std::max(closestOnCenter.length - 0.5, 0.));
-  BasicPoint2d pAfter = geometry::interpolatedPointAtDistance(centerline2d, closestOnCenter.length + 0.5);
+    geometry::interpolatedPointAtDistance(centerline2d, std::max(closestOnCenter.length - 0.5, 0.));
+  BasicPoint2d pAfter =
+    geometry::interpolatedPointAtDistance(centerline2d, closestOnCenter.length + 0.5);
   BasicPoint2d pDirection = pAfter - pBefore;
 
   double yawCenter = normalizeAngleRadians(std::atan2(pDirection.y(), pDirection.x()));

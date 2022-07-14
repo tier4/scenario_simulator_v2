@@ -37,15 +37,18 @@
 #include "Types.h"
 #include "Utilities.h"
 
-namespace lanelet {
-namespace matching {
-
+namespace lanelet
+{
+namespace matching
+{
 /**
  * @brief get deterministic lanelet matches of an object with a maximum distance of maxDist, sorted ascending by
  * distance
  */
-std::vector<LaneletMatch> getDeterministicMatches(LaneletMap& map, const Object2d& obj, double maxDist);
-std::vector<ConstLaneletMatch> getDeterministicMatches(const LaneletMap& map, const Object2d& obj, double maxDist);
+std::vector<LaneletMatch> getDeterministicMatches(
+  LaneletMap & map, const Object2d & obj, double maxDist);
+std::vector<ConstLaneletMatch> getDeterministicMatches(
+  const LaneletMap & map, const Object2d & obj, double maxDist);
 
 /**
  * @brief get probabilistic lanelet matches of an object with a maximum deterministic euler distance of maxDist, sorted
@@ -58,16 +61,17 @@ std::vector<ConstLaneletMatch> getDeterministicMatches(const LaneletMap& map, co
  * The Hague, 2013, pp. 2166-2172. doi: 10.1109/ITSC.2013.6728549
  * https://ieeexplore.ieee.org/document/6728549
  */
-std::vector<LaneletMatchProbabilistic> getProbabilisticMatches(LaneletMap& map, const ObjectWithCovariance2d& obj,
-                                                               double maxDist);
-std::vector<ConstLaneletMatchProbabilistic> getProbabilisticMatches(const LaneletMap& map,
-                                                                    const ObjectWithCovariance2d& obj, double maxDist);
+std::vector<LaneletMatchProbabilistic> getProbabilisticMatches(
+  LaneletMap & map, const ObjectWithCovariance2d & obj, double maxDist);
+std::vector<ConstLaneletMatchProbabilistic> getProbabilisticMatches(
+  const LaneletMap & map, const ObjectWithCovariance2d & obj, double maxDist);
 
 /**
  * @brief Determine whether an object is within a maximum distance to any primitive of the layer
  */
 template <typename LayerT>
-bool isCloseTo(const LayerT& map, const Object2d& obj, double maxDist) {
+bool isCloseTo(const LayerT & map, const Object2d & obj, double maxDist)
+{
   auto closePrimitives = utils::findWithin(map, obj, maxDist);
   return !closePrimitives.empty();
 }
@@ -76,7 +80,8 @@ bool isCloseTo(const LayerT& map, const Object2d& obj, double maxDist) {
  * @brief Determine whether an object is (at least partially) within any primitive of the layer
  */
 template <typename LayerT>
-bool isWithin(const LayerT& map, const Object2d& obj) {
+bool isWithin(const LayerT & map, const Object2d & obj)
+{
   return isCloseTo(map, obj, 0.);
 }
 
@@ -84,13 +89,15 @@ bool isWithin(const LayerT& map, const Object2d& obj) {
  * @brief Remove non traffic rule compliant probabilistic lanelet matches
  */
 template <typename MatchVectorT>
-MatchVectorT removeNonRuleCompliantMatches(const MatchVectorT& matches,
-                                           const lanelet::traffic_rules::TrafficRulesPtr& trafficRulesPtr) {
+MatchVectorT removeNonRuleCompliantMatches(
+  const MatchVectorT & matches, const lanelet::traffic_rules::TrafficRulesPtr & trafficRulesPtr)
+{
   MatchVectorT compliantMatches = matches;
   compliantMatches.erase(
-      std::remove_if(compliantMatches.begin(), compliantMatches.end(),
-                     [&trafficRulesPtr](auto& match) { return !trafficRulesPtr->canPass(match.lanelet); }),
-      compliantMatches.end());
+    std::remove_if(
+      compliantMatches.begin(), compliantMatches.end(),
+      [&trafficRulesPtr](auto & match) { return !trafficRulesPtr->canPass(match.lanelet); }),
+    compliantMatches.end());
   return compliantMatches;
 }
 

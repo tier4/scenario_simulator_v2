@@ -155,9 +155,12 @@ public:
 
   bool updateFrame();
 
-  double getCurrentTime() const noexcept { return clock_.getCurrentSimulationTime(); }
+  /*double getCurrentTime() const noexcept { return clock_.getCurrentSimulationTime(); } */
 
-  boost::optional<double> getCurrentScenarioTime() const { return clock_.getCurrentScenarioTime(); }
+  boost::optional<double> getCurrentTime() const noexcept
+  {
+    return clock_.getCurrentScenarioTime();
+  }
 
   void startNpcLogic();
 

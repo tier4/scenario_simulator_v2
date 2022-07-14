@@ -244,7 +244,12 @@ bool API::setEntityStatus(
   status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
   status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
   status.name = name;
-  status.time = getCurrentTime();
+  const auto current_time = getCurrentTime();
+  if (current_time) {
+    status.time = current_time.get();
+  } else {
+    status.time = 0;
+  }
   status.action_status = action_status;
   return setEntityStatus(name, status);
 }
@@ -264,7 +269,11 @@ bool API::setEntityStatus(
   status.pose = map_pose;
   status.name = name;
   status.action_status = action_status;
-  status.time = getCurrentTime();
+  if (current_time) {
+    status.time = current_time.get();
+  } else {
+    status.time = 0;
+  }
   status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
   return setEntityStatus(name, status);
 }
@@ -428,12 +437,6 @@ bool API::updateEntityStatusInSim()
 bool API::updateFrame()
 {
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = boost::none;
-  /**
-    * @brief Currently, start all NPC logics when the simulation time overs 0.
-    */
-  if (!isNpcLogicStarted() && clock_.getCurrentSimulationTime() >= 0) {
-    startNpcLogic();
-  }
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
@@ -469,6 +472,9 @@ bool API::updateFrame()
 
 void API::startNpcLogic()
 {
+  if (isNpcLogicStarted()) {
+    THROW_SIMULATION_ERROR("NPC logics are already started.");
+  }
   entity_manager_ptr_->startNpcLogic();
   clock_.onNpcLogicStart();
 }

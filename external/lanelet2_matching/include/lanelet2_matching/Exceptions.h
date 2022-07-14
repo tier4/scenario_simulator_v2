@@ -35,12 +35,13 @@
 
 #include <stdexcept>
 
-namespace lanelet {
-
+namespace lanelet
+{
 /**
  * @brief Thrown when matching is not possible.
  */
-class MatchingError : public LaneletError {
+class MatchingError : public LaneletError
+{
   using LaneletError::LaneletError;
 };
 

@@ -35,12 +35,14 @@
 
 #include "Utilities.h"
 
-namespace {
+namespace
+{
 template <typename LaneletT, typename MatchT>
-std::vector<MatchT> toMatchVector(std::vector<std::pair<double, LaneletT>> pairVec) {
+std::vector<MatchT> toMatchVector(std::vector<std::pair<double, LaneletT>> pairVec)
+{
   std::vector<MatchT> matchVec;
   matchVec.reserve(2 * pairVec.size());
-  for (const auto& pair : pairVec) {
+  for (const auto & pair : pairVec) {
     MatchT match;
     match.distance = pair.first;
     match.lanelet = pair.second;
@@ -50,18 +52,21 @@ std::vector<MatchT> toMatchVector(std::vector<std::pair<double, LaneletT>> pairV
   }
 
   // sort ascending by distance
-  std::sort(matchVec.begin(), matchVec.end(),
-            [](const auto& lhs, const auto& rhs) { return lhs.distance < rhs.distance; });
+  std::sort(matchVec.begin(), matchVec.end(), [](const auto & lhs, const auto & rhs) {
+    return lhs.distance < rhs.distance;
+  });
 
   return matchVec;
 }
 
 template <typename LaneletT, typename MatchT>
-std::vector<MatchT> getProbabilisticMatchesImpl(const std::vector<std::pair<double, LaneletT>>& pairVec,
-                                                const lanelet::matching::ObjectWithCovariance2d& obj) {
+std::vector<MatchT> getProbabilisticMatchesImpl(
+  const std::vector<std::pair<double, LaneletT>> & pairVec,
+  const lanelet::matching::ObjectWithCovariance2d & obj)
+{
   std::vector<MatchT> matchVec;
   matchVec.reserve(2 * pairVec.size());
-  for (const auto& pair : pairVec) {
+  for (const auto & pair : pairVec) {
     MatchT match;
     match.distance = pair.first;
     match.lanelet = pair.second;
@@ -73,32 +78,41 @@ std::vector<MatchT> getProbabilisticMatchesImpl(const std::vector<std::pair<doub
   }
 
   // sort ascending by mahalanobisDistSq
-  std::sort(matchVec.begin(), matchVec.end(),
-            [](const auto& lhs, const auto& rhs) { return lhs.mahalanobisDistSq < rhs.mahalanobisDistSq; });
+  std::sort(matchVec.begin(), matchVec.end(), [](const auto & lhs, const auto & rhs) {
+    return lhs.mahalanobisDistSq < rhs.mahalanobisDistSq;
+  });
 
   return matchVec;
 }
 }  // namespace
 
-namespace lanelet {
-namespace matching {
-
-std::vector<LaneletMatch> getDeterministicMatches(LaneletMap& map, const Object2d& obj, double maxDist) {
+namespace lanelet
+{
+namespace matching
+{
+std::vector<LaneletMatch> getDeterministicMatches(
+  LaneletMap & map, const Object2d & obj, double maxDist)
+{
   return toMatchVector<Lanelet, LaneletMatch>(utils::findWithin(map.laneletLayer, obj, maxDist));
 }
 
-std::vector<ConstLaneletMatch> getDeterministicMatches(const LaneletMap& map, const Object2d& obj, double maxDist) {
-  return toMatchVector<ConstLanelet, ConstLaneletMatch>(utils::findWithin(map.laneletLayer, obj, maxDist));
+std::vector<ConstLaneletMatch> getDeterministicMatches(
+  const LaneletMap & map, const Object2d & obj, double maxDist)
+{
+  return toMatchVector<ConstLanelet, ConstLaneletMatch>(
+    utils::findWithin(map.laneletLayer, obj, maxDist));
 }
 
-std::vector<LaneletMatchProbabilistic> getProbabilisticMatches(LaneletMap& map, const ObjectWithCovariance2d& obj,
-                                                               double maxDist) {
+std::vector<LaneletMatchProbabilistic> getProbabilisticMatches(
+  LaneletMap & map, const ObjectWithCovariance2d & obj, double maxDist)
+{
   auto pairVec = utils::findWithin(map.laneletLayer, obj, maxDist);
   return getProbabilisticMatchesImpl<Lanelet, LaneletMatchProbabilistic>(pairVec, obj);
 }
 
-std::vector<ConstLaneletMatchProbabilistic> getProbabilisticMatches(const LaneletMap& map,
-                                                                    const ObjectWithCovariance2d& obj, double maxDist) {
+std::vector<ConstLaneletMatchProbabilistic> getProbabilisticMatches(
+  const LaneletMap & map, const ObjectWithCovariance2d & obj, double maxDist)
+{
   auto pairVec = utils::findWithin(map.laneletLayer, obj, maxDist);
   return getProbabilisticMatchesImpl<ConstLanelet, ConstLaneletMatchProbabilistic>(pairVec, obj);
 }
