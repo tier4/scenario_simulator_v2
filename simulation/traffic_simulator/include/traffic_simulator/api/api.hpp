@@ -157,10 +157,7 @@ public:
 
   /*double getCurrentTime() const noexcept { return clock_.getCurrentSimulationTime(); } */
 
-  boost::optional<double> getCurrentTime() const noexcept
-  {
-    return clock_.getCurrentScenarioTime();
-  }
+  double getCurrentTime() const noexcept { return clock_.getCurrentScenarioTime(); }
 
   void startNpcLogic();
 
@@ -211,6 +208,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
+  FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);

@@ -245,8 +245,8 @@ bool API::setEntityStatus(
   status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
   status.name = name;
   const auto current_time = getCurrentTime();
-  if (current_time) {
-    status.time = current_time.get();
+  if (std::isnan(current_time)) {
+    status.time = current_time;
   } else {
     status.time = 0;
   }
@@ -269,8 +269,9 @@ bool API::setEntityStatus(
   status.pose = map_pose;
   status.name = name;
   status.action_status = action_status;
-  if (current_time) {
-    status.time = current_time.get();
+  const auto current_time = getCurrentTime();
+  if (std::isnan(current_time)) {
+    status.time = current_time;
   } else {
     status.time = 0;
   }

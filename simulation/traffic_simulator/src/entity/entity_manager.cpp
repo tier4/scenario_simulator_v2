@@ -446,6 +446,16 @@ bool EntityManager::isEgo(const std::string & name) const
          dynamic_cast<EgoEntity const *>(entities_.at(name).get());
 }
 
+bool EntityManager::isEgoSpawned() const
+{
+  for (const auto & name : getEntityNames()) {
+    if (isEgo(name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool EntityManager::isInLanelet(
   const std::string & name, const std::int64_t lanelet_id, const double tolerance)
 {

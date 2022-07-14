@@ -15,7 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__SIMULATION_CLOCK__SIMULATION_CLOCK_HPP_
 #define TRAFFIC_SIMULATOR__SIMULATION_CLOCK__SIMULATION_CLOCK_HPP_
 
-#include <boost/optional.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
 
@@ -28,7 +27,7 @@ public:
   void initialize(double initial_simulation_time, double step_time);
   void update();
   double getCurrentSimulationTime() const { return current_simulation_time_; }
-  boost::optional<double> getCurrentScenarioTime() const;
+  double getCurrentScenarioTime() const;
   double getStepTime() const { return step_time_; }
   void onNpcLogicStart();
   const rclcpp::Time getCurrentRosTime();

@@ -328,6 +328,8 @@ public:
 
   bool isEgo(const std::string & name) const;
 
+  bool isEgoSpawned() const;
+
   const std::string getEgoName() const;
 
   bool isInLanelet(const std::string & name, const std::int64_t lanelet_id, const double tolerance);

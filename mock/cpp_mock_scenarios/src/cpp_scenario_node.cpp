@@ -54,6 +54,7 @@ void CppScenarioNode::start()
 {
   api_.initialize(1.0, 0.05);
   onInitialize();
+  api_.startNpcLogic();
   using namespace std::chrono_literals;
   update_timer_ = this->create_wall_timer(50ms, std::bind(&CppScenarioNode::update, this));
 }

@@ -74,10 +74,10 @@ void SimulationClock::onNpcLogicStart()
   scenario_time_offset_ = getCurrentSimulationTime();
 }
 
-boost::optional<double> SimulationClock::getCurrentScenarioTime() const
+double SimulationClock::getCurrentScenarioTime() const
 {
   if (!is_npc_logic_started_) {
-    return boost::none;
+    return std::numeric_limits<double>::quiet_NaN();
   }
   return getCurrentSimulationTime() - scenario_time_offset_;
 }
