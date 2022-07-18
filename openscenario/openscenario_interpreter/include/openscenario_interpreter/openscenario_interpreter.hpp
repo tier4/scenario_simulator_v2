@@ -21,7 +21,7 @@
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
@@ -43,7 +43,8 @@
 
 namespace openscenario_interpreter
 {
-class Interpreter : public rclcpp_lifecycle::LifecycleNode
+class Interpreter : public rclcpp_lifecycle::LifecycleNode,
+                    private SimulatorCore::ConditionEvaluation
 {
   using Context = openscenario_interpreter_msgs::msg::Context;
 

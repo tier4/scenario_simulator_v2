@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/lane_position.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 
 namespace openscenario_interpreter
 {
@@ -31,16 +30,18 @@ LanePosition::LanePosition(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-LanePosition::operator traffic_simulator_msgs::msg::LaneletPose() const
+LanePosition::LanePosition(
+  const String & road_id, const String & lane_id, const Double & offset, const Double & s,
+  const Orientation & orientation)
+: road_id(road_id), lane_id(lane_id), offset(offset), s(s), orientation(orientation)
 {
-  const geometry_msgs::msg::Vector3 rpy = orientation;
-  return traffic_simulator::helper::constructLaneletPose(
-    static_cast<Integer>(lane_id), s, offset, rpy.x, rpy.y, rpy.z);
 }
 
-LanePosition::operator geometry_msgs::msg::Pose() const
+LanePosition::operator NativeLanePosition() const { return makeNativeLanePosition(*this); }
+
+LanePosition::operator NativeWorldPosition() const
 {
-  return toWorldPosition(static_cast<traffic_simulator_msgs::msg::LaneletPose>(*this));
+  return convert<NativeWorldPosition>(static_cast<NativeLanePosition>(*this));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

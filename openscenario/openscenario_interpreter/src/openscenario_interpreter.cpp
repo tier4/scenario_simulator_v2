@@ -46,7 +46,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
 }
 
-Interpreter::~Interpreter() { disconnect(); }
+Interpreter::~Interpreter() { SimulatorCore::deactivate(); }
 
 auto Interpreter::currentLocalFrameRate() const -> std::chrono::milliseconds
 {
@@ -137,8 +137,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [this]() {
         if (currentScenarioDefinition()) {
-          currentScenarioDefinition()->storyboard.init.evaluate();
-          updateFrame();
+          currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
+          SimulatorCore::update();
         } else {
           throw Error("No script evaluable.");
         }
@@ -152,13 +152,13 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         deactivate();
       },
       [this]() {
-        if (getCurrentTime() < 0) {
-          updateFrame();
+        if (evaluateSimulationTime() < 0) {
+          SimulatorCore::update();
           publishCurrentContext();
         } else if (currentScenarioDefinition()) {
           withTimeoutHandler(defaultTimeoutHandler(), [this]() {
             currentScenarioDefinition()->evaluate();
-            updateFrame();
+            SimulatorCore::update();
             publishCurrentContext();
           });
         } else {
@@ -174,13 +174,17 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [this](auto &&...) { return Interpreter::Result::ERROR; },
       [&]() {
         if (getParameter<bool>("record", true)) {
+          // clang-format off
           record::start(
-            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+            "-a",
+            "-o", boost::filesystem::path(osc_path).replace_extension("").string(),
+            "-x", "/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/intersection");
+          // clang-format on
         }
 
-        connect(shared_from_this(), makeCurrentConfiguration());
-
-        initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
+        SimulatorCore::activate(
+          shared_from_this(), makeCurrentConfiguration(), local_real_time_factor,
+          1 / local_frame_rate * local_real_time_factor);
 
         /*
            DIRTY HACK!
@@ -192,7 +196,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
            cannot start at exactly zero simulation time, which is a serious
            problem that must be solved in the future.
         */
-        updateFrame();
+        SimulatorCore::update();
 
         execution_timer.clear();
 
@@ -215,7 +219,7 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 
   publisher_of_context->on_deactivate();
 
-  disconnect();  // Deactivate traffic_simulator
+  SimulatorCore::deactivate();
 
   scenarios.pop_front();
 
@@ -260,7 +264,7 @@ auto Interpreter::publishCurrentContext() const -> void
     nlohmann::json json;
     context.stamp = now();
     context.data = (json << *script).dump();
-    context.time = getCurrentTime();
+    context.time = evaluateSimulationTime();
   }
 
   publisher_of_context->publish(context);

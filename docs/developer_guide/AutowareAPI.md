@@ -1,37 +1,47 @@
 # Autoware API
 
-Autoware APIs provide features to control autoware easily via ROS 2 APIs.  
-`concealer::Autoware` is a C++ wrapper of the Autoware API, and it enables us to integrate Autoware with other tools very easily!  
-We can control autoware while initialize_duration of the simulation. (current_time < 0)
 
-<font color="#065479E">*Note! Autoware APIs are now under development, and we are preparing documentation about this. The current code is not a final version, might be changed in the future.*</font>
+scenario_simulator_v2 can control Autoware via Autoware API.  
+Autoware API is designed for integrating Autoware with other tools such as scenario_simulator_v2!  
+In scenario_simulator_v2, we implemented C++ wrapper of Autoware API in `concealer::Autoware` class.  
+All action commands to the ego vehicle controlled by Autoware are done through this wrapper class.  
+The details of the Autoware API are described in [the Autoware interface design page](https://autowarefoundation.github.io/autoware-documentation/main/design/autoware-interfaces/).  
+
+[//]: # (<font color="#065479E">*Note! Autoware APIs are now under development, and we are preparing documentation about this. The current code is not a final version, might be changed in the future.*</font>)
+<font color="#065479E">*Note! Our `concealer::Autoware` only supports Autoware.Universe.*</font>
+
+
+Before we start simulation, scenario_simulator_v2 initialize Autoware via API like below.
+scenario_simulator_v2 waits until these initialization processes to complete and starts SimulationTime as soon as the Engage command is sent to Autoware.   
 
 ```mermaid
 sequenceDiagram
-    participant Autoware API
-    participant Autoware
 
-Autoware API -->+ Autoware : launch
-Autoware -->- Autoware API : launch result
+Note right of Autoware API: Autoware API are called via concealer::Autoware class
+participant Autoware API
+participant Autoware.Universe
+
+Autoware API -->+ Autoware.Universe : launch
+Autoware.Universe -->- Autoware API : launch result
 alt failed or timeout
-    Autoware API ->> Autoware : terminate
+    Autoware API ->> Autoware.Universe : terminate
 end
 
-Autoware API -->+ Autoware : initialize
-Autoware -->- Autoware API : initialize result
+Autoware API -->+ Autoware.Universe : initialize
+Autoware.Universe -->- Autoware API : initialize result
 alt failed
-    Autoware API ->> Autoware : terminate
+    Autoware API ->> Autoware.Universe : terminate
 end
 
-Autoware API -->+ Autoware : send goal
-Autoware -->- Autoware API : planning result
+Autoware API -->+ Autoware.Universe : send goal
+Autoware.Universe -->- Autoware API : planning result
 alt failed
-    Autoware API ->> Autoware : terminate
+    Autoware API ->> Autoware.Universe : terminate
 end
 
 loop every simulation frame
-    Autoware API ->> Autoware : vehicle status
+    Autoware API ->> Autoware.Universe : vehicle status
 end
 
-Autoware API ->> Autoware : terminate
+Autoware API ->> Autoware.Universe : terminate
 ```

@@ -20,9 +20,9 @@
 
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
 #include <boost/optional.hpp>
+#include <geometry/spline/hermite_curve.hpp>
 #include <memory>
 #include <string>
-#include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <vector>
 
@@ -51,7 +51,7 @@ public:
   void getBlackBoardValues();
 
 private:
-  boost::optional<traffic_simulator::math::HermiteCurve> curve_;
+  boost::optional<math::geometry::HermiteCurve> curve_;
   double current_s_;
   double target_s_;
   double lane_change_velocity_;

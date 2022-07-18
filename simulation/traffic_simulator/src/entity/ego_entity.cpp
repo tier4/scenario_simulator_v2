@@ -132,6 +132,7 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
   const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
   if (architecture_type == "awf/universe") {
+    std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
                  getParameter<std::string>("autoware_launch_package"),
@@ -141,7 +142,9 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
                  "sensor_model:=" + getParameter<std::string>("sensor_model"),
                  "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + configuration.rviz_config_path.string(),
+                 "rviz_config:=" + ((rviz_config == "")
+                                      ? configuration.rviz_config_path.string()
+                                      : Configuration::Pathname(rviz_config).string()),
                  "scenario_simulation:=true", "perception/enable_traffic_light:=false")
              : std::make_unique<concealer::AutowareUniverse>();
   } else {
@@ -248,7 +251,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     }
 
     if (lanelet_pose) {
-      traffic_simulator::math::CatmullRomSpline spline(
+      math::geometry::CatmullRomSpline spline(
         hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
       if (const auto s_value = spline.getSValue(status.pose)) {
         status.pose.position.z = spline.getPoint(s_value.get()).z;

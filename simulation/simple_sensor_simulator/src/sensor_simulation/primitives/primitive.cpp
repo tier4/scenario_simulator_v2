@@ -18,6 +18,8 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <geometry/polygon/polygon.hpp>
+#include <geometry/transform.hpp>
 #include <iostream>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
@@ -25,6 +27,42 @@
 
 namespace simple_sensor_simulator
 {
+Vertex toVertex(const geometry_msgs::msg::Point & point)
+{
+  Vertex v;
+  v.x = point.x;
+  v.y = point.y;
+  v.z = point.z;
+  return v;
+}
+
+geometry_msgs::msg::Point toPoint(const Vertex & v)
+{
+  geometry_msgs::msg::Point p;
+  p.x = v.x;
+  p.y = v.y;
+  p.z = v.z;
+  return p;
+}
+
+std::vector<Vertex> toVertex(const std::vector<geometry_msgs::msg::Point> & points)
+{
+  std::vector<Vertex> ret;
+  std::transform(
+    points.begin(), points.end(), std::back_inserter(ret),
+    [](const geometry_msgs::msg::Point & point) { return toVertex(point); });
+  return ret;
+}
+
+std::vector<geometry_msgs::msg::Point> toPoints(const std::vector<Vertex> & v)
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  std::transform(v.begin(), v.end(), std::back_inserter(ret), [](const Vertex & vertex) {
+    return toPoint(vertex);
+  });
+  return ret;
+}
+
 namespace primitives
 {
 Primitive::Primitive(std::string type, const geometry_msgs::msg::Pose & pose)
@@ -32,41 +70,14 @@ Primitive::Primitive(std::string type, const geometry_msgs::msg::Pose & pose)
 {
 }
 
-Vertex Primitive::transform(Vertex v) const
+Vertex Primitive::transform(const Vertex & v) const
 {
-  auto mat = quaternion_operation::getRotationMatrix(pose.orientation);
-  Eigen::VectorXd point(3);
-  point(0) = v.x;
-  point(1) = v.y;
-  point(2) = v.z;
-  point = mat * point;
-  point(0) = point(0) + pose.position.x;
-  point(1) = point(1) + pose.position.y;
-  point(2) = point(2) + pose.position.z;
-  Vertex ret;
-  ret.x = point(0);
-  ret.y = point(1);
-  ret.z = point(2);
-  return ret;
+  return toVertex(math::geometry::transformPoint(pose, toPoint(v)));
 }
 
-Vertex Primitive::transform(Vertex v, const geometry_msgs::msg::Pose & sensor_pose) const
+Vertex Primitive::transform(const Vertex & v, const geometry_msgs::msg::Pose & sensor_pose) const
 {
-  auto mat = quaternion_operation::getRotationMatrix(
-    quaternion_operation::getRotation(sensor_pose.orientation, pose.orientation));
-  Eigen::VectorXd point(3);
-  point(0) = v.x;
-  point(1) = v.y;
-  point(2) = v.z;
-  point = mat * point;
-  point(0) = point(0) + pose.position.x - sensor_pose.position.x;
-  point(1) = point(1) + pose.position.y - sensor_pose.position.y;
-  point(2) = point(2) + pose.position.z - sensor_pose.position.z;
-  Vertex ret;
-  ret.x = point(0);
-  ret.y = point(1);
-  ret.z = point(2);
-  return ret;
+  return toVertex(math::geometry::transformPoint(pose, sensor_pose, toPoint(v)));
 }
 
 std::vector<Vertex> Primitive::transform() const
@@ -94,52 +105,12 @@ std::vector<Triangle> Primitive::getTriangles() const { return triangles_; }
 std::vector<geometry_msgs::msg::Point> Primitive::get2DConvexHull(
   const geometry_msgs::msg::Pose & sensor_pose) const
 {
-  const auto vertex = transform(sensor_pose);
-  typedef boost::geometry::model::d2::point_xy<double> boost_point;
-  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
-  boost_polygon poly;
-  for (const auto & p : vertex) {
-    boost::geometry::exterior_ring(poly).push_back(boost_point(p.x, p.y));
-  }
-  boost_polygon hull;
-  boost::geometry::convex_hull(poly, hull);
-  std::vector<geometry_msgs::msg::Point> polygon;
-  for (auto it = boost::begin(boost::geometry::exterior_ring(hull));
-       it != boost::end(boost::geometry::exterior_ring(hull)); ++it) {
-    double x = boost::geometry::get<0>(*it);
-    double y = boost::geometry::get<1>(*it);
-    geometry_msgs::msg::Point p;
-    p.x = x;
-    p.y = y;
-    p.z = 0.0;
-    polygon.emplace_back(p);
-  }
-  return polygon;
+  return math::geometry::get2DConvexHull(toPoints(transform(sensor_pose)));
 }
 
 std::vector<geometry_msgs::msg::Point> Primitive::get2DConvexHull() const
 {
-  const auto vertex = getVertex();
-  typedef boost::geometry::model::d2::point_xy<double> boost_point;
-  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
-  boost_polygon poly;
-  for (const auto & p : vertex) {
-    boost::geometry::exterior_ring(poly).push_back(boost_point(p.x, p.y));
-  }
-  boost_polygon hull;
-  boost::geometry::convex_hull(poly, hull);
-  std::vector<geometry_msgs::msg::Point> polygon;
-  for (auto it = boost::begin(boost::geometry::exterior_ring(hull));
-       it != boost::end(boost::geometry::exterior_ring(hull)); ++it) {
-    double x = boost::geometry::get<0>(*it);
-    double y = boost::geometry::get<1>(*it);
-    geometry_msgs::msg::Point p;
-    p.x = x;
-    p.y = y;
-    p.z = 0.0;
-    polygon.emplace_back(p);
-  }
-  return polygon;
+  return math::geometry::get2DConvexHull(toPoints(transform()));
 }
 
 unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
@@ -157,104 +128,46 @@ unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
   for (size_t i = 0; i < triangles_.size(); i++) {
     triangles[i] = triangles_[i];
   }
+  // enable raycasting
+  rtcSetGeometryMask(mesh, 0b11111111'11111111'11111111'11111111);
   rtcCommitGeometry(mesh);
   unsigned int geometry_id = rtcAttachGeometry(scene, mesh);
   rtcReleaseGeometry(mesh);
   return geometry_id;
 }
 
-boost::optional<double> Primitive::getMax(const Axis & axis) const
+boost::optional<double> Primitive::getMax(const math::geometry::Axis & axis) const
 {
-  std::vector<double> values;
   if (vertices_.empty()) {
     return boost::none;
   }
-  const auto transformed_vertices = transform();
-  for (const auto v : transformed_vertices) {
-    switch (axis) {
-      case Axis::X:
-        values.emplace_back(v.x);
-        break;
-      case Axis::Y:
-        values.emplace_back(v.y);
-        break;
-      case Axis::Z:
-        values.emplace_back(v.z);
-        break;
-    }
-  }
-  return *std::max_element(values.begin(), values.end());
+  return math::geometry::getMaxValue(toPoints(transform()), axis);
 }
 
-boost::optional<double> Primitive::getMin(const Axis & axis) const
+boost::optional<double> Primitive::getMin(const math::geometry::Axis & axis) const
 {
-  std::vector<double> values;
   if (vertices_.empty()) {
     return boost::none;
   }
-  const auto transformed_vertices = transform();
-  for (const auto v : transformed_vertices) {
-    switch (axis) {
-      case Axis::X:
-        values.emplace_back(v.x);
-        break;
-      case Axis::Y:
-        values.emplace_back(v.y);
-        break;
-      case Axis::Z:
-        values.emplace_back(v.z);
-        break;
-    }
-  }
-  return *std::min_element(values.begin(), values.end());
+  return math::geometry::getMinValue(toPoints(transform()), axis);
 }
 
 boost::optional<double> Primitive::getMax(
-  const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
+  const math::geometry::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
 {
-  std::vector<double> values;
   if (vertices_.empty()) {
     return boost::none;
   }
-  const auto transformed_vertices = transform(sensor_pose);
-  for (const auto v : transformed_vertices) {
-    switch (axis) {
-      case Axis::X:
-        values.emplace_back(v.x);
-        break;
-      case Axis::Y:
-        values.emplace_back(v.y);
-        break;
-      case Axis::Z:
-        values.emplace_back(v.z);
-        break;
-    }
-  }
-  return *std::max_element(values.begin(), values.end());
+  return math::geometry::getMaxValue(toPoints(transform(sensor_pose)), axis);
 }
 
 boost::optional<double> Primitive::getMin(
-  const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
+  const math::geometry::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
 {
-  std::vector<double> values;
   if (vertices_.empty()) {
     return boost::none;
   }
-  const auto transformed_vertices = transform(sensor_pose);
-  for (const auto v : transformed_vertices) {
-    switch (axis) {
-      case Axis::X:
-        values.emplace_back(v.x);
-        break;
-      case Axis::Y:
-        values.emplace_back(v.y);
-        break;
-      case Axis::Z:
-        values.emplace_back(v.z);
-        break;
-    }
-  }
-  return *std::min_element(values.begin(), values.end());
+  return math::geometry::getMinValue(toPoints(transform(sensor_pose)), axis);
 }
 }  // namespace primitives
 }  // namespace simple_sensor_simulator

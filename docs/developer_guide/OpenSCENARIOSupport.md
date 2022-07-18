@@ -141,6 +141,53 @@ It is unlikely that you will need these commands for normal scenario creation.
 | error   | Generate internal error: Used to ensure that the simulator does not crash with an internal error. |
 | sigsegv | Access a null pointer: Used to make sure the simulator does not crash with an internal error.     |
 
+### UserDefinedValueCondition
+
+This condition enables us to import external values and compare them with a specific value.    
+The boolean value of  the comparison result can be used as a condition to control the scenario.
+In scenario_simulator_v2, we use `UserDefinedValueCondition` to control the progress of the scenario by Autoware's state.  
+
+```XML
+  <ByValueCondition>
+     <UserDefinedValueCondition name="ego.currentState" rule="equalTo" value="ARRIVED_GOAL" />
+  </ByValueCondition>
+```
+#### Built-in conditions
+
+You can use Autoware related conditions via UserDefinedValueCondition.  
+Like "ego.currentState", you can specify the entity by name and refer to its status.  
+The following built-in conditions return a string that represents the state.   
+See Reference for specific strings.  
+
+| Name                       | description                                         | Reference                                                                                                                   |
+|:---------------------------|:----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| currentState               | returns Autoware's state                            | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/AutowareState.idl)          |
+| currentEmergencyState      | return Autoware's emergency state.                  | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/EmergencyState.idl)         |
+| currentTurnIndicatorsState | return turn indicators state controlled by Autoware | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/msg/TurnIndicatorsCommand.idl) |
+
+#### External ROS2 topic condition
+
+You can pass values from another ROS2 node to a scenario through ROS2 topics.  
+The `name` field should be filled with the name of the ROS2 topic like below.
+```XML
+  <ByValueCondition>
+     <UserDefinedValueCondition name="/count_up" rule="equalTo" value="500" />
+  </ByValueCondition>
+```
+
+The type of topic must be `openscenario_msgs::msg::ParameterDeclaration` type.  
+You can handle the following through this function.
+
+- Boolean
+- DateTime
+- Double
+- Integer
+- String
+- UnsignedInt
+- UnsignedShort
+
+See [Message Definitions](https://github.com/tier4/scenario_simulator_v2/tree/master/openscenario/openscenario_msgs/msg) for more information.
+
 ## Non-Standard Extensions
 ---
 
@@ -159,60 +206,66 @@ OpenSCENARIO standards.
 
 ### Actions
 
-| Name                                                                                    |   Status    | Limitations                        |
-|:----------------------------------------------------------------------------------------|:-----------:|:-----------------------------------|
-| GlobalAction.**EnvironmentAction**                                                      | Unsupported |                                    |
-| GlobalAction.EntityAction.**AddEntityAction**                                           |      ✔      |                                    |
-| GlobalAction.EntityAction.**DeleteEntityAction**                                        |      ✔      |                                    |
-| GlobalAction.ParameterAction.**ParameterSetAction**                                     |      ✔      | See [here](#parametersetaction)    |
-| GlobalAction.ParameterAction.**ParameterModifyAction**                                  |      ✔      | No                                 |
-| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalControllerAction** |      ✔      |                                    |
-| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalStateAction**      |      ✔      |                                    |
-| GlobalAction.TrafficAction.**TrafficSourceAction**                                      | Unsupported |                                    |
-| GlobalAction.TrafficAction.**TrafficSinkAction**                                        | Unsupported |                                    |
-| GlobalAction.TrafficAction.**TrafficSwarmAction**                                       | Unsupported |                                    |
-| GlobalAction.TrafficAction.**TrafficStopAction**                                        | Unsupported |                                    |
-| UserDefinedAction.**CustomCommandAction**                                               |      ✔      | No                                 |
-| PrivateAction.LongitudinalAction.**SpeedAction**                                        |      ✔      | See [here](#speedaction)           |
-| PrivateAction.LongitudinalAction.**LongitudinalDistanceAction**                         | Unsupported |                                    |
-| PrivateAction.LateralAction.**LaneChangeAction**                                        |      ✔      | See [here](#lanechangeaction)      |
-| PrivateAction.LateralAction.**LaneOffsetAction**                                        | Unsupported |                                    |
-| PrivateAction.LateralAction.**LateralDistanceAction**                                   | Unsupported |                                    |
-| PrivateAction.**VisibilityAction**                                                      | Unsupported |                                    |
-| PrivateAction.**SynchronizeAction**                                                     | Unsupported |                                    |
-| PrivateAction.**ActivateControllerAction**                                              | Unsupported |                                    |
-| PrivateAction.ControllerAction.**AssignControllerAction**                               |      ✔      |                                    |
-| PrivateAction.ControllerAction.**ActivateControllerAction**                             | Unsupported |                                    |
-| PrivateAction.ControllerAction.**OverrideControllerValueAction**                        | Unsupported |                                    |
-| PrivateAction.**TeleportAction**                                                        |      ✔      | See [here](#teleportaction)        |
-| PrivateAction.RoutingAction.**AssignRouteAction**                                       |      ✔      |                                    |
-| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  | Unsupported |                                    |
-| PrivateAction.RoutingAction.**AcquirePositionAction**                                   |      ✔      | See [here](#acquirepositionaction) |
+| Name                                                                                    | Support Status | Limitations                        | OpenSCENARIO changes |
+|:----------------------------------------------------------------------------------------|:--------------:|:-----------------------------------|----------------------|
+| GlobalAction.**EnvironmentAction**                                                      |  Unsupported   |                                    |                      |
+| GlobalAction.EntityAction.**AddEntityAction**                                           |       ✔        |                                    |                      |
+| GlobalAction.EntityAction.**DeleteEntityAction**                                        |       ✔        |                                    |                      |
+| GlobalAction.ParameterAction.**ParameterSetAction**                                     |       ✔        | See [here](#parametersetaction)    | deprecated from v1.2 |
+| GlobalAction.ParameterAction.**ParameterModifyAction**                                  |       ✔        | No                                 | deprecated from v1.2 |
+| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalControllerAction** |       ✔        |                                    |                      |
+| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalStateAction**      |       ✔        |                                    |                      |
+| GlobalAction.TrafficAction.**TrafficSourceAction**                                      |  Unsupported   |                                    |                      |
+| GlobalAction.TrafficAction.**TrafficSinkAction**                                        |  Unsupported   |                                    |                      |
+| GlobalAction.TrafficAction.**TrafficSwarmAction**                                       |  Unsupported   |                                    |                      |
+| GlobalAction.TrafficAction.**TrafficStopAction**                                        |  Unsupported   |                                    |                      |
+| GlobalAction.VariableAction.**VariableSetAction**                                       |  Unsupported   |                                    | created in v1.2      |
+| GlobalAction.VariableAction.**VariableModifyAction**                                    |  Unsupported   |                                    | created in v1.2      |
+| UserDefinedAction.**CustomCommandAction**                                               |       ✔        | No                                 |                      |
+| PrivateAction.AppearanceAction.**AnimationAction**                                      |  Unsupported   |                                    | created in v1.2      |
+| PrivateAction.AppearanceAction.**LightStateAction**                                     |  Unsupported   |                                    | created in v1.2      |
+| PrivateAction.LongitudinalAction.**SpeedAction**                                        |       ✔        | See [here](#speedaction)           |                      |
+| PrivateAction.LongitudinalAction.**SpeedProfileAction**                                 |  Unsupported   |                                    | created in v1.2      |
+| PrivateAction.LongitudinalAction.**LongitudinalDistanceAction**                         |  Unsupported   |                                    |                      |
+| PrivateAction.LateralAction.**LaneChangeAction**                                        |       ✔        | See [here](#lanechangeaction)      |                      |
+| PrivateAction.LateralAction.**LaneOffsetAction**                                        |  Unsupported   |                                    |                      |
+| PrivateAction.LateralAction.**LateralDistanceAction**                                   |  Unsupported   |                                    |                      |
+| PrivateAction.**VisibilityAction**                                                      |  Unsupported   |                                    |                      |
+| PrivateAction.**SynchronizeAction**                                                     |  Unsupported   |                                    |                      |
+| PrivateAction.**ActivateControllerAction**                                              |  Unsupported   |                                    | deprecated from v1.2 |
+| PrivateAction.ControllerAction.**AssignControllerAction**                               |       ✔        |                                    |                      |
+| PrivateAction.ControllerAction.**ActivateControllerAction**                             |  Unsupported   |                                    |                      |
+| PrivateAction.ControllerAction.**OverrideControllerValueAction**                        |  Unsupported   |                                    |                      |
+| PrivateAction.**TeleportAction**                                                        |       ✔        | See [here](#teleportaction)        |                      |
+| PrivateAction.RoutingAction.**AssignRouteAction**                                       |       ✔        |                                    |                      |
+| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  |  Unsupported   |                                    |                      |
+| PrivateAction.RoutingAction.**AcquirePositionAction**                                   |       ✔        | See [here](#acquirepositionaction) |                      |
 
 ### Conditions
 
-| Name                                                            |   Status    | Limitations                                  |
-|:----------------------------------------------------------------|:-----------:|:---------------------------------------------|
-| ByEntityCondition.EntityCondition.**EndOfRoadCondition**        | Unsupported |                                              |
-| ByEntityCondition.EntityCondition.**CollisionCondition**        |      ✔      | See [here](#collisioncondition)              |
-| ByEntityCondition.EntityCondition.**OffroadCondition**          | Unsupported |                                              |
-| ByEntityCondition.EntityCondition.**TimeHeadwayCondition**      |      ✔      | See [here](#timeheadwaycondition)            |
-| ByEntityCondition.EntityCondition.**TimeToCollisionCondition**  | Unsupported |                                              |
-| ByEntityCondition.EntityCondition.**AccelerationCondition**     |      ✔      | No                                           |
-| ByEntityCondition.EntityCondition.**StandStillCondition**       |      ✔      | No                                           |
-| ByEntityCondition.EntityCondition.**SpeedCondition**            |      ✔      | No                                           |
-| ByEntityCondition.EntityCondition.**RelativeSpeedCondition**    | Unsupported |                                              |
-| ByEntityCondition.EntityCondition.**TraveledDistanceCondition** | Unsupported |                                              |
-| ByEntityCondition.EntityCondition.**ReachPositionCondition**    |      ✔      | See [here](#reachpositioncondition)          |
-| ByEntityCondition.EntityCondition.**DistanceCondition**         |      ✔      | See [here](#distancecondition)               |
-| ByEntityCondition.EntityCondition.**RelativeDistanceCondition** |      ✔      | See [here](#relativedistancecondition)       |
-| ByEntityCondition.**ParameterCondition**                        |      ✔      |                                              |
-| ByEntityCondition.**TimeOfDayCondition**                        | Unsupported |                                              |
-| ByEntityCondition.**SimulationTimeCondition**                   |      ✔      | No                                           |
-| ByEntityCondition.**StoryboardElementStateCondition**           |      ✔      | See [here](#storyboardelementstatecondition) |
-| ByEntityCondition.**UserDefinedValueCondition**                 |      ✔      |                                              |
-| ByEntityCondition.**TrafficSignalCondition**                    |      ✔      |                                              |
-| ByEntityCondition.**TrafficSignalControllerCondition**          |      ✔      |                                              |
+| Name                                                            | Support Status | Limitations                                  | OpenSCENARIO changes |
+|:----------------------------------------------------------------|:--------------:|:---------------------------------------------|----------------------|
+| ByEntityCondition.EntityCondition.**EndOfRoadCondition**        |  Unsupported   |                                              |                      |
+| ByEntityCondition.EntityCondition.**CollisionCondition**        |       ✔        | See [here](#collisioncondition)              |                      |
+| ByEntityCondition.EntityCondition.**OffroadCondition**          |  Unsupported   |                                              |                      |
+| ByEntityCondition.EntityCondition.**TimeHeadwayCondition**      |       ✔        | See [here](#timeheadwaycondition)            |                      |
+| ByEntityCondition.EntityCondition.**TimeToCollisionCondition**  |  Unsupported   |                                              |                      |
+| ByEntityCondition.EntityCondition.**AccelerationCondition**     |       ✔        | No                                           |                      |
+| ByEntityCondition.EntityCondition.**StandStillCondition**       |       ✔        | No                                           |                      |
+| ByEntityCondition.EntityCondition.**SpeedCondition**            |       ✔        | No                                           |                      |
+| ByEntityCondition.EntityCondition.**RelativeSpeedCondition**    |  Unsupported   |                                              |                      |
+| ByEntityCondition.EntityCondition.**TraveledDistanceCondition** |  Unsupported   |                                              |                      |
+| ByEntityCondition.EntityCondition.**ReachPositionCondition**    |       ✔        | See [here](#reachpositioncondition)          | deprecated from v1.2 |
+| ByEntityCondition.EntityCondition.**DistanceCondition**         |       ✔        | See [here](#distancecondition)               |                      |
+| ByEntityCondition.EntityCondition.**RelativeDistanceCondition** |       ✔        | See [here](#relativedistancecondition)       |                      |
+| ByValueCondition.**ParameterCondition**                         |       ✔        |                                              |                      |
+| ByValueCondition.**TimeOfDayCondition**                         |  Unsupported   |                                              |                      |
+| ByValueCondition.**SimulationTimeCondition**                    |       ✔        | No                                           |                      |
+| ByValueCondition.**StoryboardElementStateCondition**            |       ✔        | See [here](#storyboardelementstatecondition) |                      |
+| ByValueCondition.**UserDefinedValueCondition**                  |       ✔        |                                              |                      |
+| ByValueCondition.**TrafficSignalCondition**                     |       ✔        |                                              |                      |
+| ByValueCondition.**TrafficSignalControllerCondition**           |       ✔        |                                              |                      |
+| ByValueCondition.**VariableCondition**                          |  Unsupported   |                                              | created in v1.2      |
 
 ## Limitations
 
