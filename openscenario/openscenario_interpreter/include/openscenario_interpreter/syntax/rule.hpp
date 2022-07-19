@@ -92,6 +92,9 @@ struct Rule
 auto operator>>(std::istream &, Rule &) -> std::istream &;
 
 auto operator<<(std::ostream &, const Rule &) -> std::ostream &;
+
+static auto compare(const Object & parameter, const Rule & rule, const String & value) -> bool;
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
