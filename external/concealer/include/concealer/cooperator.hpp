@@ -17,6 +17,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <concealer/dirty_hack.hpp>
+#include <concealer/task_queue.hpp>
 #include <istream>
 #include <rclcpp/rclcpp.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
@@ -75,6 +76,8 @@ struct RTC  // Request To Cooperate
 
   CONCEALER_DEFINE_CLIENT_SIMPLE(CooperateCommands);
 
+  TaskQueue cooperate_queue;
+
   explicit RTC()
   : CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(
       CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
@@ -116,7 +119,10 @@ struct RTC  // Request To Cooperate
   {
     switch (current_cooperator) {
       case Cooperator::simulator:
-        return approve(cooperate_status_array);
+        return cooperate_queue.delay([=]()
+               {
+                 return approve(cooperate_status_array);
+               });
 
       default:
         return;
