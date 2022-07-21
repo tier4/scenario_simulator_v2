@@ -19,11 +19,13 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 
-from launch.actions import DeclareLaunchArgument, OpaqueFunction, Shutdown
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, Shutdown, IncludeLaunchDescription
 
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, LaunchConfigurationEquals
 
 from launch.substitutions import LaunchConfiguration
+
+from launch.launch_description_sources import AnyLaunchDescriptionSource
 
 from launch_ros.actions import Node, LifecycleNode
 
@@ -193,6 +195,13 @@ def launch_setup(context, *args, **kwargs):
                     / "config/scenario_simulator_v2.rviz"
                 ),
             ],
+        ),
+
+        IncludeLaunchDescription(
+            AnyLaunchDescriptionSource(
+                [get_package_share_directory("dummy_infrastructure"), "/launch/dummy_infrastructure.launch.xml"]
+            ),
+            condition=LaunchConfigurationEquals("sensor_model", "aip_x1"),
         ),
     ]
 
