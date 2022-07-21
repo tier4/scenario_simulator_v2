@@ -16,35 +16,4 @@
 
 namespace concealer
 {
-// auto operator>>(std::istream & is, RTC::Cooperator & cooperator) -> std::istream &
-// {
-//   std::string token;
-//
-//   is >> token;
-//
-//   static const std::unordered_map<std::string, RTC::Cooperator> table{
-//     {"simulator", RTC::Cooperator::simulator},
-//     {"scenario", RTC::Cooperator::scenario},
-//   };
-//
-//   if (auto iter = table.find(token); iter != std::end(table)) {
-//     cooperator = (*iter).second;
-//   } else {
-//     cooperator = RTC::Cooperator::simulator;
-//   }
-//
-//   return is;
-// }
-//
-// auto operator<<(std::ostream & os, const RTC::Cooperator & cooperator) -> std::ostream &
-// {
-//   switch (cooperator) {
-//     default:
-//     case RTC::Cooperator::simulator:
-//       return os << "simulator";
-//
-//     case RTC::Cooperator::scenario:
-//       return os << "scenario";
-//   }
-// }
 }  // namespace concealer

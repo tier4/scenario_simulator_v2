@@ -39,7 +39,9 @@
 
 namespace concealer
 {
-class AutowareUniverse : public Autoware, public RTC<AutowareUniverse>, public TransitionAssertion<AutowareUniverse>
+class AutowareUniverse : public Autoware,
+                         public RTC<AutowareUniverse>,
+                         public TransitionAssertion<AutowareUniverse>
 {
   friend class TransitionAssertion<AutowareUniverse>;
 
@@ -67,7 +69,6 @@ class AutowareUniverse : public Autoware, public RTC<AutowareUniverse>, public T
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
-  // using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
@@ -76,27 +77,19 @@ class AutowareUniverse : public Autoware, public RTC<AutowareUniverse>, public T
 
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
-  // CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
   CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
   CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
 
-  // using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
   using Engage = tier4_external_api_msgs::srv::Engage;
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
   using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
 
-  // CONCEALER_DEFINE_CLIENT_SIMPLE(CooperateCommands);
   CONCEALER_DEFINE_CLIENT(Engage);
   // TODO CONCEALER_DEFINE_CLIENT(InitializePose);
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
-
-private:  // EXPERIMENTAL RTC SUPPORTS
-  // auto approve(const CooperateStatusArray &) -> void;
-
-  // auto cooperate(const CooperateStatusArray &) -> void;
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
@@ -132,13 +125,11 @@ public:
     CONCEALER_INIT_PUBLISHER(VelocityReport, "/vehicle/status/velocity_status"),
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
-    // CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
     CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
-    // CONCEALER_INIT_CLIENT(CooperateCommands, "/api/external/set/rtc_commands"),
     CONCEALER_INIT_CLIENT(Engage, "/api/external/set/engage"),
     // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
     CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")

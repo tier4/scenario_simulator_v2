@@ -76,7 +76,8 @@ struct RTC  // Request To Cooperate
   CONCEALER_DEFINE_CLIENT_SIMPLE(CooperateCommands);
 
   explicit RTC()
-  : CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
+  : CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(
+      CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
     CONCEALER_INIT_CLIENT(CooperateCommands, "/api/external/set/rtc_commands")
   {
   }
@@ -122,10 +123,6 @@ struct RTC  // Request To Cooperate
     }
   }
 };
-
-// auto operator>>(std::istream &, RTC::Cooperator &) -> std::istream &;
-//
-// auto operator<<(std::ostream &, const RTC::Cooperator &) -> std::ostream &;
 }  // namespace concealer
 
 #endif  // CONCEALER__COOPERATOR_HPP_
