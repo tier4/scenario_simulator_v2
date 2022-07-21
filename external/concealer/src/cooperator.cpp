@@ -16,35 +16,35 @@
 
 namespace concealer
 {
-auto operator>>(std::istream & is, Cooperator::Is & cooperator) -> std::istream &
-{
-  std::string token;
-
-  is >> token;
-
-  static const std::unordered_map<std::string, Cooperator::Is> table{
-    {"simulator", Cooperator::Is::simulator},
-    {"scenario", Cooperator::Is::scenario},
-  };
-
-  if (auto iter = table.find(token); iter != std::end(table)) {
-    cooperator = (*iter).second;
-  } else {
-    cooperator = Cooperator::Is::simulator;
-  }
-
-  return is;
-}
-
-auto operator<<(std::ostream & os, const Cooperator::Is & cooperator) -> std::ostream &
-{
-  switch (cooperator) {
-    default:
-    case Cooperator::Is::simulator:
-      return os << "simulator";
-
-    case Cooperator::Is::scenario:
-      return os << "scenario";
-  }
-}
+// auto operator>>(std::istream & is, RTC::Cooperator & cooperator) -> std::istream &
+// {
+//   std::string token;
+//
+//   is >> token;
+//
+//   static const std::unordered_map<std::string, RTC::Cooperator> table{
+//     {"simulator", RTC::Cooperator::simulator},
+//     {"scenario", RTC::Cooperator::scenario},
+//   };
+//
+//   if (auto iter = table.find(token); iter != std::end(table)) {
+//     cooperator = (*iter).second;
+//   } else {
+//     cooperator = RTC::Cooperator::simulator;
+//   }
+//
+//   return is;
+// }
+//
+// auto operator<<(std::ostream & os, const RTC::Cooperator & cooperator) -> std::ostream &
+// {
+//   switch (cooperator) {
+//     default:
+//     case RTC::Cooperator::simulator:
+//       return os << "simulator";
+//
+//     case RTC::Cooperator::scenario:
+//       return os << "scenario";
+//   }
+// }
 }  // namespace concealer
