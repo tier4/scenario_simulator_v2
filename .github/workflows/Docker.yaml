@@ -44,7 +44,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          tags: ${{ matrix.rosdistro }}
+          tags: ghcr.io/${{ github.repository_owner }}/scenario_simulator_v2:${{ matrix.rosdistro }}
           no-cache: true
           build-args: ROS_DISTRO=${{ matrix.rosdistro }}
           push: ${{ github.event_name != 'pull_request' }}
