@@ -16,34 +16,34 @@
 
 namespace concealer
 {
-auto operator>>(std::istream & is, Cooperator & cooperator) -> std::istream &
+auto operator>>(std::istream & is, Cooperator::Is & cooperator) -> std::istream &
 {
   std::string token;
 
   is >> token;
 
-  static const std::unordered_map<std::string, Cooperator> table{
-    {"simulator", Cooperator::simulator},
-    {"scenario", Cooperator::scenario},
+  static const std::unordered_map<std::string, Cooperator::Is> table{
+    {"simulator", Cooperator::Is::simulator},
+    {"scenario", Cooperator::Is::scenario},
   };
 
   if (auto iter = table.find(token); iter != std::end(table)) {
     cooperator = (*iter).second;
   } else {
-    cooperator = Cooperator::simulator;
+    cooperator = Cooperator::Is::simulator;
   }
 
   return is;
 }
 
-auto operator<<(std::ostream & os, const Cooperator & cooperator) -> std::ostream &
+auto operator<<(std::ostream & os, const Cooperator::Is & cooperator) -> std::ostream &
 {
   switch (cooperator) {
     default:
-    case Cooperator::simulator:
+    case Cooperator::Is::simulator:
       return os << "simulator";
 
-    case Cooperator::scenario:
+    case Cooperator::Is::scenario:
       return os << "scenario";
   }
 }

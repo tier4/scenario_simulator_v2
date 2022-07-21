@@ -21,14 +21,17 @@
 
 namespace concealer
 {
-enum class Cooperator {
-  simulator,  // DEFAULT
-  scenario,
+struct Cooperator
+{
+  enum class Is {
+    simulator,  // DEFAULT
+    scenario,
+  };
 };
 
-auto operator>>(std::istream &, Cooperator &) -> std::istream &;
+auto operator>>(std::istream &, Cooperator::Is &) -> std::istream &;
 
-auto operator<<(std::ostream &, const Cooperator &) -> std::ostream &;
+auto operator<<(std::ostream &, const Cooperator::Is &) -> std::ostream &;
 }  // namespace concealer
 
 #endif  // CONCEALER__COOPERATOR_HPP_

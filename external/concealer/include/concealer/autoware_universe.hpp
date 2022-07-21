@@ -96,7 +96,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
 private:  // EXPERIMENTAL RTC SUPPORTS
-  Cooperator current_cooperator = Cooperator::simulator;
+  Cooperator::Is current_cooperator = Cooperator::Is::simulator;
 
   auto approve(const CooperateStatusArray &) -> void;
 
@@ -185,7 +185,7 @@ public:
 
   auto setCooperator(const std::string & cooperator) -> void override
   {
-    current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
+    current_cooperator = boost::lexical_cast<Cooperator::Is>(cooperator);
   }
 
   auto setVelocityLimit(double) -> void override;
