@@ -76,16 +76,13 @@ public:                                                                         
   }                                                                                                \
   static_assert(true, "")
 
-#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE, ...)                      \
-private:                                                              \
-  TYPE::SharedPtr current_value_of_##TYPE = std::make_shared<TYPE>(); \
-  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;       \
-                                                                      \
-public:                                                               \
-  auto get##TYPE() const-> TYPE __VA_ARGS__                           \
-  {                                                                   \
-    return *std::atomic_load(&current_value_of_##TYPE);               \
-  }                                                                   \
+#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE, ...)                                                   \
+private:                                                                                           \
+  TYPE::SharedPtr current_value_of_##TYPE = std::make_shared<TYPE>();                              \
+  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;                                    \
+                                                                                                   \
+public:                                                                                            \
+  auto get##TYPE() const->TYPE __VA_ARGS__ { return *std::atomic_load(&current_value_of_##TYPE); } \
   static_assert(true, "")
 
 #define CONCEALER_DEFINE_PUBLISHER(TYPE)                  \
