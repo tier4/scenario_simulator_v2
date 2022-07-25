@@ -99,48 +99,11 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 private:
   Cooperator current_cooperator = Cooperator::simulator;
 
-  TaskQueue cooperate_queue;
+  TaskQueue cooperation_queue;
 
-  auto approve(const CooperateStatusArray & cooperate_status_array) -> void
-  {
-    auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
-    request->stamp = cooperate_status_array.stamp;
+  auto approve(const CooperateStatusArray &) -> void;
 
-    auto approvable = [](auto && cooperate_status) {
-      return cooperate_status.safe xor
-             (cooperate_status.command_status.type == tier4_rtc_msgs::msg::Command::ACTIVATE);
-    };
-
-    auto flip = [](auto && type) {
-      using Command = tier4_rtc_msgs::msg::Command;
-      return type == Command::ACTIVATE ? Command::DEACTIVATE : Command::ACTIVATE;
-    };
-
-    for (auto && cooperate_status : cooperate_status_array.statuses) {
-      if (approvable(cooperate_status)) {
-        tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
-        cooperate_command.module = cooperate_status.module;
-        cooperate_command.uuid = cooperate_status.uuid;
-        cooperate_command.command.type = flip(cooperate_status.command_status.type);
-        request->commands.push_back(cooperate_command);
-      }
-    }
-
-    if (not request->commands.empty()) {
-      requestCooperateCommands(request);
-    }
-  }
-
-  auto cooperate(const CooperateStatusArray & cooperate_status_array) -> void
-  {
-    switch (current_cooperator) {
-      case Cooperator::simulator:
-        return cooperate_queue.delay([=]() { return approve(cooperate_status_array); });
-
-      default:
-        return;
-    }
-  }
+  auto cooperate(const CooperateStatusArray &) -> void;
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
