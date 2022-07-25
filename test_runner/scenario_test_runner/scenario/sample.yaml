@@ -11,7 +11,16 @@ OpenSCENARIO:
     revMinor: 0
   ParameterDeclarations:
     ParameterDeclaration:
-      - { name: random_offset, parameterType: double, value: $(ros2 run openscenario_interpreter_example uniform_distribution -1.0 1.0) }
+      - name: random_offset
+        parameterType: double
+        value: $(ros2 run openscenario_interpreter_example uniform_distribution -1.0 1.0)
+        ValueConstraintGroup:
+          - ValueConstraint:
+            - rule: lessOrEqual
+              value: 1.0
+            - rule: greaterOrEqual
+              value: -1.0
+
   CatalogLocations:
     CatalogLocation: []
   RoadNetwork:
