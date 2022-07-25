@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/parameter_condition.hpp>
+#include <openscenario_interpreter/utility/compare.hpp>
 #include <sstream>
 #include <stdexcept>
 
