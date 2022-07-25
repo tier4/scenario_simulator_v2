@@ -47,8 +47,9 @@ auto check(const std::string & name) -> decltype(auto)
 
 ParameterDeclaration::ParameterDeclaration(
   const openscenario_msgs::msg::ParameterDeclaration & message)
-: name(message.name),                      //
-  parameter_type(message.parameter_type),  //
+: name(message.name),
+  parameter_type(message.parameter_type),
+  constraint_group(message.constraint_group),
   value(message.value)
 {
   check(name);
@@ -56,8 +57,9 @@ ParameterDeclaration::ParameterDeclaration(
 
 ParameterDeclaration::ParameterDeclaration(
   const openscenario_msgs::msg::ParameterDeclaration & message, Scope & scope)
-: name(message.name),                      //
-  parameter_type(message.parameter_type),  //
+: name(message.name),
+  parameter_type(message.parameter_type),
+  constraint_group(message.constraint_group),
   value(message.value)
 {
   scope.insert(check(name), evaluate());
@@ -66,6 +68,7 @@ ParameterDeclaration::ParameterDeclaration(
 ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
+  constraint_group(readAttribute<ValueConstraintGroup>("ConstraintGroup", node, scope)),
   value(readAttribute<String>("value", node, scope))
 {
   scope.insert(check(name), evaluate());
