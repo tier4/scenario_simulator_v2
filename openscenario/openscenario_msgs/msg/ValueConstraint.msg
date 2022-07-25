@@ -1,0 +1,10 @@
+uint8 RULE_EQUAL_TO = 1
+uint8 RULE_GREATER_THAN = 2
+uint8 RULE_LESS_THAN = 3
+uint8 RULE_GREATER_OR_EQUAL = 4
+uint8 RULE_LESS_OR_EQUAL = 5
+uint8 RULE_NOT_EQUAL_TO = 6
+
+uint8 rule
+
+string value
