@@ -17,6 +17,7 @@
 #include <cassert>
 #include <iterator>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -129,7 +130,7 @@ Scope::GlobalEnvironment::GlobalEnvironment(const boost::filesystem::path & path
 auto Scope::GlobalEnvironment::entityRef(const EntityRef & entity_ref) const -> Object
 {
   try {
-    return entities.at(entity_ref);
+    return entities->at(entity_ref);
   } catch (const std::out_of_range &) {
     throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");
   }

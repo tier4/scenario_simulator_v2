@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/teleport_action.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -46,7 +47,7 @@ auto AddEntityAction::endsImmediately() noexcept -> bool  //
 
 auto AddEntityAction::operator()(const EntityRef & entity_ref) const -> void
 try {
-  const auto entity = global().entities.at(entity_ref);
+  const auto entity = global().entities->at(entity_ref);
 
   const auto add_entity = overload(
     [&](const Vehicle & vehicle) {

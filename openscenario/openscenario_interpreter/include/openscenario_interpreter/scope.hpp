@@ -18,6 +18,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/range/algorithm.hpp>
+#include <functional>
 #include <memory>
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
@@ -142,13 +143,20 @@ private:
   auto outermostFrame() const noexcept -> const EnvironmentFrame &;
 };
 
+inline namespace syntax
+{
+struct Entities;  // TEMPORARY!
+}
+
 class Scope
 {
   struct GlobalEnvironment
   {
     const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
-    std::unordered_map<std::string, Object> entities;  // ScenarioObject or EntitySelection
+    // std::unordered_map<std::string, Object> entities;  // ScenarioObject or EntitySelection
+
+    Entities * entities;  // XXX TEMPORARY
 
     const CatalogLocations * catalog_locations = nullptr;
 
