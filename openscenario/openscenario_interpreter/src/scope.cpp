@@ -126,18 +126,4 @@ Scope::GlobalEnvironment::GlobalEnvironment(const boost::filesystem::path & path
 : pathname(pathname)
 {
 }
-
-auto Scope::GlobalEnvironment::entityRef(const EntityRef & entity_ref) const -> Object
-{
-  try {
-    return entities->at(entity_ref);
-  } catch (const std::out_of_range &) {
-    throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");
-  }
-}
-
-auto Scope::GlobalEnvironment::isAddedEntity(const EntityRef & entity_ref) const -> bool
-{
-  return entityRef(entity_ref).as<ScenarioObject>().is_added;
-}
 }  // namespace openscenario_interpreter

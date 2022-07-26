@@ -156,15 +156,11 @@ class Scope
 
     // std::unordered_map<std::string, Object> entities;  // ScenarioObject or EntitySelection
 
-    Entities * entities;  // XXX TEMPORARY
+    Entities * entities = nullptr;  // XXX TEMPORARY
 
     const CatalogLocations * catalog_locations = nullptr;
 
     explicit GlobalEnvironment(const boost::filesystem::path &);
-
-    auto entityRef(const EntityRef &) const -> Object;  // TODO: RETURN ScenarioObject TYPE!
-
-    auto isAddedEntity(const EntityRef &) const -> bool;
   };
 
   const std::shared_ptr<EnvironmentFrame> frame;
