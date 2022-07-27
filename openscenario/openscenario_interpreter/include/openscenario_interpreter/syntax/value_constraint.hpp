@@ -20,6 +20,7 @@
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_msgs/msg/value_constraint.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -36,11 +37,13 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ValueConstraint : public ComplexType
 {
-  const Rule rule;
+  Rule rule;
 
   const String value;
 
   explicit ValueConstraint(const pugi::xml_node & node, Scope & scope);
+
+  explicit ValueConstraint(const openscenario_msgs::msg::ValueConstraint &);
 
   auto evaluate(Object & object) -> Object;
 };

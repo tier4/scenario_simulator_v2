@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
 #include <openscenario_interpreter/utility/compare.hpp>
 #include <string>
@@ -68,7 +69,7 @@ ParameterDeclaration::ParameterDeclaration(
 ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
-  constraint_group(readAttribute<ValueConstraintGroup>("ConstraintGroup", node, scope)),
+  constraint_group(readElement<ValueConstraintGroup>("ConstraintGroup", node, scope)),
   value(readAttribute<String>("value", node, scope))
 {
   scope.insert(check(name), evaluate());

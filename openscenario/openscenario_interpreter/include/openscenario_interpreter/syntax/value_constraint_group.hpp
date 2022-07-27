@@ -18,6 +18,7 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/value_constraint.hpp>
+#include <openscenario_msgs/msg/value_constraint.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -51,11 +52,6 @@ struct ValueConstraintGroup : public std::list<ValueConstraint>
   auto evaluate() -> Object;
 };
 
-//template <typename T>
-//using isValueConstraintGroup =
-//  typename std::is_same<typename std::decay<T>::type, ValueConstraintGroup>;
-//
-//static_assert(isValueConstraintGroup<ValueConstraintGroup>::value);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
