@@ -6,8 +6,6 @@
 [![BuildTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml)
 [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)
 
-[![dockeri.co](https://dockeri.co/image/tier4/scenario_simulator_v2)](https://hub.docker.com/r/tier4/scenario_simulator_v2)
-
 Scenario simulator v2 is a scenario testing framework for Autoware.
 
 ![Scenario Testing Framework](image/what_is_scenario_testing_framework.png "what is scenario testing framework")
