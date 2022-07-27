@@ -22,12 +22,11 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 OpenScenario::OpenScenario(const boost::filesystem::path & pathname)
-: Scope(pathname, this),
+: Scope(this),
   pathname(pathname),
   file_header(
     readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), local())),
-  category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, local())),
-  frame(0)
+  category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, local()))
 {
 }
 
@@ -39,9 +38,7 @@ auto OpenScenario::evaluate() -> Object
 
 auto OpenScenario::load(const boost::filesystem::path & filepath) -> const pugi::xml_node &
 {
-  const auto result = script.load_file(filepath.string().c_str());
-
-  if (not result) {
+  if (const auto result = script.load_file(filepath.string().c_str()); not result) {
     throw SyntaxError(result.description(), ": ", filepath);
   } else {
     return script;

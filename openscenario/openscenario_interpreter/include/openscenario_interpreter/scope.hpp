@@ -154,13 +154,9 @@ class Scope
 {
   struct GlobalEnvironment
   {
-    // const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
-
     Entities * entities = nullptr;  // XXX TEMPORARY
 
     const CatalogLocations * catalog_locations = nullptr;
-
-    explicit GlobalEnvironment(const boost::filesystem::path &);
   };
 
   const OpenScenario * toplevel = nullptr;
@@ -180,9 +176,9 @@ public:
 
   Scope(Scope &&) noexcept = default;
 
-  explicit Scope(const std::string &, const Scope &);
+  explicit Scope(const OpenScenario * const);
 
-  explicit Scope(const boost::filesystem::path &, const OpenScenario * const);
+  explicit Scope(const std::string &, const Scope &);
 
   auto dirname() const -> std::string;
 

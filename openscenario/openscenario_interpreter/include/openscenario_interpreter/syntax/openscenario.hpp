@@ -46,7 +46,7 @@ struct OpenScenario : public Scope
 
   const OpenScenarioCategory category;
 
-  std::size_t frame;
+  std::size_t frame = 0;
 
   explicit OpenScenario(const boost::filesystem::path &);
 

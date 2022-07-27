@@ -18,6 +18,7 @@
 #include <iterator>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/openscenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -88,8 +89,10 @@ auto EnvironmentFrame::lookupFrame(const Prefixed<Name> & prefixed_name) const
   }
 }
 
-Scope::Scope(const boost::filesystem::path & pathname)
-: frame(new EnvironmentFrame()), global_environment(std::make_shared<GlobalEnvironment>(pathname))
+Scope::Scope(const OpenScenario * const toplevel)
+: toplevel(toplevel),
+  frame(new EnvironmentFrame()),
+  global_environment(std::make_shared<GlobalEnvironment>())
 {
 }
 
@@ -126,9 +129,5 @@ auto Scope::local() noexcept -> Scope & { return *this; }
 auto Scope::insert(const Name & identifier, const Object & object) -> void
 {
   return frame->define(identifier, object);
-}
-
-Scope::GlobalEnvironment::GlobalEnvironment(const boost::filesystem::path & pathname)
-{
 }
 }  // namespace openscenario_interpreter
