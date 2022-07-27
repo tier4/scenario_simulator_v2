@@ -38,6 +38,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct OpenScenario : public Scope
 {
+  const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
+
   pugi::xml_document script;
 
   const FileHeader file_header;

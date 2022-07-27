@@ -22,9 +22,10 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 OpenScenario::OpenScenario(const boost::filesystem::path & pathname)
-: Scope(pathname),
+: Scope(pathname, this),
+  pathname(pathname),
   file_header(
-    readElement<FileHeader>("FileHeader", load(global().pathname).child("OpenSCENARIO"), local())),
+    readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), local())),
   category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, local())),
   frame(0)
 {

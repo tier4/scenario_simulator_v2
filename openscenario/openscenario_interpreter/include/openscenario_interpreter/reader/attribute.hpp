@@ -36,7 +36,7 @@ template <typename Scope>
 auto substitute(std::string attribute, Scope & scope)
 {
   auto dirname = [](auto &&, auto && scope) {
-    return scope.global().pathname.parent_path().string();
+    return scope.dirname();
   };
 
   auto find_pkg_share = [](auto && package_name, auto &&) {

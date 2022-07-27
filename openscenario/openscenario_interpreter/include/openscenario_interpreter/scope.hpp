@@ -146,15 +146,15 @@ private:
 inline namespace syntax
 {
 struct Entities;  // TEMPORARY!
+
+struct OpenScenario;  // TEMPORARY!
 }
 
 class Scope
 {
   struct GlobalEnvironment
   {
-    const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
-
-    // std::unordered_map<std::string, Object> entities;  // ScenarioObject or EntitySelection
+    // const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
     Entities * entities = nullptr;  // XXX TEMPORARY
 
@@ -162,6 +162,8 @@ class Scope
 
     explicit GlobalEnvironment(const boost::filesystem::path &);
   };
+
+  const OpenScenario * toplevel = nullptr;
 
   const std::shared_ptr<EnvironmentFrame> frame;
 
@@ -180,7 +182,9 @@ public:
 
   explicit Scope(const std::string &, const Scope &);
 
-  explicit Scope(const boost::filesystem::path &);
+  explicit Scope(const boost::filesystem::path &, const OpenScenario * const);
+
+  auto dirname() const -> std::string;
 
   template <typename... Ts>
   auto ref(Ts &&... xs) const -> decltype(auto)

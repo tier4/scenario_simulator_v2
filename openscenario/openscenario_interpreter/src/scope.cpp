@@ -101,6 +101,12 @@ Scope::Scope(const std::string & name, const Scope & outer)
 {
 }
 
+auto Scope::dirname() const -> std::string
+{
+  assert(toplevel);
+  return toplevel->pathname.parent_path().string();
+}
+
 auto Scope::global() const -> const GlobalEnvironment &
 {
   assert(global_environment);
@@ -123,7 +129,6 @@ auto Scope::insert(const Name & identifier, const Object & object) -> void
 }
 
 Scope::GlobalEnvironment::GlobalEnvironment(const boost::filesystem::path & pathname)
-: pathname(pathname)
 {
 }
 }  // namespace openscenario_interpreter
