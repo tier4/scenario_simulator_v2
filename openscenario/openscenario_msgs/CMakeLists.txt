@@ -18,6 +18,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/ParameterDeclaration.msg
   msg/ParameterType.msg
   msg/ValueConstraint.msg
+  msg/ValueConstraintGroup.msg
   DEPENDENCIES builtin_interfaces)
 
 ament_auto_package()

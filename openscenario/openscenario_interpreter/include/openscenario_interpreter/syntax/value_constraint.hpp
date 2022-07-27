@@ -37,7 +37,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ValueConstraint : public ComplexType
 {
-  Rule rule;
+  const Rule rule;
 
   const String value;
 

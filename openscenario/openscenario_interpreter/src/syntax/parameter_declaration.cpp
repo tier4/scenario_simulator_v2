@@ -50,28 +50,31 @@ ParameterDeclaration::ParameterDeclaration(
   const openscenario_msgs::msg::ParameterDeclaration & message)
 : name(message.name),
   parameter_type(message.parameter_type),
-  constraint_group(message.constraint_group),
   value(message.value)
 {
+  for (auto constraint_group : message.constraint_groups) {
+    constraint_groups.emplace_back(constraint_group);
+  }
   check(name);
 }
 
 ParameterDeclaration::ParameterDeclaration(
   const openscenario_msgs::msg::ParameterDeclaration & message, Scope & scope)
-: name(message.name),
-  parameter_type(message.parameter_type),
-  constraint_group(message.constraint_group),
-  value(message.value)
+: name(message.name), parameter_type(message.parameter_type), value(message.value)
 {
+  for (auto constraint_group : message.constraint_groups) {
+    constraint_groups.emplace_back(constraint_group);
+  }
   scope.insert(check(name), evaluate());
 }
 
 ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
-  constraint_group(readElement<ValueConstraintGroup>("ConstraintGroup", node, scope)),
   value(readAttribute<String>("value", node, scope))
 {
+  traverse<0, unbounded>(
+    node, "ConstraintGroup", [&](auto && node) { constraint_groups.emplace_back(node, scope); });
   scope.insert(check(name), evaluate());
 }
 

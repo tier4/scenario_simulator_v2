@@ -26,9 +26,9 @@ ValueConstraintGroup::ValueConstraintGroup(const pugi::xml_node & node, Scope & 
   traverse<1, unbounded>(node, "Constraint", [&](auto && node) { emplace_back(node, scope); });
 }
 ValueConstraintGroup::ValueConstraintGroup(
-  const std::vector<openscenario_msgs::msg::ValueConstraint> & constraints)
+  const openscenario_msgs::msg::ValueConstraintGroup & msg)
 {
-  for(auto & constraint : constraints){
+  for(auto & constraint : msg.constraints){
     emplace_back(constraint);
   }
 }
@@ -38,18 +38,3 @@ auto evaluate() -> Object {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-//auto operator>>(std::istream & is, openscenario_interpreter::syntax::ValueConstraintGroup & datum)
-//  -> std::istream &
-//{
-//  std::string buffer;
-//
-//  is >> buffer;
-//
-//
-//
-//}
-//
-//auto operator<<(std::ostream & os, const openscenario_interpreter::syntax::ValueConstraintGroup & datum)
-//  -> std::ostream &
-//{
-//}

@@ -41,7 +41,7 @@ struct ParameterDeclaration
 
   const ParameterType parameter_type;
 
-  const ValueConstraintGroup constraint_group;
+  std::list<ValueConstraintGroup> constraint_groups;
 
   const String value;
 

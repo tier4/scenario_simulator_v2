@@ -28,26 +28,8 @@ ValueConstraint::ValueConstraint(const pugi::xml_node & node, Scope & scope)
 }
 
 ValueConstraint::ValueConstraint(const openscenario_msgs::msg::ValueConstraint & msg)
-: value(msg.value)
+: rule(boost::lexical_cast<Rule>(msg.rule)), value(msg.value)
 {
-  switch (msg.rule) {
-    case openscenario_msgs::msg::ValueConstraint::RULE_EQUAL_TO:
-      rule.value = Rule::equalTo;
-    case openscenario_msgs::msg::ValueConstraint::RULE_GREATER_THAN:
-      rule.value = Rule::greaterThan;
-    case openscenario_msgs::msg::ValueConstraint::RULE_LESS_THAN:
-      rule.value = Rule::lessThan;
-    case openscenario_msgs::msg::ValueConstraint::RULE_GREATER_OR_EQUAL:
-      rule.value = Rule::greaterOrEqual;
-    case openscenario_msgs::msg::ValueConstraint::RULE_LESS_OR_EQUAL:
-      rule.value = Rule::lessOrEqual;
-    case openscenario_msgs::msg::ValueConstraint::RULE_NOT_EQUAL_TO:
-      rule.value = Rule::notEqualTo;
-    default:
-      throw common::Error(
-        "Failed to convert openscenario_msgs::msg::ValueConstraint::rule to "
-        "openscenario_interpreter::syntax::Rule");
-  }
 }
 
 auto ValueConstraint::evaluate(Object & object) -> Object
