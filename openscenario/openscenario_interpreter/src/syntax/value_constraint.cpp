@@ -32,9 +32,9 @@ ValueConstraint::ValueConstraint(const openscenario_msgs::msg::ValueConstraint &
 {
 }
 
-auto ValueConstraint::evaluate(Object & object) -> Object
+auto ValueConstraint::evaluate(const Object & object) const -> bool
 {
-  return asBoolean(compare(object, rule, value));
+  return compare(object, rule, value);
 }
 
 }  // namespace syntax

@@ -25,16 +25,19 @@ ValueConstraintGroup::ValueConstraintGroup(const pugi::xml_node & node, Scope & 
 {
   traverse<1, unbounded>(node, "Constraint", [&](auto && node) { emplace_back(node, scope); });
 }
-ValueConstraintGroup::ValueConstraintGroup(
-  const openscenario_msgs::msg::ValueConstraintGroup & msg)
+ValueConstraintGroup::ValueConstraintGroup(const openscenario_msgs::msg::ValueConstraintGroup & msg)
 {
-  for(auto & constraint : msg.constraints){
+  for (auto & constraint : msg.constraints) {
     emplace_back(constraint);
   }
 }
 
-auto evaluate() -> Object {}
+auto ValueConstraintGroup::evaluate(const Object & value) const -> bool
+{
+  return std::all_of(std::begin(*this), std::end(*this),[&](auto && constraint){
+    return constraint.evaluate(value);
+  });
+}
 
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-

@@ -45,7 +45,7 @@ struct ValueConstraint : public ComplexType
 
   explicit ValueConstraint(const openscenario_msgs::msg::ValueConstraint &);
 
-  auto evaluate(Object & object) -> Object;
+  auto evaluate(const Object & object) const -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

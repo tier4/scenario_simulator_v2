@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto check(const std::string & name) -> decltype(auto)
+auto checkName(const std::string & name) -> decltype(auto)
 {
   auto includes = [](const std::string & name, const std::vector<char> & chars) {
     return std::any_of(std::begin(chars), std::end(chars), [&](const auto & each) {
@@ -48,14 +48,12 @@ auto check(const std::string & name) -> decltype(auto)
 
 ParameterDeclaration::ParameterDeclaration(
   const openscenario_msgs::msg::ParameterDeclaration & message)
-: name(message.name),
-  parameter_type(message.parameter_type),
-  value(message.value)
+: name(message.name), parameter_type(message.parameter_type), value(message.value)
 {
   for (auto constraint_group : message.constraint_groups) {
     constraint_groups.emplace_back(constraint_group);
   }
-  check(name);
+  checkName(name);
 }
 
 ParameterDeclaration::ParameterDeclaration(
@@ -65,7 +63,7 @@ ParameterDeclaration::ParameterDeclaration(
   for (auto constraint_group : message.constraint_groups) {
     constraint_groups.emplace_back(constraint_group);
   }
-  scope.insert(check(name), evaluate());
+  scope.insert(checkName(name), evaluate());
 }
 
 ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
@@ -75,10 +73,12 @@ ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & 
 {
   traverse<0, unbounded>(
     node, "ConstraintGroup", [&](auto && node) { constraint_groups.emplace_back(node, scope); });
-  scope.insert(check(name), evaluate());
+  scope.insert(checkName(name), evaluate());
 }
 
-auto ParameterDeclaration::evaluate() const -> Object
+auto ParameterDeclaration::evaluate() const -> Object { return castValueByParameterType(); }
+
+auto ParameterDeclaration::castValueByParameterType() const -> Object
 {
   // clang-format off
   switch (parameter_type) {
@@ -94,6 +94,14 @@ auto ParameterDeclaration::evaluate() const -> Object
       return unspecified;
   }
   // clang-format on
+}
+
+auto ParameterDeclaration::checkValue() -> bool
+{
+  return std::any_of(
+    std::begin(constraint_groups), std::end(constraint_groups), [&](auto && constraint_group) {
+      return constraint_group.evaluate(castValueByParameterType());
+    });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

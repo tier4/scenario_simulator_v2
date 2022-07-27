@@ -47,9 +47,10 @@ struct ValueConstraintGroup : public std::list<ValueConstraint>
   ValueConstraintGroup() = default;
 
   explicit ValueConstraintGroup(const pugi::xml_node &, Scope &);
+
   explicit ValueConstraintGroup(const openscenario_msgs::msg::ValueConstraintGroup &);
 
-  auto evaluate() -> Object;
+  auto evaluate(const Object &) const -> bool;
 };
 
 }  // namespace syntax
