@@ -52,9 +52,6 @@ To generate this message, Docker took the following steps:
 To try something more ambitious, you can run an Ubuntu container with:
  $ docker run -it ubuntu bash
 
-Share images, automate workflows, and more with a free Docker ID:
- https://hub.docker.com/
-
 For more examples and ideas, visit:
  https://docs.docker.com/get-started/
 
@@ -152,8 +149,6 @@ You can run the sample scenarios easily by using our pre-built docker image.
 
 [//]: # (We automatically build docker images of scenario_simulator_v2 by using GitHub Actions and put them into our Docker Hub repository.)
 
-[![dockeri.co](https://dockeri.co/image/tier4/scenario_simulator_v2)](https://hub.docker.com/r/tier4/scenario_simulator_v2)
-
 <details>
 <summary>Optional : Build docker image locally</summary>
 If you want to build a docker image in your local machine, please execute the commands below in your terminal.
@@ -161,21 +156,21 @@ If you want to build a docker image in your local machine, please execute the co
 cd path/to/scenario_simulator_v2
 docker build -t scenario_simulator_v2 . --build-arg ROS_DISTRO=galactic
 ```
-Please replace the docker image name (e.g. "tier4/scenario_simulator_v2:galactic" ) with "scenario_simulator_v2" <br/>
+Please replace the docker image name (e.g. "ghcr.io/tier4/scenario_simulator_v2:galactic" ) with "scenario_simulator_v2" <br/>
 to use your built docker image in the launching commands. 
 
 </details>
 
 If your local machine has NVIDIA GPU(s), you can launch scenario_simulator_v2 with test scenarios
     ```bash
-    docker pull tier4/scenario_simulator_v2:galactic
-    rocker --nvidia --x11 tier4/scenario_simulator_v2:galactic ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60.0
+    docker pull ghcr.io/tier4/scenario_simulator_v2:galactic
+    rocker --nvidia --x11 ghcr.io/tier4/scenario_simulator_v2:galactic ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60.0
     ```
 
 If your local machine does NOT have NVIDIA GPU(s), you can launch scenario_simulator_v2 with test scenarios
     ```bash
-    docker pull tier4/scenario_simulator_v2:galactic
-    rocker --x11 tier4/scenario_simulator_v2:galactic ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60.0
+    docker pull ghcr.io/tier4/scenario_simulator_v2:galactic
+    rocker --x11 ghcr.io/tier4/scenario_simulator_v2:galactic ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60.0
     ```
 
 <video
@@ -209,7 +204,7 @@ and execute the command below
 
 ```
 rocker --x11 --oyr-mount $PWD/path/to/your/scenario.yaml \
-    -- tier4/scenario_simulator_v2:galactic \
+    -- ghcr.io/tier4/scenario_simulator_v2:galactic \
     ros2 launch scenario_test_runner scenario_test_runner.launch.py \
     scenario:=$PWD/path/to/your/scenario.yaml launch_rviz:=True
 ```
@@ -220,8 +215,8 @@ wget https://gist.github.com/hakuturu583/5e6a651df9abdf25dca7071ff5ea8ac3/archiv
 unzip 1448057aeebc34cbfc04598b965440fcf7ecb636.zip
 mv 5e6a651df9abdf25dca7071ff5ea8ac3-1448057aeebc34cbfc04598b965440fcf7ecb636 scenarios
 sudo pip3 install git+https://github.com/sloretz/off-your-rocker.git
-docker pull tier4/scenario_simulator_v2:galactic
-rocker --x11 --oyr-mount $PWD/scenarios/UC-001-0001-Kashiwa.yaml -- tier4/scenario_simulator_v2:galactic ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:=$PWD/scenarios/UC-001-0001-Kashiwa.yaml launch_rviz:=True
+docker pull ghcr.io/tier4/scenario_simulator_v2:galactic
+rocker --x11 --oyr-mount $PWD/scenarios/UC-001-0001-Kashiwa.yaml -- ghcr.io/tier4/scenario_simulator_v2:galactic ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:=$PWD/scenarios/UC-001-0001-Kashiwa.yaml launch_rviz:=True
 ```
 Our sample should run like the video below.
 
