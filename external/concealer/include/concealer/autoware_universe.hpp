@@ -32,6 +32,7 @@
 #include <concealer/autoware.hpp>
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
+#include <concealer/task_queue.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
@@ -95,8 +96,10 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   // TODO CONCEALER_DEFINE_CLIENT(InitializePose);
   CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
 
-private:  // EXPERIMENTAL RTC SUPPORTS
+private:
   Cooperator current_cooperator = Cooperator::simulator;
+
+  TaskQueue cooperation_queue;
 
   auto approve(const CooperateStatusArray &) -> void;
 
