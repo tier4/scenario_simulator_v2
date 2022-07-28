@@ -39,15 +39,6 @@ auto operator>>(std::istream & is, VehicleCategory & category) -> std::istream &
   BOILERPLATE(car);
   BOILERPLATE(motorbike);
   BOILERPLATE(truck);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                             \
-  if (buffer == #IDENTIFIER) {                                              \
-    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(VehicleCategory, buffer); \
-  }                                                                         \
-  static_assert(true, "")
-
   BOILERPLATE(semitrailer);
   BOILERPLATE(trailer);
   BOILERPLATE(train);
