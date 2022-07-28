@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
 
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
@@ -59,4 +59,4 @@ auto operator<<(nlohmann::json &, const OpenScenario &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
-#include <openscenario_interpreter/syntax/openscenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter

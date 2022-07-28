@@ -17,8 +17,7 @@
 #include <cassert>
 #include <iterator>
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/entities.hpp>
-#include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
