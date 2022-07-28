@@ -34,7 +34,7 @@ ValueConstraintGroup::ValueConstraintGroup(const openscenario_msgs::msg::ValueCo
 
 auto ValueConstraintGroup::evaluate(const Object & value) const -> bool
 {
-  return std::all_of(std::begin(*this), std::end(*this),[&](auto && constraint){
+  return std::all_of(std::begin(*this), std::end(*this), [&](auto && constraint) {
     return constraint.evaluate(value);
   });
 }
