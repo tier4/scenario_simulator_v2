@@ -89,16 +89,17 @@ auto EnvironmentFrame::lookupFrame(const Prefixed<Name> & prefixed_name) const
   }
 }
 
-Scope::Scope(const OpenScenario * const toplevel)
-: toplevel(toplevel),
+Scope::Scope(const OpenScenario * const open_scenario)
+: open_scenario(open_scenario),
   frame(new EnvironmentFrame()),
-  global_environment(std::make_shared<GlobalEnvironment>())
+  scenario_definition(std::make_shared<ScenarioDefinition>())
 {
 }
 
 Scope::Scope(const std::string & name, const Scope & outer)
-: frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
-  global_environment(outer.global_environment),
+: open_scenario(outer.open_scenario),
+  frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
+  scenario_definition(outer.scenario_definition),
   name(name),
   actors(outer.actors)
 {
@@ -106,20 +107,20 @@ Scope::Scope(const std::string & name, const Scope & outer)
 
 auto Scope::dirname() const -> std::string
 {
-  assert(toplevel);
-  return toplevel->pathname.parent_path().string();
+  assert(open_scenario);
+  return open_scenario->pathname.parent_path().string();
 }
 
-auto Scope::global() const -> const GlobalEnvironment &
+auto Scope::global() const -> const ScenarioDefinition &
 {
-  assert(global_environment);
-  return *global_environment;
+  assert(scenario_definition);
+  return *scenario_definition;
 }
 
-auto Scope::global() -> GlobalEnvironment &
+auto Scope::global() -> ScenarioDefinition &
 {
-  assert(global_environment);
-  return *global_environment;
+  assert(scenario_definition);
+  return *scenario_definition;
 }
 
 auto Scope::local() const noexcept -> const Scope & { return *this; }

@@ -145,25 +145,47 @@ private:
 
 inline namespace syntax
 {
-struct Entities;  // TEMPORARY!
+struct Entities;
 
-struct OpenScenario;  // TEMPORARY!
-}
+struct OpenScenario;
+}  // namespace syntax
 
 class Scope
 {
-  struct GlobalEnvironment
+  /*
+     In OpenSCENARIO, global resources are FileHeader, top-level
+     ParameterDeclaration, CatalogLocations, RoadNetwork, and Entities (These
+     are located directly under the `OpenSCENARIO` tag).
+
+     The `Scope` data member `open_scenario` is provided to reference those
+     global resources. However, some constructors need access to global
+     resources during the construction of the OpenScenario class (corresponding
+     to the OpenSCENARIO tag) for processing order reasons. Here, the data
+     member `open_scenario` is a null pointer until the
+     `syntax::ScenarioDefinition` construction is complete. The inner class
+     `Scope::ScenarioDefinition` is provided to deal with this problem, which
+     implementors understand to be a DIRTY HACK.
+
+     A fundamental solution to this problem will require a reworking of
+     CatalogReference, which is still in the pilot implementation stage at this
+     time, but the status quo will be maintained for the time being due to its
+     wide impact. If you want to access global resources via `Scope`, we
+     recommend that you go through the data member `open_scenario` instead of
+     `Scope::ScenarioDefintiion` whenever possible.
+  */
+
+  struct ScenarioDefinition
   {
-    Entities * entities = nullptr;  // XXX TEMPORARY
+    const Entities * entities = nullptr;
 
     const CatalogLocations * catalog_locations = nullptr;
   };
 
-  const OpenScenario * toplevel = nullptr;
+  const OpenScenario * const open_scenario;
 
   const std::shared_ptr<EnvironmentFrame> frame;
 
-  const std::shared_ptr<GlobalEnvironment> global_environment;
+  const std::shared_ptr<ScenarioDefinition> scenario_definition;
 
 public:
   const std::string name;
@@ -174,7 +196,7 @@ public:
 
   Scope(const Scope &) = default;  // NOTE: shallow copy
 
-  Scope(Scope &&) noexcept = default;
+  Scope(Scope &&) = default;
 
   explicit Scope(const OpenScenario * const);
 
@@ -194,9 +216,9 @@ public:
     return frame->ref<T>(std::forward<decltype(xs)>(xs)...).template as<T>();
   }
 
-  auto global() const -> const GlobalEnvironment &;
+  auto global() const -> const ScenarioDefinition &;
 
-  auto global() -> GlobalEnvironment &;
+  auto global() -> ScenarioDefinition &;
 
   auto local() const noexcept -> const Scope &;
 
