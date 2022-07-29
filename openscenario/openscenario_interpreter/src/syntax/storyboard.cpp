@@ -51,34 +51,34 @@ auto Storyboard::run() -> void
 
 auto Storyboard::start() -> void
 {
-  auto everyone_engageable = [this]() {
-    return std::all_of(
-      std::cbegin(*global().entities), std::cend(*global().entities), [&](const auto & each) {
-        const auto & [name, scenario_object] = each;
-        return not scenario_object.template as<ScenarioObject>().is_added or
-               not scenario_object.template as<ScenarioObject>()
-                     .object_controller.isUserDefinedController() or
-               asAutoware(name).ready();
-      });
-  };
-
-  auto engage_everyone = [this]() {
-    for (const auto & [name, scenario_object] : *global().entities) {
-      if (
-        scenario_object.template as<ScenarioObject>().is_added and
-        scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
-        asAutoware(name).engage();
-      }
-    }
-  };
-
-  if (everyone_engageable()) {
-    return engage_everyone();
-  } else {
-    throw common::AutowareError(
-      "Autoware did not reach an engageable state within the specified time "
-      "(initialize_duration).");
-  }
+  // auto everyone_engageable = [this]() {
+  //   return std::all_of(
+  //     std::cbegin(*global().entities), std::cend(*global().entities), [&](const auto & each) {
+  //       const auto & [name, scenario_object] = each;
+  //       return not scenario_object.template as<ScenarioObject>().is_added or
+  //              not scenario_object.template as<ScenarioObject>()
+  //                    .object_controller.isUserDefinedController() or
+  //              asAutoware(name).ready();
+  //     });
+  // };
+  //
+  // auto engage_everyone = [this]() {
+  //   for (const auto & [name, scenario_object] : *global().entities) {
+  //     if (
+  //       scenario_object.template as<ScenarioObject>().is_added and
+  //       scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
+  //       asAutoware(name).engage();
+  //     }
+  //   }
+  // };
+  //
+  // if (everyone_engageable()) {
+  //   return engage_everyone();
+  // } else {
+  //   throw common::AutowareError(
+  //     "Autoware did not reach an engageable state within the specified time "
+  //     "(initialize_duration).");
+  // }
 }
 
 auto operator<<(nlohmann::json & json, const Storyboard & datum) -> nlohmann::json &

@@ -103,6 +103,11 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
   });
 }
 
+auto AutowareUniverse::driving() const -> bool
+{
+  return isDriving();
+}
+
 auto AutowareUniverse::engage() -> void
 {
   task_queue.delay([this]() {
@@ -112,6 +117,11 @@ auto AutowareUniverse::engage() -> void
       requestEngage(request);
     });
   });
+}
+
+auto AutowareUniverse::engageable() const -> bool
+{
+  return isWaitingForEngage();
 }
 
 auto AutowareUniverse::update() -> void

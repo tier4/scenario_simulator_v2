@@ -44,7 +44,8 @@
 namespace openscenario_interpreter
 {
 class Interpreter : public rclcpp_lifecycle::LifecycleNode,
-                    private SimulatorCore::ConditionEvaluation
+                    private SimulatorCore::ConditionEvaluation,
+                    private SimulatorCore::NonStandardOperation
 {
   using Context = openscenario_interpreter_msgs::msg::Context;
 
@@ -74,6 +75,10 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
+  bool engage_requested = false;
+
+  bool engage_succeeded = false;
+
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC
   explicit Interpreter(const rclcpp::NodeOptions &);
@@ -83,6 +88,12 @@ public:
   auto currentLocalFrameRate() const -> std::chrono::milliseconds;
 
   auto currentScenarioDefinition() const -> const std::shared_ptr<ScenarioDefinition> &;
+
+  auto ready() const -> bool;
+
+  auto engage() const -> void;
+
+  auto engageable() const -> bool;
 
   auto isAnErrorIntended() const -> bool;
 

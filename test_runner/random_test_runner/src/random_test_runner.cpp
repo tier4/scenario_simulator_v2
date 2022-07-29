@@ -203,7 +203,7 @@ void RandomTestRunner::update()
   }
   if (
     api_->isEgoSpawned() && !api_->isNpcLogicStarted() &&
-    api_->asAutoware(api_->getEgoName()).ready()) {
+    api_->asAutoware(api_->getEgoName()).engageable()) {
     api_->startNpcLogic();
   }
   current_test_executor_->update(api_->getCurrentTime());

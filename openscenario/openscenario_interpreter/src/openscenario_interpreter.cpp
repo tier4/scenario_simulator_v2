@@ -20,6 +20,7 @@
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
@@ -127,6 +128,46 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
     });
 }
 
+auto Interpreter::engage() const -> void
+{
+  for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
+    if (
+      scenario_object.template as<ScenarioObject>().is_added and
+      scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
+      asAutoware(name).engage();
+    }
+  }
+}
+
+
+auto Interpreter::engageable() const -> bool
+{
+  return std::all_of(
+    std::cbegin(currentScenarioDefinition()->entities),
+    std::cend(currentScenarioDefinition()->entities),
+    [this](const auto & each) {
+      const auto & [name, scenario_object] = each;
+      return not scenario_object.template as<ScenarioObject>().is_added or
+             not scenario_object.template as<ScenarioObject>()
+                   .object_controller.isUserDefinedController() or
+             asAutoware(name).engageable();
+    });
+}
+
+auto Interpreter::ready() const -> bool
+{
+  return std::all_of(
+    std::cbegin(currentScenarioDefinition()->entities),
+    std::cend(currentScenarioDefinition()->entities),
+    [this](const auto & each) {
+      const auto & [name, scenario_object] = each;
+      return not scenario_object.template as<ScenarioObject>().is_added or
+             not scenario_object.template as<ScenarioObject>()
+                   .object_controller.isUserDefinedController() or
+             asAutoware(name).driving();
+    });
+}
+
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
   auto initializeStoryboard = [this]() {
@@ -152,7 +193,18 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         deactivate();
       },
       [this]() {
-        if (evaluateSimulationTime() < 0) {
+        if (std::isnan(evaluateSimulationTime()) and not engage_requested) {
+          if (engageable()) {
+            engage();
+            engage_requested = true;
+          }
+          SimulatorCore::update();
+          publishCurrentContext();
+        } else if (std::isnan(evaluateSimulationTime()) and not engage_succeeded) {
+          if (ready()) {
+            startNpcLogic();
+            engage_succeeded = true;
+          }
           SimulatorCore::update();
           publishCurrentContext();
         } else if (currentScenarioDefinition()) {
