@@ -76,8 +76,6 @@ ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & 
   scope.insert(checkName(name), evaluate());
 }
 
-auto ParameterDeclaration::evaluate() const -> Object { return castValueByParameterType(); }
-
 auto ParameterDeclaration::castValueByParameterType() const -> Object
 {
   // clang-format off
@@ -96,12 +94,32 @@ auto ParameterDeclaration::castValueByParameterType() const -> Object
   // clang-format on
 }
 
-auto ParameterDeclaration::checkValue() -> bool
+auto ParameterDeclaration::checkValue() const -> bool
 {
-  return std::any_of(
-    std::begin(constraint_groups), std::end(constraint_groups), [&](auto && constraint_group) {
-      return constraint_group.evaluate(castValueByParameterType());
-    });
+  if (constraint_groups.empty()) {
+    return true;
+  } else {
+    return std::any_of(
+      std::begin(constraint_groups), std::end(constraint_groups), [&](auto && constraint_group) {
+        return constraint_group.evaluate(castValueByParameterType());
+      });
+  }
 }
+
+auto ParameterDeclaration::evaluate() const -> Object
+{
+  if (checkValue()) {
+    return castValueByParameterType();
+  } else {
+    std::stringstream ss;
+    ss << "\x1b[1;31mParameter is not suit for constraints. name : " << name
+       << ", value : " << castValueByParameterType() << "\x1b[0m";
+    // use std::cout to show the error message in the log file
+    // because messages by common::Error written here are not shown in the log.
+    std::cout << ss.str() << std::endl;
+    throw common::Error(ss.str());
+  }
+}
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter

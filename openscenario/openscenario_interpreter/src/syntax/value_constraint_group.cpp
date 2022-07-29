@@ -23,7 +23,7 @@ inline namespace syntax
 {
 ValueConstraintGroup::ValueConstraintGroup(const pugi::xml_node & node, Scope & scope)
 {
-  traverse<1, unbounded>(node, "Constraint", [&](auto && node) { emplace_back(node, scope); });
+  traverse<1, unbounded>(node, "ValueConstraint", [&](auto && node) { emplace_back(node, scope); });
 }
 ValueConstraintGroup::ValueConstraintGroup(const openscenario_msgs::msg::ValueConstraintGroup & msg)
 {
@@ -34,9 +34,10 @@ ValueConstraintGroup::ValueConstraintGroup(const openscenario_msgs::msg::ValueCo
 
 auto ValueConstraintGroup::evaluate(const Object & value) const -> bool
 {
-  return std::all_of(std::begin(*this), std::end(*this), [&](auto && constraint) {
+  auto ret = std::all_of(std::begin(*this), std::end(*this), [&](auto && constraint) {
     return constraint.evaluate(value);
   });
+  return ret;
 }
 
 }  // namespace syntax
