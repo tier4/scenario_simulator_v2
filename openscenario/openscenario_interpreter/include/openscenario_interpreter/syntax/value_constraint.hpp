@@ -41,7 +41,7 @@ struct ValueConstraint : public ComplexType
 
   const String value;
 
-  explicit ValueConstraint(const pugi::xml_node & node, Scope & scope);
+  explicit ValueConstraint(const pugi::xml_node &, Scope &);
 
   explicit ValueConstraint(const openscenario_msgs::msg::ValueConstraint &);
 

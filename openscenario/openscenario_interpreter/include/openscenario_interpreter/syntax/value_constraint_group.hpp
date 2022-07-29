@@ -42,8 +42,6 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ValueConstraintGroup : public std::list<ValueConstraint>
 {
-  bool current_value;
-
   ValueConstraintGroup() = default;
 
   explicit ValueConstraintGroup(const pugi::xml_node &, Scope &);
