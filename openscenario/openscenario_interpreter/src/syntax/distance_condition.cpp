@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/distance_condition.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
@@ -180,7 +181,7 @@ auto DistanceCondition::distance<  //
   return apply<double>(
     overload(
       [&](const WorldPosition & position) {
-        if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
+        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
           return makeNativeRelativeLanePosition(
                    triggering_entity, static_cast<NativeLanePosition>(position))
             .s;
@@ -189,7 +190,7 @@ auto DistanceCondition::distance<  //
         }
       },
       [&](const RelativeWorldPosition & position) {
-        if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
+        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
           return makeNativeRelativeLanePosition(
                    triggering_entity, static_cast<NativeLanePosition>(position))
             .s;
@@ -198,7 +199,7 @@ auto DistanceCondition::distance<  //
         }
       },
       [&](const LanePosition & position) {
-        if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
+        if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
           return makeNativeRelativeLanePosition(
                    triggering_entity, static_cast<NativeLanePosition>(position))
             .s;

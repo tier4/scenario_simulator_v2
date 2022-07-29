@@ -24,16 +24,29 @@ inline namespace syntax
 Entities::Entities(const pugi::xml_node & node, Scope & scope)
 {
   traverse<0, unbounded>(node, "ScenarioObject", [&](auto && node) {
-    auto name = readAttribute<std::string>("name", node, scope);
-    auto element = make<ScenarioObject>(node, scope);
-    scope.global().entities.emplace(name, element);
-    // scope.insert(name, element);
+    emplace(readAttribute<String>("name", node, scope), make<ScenarioObject>(node, scope));
   });
+
+  scope.global().entities = this;
 
   traverse<0, unbounded>(node, "EntitySelection", [&](auto && node) {
     throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
     return unspecified;
   });
+}
+
+auto Entities::isAdded(const EntityRef & entity_ref) const -> bool
+{
+  return ref(entity_ref).template as<ScenarioObject>().is_added;
+}
+
+auto Entities::ref(const EntityRef & entity_ref) const -> Object
+{
+  try {
+    return at(entity_ref);
+  } catch (const std::out_of_range &) {
+    throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

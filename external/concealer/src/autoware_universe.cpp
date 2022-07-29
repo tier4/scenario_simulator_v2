@@ -53,7 +53,7 @@ auto AutowareUniverse::cooperate(const CooperateStatusArray & cooperate_status_a
 {
   switch (current_cooperator) {
     case Cooperator::simulator:
-      return approve(cooperate_status_array);
+      return cooperation_queue.delay([=]() { return approve(cooperate_status_array); });
 
     default:
       return;
