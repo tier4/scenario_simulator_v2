@@ -21,7 +21,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 ValueConstraint::ValueConstraint(const pugi::xml_node & node, Scope & scope)
 : rule(readAttribute<Rule>("rule", node, scope)), value(readAttribute<String>("value", node, scope))
 {
@@ -36,6 +35,5 @@ auto ValueConstraint::evaluate(const Object & object) const -> bool
 {
   return compare(object, rule, value);
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
