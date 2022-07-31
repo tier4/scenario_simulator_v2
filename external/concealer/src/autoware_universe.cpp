@@ -45,7 +45,7 @@ auto AutowareUniverse::approve(const CooperateStatusArray & cooperate_status_arr
   }
 
   if (not request->commands.empty()) {
-    requestCooperateCommands(request);
+    service_cooperate_commands.requestOnce(request);
   }
 }
 
@@ -109,7 +109,7 @@ auto AutowareUniverse::engage() -> void
     waitForAutowareStateToBeDriving([this]() {
       auto request = std::make_shared<Engage::Request>();
       request->engage = true;
-      requestEngage(request);
+      service_engage.requestUntilSuccess(request);
     });
   });
 }
@@ -240,7 +240,7 @@ auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
 {
   auto request = std::make_shared<SetVelocityLimit::Request>();
   request->velocity = velocity_limit;
-  requestSetVelocityLimit(request);
+  service_set_velocity_limit.requestUntilSuccess(request);
 }
 
 auto AutowareUniverse::isReady() noexcept -> bool

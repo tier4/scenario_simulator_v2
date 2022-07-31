@@ -40,6 +40,8 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
+#include "concealer/utility/service_with_validation.h"
+
 namespace concealer
 {
 class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUniverse>
@@ -91,10 +93,10 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
   using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
 
-  CONCEALER_DEFINE_CLIENT_SIMPLE(CooperateCommands);
-  CONCEALER_DEFINE_CLIENT(Engage);
-  // TODO CONCEALER_DEFINE_CLIENT(InitializePose);
-  CONCEALER_DEFINE_CLIENT(SetVelocityLimit);
+  ServiceWithValidation<CooperateCommands> service_cooperate_commands;
+  ServiceWithValidation<Engage> service_engage;
+  // TODO ServiceWithValidation<InitializePose> service_initialize_pose;
+  ServiceWithValidation<SetVelocityLimit> service_set_velocity_limit;
 
 private:
   Cooperator current_cooperator = Cooperator::simulator;
@@ -145,10 +147,10 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
-    CONCEALER_INIT_CLIENT(CooperateCommands, "/api/external/set/rtc_commands"),
-    CONCEALER_INIT_CLIENT(Engage, "/api/external/set/engage"),
-    // TODO CONCEALER_INIT_CLIENT(InitializePose, "/api/autoware/set/initialize_pose"),
-    CONCEALER_INIT_CLIENT(SetVelocityLimit, "/api/autoware/set/velocity_limit")
+    service_cooperate_commands("/api/external/set/rtc_commands", *this),
+    service_engage("/api/external/set/engage", *this),
+    // TODO service_initialize_pose("/api/autoware/set/initialize_pose", *this),
+    service_set_velocity_limit("/api/autoware/set/velocity_limit", *this)
   // clang-format on
   {
     waitpid_options = 0;
