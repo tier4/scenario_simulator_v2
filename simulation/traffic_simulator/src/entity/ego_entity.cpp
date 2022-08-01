@@ -129,9 +129,8 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-
-  if (architecture_type == "awf/universe") {
+  if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
+      architecture_type == "awf/universe") {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
@@ -166,7 +165,11 @@ EgoEntity::EgoEntity(
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
-auto EgoEntity::asAutoware() const -> concealer::Autoware & { return *autoware; }
+auto EgoEntity::asAutoware() const -> concealer::Autoware &
+{
+  assert(autoware);
+  return *autoware;
+}
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
@@ -280,16 +283,15 @@ auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Ob
 
 auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 {
-  const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
-  std::vector<std::int64_t> ids = {};
-  if (universe) {
-    const auto points = universe->getPathWithLaneId().points;
-    for (const auto & point : points) {
+  std::vector<std::int64_t> ids{};
+
+  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get()); universe) {
+    for (const auto & point : universe->getPathWithLaneId().points) {
       std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }
-    auto result = std::unique(ids.begin(), ids.end());
-    ids.erase(result, ids.end());
+    ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
   }
+
   return ids;
 }
 
@@ -301,78 +303,47 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   autoware->rethrow();
+
   EntityBase::onUpdate(current_time, step_time);
-  if (current_time < 0) {
-    updateEntityStatusTimestamp(current_time);
 
-    geometry_msgs::msg::Pose current_pose;
-    {
-      geometry_msgs::msg::Vector3 rpy;
-      {
-        rpy.x = 0;
-        rpy.y = 0;
-        rpy.z = vehicle_model_ptr_->getYaw();
-      }
+  Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
 
-      current_pose.position.x = (*vehicle_model_ptr_).getX() + initial_pose_.get().position.x;
-      current_pose.position.y = (*vehicle_model_ptr_).getY() + initial_pose_.get().position.y;
-      current_pose.position.z = /*                          */ initial_pose_.get().position.z;
+  switch (vehicle_model_type_) {
+    case VehicleModelType::DELAY_STEER_ACC:
+    case VehicleModelType::IDEAL_STEER_ACC:
+      input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
+      break;
 
-      current_pose.orientation =
-        initial_pose_.get().orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
-    }
+    case VehicleModelType::DELAY_STEER_ACC_GEARED:
+    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+      input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
+      break;
 
-    autoware->set(current_pose);
+    case VehicleModelType::DELAY_STEER_VEL:
+    case VehicleModelType::IDEAL_STEER_VEL:
+      input << autoware->getVelocity(), autoware->getSteeringAngle();
+      break;
 
-    geometry_msgs::msg::Twist current_twist;
-    {
-      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
-      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
-    }
-
-    autoware->set(current_twist);
-  } else {
-    Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
-
-    switch (vehicle_model_type_) {
-      case VehicleModelType::DELAY_STEER_ACC:
-      case VehicleModelType::IDEAL_STEER_ACC:
-        input << autoware->getGearSign() * autoware->getAcceleration(),
-          autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input << autoware->getGearSign() * autoware->getAcceleration(),
-          autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::DELAY_STEER_VEL:
-      case VehicleModelType::IDEAL_STEER_VEL:
-        input << autoware->getVelocity(), autoware->getSteeringAngle();
-        break;
-
-      default:
-        THROW_SEMANTIC_ERROR(
-          "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
-    }
-
-    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
-    vehicle_model_ptr_->setInput(input);
-    vehicle_model_ptr_->update(step_time);
-
-    setStatus(getEntityStatus(current_time + step_time, step_time));
-    updateStandStillDuration(step_time);
-
-    if (previous_linear_velocity_) {
-      linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
-    } else {
-      linear_jerk_ = 0;
-    }
-
-    previous_linear_velocity_ = vehicle_model_ptr_->getVx();
-    previous_angular_velocity_ = vehicle_model_ptr_->getWz();
+    default:
+      THROW_SEMANTIC_ERROR(
+        "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
   }
+
+  vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+  vehicle_model_ptr_->setInput(input);
+  vehicle_model_ptr_->update(step_time);
+
+  setStatus(getEntityStatus(current_time + step_time, step_time));
+  updateStandStillDuration(step_time);
+
+  if (previous_linear_velocity_) {
+    linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
+  } else {
+    linear_jerk_ = 0;
+  }
+
+  previous_linear_velocity_ = vehicle_model_ptr_->getVx();
+  previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 }
 
 void EgoEntity::requestAcquirePosition(

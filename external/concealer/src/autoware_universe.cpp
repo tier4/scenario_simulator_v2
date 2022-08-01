@@ -103,10 +103,7 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
   });
 }
 
-auto AutowareUniverse::driving() const -> bool
-{
-  return isDriving();
-}
+auto AutowareUniverse::driving() const -> bool { return isDriving(); }
 
 auto AutowareUniverse::engage() -> void
 {
@@ -119,10 +116,7 @@ auto AutowareUniverse::engage() -> void
   });
 }
 
-auto AutowareUniverse::engageable() const -> bool
-{
-  return isWaitingForEngage();
-}
+auto AutowareUniverse::engageable() const -> bool { return isWaitingForEngage(); }
 
 auto AutowareUniverse::update() -> void
 {
@@ -287,8 +281,9 @@ auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostr
         "Unsupported EmergencyState, state number : ", static_cast<int>(message.state));
   }
 
-  return out;
 #undef CASE
+
+  return out;
 }
 
 auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
@@ -335,9 +330,11 @@ auto operator<<(std::ostream & out, const TurnIndicatorsCommand & message) -> st
         "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
   }
 
-  return out;
 #undef CASE
+
+  return out;
 }
+
 auto operator>>(std::istream & is, TurnIndicatorsCommand & message) -> std::istream &
 {
 #define STATE(IDENTIFIER) {#IDENTIFIER, TurnIndicatorsCommand::IDENTIFIER}

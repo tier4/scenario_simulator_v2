@@ -73,10 +73,6 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
     logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
   {
     configuration.auto_sink = false;
-
-    configuration.initialize_duration =
-      ObjectController::ego_count > 0 ? getParameter<int>("initialize_duration") : 0;
-
     configuration.scenario_path = osc_path;
 
     // XXX DIRTY HACK!!!
@@ -185,7 +181,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
   engage_requested = engage_succeeded = false;  // DIRTY HACK
 
-  auto evaluateStoryboard = [&]() {
+  auto evaluateStoryboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
