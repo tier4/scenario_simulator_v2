@@ -139,13 +139,11 @@ auto Interpreter::engage() const -> void
   }
 }
 
-
 auto Interpreter::engageable() const -> bool
 {
   return std::all_of(
     std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities),
-    [this](const auto & each) {
+    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
       const auto & [name, scenario_object] = each;
       return not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>()
@@ -158,8 +156,7 @@ auto Interpreter::ready() const -> bool
 {
   return std::all_of(
     std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities),
-    [this](const auto & each) {
+    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
       const auto & [name, scenario_object] = each;
       return not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>()
@@ -186,6 +183,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       });
   };
 
+  engage_requested = engage_succeeded = false;  // DIRTY HACK
+
   auto evaluateStoryboard = [&]() {
     withExceptionHandler(
       [this](auto &&...) {
@@ -202,7 +201,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           publishCurrentContext();
         } else if (std::isnan(evaluateSimulationTime()) and not engage_succeeded) {
           if (ready()) {
-            startNpcLogic();
+            activateNonUserDefinedControllers();
             engage_succeeded = true;
           }
           SimulatorCore::update();

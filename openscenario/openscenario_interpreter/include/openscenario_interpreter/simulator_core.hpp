@@ -361,7 +361,7 @@ public:
       return core->asAutoware(std::forward<decltype(xs)>(xs)...);
     }
 
-    static auto startNpcLogic() -> decltype(auto)
+    static auto activateNonUserDefinedControllers() -> decltype(auto)
     {
       return core->startNpcLogic();
     }
