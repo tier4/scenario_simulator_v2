@@ -247,11 +247,6 @@ auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
   requestSetVelocityLimit(request);
 }
 
-auto AutowareUniverse::isReady() noexcept -> bool
-{
-  return is_ready or (is_ready = isWaitingForRoute());
-}
-
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
   autoware_auto_control_msgs::msg::AckermannControlCommand,
   autoware_auto_vehicle_msgs::msg::GearCommand>

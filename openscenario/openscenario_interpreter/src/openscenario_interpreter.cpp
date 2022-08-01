@@ -163,7 +163,7 @@ auto Interpreter::ready() const -> bool
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  auto initializeStoryboard = [this]() {
+  auto initialize_storyboard = [this]() {
     return withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
@@ -181,7 +181,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
   engage_requested = engage_succeeded = false;  // DIRTY HACK
 
-  auto evaluateStoryboard = [this]() {
+  auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
@@ -251,9 +251,9 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         assert(publisher_of_context->is_activated());
 
-        initializeStoryboard();
+        initialize_storyboard();
 
-        timer = create_wall_timer(currentLocalFrameRate(), evaluateStoryboard);
+        timer = create_wall_timer(currentLocalFrameRate(), evaluate_storyboard);
 
         return Interpreter::Result::SUCCESS;  // => Active
       });
