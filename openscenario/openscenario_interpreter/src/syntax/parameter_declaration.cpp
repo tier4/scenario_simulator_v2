@@ -93,30 +93,22 @@ auto ParameterDeclaration::castValueByParameterType() const -> Object
   // clang-format on
 }
 
-auto ParameterDeclaration::checkValue() const -> bool
-{
-  if (constraint_groups.empty()) {
-    return true;
-  } else {
-    return std::any_of(
-      std::begin(constraint_groups), std::end(constraint_groups), [&](auto && constraint_group) {
-        return constraint_group.evaluate(castValueByParameterType());
-      });
-  }
-}
-
 auto ParameterDeclaration::evaluate() const -> Object
 {
-  if (checkValue()) {
+  if (
+    constraint_groups.empty() or
+    std::any_of(
+      std::begin(constraint_groups), std::end(constraint_groups), [&](auto && constraint_group) {
+        return constraint_group.evaluate(castValueByParameterType());
+      })) {
     return castValueByParameterType();
   } else {
     std::stringstream ss;
-    ss << "\x1b[1;31mParameter is not suit for constraints. name : " << name
-       << ", value : " << castValueByParameterType() << "\x1b[0m";
-    // use std::cout to show the error message in the log file
-    // because messages by common::Error written here are not shown in the log.
-    std::cout << ss.str() << std::endl;
-    throw common::Error(ss.str());
+    ss << "The parameter " << std::quoted(name) << " was assigned to \""
+       << castValueByParameterType()
+       << "\". Please specify a value within the constraints, because the value does not fit the "
+          "constraints.";
+    throw common::SyntaxError(ss.str());
   }
 }
 

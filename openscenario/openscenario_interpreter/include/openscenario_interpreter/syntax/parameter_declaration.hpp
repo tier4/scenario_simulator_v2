@@ -55,8 +55,6 @@ struct ParameterDeclaration
 
   auto castValueByParameterType() const -> Object;
 
-  auto checkValue() const -> bool;
-
   auto evaluate() const -> Object;
 };
 }  // namespace syntax
