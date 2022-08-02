@@ -23,7 +23,8 @@ ValueConstraintGroup::ValueConstraintGroup(const pugi::xml_node & node, Scope & 
 {
   traverse<1, unbounded>(node, "ValueConstraint", [&](auto && node) { emplace_back(node, scope); });
 }
-ValueConstraintGroup::ValueConstraintGroup(const openscenario_msgs::msg::ValueConstraintGroup & message)
+ValueConstraintGroup::ValueConstraintGroup(
+  const openscenario_msgs::msg::ValueConstraintGroup & message)
 {
   for (auto & constraint : message.constraints) {
     emplace_back(constraint);
