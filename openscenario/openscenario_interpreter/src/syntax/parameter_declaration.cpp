@@ -49,7 +49,7 @@ ParameterDeclaration::ParameterDeclaration(
   const openscenario_msgs::msg::ParameterDeclaration & message)
 : name(message.name), parameter_type(message.parameter_type), value(message.value)
 {
-  for (auto constraint_group : message.constraint_groups) {
+  for (const auto & constraint_group : message.constraint_groups) {
     constraint_groups.emplace_back(constraint_group);
   }
   checkName(name);
@@ -59,7 +59,7 @@ ParameterDeclaration::ParameterDeclaration(
   const openscenario_msgs::msg::ParameterDeclaration & message, Scope & scope)
 : name(message.name), parameter_type(message.parameter_type), value(message.value)
 {
-  for (auto constraint_group : message.constraint_groups) {
+  for (const auto & constraint_group : message.constraint_groups) {
     constraint_groups.emplace_back(constraint_group);
   }
   scope.insert(checkName(name), evaluate());
@@ -75,37 +75,32 @@ ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & 
   scope.insert(checkName(name), evaluate());
 }
 
-auto ParameterDeclaration::castValueByParameterType() const -> Object
-{
-  // clang-format off
-  switch (parameter_type) {
-    case ParameterType::BOOLEAN:        return make<Boolean      >(value);
-    case ParameterType::DATE_TIME:      return make<String       >(value);
-    case ParameterType::DOUBLE:         return make<Double       >(value);
-    case ParameterType::INTEGER:        return make<Integer      >(value);
-    case ParameterType::STRING:         return make<String       >(value);
-    case ParameterType::UNSIGNED_INT:   return make<UnsignedInt  >(value);
-    case ParameterType::UNSIGNED_SHORT: return make<UnsignedShort>(value);
-
-    default:
-      return unspecified;
-  }
-  // clang-format on
-}
-
 auto ParameterDeclaration::evaluate() const -> Object
 {
+  auto get_value = [this]() -> Object {
+    // clang-format off
+    switch (parameter_type) {
+      case ParameterType::BOOLEAN:        return make<Boolean      >(value);
+      case ParameterType::DATE_TIME:      return make<String       >(value);
+      case ParameterType::DOUBLE:         return make<Double       >(value);
+      case ParameterType::INTEGER:        return make<Integer      >(value);
+      case ParameterType::STRING:         return make<String       >(value);
+      case ParameterType::UNSIGNED_INT:   return make<UnsignedInt  >(value);
+      case ParameterType::UNSIGNED_SHORT: return make<UnsignedShort>(value);
+      default:
+        return unspecified;
+    }
+    // clang-format on
+  };
   if (
     constraint_groups.empty() or
     std::any_of(
-      std::begin(constraint_groups), std::end(constraint_groups), [&](auto && constraint_group) {
-        return constraint_group.evaluate(castValueByParameterType());
-      })) {
-    return castValueByParameterType();
+      std::begin(constraint_groups), std::end(constraint_groups),
+      [&](auto && constraint_group) { return constraint_group.evaluate(get_value()); })) {
+    return get_value();
   } else {
     std::stringstream ss;
-    ss << "The parameter " << std::quoted(name) << " was assigned to \""
-       << castValueByParameterType()
+    ss << "The parameter " << std::quoted(name) << " was assigned to \"" << get_value()
        << "\". Please specify a value within the constraints, because the value does not fit the "
           "constraints.";
     throw common::SyntaxError(ss.str());

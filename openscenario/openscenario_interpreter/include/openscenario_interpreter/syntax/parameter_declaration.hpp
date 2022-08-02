@@ -53,8 +53,6 @@ struct ParameterDeclaration
 
   explicit ParameterDeclaration(const pugi::xml_node &, Scope &);
 
-  auto castValueByParameterType() const -> Object;
-
   auto evaluate() const -> Object;
 };
 }  // namespace syntax
