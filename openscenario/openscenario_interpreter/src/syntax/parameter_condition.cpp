@@ -15,10 +15,10 @@
 #include <iomanip>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/parameter_condition.hpp>
-#include <openscenario_interpreter/syntax/rule.hpp>
-#include <openscenario_interpreter/utility/compare.hpp>
 #include <sstream>
 #include <stdexcept>
+#include <typeindex>
+#include <unordered_map>
 
 namespace openscenario_interpreter
 {
@@ -30,6 +30,32 @@ ParameterCondition::ParameterCondition(const pugi::xml_node & node, Scope & scop
   value(readAttribute<String>("value", node, local())),
   rule(readAttribute<Rule>("rule", node, local()))
 {
+}
+
+auto ParameterCondition::compare(const Object & parameter, const Rule & rule, const String & value)
+  -> bool
+{
+  static const std::unordered_map<
+    std::type_index,  //
+    std::function<bool(const Object &, const Rule, const String &)>>
+    overloads{
+      // clang-format off
+      { typeid(Boolean        ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Boolean        >(), Boolean        (rhs)); } },
+      { typeid(Double         ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Double         >(), Double         (rhs)); } },
+      { typeid(Integer        ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<Integer        >(), Integer        (rhs)); } },
+      { typeid(String         ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<String         >(),                 rhs ); } },
+      { typeid(UnsignedInteger), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<UnsignedInteger>(), UnsignedInteger(rhs)); } },
+      { typeid(UnsignedShort  ), [](auto && lhs, auto && compare, auto && rhs) { return compare(lhs.template as<UnsignedShort  >(), UnsignedShort  (rhs)); } },
+      // clang-format on
+    };
+
+  try {
+    return overloads.at(parameter.type())(parameter, rule, value);
+  } catch (const std::out_of_range &) {
+    throw SemanticError(
+      "No viable operation ", std::quoted(boost::lexical_cast<String>(rule)), " with value ",
+      std::quoted(boost::lexical_cast<String>(parameter)), " and value ", std::quoted(value));
+  }
 }
 
 auto ParameterCondition::description() const -> String

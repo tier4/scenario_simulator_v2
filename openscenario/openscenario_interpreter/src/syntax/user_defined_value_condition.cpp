@@ -17,11 +17,10 @@
 #include <openscenario_interpreter/functional/curry.hpp>
 #include <openscenario_interpreter/regex/function_call_expression.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
-#include <openscenario_interpreter/syntax/lane_position.hpp>  // for RelativeHeadingCondition
-#include <openscenario_interpreter/syntax/parameter_condition.hpp>
+#include <openscenario_interpreter/syntax/lane_position.hpp>        // for RelativeHeadingCondition
+#include <openscenario_interpreter/syntax/parameter_condition.hpp>  // for ParameterCondition::compare
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
-#include <openscenario_interpreter/utility/compare.hpp>
 #include <regex>
 #include <unordered_map>
 
@@ -141,7 +140,7 @@ auto UserDefinedValueCondition::evaluate() -> Object
   if (result == unspecified) {
     return false_v;
   } else {
-    return asBoolean(compare(result, rule, value));
+    return asBoolean(ParameterCondition::compare(result, rule, value));
   }
 }
 }  // namespace syntax

@@ -14,8 +14,8 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/parameter_condition.hpp>  // for ParameterCondition::compare
 #include <openscenario_interpreter/syntax/value_constraint.hpp>
-#include <openscenario_interpreter/utility/compare.hpp>
 
 namespace openscenario_interpreter
 {
@@ -33,7 +33,7 @@ ValueConstraint::ValueConstraint(const openscenario_msgs::msg::ValueConstraint &
 
 auto ValueConstraint::evaluate(const Object & object) const -> bool
 {
-  return compare(object, rule, value);
+  return ParameterCondition::compare(object, rule, value);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

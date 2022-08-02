@@ -45,6 +45,8 @@ struct ParameterCondition : private Scope
 
   explicit ParameterCondition(const pugi::xml_node &, Scope &);
 
+  static auto compare(const Object &, const Rule &, const String &) -> bool;
+
   /*  */ auto description() const -> String;
 
   /*  */ auto evaluate() const -> Object;

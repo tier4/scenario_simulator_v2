@@ -15,7 +15,6 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
-#include <openscenario_interpreter/utility/compare.hpp>
 #include <string>
 #include <vector>
 
