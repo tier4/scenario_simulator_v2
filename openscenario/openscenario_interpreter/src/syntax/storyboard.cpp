@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/global_action.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
@@ -52,7 +53,7 @@ auto Storyboard::start() -> void
 {
   auto everyone_engageable = [this]() {
     return std::all_of(
-      std::cbegin(global().entities), std::cend(global().entities), [&](const auto & each) {
+      std::cbegin(*global().entities), std::cend(*global().entities), [&](const auto & each) {
         const auto & [name, scenario_object] = each;
         return not scenario_object.template as<ScenarioObject>().is_added or
                not scenario_object.template as<ScenarioObject>()
@@ -62,7 +63,7 @@ auto Storyboard::start() -> void
   };
 
   auto engage_everyone = [this]() {
-    for (const auto & [name, scenario_object] : global().entities) {
+    for (const auto & [name, scenario_object] : *global().entities) {
       if (
         scenario_object.template as<ScenarioObject>().is_added and
         scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {

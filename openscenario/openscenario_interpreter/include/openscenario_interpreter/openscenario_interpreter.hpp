@@ -23,7 +23,7 @@
 #include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
-#include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/utility/execution_timer.hpp>
 #include <openscenario_interpreter/utility/visibility.hpp>
