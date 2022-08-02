@@ -14,7 +14,7 @@ OpenSCENARIO:
       - name: random_offset
         parameterType: double
         value: $(ros2 run openscenario_interpreter_example uniform_distribution -1.0 1.0)
-        ValueConstraintGroup:
+        ConstraintGroup:
           - ValueConstraint:
             - rule: lessOrEqual
               value: 1.0
