@@ -246,31 +246,36 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
 std::vector<std::pair<size_t, size_t>> Grid::fillInside(
   const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data)
 {
-  std::vector<std::pair<size_t, size_t>> ret;
-  const auto rows = getRows(row_and_cols);
-  for (const auto & row : rows) {
-    const auto cells_in_row = filterByRow(row_and_cols, row);
-    if (cells_in_row.size() > 1) {
-      for (auto col = cells_in_row[0].second; col <= cells_in_row[cells_in_row.size() - 1].second;
-           col++) {
-        if (fillByRowCol(row, col, data)) {
-          ret.emplace_back(std::pair<size_t, size_t>(row, col));
-        }
+  auto ret = std::vector<std::pair<size_t, size_t>>();
+
+  auto group_by_row = std::map<size_t, std::vector<size_t>>();
+  for (const auto [row, col] : row_and_cols) {
+    group_by_row[row].emplace_back(col);
+  }
+  for (const auto & [row, cols] : group_by_row) {
+    if (cols.size() <= 1) continue;
+    auto [min_col_itr, max_col_itr] = std::minmax_element(cols.begin(), cols.end());
+    for (auto col = *min_col_itr; col <= *max_col_itr; col++) {
+      if (fillByRowCol(row, col, data)) {
+        ret.emplace_back(row, col);
       }
     }
   }
-  const auto cols = getCols(row_and_cols);
-  for (const auto & col : cols) {
-    const auto cells_in_col = filterByCol(row_and_cols, col);
-    if (cells_in_col.size() > 1) {
-      for (auto row = cells_in_col[0].first; row <= cells_in_col[cells_in_col.size() - 1].first;
-           row++) {
-        if (fillByRowCol(row, col, data)) {
-          ret.emplace_back(std::pair<size_t, size_t>(row, col));
-        }
+
+  auto group_by_col = std::map<size_t, std::vector<size_t>>();
+  for (const auto [row, col] : row_and_cols) {
+    group_by_col[col].emplace_back(row);
+  }
+  for (const auto & [col, rows] : group_by_col) {
+    if (rows.size() <= 1) continue;
+    auto [min_row_itr, max_row_itr] = std::minmax_element(rows.begin(), rows.end());
+    for (auto row = *min_row_itr; row <= *max_row_itr; row++) {
+      if (fillByRowCol(row, col, data)) {
+        ret.emplace_back(row, col);
       }
     }
   }
+
   return ret;
 }
 
