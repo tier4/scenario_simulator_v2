@@ -283,6 +283,10 @@ void EntityBase::requestLaneChange(
 
 void EntityBase::updateStandStillDuration(const double step_time)
 {
+  if(!npc_logic_started_){
+    stand_still_duration_ = 0;
+    return;
+  }
   if (!status_) {
     stand_still_duration_ = boost::none;
   } else {
