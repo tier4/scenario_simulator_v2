@@ -53,7 +53,7 @@ struct CatalogReference
       std::stringstream what;
       what << "Required type of catalog element is one of the following type: ";
       print_to(what, std::array<const char *, sizeof...(Ts)>{typeid(Ts).name()...});
-      what << ". But the type of this element is " << result.type().name() << ".";
+      what << ". But the type of this element is " << makeTypename(result.type()) << ".";
       throw SyntaxError(what.str());
     }
   }

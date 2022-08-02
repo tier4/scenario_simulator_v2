@@ -50,6 +50,9 @@ struct LanePosition : private SimulatorCore::CoordinateSystemConversion
 
   explicit LanePosition(const pugi::xml_node &, Scope &);
 
+  explicit LanePosition(
+    const String &, const String &, const Double &, const Double &, const Orientation & = {});
+
   explicit operator NativeLanePosition() const;
 
   explicit operator NativeWorldPosition() const;

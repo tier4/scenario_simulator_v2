@@ -35,9 +35,7 @@ inline namespace reader
 template <typename Scope>
 auto substitute(std::string attribute, Scope & scope)
 {
-  auto dirname = [](auto &&, auto && scope) {
-    return scope.global().pathname.parent_path().string();
-  };
+  auto dirname = [](auto &&, auto && scope) { return scope.dirname(); };
 
   auto find_pkg_share = [](auto && package_name, auto &&) {
     return ament_index_cpp::get_package_share_directory(package_name);
@@ -132,7 +130,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
     } catch (const boost::bad_lexical_cast &) {
       throw SyntaxError(
         "Value ", std::quoted(s), " specified for attribute ", std::quoted(name),
-        " is invalid (Is not value of type ", typeid(T).name(), ")");
+        " is invalid (Is not value of type ", makeTypename(typeid(T)), ")");
     }
   };
 

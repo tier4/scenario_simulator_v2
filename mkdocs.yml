@@ -55,11 +55,10 @@ nav:
   - Home: README.md
   - Release Note: ReleaseNotes.md
   - User Guide:
+      - Quick Start : user_guide/QuickStart.md
       - Build Instructions : user_guide/BuildInstructions.md
-      - Quick Start : user_guide/RunWithAutowareUniverse.md
-      - Cpp scenario demo : user_guide/SimpleDemo.md
       - Run on Docker : user_guide/RunWithDocker.md
-      - Run test scenario on Docker : user_guide/RunTestScenarioWithDocker.md
+      - Scenario Writing Tips : user_guide/ScenarioTips.md
       - Scenario Editor:
           - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
           - user_guide/scenario_editor/CreateSimpleScenario.md

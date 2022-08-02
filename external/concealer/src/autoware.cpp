@@ -47,7 +47,7 @@ void Autoware::checkAutowareProcess()
   }
 }
 
-auto Autoware::getEmergencyState() const -> const autoware_auto_system_msgs::msg::EmergencyState &
+auto Autoware::getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState
 {
   static auto emergency_state = []() {
     autoware_auto_system_msgs::msg::EmergencyState emergency_state;
@@ -58,7 +58,7 @@ auto Autoware::getEmergencyState() const -> const autoware_auto_system_msgs::msg
   return emergency_state;
 }
 
-auto Autoware::getGearCommand() const -> const autoware_auto_vehicle_msgs::msg::GearCommand &
+auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
 {
   static auto gear_command = []() {
     autoware_auto_vehicle_msgs::msg::GearCommand gear_command;
@@ -70,7 +70,7 @@ auto Autoware::getGearCommand() const -> const autoware_auto_vehicle_msgs::msg::
 }
 
 auto Autoware::getTurnIndicatorsCommand() const
-  -> const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand &
+  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   static auto turn_indicators_command = []() {
     autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;

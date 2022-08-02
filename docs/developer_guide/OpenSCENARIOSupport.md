@@ -151,7 +151,6 @@ In scenario_simulator_v2, we use `UserDefinedValueCondition` to control the prog
   <ByValueCondition>
      <UserDefinedValueCondition name="ego.currentState" rule="equalTo" value="ARRIVED_GOAL" />
   </ByValueCondition>
-
 ```
 #### Built-in conditions
 
@@ -165,6 +164,29 @@ See Reference for specific strings.
 | currentState               | returns Autoware's state                            | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/AutowareState.idl)          |
 | currentEmergencyState      | return Autoware's emergency state.                  | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/EmergencyState.idl)         |
 | currentTurnIndicatorsState | return turn indicators state controlled by Autoware | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/msg/TurnIndicatorsCommand.idl) |
+
+#### External ROS2 topic condition
+
+You can pass values from another ROS2 node to a scenario through ROS2 topics.  
+The `name` field should be filled with the name of the ROS2 topic like below.
+```XML
+  <ByValueCondition>
+     <UserDefinedValueCondition name="/count_up" rule="equalTo" value="500" />
+  </ByValueCondition>
+```
+
+The type of topic must be `openscenario_msgs::msg::ParameterDeclaration` type.  
+You can handle the following through this function.
+
+- Boolean
+- DateTime
+- Double
+- Integer
+- String
+- UnsignedInt
+- UnsignedShort
+
+See [Message Definitions](https://github.com/tier4/scenario_simulator_v2/tree/master/openscenario/openscenario_msgs/msg) for more information.
 
 ## Non-Standard Extensions
 ---

@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/teleport_action.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -43,7 +44,7 @@ auto TeleportAction::run() noexcept -> void {}
 auto TeleportAction::start() const -> void
 {
   for (const auto & actor : actors) {
-    if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
+    if (not global().entities->at(actor).as<ScenarioObject>().is_added) {
       AddEntityAction(local(), position)(actor);  // NOTE: TIER IV extension
     } else {
       return teleport(actor, position);

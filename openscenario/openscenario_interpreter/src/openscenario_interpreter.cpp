@@ -137,7 +137,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [this]() {
         if (currentScenarioDefinition()) {
-          currentScenarioDefinition()->storyboard.init.evaluate();
+          currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
           SimulatorCore::update();
         } else {
           throw Error("No script evaluable.");
