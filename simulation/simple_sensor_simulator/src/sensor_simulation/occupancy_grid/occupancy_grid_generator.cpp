@@ -26,10 +26,14 @@ nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
   const geometry_msgs::msg::Pose & ego_pose, const rclcpp::Time & stamp) const
 {
   Grid grid(ego_pose, configuration.resolution(), configuration.height(), configuration.width());
+  for (const auto & primitive : primitive_ptrs_) {
+    grid.addPrimitive(primitive.second);
+  }
+
   nav_msgs::msg::OccupancyGrid occupancy_grid;
   occupancy_grid.header.stamp = stamp;
   occupancy_grid.header.frame_id = "map";
-  occupancy_grid.data = std::vector<int8_t>(configuration.height() * configuration.width(), 0);
+  occupancy_grid.data = grid.getData();
   occupancy_grid.info.height = configuration.height();
   occupancy_grid.info.width = configuration.width();
   occupancy_grid.info.map_load_time = stamp;
@@ -39,10 +43,6 @@ nav_msgs::msg::OccupancyGrid OccupancyGridGenerator::generate(
                                           0.5 * configuration.height() * configuration.resolution();
   occupancy_grid.info.origin.position.y = occupancy_grid.info.origin.position.y -
                                           0.5 * configuration.width() * configuration.resolution();
-  for (const auto & primitive : primitive_ptrs_) {
-    grid.addPrimitive(primitive.second);
-  }
-  occupancy_grid.data = grid.getData();
   return occupancy_grid;
 }
 }  // namespace simple_sensor_simulator
