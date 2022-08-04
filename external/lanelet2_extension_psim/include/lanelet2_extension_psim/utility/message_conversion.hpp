@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2015-2019 Autoware Foundation. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+//
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
 #ifndef LANELET2_EXTENSION_PSIM__UTILITY__MESSAGE_CONVERSION_HPP_
@@ -25,8 +25,6 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/point32.hpp>
 #include <geometry_msgs/msg/polygon.hpp>
-#include <memory>
-#include <rclcpp/rclcpp.hpp>
 
 namespace lanelet
 {
@@ -35,14 +33,13 @@ namespace utils
 namespace conversion
 {
 /**
- * [toBinMsg convervets lanelet2 map to ROS message. Similar implementation to
+ * [toBinMsg converts lanelet2 map to ROS message. Similar implementation to
  * lanelet::io_handlers::BinHandler::write()]
  * @param map [lanelet map data]
  * @param msg [converted ROS message. Only "data" field is filled]
  */
 void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_mapping_msgs::msg::HADMapBin * msg);
-void toBinMsg(
-  const std::unique_ptr<LaneletMap> & map, autoware_auto_mapping_msgs::msg::HADMapBin * msg);
+
 /**
  * [fromBinMsg converts ROS message into lanelet2 data. Similar implementation
  * to lanelet::io_handlers::BinHandler::parse()]
@@ -51,15 +48,13 @@ void toBinMsg(
  */
 void fromBinMsg(const autoware_auto_mapping_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map);
 void fromBinMsg(
-  const autoware_auto_mapping_msgs::msg::HADMapBin & msg, const std::unique_ptr<LaneletMap> & map);
-void fromBinMsg(
   const autoware_auto_mapping_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map,
   lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,
   lanelet::routing::RoutingGraphPtr * routing_graph);
 
 /**
  * [toGeomMsgPt converts various point types to geometry_msgs point]
- * @param src [input point(geometry_msgs::Point3,
+ * @param src [input point(geometry_msgs::msg::Point3,
  * Eigen::VEctor3d=lanelet::BasicPoint3d, lanelet::Point3d, lanelet::Point2d) ]
  * @param dst [converted geometry_msgs point]
  */
@@ -70,7 +65,7 @@ void toGeomMsgPt(const lanelet::ConstPoint2d & src, geometry_msgs::msg::Point * 
 
 /**
  * [toGeomMsgPt converts various point types to geometry_msgs point]
- * @param src [input point(geometry_msgs::Point3,
+ * @param src [input point(geometry_msgs::msg::Point3,
  * Eigen::VEctor3d=lanelet::BasicPoint3d, lanelet::Point3d, lanelet::Point2d) ]
  * @return    [converted geometry_msgs point]
  */
@@ -92,7 +87,7 @@ void toGeomMsgPoly(
 
 /**
  * [toGeomMsgPt32 converts Eigen::Vector3d(lanelet:BasicPoint3d to
- * geometry_msgs::Point32)]
+ * geometry_msgs::msg::Point32)]
  * @param src [input point]
  * @param dst [converted point]
  */

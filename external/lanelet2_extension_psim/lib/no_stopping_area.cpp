@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Autoware Foundation. All rights reserved.
+// Copyright 2021 Tier IV, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,14 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-// Authors: Ryohsuke Mitsudome
 
 #include <lanelet2_core/primitives/RegulatoryElement.h>
 
 #include <algorithm>
 #include <boost/variant.hpp>
-#include <lanelet2_extension_psim/regulatory_elements/detection_area.hpp>
+#include <lanelet2_extension_psim/regulatory_elements/no_stopping_area.hpp>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -45,18 +43,20 @@ bool findAndErase(const T & primitive, RuleParameters * member)
 }
 
 template <typename T>
+Optional<T> tryGetFront(const std::vector<T> & vec)
+{
+  if (vec.empty()) {
+    return {};
+  }
+  return vec.front();
+}
+
+template <typename T>
 RuleParameters toRuleParameters(const std::vector<T> & primitives)
 {
   auto cast_func = [](const auto & elem) { return static_cast<RuleParameter>(elem); };
   return utils::transform(primitives, cast_func);
 }
-
-// template <>
-// RuleParameters toRuleParameters(const std::vector<Polygon3d>& primitives)
-// {
-//   auto cast_func = [](const auto& elem) { return elem.asRuleParameter(); };
-//   return utils::transform(primitives, cast_func);
-// }
 
 Polygons3d getPoly(const RuleParameterMap & paramsMap, RoleName role)
 {
@@ -81,74 +81,74 @@ ConstPolygons3d getConstPoly(const RuleParameterMap & params, RoleName role)
   return utils::transform(getPoly(params, role), cast_func);
 }
 
-RegulatoryElementDataPtr constructDetectionAreaData(
-  Id id, const AttributeMap & attributes, const Polygons3d & detectionAreas,
-  const LineString3d & stopLine)
+RegulatoryElementDataPtr constructNoStoppingAreaData(
+  Id id, const AttributeMap & attributes, const Polygons3d & noStoppingAreas,
+  const Optional<LineString3d> & stopLine = {})
 {
-  RuleParameterMap rpm = {{RoleNameString::Refers, toRuleParameters(detectionAreas)}};
+  RuleParameterMap rpm = {{RoleNameString::Refers, toRuleParameters(noStoppingAreas)}};
+  if (!!stopLine) {
+    rpm.insert({RoleNameString::RefLine, {*stopLine}});
+  }
 
-  RuleParameters rule_parameters = {stopLine};
-  rpm.insert(std::make_pair(RoleNameString::RefLine, rule_parameters));
-
-  auto data = std::make_shared<RegulatoryElementData>(id, rpm, attributes);
+  auto data = std::make_shared<RegulatoryElementData>(id, std::move(rpm), attributes);
   data->attributes[AttributeName::Type] = AttributeValueString::RegulatoryElement;
-  data->attributes[AttributeName::Subtype] = "detection_area";
+  data->attributes[AttributeName::Subtype] = "no_stopping_area";
   return data;
 }
 }  // namespace
 
-DetectionArea::DetectionArea(const RegulatoryElementDataPtr & data) : RegulatoryElement(data)
+NoStoppingArea::NoStoppingArea(const RegulatoryElementDataPtr & data) : RegulatoryElement(data)
 {
   if (getConstPoly(data->parameters, RoleName::Refers).empty()) {
-    throw InvalidInputError("No detection area defined!");
+    throw InvalidInputError("no stopping area defined!");
   }
-  if (getParameters<ConstLineString3d>(RoleName::RefLine).size() != 1) {
-    throw InvalidInputError("There must be exactly one stopline defined!");
+  if (getParameters<ConstLineString3d>(RoleName::RefLine).size() > 1) {
+    throw InvalidInputError("There can not exist more than one stop line!");
   }
 }
 
-DetectionArea::DetectionArea(
-  Id id, const AttributeMap & attributes, const Polygons3d & detectionAreas,
-  const LineString3d & stopLine)
-: DetectionArea(constructDetectionAreaData(id, attributes, detectionAreas, stopLine))
+NoStoppingArea::NoStoppingArea(
+  Id id, const AttributeMap & attributes, const Polygons3d & no_stopping_areas,
+  const Optional<LineString3d> & stopLine)
+: NoStoppingArea(constructNoStoppingAreaData(id, attributes, no_stopping_areas, stopLine))
 {
 }
 
-ConstPolygons3d DetectionArea::detectionAreas() const
+ConstPolygons3d NoStoppingArea::noStoppingAreas() const
 {
   return getConstPoly(parameters(), RoleName::Refers);
 }
-Polygons3d DetectionArea::detectionAreas() { return getPoly(parameters(), RoleName::Refers); }
+Polygons3d NoStoppingArea::noStoppingAreas() { return getPoly(parameters(), RoleName::Refers); }
 
-void DetectionArea::addDetectionArea(const Polygon3d & primitive)
+void NoStoppingArea::addNoStoppingArea(const Polygon3d & primitive)
 {
-  parameters()["detection_area"].emplace_back(primitive);
+  parameters()["no_stopping_area"].emplace_back(primitive);
 }
 
-bool DetectionArea::removeDetectionArea(const Polygon3d & primitive)
+bool NoStoppingArea::removeNoStoppingArea(const Polygon3d & primitive)
 {
-  return findAndErase(primitive, &parameters().find("detection_area")->second);
+  return findAndErase(primitive, &parameters().find("no_stopping_area")->second);
 }
 
-ConstLineString3d DetectionArea::stopLine() const
+Optional<ConstLineString3d> NoStoppingArea::stopLine() const
 {
-  return getParameters<ConstLineString3d>(RoleName::RefLine).front();
+  return tryGetFront(getParameters<ConstLineString3d>(RoleName::RefLine));
 }
 
-LineString3d DetectionArea::stopLine()
+Optional<LineString3d> NoStoppingArea::stopLine()
 {
-  return getParameters<LineString3d>(RoleName::RefLine).front();
+  return tryGetFront(getParameters<LineString3d>(RoleName::RefLine));
 }
 
-void DetectionArea::setStopLine(const LineString3d & stopLine)
+void NoStoppingArea::setStopLine(const LineString3d & stopLine)
 {
   parameters()[RoleName::RefLine] = {stopLine};
 }
 
-void DetectionArea::removeStopLine() { parameters()[RoleName::RefLine] = {}; }
+void NoStoppingArea::removeStopLine() { parameters()[RoleName::RefLine] = {}; }
 
 #if __cplusplus < 201703L
-constexpr char DetectionArea::RuleName[];  // instantiate string in cpp file
+constexpr char NoStoppingArea::RuleName[];  // instantiate string in cpp file
 #endif
 
 }  // namespace autoware
