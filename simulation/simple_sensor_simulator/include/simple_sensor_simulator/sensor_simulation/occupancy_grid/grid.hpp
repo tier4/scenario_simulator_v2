@@ -30,18 +30,19 @@ class Grid
 {
 public:
   Grid(
-    const geometry_msgs::msg::Pose & origin, double resolution, size_t height, size_t width,
-    int8_t occupied_cost = 100, int8_t invisible_cost = 50);
+    double resolution, size_t height, size_t width, int8_t occupied_cost = 100,
+    int8_t invisible_cost = 50);
   const double resolution;
   const size_t height;
   const size_t width;
-  const geometry_msgs::msg::Pose origin;
   const int8_t occupied_cost;
   const int8_t invisible_cost;
   void addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive);
   std::vector<int8_t> getData();
+  void updateOrigin(const geometry_msgs::msg::Pose & origin);
 
 private:
+  geometry_msgs::msg::Pose origin_;
   std::vector<GridCell> grid_cells_;
   bool fillByIndex(size_t index, int8_t data);
   void fillByRow(size_t row, int8_t data);
@@ -68,7 +69,6 @@ private:
   std::vector<size_t> getRows(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   std::vector<size_t> getCols(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
   bool indexExist(size_t index) const;
-  std::vector<GridCell> getAllCells() const;
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & grid_point) const;
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
   math::geometry::LineSegment transformToGrid(const math::geometry::LineSegment & line) const;
@@ -76,10 +76,12 @@ private:
   math::geometry::LineSegment transformToPixel(const math::geometry::LineSegment & line) const;
   math::geometry::LineSegment getInvisibleRay(
     const geometry_msgs::msg::Point & point_on_polygon) const;
-  std::vector<math::geometry::LineSegment> getRayToGridCorner();
+  std::vector<math::geometry::LineSegment> getRayToGridCorner() const;
   std::vector<math::geometry::LineSegment> getInvisibleRay(
     const std::vector<geometry_msgs::msg::Point> & points) const;
   double getDiagonalLength() const;
+  void updateAllCells();
+
   template <typename T>
   void sortAndUnique(std::vector<T> & data) const
   {

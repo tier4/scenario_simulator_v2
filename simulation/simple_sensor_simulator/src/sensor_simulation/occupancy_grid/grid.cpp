@@ -23,16 +23,15 @@
 namespace simple_sensor_simulator
 {
 Grid::Grid(
-  const geometry_msgs::msg::Pose & origin, double resolution, size_t height, size_t width,
-  int8_t occupied_cost, int8_t invisible_cost)
+  double resolution, size_t height, size_t width, int8_t occupied_cost, int8_t invisible_cost)
 : resolution(resolution),
   height(height),
   width(width),
-  origin(origin),
   occupied_cost(occupied_cost),
   invisible_cost(invisible_cost),
-  grid_cells_(getAllCells())
+  grid_cells_(height * width)
 {
+  updateAllCells();
 }
 
 double Grid::getDiagonalLength() const { return std::hypot(width, height) * resolution; }
@@ -40,15 +39,15 @@ double Grid::getDiagonalLength() const { return std::hypot(width, height) * reso
 geometry_msgs::msg::Point Grid::transformToGrid(const geometry_msgs::msg::Point & world_point) const
 {
   auto mat =
-    quaternion_operation::getRotationMatrix(quaternion_operation::conjugate(origin.orientation));
+    quaternion_operation::getRotationMatrix(quaternion_operation::conjugate(origin_.orientation));
   Eigen::VectorXd p(3);
   p(0) = world_point.x;
   p(1) = world_point.y;
   p(2) = world_point.z;
   p = mat * p;
-  p(0) = p(0) - origin.position.x;
-  p(1) = p(1) - origin.position.y;
-  p(2) = p(2) - origin.position.z;
+  p(0) = p(0) - origin_.position.x;
+  p(1) = p(1) - origin_.position.y;
+  p(2) = p(2) - origin_.position.z;
   geometry_msgs::msg::Point ret;
   ret.x = p(0);
   ret.y = p(1);
@@ -64,15 +63,15 @@ math::geometry::LineSegment Grid::transformToGrid(const math::geometry::LineSegm
 
 geometry_msgs::msg::Point Grid::transformToWorld(const geometry_msgs::msg::Point & grid_point) const
 {
-  auto mat = quaternion_operation::getRotationMatrix(origin.orientation);
+  auto mat = quaternion_operation::getRotationMatrix(origin_.orientation);
   Eigen::VectorXd p(3);
   p(0) = grid_point.x;
   p(1) = grid_point.y;
   p(2) = grid_point.z;
   p = mat * p;
-  p(0) = p(0) + origin.position.x;
-  p(1) = p(1) + origin.position.y;
-  p(2) = p(2) + origin.position.z;
+  p(0) = p(0) + origin_.position.x;
+  p(1) = p(1) + origin_.position.y;
+  p(2) = p(2) + origin_.position.z;
   geometry_msgs::msg::Point ret;
   ret.x = p(0);
   ret.y = p(1);
@@ -95,28 +94,11 @@ math::geometry::LineSegment Grid::transformToPixel(const math::geometry::LineSeg
     transformToPixel(line.start_point), transformToPixel(line.end_point));
 }
 
-std::vector<GridCell> Grid::getAllCells() const
-{
-  std::vector<GridCell> ret;
-  for (size_t x_index = 0; x_index < height; x_index++) {
-    for (size_t y_index = 0; y_index < width; y_index++) {
-      geometry_msgs::msg::Pose cell_origin;
-      cell_origin.position.x = origin.position.x + (x_index - 0.5 * height) * resolution;
-      cell_origin.position.y = origin.position.y + (y_index - 0.5 * width) * resolution;
-      cell_origin.position.z = origin.position.z;
-      cell_origin.orientation = origin.orientation;
-      ret.emplace_back(
-        GridCell(cell_origin, resolution, width * y_index + x_index, y_index, x_index));
-    }
-  }
-  return ret;
-}
-
 math::geometry::LineSegment Grid::getInvisibleRay(
   const geometry_msgs::msg::Point & point_on_polygon) const
 {
   return math::geometry::LineSegment(
-    point_on_polygon, math::geometry::LineSegment(origin.position, point_on_polygon).get2DVector(),
+    point_on_polygon, math::geometry::LineSegment(origin_.position, point_on_polygon).get2DVector(),
     getDiagonalLength());
 }
 
@@ -130,7 +112,7 @@ std::vector<math::geometry::LineSegment> Grid::getInvisibleRay(
   return ret;
 }
 
-std::vector<math::geometry::LineSegment> Grid::getRayToGridCorner()
+std::vector<math::geometry::LineSegment> Grid::getRayToGridCorner() const
 {
   geometry_msgs::msg::Point left_up;
   left_up.x = static_cast<double>(width) * resolution * 0.5;
@@ -149,10 +131,10 @@ std::vector<math::geometry::LineSegment> Grid::getRayToGridCorner()
   right_down.y = -static_cast<double>(height) * resolution * 0.5;
   right_down = transformToWorld(right_down);
   return {
-    math::geometry::LineSegment(origin.position, left_up),
-    math::geometry::LineSegment(origin.position, left_down),
-    math::geometry::LineSegment(origin.position, right_down),
-    math::geometry::LineSegment(origin.position, right_up)};
+    math::geometry::LineSegment(origin_.position, left_up),
+    math::geometry::LineSegment(origin_.position, left_down),
+    math::geometry::LineSegment(origin_.position, right_down),
+    math::geometry::LineSegment(origin_.position, right_up)};
 }
 
 size_t Grid::getIndex(size_t row, size_t col) const { return width * col + row; }
@@ -409,4 +391,30 @@ void Grid::fillByCol(size_t col, int8_t data)
     }
   }
 }
+
+void Grid::updateOrigin(const geometry_msgs::msg::Pose & origin)
+{
+  origin_ = origin;
+  updateAllCells();
+}
+
+void Grid::updateAllCells()
+{
+  for (size_t x_index = 0; x_index < height; x_index++) {
+    for (size_t y_index = 0; y_index < width; y_index++) {
+      size_t index = x_index * width + y_index;
+      auto & cell = grid_cells_[index];
+      cell.origin.position.x = origin_.position.x + (x_index - 0.5 * height) * resolution;
+      cell.origin.position.y = origin_.position.y + (y_index - 0.5 * width) * resolution;
+      cell.origin.position.z = origin_.position.z;
+      cell.origin.orientation = origin_.orientation;
+      cell.size = resolution;
+      cell.index = index;
+      cell.row = y_index;
+      cell.col = x_index;
+      cell.setData(0);
+    }
+  }
+}
+
 }  // namespace simple_sensor_simulator
