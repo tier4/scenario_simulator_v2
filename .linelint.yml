@@ -11,6 +11,8 @@ rules:
     ignore:
       - docs/image/inter_process_communication.drawio
       - docs/image/what_is_scenario_testing_framework.drawio
+      - external/lanelet2_extension_psim/docs/pedestrian_lane.svg
+      - external/lanelet2_extension_psim/docs/road_shoulder.svg
       - openscenario/openscenario_utility/openscenario_utility/__init__.py
       - openscenario/openscenario_utility/resource/openscenario_utility
       - test_runner/scenario_test_runner/resource/scenario_test_runner
