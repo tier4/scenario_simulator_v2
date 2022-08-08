@@ -22,14 +22,18 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <string>
 #include <vector>
+#include <simple_sensor_simulator/sensor_simulation/measure_time.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
+
 
 namespace simple_sensor_simulator
 {
 class LidarSensorBase
 {
 protected:
+  MeasureTime timer;
   double last_update_stamp_;
-
+  Raycaster raycaster_;
   simulation_api_schema::LidarConfiguration configuration_;
 
   std::vector<std::string> detected_objects_;

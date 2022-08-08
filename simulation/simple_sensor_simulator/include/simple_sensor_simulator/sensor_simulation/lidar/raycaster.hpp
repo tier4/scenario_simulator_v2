@@ -55,6 +55,14 @@ public:
   const std::vector<std::string> & getDetectedObject() const;
 
 private:
+  std::vector<geometry_msgs::msg::Quaternion> getDirections(
+    std::vector<double> vertical_angles, double horizontal_angle_start,
+    double horizontal_angle_end, double horizontal_resolution);
+  std::vector<geometry_msgs::msg::Quaternion> directions_;
+  double previous_horizontal_angle_start_;
+  double previous_horizontal_angle_end_;
+  double previous_horizontal_resolution_;
+  std::vector<double>  previous_vertical_angles_;
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
   RTCDevice device_;
   RTCScene scene_;
@@ -66,6 +74,7 @@ private:
     double min_distance = 0);
   std::vector<std::string> detected_objects_;
   std::unordered_map<unsigned int, std::string> geometry_ids_;
+
 };
 }  // namespace simple_sensor_simulator
 

@@ -18,7 +18,6 @@
 #include <memory>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
-#include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
 #include <vector>
@@ -30,7 +29,7 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
   -> sensor_msgs::msg::PointCloud2
 {
-  Raycaster raycaster;
+  // Raycaster raycaster;
   boost::optional<geometry_msgs::msg::Pose> ego_pose;
   for (const auto & s : status) {
     if (configuration_.entity() == s.name()) {
@@ -48,7 +47,7 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
       pose.position.x = pose.position.x + center.x();
       pose.position.y = pose.position.y + center.y();
       pose.position.z = pose.position.z + center.z();
-      raycaster.addPrimitive<simple_sensor_simulator::primitives::Box>(
+      raycaster_.addPrimitive<simple_sensor_simulator::primitives::Box>(
         s.name(), s.bounding_box().dimensions().x(), s.bounding_box().dimensions().y(),
         s.bounding_box().dimensions().z(), pose);
     }
@@ -58,9 +57,11 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     for (const auto v : configuration_.vertical_angles()) {
       vertical_angles.emplace_back(v);
     }
-    const auto pointcloud = raycaster.raycast(
+    timer.start();
+    const auto pointcloud = raycaster_.raycast(
       "base_link", stamp, ego_pose.get(), configuration_.horizontal_resolution(), vertical_angles);
-    detected_objects_ = raycaster.getDetectedObject();
+    timer.stop();
+    detected_objects_ = raycaster_.getDetectedObject();
     return pointcloud;
   }
   throw simple_sensor_simulator::SimulationRuntimeError("failed to found ego vehicle");
