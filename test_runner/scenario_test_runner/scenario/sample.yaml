@@ -1,7 +1,7 @@
 ScenarioModifiers:
   ScenarioModifier:
     - name: LANE_ID
-      list: [34564]
+      list: [34513, 34510, 34564]
 OpenSCENARIO:
   FileHeader:
     author: 'Tatsuya Yamasaki'
