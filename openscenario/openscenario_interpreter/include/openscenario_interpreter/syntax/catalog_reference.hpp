@@ -15,13 +15,15 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 
-#include <boost/filesystem.hpp>
 #include <openscenario_interpreter/functional/fold.hpp>
+#include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
+
+#include <boost/filesystem.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,25 +42,28 @@ inline namespace syntax
 
 struct CatalogReference
 {
-  static auto make(const pugi::xml_node &, Scope &) -> Object;
-
-  template <typename... Ts>
-  static auto make(const pugi::xml_node & node, Scope & scope) -> Object
-  {
-    auto result = CatalogReference::make(node, scope);
-
-    if (fold_right(std::logical_or<void>(), result.is_also<Ts>()...)) {
-      return result;
-    } else {
-      std::stringstream what;
-      what << "Required type of catalog element is one of the following type: ";
-      print_to(what, std::array<const char *, sizeof...(Ts)>{typeid(Ts).name()...});
-      what << ". But the type of this element is " << makeTypename(result.type()) << ".";
-      throw SyntaxError(what.str());
-    }
-  }
 };
 }  // namespace syntax
+
+template <>
+auto make<CatalogReference, pugi::xml_node, Scope>(pugi::xml_node &&, Scope &&) -> decltype(auto);
+
+template <typename... Ts>
+auto make(const pugi::xml_node & node, Scope & scope) -> Object
+{
+  auto result = make<CatalogReference>(node, scope);
+
+  if (fold_right(std::logical_or<void>(), result.is_also<Ts>()...)) {
+    return result;
+  } else {
+    std::stringstream what;
+    what << "Required type of catalog element is one of the following type: ";
+    print_to(what, std::array<const char *, sizeof...(Ts)>{typeid(Ts).name()...});
+    what << ". But the type of this element is " << makeTypename(result.type()) << ".";
+    throw SyntaxError(what.str());
+  }
+}
+
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_

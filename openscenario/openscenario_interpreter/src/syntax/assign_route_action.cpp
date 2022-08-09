@@ -28,8 +28,8 @@ AssignRouteAction::AssignRouteAction(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
   route(
     choice(node,
-      std::make_pair("Route",            [&](auto && node) { return                   make<Route>(node, local()); }),
-      std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference::make<Route>(node, local()); })))
+      std::make_pair("Route",            [&](auto && node) { return make<Route           >(node, local()); }),
+      std::make_pair("CatalogReference", [&](auto && node) { return make<CatalogReference>(node, local()); })))
 // clang-format on
 {
 }

@@ -88,7 +88,11 @@ struct CatalogInstance : public Derived
   }
 };
 
-auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) -> Object
+}  // namespace syntax
+
+template <>
+auto make<CatalogReference, pugi::xml_node, Scope>(pugi::xml_node && node, Scope && outer_scope)
+  -> decltype(auto)
 {
   auto catalog_name = readAttribute<std::string>("catalogName", node, outer_scope);
 
@@ -122,7 +126,8 @@ auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) ->
           // clang-format on
         };
 
-        return choice_by_attribute(
+        // DIRTY HACK : add const to make the return type the same type to unspecified
+        return static_cast<const Object>(choice_by_attribute(
           found_catalog->second, "name",
           std::make_pair(entry_name, [&](const pugi::xml_node & node) {
             auto iter = dispatcher.find(node.name());
@@ -139,7 +144,7 @@ auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) ->
               what << "]. But no element specified.";
               throw SyntaxError(what.str());
             }
-          }));
+          })));
       }
     }
   }
@@ -147,5 +152,4 @@ auto CatalogReference::make(const pugi::xml_node & node, Scope & outer_scope) ->
   return unspecified;
 }
 
-}  // namespace syntax
 }  // namespace openscenario_interpreter
