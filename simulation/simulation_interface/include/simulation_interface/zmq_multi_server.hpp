@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,6 +74,10 @@ public:
       simulation_api_schema::AttachDetectionSensorResponse &)>
       attach_detection_sensor_func,
     std::function<void(
+      const simulation_api_schema::AttachOccupancyGridSensorRequest &,
+      simulation_api_schema::AttachOccupancyGridSensorResponse &)>
+      attach_occupancy_sensor_func,
+    std::function<void(
       const simulation_api_schema::UpdateTrafficLightsRequest &,
       simulation_api_schema::UpdateTrafficLightsResponse &)>
       update_traffic_lights_func);
@@ -135,6 +139,11 @@ private:
     const simulation_api_schema::AttachDetectionSensorRequest &,
     simulation_api_schema::AttachDetectionSensorResponse &)>
     attach_detection_sensor_func_;
+  zmqpp::socket attach_occupancy_grid_sensor_sock_;
+  std::function<void(
+    const simulation_api_schema::AttachOccupancyGridSensorRequest &,
+    simulation_api_schema::AttachOccupancyGridSensorResponse &)>
+    attach_occupancy_grid_sensor_func_;
   zmqpp::socket update_traffic_lights_sock_;
   std::function<void(
     const simulation_api_schema::UpdateTrafficLightsRequest &,

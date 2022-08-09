@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,11 @@
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_routing/RoutingGraph.h>
 #include <tf2/utils.h>
+#ifdef USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#else
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#endif
 
 #include <Eigen/Eigen>
 #include <deque>
@@ -51,7 +56,7 @@ namespace lanelet
 namespace utils
 {
 // returns all lanelets in laneletLayer - don't know how to convert
-// PrimitveLayer<Lanelets> -> std::vector<Lanelets>
+// PrimitiveLayer<Lanelets> -> std::vector<Lanelets>
 lanelet::ConstLanelets query::laneletLayer(const lanelet::LaneletMapConstPtr & ll_map)
 {
   lanelet::ConstLanelets lanelets;
@@ -432,17 +437,17 @@ std::vector<lanelet::ConstLineString3d> query::stopLinesLanelets(
   return stoplines;
 }
 
-// return all stop and ref lines from a given lanel
+// return all stop and ref lines from a given lanelet
 std::vector<lanelet::ConstLineString3d> query::stopLinesLanelet(const lanelet::ConstLanelet ll)
 {
   std::vector<lanelet::ConstLineString3d> stoplines;
 
-  // find stop lines referened by right ofway reg. elems.
+  // find stop lines referened by right of way reg. elems.
   std::vector<std::shared_ptr<const lanelet::RightOfWay>> right_of_way_reg_elems =
     ll.regulatoryElementsAs<const lanelet::RightOfWay>();
 
   if (right_of_way_reg_elems.size() > 0) {
-    // lanelet has a right of way elem elemetn
+    // lanelet has a right of way elem element n
     for (auto j = right_of_way_reg_elems.begin(); j < right_of_way_reg_elems.end(); j++) {
       if ((*j)->getManeuver(ll) == lanelet::ManeuverType::Yield) {
         // lanelet has a yield reg. elem.
@@ -459,7 +464,7 @@ std::vector<lanelet::ConstLineString3d> query::stopLinesLanelet(const lanelet::C
     ll.regulatoryElementsAs<const lanelet::TrafficLight>();
 
   if (traffic_light_reg_elems.size() > 0) {
-    // lanelet has a traffic light elem elemetn
+    // lanelet has a traffic light elem element n
     for (auto j = traffic_light_reg_elems.begin(); j < traffic_light_reg_elems.end(); j++) {
       lanelet::Optional<lanelet::ConstLineString3d> traffic_light_stopline_opt = (*j)->stopLine();
       if (!!traffic_light_stopline_opt) {
@@ -692,7 +697,7 @@ std::vector<std::deque<lanelet::ConstLanelet>> getSucceedingLaneletSequencesRecu
   }
 
   for (const auto & next_lanelet : next_lanelets) {
-    // get lanelet sequnce after next_lanelet
+    // get lanelet sequence after next_lanelet
     auto tmp_lanelet_sequences =
       getSucceedingLaneletSequencesRecursive(graph, next_lanelet, length - lanelet_length);
     for (auto & tmp_lanelet_sequence : tmp_lanelet_sequences) {
@@ -719,7 +724,7 @@ std::vector<std::deque<lanelet::ConstLanelet>> getPreceedingLaneletSequencesRecu
   }
 
   for (const auto & prev_lanelet : prev_lanelets) {
-    // get lanelet sequnce after prev_lanelet
+    // get lanelet sequence after prev_lanelet
     auto tmp_lanelet_sequences =
       getPreceedingLaneletSequencesRecursive(graph, prev_lanelet, length - lanelet_length);
     for (auto & tmp_lanelet_sequence : tmp_lanelet_sequences) {

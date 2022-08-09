@@ -47,4 +47,3 @@ if(BUILD_TESTING)
   add_cpp_mock_scenario_test(${PROJECT_NAME} "collision" "5.0")
   add_cpp_mock_scenario_test(${PROJECT_NAME} "standstill_duration" "15.0")
 endif()
-

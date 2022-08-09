@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -41,7 +40,7 @@ const boost::optional<traffic_simulator_msgs::msg::Obstacle> YieldAction::calcul
   if (distance_to_stop_target_.get() < 0) {
     return boost::none;
   }
-  if (distance_to_stop_target_.get() > reference_trajectory->getLength()) {
+  if (distance_to_stop_target_.get() > trajectory->getLength()) {
     return boost::none;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
@@ -62,6 +61,8 @@ const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoint
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
+    trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
+      reference_trajectory, entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon);
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -73,8 +74,11 @@ boost::optional<double> YieldAction::calculateTargetSpeed()
   if (!distance_to_stop_target_) {
     return boost::none;
   }
+  /**
+   * @brief hard coded parameter!! 1.0 is a stop margin
+   */
   double rest_distance =
-    distance_to_stop_target_.get() - (vehicle_parameters.bounding_box.dimensions.x) - 10;
+    distance_to_stop_target_.get() - vehicle_parameters.bounding_box.dimensions.x * 0.5 - 1.0;
   if (rest_distance < calculateStopDistance(driver_model.deceleration)) {
     if (rest_distance > 0) {
       return std::sqrt(2 * driver_model.deceleration * rest_distance);

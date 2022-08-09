@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 
-#include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
-#include <unordered_map>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -40,18 +37,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntityObject : public Group
 {
-  template <typename XML, typename... Ts>
-  explicit EntityObject(const XML & node, Ts &&... xs)
-  // clang-format off
-  : Group(
-      choice(node,
-        std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference::make<Vehicle, Pedestrian, MiscObject>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>         (node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>      (node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>      (node, std::forward<decltype(xs)>(xs)...); })))
-  // clang-format on
-  {
-  }
+  explicit EntityObject(const pugi::xml_node &, Scope &);
 };
 
 DEFINE_LAZY_VISITOR(

@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -51,7 +51,7 @@ auto TimeHeadwayCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(getTimeHeadway(triggering_entity, entity_ref));
+    results.push_back(evaluateTimeHeadway(triggering_entity, entity_ref));
     return compare(results.back(), value);
   }));
 }

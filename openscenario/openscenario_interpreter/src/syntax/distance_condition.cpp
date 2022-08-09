@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
 // limitations under the License.
 
 #include <cmath>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/distance_condition.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
@@ -105,19 +106,19 @@ auto DistanceCondition::distance<
   return apply<double>(
     overload(
       [&](const WorldPosition & position) {
-        const auto pose =
-          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-        return std::hypot(pose.position.x, pose.position.y);
+        const auto relative_world = makeNativeRelativeWorldPosition(
+          triggering_entity, static_cast<NativeWorldPosition>(position));
+        return std::hypot(relative_world.position.x, relative_world.position.y);
       },
       [&](const RelativeWorldPosition & position) {
-        const auto pose =
-          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-        return std::hypot(pose.position.x, pose.position.y);
+        const auto relative_world = makeNativeRelativeWorldPosition(
+          triggering_entity, static_cast<NativeWorldPosition>(position));
+        return std::hypot(relative_world.position.x, relative_world.position.y);
       },
       [&](const LanePosition & position) {
-        const auto pose =
-          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-        return std::hypot(pose.position.x, pose.position.y);
+        const auto relative_world = makeNativeRelativeWorldPosition(
+          triggering_entity, static_cast<NativeWorldPosition>(position));
+        return std::hypot(relative_world.position.x, relative_world.position.y);
       }),
     position);
 }
@@ -130,15 +131,18 @@ auto DistanceCondition::distance<  //
   return apply<double>(
     overload(
       [&](const WorldPosition & position) {
-        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position))
           .position.y;
       },
       [&](const RelativeWorldPosition & position) {
-        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position))
           .position.y;
       },
       [&](const LanePosition & position) {
-        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position))
           .position.y;
       }),
     position);
@@ -152,15 +156,18 @@ auto DistanceCondition::distance<
   return apply<double>(
     overload(
       [&](const WorldPosition & position) {
-        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position))
           .position.x;
       },
       [&](const RelativeWorldPosition & position) {
-        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position))
           .position.x;
       },
       [&](const LanePosition & position) {
-        return getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position))
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position))
           .position.x;
       }),
     position);
@@ -174,25 +181,28 @@ auto DistanceCondition::distance<  //
   return apply<double>(
     overload(
       [&](const WorldPosition & position) {
-        if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
-          return getLongitudinalDistance(
-            triggering_entity, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
+        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+          return makeNativeRelativeLanePosition(
+                   triggering_entity, static_cast<NativeLanePosition>(position))
+            .s;
         } else {
           return std::numeric_limits<double>::quiet_NaN();
         }
       },
       [&](const RelativeWorldPosition & position) {
-        if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
-          return getLongitudinalDistance(
-            triggering_entity, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
+        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+          return makeNativeRelativeLanePosition(
+                   triggering_entity, static_cast<NativeLanePosition>(position))
+            .s;
         } else {
           return std::numeric_limits<double>::quiet_NaN();
         }
       },
       [&](const LanePosition & position) {
-        if (global().entityRef(triggering_entity).as<ScenarioObject>().is_added) {
-          return getLongitudinalDistance(
-            triggering_entity, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
+        if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
+          return makeNativeRelativeLanePosition(
+                   triggering_entity, static_cast<NativeLanePosition>(position))
+            .s;
         } else {
           return std::numeric_limits<double>::quiet_NaN();
         }

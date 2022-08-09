@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>lanelet2_extension_psim</name>
-  <version>0.6.4</version>
-  <description>The lanelet2_extension_psim pacakge contains libraries to handle Lanelet2 format data.</description>
+  <version>0.6.5</version>
+  <description>The lanelet2_extension_psim package contains libraries to handle Lanelet2 format data.</description>
 
   <maintainer email="ryohsuke.mitsudome@tier4.jp">mitsudome-r</maintainer>
 
-  <license>Apach 2</license>
+  <license>Apache 2</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
@@ -24,6 +24,8 @@
   <depend>geometry_msgs</depend>
   <depend>visualization_msgs</depend>
   <depend>pugixml-dev</depend>
+  <depend>tf2</depend>
+  <depend>tf2_geometry_msgs</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>

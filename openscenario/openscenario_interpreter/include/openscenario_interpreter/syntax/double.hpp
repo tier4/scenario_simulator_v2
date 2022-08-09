@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,6 +35,10 @@ struct Double : public std_msgs::msg::Float64
   static auto infinity() noexcept -> Double;
 
   static auto nan() noexcept -> Double;
+
+  static auto max() noexcept -> Double;
+
+  static auto lowest() noexcept -> Double;
 
   auto operator=(const value_type & rhs) noexcept -> Double &;
 

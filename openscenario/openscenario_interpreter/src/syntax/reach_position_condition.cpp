@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/reach_position_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
@@ -52,18 +52,18 @@ auto ReachPositionCondition::evaluate() -> Object
   // TODO USE DistanceCondition::distance
   const auto distance = overload(
     [&](const WorldPosition & position, auto && triggering_entity) {
-      const auto pose =
-        getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+      const auto pose = makeNativeRelativeWorldPosition(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
       return std::hypot(pose.position.x, pose.position.y);
     },
     [&](const RelativeWorldPosition & position, auto && triggering_entity) {
-      const auto pose =
-        getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+      const auto pose = makeNativeRelativeWorldPosition(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
       return std::hypot(pose.position.x, pose.position.y);
     },
     [&](const LanePosition & position, auto && triggering_entity) {
-      const auto pose =
-        getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+      const auto pose = makeNativeRelativeWorldPosition(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
       return std::hypot(pose.position.x, pose.position.y);
     });
 

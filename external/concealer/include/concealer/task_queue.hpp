@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
 #ifndef CONCEALER__TASK_QUEUE_HPP_
 #define CONCEALER__TASK_QUEUE_HPP_
 
+#include <atomic>
 #include <exception>
 #include <functional>
-#include <future>
+#include <mutex>
 #include <queue>
 #include <thread>
 
@@ -29,9 +30,13 @@ class TaskQueue
 
   std::queue<Thunk> thunks;
 
-  std::promise<void> notifier;
+  std::mutex thunks_mutex;
 
   std::thread dispatcher;
+
+  std::atomic<bool> is_stop_requested = false;
+
+  std::atomic<bool> is_thrown = false;
 
   std::exception_ptr thrown;
 
@@ -43,18 +48,13 @@ public:
   template <typename F>
   decltype(auto) delay(F && f)
   {
-    return thunks.emplace([this, f]() {
-      try {
-        return f();
-      } catch (...) {
-        thrown = std::current_exception();
-      }
-    });
+    std::unique_lock lk(thunks_mutex);
+    thunks.emplace(std::forward<F>(f));
   }
 
   bool exhausted() const noexcept;
 
-  void rethrow() const noexcept(false);
+  void rethrow() const;
 };
 }  // namespace concealer
 

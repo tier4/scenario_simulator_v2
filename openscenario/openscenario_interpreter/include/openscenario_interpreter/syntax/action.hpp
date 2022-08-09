@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,6 +47,8 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
   using StoryboardElement::evaluate;
 
   auto accomplished() const -> bool override;
+
+  auto endsImmediately() const -> bool;
 
   auto run() -> void override;
 

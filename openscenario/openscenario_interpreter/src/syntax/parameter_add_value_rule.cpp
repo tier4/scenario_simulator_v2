@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ auto ParameterAddValueRule::operator()(const Object & target) const -> Object
     throw SyntaxError(
       "The parameter specified by attribute 'parameterRef' of type 'ParameterAction' must be "
       "numeric type (double, integer, unsignedInteger or unsignedShort), but ",
-      target, " (type ", target.type().name(), ") specified");
+      target, " (type ", makeTypename(target.type()), ") specified");
   }
 }
 }  // namespace syntax

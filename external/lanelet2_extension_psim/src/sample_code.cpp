@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ void usingAutowareTrafficLight(const std::string map_file_path)
         std::cout << light_bulb_string.id() << std::endl;
       }
       // Since AutowareTrafficLight class is inheriting lanelet::TrafficLight
-      // class, you can also acess to outline of traffic light by the same
+      // class, you can also access to outline of traffic light by the same
       // method.
       for (auto light_string : light->trafficLights()) {
         std::cout << light_string.id() << std::endl;

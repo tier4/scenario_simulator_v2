@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,11 @@ AssignControllerAction::AssignControllerAction()  //
 {
 }
 
+AssignControllerAction::AssignControllerAction(const ComplexType & controller)
+: ComplexType(controller)
+{
+}
+
 AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
@@ -39,7 +44,7 @@ AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scop
 auto AssignControllerAction::operator()(const EntityRef & entity_ref) const -> void
 {
   if (is<Controller>()) {
-    as<Controller>().assign(entity_ref);
+    applyAssignControllerAction(entity_ref, as<Controller>());
   }
 }
 }  // namespace syntax

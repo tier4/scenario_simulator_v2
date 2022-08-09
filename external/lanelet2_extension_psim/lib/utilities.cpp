@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ namespace
  * search_point]
  * @param  lanelet_map   [pointer to lanelet]
  * @param  trafficRules  [traffic rules to ignore lanelets that are not
- * traversible]
+ * traversable]
  * @param  search_point  [2D point used for searching]
  * @param  contacting_lanelet_ids [array of lanelet ids that is contacting with
  * search_point]

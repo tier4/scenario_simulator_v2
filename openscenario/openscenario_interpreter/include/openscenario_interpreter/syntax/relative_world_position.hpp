@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
 
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/orientation.hpp>
@@ -41,7 +40,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeWorldPosition
+struct RelativeWorldPosition : private SimulatorCore::CoordinateSystemConversion
 {
   const Orientation orientation;
 
@@ -53,9 +52,9 @@ struct RelativeWorldPosition
 
   operator geometry_msgs::msg::Point() const;
 
-  explicit operator geometry_msgs::msg::Pose() const;
+  explicit operator NativeLanePosition() const;
 
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
+  explicit operator NativeWorldPosition() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

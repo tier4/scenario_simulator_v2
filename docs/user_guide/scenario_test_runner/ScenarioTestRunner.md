@@ -2,7 +2,7 @@
 
 You can test run (preview) the scenarios you created using the GUI scenario editor before running it with Autoware.
 
-The file you exported from the GUI scenario editor is in YAML based format called "[TierIV Scenario Format Version 2.0](../../design/TierIVScenarioFormatVersion2.md)". Then it is converted into XML based OpenSCENARIO format.
+The file you exported from the GUI scenario editor is in YAML based format called "[TIER IV Scenario Format Version 2.0](../../developer_guide/TIERIVScenarioFormatVersion2.md)". Then it is converted into XML based OpenSCENARIO format.
 The specification of this OpenSCENARIO format is found at [OpenSCENARIO](http://www.openscenario.org/) site.
 
 ## Before Testing Scenarios
@@ -42,7 +42,7 @@ and change to;
                 - name: isEgo
                   value: "false"
 ```
-This is the setting to let Ego vehicle run without connecting to Autoware for testing the scenario. <font color="Red"> Please note that this "isEgo" setting is only for scenario testing and you will need to revert it to "true" when you conduct the actual scenario simulation with Autoware. </font>
+This is the setting to let Ego vehicle run without connecting to Autoware for testing the scenario. <font color="Red"> Please note that this "isEgo" setting is only for scenario testing, and you will need to revert it to "true" when you conduct the actual scenario simulation with Autoware. </font>
 
 ## How to Test Single Scenario
 ```bash

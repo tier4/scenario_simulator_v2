@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/distance.hpp>
+#include <geometry/polygon/polygon.hpp>
+#include <geometry/transform.hpp>
 #include <limits>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
@@ -30,28 +33,6 @@ EntityBase::EntityBase(
 : name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
 {
   status_ = boost::none;
-  job_list_.append(
-    /**
-     * @brief Update stand still duration.
-     */
-    [this]() {
-      if (!status_) {
-        stand_still_duration_ = boost::none;
-      } else {
-        if (!stand_still_duration_) {
-          stand_still_duration_ = 0;
-        }
-        if (
-          std::fabs(status_->action_status.twist.linear.x) <=
-          std::numeric_limits<double>::epsilon()) {
-          stand_still_duration_ = step_time_ + stand_still_duration_.get();
-        } else {
-          stand_still_duration_ = 0;
-        }
-      }
-      return false;
-    },
-    [this]() {}, job::Type::STAND_STILL_DURATION, false, job::Trigger::ON_MEASURE);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
@@ -59,18 +40,18 @@ void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*mark
   return;
 }
 
-void EntityBase::onUpdate(double current_time, double step_time)
-{
-  current_time_ = current_time;
-  step_time_ = step_time;
-  status_before_update_ = status_;
-}
-
-auto EntityBase::getEmergencyStateString() const -> std::string
+auto EntityBase::asAutoware() const -> concealer::Autoware &
 {
   throw common::Error(
-    "Inquiry of emergency state is valid query to only Autoware.Universe-controlled entity.",
-    "But the target entity ", std::quoted(name.c_str()), " is not controlled by Autoware.Universe");
+    "An operation was requested for Entity ", std::quoted(name),
+    " that is valid only for the entity controlled by Autoware, but ", std::quoted(name),
+    " is not the entity controlled by Autoware.");
+}
+
+void EntityBase::onUpdate(double, double)
+{
+  job_list_.update();
+  status_before_update_ = status_;
 }
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
@@ -96,7 +77,7 @@ void EntityBase::requestSpeedChange(
           [this]() {
             setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration);
           },
-          job::Type::LINEAR_ACCELERATION, true, job::Trigger::ON_UPDATE);
+          job::Type::LINEAR_ACCELERATION, true);
       } else if (getStatus().action_status.twist.linear.x > target_speed) {
         setDecelerationLimit(std::abs(constraint.value));
         job_list_.append(
@@ -112,7 +93,7 @@ void EntityBase::requestSpeedChange(
           [this]() {
             setDecelerationLimit(traffic_simulator_msgs::msg::DriverModel().deceleration);
           },
-          job::Type::LINEAR_ACCELERATION, true, job::Trigger::ON_UPDATE);
+          job::Type::LINEAR_ACCELERATION, true);
       }
       requestSpeedChange(target_speed, continuous);
       break;
@@ -160,7 +141,7 @@ void EntityBase::requestSpeedChange(
            * @brief Resets acceleration limit.
            */
         [this]() { setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration); },
-        job::Type::LINEAR_ACCELERATION, true, job::Trigger::ON_UPDATE);
+        job::Type::LINEAR_ACCELERATION, true);
       requestSpeedChange(target_speed, continuous);
       break;
     }
@@ -188,7 +169,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cansel speed change request.
        */
-      [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Trigger::ON_UPDATE);
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
   } else {
     job_list_.append(
       /**
@@ -204,8 +185,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
-      job::Trigger::ON_UPDATE);
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
 }
 
@@ -224,7 +204,7 @@ void EntityBase::requestSpeedChange(
         target_speed_ = target_speed.getAbsoluteValue(other_status_);
         return false;
       },
-      [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Trigger::ON_UPDATE);
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
   } else {
     job_list_.append(
       /**
@@ -245,8 +225,7 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
-      job::Trigger::ON_UPDATE);
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
 }
 
@@ -297,16 +276,21 @@ void EntityBase::requestLaneChange(
   }
 }
 
-void EntityBase::runMeasureJob() { job_list_.measure(); }
-
-void EntityBase::runUpdateJob() { job_list_.update(); }
-
-auto EntityBase::getVehicleCommand() const -> std::tuple<
-  autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
+void EntityBase::updateStandStillDuration(const double step_time)
 {
-  THROW_SIMULATION_ERROR(
-    "`getVehicleCommand` is not provided for ", getEntityTypename(), " type entity.");
+  if (!status_) {
+    stand_still_duration_ = boost::none;
+  } else {
+    if (!stand_still_duration_) {
+      stand_still_duration_ = 0;
+    }
+    if (
+      std::fabs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
+      stand_still_duration_ = step_time + stand_still_duration_.get();
+    } else {
+      stand_still_duration_ = 0;
+    }
+  }
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
@@ -355,6 +339,154 @@ bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   return true;
 }
 
+auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose
+{
+  const auto status = getStatus();
+  return status.pose;
+}
+
+auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
+  -> geometry_msgs::msg::Pose
+{
+  const auto ref_status = getStatus();
+  tf2::Transform ref_transform, relative_transform;
+  tf2::fromMsg(ref_status.pose, ref_transform);
+  tf2::fromMsg(relative_pose, relative_transform);
+  geometry_msgs::msg::Pose ret;
+  tf2::toMsg(ref_transform * relative_transform, ret);
+  return ret;
+}
+
+auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
+{
+  const auto status = getStatus();
+
+  std::vector<geometry_msgs::msg::Point> points_bbox;
+  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
+
+  p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p0.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p0.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p0);
+
+  p1.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p1.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p1.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p1);
+
+  p2.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p2.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p2.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p2);
+
+  p3.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p3.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p3.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p3);
+
+  p4.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p4.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p4.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p4);
+
+  p5.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p5.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p5.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p5);
+
+  p6.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p6.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p6.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p6);
+
+  p7.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p7.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p7.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p7);
+
+  return math::geometry::get2DConvexHull(points_bbox);
+}
+
+auto EntityBase::getDistanceToLaneBound() -> double
+{
+  return std::min(getDistanceToLeftLaneBound(), getDistanceToRightLaneBound());
+}
+
+auto EntityBase::getDistanceToLaneBound(std::int64_t lanelet_id) const -> double
+{
+  return std::min(getDistanceToLeftLaneBound(lanelet_id), getDistanceToRightLaneBound(lanelet_id));
+}
+
+auto EntityBase::getDistanceToLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+  -> double
+{
+  return std::min(
+    getDistanceToLeftLaneBound(lanelet_ids), getDistanceToRightLaneBound(lanelet_ids));
+}
+
+auto EntityBase::getDistanceToLeftLaneBound() -> double
+{
+  return getDistanceToLeftLaneBound(getRouteLanelets());
+}
+
+auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double
+{
+  const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id);
+  if (bound.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
+  }
+  const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
+  if (polygon.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
+      " exists and it's definition");
+  }
+  return math::geometry::getDistance2D(bound, polygon);
+}
+
+auto EntityBase::getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+  -> double
+{
+  std::vector<double> distances;
+  std::transform(
+    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
+    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
+  return *std::min_element(distances.begin(), distances.end());
+}
+
+auto EntityBase::getDistanceToRightLaneBound() -> double
+{
+  return getDistanceToRightLaneBound(getRouteLanelets());
+}
+
+auto EntityBase::getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double
+{
+  const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id);
+  if (bound.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
+      " please check lanelet map.");
+  }
+  const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
+  if (polygon.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
+      " exists and it's definition");
+  }
+  return math::geometry::getDistance2D(bound, polygon);
+}
+
+auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+  -> double
+{
+  std::vector<double> distances;
+  std::transform(
+    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
+    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
+  return *std::min_element(distances.begin(), distances.end());
+}
+
 void EntityBase::stopAtEndOfRoad()
 {
   if (!status_) {
@@ -375,6 +507,19 @@ void EntityBase::setDecelerationLimit(double)
 {
   THROW_SIMULATION_ERROR(
     "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
+}
+
+auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  const auto status = getStatus();
+  if (status.lanelet_pose_valid) {
+    return status.lanelet_pose;
+  }
+  if (getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
+    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
+  } else {
+    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
+  }
 }
 }  // namespace entity
 }  // namespace traffic_simulator

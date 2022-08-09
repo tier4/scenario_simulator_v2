@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ void AutowareOsmParser::parseVersions(
   auto result = doc.load_file(filename.c_str());
   if (!result) {
     throw lanelet::ParseError(
-      std::string("Errors occured while parsing osm file: ") + result.description());
+      std::string("Errors occurred while parsing osm file: ") + result.description());
   }
 
   auto osmNode = doc.child("osm");

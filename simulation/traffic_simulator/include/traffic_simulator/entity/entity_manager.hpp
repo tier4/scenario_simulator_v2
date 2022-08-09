@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,11 @@
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
 
 #include <tf2/LinearMath/Quaternion.h>
+#ifdef USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#else
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#endif
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
@@ -196,20 +200,26 @@ public:
   }                                                                            \
   static_assert(true, "")
 
+  FORWARD_TO_ENTITY(asAutoware, const);
   FORWARD_TO_ENTITY(cancelRequest, );
-  FORWARD_TO_ENTITY(engage, );
+  FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
+  FORWARD_TO_ENTITY(getDistanceToLaneBound, );
+  FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
+  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
+  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, const);
+  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
+  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getDriverModel, const);
-  FORWARD_TO_ENTITY(getEmergencyStateString, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
+  FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
+  FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getVehicleCommand, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
-  FORWARD_TO_ENTITY(ready, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
@@ -281,20 +291,12 @@ public:
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
-  auto getLaneletPose(const std::string & name)
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
-
   // clang-format off
   auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &, const double = 100) -> boost::optional<double>;
   auto getLongitudinalDistance(const LaneletPose &, const std::string &, const double = 100) -> boost::optional<double>;
   auto getLongitudinalDistance(const std::string &, const LaneletPose &, const double = 100) -> boost::optional<double>;
   auto getLongitudinalDistance(const std::string &, const std::string &, const double = 100) -> boost::optional<double>;
   // clang-format on
-
-  auto getMapPose(const std::string & entity_name) -> geometry_msgs::msg::Pose;
-  auto getMapPose(
-    const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose)
-    -> geometry_msgs::msg::Pose;
 
   auto getNumberOfEgo() const -> std::size_t;
 
@@ -303,9 +305,13 @@ public:
 
   // clang-format off
   auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const geometry_msgs::msg::Pose & from, const std::string              & to)       -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string              & from, const geometry_msgs::msg::Pose & to)       -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string              & from, const std::string              & to)       -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const geometry_msgs::msg::Pose & from, const std::string              & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const std::string              & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const std::string              & from, const std::string              & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const geometry_msgs::msg::Pose & from, const LaneletPose              & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const LaneletPose              & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const std::string              & from, const LaneletPose              & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const LaneletPose              & from, const std::string              & to) const -> geometry_msgs::msg::Pose;
   // clang-format on
 
   auto getStepTime() const noexcept -> double;

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,15 +39,6 @@ auto operator>>(std::istream & is, VehicleCategory & category) -> std::istream &
   BOILERPLATE(car);
   BOILERPLATE(motorbike);
   BOILERPLATE(truck);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                             \
-  if (buffer == #IDENTIFIER) {                                              \
-    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(VehicleCategory, buffer); \
-  }                                                                         \
-  static_assert(true, "")
-
   BOILERPLATE(semitrailer);
   BOILERPLATE(trailer);
   BOILERPLATE(train);

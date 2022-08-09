@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ static lanelet::RegisterRegulatoryElement<AutowareTrafficLight> regAutowareTraff
 // definition errors
 /*
 #if __cplusplus < 201703L
-constexpr char AutowareTrafficLight::RuleName[];      // instanciate string in
+constexpr char AutowareTrafficLight::RuleName[];      // instantiate string in
 cpp file #endif
 */
 }  // namespace autoware

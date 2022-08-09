@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
 #include <boost/optional.hpp>
+#include <geometry/spline/hermite_curve.hpp>
 #include <memory>
 #include <string>
-#include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <vector>
 
@@ -51,7 +51,7 @@ public:
   void getBlackBoardValues();
 
 private:
-  boost::optional<traffic_simulator::math::HermiteCurve> curve_;
+  boost::optional<math::geometry::HermiteCurve> curve_;
   double current_s_;
   double target_s_;
   double lane_change_velocity_;

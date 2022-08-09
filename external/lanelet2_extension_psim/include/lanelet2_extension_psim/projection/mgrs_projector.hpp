@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ private:
   std::string mgrs_code_;
 
   /**
-   * mgrs grid code that was last projected in previous foward function.
+   * mgrs grid code that was last projected in previous forward function.
    * reverse function will use this if isMGRSCodeSet() returns false.
    */
   mutable std::string projected_grid_;

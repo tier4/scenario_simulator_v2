@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ struct CatalogReference
       std::stringstream what;
       what << "Required type of catalog element is one of the following type: ";
       print_to(what, std::array<const char *, sizeof...(Ts)>{typeid(Ts).name()...});
-      what << ". But the type of this element is " << result.type().name() << ".";
+      what << ". But the type of this element is " << makeTypename(result.type()) << ".";
       throw SyntaxError(what.str());
     }
   }

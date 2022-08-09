@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,7 +51,8 @@ void ContextPanel::onDisable()
   parentWidget()->hide();
 }
 
-void ContextPanel::contextCallback(const openscenario_interpreter_msgs::msg::Context::SharedPtr msg)
+void ContextPanel::contextCallback(
+  const openscenario_interpreter_msgs::msg::Context::ConstSharedPtr msg)
 {
   context_ = msg->data;
   simulation_time_ = msg->time;

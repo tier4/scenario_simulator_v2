@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,32 +15,40 @@
 #include <chrono>
 #include <concealer/task_queue.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <utility>
 
 namespace concealer
 {
 TaskQueue::TaskQueue()
-: dispatcher(
-    [this](auto notification) {
-      using namespace std::literals::chrono_literals;
-      while (rclcpp::ok() and notification.wait_for(1ms) == std::future_status::timeout) {
-        if (not thunks.empty() and not thrown) {
-          // NOTE: To ensure that the task to be queued is completed as expected is the responsibility of the side to create a task.
-          std::thread(thunks.front()).join();
+: dispatcher([this] {
+    try {
+      while (rclcpp::ok() and not is_stop_requested.load(std::memory_order_acquire)) {
+        using namespace std::literals::chrono_literals;
+        std::unique_lock lk(thunks_mutex);
+        if (not thunks.empty()) {
+          // NOTE: To ensure that the task to be queued is completed as expected is the
+          // responsibility of the side to create a task.
+          auto f = std::move(thunks.front());
           thunks.pop();
+          lk.unlock();
+
+          f();
         } else {
+          lk.unlock();
           std::this_thread::sleep_for(100ms);
         }
       }
-    },
-    std::move(notifier.get_future()))
+    } catch (...) {
+      thrown = std::current_exception();
+      is_thrown.store(true, std::memory_order_release);
+    }
+  })
 {
 }
 
 TaskQueue::~TaskQueue()
 {
   if (dispatcher.joinable()) {
-    notifier.set_value();
+    is_stop_requested.store(true, std::memory_order_release);
     dispatcher.join();
   }
 }
@@ -49,7 +57,7 @@ bool TaskQueue::exhausted() const noexcept { return thunks.empty(); }
 
 void TaskQueue::rethrow() const
 {
-  if (thrown) {
+  if (is_thrown.load(std::memory_order_acquire)) {
     std::rethrow_exception(thrown);
   }
 }
