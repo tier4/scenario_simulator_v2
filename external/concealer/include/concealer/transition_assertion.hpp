@@ -52,6 +52,7 @@ struct TransitionAssertion
   auto makeTransitionError(const std::string & expected) const
   {
     const auto current_state = asAutoware().getAutowareStateName();
+    using namespace std::chrono;
     return common::AutowareError(
       "Simulator waited for the Autoware state to transition to ", expected,
       ", but time is up. The current Autoware state is ",
@@ -61,22 +62,25 @@ struct TransitionAssertion
   auto asAutoware() -> Autoware & { return static_cast<Autoware &>(*this); }
   auto asAutoware() const -> const Autoware & { return static_cast<const Autoware &>(*this); }
 
-#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                        \
+#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(STATE)             \
   template <typename Thunk = void (*)()>                                                   \
   void waitForAutowareStateToBe##STATE(                                                    \
     Thunk && thunk = [] {}, std::chrono::seconds interval = std::chrono::seconds(1))       \
   {                                                                                        \
-    using namespace std::chrono;                                                           \
+    using std::chrono::duration_cast;                                                      \
+    using std::chrono::seconds;                                                            \
     rate_type rate(interval);                                                              \
     for (thunk(); not asAutoware().isStopRequested() and not asAutoware().is##STATE();     \
-         rate.sleep(), thunk()) {                                                          \
-      if (auto now = clock_type::now(); start + initialize_duration <= now) {              \
+         rate.sleep()) {                                                                   \
+      auto now = clock_type::now();                                                        \
+      if (start + initialize_duration <= now) {                                            \
         throw makeTransitionError(#STATE);                                                 \
       } else {                                                                             \
         RCLCPP_INFO_STREAM(                                                                \
           asAutoware().get_logger(),                                                       \
           "Simulator waiting for Autoware state to be " #STATE " (remain: "                \
             << duration_cast<seconds>(start + initialize_duration - now).count() << ")."); \
+        thunk();                                                                           \
       }                                                                                    \
     }                                                                                      \
     RCLCPP_INFO_STREAM(                                                                    \
@@ -85,10 +89,37 @@ struct TransitionAssertion
   }                                                                                        \
   static_assert(true, "")
 
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Initializing);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForRoute);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Planning);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForEngage);
+#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                      \
+  template <typename Thunk = void (*)()>                                                 \
+  void waitForAutowareStateToBe##STATE(                                                  \
+    Thunk && thunk = [] {}, std::chrono::seconds interval = std::chrono::seconds(1))     \
+  {                                                                                      \
+    using std::chrono::duration_cast;                                                    \
+    using std::chrono::seconds;                                                          \
+    rate_type rate(interval);                                                            \
+    for (thunk(); not asAutoware().isStopRequested() and not asAutoware().is##STATE();   \
+         rate.sleep()) {                                                                 \
+      auto now = clock_type::now();                                                      \
+      RCLCPP_INFO_STREAM(                                                                \
+        asAutoware().get_logger(),                                                       \
+        "Simulator waiting for Autoware state to be " #STATE " (remain: "                \
+          << duration_cast<seconds>(start + initialize_duration - now).count() << ")."); \
+      thunk();                                                                           \
+    }                                                                                    \
+    RCLCPP_INFO_STREAM(                                                                  \
+      asAutoware().get_logger(),                                                         \
+      "Autoware is " << asAutoware().getAutowareStateName() << " now.");                 \
+  }                                                                                      \
+  static_assert(true, "")
+
+  // XXX: The time limit must be ignored in waitForAutowareStateToBeDriving() because the current
+  // implementation attepmts to transition to Driving state after initialize_duration seconds have
+  // elapsed.
+
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(Initializing);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(WaitingForRoute);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(Planning);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(WaitingForEngage);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Driving);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(ArrivedGoal);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Finalizing);
