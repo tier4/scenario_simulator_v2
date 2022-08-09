@@ -28,13 +28,28 @@
 
 namespace simple_sensor_simulator
 {
+
+/**
+ * @brief Occupancy grid generator
+ */
 class OccupancyGridGenerator
 {
 public:
   OccupancyGridGenerator(
     const simulation_api_schema::OccupancyGridSensorConfiguration & configuration);
+
+  /**
+   * @brief Construct occupancy grid from ego's pose and primitive objects
+   * @return Occupancy grid
+   */
   nav_msgs::msg::OccupancyGrid generate(
     const geometry_msgs::msg::Pose & ego_pose, const rclcpp::Time & stamp) const;
+
+  /**
+   * @brief Add primitive object with name
+   * @warning Names need to be unique
+   * @exception std::runtime_error if called with same `name` twice
+   */
   template <typename T, typename... Ts>
   void addPrimitive(std::string name, Ts &&... xs)
   {
