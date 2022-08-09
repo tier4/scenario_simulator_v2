@@ -92,6 +92,7 @@ struct Rule
 auto operator>>(std::istream &, Rule &) -> std::istream &;
 
 auto operator<<(std::ostream &, const Rule &) -> std::ostream &;
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
