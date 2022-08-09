@@ -53,8 +53,6 @@ private:
       traffic_simulator::helper::constructActionStatus(0));
     api_.requestSpeedChange("npc1", 0, true);
     std::vector<std::string> targets = {"npc1"};
-    api_.addMetric<metrics::CollisionMetric>("ego_collision0", "ego", targets);
-    api_.addMetric<metrics::CollisionMetric>("ego_collision1", "ego");
     expectThrow();
   }
 };
