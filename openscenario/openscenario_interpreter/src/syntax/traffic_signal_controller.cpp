@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 
 namespace openscenario_interpreter
@@ -68,7 +68,7 @@ auto TrafficSignalController::changePhaseTo(std::list<Phase>::iterator next) -> 
     }
   }
 
-  current_phase_started_at = getCurrentTime();
+  current_phase_started_at = evaluateSimulationTime();
   current_phase = next;
 
   return current_phase != std::end(phases) ? (*current_phase).evaluate() : unspecified;
@@ -77,7 +77,7 @@ auto TrafficSignalController::changePhaseTo(std::list<Phase>::iterator next) -> 
 auto TrafficSignalController::currentPhaseExceeded() const -> bool
 {
   return current_phase != std::end(phases) and
-         (*current_phase).duration <= (getCurrentTime() - current_phase_started_at);
+         (*current_phase).duration <= (evaluateSimulationTime() - current_phase_started_at);
 }
 
 auto TrafficSignalController::currentPhaseName() const -> const String &
@@ -110,7 +110,7 @@ auto TrafficSignalController::evaluate() -> Object
 
 auto TrafficSignalController::notifyBegin() -> void
 {
-  change_to_begin_time = getCurrentTime() + delay;
+  change_to_begin_time = evaluateSimulationTime() + delay;
 }
 
 auto TrafficSignalController::shouldChangePhaseToBegin() -> bool
@@ -118,7 +118,7 @@ auto TrafficSignalController::shouldChangePhaseToBegin() -> bool
   if (reference.empty()) {
     return current_phase == std::end(phases);  // if current_phase haven't been initialized
   } else if (
-    change_to_begin_time.has_value() and (change_to_begin_time.value() < getCurrentTime())) {
+    change_to_begin_time.has_value() and change_to_begin_time.value() < evaluateSimulationTime()) {
     change_to_begin_time = boost::none;
     return true;
   } else {

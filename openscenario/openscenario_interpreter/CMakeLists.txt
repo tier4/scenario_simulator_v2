@@ -29,11 +29,17 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/object.cpp
   src/evaluate.cpp
   src/openscenario_interpreter.cpp
-  src/procedure.cpp
   src/record.cpp
   src/scope.cpp)
 
 target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
+
+# workaround to allow deprecated header to build on both galactic and humble
+if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC
+    USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
+  )
+endif()
 
 rclcpp_components_register_nodes(${PROJECT_NAME} "openscenario_interpreter::Interpreter")
 

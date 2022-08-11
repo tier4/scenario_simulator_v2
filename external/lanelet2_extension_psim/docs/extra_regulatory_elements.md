@@ -1,15 +1,17 @@
 # Extra Regulatory Elements
 
 ## Detection Area
-This regualtory element specifies region of interest which vehicle must pay attention whenever it is driving along the associated lanelet. When there are any obstcle in the detection area, vehicle must stop at specified stopline
 
-* refers: refers to detection area polygon. There could be multiple detection areas registered to a single regulatory element.
-* refline: refers to stop line of the detection area
+This regulatory element specifies region of interest which vehicle must pay attention whenever it is driving along the associated lanelet. When there are any obstacle in the detection area, vehicle must stop at specified stopline.
 
-<img src="./detection_area.png" width="400">
+- refers: refers to detection area polygon. There could be multiple detection areas registered to a single regulatory element.
+- refline: refers to stop line of the detection area
+
+![Detection area](detection_area.png)
 
 Sample detection area in .osm format is shown below:
-```
+
+```xml
   <node id=1 version='1' lat='49.00541994701' lon='8.41565013855'>
     <tag k=’ele’ v=’0’/>
   </node>
@@ -51,11 +53,11 @@ Sample detection area in .osm format is shown below:
 ```
 
 ## Road Marking
+
 This regulatory element specifies related road markings to a lanelet as shown below.
 
 \* Note that the stopline in the image is for stoplines that are for reference, and normal stoplines should be expressed using TrafficSign regulatory element.
 
-refers: linestring with type attribute. Type explains the what road marking it represents (e.g. stopline). 
+refers: linestring with type attribute. Type explains what road marking it represents (e.g. stopline).
 
-<img src="./road_mark.png" width="400">
-
+![Road marking](road_mark.png)

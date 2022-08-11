@@ -1,0 +1,68 @@
+@startuml
+allow_mixing
+title WholeArchitecture
+
+interface ros2lifecycle
+
+Node openscenario_interpreter_node {
+  class openscenario_interpreter::Interpreter
+  class EntityManager
+  class TrafficLightManager
+  class MetricsManager
+  class traffic_simulator::API
+  class ZeroMQRequestSocket
+  openscenario_interpreter::Interpreter o-- traffic_simulator::API
+  traffic_simulator::API o-- EntityManager
+  traffic_simulator::API o-- TrafficLightManager
+  traffic_simulator::API o-- MetricsManager
+  TrafficLightManager -right-> EntityManager
+  EntityManager -right-> MetricsManager
+  class EgoEntity
+  class VehicleEntity
+  class PedestrianEntity
+  EntityManager o-- EgoEntity
+  EntityManager o-- VehicleEntity
+  EntityManager o-- PedestrianEntity
+  class AwapiAccessor
+  EgoEntity o-- AwapiAccessor
+}
+
+openscenario_interpreter::Interpreter -up-> ros2lifecycle
+
+ros2lifecycle -down-> openscenario_interpreter::Interpreter
+
+Node test_runner_node {
+}
+
+test_runner_node -down-> ros2lifecycle
+ros2lifecycle -up-> test_runner_node
+
+Node Autoware {
+  Interface AutowareAPI
+}
+
+AwapiAccessor -down-> AutowareAPI
+
+interface ros2launch
+
+test_runner_node -down-> ros2launch
+ros2launch -down-> Autoware
+ros2launch -down-> openscenario_interpreter_node
+
+interface "ZEROMQ (TCP)"
+
+traffic_simulator::API -left-> ZeroMQRequestSocket
+ZeroMQRequestSocket -right-> traffic_simulator::API
+ZeroMQRequestSocket -right-> "ZEROMQ (TCP)"
+"ZEROMQ (TCP)" -left-> ZeroMQRequestSocket
+
+Node Simulator {
+  class ZeroMQReplySocket
+}
+
+ros2launch -down-> Simulator
+
+"ZEROMQ (TCP)" -up-> ZeroMQReplySocket
+ZeroMQReplySocket -down-> "ZEROMQ (TCP)"
+
+@enduml

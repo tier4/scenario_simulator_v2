@@ -12,13 +12,8 @@
 
 # external packages
 external/autoware_auto_msgs
-external/doxybook2
-external/lanelet2
-external/mrt_cmake_modules
-external/operational-design-domains
-external/ouxt_common
-external/quaternion_operation
 external/tier4_msgs
+external/zmqpp_vendor
 
 # auto-generated files
 html

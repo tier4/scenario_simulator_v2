@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -95,9 +95,7 @@ class ExecutionTimer
 
 public:
   template <typename Thunk, typename... Ts>
-  auto invoke(const std::string & tag, Thunk && thunk) -> typename std::enable_if<
-    std::is_same<typename std::result_of<Thunk()>::type, void>::value,
-    typename Clock::duration>::type
+  auto invoke(const std::string & tag, Thunk && thunk)
   {
     const auto begin = Clock::now();
 
@@ -106,24 +104,6 @@ public:
     const auto end = Clock::now();
 
     statistics_map[tag].add(end - begin);
-
-    return end - begin;
-  }
-
-  template <typename Thunk, typename... Ts>
-  auto invoke(const std::string & tag, Thunk && thunk) -> typename std::enable_if<
-    std::is_same<typename std::result_of<Thunk()>::type, bool>::value,
-    typename Clock::duration>::type
-  {
-    const auto begin = Clock::now();
-
-    const auto result = thunk();
-
-    const auto end = Clock::now();
-
-    if (result) {
-      statistics_map[tag].add(end - begin);
-    }
 
     return end - begin;
   }

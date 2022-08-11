@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ public:
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
 
-  auto engage() -> void override;
+  auto asAutoware() const -> concealer::Autoware & override;
 
   auto getCurrentAction() const -> const std::string override;
 
@@ -99,17 +99,9 @@ public:
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 
-  auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> override;
-
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  auto getEmergencyStateString() const -> std::string override;
-
   void onUpdate(double current_time, double step_time) override;
-
-  auto ready() const -> bool override;
 
   void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override;
 

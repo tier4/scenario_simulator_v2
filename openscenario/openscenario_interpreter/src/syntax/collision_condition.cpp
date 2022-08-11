@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/collision_condition.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 
 namespace openscenario_interpreter
@@ -51,7 +52,7 @@ auto CollisionCondition::evaluate() const -> Object
 {
   if (
     another_given_entity.is<EntityRef>() and
-    global().isAddedEntity(another_given_entity.as<EntityRef>())) {
+    global().entities->isAdded(another_given_entity.as<EntityRef>())) {
     return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
       return evaluateCollisionCondition(triggering_entity, another_given_entity.as<EntityRef>());
     }));

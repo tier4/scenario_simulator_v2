@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,16 @@ Init::Init(const pugi::xml_node & node, Scope & scope)
 
 auto Init::endsImmediately() const -> bool { return actions.endsImmediately(); }
 
-auto Init::evaluate() -> Object { return actions.evaluate(); }
+auto Init::evaluateInstantaneousActions() -> Object
+{
+  actions.startInstantaneousActions();
+  actions.runInstantaneousActions();
+  return unspecified;
+}
+
+auto Init::runNonInstantaneousActions() -> void { actions.runNonInstantaneousActions(); }
+
+auto Init::startNonInstantaneousActions() -> void { actions.startNonInstantaneousActions(); }
 
 auto operator<<(nlohmann::json & json, const Init & datum) -> nlohmann::json &
 {

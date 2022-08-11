@@ -5,11 +5,11 @@
  * @version 0.1
  * @date 2021-04-01
  *
- * @copyright Copyright(c) Tier IV.Inc {2015-2021}
+ * @copyright Copyright(c) TIER IV.Inc {2015}
  *
  */
 
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015 TIER IV.inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@
 // limitations under the License.
 
 #include <functional>
+#include <geometry/distance.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <traffic_simulator/math/distance.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <vector>
 
@@ -54,7 +54,7 @@ void TrafficSink::execute()
   const auto names = get_entity_names_function();
   for (const auto & name : names) {
     const auto pose = get_entity_pose_function(name);
-    if (traffic_simulator::math::getDistance(position, pose) <= radius) {
+    if (math::geometry::getDistance(position, pose) <= radius) {
       despawn_function(name);
     }
   }

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -34,13 +35,29 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct InitActions : public Elements
+struct InitActions : public StoryboardElement
 {
   explicit InitActions(const pugi::xml_node &, Scope &);
 
+  auto accomplished() const -> bool override;
+
   auto endsImmediately() const -> bool;
 
-  auto evaluate() const -> Object;
+  auto run() -> void override;
+
+  auto runInstantaneousActions() -> void;
+
+  auto runNonInstantaneousActions() -> void;
+
+  auto start() -> void override;
+
+  auto startInstantaneousActions() -> void;
+
+  auto startNonInstantaneousActions() -> void;
+
+  Elements global_actions;
+  Elements user_defined_actions;
+  Elements privates;
 };
 
 auto operator<<(nlohmann::json &, const InitActions &) -> nlohmann::json &;

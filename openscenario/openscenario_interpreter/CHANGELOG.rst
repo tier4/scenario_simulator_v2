@@ -2,6 +2,88 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.5 (2022-06-16)
+------------------
+* Merge pull request `#813 <https://github.com/tier4/scenario_simulator_v2/issues/813>`_ from tier4/fix/boost_depend
+* add boost to the depends of concealer and interpreter
+* Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
+* Merge remote-tracking branch 'origin/master' into feature/change_engage_api_name
+* fix(openscenario_interpreter): modify build error in both galactic and humble
+* more build fixes
+* is console lambda inline
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_distance_to_lane_bound
+* Merge pull request `#796 <https://github.com/tier4/scenario_simulator_v2/issues/796>`_ from tier4/refactor/concealer/virtual-functions
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/pull_over_metrics
+* Fix code style divergences
+* Merge branch 'master' into feature/change_engage_api_name
+* Fix local function `everyone_engageable`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* Remove member function `API::engage` and `API::ready`
+* Remove some member functions for Autoware.Universe from API
+* Merge pull request `#797 <https://github.com/tier4/scenario_simulator_v2/issues/797>`_ from tier4/feature/occupancy_grid_sensor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Merge branch 'master' into feature/occupancy_grid_sensor
+* Merge remote-tracking branch 'origin/master' into doc/arrange_docs_and_fix_copyright
+* Fix Licence
+* Merge pull request `#774 <https://github.com/tier4/scenario_simulator_v2/issues/774>`_ from tier4/feature/allow_event_starttriger_ommision
+* Merge remote-tracking branch 'origin/feature/allow_event_starttriger_ommision' into feature/allow_event_starttriger_ommision
+* Refactor
+* Merge remote-tracking branch 'origin/master' into fix/autoware/reverse-gear
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* Refactor
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/missing_autoware_launch
+* Merge pull request `#758 <https://github.com/tier4/scenario_simulator_v2/issues/758>`_ from tier4/feature/interpreter/instantaneously-transition
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into build/add_missing_depend
+* Fix runtime errors & Delete debug codes
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' into feature/zmqpp_vendor
+* Merge pull request `#785 <https://github.com/tier4/scenario_simulator_v2/issues/785>`_ from tier4/doc/improve
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge remote-tracking branch 'origin/master' into doc/improve
+* Update `Storyboard` to call thunks after parsing
+* Fix old "TierIV" annotation
+* Fix StoryboardElementStateCondition registration to perform on `Storyboard` startTransition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge pull request `#777 <https://github.com/tier4/scenario_simulator_v2/issues/777>`_ from tier4/feature/indicator_condition
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* fix problems in server
+* WIP : Debug
+* Update interpreter to publish context topic once before deactivation
+* Refactor
+* Rename **StateString to **StateName
+* Fix compile errors
+* Implement TurnIndicatorsState as an UserDefinedValueCondition
+* Apply linter
+* Fix compile error
+* Change implementation of readElement
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Make the event starttrager optional and set default return true
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Merge pull request `#760 <https://github.com/tier4/scenario_simulator_v2/issues/760>`_ from tier4/feature/emergency_state_for_fault_injection
+* Fix assertion
+* Update ReleaseNotes
+* Add new member function `Interpreter::withTimeoutHandler` and `defaultTimeoutHandler`
+* Update `Storyboard` to engage Autoware on `startTransition`
+* Update `Interpreter` to not to evaluate `Storyboard` if simulation-time < 0
+* Add currentEmergencyState to UserDefinedValueCondition as a value source
+* Fix regex
+* Move `updateFrame` call into `Interpreter` from `ScenarioDefinition`
+* Remove header `utility/pair.hpp`
+* Update `Storyboard.Init` to evaluate during the initialization phase of the interpreter
+* Lipsticks
+* Update member function `StoryboardElement::notify` to `transitionTo`
+* Update `StoryboardElement::evaluate` not to stay in fooTransition state
+* Lipsticks
+* Add experimental data member `StoryboardElement::callbacks`
+* Merge branch 'master' into AJD-331-optimization-2nd-stage
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Contributors: Adam Krawczyk, Daisuke Nishimatsu, Daniel Marczak, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, Yuma Nihei, kyabe2718, yamacir-kit
+
 0.6.4 (2022-04-26)
 ------------------
 * Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe

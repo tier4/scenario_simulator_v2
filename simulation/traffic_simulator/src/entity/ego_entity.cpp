@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <boost/lexical_cast.hpp>
 #include <functional>
 #include <memory>
 #include <string>
@@ -131,6 +132,7 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
   const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
   if (architecture_type == "awf/universe") {
+    std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
                  getParameter<std::string>("autoware_launch_package"),
@@ -140,7 +142,9 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
                  "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
                  "sensor_model:=" + getParameter<std::string>("sensor_model"),
                  "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + configuration.rviz_config_path.string(),
+                 "rviz_config:=" + ((rviz_config == "")
+                                      ? configuration.rviz_config_path.string()
+                                      : Configuration::Pathname(rviz_config).string()),
                  "scenario_simulation:=true", "perception/enable_traffic_light:=false")
              : std::make_unique<concealer::AutowareUniverse>();
   } else {
@@ -162,18 +166,11 @@ EgoEntity::EgoEntity(
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
-void EgoEntity::engage() { autoware->engage(); }
-
-auto EgoEntity::getVehicleCommand() const -> std::tuple<
-  autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
-{
-  return autoware->getVehicleCommand();
-}
+auto EgoEntity::asAutoware() const -> concealer::Autoware & { return *autoware; }
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  const auto state = autoware->getAutowareStateString();
+  const auto state = autoware->getAutowareStateName();
   return state.empty() ? "Launching" : state;
 }
 
@@ -254,7 +251,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     }
 
     if (lanelet_pose) {
-      traffic_simulator::math::CatmullRomSpline spline(
+      math::geometry::CatmullRomSpline spline(
         hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
       if (const auto s_value = spline.getSValue(status.pose)) {
         status.pose.position.z = spline.getPoint(s_value.get()).z;
@@ -287,21 +284,13 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   std::vector<std::int64_t> ids = {};
   if (universe) {
     const auto points = universe->getPathWithLaneId().points;
-    for (const auto point : points) {
+    for (const auto & point : points) {
       std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }
     auto result = std::unique(ids.begin(), ids.end());
     ids.erase(result, ids.end());
   }
   return ids;
-}
-
-auto EgoEntity::getEmergencyStateString() const -> std::string
-{
-  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
-    return boost::lexical_cast<std::string>(universe->getEmergencyState());
-  }
-  return "";
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
@@ -311,6 +300,7 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
+  autoware->rethrow();
   EntityBase::onUpdate(current_time, step_time);
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
@@ -347,7 +337,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC:
-        input << autoware->getAcceleration(), autoware->getSteeringAngle();
+        input << autoware->getGearSign() * autoware->getAcceleration(),
+          autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
@@ -366,6 +357,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
+    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
 
@@ -381,8 +373,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     previous_angular_velocity_ = vehicle_model_ptr_->getWz();
   }
 }
-
-auto EgoEntity::ready() const -> bool { return autoware->ready(); }
 
 void EgoEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)

@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,13 +45,6 @@ ObjectController::~ObjectController()
 {
   if (isUserDefinedController()) {
     ego_count--;
-  }
-}
-
-auto ObjectController::assign(const EntityRef & entity_ref) -> void
-{
-  if (is<Controller>()) {
-    return as<Controller>().assign(entity_ref);
   }
 }
 

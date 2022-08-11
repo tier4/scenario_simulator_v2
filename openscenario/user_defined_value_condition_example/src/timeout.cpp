@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -111,6 +111,7 @@ int main(const int argc, char const * const * const argv)
                 .count())
           ? "true"
           : "false";
+      // if you want to add constraints for parameter, please add constraints to message.constraint_groups
     }
 
     std::cout << "message.value = " << message.value << std::endl;

@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,10 @@ Action::Action(const pugi::xml_node & node, Scope & scope)
 
 auto Action::accomplished() const -> bool { return ComplexType::accomplished(); }
 
+auto Action::endsImmediately() const -> bool
+{
+  return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
+}
 auto Action::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);

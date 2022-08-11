@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
-#include <openscenario_interpreter/syntax/openscenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
@@ -22,11 +22,10 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 OpenScenario::OpenScenario(const boost::filesystem::path & pathname)
-: Scope(pathname),
-  file_header(
-    readElement<FileHeader>("FileHeader", load(global().pathname).child("OpenSCENARIO"), local())),
-  category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, local())),
-  frame(0)
+: Scope(this),
+  pathname(pathname),
+  file_header(readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), local())),
+  category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, local()))
 {
 }
 
@@ -38,9 +37,7 @@ auto OpenScenario::evaluate() -> Object
 
 auto OpenScenario::load(const boost::filesystem::path & filepath) -> const pugi::xml_node &
 {
-  const auto result = script.load_file(filepath.string().c_str());
-
-  if (not result) {
+  if (const auto result = script.load_file(filepath.string().c_str()); not result) {
     throw SyntaxError(result.description(), ": ", filepath);
   } else {
     return script;
