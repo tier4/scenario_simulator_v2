@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2015-2019 Autoware Foundation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,15 +22,13 @@
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
 #include <iostream>
-#include <lanelet2_extension_psim/exception.hpp>
 #include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
 #include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
 #include <pugixml.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <string>
 
-namespace lanelet
-{
-namespace validation
+namespace
 {
 namespace keyword
 {
@@ -42,22 +40,30 @@ constexpr const char * Node = "node";
 constexpr const char * Elevation = "ele";
 }  // namespace keyword
 
+void printUsage()
+{
+  std::cout << "Usage:" << std::endl
+            << "ros2 run lanelet2_extension autoware_lanelet2_validation"
+               " --ros-args -p map_file:=<path to osm file>"
+            << std::endl;
+}
+}  // namespace
+
 void validateElevationTag(const std::string filename)
 {
   pugi::xml_document doc;
   auto result = doc.load_file(filename.c_str());
   if (!result) {
-    throw lanelet::HdMapFormatException(result.description());
+    std::cerr << result.description() << std::endl;
+    exit(1);
   }
 
-  auto osmNode = doc.child("osm");
+  auto osmNode = doc.child(keyword::Osm);
   for (auto node = osmNode.child(keyword::Node); node;  // NOLINT
        node = node.next_sibling(keyword::Node)) {
     const auto id = node.attribute(keyword::Id).as_llong(lanelet::InvalId);
     if (!node.find_child_by_attribute(keyword::Tag, keyword::Key, keyword::Elevation)) {
-      std::stringstream sstream;
-      sstream << "failed to find elevation tag for node: " << id;
-      throw lanelet::HdMapFormatException(sstream.str());
+      std::cerr << "failed to find elevation tag for node: " << id << std::endl;
     }
   }
 }
@@ -65,7 +71,8 @@ void validateElevationTag(const std::string filename)
 void validateTrafficLight(const lanelet::LaneletMapPtr lanelet_map)
 {
   if (!lanelet_map) {
-    throw lanelet::HdMapFormatException("Missing map. Are you sure you set correct path for map?");
+    std::cerr << "Missing map. Are you sure you set correct path for map?" << std::endl;
+    exit(1);
   }
 
   for (auto lanelet : lanelet_map->laneletLayer) {
@@ -75,33 +82,29 @@ void validateTrafficLight(const lanelet::LaneletMapPtr lanelet_map)
       continue;
     }
     for (auto light : autoware_traffic_lights) {
-      if (light->lightBulbs().empty()) {
-        std::stringstream sstream;
-        sstream << "regulatory element traffic light " << light->id()
-                << " is missing optional light_bulb member. You won't "
-                   "be able to use region_tlr node with this map";
-        throw lanelet::HdMapFormatException(sstream.str());
+      if (light->lightBulbs().size() == 0) {
+        std::cerr << "regulatory element traffic light " << light->id()
+                  << " is missing optional light_bulb member. You won't be able to use region_tlr "
+                     "node with this map"
+                  << std::endl;
       }
       for (auto light_string : light->lightBulbs()) {
         if (!light_string.hasAttribute("traffic_light_id")) {
-          std::stringstream sstream;
-          sstream << "light_bulb " << light_string.id() << " is missing traffic_light_id tag";
-          throw lanelet::HdMapFormatException(sstream.str());
+          std::cerr << "light_bulb " << light_string.id() << " is missing traffic_light_id tag"
+                    << std::endl;
         }
       }
       for (auto base_string_or_poly : light->trafficLights()) {
         if (!base_string_or_poly.isLineString()) {
-          std::stringstream sstream;
-          sstream << "traffic_light " << base_string_or_poly.id()
-                  << " is polygon, and only linestring class is currently supported for "
-                     "traffic lights";
-          throw lanelet::HdMapFormatException(sstream.str());
+          std::cerr
+            << "traffic_light " << base_string_or_poly.id()
+            << " is polygon, and only linestring class is currently supported for traffic lights"
+            << std::endl;
         }
         auto base_string = static_cast<lanelet::LineString3d>(base_string_or_poly);
         if (!base_string.hasAttribute("height")) {
-          std::stringstream sstream;
-          sstream << "traffic_light " << base_string.id() << " is missing height tag";
-          throw lanelet::HdMapFormatException(sstream.str());
+          std::cerr << "traffic_light " << base_string.id() << " is missing height tag"
+                    << std::endl;
         }
       }
     }
@@ -111,7 +114,8 @@ void validateTrafficLight(const lanelet::LaneletMapPtr lanelet_map)
 void validateTurnDirection(const lanelet::LaneletMapPtr lanelet_map)
 {
   if (!lanelet_map) {
-    throw lanelet::HdMapFormatException("Missing map. Are you sure you set correct path for map?");
+    std::cerr << "Missing map. Are you sure you set correct path for map?" << std::endl;
+    exit(1);
   }
 
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules =
@@ -126,29 +130,43 @@ void validateTurnDirection(const lanelet::LaneletMapPtr lanelet_map)
     }
 
     const auto conflicting_lanelets_or_areas = vehicle_graph->conflicting(lanelet);
-    if (conflicting_lanelets_or_areas.empty()) {
+    if (conflicting_lanelets_or_areas.size() == 0) {
       continue;
     }
     if (!lanelet.hasAttribute("turn_direction")) {
-      std::stringstream sstream;
-      sstream << "lanelet " << lanelet.id()
-              << " seems to be intersecting other lanelet, but does "
-                 "not have turn_direction tagging.";
-      throw lanelet::HdMapFormatException(sstream.str());
+      std::cerr
+        << "lanelet " << lanelet.id()
+        << " seems to be intersecting other lanelet, but does not have turn_direction tagging."
+        << std::endl;
     }
   }
 }
 
-void validateAll(std::string map_path)
+int main(int argc, char * argv[])
 {
+  rclcpp::init(argc, argv);
+  auto node = rclcpp::Node::make_shared("autoware_lanelet_validation");
+
+  std::string map_path;
+  try {
+    map_path = node->declare_parameter<std::string>("map_file");
+  } catch (...) {
+    std::cerr << "failed find map_file parameter! No file to load" << std::endl;
+    printUsage();
+    return 1;
+  }
   lanelet::LaneletMapPtr lanelet_map;
   lanelet::ErrorMessages errors;
   lanelet::projection::MGRSProjector projector;
   lanelet_map = lanelet::load(map_path, "autoware_osm_handler", projector, &errors);
+
+  std::cout << "starting validation" << std::endl;
+
   validateElevationTag(map_path);
   validateTrafficLight(lanelet_map);
   validateTurnDirection(lanelet_map);
-}
 
-}  // namespace validation
-}  // namespace lanelet
+  std::cout << "finished validation" << std::endl;
+
+  return 0;
+}

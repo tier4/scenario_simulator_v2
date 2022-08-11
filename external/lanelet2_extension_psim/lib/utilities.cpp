@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2015-2019 Autoware Foundation. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+//
 // Authors: Kenji Miyake, Ryohsuke Mitsudome
 
 #include <lanelet2_core/geometry/Lanelet.h>
@@ -21,7 +21,6 @@
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
 #include <algorithm>
-#include <lanelet2_extension_psim/exception.hpp>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
 #include <lanelet2_extension_psim/utility/query.hpp>
 #include <lanelet2_extension_psim/utility/utilities.hpp>
@@ -57,14 +56,12 @@ namespace
   const lanelet::BasicPoint2d search_point, std::vector<int> * contacting_lanelet_ids)
 {
   if (!lanelet_map) {
-    lanelet::HdMapException("No lanelet map is set!");
+    std::cerr << "No lanelet map is set!" << std::endl;
     return;
   }
 
   if (contacting_lanelet_ids == nullptr) {
-    std::stringstream sstream;
-    sstream << __FUNCTION__ << " contacting_lanelet_ids is null pointer!";
-    lanelet::HdMapException(sstream.str());
+    std::cerr << __FUNCTION__ << " contacting_lanelet_ids is null pointer!" << std::endl;
     return;
   }
 
@@ -110,7 +107,7 @@ std::pair<size_t, size_t> findNearestIndexPair(
   const std::vector<double> & accumulated_lengths, const double target_length)
 {
   // List size
-  const size_t N = accumulated_lengths.size();
+  const auto N = accumulated_lengths.size();
 
   // Front
   if (target_length < accumulated_lengths.at(1)) {
@@ -123,7 +120,7 @@ std::pair<size_t, size_t> findNearestIndexPair(
   }
 
   // Middle
-  for (size_t i = 1; i < N; ++i) {
+  for (std::size_t i = 1; i < N; ++i) {
     if (
       accumulated_lengths.at(i - 1) <= target_length &&
       target_length <= accumulated_lengths.at(i)) {
@@ -242,7 +239,7 @@ lanelet::ConstLanelet combineLanelets(const lanelet::ConstLanelets lanelets)
   const auto center_line = lanelet::LineString3d(lanelet::InvalId, centers);
   auto combined_lanelet = lanelet::Lanelet(lanelet::InvalId, left_bound, right_bound);
   combined_lanelet.setCenterline(center_line);
-  return combined_lanelet;
+  return std::move(combined_lanelet);
 }
 
 }  // namespace
@@ -271,6 +268,124 @@ lanelet::LineString3d generateFineCenterline(
     centerline.push_back(center_point);
   }
   return centerline;
+}
+
+lanelet::ConstLineString3d getCenterlineWithOffset(
+  const lanelet::ConstLanelet & lanelet_obj, const double offset, const double resolution)
+{
+  // Get length of longer border
+  const double left_length = lanelet::geometry::length(lanelet_obj.leftBound());
+  const double right_length = lanelet::geometry::length(lanelet_obj.rightBound());
+  const double longer_distance = (left_length > right_length) ? left_length : right_length;
+  const int num_segments = std::max(static_cast<int>(ceil(longer_distance / resolution)), 1);
+
+  // Resample points
+  const auto left_points = lanelet::utils::resamplePoints(lanelet_obj.leftBound(), num_segments);
+  const auto right_points = resamplePoints(lanelet_obj.rightBound(), num_segments);
+
+  // Create centerline
+  lanelet::LineString3d centerline(lanelet::utils::getId());
+  for (int i = 0; i < num_segments + 1; i++) {
+    // Add ID for the average point of left and right
+    const auto center_basic_point = (right_points.at(i) + left_points.at(i)) / 2;
+
+    const auto vec_right_2_left = (left_points.at(i) - right_points.at(i)).normalized();
+
+    const auto offset_center_basic_point = center_basic_point + vec_right_2_left * offset;
+
+    const lanelet::Point3d center_point(
+      lanelet::utils::getId(), offset_center_basic_point.x(), offset_center_basic_point.y(),
+      offset_center_basic_point.z());
+    centerline.push_back(center_point);
+  }
+  return static_cast<lanelet::ConstLineString3d>(centerline);
+}
+
+lanelet::ConstLanelet getExpandedLanelet(
+  const lanelet::ConstLanelet & lanelet_obj, const double left_offset, const double right_offset)
+{
+  using lanelet::geometry::offsetNoThrow;
+  using lanelet::geometry::internal::checkForInversion;
+
+  const auto & orig_left_bound_2d = lanelet_obj.leftBound2d().basicLineString();
+  const auto & orig_right_bound_2d = lanelet_obj.rightBound2d().basicLineString();
+
+  // Note: The lanelet::geometry::offset throws exception when the undesired inversion is found.
+  // Use offsetNoThrow until the logic is updated to handle the inversion.
+  // TODO(Horibe) update
+  auto expanded_left_bound_2d = offsetNoThrow(orig_left_bound_2d, left_offset);
+  auto expanded_right_bound_2d = offsetNoThrow(orig_right_bound_2d, right_offset);
+
+  // Note: modify front and back points so that the successive lanelets will not have any
+  // longitudinal space between them.
+  {  // front
+    const double diff_x = orig_right_bound_2d.front().x() - orig_left_bound_2d.front().x();
+    const double diff_y = orig_right_bound_2d.front().y() - orig_left_bound_2d.front().y();
+    const double theta = std::atan2(diff_y, diff_x);
+    expanded_right_bound_2d.front().x() =
+      orig_right_bound_2d.front().x() - right_offset * std::cos(theta);
+    expanded_right_bound_2d.front().y() =
+      orig_right_bound_2d.front().y() - right_offset * std::sin(theta);
+    expanded_left_bound_2d.front().x() =
+      orig_left_bound_2d.front().x() - left_offset * std::cos(theta);
+    expanded_left_bound_2d.front().y() =
+      orig_left_bound_2d.front().y() - left_offset * std::sin(theta);
+  }
+  {  // back
+    const double diff_x = orig_right_bound_2d.back().x() - orig_left_bound_2d.back().x();
+    const double diff_y = orig_right_bound_2d.back().y() - orig_left_bound_2d.back().y();
+    const double theta = std::atan2(diff_y, diff_x);
+    expanded_right_bound_2d.back().x() =
+      orig_right_bound_2d.back().x() - right_offset * std::cos(theta);
+    expanded_right_bound_2d.back().y() =
+      orig_right_bound_2d.back().y() - right_offset * std::sin(theta);
+    expanded_left_bound_2d.back().x() =
+      orig_left_bound_2d.back().x() - left_offset * std::cos(theta);
+    expanded_left_bound_2d.back().y() =
+      orig_left_bound_2d.back().y() - left_offset * std::sin(theta);
+  }
+
+  rclcpp::Clock clock{RCL_ROS_TIME};
+  try {
+    checkForInversion(orig_left_bound_2d, expanded_left_bound_2d, left_offset);
+    checkForInversion(orig_right_bound_2d, expanded_right_bound_2d, right_offset);
+  } catch (const lanelet::GeometryError & e) {
+    RCLCPP_ERROR_THROTTLE(
+      rclcpp::get_logger("lanelet2_extension"), clock, 1000,
+      "Fail to expand lanelet. output may be undesired. Lanelet points interval in map data could "
+      "be too narrow.");
+  }
+
+  const auto toPoints3d = [](const lanelet::BasicLineString2d & ls2d, const double z) {
+    lanelet::Points3d output;
+    for (const auto & pt : ls2d) {
+      output.push_back(lanelet::Point3d(lanelet::InvalId, pt.x(), pt.y(), z));
+    }
+    return output;
+  };
+
+  // Original z value cannot be used directly since the offset function can vary the points size.
+  const lanelet::Points3d ex_lefts =
+    toPoints3d(expanded_left_bound_2d, lanelet_obj.leftBound3d().basicLineString().at(0).z());
+  const lanelet::Points3d ex_rights =
+    toPoints3d(expanded_right_bound_2d, lanelet_obj.rightBound3d().basicLineString().at(0).z());
+
+  const auto & extended_left_bound_3d = lanelet::LineString3d(lanelet::InvalId, ex_lefts);
+  const auto & expanded_right_bound_3d = lanelet::LineString3d(lanelet::InvalId, ex_rights);
+  const auto & lanelet = lanelet::Lanelet(
+    lanelet_obj.id(), extended_left_bound_3d, expanded_right_bound_3d, lanelet_obj.attributes());
+
+  return lanelet;
+}
+
+lanelet::ConstLanelets getExpandedLanelets(
+  const lanelet::ConstLanelets & lanelet_obj, const double left_offset, const double right_offset)
+{
+  lanelet::ConstLanelets lanelets;
+  for (const auto & llt : lanelet_obj) {
+    lanelets.push_back(getExpandedLanelet(llt, left_offset, right_offset));
+  }
+  return lanelets;
 }
 
 void overwriteLaneletsCenterline(
@@ -303,24 +418,19 @@ bool lineStringWithWidthToPolygon(
   const lanelet::ConstLineString3d & linestring, lanelet::ConstPolygon3d * polygon)
 {
   if (polygon == nullptr) {
-    std::stringstream sstream;
-    sstream << __func__ << ": polygon is null pointer! Failed to convert to polygon.";
-    lanelet::HdMapException(sstream.str());
+    std::cerr << __func__ << ": polygon is null pointer! Failed to convert to polygon."
+              << std::endl;
     return false;
   }
   if (linestring.size() != 2) {
-    std::stringstream sstream;
-    sstream << __func__ << ": linestring" << linestring.id() << " must have 2 points! ("
-            << linestring.size() << " != 2)" << std::endl
-            << "Failed to convert to polygon.";
-    lanelet::HdMapException(sstream.str());
+    std::cerr << __func__ << ": linestring" << linestring.id() << " must have 2 points! ("
+              << linestring.size() << " != 2)" << std::endl
+              << "Failed to convert to polygon.";
     return false;
   }
   if (!linestring.hasAttribute("width")) {
-    std::stringstream sstream;
-    sstream << __func__ << ": linestring" << linestring.id()
-            << " does not have width tag. Failed to convert to polygon.";
-    lanelet::HdMapException(sstream.str());
+    std::cerr << __func__ << ": linestring" << linestring.id()
+              << " does not have width tag. Failed to convert to polygon.";
     return false;
   }
 
@@ -341,6 +451,43 @@ bool lineStringWithWidthToPolygon(
   const lanelet::Point3d p4(lanelet::InvalId, eigen_p4.x(), eigen_p4.y(), eigen_p4.z());
 
   *polygon = lanelet::Polygon3d(lanelet::InvalId, {p1, p2, p3, p4});
+
+  return true;
+}
+
+bool lineStringToPolygon(
+  const lanelet::ConstLineString3d & linestring, lanelet::ConstPolygon3d * polygon)
+{
+  if (polygon == nullptr) {
+    RCLCPP_ERROR_STREAM(
+      rclcpp::get_logger("lanelet2_extension.visualization"),
+      __func__ << ": polygon is null pointer! Failed to convert to polygon.");
+    return false;
+  }
+  if (linestring.size() < 4) {
+    if (linestring.size() < 3 || linestring.front().id() == linestring.back().id()) {
+      RCLCPP_ERROR_STREAM(
+        rclcpp::get_logger("lanelet2_extension.visualization"),
+        __func__ << ": linestring" << linestring.id()
+                 << " must have more than different 3 points! (size is " << linestring.size() << ")"
+                 << std::endl
+                 << "Failed to convert to polygon.");
+      return false;
+    }
+  }
+
+  lanelet::Polygon3d llt_poly;
+
+  for (const auto & lp : linestring) {
+    llt_poly.push_back(lanelet::Point3d(
+      lanelet::InvalId, lp.basicPoint().x(), lp.basicPoint().y(), lp.basicPoint().z()));
+  }
+
+  if (linestring.front().id() == linestring.back().id()) {
+    llt_poly.pop_back();
+  }
+
+  *polygon = llt_poly;
 
   return true;
 }
@@ -463,6 +610,18 @@ double getLaneletAngle(
   lanelet::ConstLineString3d segment = getClosestSegment(llt_search_point, lanelet.centerline());
   return std::atan2(
     segment.back().y() - segment.front().y(), segment.back().x() - segment.front().x());
+}
+
+bool isInLanelet(
+  const geometry_msgs::msg::Pose & current_pose, const lanelet::ConstLanelet & lanelet,
+  const double radius)
+{
+  constexpr double eps = 1.0e-9;
+  const lanelet::BasicPoint2d p(current_pose.position.x, current_pose.position.y);
+  if (boost::geometry::distance(p, lanelet.polygon2d().basicPolygon()) < radius + eps) {
+    return true;
+  }
+  return false;
 }
 
 }  // namespace utils

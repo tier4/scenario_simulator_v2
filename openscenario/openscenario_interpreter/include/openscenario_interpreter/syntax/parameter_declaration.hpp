@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/syntax/value_constraint_group.hpp>
 #include <openscenario_msgs/msg/parameter_declaration.hpp>
 #include <pugixml.hpp>
 
@@ -39,6 +40,8 @@ struct ParameterDeclaration
   const String name;
 
   const ParameterType parameter_type;
+
+  std::list<ValueConstraintGroup> constraint_groups;
 
   const String value;
 

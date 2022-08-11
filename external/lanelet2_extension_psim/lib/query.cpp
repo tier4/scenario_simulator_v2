@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2015-2019 Autoware Foundation. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,45 +11,31 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+//
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_routing/RoutingGraph.h>
 #include <tf2/utils.h>
-#ifdef USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#else
+
+#if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#else
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #endif
 
 #include <Eigen/Eigen>
 #include <deque>
-#include <lanelet2_extension_psim/exception.hpp>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
 #include <lanelet2_extension_psim/utility/query.hpp>
 #include <lanelet2_extension_psim/utility/utilities.hpp>
 #include <limits>
 #include <memory>
-#include <queue>
-#include <rclcpp/rclcpp.hpp>
 #include <set>
 #include <string>
 #include <vector>
 
 using lanelet::utils::to2D;
-namespace
-{
-double getAngleDifference(const double angle1, const double angle2)
-{
-  Eigen::Vector2d vec1, vec2;
-  vec1 << std::cos(angle1), std::sin(angle1);
-  vec2 << std::cos(angle2), std::sin(angle2);
-  const double diff_angle = std::acos(vec1.dot(vec2));
-  return std::fabs(diff_angle);
-}
-
-}  // namespace
 
 namespace lanelet
 {
@@ -61,7 +47,7 @@ lanelet::ConstLanelets query::laneletLayer(const lanelet::LaneletMapConstPtr & l
 {
   lanelet::ConstLanelets lanelets;
   if (!ll_map) {
-    lanelet::HdMapException("No map received!");
+    std::cerr << "No map received!";
     return lanelets;
   }
 
@@ -104,6 +90,11 @@ lanelet::ConstLanelets query::walkwayLanelets(const lanelet::ConstLanelets lls)
 lanelet::ConstLanelets query::roadLanelets(const lanelet::ConstLanelets lls)
 {
   return query::subtypeLanelets(lls, lanelet::AttributeValueString::Road);
+}
+
+lanelet::ConstLanelets query::shoulderLanelets(const lanelet::ConstLanelets lls)
+{
+  return query::subtypeLanelets(lls, "road_shoulder");
 }
 
 std::vector<lanelet::TrafficLightConstPtr> query::trafficLights(
@@ -196,6 +187,49 @@ std::vector<lanelet::DetectionAreaConstPtr> query::detectionAreas(
   return da_reg_elems;
 }
 
+std::vector<lanelet::NoStoppingAreaConstPtr> query::noStoppingAreas(
+  const lanelet::ConstLanelets & lanelets)
+{
+  std::vector<lanelet::NoStoppingAreaConstPtr> no_reg_elems;
+
+  for (auto i = lanelets.begin(); i != lanelets.end(); i++) {
+    lanelet::ConstLanelet ll = *i;
+    std::vector<lanelet::NoStoppingAreaConstPtr> ll_no_re =
+      ll.regulatoryElementsAs<lanelet::autoware::NoStoppingArea>();
+
+    // insert unique tl into array
+    for (const auto & no_ptr : ll_no_re) {
+      lanelet::Id id = no_ptr->id();
+      bool unique_id = true;
+
+      for (auto ii = no_reg_elems.begin(); ii != no_reg_elems.end(); ii++) {
+        if (id == (*ii)->id()) {
+          unique_id = false;
+          break;
+        }
+      }
+
+      if (unique_id) {
+        no_reg_elems.push_back(no_ptr);
+      }
+    }
+  }
+  return no_reg_elems;
+}
+
+lanelet::ConstPolygons3d query::getAllObstaclePolygons(
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr)
+{
+  lanelet::ConstPolygons3d obstacle_polygons;
+  for (const auto & poly : lanelet_map_ptr->polygonLayer) {
+    const std::string type = poly.attributeOr(lanelet::AttributeName::Type, "none");
+    if (type.compare("obstacle") == 0) {
+      obstacle_polygons.push_back(poly);
+    }
+  }
+  return obstacle_polygons;
+}
+
 lanelet::ConstPolygons3d query::getAllParkingLots(
   const lanelet::LaneletMapConstPtr & lanelet_map_ptr)
 {
@@ -207,6 +241,33 @@ lanelet::ConstPolygons3d query::getAllParkingLots(
     }
   }
   return parking_lots;
+}
+
+lanelet::ConstLineStrings3d query::getAllPartitions(
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr)
+{
+  lanelet::ConstLineStrings3d partitions;
+  for (const auto & ls : lanelet_map_ptr->lineStringLayer) {
+    const std::string type = ls.attributeOr(lanelet::AttributeName::Type, "none");
+    if (
+      type.compare("guard_rail") == 0 || type.compare("fence") == 0 || type.compare("wall") == 0) {
+      partitions.push_back(ls);
+    }
+  }
+  return partitions;
+}
+
+lanelet::ConstLineStrings3d query::getAllPedestrianMarkings(
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr)
+{
+  lanelet::ConstLineStrings3d pedestrian_markings;
+  for (const auto & ls : lanelet_map_ptr->lineStringLayer) {
+    const std::string type = ls.attributeOr(lanelet::AttributeName::Type, "none");
+    if (type.compare("pedestrian_marking") == 0) {
+      pedestrian_markings.push_back(ls);
+    }
+  }
+  return pedestrian_markings;
 }
 
 lanelet::ConstLineStrings3d query::getAllParkingSpaces(
@@ -442,12 +503,12 @@ std::vector<lanelet::ConstLineString3d> query::stopLinesLanelet(const lanelet::C
 {
   std::vector<lanelet::ConstLineString3d> stoplines;
 
-  // find stop lines referened by right of way reg. elems.
+  // find stop lines referenced by right of way reg. elems.
   std::vector<std::shared_ptr<const lanelet::RightOfWay>> right_of_way_reg_elems =
     ll.regulatoryElementsAs<const lanelet::RightOfWay>();
 
   if (right_of_way_reg_elems.size() > 0) {
-    // lanelet has a right of way elem element n
+    // lanelet has a right of way elem element
     for (auto j = right_of_way_reg_elems.begin(); j < right_of_way_reg_elems.end(); j++) {
       if ((*j)->getManeuver(ll) == lanelet::ManeuverType::Yield) {
         // lanelet has a yield reg. elem.
@@ -464,7 +525,7 @@ std::vector<lanelet::ConstLineString3d> query::stopLinesLanelet(const lanelet::C
     ll.regulatoryElementsAs<const lanelet::TrafficLight>();
 
   if (traffic_light_reg_elems.size() > 0) {
-    // lanelet has a traffic light elem element n
+    // lanelet has a traffic light elem element
     for (auto j = traffic_light_reg_elems.begin(); j < traffic_light_reg_elems.end(); j++) {
       lanelet::Optional<lanelet::ConstLineString3d> traffic_light_stopline_opt = (*j)->stopLine();
       if (!!traffic_light_stopline_opt) {
@@ -631,7 +692,8 @@ bool query::getClosestLanelet(
   ConstLanelet * closest_lanelet_ptr)
 {
   if (closest_lanelet_ptr == nullptr) {
-    lanelet::HdMapException("argument closest_lanelet_ptr is null! Failed to find closest lanelet");
+    std::cerr << "argument closest_lanelet_ptr is null! Failed to find closest lanelet"
+              << std::endl;
     return false;
   }
 
@@ -670,7 +732,18 @@ bool query::getClosestLanelet(
       lanelet::ConstLineString3d segment = getClosestSegment(search_point, llt.centerline());
       double segment_angle = std::atan2(
         segment.back().y() - segment.front().y(), segment.back().x() - segment.front().x());
-      double angle_diff = getAngleDifference(segment_angle, pose_yaw);
+      auto normalize_radian = [](const double rad) {
+        constexpr double pi =
+          3.14159265358979323846;  // To be replaced by std::numbers::pi in C++20
+        const auto min_rad = -pi;
+        const auto max_rad = min_rad + 2 * pi;
+        if (const auto value = std::fmod(rad, 2 * pi); min_rad <= value && value < max_rad) {
+          return value;
+        } else {
+          return value - std::copysign(2 * pi, value);
+        }
+      };
+      double angle_diff = std::abs(normalize_radian(segment_angle - pose_yaw));
       if (angle_diff < min_angle) {
         min_angle = angle_diff;
         *closest_lanelet_ptr = llt;
@@ -708,31 +781,41 @@ std::vector<std::deque<lanelet::ConstLanelet>> getSucceedingLaneletSequencesRecu
   return succeeding_lanelet_sequences;
 }
 
-std::vector<std::deque<lanelet::ConstLanelet>> getPreceedingLaneletSequencesRecursive(
+std::vector<std::deque<lanelet::ConstLanelet>> getPrecedingLaneletSequencesRecursive(
   const routing::RoutingGraphPtr & graph, const lanelet::ConstLanelet & lanelet,
-  const double length)
+  const double length, const lanelet::ConstLanelets & exclude_lanelets)
 {
-  std::vector<std::deque<lanelet::ConstLanelet>> preceeding_lanelet_sequences;
+  std::vector<std::deque<lanelet::ConstLanelet>> preceding_lanelet_sequences;
 
   const auto prev_lanelets = graph->previous(lanelet);
   const double lanelet_length = utils::getLaneletLength3d(lanelet);
 
   // end condition of the recursive function
   if (prev_lanelets.empty() || lanelet_length >= length) {
-    preceeding_lanelet_sequences.push_back({lanelet});
-    return preceeding_lanelet_sequences;
+    preceding_lanelet_sequences.push_back({lanelet});
+    return preceding_lanelet_sequences;
   }
 
   for (const auto & prev_lanelet : prev_lanelets) {
+    if (lanelet::utils::contains(exclude_lanelets, prev_lanelet)) {
+      // if prev_lanelet is included in exclude_lanelets,
+      // remove prev_lanelet from preceding_lanelet_sequences
+      continue;
+    }
+
     // get lanelet sequence after prev_lanelet
-    auto tmp_lanelet_sequences =
-      getPreceedingLaneletSequencesRecursive(graph, prev_lanelet, length - lanelet_length);
+    auto tmp_lanelet_sequences = getPrecedingLaneletSequencesRecursive(
+      graph, prev_lanelet, length - lanelet_length, exclude_lanelets);
     for (auto & tmp_lanelet_sequence : tmp_lanelet_sequences) {
       tmp_lanelet_sequence.push_back(lanelet);
-      preceeding_lanelet_sequences.push_back(tmp_lanelet_sequence);
+      preceding_lanelet_sequences.push_back(tmp_lanelet_sequence);
     }
   }
-  return preceeding_lanelet_sequences;
+
+  if (preceding_lanelet_sequences.empty()) {
+    preceding_lanelet_sequences.push_back({lanelet});
+  }
+  return preceding_lanelet_sequences;
 }
 
 std::vector<lanelet::ConstLanelets> query::getSucceedingLaneletSequences(
@@ -751,16 +834,21 @@ std::vector<lanelet::ConstLanelets> query::getSucceedingLaneletSequences(
   return lanelet_sequences_vec;
 }
 
-std::vector<lanelet::ConstLanelets> query::getPreceedingLaneletSequences(
+std::vector<lanelet::ConstLanelets> query::getPrecedingLaneletSequences(
   const routing::RoutingGraphPtr & graph, const lanelet::ConstLanelet & lanelet,
-  const double length)
+  const double length, const lanelet::ConstLanelets & exclude_lanelets)
 {
   std::vector<ConstLanelets> lanelet_sequences_vec;
   const auto prev_lanelets = graph->previous(lanelet);
   for (const auto & prev_lanelet : prev_lanelets) {
+    if (lanelet::utils::contains(exclude_lanelets, prev_lanelet)) {
+      // if prev_lanelet is included in exclude_lanelets,
+      // remove prev_lanelet from preceding_lanelet_sequences
+      continue;
+    }
     // convert deque into vector
     const auto lanelet_sequences_deq =
-      getPreceedingLaneletSequencesRecursive(graph, prev_lanelet, length);
+      getPrecedingLaneletSequencesRecursive(graph, prev_lanelet, length, exclude_lanelets);
     for (const auto & lanelet_sequence : lanelet_sequences_deq) {
       lanelet_sequences_vec.emplace_back(lanelet_sequence.begin(), lanelet_sequence.end());
     }
