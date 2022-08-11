@@ -62,7 +62,15 @@ public:
   const simulation_api_schema::OccupancyGridSensorConfiguration configuration;
 
 private:
+  /**
+   * @brief A collection of unique primitives
+   */
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
+
+  /**
+   * @brief An actual occupancy grid calculator
+   * @note this member is intentionally marked as mutable for performance reason
+   */
   mutable Grid grid_;
 };
 }  // namespace simple_sensor_simulator

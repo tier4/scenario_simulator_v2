@@ -60,7 +60,16 @@ public:
   void updateOrigin(const geometry_msgs::msg::Pose & origin);
 
 private:
+  /**
+   * @brief origin
+   * @note Grid treats Ego's origin as its origin
+   */
   geometry_msgs::msg::Pose origin_;
+
+  /**
+   * @brief a vector which contains cells data
+   * @note Grid access this 1d vector by calculating an index from a 2d grid coordinate
+   */
   std::vector<GridCell> grid_cells_;
 
   /**
@@ -178,13 +187,13 @@ private:
 
   /**
    * @brief Convert point in grid coordinate to point in world cooridnate
-   * @return Point in orld coordinate
+   * @return Point in world coordinate
    */
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & grid_point) const;
 
   /**
    * @brief Convert point in world coordinate to point in grid cooridnate
-   * @return Point in rid coordinate
+   * @return Point in grid coordinate
    */
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
 
