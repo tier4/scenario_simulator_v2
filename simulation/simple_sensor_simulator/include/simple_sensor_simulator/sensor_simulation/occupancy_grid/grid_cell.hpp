@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,13 +32,11 @@ std::vector<geometry_msgs::msg::Point> getIntersection2D(
 class GridCell
 {
 public:
-  GridCell(
-    const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col);
-  const geometry_msgs::msg::Pose origin;
-  const double size;
-  const size_t index;
-  const size_t row;
-  const size_t col;
+  geometry_msgs::msg::Pose origin;
+  double size;
+  size_t index;
+  size_t row;
+  size_t col;
   bool contains(const geometry_msgs::msg::Point & p) const;
   bool contains(const std::vector<geometry_msgs::msg::Point> & points) const;
   int8_t getData() const;
@@ -49,7 +47,7 @@ public:
   geometry_msgs::msg::Point getRightDownPoint() const;
 
 private:
-  int8_t data_;
+  int8_t data_ = 0;
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & point) const;
   std::vector<geometry_msgs::msg::Point> getPolygon() const;
 };

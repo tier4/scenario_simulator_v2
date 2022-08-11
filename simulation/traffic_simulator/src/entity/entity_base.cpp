@@ -48,9 +48,10 @@ auto EntityBase::asAutoware() const -> concealer::Autoware &
     " is not the entity controlled by Autoware.");
 }
 
-void EntityBase::onUpdate(double, double)
+void EntityBase::onUpdate(double current_time, double step_time)
 {
-  job_list_.update();
+  current_time_ = current_time;
+  step_time_ = step_time;
   status_before_update_ = status_;
 }
 
@@ -276,22 +277,9 @@ void EntityBase::requestLaneChange(
   }
 }
 
-void EntityBase::updateStandStillDuration(const double step_time)
-{
-  if (!status_) {
-    stand_still_duration_ = boost::none;
-  } else {
-    if (!stand_still_duration_) {
-      stand_still_duration_ = 0;
-    }
-    if (
-      std::fabs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
-      stand_still_duration_ = step_time + stand_still_duration_.get();
-    } else {
-      stand_still_duration_ = 0;
-    }
-  }
-}
+void EntityBase::runMeasureJob() { job_list_.measure(); }
+
+void EntityBase::runUpdateJob() { job_list_.update(); }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {

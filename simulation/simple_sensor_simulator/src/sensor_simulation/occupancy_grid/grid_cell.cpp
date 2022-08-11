@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,12 +21,6 @@
 
 namespace simple_sensor_simulator
 {
-GridCell::GridCell(
-  const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col)
-: origin(origin), size(size), index(index), row(row), col(col), data_(0)
-{
-}
-
 geometry_msgs::msg::Point GridCell::getLeftUpPoint() const
 {
   geometry_msgs::msg::Point left_up;
