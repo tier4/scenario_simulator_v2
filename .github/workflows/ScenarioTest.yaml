@@ -40,7 +40,8 @@ jobs:
 
       - name: Install lcov
         run: |
-          apt install wget lcov
+          apt-get update
+          apt-get install wget lcov
           mkdir -p ~/ros2_ws
           cd ~/ros2_ws
           wget https://gitlab.com/autowarefoundation/autoware.auto/AutowareAuto/-/raw/master/.lcovrc
@@ -53,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          apt install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
+          apt-get install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
           rosdep update
           cd ~/ros2_ws
           vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
