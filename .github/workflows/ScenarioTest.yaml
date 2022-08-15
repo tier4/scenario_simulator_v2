@@ -31,6 +31,9 @@ jobs:
       ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:
       - uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install lcov
         run: |
