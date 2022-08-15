@@ -30,6 +30,9 @@ jobs:
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:
+      - name: supress warnings
+        run: |
+          git config --global --add safe.directory '*'
       - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 0
