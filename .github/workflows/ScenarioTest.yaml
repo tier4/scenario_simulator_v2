@@ -45,15 +45,16 @@ jobs:
           mkdir -p ~/ros2_ws
           cd ~/ros2_ws
           wget https://gitlab.com/autowarefoundation/autoware.auto/AutowareAuto/-/raw/master/.lcovrc
+        shell: bash
 
       - name: Copy repository
         run: |
           mkdir -p ~/ros2_ws/src/scenario_simulator_v2
           cp -rf . ~/ros2_ws/src/scenario_simulator_v2
+        shell: bash
 
       - name: Install dependencies
         run: |
-          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           apt-get install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
           rosdep update
           cd ~/ros2_ws
@@ -63,15 +64,17 @@ jobs:
         run: |
           cd ~/ros2_ws
           rosdep install -iry --from-paths src --rosdistro ${{ matrix.rosdistro }}
+        shell: bash
 
       - name: Build packages
         run: |
-          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           cd ~/ros2_ws
           colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+        shell: bash
 
       - name: Scenario test
         run: |
           source ~/ros2_ws/install/setup.bash
           ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' global_frame_rate:=20
           ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
+        shell: bash
