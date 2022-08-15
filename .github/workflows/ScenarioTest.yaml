@@ -41,7 +41,7 @@ jobs:
       - name: Install lcov
         run: |
           apt-get update
-          apt-get install wget lcov
+          apt-get install -y wget lcov
           mkdir -p ~/ros2_ws
           cd ~/ros2_ws
           wget https://gitlab.com/autowarefoundation/autoware.auto/AutowareAuto/-/raw/master/.lcovrc
