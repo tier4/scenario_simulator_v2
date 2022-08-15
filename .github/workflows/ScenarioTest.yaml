@@ -22,6 +22,9 @@ jobs:
     name: ScenarioTest
     runs-on: ubuntu-20.04
     timeout-minutes: 120
+    container: ros:${{ matrix.rosdistro }}
+    env:
+      DEBIAN_FRONTEND: noninteractive
     strategy:
       fail-fast: false
       matrix:
@@ -29,40 +32,32 @@ jobs:
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:
+      - name: supress warnings
+        run: |
+          git config --global --add safe.directory '*'
       - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 0
-
-      - name: Install ROS2 via Debian Packages
-        run: |
-          sudo apt update
-          sudo apt install locales
-          sudo locale-gen en_US en_US.UTF-8
-          sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-          export LANG=en_US.UTF-8
-          sudo apt update
-          sudo apt install curl gnupg2 lsb-release
-          curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
-          sudo apt update
-          sudo apt install ros-${{ matrix.rosdistro }}-desktop
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install lcov
         run: |
-          sudo apt install wget lcov
+          apt-get update
+          apt-get install -y wget lcov
           mkdir -p ~/ros2_ws
           cd ~/ros2_ws
           wget https://gitlab.com/autowarefoundation/autoware.auto/AutowareAuto/-/raw/master/.lcovrc
+        shell: bash
 
       - name: Copy repository
         run: |
           mkdir -p ~/ros2_ws/src/scenario_simulator_v2
           cp -rf . ~/ros2_ws/src/scenario_simulator_v2
+        shell: bash
 
       - name: Install dependencies
         run: |
-          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          sudo apt install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
+          apt-get install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
           rosdep update
           cd ~/ros2_ws
           vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
@@ -71,35 +66,17 @@ jobs:
         run: |
           cd ~/ros2_ws
           rosdep install -iry --from-paths src --rosdistro ${{ matrix.rosdistro }}
+        shell: bash
 
       - name: Build packages
         run: |
-          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           cd ~/ros2_ws
-          colcon build --symlink-install --ament-cmake-args -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -DCOVERAGE_RUN=1" --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.base --initial
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+        shell: bash
 
       - name: Scenario test
         run: |
           source ~/ros2_ws/install/setup.bash
           ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' global_frame_rate:=20
           ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
-
-      - name: Collect coverage for with_openscenario_interpreter
-        run: |
-          cd ~/ros2_ws
-          lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.test
-          lcov --config-file .lcovrc -a lcov.base -a lcov.test -o lcov.total
-          lcov --config-file .lcovrc -r lcov.total "*/build/*" "*/install/*" "*/test/*" "*/CMakeCCompilerId.c" "*/CMakeCXXCompilerId.cpp" "*_msgs/*" \
-            "/opt/ros/*" "/usr/*" \
-            -o lcov.total.filtered
-
-      - name: publish codecov result
-        uses: codecov/codecov-action@v1.2.1
-        if: always()
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
-          files: /home/runner/ros2_ws/lcov.total.filtered
-          flags: scenario_test
-          env_vars: ROS_DISTRO
-          name: scenario_simulator_v2
+        shell: bash
