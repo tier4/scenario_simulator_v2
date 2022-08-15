@@ -735,9 +735,7 @@ void EntityManager::startNpcLogic()
 {
   npc_logic_started_ = true;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if (!isEgo(it->first)) {
-      it->second->startNpcLogic();
-    }
+    it->second->startNpcLogic();
   }
 }
 }  // namespace entity

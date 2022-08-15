@@ -306,32 +306,36 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   EntityBase::onUpdate(current_time, step_time);
 
-  Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
+  if (npc_logic_started_) {
+    Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
 
-  switch (vehicle_model_type_) {
-    case VehicleModelType::DELAY_STEER_ACC:
-    case VehicleModelType::IDEAL_STEER_ACC:
-      input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
-      break;
+    switch (vehicle_model_type_) {
+      case VehicleModelType::DELAY_STEER_ACC:
+      case VehicleModelType::IDEAL_STEER_ACC:
+        input << autoware->getGearSign() * autoware->getAcceleration(),
+          autoware->getSteeringAngle();
+        break;
 
-    case VehicleModelType::DELAY_STEER_ACC_GEARED:
-    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-      input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
-      break;
+      case VehicleModelType::DELAY_STEER_ACC_GEARED:
+      case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+        input << autoware->getGearSign() * autoware->getAcceleration(),
+          autoware->getSteeringAngle();
+        break;
 
-    case VehicleModelType::DELAY_STEER_VEL:
-    case VehicleModelType::IDEAL_STEER_VEL:
-      input << autoware->getVelocity(), autoware->getSteeringAngle();
-      break;
+      case VehicleModelType::DELAY_STEER_VEL:
+      case VehicleModelType::IDEAL_STEER_VEL:
+        input << autoware->getVelocity(), autoware->getSteeringAngle();
+        break;
 
-    default:
-      THROW_SEMANTIC_ERROR(
-        "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
+      default:
+        THROW_SEMANTIC_ERROR(
+          "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
+    }
+
+    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+    vehicle_model_ptr_->setInput(input);
+    vehicle_model_ptr_->update(step_time);
   }
-
-  vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
-  vehicle_model_ptr_->setInput(input);
-  vehicle_model_ptr_->update(step_time);
 
   setStatus(getEntityStatus(current_time + step_time, step_time));
   updateStandStillDuration(step_time);
@@ -492,11 +496,6 @@ void EgoEntity::requestSpeedChange(
 auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
   autoware->setVelocityLimit(value);
-}
-
-auto EgoEntity::startNpcLogic() -> void
-{
-  THROW_SIMULATION_ERROR("startNpcLogic only allowed in non-ego entity.");
 }
 }  // namespace entity
 }  // namespace traffic_simulator

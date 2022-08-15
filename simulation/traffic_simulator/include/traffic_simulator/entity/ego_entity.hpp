@@ -133,8 +133,6 @@ public:
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   auto setVelocityLimit(double) -> void override;
-
-  auto startNpcLogic() -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
