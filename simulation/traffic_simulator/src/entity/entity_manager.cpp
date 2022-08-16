@@ -438,6 +438,15 @@ void EntityManager::getGoalPoses(
   }
 }
 
+double EntityManager::getTraveledDistance(const std::string & target_entity) const
+{
+  auto it = entities_.find(target_entity);
+  if (it == entities_.end()) {
+    THROW_SEMANTIC_ERROR("entity : ", target_entity, " does not exist.");
+  }
+  return it->second->getTraveledDistance();
+}
+
 bool EntityManager::isEgo(const std::string & name) const
 {
   using traffic_simulator_msgs::msg::EntityType;

@@ -30,7 +30,12 @@ namespace entity
 {
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-: name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
+: name(name),
+  status_(boost::none),
+  verbose_(true),
+  visibility_(true),
+  entity_subtype_(subtype),
+  traveled_distance_(0)
 {
   status_ = boost::none;
   job_list_.append(
@@ -55,6 +60,15 @@ EntityBase::EntityBase(
       return false;
     },
     [this]() {}, job::Type::STAND_STILL_DURATION, false, job::Trigger::ON_MEASURE);
+
+  job_list_.append(
+    [this]() {
+      if (status_) {
+        traveled_distance_ += std::abs(status_->action_status.twist.linear.x) * step_time_;
+      }
+      return false;
+    },
+    [this]() {}, job::Type::TRAVELED_DISTANCE, false, job::Trigger::ON_MEASURE);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
@@ -533,5 +547,8 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
     return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
   }
 }
+
+auto EntityBase::getTraveledDistance() const -> double { return traveled_distance_; }
+
 }  // namespace entity
 }  // namespace traffic_simulator

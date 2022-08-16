@@ -323,6 +323,8 @@ public:
 
   void getGoalPoses(const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals);
 
+  double getTraveledDistance(const std::string & target_entity) const;
+
   bool isEgo(const std::string & name) const;
 
   const std::string getEgoName() const;

@@ -125,6 +125,8 @@ public:
 
   virtual auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel = 0;
 
+  /*   */ auto getTraveledDistance() const -> double;
+
   virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) = 0;
 
   virtual void setAccelerationLimit(double acceleration);
@@ -249,6 +251,8 @@ protected:
 
   double current_time_;
   double step_time_;
+
+  double traveled_distance_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
