@@ -52,6 +52,8 @@ jobs:
       - name: Resolve rosdep
         run: |
           cd ~/ros2_ws
+          apt-get update
+          rosdep update
           rosdep install -iry --from-paths src --rosdistro ${{ matrix.rosdistro }}
         shell: bash
 
