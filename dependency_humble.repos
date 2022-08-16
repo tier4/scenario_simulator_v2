@@ -7,3 +7,7 @@ repositories:
     type: git
     url: https://github.com/tier4/tier4_autoware_msgs.git
     version: tier4/universe # for Autoware.Universe (TIER IV)
+  color_names:
+    type: git
+    url: https://github.com/OUXT-Polaris/color_names.git
+    version: master
