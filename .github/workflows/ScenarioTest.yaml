@@ -29,8 +29,6 @@ jobs:
       fail-fast: false
       matrix:
         rosdistro: [galactic]
-    env:
-      ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:
       - name: supress warnings
         run: |
