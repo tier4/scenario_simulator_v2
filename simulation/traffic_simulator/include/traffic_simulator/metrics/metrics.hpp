@@ -21,6 +21,5 @@
 #include <traffic_simulator/metrics/out_of_range_metric.hpp>
 #include <traffic_simulator/metrics/reaction_time_metric.hpp>
 #include <traffic_simulator/metrics/standstill_metric.hpp>
-#include <traffic_simulator/metrics/traveled_distance_metric.hpp>
 
 #endif  // TRAFFIC_SIMULATOR__METRICS__METRICS_HPP_
