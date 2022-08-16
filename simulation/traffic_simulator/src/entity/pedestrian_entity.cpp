@@ -169,13 +169,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    if (!status_) {
-      linear_jerk_ = 0;
-    } else {
-      linear_jerk_ =
-        (status_updated.action_status.accel.linear.x - status_->action_status.accel.linear.x) /
-        step_time_;
-    }
+
     setStatus(status_updated);
   }
 }

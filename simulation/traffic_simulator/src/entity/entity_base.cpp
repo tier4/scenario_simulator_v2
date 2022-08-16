@@ -69,6 +69,19 @@ EntityBase::EntityBase(
       return false;
     },
     [this]() {}, job::Type::TRAVELED_DISTANCE, false, job::Trigger::ON_MEASURE);
+
+  job_list_.append(
+    [this]() {
+      if (!status_ || !status_before_update_) {
+        linear_jerk_ = 0;
+      } else {
+        linear_jerk_ = (status_before_update_->action_status.accel.linear.x -
+                        status_->action_status.accel.linear.x) /
+                       step_time_;
+      }
+      return false;
+    },
+    [this]() {}, job::Type::LINEAR_JERK, false, job::Trigger::ON_MEASURE);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
