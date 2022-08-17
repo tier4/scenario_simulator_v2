@@ -154,16 +154,18 @@ In scenario_simulator_v2, we use `UserDefinedValueCondition` to control the prog
 ```
 #### Built-in conditions
 
-You can use Autoware related conditions via UserDefinedValueCondition.  
-Like "ego.currentState", you can specify the entity by name and refer to its status.  
+Like "currentState", the conditions start with "current" return Autoware-related conditions.  
+And like "ego.currentState", they can specify the entity reference by prepending the name of the entity
+
 The following built-in conditions return a string that represents the state.   
 See Reference for specific strings.  
 
-| Name                       | description                                         | Reference                                                                                                                   |
+| Name                       | description                                         | Reference /                                                                                                                 |
 |:---------------------------|:----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
 | currentState               | returns Autoware's state                            | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/AutowareState.idl)          |
 | currentEmergencyState      | return Autoware's emergency state.                  | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/EmergencyState.idl)         |
 | currentTurnIndicatorsState | return turn indicators state controlled by Autoware | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/msg/TurnIndicatorsCommand.idl) |
+| RelativeHeadingCondition   | return the relative angle to the lane heading       | need to give the entity reference, lane id, and s coordinate                                                                |
 
 #### External ROS2 topic condition
 
