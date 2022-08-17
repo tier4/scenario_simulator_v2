@@ -29,8 +29,6 @@ jobs:
       fail-fast: false
       matrix:
         rosdistro: [galactic]
-    env:
-      ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:
       - name: supress warnings
         run: |
@@ -40,15 +38,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install lcov
-        run: |
-          apt-get update
-          apt-get install -y wget lcov
-          mkdir -p ~/ros2_ws
-          cd ~/ros2_ws
-          wget https://gitlab.com/autowarefoundation/autoware.auto/AutowareAuto/-/raw/master/.lcovrc
-        shell: bash
-
       - name: Copy repository
         run: |
           mkdir -p ~/ros2_ws/src/scenario_simulator_v2
@@ -57,19 +46,21 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt-get install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
-          rosdep update
           cd ~/ros2_ws
           vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
 
       - name: Resolve rosdep
         run: |
           cd ~/ros2_ws
+          apt-get update
+          apt install -y python3-pip
+          rosdep update
           rosdep install -iry --from-paths src --rosdistro ${{ matrix.rosdistro }}
         shell: bash
 
       - name: Build packages
         run: |
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           cd ~/ros2_ws
           colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
         shell: bash
