@@ -116,31 +116,31 @@ private:
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data);
 
   /**
-   * @brief Caluculate index of coordinate
+   * @brief Calculate index of coordinate
    * @return Index
    */
   size_t getIndex(size_t row, size_t col) const;
 
   /**
-   * @brief Caluculate index of adjacent coordinate on next row
+   * @brief Calculate index of adjacent coordinate on next row
    * @return Index
    */
   size_t getNextRowIndex(size_t row, size_t col) const;
 
   /**
-   * @brief Caluculate index of adjacent coordinate on next column
+   * @brief Calculate index of adjacent coordinate on next column
    * @return Index
    */
   size_t getNextColIndex(size_t row, size_t col) const;
 
   /**
-   * @brief Caluculate index of adjacent coordinate on previous row
+   * @brief Calculate index of adjacent coordinate on previous row
    * @return Index
    */
   size_t getPreviousRowIndex(size_t row, size_t col) const;
 
   /**
-   * @brief Caluculate index of adjacent coordinate on previous column
+   * @brief Calculate index of adjacent coordinate on previous column
    * @return Index
    */
   size_t getPreviousColIndex(size_t row, size_t col) const;
