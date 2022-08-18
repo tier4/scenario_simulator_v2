@@ -29,10 +29,8 @@ Grid::Grid(
   width(width),
   occupied_cost(occupied_cost),
   invisible_cost(invisible_cost),
-  grid_cells_(height * width)
-{
-  updateAllCells();
-}
+  values_(height * width)
+{ }
 
 double Grid::getDiagonalLength() const { return std::hypot(width, height) * resolution; }
 
@@ -345,19 +343,15 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
   fillInside(fillByIntersection(line_segments_on_hull, occupied_cost), occupied_cost);
 }
 
-std::vector<int8_t> Grid::getData()
+const std::vector<int8_t> &Grid::getData()
 {
-  std::vector<int8_t> data;
-  for (const auto & cell : grid_cells_) {
-    data.emplace_back(cell.getData());
-  }
-  return data;
+  return values_;
 }
 
 bool Grid::fillByIndex(size_t index, int8_t data)
 {
-  if (index < grid_cells_.size()) {
-    grid_cells_[index].setData(data);
+  if (index < values_.size()) {
+    values_[index] = data;
     return true;
   }
   return false;
@@ -395,26 +389,7 @@ void Grid::fillByCol(size_t col, int8_t data)
 void Grid::updateOrigin(const geometry_msgs::msg::Pose & origin)
 {
   origin_ = origin;
-  updateAllCells();
-}
-
-void Grid::updateAllCells()
-{
-  for (size_t x_index = 0; x_index < height; x_index++) {
-    for (size_t y_index = 0; y_index < width; y_index++) {
-      size_t index = x_index * width + y_index;
-      auto & cell = grid_cells_[index];
-      cell.origin.position.x = origin_.position.x + (x_index - 0.5 * height) * resolution;
-      cell.origin.position.y = origin_.position.y + (y_index - 0.5 * width) * resolution;
-      cell.origin.position.z = origin_.position.z;
-      cell.origin.orientation = origin_.orientation;
-      cell.size = resolution;
-      cell.index = index;
-      cell.row = y_index;
-      cell.col = x_index;
-      cell.setData(0);
-    }
-  }
+  std::fill(values_.begin(), values_.end(), int8_t(0));
 }
 
 }  // namespace simple_sensor_simulator

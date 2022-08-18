@@ -38,12 +38,13 @@ public:
   const int8_t occupied_cost;
   const int8_t invisible_cost;
   void addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive);
-  std::vector<int8_t> getData();
+  const std::vector<int8_t> &getData();
   void updateOrigin(const geometry_msgs::msg::Pose & origin);
 
 private:
   geometry_msgs::msg::Pose origin_;
-  std::vector<GridCell> grid_cells_;
+  std::vector<int8_t> values_;
+
   bool fillByIndex(size_t index, int8_t data);
   void fillByRow(size_t row, int8_t data);
   void fillByCol(size_t col, int8_t data);
