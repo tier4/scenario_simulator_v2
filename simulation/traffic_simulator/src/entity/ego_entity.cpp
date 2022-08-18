@@ -248,6 +248,9 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
     } else {
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, route_lanelets, 1.0);
+      if(!lanelet_pose) {
+        lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
+      }
     }
 
     if (lanelet_pose) {
