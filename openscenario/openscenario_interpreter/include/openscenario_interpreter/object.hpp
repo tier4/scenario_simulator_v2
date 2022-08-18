@@ -15,9 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 
-#include <list>
 #include <openscenario_interpreter/expression.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
+
+#include <list>
 #include <typeindex>
 #include <utility>
 
@@ -55,15 +56,32 @@ using Group = Object;
 
 using Elements = std::list<Object>;
 
+inline namespace syntax
+{
+struct CatalogReference;
+}
+
+// namespace internal
+//{
+// template <typename... Ts>
+// auto makeFromCatalogReference(Ts &&...) -> const Object;
+// }
+
 template <typename T, typename... Ts>
 constexpr auto make(Ts &&... xs) -> decltype(auto)
 {
+  std::cout << "make : " << demangle(typeid(T)) << std::endl;
+  //  if constexpr (std::is_same<T,CatalogReference>::value){
+  //    return internal::makeFromCatalogReference(std::forward<decltype(xs)>(xs)...);
+  //  }else{
   return Object::bind<T>(std::forward<decltype(xs)>(xs)...);
+  //  }
 }
 
 template <typename T>
 constexpr auto make(T && x) -> decltype(auto)
 {
+  std::cout << "make : " << demangle(typeid(T)) << std::endl;
   return Object::bind<typename std::decay<decltype(x)>::type>(std::forward<decltype(x)>(x));
 }
 

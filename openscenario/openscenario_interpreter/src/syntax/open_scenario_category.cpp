@@ -22,9 +22,10 @@ inline namespace syntax
 {
 OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & scope)
 : Group(
-    tree.child("Catalog") ? make<CatalogDefinition>(tree, scope)
-                          : make<ScenarioDefinition>(tree, scope))
+    tree.child("Catalog") ? (std::cout << "CatalogDefinition" << std::endl, make<CatalogDefinition>(tree, scope))
+                          : (std::cout << "ScenarioDefinition" << std::endl, make<ScenarioDefinition>(tree, scope)))
 {
+  std::cout << "OpenScenarioCategory is constructed!" << std::endl;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

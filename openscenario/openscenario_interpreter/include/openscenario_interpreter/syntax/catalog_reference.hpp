@@ -21,9 +21,12 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
+#include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
 #include <boost/filesystem.hpp>
+
+#include <optional>
 
 namespace openscenario_interpreter
 {
@@ -40,29 +43,44 @@ inline namespace syntax
  *  </xsd:complexType>
  * -------------------------------------------------------------------------- */
 
+
 struct CatalogReference
 {
+  CatalogReference(const pugi::xml_node & node, Scope & scope)
+  : scope(scope),
+    node(node),
+    catalog_name(readAttribute<std::string>("catalogName", node, scope)),
+    entry_name(readAttribute<std::string>("entryName", node, scope)),
+    parameter_assignments(readElement<ParameterAssignments>("ParameterAssignments", node, scope))
+  {
+    auto catalog_locations = scope.global().catalog_locations;
+    if (catalog_locations) {
+      for (auto & p : *catalog_locations) {
+        auto & catalog_location = p.second;
+        auto found_catalog = catalog_location.find(catalog_name);
+
+        if (found_catalog != std::end(catalog_location)) {
+          catalog = found_catalog->second;
+          break;
+        }
+      }
+    }
+    std::cout << "Catalog Reference" << std::endl;
+  }
+  Scope scope;  // anonymous namespace
+  pugi::xml_node node;
+  std::string catalog_name;
+  std::string entry_name;
+  ParameterAssignments parameter_assignments;
+  std::optional<pugi::xml_node> catalog = std::nullopt;
 };
+
+
+
 }  // namespace syntax
 
-template <>
-auto make<CatalogReference, pugi::xml_node, Scope>(pugi::xml_node &&, Scope &&) -> decltype(auto);
+auto makeFromCatalogReference(const pugi::xml_node& , Scope & ) -> const Object;
 
-template <typename... Ts>
-auto make(const pugi::xml_node & node, Scope & scope) -> Object
-{
-  auto result = make<CatalogReference>(node, scope);
-
-  if (fold_right(std::logical_or<void>(), result.is_also<Ts>()...)) {
-    return result;
-  } else {
-    std::stringstream what;
-    what << "Required type of catalog element is one of the following type: ";
-    print_to(what, std::array<const char *, sizeof...(Ts)>{typeid(Ts).name()...});
-    what << ". But the type of this element is " << makeTypename(result.type()) << ".";
-    throw SyntaxError(what.str());
-  }
-}
 
 }  // namespace openscenario_interpreter
 

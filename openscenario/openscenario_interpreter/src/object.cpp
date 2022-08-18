@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/object.hpp>
+#include <openscenario_interpreter/syntax/catalog_reference.hpp>
 
 namespace openscenario_interpreter
 {
@@ -22,4 +23,14 @@ std::ostream & operator<<(std::ostream & os, const Unspecified &)
 {
   return os << "<!-- Unspecified -->";
 }
+
+//namespace internal
+//{
+//template <typename... Ts>
+//auto makeFromCatalogReference(Ts &&... xs) -> const Object
+//{
+//  return syntax::makeFromCatalogReference(std::forward<decltype(xs)>(xs)...);
+//}
+//}  // namespace internal
+
 }  // namespace openscenario_interpreter

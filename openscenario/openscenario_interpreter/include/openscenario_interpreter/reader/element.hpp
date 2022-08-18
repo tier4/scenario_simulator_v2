@@ -74,7 +74,9 @@ auto traverse(const pugi::xml_node & parent, const std::string & name, F && f) -
 template <typename T, typename Scope>
 auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope)
 {
+  std::cout << "readElement : " << name << std::endl;
   if (const auto child = parent.child(name.c_str())) {
+    std::cout << "readElement : T(child, scope), name : " << name << std::endl;
     return T(child, scope);
   } else {
     /* ---- NOTE ---------------------------------------------------------------
@@ -84,6 +86,7 @@ auto readElement(const std::string & name, const pugi::xml_node & parent, Scope 
      *  attempts to build a default T type.
      *
      * ---------------------------------------------------------------------- */
+    std::cout << "readElement : requires class " << name << " as element, but there is no declaration" << std::endl;
     return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
       parent.name(), " requires class ", name, " as element, but there is no declaration"));
   }
@@ -92,19 +95,26 @@ auto readElement(const std::string & name, const pugi::xml_node & parent, Scope 
 template <typename T, typename U, typename Scope>
 auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope, U && value)
 {
+  std::cout << "readElement : " << name << std::endl;
   if constexpr (std::is_same<T, typename std::decay<U>::type>::value) {
+    std::cout << "readElement : try to use 'value' as a default element" << std::endl;
     // use 'value' as a default element.
     // the default element will be used when current scope has no description about 'name'.
     if (const auto child = parent.child(name.c_str())) {
+      std::cout << "readElement : T(child, scope), name : " << name << std::endl;
       return T(child, scope);
     } else {
+      std::cout << "readElement : use default value" <<  std::endl;
       return value;
     }
   } else {
+    std::cout << "readElement : use \"value\" as an additional arguments to the constructor" <<  std::endl;
     // use "value" as an additional arguments to the constructor
     if (const auto child = parent.child(name.c_str())) {
+      std::cout << "readElement : T(child, scope, value), name : " << name << std::endl;
       return T(child, scope, value);
     } else {
+      std::cout << "readElement : requires class " << name << " as element, but there is no declaration" << std::endl;
       return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
         parent.name(), " requires class ", name, " as element, but there is no declaration"));
     }

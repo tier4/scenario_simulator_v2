@@ -77,76 +77,56 @@ struct CatalogInstance : public Derived
 {
   Scope scope;
 
-  ParameterAssignments parameter_assignments;
-
   CatalogInstance(
-    const pugi::xml_node & node,                         //
-    Scope & scope,                                       //
-    const ParameterAssignments & parameter_assignments)  //
-  : Derived(node, scope), scope(scope), parameter_assignments(parameter_assignments)
+    const pugi::xml_node & node,  //
+    Scope & scope)                //
+  : Derived(node, scope), scope(scope)
   {
   }
 };
 
 }  // namespace syntax
 
-template <>
-auto make<CatalogReference, pugi::xml_node, Scope>(pugi::xml_node && node, Scope && outer_scope)
-  -> decltype(auto)
+
+auto makeFromCatalogReference(const pugi::xml_node& node, Scope & scope_) -> const Object
 {
-  auto catalog_name = readAttribute<std::string>("catalogName", node, outer_scope);
+  CatalogReference catalog(node,scope_);
+  auto scope = Scope("", catalog.scope);  // anonymous namespace
 
-  auto entry_name = readAttribute<std::string>("entryName", node, outer_scope);
+  if (catalog.catalog) {
+    using ::openscenario_interpreter::make;
 
-  auto scope = Scope("", outer_scope);  // anonymous namespace
-
-  auto parameter_assignments =
-    readElement<ParameterAssignments>("ParameterAssignments", node, scope);
-
-  auto catalog_locations = scope.global().catalog_locations;
-
-  if (catalog_locations) {
-    for (auto & p : *catalog_locations) {
-      auto & catalog_location = p.second;
-      auto found_catalog = catalog_location.find(catalog_name);
-
-      if (found_catalog != std::end(catalog_location)) {
-        using ::openscenario_interpreter::make;
-
-        std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
-          // clang-format off
-          std::make_pair("Vehicle",     [&](auto && node) { return make<CatalogInstance<Vehicle>>   (node, scope, parameter_assignments); }),
-          std::make_pair("Controller",  [&](auto && node) { return make<CatalogInstance<Controller>>(node, scope, parameter_assignments); }),
-          std::make_pair("Pedestrian",  [&](auto && node) { return make<CatalogInstance<Pedestrian>>(node, scope, parameter_assignments); }),
-          std::make_pair("MiscObject",  [&](auto && node) { return make<CatalogInstance<MiscObject>>(node, scope, parameter_assignments); }),
+    std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
+      // clang-format off
+          std::make_pair("Vehicle",     [&](auto && node) { return make<CatalogInstance<Vehicle>>   (node, catalog.scope); }),
+          std::make_pair("Controller",  [&](auto && node) { return make<CatalogInstance<Controller>>(node, catalog.scope); }),
+          std::make_pair("Pedestrian",  [&](auto && node) { return make<CatalogInstance<Pedestrian>>(node, catalog.scope); }),
+          std::make_pair("MiscObject",  [&](auto && node) { return make<CatalogInstance<MiscObject>>(node, catalog.scope); }),
           std::make_pair("Environment", [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
-          std::make_pair("Maneuver",    [&](auto && node) { return make<CatalogInstance<Maneuver>>  (node, scope, parameter_assignments); }),
+          std::make_pair("Maneuver",    [&](auto && node) { return make<CatalogInstance<Maneuver>>  (node, catalog.scope); }),
           std::make_pair("Trajectory",  [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
           std::make_pair("Route",       [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;})
-          // clang-format on
-        };
+      // clang-format on
+    };
 
-        // DIRTY HACK : add const to make the return type the same type to unspecified
-        return static_cast<const Object>(choice_by_attribute(
-          found_catalog->second, "name",
-          std::make_pair(entry_name, [&](const pugi::xml_node & node) {
-            auto iter = dispatcher.find(node.name());
-            if (iter != std::end(dispatcher)) {
-              return iter->second(node);
-            } else {
-              std::stringstream what;
-              what << "Catalog element must be one of following elements: ";
-              const auto * separator = "[";
-              for (auto & each : dispatcher) {
-                what << separator << each.first;
-                separator = ", ";
-              }
-              what << "]. But no element specified.";
-              throw SyntaxError(what.str());
-            }
-          })));
-      }
-    }
+    // DIRTY HACK : add const to make the return type the same type to unspecified
+    return static_cast<const Object>(choice_by_attribute(
+      *catalog.catalog, "name", std::make_pair(catalog.entry_name, [&](const pugi::xml_node & node) {
+        auto iter = dispatcher.find(node.name());
+        if (iter != std::end(dispatcher)) {
+          return iter->second(node);
+        } else {
+          std::stringstream what;
+          what << "Catalog element must be one of following elements: ";
+          const auto * separator = "[";
+          for (auto & each : dispatcher) {
+            what << separator << each.first;
+            separator = ", ";
+          }
+          what << "]. But no element specified.";
+          throw SyntaxError(what.str());
+        }
+      })));
   }
 
   return unspecified;

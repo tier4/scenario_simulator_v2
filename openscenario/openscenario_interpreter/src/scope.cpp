@@ -93,6 +93,7 @@ Scope::Scope(const OpenScenario * const open_scenario)
   frame(new EnvironmentFrame()),
   scenario_definition(std::make_shared<ScenarioDefinition>())
 {
+  std::cout << "Scope class is initialized by OpenScenario class" << std::endl;
 }
 
 Scope::Scope(const std::string & name, const Scope & outer)

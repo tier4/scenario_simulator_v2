@@ -39,11 +39,13 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   osc_path(""),
   output_directory("/tmp")
 {
+  std::cout << "Interpreter constructor start" << std::endl;
   DECLARE_PARAMETER(intended_result);
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
+  std::cout << "Interpreter constructor finish" << std::endl;
 }
 
 Interpreter::~Interpreter() { SimulatorCore::deactivate(); }
@@ -89,8 +91,10 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 {
+  std::cout << "on configure start" << std::endl;
   return withExceptionHandler(
     [](auto &&...) {
+      std::cout << "configure failed" << std::endl;
       return Interpreter::Result::FAILURE;  // => Unconfigured
     },
     [this]() {
@@ -109,26 +113,30 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
 
+      std::cout << "setting parameters..." << std::endl;
       GET_PARAMETER(intended_result);
       GET_PARAMETER(local_frame_rate);
       GET_PARAMETER(local_real_time_factor);
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
 
+      std::cout << "reading OpenScenario..." << std::endl;
       script = std::make_shared<OpenScenario>(osc_path);
+      std::cout << "Finish reading!" << std::endl;
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
       } else {
         throw SyntaxError("ParameterValueDistributionDefinition is not yet supported.");
       }
-
+      std::cout << "success" << std::endl;
       return Interpreter::Result::SUCCESS;  // => Inactive
     });
 }
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
+  std::cout << "on activate start" << std::endl;
   auto initializeStoryboard = [this]() {
     return withExceptionHandler(
       [this](auto &&...) {
