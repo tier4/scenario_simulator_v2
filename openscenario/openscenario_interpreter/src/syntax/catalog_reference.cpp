@@ -87,31 +87,49 @@ struct CatalogInstance : public Derived
 
 }  // namespace syntax
 
-
-auto makeFromCatalogReference(const pugi::xml_node& node, Scope & scope_) -> const Object
+//template <typename T>
+auto makeFromCatalogReference(const pugi::xml_node & node, Scope & scope_) -> const Object
 {
-  CatalogReference catalog(node,scope_);
+  //  std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>>
+  //  catalog_dispatcher{
+  //    // clang-format off
+  //          std::make_pair("Vehicle",     [&](auto && node) { return
+  //          make<CatalogReference<Vehicle>>   (node, scope); }), std::make_pair("Controller",
+  //          [&](auto && node) { return make<CatalogReference<Controller>>(node, scope); }),
+  //          std::make_pair("Pedestrian",  [&](auto && node) { return
+  //          make<CatalogReference<Pedestrian>>(node, scope); }), std::make_pair("MiscObject",
+  //          [&](auto && node) { return make<CatalogReference<MiscObject>>(node, scope); }),
+  ////          std::make_pair("Environment", [ ](auto && node) { return
+  ///make<CatalogReference<Environment>>  (node, scope);}),
+  //          std::make_pair("Maneuver",    [&](auto && node) { return
+  //          make<CatalogReference<Maneuver>>  (node, scope); })
+  ////          std::make_pair("Trajectory",  [ ](auto && node) { return
+  ///make<CatalogReference<Trajectory>>  (node, scope);}), /          std::make_pair("Route", [
+  ///](auto && node) { return make<CatalogReference<Route>>  (node, scope);})
+  //    // clang-format on
+  //  };
+
+  CatalogReference catalog(node, scope_);
   auto scope = Scope("", catalog.scope);  // anonymous namespace
 
-  if (catalog.catalog) {
+  if (catalog.scope_by_catalog) {
     using ::openscenario_interpreter::make;
 
     std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
       // clang-format off
-          std::make_pair("Vehicle",     [&](auto && node) { return make<CatalogInstance<Vehicle>>   (node, catalog.scope); }),
-          std::make_pair("Controller",  [&](auto && node) { return make<CatalogInstance<Controller>>(node, catalog.scope); }),
-          std::make_pair("Pedestrian",  [&](auto && node) { return make<CatalogInstance<Pedestrian>>(node, catalog.scope); }),
-          std::make_pair("MiscObject",  [&](auto && node) { return make<CatalogInstance<MiscObject>>(node, catalog.scope); }),
+          std::make_pair("Vehicle",     [&](auto && node) { return catalog.make<Vehicle>   (node); }),
+          std::make_pair("Controller",  [&](auto && node) { return catalog.make<Controller>(node); }),
+          std::make_pair("Pedestrian",  [&](auto && node) { return catalog.make<Pedestrian>(node); }),
+          std::make_pair("MiscObject",  [&](auto && node) { return catalog.make<MiscObject>(node); }),
           std::make_pair("Environment", [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
-          std::make_pair("Maneuver",    [&](auto && node) { return make<CatalogInstance<Maneuver>>  (node, catalog.scope); }),
+          std::make_pair("Maneuver",    [&](auto && node) { return catalog.make<Maneuver>  (node); }),
           std::make_pair("Trajectory",  [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
           std::make_pair("Route",       [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;})
       // clang-format on
     };
 
-    // DIRTY HACK : add const to make the return type the same type to unspecified
-    return static_cast<const Object>(choice_by_attribute(
-      *catalog.catalog, "name", std::make_pair(catalog.entry_name, [&](const pugi::xml_node & node) {
+    return choice_by_attribute(
+      *catalog.scope_by_catalog, "name", std::make_pair(catalog.entry_name, [&](const pugi::xml_node & node) {
         auto iter = dispatcher.find(node.name());
         if (iter != std::end(dispatcher)) {
           return iter->second(node);
@@ -126,7 +144,7 @@ auto makeFromCatalogReference(const pugi::xml_node& node, Scope & scope_) -> con
           what << "]. But no element specified.";
           throw SyntaxError(what.str());
         }
-      })));
+      }));
   }
 
   return unspecified;
