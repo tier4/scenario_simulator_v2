@@ -113,29 +113,6 @@ std::vector<geometry_msgs::msg::Point> Primitive::get2DConvexHull() const
   return math::geometry::get2DConvexHull(toPoints(transform()));
 }
 
-unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
-{
-  RTCGeometry mesh = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
-  const auto transformed_vertices = transform();
-  Vertex * vertices = static_cast<Vertex *>(rtcSetNewGeometryBuffer(
-    mesh, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(Vertex),
-    transformed_vertices.size()));
-  for (size_t i = 0; i < transformed_vertices.size(); i++) {
-    vertices[i] = transformed_vertices[i];
-  }
-  Triangle * triangles = static_cast<Triangle *>(rtcSetNewGeometryBuffer(
-    mesh, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(Triangle), triangles_.size()));
-  for (size_t i = 0; i < triangles_.size(); i++) {
-    triangles[i] = triangles_[i];
-  }
-  // enable raycasting
-  rtcSetGeometryMask(mesh, 0b11111111'11111111'11111111'11111111);
-  rtcCommitGeometry(mesh);
-  unsigned int geometry_id = rtcAttachGeometry(scene, mesh);
-  rtcReleaseGeometry(mesh);
-  return geometry_id;
-}
-
 boost::optional<double> Primitive::getMax(const math::geometry::Axis & axis) const
 {
   if (vertices_.empty()) {

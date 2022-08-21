@@ -49,7 +49,7 @@ public:
     auto duration_std = duration<double, std::milli>(steady_clock::now() - start_time).count();
     loop_durations.push_back(duration_std);
     // std::cerr << "[MeasureTime] Measured duration_chrono: " << duration_chrono << std::endl;
-    // std::cerr << "[MeasureTime] Measured duration_std: " << loop_durations.back() << "[ms]" << std::endl;
+    std::cerr << "[MeasureTime] Measured duration_std: " << loop_durations.back() << "[ms]" << std::endl;
       std::cerr << "[MeasureTime] Measured average time: " << getAverageMeasurements() << "[ms]" << std::endl;
     is_started = false;
   }

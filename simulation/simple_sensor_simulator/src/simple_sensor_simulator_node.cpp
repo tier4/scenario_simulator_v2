@@ -16,9 +16,15 @@
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <string>
+// #include <xmmintrin.h>
+// #include <pmmintrin.h>
+
+
 
 int main(int argc, char * argv[])
 {
+  // _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+  // _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   auto component = std::make_shared<simple_sensor_simulator::ScenarioSimulator>(options);

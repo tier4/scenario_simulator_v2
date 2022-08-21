@@ -38,14 +38,22 @@ public:
   Raycaster();
   explicit Raycaster(std::string embree_config);
   ~Raycaster();
+  unsigned int addToScene(RTCDevice device, RTCScene scene, primitives::Primitive primitive);
+  void updateOnScene(RTCScene scene, std::string entity_name, primitives::Primitive primitive);
   template <typename T, typename... Ts>
   void addPrimitive(std::string name, Ts &&... xs)
   {
-    if (primitive_ptrs_.count(name) != 0) {
-      throw std::runtime_error("primitive " + name + " already exist.");
-    }
+    // todo change name to updatePrimitve
+    // todo delete this if
+    // if (primitive_ptrs_.count(name) != 0) {
+    //   //? is it neccessary
+    //   std::clog << "primitive " + name + " already exist." << std::endl;
+    //   return;
+    // }
+
+    //TODO mutable primitives
     auto primitive_ptr = std::make_unique<T>(std::forward<Ts>(xs)...);
-    primitive_ptrs_.emplace(name, std::move(primitive_ptr));
+    primitive_ptrs_.insert_or_assign(name, std::move(primitive_ptr));
   }
   const sensor_msgs::msg::PointCloud2 raycast(
     std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
@@ -64,6 +72,7 @@ private:
   double previous_horizontal_resolution_;
   std::vector<double>  previous_vertical_angles_;
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
+  std::unordered_map<std::string, unsigned int> primitive_on_scene_id_;
   RTCDevice device_;
   RTCScene scene_;
   std::random_device seed_gen_;
