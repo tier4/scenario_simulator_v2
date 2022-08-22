@@ -21,12 +21,6 @@
 
 namespace simple_sensor_simulator
 {
-GridCell::GridCell(
-  const geometry_msgs::msg::Pose & origin, double size, size_t index, size_t row, size_t col)
-: origin(origin), size(size), index(index), row(row), col(col), data_(0)
-{
-}
-
 geometry_msgs::msg::Point GridCell::getLeftUpPoint() const
 {
   geometry_msgs::msg::Point left_up;

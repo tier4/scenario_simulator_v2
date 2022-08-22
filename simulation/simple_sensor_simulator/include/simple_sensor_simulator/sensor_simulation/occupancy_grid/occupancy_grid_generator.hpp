@@ -48,6 +48,7 @@ public:
 
 private:
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
+  mutable Grid grid_;
 };
 }  // namespace simple_sensor_simulator
 
