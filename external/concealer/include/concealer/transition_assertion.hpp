@@ -113,7 +113,7 @@ struct TransitionAssertion
   static_assert(true, "")
 
   // XXX: The time limit must be ignored in waitForAutowareStateToBeDriving() because the current
-  // implementation attepmts to transition to Driving state after initialize_duration seconds have
+  // implementation attempts to transition to Driving state after initialize_duration seconds have
   // elapsed.
 
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(Initializing);
