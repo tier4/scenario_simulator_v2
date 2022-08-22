@@ -37,6 +37,7 @@ struct ParameterAssignment
   : parameterRef(readAttribute<std::string>("parameterRef", node, scope)),
     value(readAttribute<std::string>("value", node, scope))
   {
+    std::cout << "parameterRef: " << parameterRef << ", " << value << std::endl;
     scope.insert(parameterRef, make<std::string>(value));
   }
 

@@ -91,10 +91,8 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 {
-  std::cout << "on configure start" << std::endl;
   return withExceptionHandler(
     [](auto &&...) {
-      std::cout << "configure failed" << std::endl;
       return Interpreter::Result::FAILURE;  // => Unconfigured
     },
     [this]() {
@@ -129,7 +127,6 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       } else {
         throw SyntaxError("ParameterValueDistributionDefinition is not yet supported.");
       }
-      std::cout << "success" << std::endl;
       return Interpreter::Result::SUCCESS;  // => Inactive
     });
 }

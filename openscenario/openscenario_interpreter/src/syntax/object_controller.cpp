@@ -26,6 +26,7 @@ int ObjectController::ego_count = 0;
 ObjectController::ObjectController()  //
 : ComplexType(unspecified)
 {
+  std::cout << "ObjectController is constructed with default constructor." << std::endl;
 }
 
 ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)

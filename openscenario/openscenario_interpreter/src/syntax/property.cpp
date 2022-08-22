@@ -24,6 +24,7 @@ Property::Property(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),  //
   value(readAttribute<String>("value", node, scope))
 {
+  std::cout << "Property: " << name << ", " << value << std::endl;
 }
 
 Property::operator bool() const { return value.empty() ? Boolean() : Boolean(value); }
