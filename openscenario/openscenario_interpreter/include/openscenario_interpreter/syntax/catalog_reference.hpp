@@ -43,45 +43,10 @@ inline namespace syntax
  *  </xsd:complexType>
  * -------------------------------------------------------------------------- */
 
-//template <typename T>
 class CatalogReference
 {
 public:
-  CatalogReference(const pugi::xml_node & node, Scope & scope)
-  : scope(scope),
-    node(node),
-    catalog_name(readAttribute<std::string>("catalogName", node, scope)),
-    entry_name(readAttribute<std::string>("entryName", node, scope)),
-    parameter_assignments(readElement<ParameterAssignments>("ParameterAssignments", node, scope))
-  {
-//    static_assert(
-//      // clang-format off
-//      std::is_same<Vehicle    , T>::value or
-//      std::is_same<Controller , T>::value or
-//      std::is_same<Pedestrian , T>::value or
-//      std::is_same<MiscObject , T>::value or
-////      std::is_same<Environment, T>::value or
-//      std::is_same<Maneuver   , T>::value)
-////      std::is_same<Trajectory , T>::value) or
-////      std::is_same<Route      , T>::value)
-//      // clang-format on
-//      , "Catalog element type must be one of supported types"
-//    );
-
-    auto catalog_locations = scope.global().catalog_locations;
-    if (catalog_locations) {
-      for (auto & p : *catalog_locations) {
-        auto & catalog_location = p.second;
-        auto found_catalog = catalog_location.find(catalog_name);
-
-        if (found_catalog != std::end(catalog_location)) {
-          scope_by_catalog = found_catalog->second;
-          break;
-        }
-      }
-    }
-    std::cout << "Catalog Reference" << std::endl;
-  }
+  CatalogReference(const pugi::xml_node & node, Scope & scope);
 
   Scope scope;  // anonymous namespace
   const pugi::xml_node node;
@@ -93,14 +58,13 @@ public:
   template <typename T>
   auto make(const pugi::xml_node & node_) -> Object
   {
-//    auto scope_ = Scope("", scope);
-    return openscenario_interpreter::make<T>(node_, this->scope);
+    auto scope_ = Scope("", scope);
+    return openscenario_interpreter::make<T>(node_, scope);
   }
 };
 
 }  // namespace syntax
 
-// template<typename T>
 auto makeFromCatalogReference(const pugi::xml_node &, Scope &) -> const Object;
 
 }  // namespace openscenario_interpreter
