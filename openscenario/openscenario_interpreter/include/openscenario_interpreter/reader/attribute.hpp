@@ -101,9 +101,6 @@ auto substitute(std::string attribute, Scope & scope)
 template <typename T, typename Node, typename Scope>
 auto readAttribute(const std::string & name, const Node & node, const Scope & scope) -> T
 {
-  if(name == "isEgo"){
-    std::cout << "readAttribute : isEgo" << std::endl;
-  }
   auto is_openscenario_standard_expression = [](const auto & s) {
     return s.substr(0, 2) == "${" and s.back() == '}';
   };
@@ -119,10 +116,6 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
   auto read_openscenario_standard_parameter_reference = [&](const auto & s) {
     // TODO Use `return scope.template ref<T>(s.substr(1));`
     if (auto && object = scope.ref(s.substr(1)); object) {
-      if(name == "isEgo"){
-        std::cout << "readAttribute : parse parameter" << std::endl;
-        std::cout << boost::lexical_cast<String>(object) << std::endl;
-      }
       return boost::lexical_cast<T>(boost::lexical_cast<String>(object));
     } else {
       throw SyntaxError(

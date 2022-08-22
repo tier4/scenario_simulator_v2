@@ -33,7 +33,6 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 
 auto Controller::isUserDefinedController() const & -> bool
 {
-  std::cout << "asking isEgo : " << properties.get<Boolean>("isEgo") << std::endl;
   return properties.get<Boolean>("isEgo");
 }
 }  // namespace syntax

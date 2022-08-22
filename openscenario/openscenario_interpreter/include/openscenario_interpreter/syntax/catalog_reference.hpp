@@ -58,7 +58,6 @@ public:
   template <typename T>
   auto make(const pugi::xml_node & node_) -> Object
   {
-    auto scope_ = Scope("", scope);
     return openscenario_interpreter::make<T>(node_, scope);
   }
 };

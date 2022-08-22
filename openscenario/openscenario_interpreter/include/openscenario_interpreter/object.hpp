@@ -56,32 +56,15 @@ using Group = Object;
 
 using Elements = std::list<Object>;
 
-inline namespace syntax
-{
-struct CatalogReference;
-}
-
-// namespace internal
-//{
-// template <typename... Ts>
-// auto makeFromCatalogReference(Ts &&...) -> const Object;
-// }
-
 template <typename T, typename... Ts>
 constexpr auto make(Ts &&... xs) -> decltype(auto)
 {
-//  std::cout << "make : " << demangle(typeid(T)) << std::endl;
-  //  if constexpr (std::is_same<T,CatalogReference>::value){
-  //    return internal::makeFromCatalogReference(std::forward<decltype(xs)>(xs)...);
-  //  }else{
   return Object::bind<T>(std::forward<decltype(xs)>(xs)...);
-  //  }
 }
 
 template <typename T>
 constexpr auto make(T && x) -> decltype(auto)
 {
-//  std::cout << "make : " << demangle(typeid(T)) << std::endl;
   return Object::bind<typename std::decay<decltype(x)>::type>(std::forward<decltype(x)>(x));
 }
 

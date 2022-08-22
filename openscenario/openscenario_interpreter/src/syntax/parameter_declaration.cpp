@@ -49,7 +49,6 @@ ParameterDeclaration::ParameterDeclaration(
   const openscenario_msgs::msg::ParameterDeclaration & message)
 : name(message.name), parameter_type(message.parameter_type), value(message.value)
 {
-  std::cout << "Constructing ParameterDeclaration from msg!" << std::endl;
   for (const auto & constraint_group : message.constraint_groups) {
     constraint_groups.emplace_back(constraint_group);
   }
@@ -60,7 +59,6 @@ ParameterDeclaration::ParameterDeclaration(
   const openscenario_msgs::msg::ParameterDeclaration & message, Scope & scope)
 : name(message.name), parameter_type(message.parameter_type), value(message.value)
 {
-  std::cout << "Constructing ParameterDeclaration from msg and scope!" << std::endl;
   for (const auto & constraint_group : message.constraint_groups) {
     constraint_groups.emplace_back(constraint_group);
   }
@@ -72,7 +70,6 @@ ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & 
   parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
   value(readAttribute<String>("value", node, scope))
 {
-  std::cout << "Constructing ParameterDeclaration from scope!" << std::endl;
   traverse<0, unbounded>(
     node, "ConstraintGroup", [&](auto && node) { constraint_groups.emplace_back(node, scope); });
   scope.insert(checkName(name), evaluate());

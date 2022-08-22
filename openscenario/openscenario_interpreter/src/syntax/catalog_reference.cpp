@@ -73,42 +73,33 @@ auto choice_by_attribute(const pugi::xml_node & node, const std::string & attrib
 }
 
 CatalogReference::CatalogReference(const pugi::xml_node & node, Scope & scope)
-  : scope(scope),
-    node(node),
-    catalog_name(readAttribute<std::string>("catalogName", node, scope)),
-    entry_name(readAttribute<std::string>("entryName", node, scope)),
-    parameter_assignments(readElement<ParameterAssignments>("ParameterAssignments", node, scope))
+: scope(scope),
+  node(node),
+  catalog_name(readAttribute<std::string>("catalogName", node, scope)),
+  entry_name(readAttribute<std::string>("entryName", node, scope)),
+  parameter_assignments(readElement<ParameterAssignments>("ParameterAssignments", node, scope))
 {
-  std::cout << "CatalogReference: name: " << catalog_name << std::endl;
   auto catalog_locations = scope.global().catalog_locations;
   if (catalog_locations) {
-    std::cout << "CatalogReference: catalog_locations are valid" << std::endl;
     for (auto & p : *catalog_locations) {
       auto & catalog_location = p.second;
-      std::cout << catalog_location.directory.path << ", " << p.first << std::endl;
       auto found_catalog = catalog_location.find(catalog_name);
 
       if (found_catalog != std::end(catalog_location)) {
-        std::cout << "CatalogReference: catalog found! " << catalog_name << std::endl;
         scope_by_catalog = found_catalog->second;
         break;
       }
     }
   }
-  std::cout << "CatalogReference: Constructed!" << std::endl;
 }
 }  // namespace syntax
 
 auto makeFromCatalogReference(const pugi::xml_node & node, Scope & scope_) -> const Object
 {
-  std::cout << "makeFromCatalogReference: " << node.name() << std::endl;
   CatalogReference catalog(node, scope_);
-  std::cout << "makeFromCatalogReference: CatalogReference constructed!" << std::endl;
   auto scope = Scope("", catalog.scope);  // anonymous namespace
 
   if (catalog.scope_by_catalog) {
-
-    std::cout << "makeFromCatalogReference: Catalog is valid！" << std::endl;
     using ::openscenario_interpreter::make;
 
     std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
@@ -127,7 +118,6 @@ auto makeFromCatalogReference(const pugi::xml_node & node, Scope & scope_) -> co
     return choice_by_attribute(
       *catalog.scope_by_catalog, "name",
       std::make_pair(catalog.entry_name, [&](const pugi::xml_node & node) {
-        std::cout << "makeFromCatalogReference: Constructing " << node.name() << std::endl;
         auto iter = dispatcher.find(node.name());
         if (iter != std::end(dispatcher)) {
           return iter->second(node);
@@ -144,8 +134,6 @@ auto makeFromCatalogReference(const pugi::xml_node & node, Scope & scope_) -> co
         }
       }));
   }
-
-  std::cout << "makeFromCatalogReference: UNCONFIGURED" << std::endl;
 
   return unspecified;
 }

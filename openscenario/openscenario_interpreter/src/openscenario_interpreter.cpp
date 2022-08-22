@@ -14,7 +14,6 @@
 
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
-#include <algorithm>
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
@@ -22,6 +21,8 @@
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
+
+#include <algorithm>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
@@ -39,13 +40,11 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   osc_path(""),
   output_directory("/tmp")
 {
-  std::cout << "Interpreter constructor start" << std::endl;
   DECLARE_PARAMETER(intended_result);
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
-  std::cout << "Interpreter constructor finish" << std::endl;
 }
 
 Interpreter::~Interpreter() { SimulatorCore::deactivate(); }
@@ -111,29 +110,26 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
 
-      std::cout << "setting parameters..." << std::endl;
       GET_PARAMETER(intended_result);
       GET_PARAMETER(local_frame_rate);
       GET_PARAMETER(local_real_time_factor);
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
 
-      std::cout << "reading OpenScenario..." << std::endl;
       script = std::make_shared<OpenScenario>(osc_path);
-      std::cout << "Finish reading!" << std::endl;
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
       } else {
         throw SyntaxError("ParameterValueDistributionDefinition is not yet supported.");
       }
+
       return Interpreter::Result::SUCCESS;  // => Inactive
     });
 }
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  std::cout << "on activate start" << std::endl;
   auto initializeStoryboard = [this]() {
     return withExceptionHandler(
       [this](auto &&...) {

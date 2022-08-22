@@ -26,7 +26,6 @@ ScenarioDefinition::ScenarioDefinition(const pugi::xml_node & node, Scope & scop
   entities(readElement<Entities>("Entities", node, scope)),
   storyboard(readElement<Storyboard>("Storyboard", node, scope))
 {
-  std::cout << "ScenarioDefinition is constructed!" << std::endl;
 }
 
 auto ScenarioDefinition::evaluate() -> Object

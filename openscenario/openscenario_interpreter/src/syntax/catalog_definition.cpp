@@ -22,7 +22,6 @@ inline namespace syntax
 CatalogDefinition::CatalogDefinition(const pugi::xml_node & node, Scope & scope)
 : Catalog(readElement<Catalog>("Catalog", node, scope))
 {
-  std::cout << "CatalogDefinition is constructed!" << std::endl;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

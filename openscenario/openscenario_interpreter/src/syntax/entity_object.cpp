@@ -25,9 +25,9 @@ EntityObject::EntityObject(const pugi::xml_node & node, Scope & scope)
 : Group(
     choice(node,
       std::make_pair("CatalogReference", [&](auto && node) { return makeFromCatalogReference(node, scope); }),
-      std::make_pair("Vehicle",      [&](auto && node) { return make<Vehicle          >(node, scope); }),
-      std::make_pair("Pedestrian",   [&](auto && node) { return make<Pedestrian       >(node, scope); }),
-      std::make_pair("MiscObject",   [&](auto && node) { return make<MiscObject       >(node, scope); })))
+      std::make_pair("Vehicle",          [&](auto && node) { return         make<Vehicle   >(node, scope); }),
+      std::make_pair("Pedestrian",       [&](auto && node) { return         make<Pedestrian>(node, scope); }),
+      std::make_pair("MiscObject",       [&](auto && node) { return         make<MiscObject>(node, scope); })))
 // clang-format on
 {
 }

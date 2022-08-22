@@ -27,7 +27,6 @@ OpenScenario::OpenScenario(const boost::filesystem::path & pathname)
   file_header(readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), local())),
   category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, local()))
 {
-  std::cout << "OpenScenario is constructed!" << std::endl;
 }
 
 auto OpenScenario::evaluate() -> Object

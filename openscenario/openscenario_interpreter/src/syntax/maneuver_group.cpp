@@ -38,7 +38,6 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
 auto ManeuverGroup::start() -> void
 {
   for (auto && element : elements) {
-    std::cout << demangle(element.type()) << std::endl;
     assert(element.template is<Maneuver>());
     assert(element.template is_also<StoryboardElement>());
     element.template as<StoryboardElement>().current_state = start_transition;
