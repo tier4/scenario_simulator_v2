@@ -121,10 +121,11 @@ Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh` co
 
 #### Built-in commands
 
-| Name        | Effect                                               |
-|:------------|:-----------------------------------------------------|
-| exitSuccess | Immediately terminates the simulation as successful. |
-| exitFailure | Immediately terminates the simulation as a failure.  |
+| Name               | Effect                                                   |
+|:-------------------|:---------------------------------------------------------|
+| exitSuccess        | Immediately terminates the simulation as successful.     |
+| exitFailure        | Immediately terminates the simulation as a failure.      |
+| WalkStraightAction | Make a **pedestrian** NPC walk straight without a target |
 
 These built-in commands force the simulation to terminate.
 This termination ignores the StoryboardElement's lifecycle transition (that is, it means that `StoryboardElementStateCondition` cannot be used to prevent or detect the execution of this command).
@@ -223,7 +224,7 @@ OpenSCENARIO standards.
 | GlobalAction.TrafficAction.**TrafficStopAction**                                        |  Unsupported   |                                    |                      |
 | GlobalAction.VariableAction.**VariableSetAction**                                       |  Unsupported   |                                    | created in v1.2      |
 | GlobalAction.VariableAction.**VariableModifyAction**                                    |  Unsupported   |                                    | created in v1.2      |
-| UserDefinedAction.**CustomCommandAction**                                               |       ✔        | No                                 |                      |
+| UserDefinedAction.**CustomCommandAction**                                               |       ✔        | See [here](#customcommandaction)   |                      |
 | PrivateAction.AppearanceAction.**AnimationAction**                                      |  Unsupported   |                                    | created in v1.2      |
 | PrivateAction.AppearanceAction.**LightStateAction**                                     |  Unsupported   |                                    | created in v1.2      |
 | PrivateAction.LongitudinalAction.**SpeedAction**                                        |       ✔        | See [here](#speedaction)           |                      |
@@ -274,6 +275,12 @@ OpenSCENARIO standards.
 ### ParameterSetAction
 
 - Currently, ParameterSetAction cannot handle `dateTime` type parameters.
+
+### CustomCommandAction
+#### WalkStraightAction
+- This action is a temporary feature until `FollowTrajectoryAction` is implemented.
+- This action cannot be used in combination with `AquirePositionAction` because `WalkStraightAction` just makes a pedestrian NPC go straight without a destination.
+
 
 ### SpeedAction
 
