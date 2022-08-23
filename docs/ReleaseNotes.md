@@ -6,11 +6,12 @@
 Major Changes :race_car: :red_car: :blue_car:
 
 | Feature                                                           | Brief summary                                                                                        | Category                   | Pull request                                                    | Contributor                                   |
-|-------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
 | Add `API::getRelativePose()` argument for function                | Add `API::getRelativePose()` argument for getting relative distance between lanelet pose and entity. | `traffic_simulator`        | [#809](https://github.com/tier4/scenario_simulator_v2/pull/809) | [hakuturu583](https://github.com/hakuturu583) |
 | RTC (Request to Cooperate)                                        | Experimental support for automatic approval of requests to cooperate from Autoware.Universe.         | `concealer`                | [#818](https://github.com/tier4/scenario_simulator_v2/pull/818) | [yamacir-kit](https://github.com/yamacir-kit) |
 | Experimental UserDefinedValueCondition `RelativeHeadingCondition` | Update `UserDefinedValueCondition` to support new experimental condition `RelativeHeadingCondition`. | `openscenario_interpreter` | [#830](https://github.com/tier4/scenario_simulator_v2/pull/830) | [yamacir-kit](https://github.com/yamacir-kit) |
 | OpenSCENARIO `ValueConstraint`, `ValueConstraintGroup`            | Add support for `ValueConstraint` and `ValueConstraintGroup`.                                        | `openscenario_interpreter` | [#847](https://github.com/tier4/scenario_simulator_v2/pull/847) | [HansRobo](https://github.com/HansRobo)       |
+| Improve ego lane matching Logic                                   | Retry mathing to lanelet without using route infomation from Autoware.                               | `traffic_simulator`        | [#864](https://github.com/tier4/scenario_simulator_v2/pull/864) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
 
