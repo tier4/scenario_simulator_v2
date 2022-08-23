@@ -21,7 +21,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 ParameterAssignment::ParameterAssignment(const pugi::xml_node & node, Scope & scope)
 : parameterRef(readAttribute<std::string>("parameterRef", node, scope)),
   value(readAttribute<std::string>("value", node, scope))
