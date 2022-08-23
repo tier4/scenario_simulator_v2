@@ -1,8 +1,3 @@
-ament_auto_add_executable(traveled_distance
-  traveled_distance.cpp
-)
-target_link_libraries(traveled_distance cpp_scenario_node)
-
 ament_auto_add_executable(momentary_stop
   momentary_stop.cpp
 )
@@ -29,7 +24,6 @@ ament_auto_add_executable(collision
 target_link_libraries(collision cpp_scenario_node)
 
 install(TARGETS
-  traveled_distance
   momentary_stop
   reaction_time
   out_of_range
