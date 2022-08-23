@@ -15,18 +15,16 @@
 #ifndef OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
+#include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/range/algorithm.hpp>
+#include <functional>
+#include <memory>
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
-
-#include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/range/algorithm.hpp>
-
-#include <functional>
-#include <memory>
 #include <unordered_map>
 #include <utility>
 #include <vector>

@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+#include <cassert>
+#include <iterator>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-
-#include <cassert>
-#include <iterator>
 
 namespace openscenario_interpreter
 {
