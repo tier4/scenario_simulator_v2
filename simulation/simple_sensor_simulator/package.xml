@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>0.6.4</version>
+  <version>0.6.5</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -10,6 +10,8 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
+
+  <depend>geometry</depend>
 
   <build_depend>geometry_msgs</build_depend>
   <build_depend>rclcpp</build_depend>

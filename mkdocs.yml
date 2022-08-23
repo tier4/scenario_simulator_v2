@@ -14,13 +14,16 @@ extra:
     code: "Consolas"
   search:
     language: en
+  social:
+    - icon: fontawesome/solid/bug
+      link: https://github.com/tier4/scenario_simulator_v2/issues
+    - icon: fontawesome/solid/code-pull-request
+      link: https://github.com/tier4/scenario_simulator_v2/pulls
 plugins:
   - search
   - git-revision-date-localized
-palette:
-  scheme: slate
 
-copyright: "Copyright &copy; 2020 TIER IV, Inc."
+copyright: "Copyright &copy; 2022 TIER IV, Inc."
 
 markdown_extensions:
   - attr_list
@@ -42,6 +45,7 @@ markdown_extensions:
 extra_css:
   - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
   - stylesheet/tierivcolor.css
+  - stylesheet/extra.css
   - https://unpkg.com/mermaid@8.0.0/dist/mermaid.css
 extra_javascript:
   - http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
@@ -49,12 +53,12 @@ extra_javascript:
 
 nav:
   - Home: README.md
+  - Release Note: ReleaseNotes.md
   - User Guide:
+      - Quick Start : user_guide/QuickStart.md
       - Build Instructions : user_guide/BuildInstructions.md
-      - Quick Start : user_guide/RunWithAutowareUniverse.md
-      - Cpp scenario demo : user_guide/SimpleDemo.md
       - Run on Docker : user_guide/RunWithDocker.md
-      - Run test scenario on Docker : user_guide/RunTestScenarioWithDocker.md
+      - Scenario Writing Tips : user_guide/ScenarioTips.md
       - Scenario Editor:
           - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
           - user_guide/scenario_editor/CreateSimpleScenario.md
@@ -81,9 +85,6 @@ nav:
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
       - developer_guide/TIERIVScenarioFormatVersion2.md
+      - developer_guide/CONTRIBUTING.md
+      - developer_guide/Communication.md
       - Package Details: package/About.md
-  - etc:
-    - Release Notes: etc/ReleaseNotes.md
-    - Contact Information: etc/ContactUs.md
-    - How to Contribute: etc/HowToContribute.md
-    - LICENSE: etc/LICENSE.md

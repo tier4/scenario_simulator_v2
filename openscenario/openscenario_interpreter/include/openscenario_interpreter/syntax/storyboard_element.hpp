@@ -17,9 +17,9 @@
 
 #include <cstddef>
 #include <limits>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <openscenario_interpreter/syntax/trigger.hpp>
@@ -33,7 +33,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-class StoryboardElement
+class StoryboardElement : private SimulatorCore::ConditionEvaluation
 {
   Trigger stop_trigger;
 
@@ -147,7 +147,7 @@ protected:
     } else {
       throw SyntaxError(
         "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
-        typeid(U).name(), ")");
+        makeTypename(typeid(U)), ")");
     }
   }
 
@@ -160,7 +160,7 @@ protected:
     if (not unique(name)) {
       throw SyntaxError(
         "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
-        typeid(U).name(), ")");
+        makeTypename(typeid(U)), ")");
     }
 
     inner_scope.insert(name, element);

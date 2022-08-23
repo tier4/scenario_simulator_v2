@@ -17,7 +17,7 @@
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/catalog_location.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
-#include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/syntax/open_scenario.hpp>
 
 namespace openscenario_interpreter
 {
@@ -33,7 +33,7 @@ auto convertScenario(
           << " --output " << output_dir;
 
   if (std::system(command.str().c_str()) != 0) {
-    THROW_SYNTAX_ERROR("failed to convert sceanrio: " + yaml_path.string());
+    THROW_SYNTAX_ERROR("failed to convert scenario: " + yaml_path.string());
   } else {
     return output_dir / yaml_path.filename().stem().replace_extension(".xosc");
   }

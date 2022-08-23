@@ -18,7 +18,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <memory>
-#include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <thread>
 

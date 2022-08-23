@@ -111,6 +111,7 @@ int main(const int argc, char const * const * const argv)
                 .count())
           ? "true"
           : "false";
+      // if you want to add constraints for parameter, please add constraints to message.constraint_groups
     }
 
     std::cout << "message.value = " << message.value << std::endl;

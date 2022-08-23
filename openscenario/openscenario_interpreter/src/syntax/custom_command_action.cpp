@@ -15,9 +15,10 @@
 #include <iterator>  // std::distance
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
+#include <openscenario_interpreter/regex/function_call_expression.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <unordered_map>
 
@@ -67,20 +68,6 @@ auto CustomCommandAction::applyFaultInjectionAction(
   return events.size();
 }
 
-auto CustomCommandAction::applyWalkStraightAction(
-  const std::vector<std::string> & actors, const Scope & scope) -> int
-{
-  for (const auto & actor : actors) {
-    openscenario_interpreter::applyWalkStraightAction(actor);
-  }
-
-  for (const auto & actor : scope.actors) {
-    openscenario_interpreter::applyWalkStraightAction(actor);
-  }
-
-  return scope.actors.size();
-}
-
 auto CustomCommandAction::debugError(const std::vector<std::string> &, const Scope &) -> int
 {
   throw Error(__FILE__, ":", __LINE__);
@@ -118,26 +105,26 @@ auto CustomCommandAction::publisher()
 
 auto CustomCommandAction::run() noexcept -> void {}
 
-auto CustomCommandAction::split(const std::string & s) -> std::vector<std::string>
-{
-  static const std::regex pattern{R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"};
-
-  std::vector<std::string> args{};
-
-  for (std::sregex_iterator iter{std::begin(s), std::end(s), pattern}, end; iter != end; ++iter) {
-    args.emplace_back((*iter)[1]);
-  }
-
-  return args;
-}
-
 auto CustomCommandAction::start() const -> void
 {
+  auto apply_walk_straight_action =
+    [this](const std::vector<std::string> & actors, const Scope & scope) {
+      for (const auto & actor : actors) {
+        applyWalkStraightAction(actor);
+      }
+
+      for (const auto & actor : scope.actors) {
+        applyWalkStraightAction(actor);
+      }
+
+      return scope.actors.size();
+    };
+
   static const std::unordered_map<
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
     commands{
       std::make_pair("FaultInjectionAction", applyFaultInjectionAction),
-      std::make_pair("WalkStraightAction", applyWalkStraightAction),
+      std::make_pair("WalkStraightAction", apply_walk_straight_action),
       std::make_pair("debugError", debugError),
       std::make_pair("debugSegmentationFault", debugSegmentationFault),  // DEPRECATED
       std::make_pair("exitFailure", exitFailure),
@@ -145,25 +132,14 @@ auto CustomCommandAction::start() const -> void
       std::make_pair("test", test),
     };
 
-  /* ---- NOTE ---------------------------------------------------------------
-   *
-   *  <CustomCommandAction type="function(foo, &quot;hello, world!&quot;, 3.14)"/>
-   *
-   *    result[0] = function(foo, "hello, world!", 3.14)
-   *    result[1] = function
-   *    result[2] =         (foo, "hello, world!", 3.14)
-   *    result[3] =          foo, "hello, world!", 3.14
-   *
-   * ---------------------------------------------------------------------- */
-  static const std::regex pattern{R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)"};
-
   std::smatch result{};
 
   if (type == ":") {
     return;
   } else if (
-    std::regex_match(type, result, pattern) and commands.find(result[1]) != std::end(commands)) {
-    commands.at(result[1])(split(result[3]), local());
+    std::regex_match(type, result, FunctionCallExpression::pattern()) and
+    commands.find(result[1]) != std::end(commands)) {
+    commands.at(result[1])(FunctionCallExpression::splitParameters(result[3]), local());
   } else {
     fork_exec(type, content);
   }

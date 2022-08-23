@@ -163,9 +163,9 @@ public:
 
   virtual auto getAutowareStateName() const -> std::string = 0;
 
-  virtual auto getEmergencyState() const -> const autoware_auto_system_msgs::msg::EmergencyState &;
+  virtual auto getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState;
 
-  virtual auto getGearCommand() const -> const autoware_auto_vehicle_msgs::msg::GearCommand &;
+  virtual auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand;
 
   // returns -1.0 when gear is reverse and 1.0 otherwise
   virtual auto getGearSign() const -> double = 0;
@@ -173,7 +173,7 @@ public:
   virtual auto getSteeringAngle() const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-    -> const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand &;
+    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
@@ -195,6 +195,8 @@ public:
   /*   */ auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
 
   /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
+
+  virtual auto setCooperator(const std::string &) -> void = 0;
 
   virtual auto setVelocityLimit(double) -> void = 0;
 };

@@ -48,6 +48,8 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
 
   auto accomplished() const -> bool override;
 
+  auto endsImmediately() const -> bool;
+
   auto run() -> void override;
 
   auto start() -> void override;

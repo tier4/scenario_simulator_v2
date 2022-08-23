@@ -17,7 +17,9 @@ find_package(ament_cmake_auto REQUIRED)
 find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
 find_package(lanelet2_matching REQUIRED)
+find_package(tinyxml2_vendor REQUIRED)
 find_package(quaternion_operation REQUIRED)
+find_package(pluginlib REQUIRED)
 include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
@@ -37,17 +39,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/helper/helper.cpp
   src/job/job_list.cpp
   src/job/job.cpp
-  src/math/bounding_box.cpp
-  src/math/catmull_rom_spline.cpp
-  src/math/catmull_rom_subspline.cpp
-  src/math/collision.cpp
-  src/math/distance.cpp
-  src/math/hermite_curve.cpp
-  src/math/linear_algebra.cpp
-  src/math/polygon.cpp
-  src/math/polynomial_solver.cpp
-  src/math/transform.cpp
-  src/math/uuid.cpp
   src/metrics/collision_metric.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp
@@ -81,6 +72,13 @@ target_link_libraries(traffic_simulator
   stdc++fs
   Boost::filesystem
   ${PROTOBUF_LIBRARY})
+
+# workaround to allow deprecated header to build on both galactic and humble
+if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
+  target_compile_definitions(traffic_simulator PUBLIC
+    USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
+  )
+endif()
 
 install(
   DIRECTORY config test/catalog test/map

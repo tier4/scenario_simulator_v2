@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -43,10 +44,6 @@ struct ScenarioObject : public Scope, public EntityObject
   bool is_added = false;  // NOTE: Is applied AddEntityAction?
 
   explicit ScenarioObject(const pugi::xml_node &, Scope &);
-
-  auto activateOutOfRangeMetric(const Vehicle &) const -> bool;
-
-  auto activateSensors() -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

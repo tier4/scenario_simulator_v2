@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
@@ -43,7 +44,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeDistanceCondition : private Scope
+struct RelativeDistanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity".
   const CoordinateSystem coordinate_system;

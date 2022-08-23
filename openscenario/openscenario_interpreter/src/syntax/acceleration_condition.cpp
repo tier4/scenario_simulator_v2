@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/acceleration_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -47,7 +47,7 @@ auto AccelerationCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(getEntityStatus(triggering_entity).action_status.accel.linear.x);
+    results.push_back(evaluateAcceleration(triggering_entity));
     return compare(results.back(), value);
   }));
 }

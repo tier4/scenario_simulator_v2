@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <boost/optional.hpp>
+#include <geometry/polygon/polygon.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <string>
 #include <vector>
@@ -32,14 +33,17 @@ struct Vertex
   float z;
 };
 
+Vertex toVertex(const geometry_msgs::msg::Point & point);
+std::vector<Vertex> toVertex(const std::vector<geometry_msgs::msg::Point> & points);
+geometry_msgs::msg::Point toPoint(const Vertex & v);
+std::vector<geometry_msgs::msg::Point> toPoints(const std::vector<Vertex> & v);
+
 struct Triangle
 {
   unsigned int v0;
   unsigned int v1;
   unsigned int v2;
 };
-
-enum class Axis { X = 0, Y = 1, Z = 2 };
 
 namespace primitives
 {
@@ -56,12 +60,12 @@ public:
   std::vector<geometry_msgs::msg::Point> get2DConvexHull() const;
   std::vector<geometry_msgs::msg::Point> get2DConvexHull(
     const geometry_msgs::msg::Pose & sensor_pose) const;
-  boost::optional<double> getMax(const Axis & axis) const;
-  boost::optional<double> getMin(const Axis & axis) const;
+  boost::optional<double> getMax(const math::geometry::Axis & axis) const;
+  boost::optional<double> getMin(const math::geometry::Axis & axis) const;
   boost::optional<double> getMax(
-    const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
+    const math::geometry::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
   boost::optional<double> getMin(
-    const Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
+    const math::geometry::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const;
 
 protected:
   std::vector<Vertex> transform() const;
@@ -70,8 +74,8 @@ protected:
   std::vector<Triangle> triangles_;
 
 private:
-  Vertex transform(Vertex v) const;
-  Vertex transform(Vertex v, const geometry_msgs::msg::Pose & sensor_pose) const;
+  Vertex transform(const Vertex & v) const;
+  Vertex transform(const Vertex & v, const geometry_msgs::msg::Pose & sensor_pose) const;
 };
 }  // namespace primitives
 }  // namespace simple_sensor_simulator

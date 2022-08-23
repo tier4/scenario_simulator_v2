@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2015-2019 Autoware Foundation. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+//
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
 #ifndef LANELET2_EXTENSION_PSIM__PROJECTION__MGRS_PROJECTOR_HPP_
@@ -22,8 +22,6 @@
 
 #include <GeographicLib/MGRS.hpp>
 #include <GeographicLib/UTMUPS.hpp>
-#include <lanelet2_extension_psim/exception.hpp>
-#include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <utility>
 
@@ -104,7 +102,7 @@ private:
   std::string mgrs_code_;
 
   /**
-   * mgrs grid code that was last projected in previous foward function.
+   * mgrs grid code that was last projected in previous forward function.
    * reverse function will use this if isMGRSCodeSet() returns false.
    */
   mutable std::string projected_grid_;

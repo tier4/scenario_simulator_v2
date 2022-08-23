@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/lane_change_target.hpp>
@@ -39,7 +40,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct LaneChangeAction : private Scope
+struct LaneChangeAction : private Scope,
+                          private SimulatorCore::ActionApplication,
+                          private SimulatorCore::NonStandardOperation
 {
   const Double target_lane_offset;
 

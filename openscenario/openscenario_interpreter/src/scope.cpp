@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <cassert>
-#include <iterator>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+
+#include <cassert>
+#include <iterator>
 
 namespace openscenario_interpreter
 {
@@ -87,14 +90,17 @@ auto EnvironmentFrame::lookupFrame(const Prefixed<Name> & prefixed_name) const
   }
 }
 
-Scope::Scope(const boost::filesystem::path & pathname)
-: frame(new EnvironmentFrame()), global_environment(std::make_shared<GlobalEnvironment>(pathname))
+Scope::Scope(const OpenScenario * const open_scenario)
+: open_scenario(open_scenario),
+  frame(new EnvironmentFrame()),
+  scenario_definition(std::make_shared<ScenarioDefinition>())
 {
 }
 
 Scope::Scope(const std::string & name, const Scope & outer)
-: frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
-  global_environment(outer.global_environment),
+: open_scenario(outer.open_scenario),
+  frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
+  scenario_definition(outer.scenario_definition),
   name(name),
   actors(outer.actors)
 {
@@ -102,24 +108,31 @@ Scope::Scope(const std::string & name, const Scope & outer)
 
 Scope::Scope(
   const std::string & name, const Scope & outer, const ParameterAssignments & parameter_assignments)
-: frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
-  global_environment(outer.global_environment),
+: open_scenario(outer.open_scenario),
+  frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
+  scenario_definition(outer.scenario_definition),
   name(name),
   actors(outer.actors)
 {
   parameter_assignments.apply(*this);
 }
 
-auto Scope::global() const -> const GlobalEnvironment &
+auto Scope::dirname() const -> std::string
 {
-  assert(global_environment);
-  return *global_environment;
+  assert(open_scenario);
+  return open_scenario->pathname.parent_path().string();
 }
 
-auto Scope::global() -> GlobalEnvironment &
+auto Scope::global() const -> const ScenarioDefinition &
 {
-  assert(global_environment);
-  return *global_environment;
+  assert(scenario_definition);
+  return *scenario_definition;
+}
+
+auto Scope::global() -> ScenarioDefinition &
+{
+  assert(scenario_definition);
+  return *scenario_definition;
 }
 
 auto Scope::local() const noexcept -> const Scope & { return *this; }
@@ -129,24 +142,5 @@ auto Scope::local() noexcept -> Scope & { return *this; }
 auto Scope::insert(const Name & identifier, const Object & object) -> void
 {
   return frame->define(identifier, object);
-}
-
-Scope::GlobalEnvironment::GlobalEnvironment(const boost::filesystem::path & pathname)
-: pathname(pathname)
-{
-}
-
-auto Scope::GlobalEnvironment::entityRef(const EntityRef & entity_ref) const -> Object
-{
-  try {
-    return entities.at(entity_ref);
-  } catch (const std::out_of_range &) {
-    throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");
-  }
-}
-
-auto Scope::GlobalEnvironment::isAddedEntity(const EntityRef & entity_ref) const -> bool
-{
-  return entityRef(entity_ref).as<ScenarioObject>().is_added;
 }
 }  // namespace openscenario_interpreter

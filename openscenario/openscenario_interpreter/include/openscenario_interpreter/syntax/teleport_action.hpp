@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TELEPORT_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <pugixml.hpp>
 
@@ -32,7 +33,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TeleportAction : private Scope
+struct TeleportAction : private Scope, private SimulatorCore::ActionApplication
 {
   const Position position;
 

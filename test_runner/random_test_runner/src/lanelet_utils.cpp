@@ -21,11 +21,10 @@
 #include <lanelet2_routing/RoutingCost.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
+#include <geographic_msgs/msg/geo_point.hpp>
+#include <geometry/linear_algebra.hpp>
 #include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
-
-#include "geographic_msgs/msg/geo_point.hpp"
-#include "traffic_simulator/hdmap_utils/hdmap_utils.hpp"
-#include "traffic_simulator/math/linear_algebra.hpp"
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
 LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 {
@@ -116,7 +115,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOppos
   perpendicular_vector.x = tangent_vector->y;
   perpendicular_vector.y = -tangent_vector->x;
   perpendicular_vector.z = 0.0;
-  perpendicular_vector = traffic_simulator::math::normalize(perpendicular_vector);
+  perpendicular_vector = math::geometry::normalize(perpendicular_vector);
 
   geometry_msgs::msg::Point global_position_p = toMapPose(pose).pose.position;
   geometry_msgs::msg::Vector3 global_position;
