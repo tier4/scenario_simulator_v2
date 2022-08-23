@@ -26,7 +26,6 @@
 
 namespace simple_sensor_simulator
 {
-
 /**
  * @brief grid
  */

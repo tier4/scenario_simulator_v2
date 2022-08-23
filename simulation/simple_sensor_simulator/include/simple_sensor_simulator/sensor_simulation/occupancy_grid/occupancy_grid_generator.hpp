@@ -28,7 +28,6 @@
 
 namespace simple_sensor_simulator
 {
-
 /**
  * @brief Occupancy grid generator
  */

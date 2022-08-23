@@ -25,7 +25,6 @@
 
 namespace simple_sensor_simulator
 {
-
 /**
  * @brief Base class of occupancy grid sensor simulator
  */
