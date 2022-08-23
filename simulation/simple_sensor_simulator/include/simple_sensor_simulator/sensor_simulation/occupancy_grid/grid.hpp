@@ -20,7 +20,6 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid_cell.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <vector>
 
@@ -56,20 +55,7 @@ private:
   std::vector<std::pair<size_t, size_t>> fillInside(
     const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data);
   size_t getIndex(size_t row, size_t col) const;
-  size_t getNextRowIndex(size_t row, size_t col) const;
-  size_t getNextColIndex(size_t row, size_t col) const;
-  size_t getPreviousRowIndex(size_t row, size_t col) const;
-  size_t getPreviousColIndex(size_t row, size_t col) const;
-  std::vector<std::pair<size_t, size_t>> filterByRow(
-    const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t row) const;
-  std::vector<std::pair<size_t, size_t>> filterByCol(
-    const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t col) const;
-  std::vector<math::geometry::LineSegment> filterByIntersection(
-    const std::vector<math::geometry::LineSegment> & source_lines,
-    const std::vector<math::geometry::LineSegment> & fillter_lines) const;
-  std::vector<size_t> getRows(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
-  std::vector<size_t> getCols(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const;
-  bool indexExist(size_t index) const;
+
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & grid_point) const;
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
   math::geometry::LineSegment transformToGrid(const math::geometry::LineSegment & line) const;
@@ -81,7 +67,6 @@ private:
   std::vector<math::geometry::LineSegment> getInvisibleRay(
     const std::vector<geometry_msgs::msg::Point> & points) const;
   double getDiagonalLength() const;
-  void updateAllCells();
 
   template <typename T>
   void sortAndUnique(std::vector<T> & data) const

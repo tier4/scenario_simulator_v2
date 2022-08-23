@@ -136,17 +136,6 @@ std::vector<math::geometry::LineSegment> Grid::getRayToGridCorner() const
 }
 
 size_t Grid::getIndex(size_t row, size_t col) const { return width * col + row; }
-size_t Grid::getNextRowIndex(size_t row, size_t col) const { return width * col + (row + 1); }
-size_t Grid::getNextColIndex(size_t row, size_t col) const { return width * (col + 1) + row; }
-size_t Grid::getPreviousRowIndex(size_t row, size_t col) const { return width * col + (row - 1); }
-size_t Grid::getPreviousColIndex(size_t row, size_t col) const { return width * (col - 1) + row; }
-bool Grid::indexExist(size_t index) const
-{
-  if (index <= (height * width - 1)) {
-    return true;
-  }
-  return false;
-}
 
 std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
   const math::geometry::LineSegment & line_segment, int8_t data)
@@ -160,7 +149,7 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
   if (start_row == end_row) {
     for (int col = start_col; col <= end_col; col++) {
       if (fillByRowCol(start_row, col, data)) {
-        ret.emplace_back(std::pair<size_t, size_t>({start_row, col}));
+        ret.emplace_back(start_row, col);
       }
     }
     sortAndUnique(ret);
@@ -169,7 +158,7 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
   if (start_col == end_col) {
     for (int row = start_row; row <= end_row; row++) {
       if (fillByRowCol(row, start_col, data)) {
-        ret.emplace_back(std::pair<size_t, size_t>({row, start_col}));
+        ret.emplace_back(row, start_col);
       }
     }
     sortAndUnique(ret);
@@ -182,11 +171,11 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
         line_segment_pixel.getIntercept());
       if (0 <= col && col < static_cast<int>(height)) {
         if (fillByRowCol(row, col, data)) {
-          ret.emplace_back(std::pair<size_t, size_t>({row, col}));
+          ret.emplace_back(row, col);
         }
         if (row != std::max(start_row, end_row)) {
           if (fillByRowCol(row - 1, col, data)) {
-            ret.emplace_back(std::pair<size_t, size_t>({row - 1, col}));
+            ret.emplace_back(row - 1, col);
           }
         }
       }
@@ -199,11 +188,11 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
         line_segment_pixel.getSlope());
       if (0 <= row && row < static_cast<int>(width)) {
         if (fillByRowCol(row, col, data)) {
-          ret.emplace_back(std::pair<size_t, size_t>({row, col}));
+          ret.emplace_back(row, col);
         }
         if (col != std::max(start_col, end_col)) {
           if (fillByRowCol(row, col - 1, data)) {
-            ret.emplace_back(std::pair<size_t, size_t>({row, col - 1}));
+            ret.emplace_back(row, col - 1);
           }
         }
       }
@@ -259,77 +248,14 @@ std::vector<std::pair<size_t, size_t>> Grid::fillInside(
   return ret;
 }
 
-std::vector<std::pair<size_t, size_t>> Grid::filterByRow(
-  const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t row) const
-{
-  std::vector<std::pair<size_t, size_t>> filtered;
-  for (const auto & row_and_col : row_and_cols) {
-    if (row_and_col.first == row) {
-      filtered.emplace_back(row_and_col);
-    }
-  }
-  sortAndUnique(filtered);
-  return filtered;
-}
-
-std::vector<std::pair<size_t, size_t>> Grid::filterByCol(
-  const std::vector<std::pair<size_t, size_t>> & row_and_cols, size_t col) const
-{
-  std::vector<std::pair<size_t, size_t>> filtered;
-  for (const auto & row_and_col : row_and_cols) {
-    if (row_and_col.second == col) {
-      filtered.emplace_back(row_and_col);
-    }
-  }
-  sortAndUnique(filtered);
-  return filtered;
-}
-
-std::vector<math::geometry::LineSegment> Grid::filterByIntersection(
-  const std::vector<math::geometry::LineSegment> & source_lines,
-  const std::vector<math::geometry::LineSegment> & filter_lines) const
-{
-  std::vector<math::geometry::LineSegment> filtered_lines;
-  for (const auto & source_line : source_lines) {
-    for (const auto & filter_line : filter_lines) {
-      if (source_line.getIntersection2D(filter_line)) {
-        filtered_lines.emplace_back(source_line);
-        break;
-      }
-    }
-  }
-  return filtered_lines;
-}
-
-std::vector<size_t> Grid::getRows(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const
-{
-  std::vector<size_t> ret;
-  for (const auto & row_and_col : row_and_cols) {
-    ret.emplace_back(row_and_col.first);
-  }
-  sortAndUnique(ret);
-  return ret;
-}
-
-std::vector<size_t> Grid::getCols(const std::vector<std::pair<size_t, size_t>> & row_and_cols) const
-{
-  std::vector<size_t> ret;
-  for (const auto & row_and_col : row_and_cols) {
-    ret.emplace_back(row_and_col.second);
-  }
-  sortAndUnique(ret);
-  return ret;
-}
-
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
   const auto hull = primitive->get2DConvexHull();
   const auto line_segments_on_hull = math::geometry::getLineSegments(hull);
-  std::vector<math::geometry::LineSegment> rays_to_grid_corner = {};
-  for (const auto & ray : filterByIntersection(getRayToGridCorner(), line_segments_on_hull)) {
+  auto rays_to_grid_corner = std::vector<math::geometry::LineSegment>();
+  for (const auto & ray : getRayToGridCorner()) {
     for (const auto & line_segment : line_segments_on_hull) {
-      const auto intersection = ray.getIntersection2D(line_segment);
-      if (intersection) {
+      if (const auto intersection = ray.getIntersection2D(line_segment)) {
         rays_to_grid_corner.emplace_back(
           math::geometry::LineSegment(intersection.get(), ray.get2DVector(), getDiagonalLength()));
       }
@@ -389,7 +315,7 @@ void Grid::fillByCol(size_t col, int8_t data)
 void Grid::updateOrigin(const geometry_msgs::msg::Pose & origin)
 {
   origin_ = origin;
-  std::fill(values_.begin(), values_.end(), int8_t(0));
+  values_.assign(values_.size(), 0);
 }
 
 }  // namespace simple_sensor_simulator
