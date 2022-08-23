@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include <cstdint>
+#include <geometry/bounding_box.hpp>
+#include <geometry/intersection/collision.hpp>
+#include <geometry/transform.hpp>
 #include <limits>
 #include <memory>
 #include <queue>
@@ -22,9 +25,6 @@
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/math/bounding_box.hpp>
-#include <traffic_simulator/math/collision.hpp>
-#include <traffic_simulator/math/transform.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -85,7 +85,7 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   }
   auto bbox0 = getBoundingBox(name0);
   auto bbox1 = getBoundingBox(name1);
-  return traffic_simulator::math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
+  return math::geometry::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
@@ -119,7 +119,7 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
   const auto pose0 = getMapPose(from);
   const auto bbox1 = getBoundingBox(to);
   const auto pose1 = getMapPose(to);
-  return math::getPolygonDistance(pose0, bbox0, pose1, bbox1);
+  return math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1);
 }
 
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
@@ -134,7 +134,7 @@ auto EntityManager::getDistanceToCrosswalk(
   if (getWaypoints(name).waypoints.empty()) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
+  math::geometry::CatmullRomSpline spline(getWaypoints(name).waypoints);
   auto polygon = hdmap_utils_ptr_->getLaneletPolygon(target_crosswalk_id);
   return spline.getCollisionPointIn2D(polygon);
 }
@@ -149,7 +149,7 @@ auto EntityManager::getDistanceToStopLine(
   if (getWaypoints(name).waypoints.empty()) {
     return boost::none;
   }
-  traffic_simulator::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
+  math::geometry::CatmullRomSpline spline(getWaypoints(name).waypoints);
   auto polygon = hdmap_utils_ptr_->getStopLinePolygon(target_stop_line_id);
   return spline.getCollisionPointIn2D(polygon);
 }
@@ -203,23 +203,6 @@ auto EntityManager::getEntityTypeList() const
 auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
 {
   return hdmap_utils_ptr_;
-}
-
-auto EntityManager::getLaneletPose(const std::string & name)
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
-{
-  const auto status = getEntityStatus(name);
-  if (!status) {
-    return boost::none;
-  }
-  if (status->lanelet_pose_valid) {
-    return status->lanelet_pose;
-  }
-  bool include_crosswalk = true;
-  if (getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    include_crosswalk = false;
-  }
-  return toLaneletPose(status->pose, getBoundingBox(name), include_crosswalk);
 }
 
 auto EntityManager::getLongitudinalDistance(
@@ -320,38 +303,6 @@ bool EntityManager::laneMatchingSucceed(const std::string & name)
   return false;
 }
 
-/**
- * @brief
- *
- * @param from from entity name
- * @param to to entity name
- * @retval boost::none bounding box is intersects
- * @retval 0 <= distance between two bounding box
- */
-geometry_msgs::msg::Pose EntityManager::getMapPose(const std::string & entity_name)
-{
-  const auto status = getEntityStatus(entity_name);
-  if (!status) {
-    THROW_SEMANTIC_ERROR("entity : ", entity_name, " status is empty");
-  }
-  return status->pose;
-}
-
-geometry_msgs::msg::Pose EntityManager::getMapPose(
-  const std::string & reference_entity_name, const geometry_msgs::msg::Pose & relative_pose)
-{
-  const auto ref_status = getEntityStatus(reference_entity_name);
-  if (!ref_status) {
-    THROW_SEMANTIC_ERROR("entity : ", reference_entity_name, " status is empty");
-  }
-  tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(ref_status->pose, ref_transform);
-  tf2::fromMsg(relative_pose, relative_transform);
-  geometry_msgs::msg::Pose ret;
-  tf2::toMsg(ref_transform * relative_transform, ret);
-  return ret;
-}
-
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
@@ -362,7 +313,7 @@ auto EntityManager::getNumberOfEgo() const -> std::size_t
 const std::string EntityManager::getEgoName() const
 {
   const auto names = getEntityNames();
-  for (const auto name : names) {
+  for (const auto & name : names) {
     if (isEgo(name)) {
       return name;
     }
@@ -385,11 +336,11 @@ auto EntityManager::getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const
   -> geometry_msgs::msg::Pose
 {
-  return traffic_simulator::math::getRelativePose(from, to);
+  return math::geometry::getRelativePose(from, to);
 }
 
-auto EntityManager::getRelativePose(const geometry_msgs::msg::Pose & from, const std::string & to)
-  -> geometry_msgs::msg::Pose
+auto EntityManager::getRelativePose(
+  const geometry_msgs::msg::Pose & from, const std::string & to) const -> geometry_msgs::msg::Pose
 {
   const auto to_status = getEntityStatus(to);
   if (!to_status) {
@@ -398,8 +349,8 @@ auto EntityManager::getRelativePose(const geometry_msgs::msg::Pose & from, const
   return getRelativePose(from, to_status->pose);
 }
 
-auto EntityManager::getRelativePose(const std::string & from, const geometry_msgs::msg::Pose & to)
-  -> geometry_msgs::msg::Pose
+auto EntityManager::getRelativePose(
+  const std::string & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose
 {
   const auto from_status = getEntityStatus(from);
   if (!from_status) {
@@ -408,7 +359,7 @@ auto EntityManager::getRelativePose(const std::string & from, const geometry_msg
   return getRelativePose(from_status->pose, to);
 }
 
-auto EntityManager::getRelativePose(const std::string & from, const std::string & to)
+auto EntityManager::getRelativePose(const std::string & from, const std::string & to) const
   -> geometry_msgs::msg::Pose
 {
   const auto from_status = getEntityStatus(from);
@@ -420,6 +371,38 @@ auto EntityManager::getRelativePose(const std::string & from, const std::string 
     THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
   }
   return getRelativePose(from_status->pose, to_status->pose);
+}
+
+auto EntityManager::getRelativePose(
+  const geometry_msgs::msg::Pose & from, const LaneletPose & to) const -> geometry_msgs::msg::Pose
+{
+  return getRelativePose(from, toMapPose(to));
+}
+
+auto EntityManager::getRelativePose(
+  const LaneletPose & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose
+{
+  return getRelativePose(toMapPose(from), to);
+}
+
+auto EntityManager::getRelativePose(const std::string & from, const LaneletPose & to) const
+  -> geometry_msgs::msg::Pose
+{
+  const auto from_status = getEntityStatus(from);
+  if (!from_status) {
+    THROW_SEMANTIC_ERROR("entity : " + from + " status is empty");
+  }
+  return getRelativePose(from_status->pose, to);
+}
+
+auto EntityManager::getRelativePose(const LaneletPose & from, const std::string & to) const
+  -> geometry_msgs::msg::Pose
+{
+  const auto to_status = getEntityStatus(to);
+  if (!to_status) {
+    THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
+  }
+  return getRelativePose(from, to_status->pose);
 }
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
@@ -457,7 +440,9 @@ void EntityManager::getGoalPoses(
 
 bool EntityManager::isEgo(const std::string & name) const
 {
-  return getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::EGO;
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::EGO and
+         dynamic_cast<EgoEntity const *>(entities_.at(name).get());
 }
 
 bool EntityManager::isInLanelet(

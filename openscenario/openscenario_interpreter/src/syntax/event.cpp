@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ Event::Event(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
   StoryboardElement(
     readAttribute<UnsignedInt>("maximumExecutionCount", node, local(), UnsignedInt(1)),
-    readElement<Trigger>("StartTrigger", node, local())),
+    // If there is no "StartTrigger" in the "Event", the default StartTrigger that always returns true is used.
+    readElement<Trigger>("StartTrigger", node, local(), Trigger({ConditionGroup()}))),
   priority(readAttribute<Priority>("priority", node, local()))
 {
   traverse<1, unbounded>(node, "Action", [&](auto && node) {

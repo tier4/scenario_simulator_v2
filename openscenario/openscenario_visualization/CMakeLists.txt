@@ -25,9 +25,7 @@ find_package(quaternion_operation REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
-find_package(rviz2 REQUIRED)
 find_package(rviz_common REQUIRED)
-find_package(rviz_default_plugins REQUIRED)
 find_package(traffic_simulator REQUIRED)
 find_package(traffic_simulator_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -36,7 +34,6 @@ ament_export_dependencies(class_loader REQUIRED)
 ament_export_dependencies(pluginlib REQUIRED)
 ament_export_dependencies(rclcpp REQUIRED)
 ament_export_dependencies(std_msgs REQUIRED)
-ament_export_dependencies(rviz2 REQUIRED)
 ament_export_dependencies(Eigen3 REQUIRED)
 
 include_directories(
@@ -99,11 +96,11 @@ add_library(openscenario_visualization_rviz_plugin SHARED
   src/context_panel_plugin.cpp
   ${UIC_FILES})
 ament_target_dependencies(openscenario_visualization_rviz_plugin
-  rviz2
   Qt5
   pluginlib
   rclcpp
   openscenario_interpreter_msgs
+  rviz_common
 )
 target_include_directories(openscenario_visualization_rviz_plugin PRIVATE "${OGRE_PREFIX_DIR}/include")
 

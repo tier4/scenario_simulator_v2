@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/type_traits/must_be_default_constructible.hpp>
 #include <pugixml.hpp>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 
@@ -70,11 +71,11 @@ auto traverse(const pugi::xml_node & parent, const std::string & name, F && f) -
   }
 }
 
-template <typename T, typename... Ts>
-auto readElement(const std::string & name, const pugi::xml_node & parent, Ts &&... xs)
+template <typename T, typename Scope>
+auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope)
 {
   if (const auto child = parent.child(name.c_str())) {
-    return T(child, std::forward<decltype(xs)>(xs)...);
+    return T(child, scope);
   } else {
     /* ---- NOTE ---------------------------------------------------------------
      *
@@ -85,6 +86,28 @@ auto readElement(const std::string & name, const pugi::xml_node & parent, Ts &&.
      * ---------------------------------------------------------------------- */
     return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
       parent.name(), " requires class ", name, " as element, but there is no declaration"));
+  }
+}
+
+template <typename T, typename U, typename Scope>
+auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope, U && value)
+{
+  if constexpr (std::is_same<T, typename std::decay<U>::type>::value) {
+    // use 'value' as a default element.
+    // the default element will be used when current scope has no description about 'name'.
+    if (const auto child = parent.child(name.c_str())) {
+      return T(child, scope);
+    } else {
+      return value;
+    }
+  } else {
+    // use "value" as an additional arguments to the constructor
+    if (const auto child = parent.child(name.c_str())) {
+      return T(child, scope, value);
+    } else {
+      return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
+        parent.name(), " requires class ", name, " as element, but there is no declaration"));
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2019 Autoware Foundation. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+//
 // Authors: Ryohsuke Mitsudome
 
 #include <lanelet2_core/primitives/RegulatoryElement.h>
@@ -142,7 +142,7 @@ bool AutowareTrafficLight::removeLightBulbs(const LineStringOrPolygon3d & primit
 }
 
 #if __cplusplus < 201703L
-constexpr char AutowareTrafficLight::RuleName[];  // instanciate string in cpp file
+constexpr char AutowareTrafficLight::RuleName[];  // instantiate string in cpp file
 #endif
 
 }  // namespace autoware

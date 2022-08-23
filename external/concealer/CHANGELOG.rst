@@ -2,6 +2,114 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.5 (2022-06-16)
+------------------
+* Merge pull request `#813 <https://github.com/tier4/scenario_simulator_v2/issues/813>`_ from tier4/fix/boost_depend
+* add boost to the depends of concealer and interpreter
+* Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
+* Merge remote-tracking branch 'origin/master' into fix/build-error-humble
+* Merge pull request `#804 <https://github.com/tier4/scenario_simulator_v2/issues/804>`_ from tier4/feature/change_engage_api_name
+* Merge remote-tracking branch 'origin/master' into feature/change_engage_api_name
+* Update `AutowareUniverse::request##TYPE` to not to re-request service
+* fix concealer subscription macro
+* add compile definition for tf2 geometry msgs
+* fix(concealer): modify build error in humble
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_distance_to_lane_bound
+* Merge pull request `#796 <https://github.com/tier4/scenario_simulator_v2/issues/796>`_ from tier4/refactor/concealer/virtual-functions
+* Merge branch 'master' into feature/change_engage_api_name
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* Remove member function `API::engage` and `API::ready`
+* Remove some member functions for Autoware.Universe from API
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Merge branch 'master' into feature/occupancy_grid_sensor
+* Merge remote-tracking branch 'origin/master' into doc/arrange_docs_and_fix_copyright
+* Fix Licence
+* Add virtual function `getTurnIndicatorsCommand` to class `Autoware`
+* Add virtual function `getGearCommand` to class `Autoware`
+* Merge pull request `#750 <https://github.com/tier4/scenario_simulator_v2/issues/750>`_ from tier4/fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* Merge pull request `#792 <https://github.com/tier4/scenario_simulator_v2/issues/792>`_ from tier4/fix/autoware/reverse-gear
+* Fix Autoware.Universe to accept `GearCommand` correctly
+* feat(api): change set/engage to external api
+* remove unnecessary file
+* format
+* trivial fix
+* reformat
+* make AutowareUniverse's subscribers and get##TYPE() non-blocking
+* change the exit system of task_queue from future/promise to atomic bool
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into build/add_missing_depend
+* Rename type aliases to match .Universe typenames
+* Lipsticks
+* Fix `concealer::AutowareUniverse` to publish received `GearCommand` as `GearReport`
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* format
+* throw AutowareError from checkAutowareProcess
+* add autoware->rethrow() in EgoEntity::onUpdate()
+* Merge branch 'master' into feature/zmqpp_vendor
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge remote-tracking branch 'origin/master' into doc/improve
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge pull request `#777 <https://github.com/tier4/scenario_simulator_v2/issues/777>`_ from tier4/feature/indicator_condition
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Refactor
+* Rename **StateString to **StateName
+* Fix linter error
+* Implement TurnIndicatorsState as an UserDefinedValueCondition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Merge pull request `#760 <https://github.com/tier4/scenario_simulator_v2/issues/760>`_ from tier4/feature/emergency_state_for_fault_injection
+* Refactor
+* Add getEmergencyStateString function to EntityBase class
+* refactor
+* Use common::Error instead of SEMANTIC_ERROR
+* Refactor
+* Fix typo
+* Add emergency state subscription to concealer::AutowareUniverse
+* ament_clang_format
+* fix typo
+* check subprocess on the concealer::Autoware's thread
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* reformat
+* revise unnecessary change
+* fail if autoware_launch_file doesn't exist
+* Contributors: Adam Krawczyk, Daniel Marczak, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yuma Nihei, kyabe2718, wep21, yamacir-kit
+
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#728 <https://github.com/tier4/scenario_simulator_v2/issues/728>`_ from tier4/fix/interpreter/interrupt
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge pull request `#733 <https://github.com/tier4/scenario_simulator_v2/issues/733>`_ from tier4/feature/improve_ego_lane_matching
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* use dynamic_cast
+* fix virtual specifier
+* add getPath function
+* apply reformat
+* enable matching to on route lane
+* add getRouteLanelets function
+* fixes and cleanup
+* ugly but working
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* fixes and cleanup
+* ugly but working
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
 0.6.3 (2022-03-09)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset

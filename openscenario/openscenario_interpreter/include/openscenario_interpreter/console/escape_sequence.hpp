@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ auto & escape_sequence(std::basic_ostream<Ts...> & os, const std::string & code)
 }
 
 #define BOILERPLATE(CODE, NAME) \
-  auto NAME = [](std::ostream & os) -> decltype(auto) { return escape_sequence(os, CODE); }
+  inline auto NAME = [](std::ostream & os) -> decltype(auto) { return escape_sequence(os, CODE); }
 
 BOILERPLATE("[0m", reset);
 BOILERPLATE("[1m", bold);

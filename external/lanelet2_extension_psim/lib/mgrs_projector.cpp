@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2019 Autoware Foundation. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,11 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+//
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
+#include <iostream>
 #include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
-#include <rclcpp/rclcpp.hpp>
 #include <set>
 #include <string>
 #include <utility>
@@ -39,15 +39,16 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
 
   BasicPoint3d mgrs_point{0., 0., gps.ele};
   BasicPoint3d utm_point{0., 0., gps.ele};
-  int zone;
-  bool northp;
+  int zone{};
+  bool northp{};
   std::string mgrs_code;
 
   try {
     GeographicLib::UTMUPS::Forward(gps.lat, gps.lon, zone, northp, utm_point.x(), utm_point.y());
     GeographicLib::MGRS::Forward(
       zone, northp, utm_point.x(), utm_point.y(), gps.lat, precision, mgrs_code);
-  } catch (const GeographicLib::GeographicErr &) {
+  } catch (const GeographicLib::GeographicErr & err) {
+    std::cerr << err.what() << std::endl;
     return mgrs_point;
   }
 
@@ -57,11 +58,10 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
   projected_grid_ = mgrs_code;
 
   if (!prev_projected_grid.empty() && prev_projected_grid != projected_grid_) {
-    std::string message =
-      R"(Projected MGRS Grid changed from last projection.
-      Projected point might be far away from previously projected point.
-      You may want to use different projector.)";
-    throw lanelet::HdMapException(message);
+    std::cerr << "Projected MGRS Grid changed from last projection. Projected point"
+                 "might be far away from previously projected point."
+              << std::endl
+              << "You may want to use different projector.";
   }
 
   return mgrs_point;
@@ -76,10 +76,8 @@ GPSPoint MGRSProjector::reverse(const BasicPoint3d & mgrs_point) const
   } else if (!projected_grid_.empty()) {
     gps = reverse(mgrs_point, projected_grid_);
   } else {
-    std::string message =
-      R"(cannot run reverse operation if mgrs code is not set in projector.
-      Use setMGRSCode function or explicitly give mgrs code as an argument.)";
-    throw lanelet::HdMapException(message);
+    std::cerr << "cannot run reverse operation if mgrs code is not set in projector." << std::endl
+              << "use setMGRSCode function or explicitly give mgrs code as an argument.";
   }
   return gps;
 }
@@ -90,8 +88,9 @@ GPSPoint MGRSProjector::reverse(
   GPSPoint gps{0., 0., mgrs_point.z()};
   BasicPoint3d utm_point{0., 0., gps.ele};
 
-  int zone, prec;
-  bool northp;
+  int zone{};
+  int prec{};
+  bool northp{};
   try {
     GeographicLib::MGRS::Reverse(
       mgrs_code, zone, northp, utm_point.x(), utm_point.y(), prec, false);
@@ -99,9 +98,8 @@ GPSPoint MGRSProjector::reverse(
     utm_point.y() += fmod(mgrs_point.y(), pow(10, 5 - prec));
     GeographicLib::UTMUPS::Reverse(zone, northp, utm_point.x(), utm_point.y(), gps.lat, gps.lon);
   } catch (const GeographicLib::GeographicErr & err) {
-    std::string message =
-      "Failed to convert from MGRS to WGS " + static_cast<std::string>(err.what());
-    throw lanelet::HdMapException(message);
+    std::cerr << "Failed to convert from MGRS to WGS";
+    return gps;
   }
 
   return gps;
@@ -112,8 +110,8 @@ void MGRSProjector::setMGRSCode(const std::string & mgrs_code) { mgrs_code_ = mg
 void MGRSProjector::setMGRSCode(const GPSPoint & gps, const int precision)
 {
   BasicPoint3d utm_point{0., 0., gps.ele};
-  int zone;
-  bool northp;
+  int zone{};
+  bool northp{};
   std::string mgrs_code;
 
   try {
@@ -121,7 +119,7 @@ void MGRSProjector::setMGRSCode(const GPSPoint & gps, const int precision)
     GeographicLib::MGRS::Forward(
       zone, northp, utm_point.x(), utm_point.y(), gps.lat, precision, mgrs_code);
   } catch (const GeographicLib::GeographicErr & err) {
-    throw lanelet::HdMapException(err.what());
+    std::cerr << err.what() << std::endl;
   }
 
   setMGRSCode(mgrs_code);

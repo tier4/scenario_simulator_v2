@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ struct Expression  // NOTE: Member functions are lexicographically sorted.
 
   virtual auto evaluate(const Pointer<Expression> &) -> Pointer<Expression>
   {
-    throw SemanticError("No viable evaluation for class ", type().name());
+    throw SemanticError("No viable evaluation for class ", makeTypename(type()));
   }
 
   virtual auto type() const noexcept -> const std::type_info & { return typeid(Expression); }

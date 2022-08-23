@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateW
   }
   const auto ids = hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id);
   // DIFFERENT SPLINE - recalculation needed
-  traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ids));
+  math::geometry::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ids));
   double s_in_spline = 0;
   for (const auto id : ids) {
     if (id == entity_status.lanelet_pose.lanelet_id) {

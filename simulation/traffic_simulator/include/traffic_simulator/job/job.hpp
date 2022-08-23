@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ namespace job
 enum class Type {
   UNKOWN = 0,
   LINEAR_VELOCITY = 1,
+  LINEAR_ACCELERATION = 2,
 };
 
 enum class Status {

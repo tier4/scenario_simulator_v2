@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ void VehicleActionNode::getBlackBoardValues()
         "vehicle_parameters", vehicle_parameters)) {
     THROW_SIMULATION_ERROR("failed to get input vehicle_parameters in VehicleActionNode");
   }
-  if (!getInput<std::shared_ptr<traffic_simulator::math::CatmullRomSpline>>(
+  if (!getInput<std::shared_ptr<math::geometry::CatmullRomSpline>>(
         "reference_trajectory", reference_trajectory)) {
     THROW_SIMULATION_ERROR("failed to get input reference_trajectory in VehicleActionNode");
   }

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
@@ -33,14 +34,14 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalStateAction
+struct TrafficSignalStateAction : private SimulatorCore::CoordinateSystemConversion
 {
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  ID of a signal in a road network. The signal ID must be listed in the
    *  TrafficSignal list of the RoadNetwork.
    *
-   *  In the TierIV OpenSCENARIO implementation, it is the Lanelet ID (positive
+   *  In the TIER IV OpenSCENARIO implementation, it is the Lanelet ID (positive
    *  integer) of the traffic light.
    *
    * ------------------------------------------------------------------------ */

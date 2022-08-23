@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -253,9 +253,6 @@ TrafficLight::TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_
   if (not map_manager.isTrafficLight(id)) {
     throw common::scenario_simulator_exception::Error(
       "Given lanelet ID ", id, " is not a traffic light ID.");
-  } else if (map_manager.isTrafficRelation(id)) {
-    throw common::scenario_simulator_exception::Error(
-      "Given lanelet ID ", id, " is a traffic relation ID, not a traffic light ID.");
   }
 }
 

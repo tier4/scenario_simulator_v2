@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/functional/equal_to.hpp>
-#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
 
 namespace openscenario_interpreter
@@ -45,22 +45,19 @@ auto SpeedAction::accomplished() -> bool
   auto check = [this](auto && actor) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       return equal_to<double>()(
-        speed_action_target.as<AbsoluteTargetSpeed>().value,
-        getEntityStatus(actor).action_status.twist.linear.x);
+        speed_action_target.as<AbsoluteTargetSpeed>().value, evaluateSpeed(actor));
     } else {
       switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
         case SpeedTargetValueType::delta:
           return equal_to<double>()(
-            getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
-                .action_status.twist.linear.x +
+            evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
               speed_action_target.as<RelativeTargetSpeed>().value,
-            getEntityStatus(actor).action_status.twist.linear.x);
+            evaluateSpeed(actor));
         case SpeedTargetValueType::factor:
           return equal_to<double>()(
-            getEntityStatus(speed_action_target.as<RelativeTargetSpeed>().entity_ref)
-                .action_status.twist.linear.x *
+            evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
               speed_action_target.as<RelativeTargetSpeed>().value,
-            getEntityStatus(actor).action_status.twist.linear.x);
+            evaluateSpeed(actor));
         default:
           return false;
       }
@@ -98,13 +95,13 @@ auto SpeedAction::start() -> void
 
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      requestSpeedChange(
+      applySpeedAction(
         std::get<0>(each), speed_action_target.as<AbsoluteTargetSpeed>().value,
         static_cast<traffic_simulator::speed_change::Transition>(
           speed_action_dynamics.dynamics_shape),
         static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics), true);
     } else {
-      requestSpeedChange(
+      applySpeedAction(
         std::get<0>(each),
         static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
           speed_action_target.as<RelativeTargetSpeed>()),

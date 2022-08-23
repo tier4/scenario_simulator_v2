@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,13 +35,17 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Init
 {
-  const InitActions actions;
+  InitActions actions;
 
   explicit Init(const pugi::xml_node &, Scope &);
 
   auto endsImmediately() const -> bool;
 
-  auto evaluate() -> Object;
+  auto evaluateInstantaneousActions() -> Object;
+
+  auto runNonInstantaneousActions() -> void;
+
+  auto startNonInstantaneousActions() -> void;
 };
 
 auto operator<<(nlohmann::json &, const Init &) -> nlohmann::json &;

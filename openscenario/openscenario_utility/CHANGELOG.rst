@@ -2,6 +2,30 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.5 (2022-06-16)
+------------------
+* Merge branch 'master' into feature/change_engage_api_name
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Fix Licence
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Contributors: Daniel Marczak, Kotaro Yoshimoto, MasayaKataoka, Yuma Nihei, kyabe2718, yamacir-kit
+
+0.6.4 (2022-04-26)
+------------------
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' into AJD-331-optimization
+* Contributors: Daniel Marczak, MasayaKataoka, Wojciech Jaworski, danielm1405, yamacir-kit
+
 0.6.3 (2022-03-09)
 ------------------
 * Merge https://github.com/tier4/scenario_simulator_v2 into feature/waypoint_offset
@@ -76,7 +100,7 @@ Changelog for package openscenario_utility
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/autoware/upper-bound-velocity
 * Merge pull request `#553 <https://github.com/tier4/scenario_simulator_v2/issues/553>`_ from tier4/fix/interpreter/condition-edge
-* Add Tier IV extension `conditionEdge="sticky"` to `1.1.xsd`
+* Add TIER IV extension `conditionEdge="sticky"` to `1.1.xsd`
 * Contributors: Masaya Kataoka, yamacir-kit
 
 0.5.3 (2021-10-07)

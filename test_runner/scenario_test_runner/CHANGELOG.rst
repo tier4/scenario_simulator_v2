@@ -2,6 +2,86 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.5 (2022-06-16)
+------------------
+* Merge branch 'master' into feature/change_engage_api_name
+* Merge remote-tracking branch 'origin/master' into refactor/concealer/virtual-functions
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/occupancy_grid_sensor
+* Merge pull request `#791 <https://github.com/tier4/scenario_simulator_v2/issues/791>`_ from tier4/doc/arrange_docs_and_fix_copyright
+* Merge branch 'master' into feature/occupancy_grid_sensor
+* Merge remote-tracking branch 'origin/master' into doc/arrange_docs_and_fix_copyright
+* Fix Licence
+* Merge pull request `#750 <https://github.com/tier4/scenario_simulator_v2/issues/750>`_ from tier4/fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into fix/autoware/reverse-gear
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* Migrate README of scenario_test_runner to docs directory
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/missing_autoware_launch
+* Merge pull request `#758 <https://github.com/tier4/scenario_simulator_v2/issues/758>`_ from tier4/feature/interpreter/instantaneously-transition
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into build/add_missing_depend
+* Merge remote-tracking branch 'origin/master' into feature/allow_event_starttriger_ommision
+* LifycycleNode's timeout is the same as global_timeout
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' into feature/zmqpp_vendor
+* Merge pull request `#785 <https://github.com/tier4/scenario_simulator_v2/issues/785>`_ from tier4/doc/improve
+* Fix broken links
+* Fix old "TierIV" annotation
+* scenario_test_runner raises RuntimeError when openscenario_interpreter doesn't respond to a request
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/instantaneously-transition
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* Lipsticks
+* Merge branch 'master' into AJD-331-optimization-2nd-stage
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'master' into fix/interpreter/missing_autoware_launch
+* Merge branch 'tier4:master' into AJD-331-optimization-2nd-stage
+* fail if autoware_launch_file doesn't exist
+* Contributors: Adam Krawczyk, Daniel Marczak, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yuma Nihei, kyabe2718, yamacir-kit
+
+0.6.4 (2022-04-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge pull request `#740 <https://github.com/tier4/scenario_simulator_v2/issues/740>`_ from tier4/refactor/traffic_simulator/traffic_light_manager
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_acecel_in_request_speed_change
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/traffic_light_manager
+* Merge pull request `#728 <https://github.com/tier4/scenario_simulator_v2/issues/728>`_ from tier4/fix/interpreter/interrupt
+* Remove enumeration `TrafficLightColor::NONE`
+* Merge branch 'tier4:master' into feature/awf_universe_instruction
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'tier4:master' into AJD-331-make-zmq-client-work-through-network
+* on_exit=Shutdown()
+* reuse executor
+* remove on_exit=Shtudown()
+* extend sigterm_timeout
+* shutdown_flag -> is_running
+* Merge branch 'master' into fix/interpreter/interrupt
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/improve_ego_lane_matching
+* Merge pull request `#734 <https://github.com/tier4/scenario_simulator_v2/issues/734>`_ from tier4/fix/interpreter/global-action
+* Remove unnecessary prints from the interpreter and simulator
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Merge pull request `#727 <https://github.com/tier4/scenario_simulator_v2/issues/727>`_ from tier4/feature/interpreter/reader
+* Add new example node `uniform_distribution`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/ignore_raycast_result
+* Add new experimental substitution `$(ros2 ...)`
+* add disconect() to ~Interpreter(). stop zeromq call if shut down.
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/semantics
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into doc/release_note_format
+* Merge pull request `#720 <https://github.com/tier4/scenario_simulator_v2/issues/720>`_ from tier4/refactor/interpreter/execution
+* Merge branch 'tier4:master' into AJD-345-random_test_runner_with_autoware_universe
+* Update some sample scenarios to ommit optional element `TrafficSignals`
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/storyboard-element
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/waypoint_height
+* Merge branch 'tier4:master' into AJD-331-optimization
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Merge branch 'master' into AJD-345-random_test_runner_with_autoware_universe
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, kyabe2718, yamacir-kit
+
 0.6.3 (2022-03-09)
 ------------------
 * Merge pull request `#717 <https://github.com/tier4/scenario_simulator_v2/issues/717>`_ from tier4/improvement/sample-scenario

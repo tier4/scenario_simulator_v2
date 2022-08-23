@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,15 +41,15 @@ RelativeWorldPosition::operator geometry_msgs::msg::Point() const
   return result;
 }
 
-RelativeWorldPosition::operator geometry_msgs::msg::Pose() const
-{
-  throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, geometry_msgs::msg::Pose);
-}
-
-RelativeWorldPosition::operator traffic_simulator_msgs::msg::LaneletPose() const
+RelativeWorldPosition::operator NativeLanePosition() const
 {
   throw UNSUPPORTED_CONVERSION_DETECTED(
     RelativeWorldPosition, traffic_simulator_msgs::msg::LaneletPose);
+}
+
+RelativeWorldPosition::operator NativeWorldPosition() const
+{
+  throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, geometry_msgs::msg::Pose);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

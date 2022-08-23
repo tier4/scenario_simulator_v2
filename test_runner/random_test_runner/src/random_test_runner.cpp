@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// Co-developed by Tier IV, Inc. and Robotec.AI sp. z o.o.
+// Co-developed by TIER IV, Inc. and Robotec.AI sp. z o.o.
 
 #include "random_test_runner/random_test_runner.hpp"
 
@@ -95,7 +95,8 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
         get_logger(), validated_params, test_case_parameters_vector[test_id], lanelet_utils)
         .generate(),
       error_reporter_.spawnTestCase(validated_params.name, std::to_string(test_id)),
-      test_control_parameters.simulator_type, get_logger());
+      test_control_parameters.simulator_type, test_control_parameters.architecture_type,
+      get_logger());
     yaml_test_params_saver.addTestCase(test_case_parameters_vector[test_id], validated_params.name);
   }
 
@@ -140,6 +141,8 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
   tp.test_count = this->declare_parameter<int>("test_count", 5);
   tp.simulator_type = simulatorTypeFromString(
     this->declare_parameter<std::string>("simulator_type", "simple_sensor_simulator"));
+  tp.architecture_type =
+    architectureTypeFromString(this->declare_parameter<std::string>("architecture_type", ""));
   tp.simulator_host = this->declare_parameter<std::string>("simulator_host", "localhost");
 
   if (!tp.input_dir.empty() && !boost::filesystem::is_directory(tp.input_dir)) {
@@ -153,17 +156,6 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
   }
 
   return tp;
-}
-
-SimulatorType RandomTestRunner::simulatorTypeFromString(const std::string & simulator_type_str)
-{
-  if (simulator_type_str == "simple_sensor_simulator") {
-    return SimulatorType::SIMPLE_SENSOR_SIMULATOR;
-  } else if (simulator_type_str == "unity") {
-    return SimulatorType::UNITY;
-  }
-  throw std::runtime_error(
-    fmt::format("Failed to convert {} to simulation type", simulator_type_str));
 }
 
 TestSuiteParameters RandomTestRunner::validateParameters(

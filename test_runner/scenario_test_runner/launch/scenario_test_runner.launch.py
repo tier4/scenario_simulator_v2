@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2020 Tier IV, Inc. All rights reserved.
+# Copyright 2020 TIER IV, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,11 +68,12 @@ def launch_setup(context, *args, **kwargs):
     output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
     port                    = LaunchConfiguration("port",                    default=8080)
     record                  = LaunchConfiguration("record",                  default=True)
+    rviz_config             = LaunchConfiguration("rviz_config",             default="")
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
+    sigterm_timeout         = LaunchConfiguration("sigterm_timeout",         default=8)
     vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
     workflow                = LaunchConfiguration("workflow",                default=Path("/dev/null"))
-    sigterm_timeout         = LaunchConfiguration("sigterm_timeout",         default=8)
     # fmt: on
 
     print(f"architecture_type       := {architecture_type.perform(context)}")
@@ -87,11 +88,12 @@ def launch_setup(context, *args, **kwargs):
     print(f"output_directory        := {output_directory.perform(context)}")
     print(f"port                    := {port.perform(context)}")
     print(f"record                  := {record.perform(context)}")
+    print(f"rviz_config             := {rviz_config.perform(context)}")
     print(f"scenario                := {scenario.perform(context)}")
     print(f"sensor_model            := {sensor_model.perform(context)}")
+    print(f"sigterm_timeout         := {sigterm_timeout.perform(context)}")
     print(f"vehicle_model           := {vehicle_model.perform(context)}")
     print(f"workflow                := {workflow.perform(context)}")
-    print(f"sigterm_timeout         := {sigterm_timeout.perform(context)}")
 
     def make_parameters():
         parameters = [
@@ -102,6 +104,7 @@ def launch_setup(context, *args, **kwargs):
             {"launch_autoware": launch_autoware},
             {"port": port},
             {"record": record},
+            {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
             {"vehicle_model": vehicle_model},
         ]
@@ -128,11 +131,12 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("launch_autoware",         default_value=launch_autoware        ),
         DeclareLaunchArgument("launch_rviz",             default_value=launch_rviz            ),
         DeclareLaunchArgument("output_directory",        default_value=output_directory       ),
+        DeclareLaunchArgument("rviz_config",             default_value=rviz_config            ),
         DeclareLaunchArgument("scenario",                default_value=scenario               ),
         DeclareLaunchArgument("sensor_model",            default_value=sensor_model           ),
+        DeclareLaunchArgument("sigterm_timeout",         default_value=sigterm_timeout        ),
         DeclareLaunchArgument("vehicle_model",           default_value=vehicle_model          ),
         DeclareLaunchArgument("workflow",                default_value=workflow               ),
-        DeclareLaunchArgument("sigterm_timeout",         default_value=sigterm_timeout        ),
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -167,6 +171,7 @@ def launch_setup(context, *args, **kwargs):
             name="openscenario_interpreter",
             output="screen",
             parameters=make_parameters(),
+            # on_exit=Shutdown(),
         ),
         Node(
             package="openscenario_visualization",
@@ -184,7 +189,6 @@ def launch_setup(context, *args, **kwargs):
             arguments=[
                 "-d",
                 str(
-                    # Path(get_package_share_directory("scenario_test_runner"))
                     Path(get_package_share_directory("traffic_simulator"))
                     / "config/scenario_simulator_v2.rviz"
                 ),

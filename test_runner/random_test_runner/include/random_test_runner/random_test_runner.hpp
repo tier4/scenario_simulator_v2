@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// Co-developed by Tier IV, Inc. and Robotec.AI sp. z o.o.
+// Co-developed by TIER IV, Inc. and Robotec.AI sp. z o.o.
 
 #ifndef RANDOM_TEST_RUNNER__RANDOM_TEST_RUNNER_HPP
 #define RANDOM_TEST_RUNNER__RANDOM_TEST_RUNNER_HPP
@@ -43,7 +43,6 @@ private:
 
   static TestSuiteParameters validateParameters(
     const TestSuiteParameters & test_parameters, std::shared_ptr<LaneletUtils> hdmap_utils);
-  static SimulatorType simulatorTypeFromString(const std::string & simulator_type_str);
 
   void update();
   void start();

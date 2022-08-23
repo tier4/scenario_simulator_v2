@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/error.hpp>
-#include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/syntax/parameter_condition.hpp>
+#include <openscenario_interpreter/functional/curry.hpp>
+#include <openscenario_interpreter/regex/function_call_expression.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/lane_position.hpp>        // for RelativeHeadingCondition
+#include <openscenario_interpreter/syntax/parameter_condition.hpp>  // for ParameterCondition::compare
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
 #include <regex>
+#include <unordered_map>
 
 namespace openscenario_interpreter
 {
@@ -71,12 +76,37 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
 {
   std::smatch result;
 
-  if (std::regex_match(name, result, std::regex(R"(([^\.]+)\.(.+))"))) {
+  if (std::regex_match(name, result, std::regex(R"(([^.]+)\.(.+))"))) {
     const std::unordered_map<std::string, std::function<Object()>> dispatch{
       std::make_pair(
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
+      std::make_pair(
+        "currentEmergencyState",
+        [result]() {
+          return make<String>(
+            boost::lexical_cast<String>(asAutoware(result.str(1)).getEmergencyState()));
+        }),
+      std::make_pair(
+        "currentTurnIndicatorsState",
+        [result]() {
+          return make<String>(
+            boost::lexical_cast<String>(asAutoware(result.str(1)).getTurnIndicatorsCommand()));
+        }),
     };
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
+  } else if (std::regex_match(name, result, FunctionCallExpression::pattern())) {
+    const std::unordered_map<std::string, std::function<Object(const std::vector<std::string> &)>>
+      functions{
+        std::make_pair(
+          "RelativeHeadingCondition",
+          [this, result](const auto & xs) {
+            // RelativeHeadingCondition(<ENTITY-REF>, <LANE-ID>, <S>)
+            return make<Double>(evaluateRelativeHeading(
+              xs[0], LanePosition("", xs[1], 0, boost::lexical_cast<Double>(xs[2]))));
+          }),
+      };
+    evaluateValue =
+      curry2(functions.at(result.str(1)))(FunctionCallExpression::splitParameters(result.str(3)));
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
     evaluateValue =
       [&, result,
