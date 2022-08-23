@@ -92,12 +92,16 @@ CatalogReference::CatalogReference(const pugi::xml_node & node, Scope & scope)
     }
   }
 }
+template <typename T>
+auto CatalogReference::make(const pugi::xml_node & node) -> Object
+{
+  return openscenario_interpreter::make<T>(node, scope);
+}
 }  // namespace syntax
 
-auto makeFromCatalogReference(const pugi::xml_node & node, Scope & scope_) -> const Object
+auto makeFromCatalogReference(const pugi::xml_node & node, Scope & scope) -> const Object
 {
-  CatalogReference catalog(node, scope_);
-  auto scope = Scope("", catalog.scope);  // anonymous namespace
+  CatalogReference catalog(node, scope);
 
   if (catalog.scope_by_catalog) {
     using ::openscenario_interpreter::make;

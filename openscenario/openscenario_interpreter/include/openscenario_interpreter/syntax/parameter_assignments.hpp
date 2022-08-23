@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ASSIGNMENTS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_ASSIGNMENTS_HPP_
 
-#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_assignment.hpp>
 #include <pugixml.hpp>
 

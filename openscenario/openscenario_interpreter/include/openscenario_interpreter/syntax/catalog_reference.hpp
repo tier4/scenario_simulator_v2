@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 
+#include <boost/filesystem.hpp>
 #include <openscenario_interpreter/functional/fold.hpp>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
@@ -23,9 +24,6 @@
 #include <openscenario_interpreter/syntax/directory.hpp>
 #include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
-
-#include <boost/filesystem.hpp>
-
 #include <optional>
 
 namespace openscenario_interpreter
@@ -43,23 +41,19 @@ inline namespace syntax
  *  </xsd:complexType>
  * -------------------------------------------------------------------------- */
 
-class CatalogReference
+struct CatalogReference
 {
-public:
   CatalogReference(const pugi::xml_node & node, Scope & scope);
 
-  Scope scope;  // anonymous namespace
+  template <typename T>
+  auto make(const pugi::xml_node & node_) -> Object;
+
+  Scope scope;
   const pugi::xml_node node;
   const std::string catalog_name;
   const std::string entry_name;
   ParameterAssignments parameter_assignments;
   std::optional<pugi::xml_node> scope_by_catalog = std::nullopt;
-
-  template <typename T>
-  auto make(const pugi::xml_node & node_) -> Object
-  {
-    return openscenario_interpreter::make<T>(node_, scope);
-  }
 };
 
 }  // namespace syntax

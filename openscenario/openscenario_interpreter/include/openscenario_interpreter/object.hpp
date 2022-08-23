@@ -15,10 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 
+#include <list>
 #include <openscenario_interpreter/expression.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
-
-#include <list>
 #include <typeindex>
 #include <utility>
 
