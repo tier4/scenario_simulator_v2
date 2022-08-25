@@ -57,12 +57,6 @@ public:
    */
   void reset(const geometry_msgs::msg::Pose & origin);
 
-  /**
-   * @brief Update origin
-   * @note This function also clear internal states
-   */
-  void updateOrigin(const geometry_msgs::msg::Pose & origin);
-
 private:
   /**
    * @brief origin
