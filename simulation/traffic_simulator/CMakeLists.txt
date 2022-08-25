@@ -39,13 +39,11 @@ ament_auto_add_library(traffic_simulator SHARED
   src/helper/helper.cpp
   src/job/job_list.cpp
   src/job/job.cpp
-  src/metrics/collision_metric.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp
   src/metrics/momentary_stop_metric.cpp
   src/metrics/out_of_range_metric.cpp
   src/metrics/reaction_time_metric.cpp
-  src/metrics/standstill_metric.cpp
   src/metrics/traveled_distance_metric.cpp
   src/simulation_clock/simulation_clock.cpp
   src/traffic_lights/traffic_light_manager.cpp
