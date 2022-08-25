@@ -33,8 +33,6 @@ Grid::Grid(
 {
 }
 
-double Grid::getDiagonalLength() const { return std::hypot(width, height) * resolution; }
-
 geometry_msgs::msg::Point Grid::transformToGrid(const geometry_msgs::msg::Point & world_point) const
 {
   auto conj = quaternion_operation::conjugate(origin_.orientation);
@@ -81,53 +79,10 @@ math::geometry::LineSegment Grid::transformToPixel(const math::geometry::LineSeg
     transformToPixel(line.start_point), transformToPixel(line.end_point));
 }
 
-math::geometry::LineSegment Grid::getInvisibleRay(
-  const geometry_msgs::msg::Point & point_on_polygon) const
+void Grid::fillByIntersection(
+  const math::geometry::LineSegment & line_segment, int8_t data,
+  std::vector<std::pair<size_t, size_t>> & ret)
 {
-  return math::geometry::LineSegment(
-    point_on_polygon, math::geometry::LineSegment(origin_.position, point_on_polygon).get2DVector(),
-    getDiagonalLength());
-}
-
-std::vector<math::geometry::LineSegment> Grid::getInvisibleRay(
-  const std::vector<geometry_msgs::msg::Point> & points) const
-{
-  std::vector<math::geometry::LineSegment> ret = {};
-  for (const auto & point : points) {
-    ret.emplace_back(getInvisibleRay(point));
-  }
-  return ret;
-}
-
-std::vector<math::geometry::LineSegment> Grid::getRayToGridCorner() const
-{
-  geometry_msgs::msg::Point left_up;
-  left_up.x = static_cast<double>(width) * resolution * 0.5;
-  left_up.y = static_cast<double>(height) * resolution * 0.5;
-  left_up = transformToWorld(left_up);
-  geometry_msgs::msg::Point left_down;
-  left_down.x = static_cast<double>(width) * resolution * 0.5;
-  left_down.y = -static_cast<double>(height) * resolution * 0.5;
-  left_down = transformToWorld(left_down);
-  geometry_msgs::msg::Point right_up;
-  right_up.x = -static_cast<double>(width) * resolution * 0.5;
-  right_up.y = static_cast<double>(height) * resolution * 0.5;
-  right_up = transformToWorld(right_up);
-  geometry_msgs::msg::Point right_down;
-  right_down.x = -static_cast<double>(width) * resolution * 0.5;
-  right_down.y = -static_cast<double>(height) * resolution * 0.5;
-  right_down = transformToWorld(right_down);
-  return {
-    math::geometry::LineSegment(origin_.position, left_up),
-    math::geometry::LineSegment(origin_.position, left_down),
-    math::geometry::LineSegment(origin_.position, right_down),
-    math::geometry::LineSegment(origin_.position, right_up)};
-}
-
-std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
-  const math::geometry::LineSegment & line_segment, int8_t data)
-{
-  std::vector<std::pair<size_t, size_t>> ret;
   const auto line_segment_pixel = transformToPixel(transformToGrid(line_segment));
   int start_row = std::floor(line_segment_pixel.start_point.x);
   int start_col = std::floor(line_segment_pixel.start_point.y);
@@ -139,8 +94,6 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
         ret.emplace_back(start_row, col);
       }
     }
-    sortAndUnique(ret);
-    return ret;
   }
   if (start_col == end_col) {
     for (int row = start_row; row <= end_row; row++) {
@@ -148,8 +101,6 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
         ret.emplace_back(row, start_col);
       }
     }
-    sortAndUnique(ret);
-    return ret;
   }
   for (int row = std::min(start_row, end_row) + 1; row < std::max(start_row, end_row) + 1; row++) {
     if (0 <= row && row < static_cast<int>(width)) {
@@ -185,22 +136,9 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
       }
     }
   }
-  sortAndUnique(ret);
-  return ret;
 }
 
-std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
-  const std::vector<math::geometry::LineSegment> & line_segments, int8_t data)
-{
-  std::vector<std::pair<size_t, size_t>> filled_cells = {};
-  for (const auto & line : line_segments) {
-    append(filled_cells, fillByIntersection(line, data));
-  }
-  return filled_cells;
-}
-
-void Grid::fillInside(
-  const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data)
+void Grid::fillInside(const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data)
 {
   auto group_by_row = std::vector<std::vector<size_t>>(height);
   for (const auto [row, col] : row_and_cols) {
@@ -232,26 +170,60 @@ void Grid::fillInside(
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
   const auto hull = primitive->get2DConvexHull();
-  const auto line_segments_on_hull = math::geometry::getLineSegments(hull);
-  auto rays_to_grid_corner = std::vector<math::geometry::LineSegment>();
-  for (const auto & ray : getRayToGridCorner()) {
-    for (const auto & line_segment : line_segments_on_hull) {
-      if (const auto intersection = ray.getIntersection2D(line_segment)) {
-        rays_to_grid_corner.emplace_back(
-          math::geometry::LineSegment(intersection.get(), ray.get2DVector(), getDiagonalLength()));
+  const auto occupied_edges = math::geometry::getLineSegments(hull);
+
+  auto invisible_edges = occupied_edges;
+  {
+    auto corners = std::vector<geometry_msgs::msg::Point>(4);
+    {
+      // enumerate normalized corner coordinates
+      corners[0].x = 0.5, corners[0].y = 0.5;
+      corners[1].x = -0.5, corners[1].y = 0.5;
+      corners[2].x = 0.5, corners[2].y = -0.5;
+      corners[3].x = -0.5, corners[3].y = -0.5;
+
+      // scale corner coordinates
+      for (auto & corner : corners) {
+        corner.x *= static_cast<double>(width) * resolution;
+        corner.y *= static_cast<double>(height) * resolution;
       }
+    }
+
+    auto diagonal_length = std::hypot(width, height) * resolution;
+
+    // add rays through grid corners
+    for (const auto & corner : corners) {
+      auto ray = math::geometry::LineSegment(origin_.position, corner);
+      for (const auto & line_segment : occupied_edges) {
+        if (const auto intersection = ray.getIntersection2D(line_segment)) {
+          invisible_edges.emplace_back(intersection.get(), ray.get2DVector(), diagonal_length);
+        }
+      }
+    }
+    // add rays through hull points
+    for (const auto & point : hull) {
+      auto v = math::geometry::LineSegment(origin_.position, point).get2DVector();
+      invisible_edges.emplace_back(point, v, diagonal_length);
     }
   }
 
-  auto invisible_edges = std::vector<math::geometry::LineSegment>();
-  append(invisible_edges, line_segments_on_hull);
-  append(invisible_edges, getInvisibleRay(hull));
-  append(invisible_edges, rays_to_grid_corner);
-  auto invisible_edge_cells = fillByIntersection(invisible_edges, invisible_cost);
-  fillInside(invisible_edge_cells, invisible_cost);
+  // fill invisible area
+  {
+    auto invisible_edge_cells = std::vector<std::pair<size_t, size_t>>();
+    for (const auto & edge : invisible_edges) {
+      fillByIntersection(edge, invisible_cost, invisible_edge_cells);
+    }
+    fillInside(invisible_edge_cells, invisible_cost);
+  }
 
-  auto occupied_edge_cells = fillByIntersection(line_segments_on_hull, occupied_cost);
-  fillInside(occupied_edge_cells, occupied_cost);
+  // fill occupied area
+  {
+    auto occupied_edge_cells = std::vector<std::pair<size_t, size_t>>();
+    for (const auto & edge : occupied_edges) {
+      fillByIntersection(edge, occupied_cost, occupied_edge_cells);
+    }
+    fillInside(occupied_edge_cells, occupied_cost);
+  }
 }
 
 const std::vector<int8_t> & Grid::getData() { return values_; }

@@ -78,17 +78,11 @@ private:
 
   /**
    * @brief Update value of cells intersect with `line_segment` to `data`
-   * @return Vector of affected cell coordinates
+   * @param [out] ret coordinates of filled cells
    */
-  std::vector<std::pair<size_t, size_t>> fillByIntersection(
-    const math::geometry::LineSegment & line_segment, int8_t data);
-
-  /**
-   * @brief Update value of cells intersect with `line_segments` to `data`
-   * @return Vector of affected cell coordinates
-   */
-  std::vector<std::pair<size_t, size_t>> fillByIntersection(
-    const std::vector<math::geometry::LineSegment> & line_segments, int8_t data);
+  void fillByIntersection(
+    const math::geometry::LineSegment & line_segment, int8_t data,
+    std::vector<std::pair<size_t, size_t>> & ret);
 
   /**
    * @brief Update value of cells surrounded by `row_and_cols` to `data`
@@ -124,50 +118,6 @@ private:
    * @return Digitized line segment
    */
   math::geometry::LineSegment transformToPixel(const math::geometry::LineSegment & line) const;
-
-  /**
-   * @brief Get pseudo half-open line segment through `point_on_polygon` from origin
-   * @return Pseudo half-open line segment through `point_on_polygon` from origin
-   */
-  math::geometry::LineSegment getInvisibleRay(
-    const geometry_msgs::msg::Point & point_on_polygon) const;
-
-  /**
-   * @brief Get pseudo half-open line segments through grid corners from origin
-   * @return Pseudo half-open line segments through grid corners from origin
-   */
-  std::vector<math::geometry::LineSegment> getRayToGridCorner() const;
-
-  /**
-   * @brief Get pseudo half-open line segments through `points` from origin
-   * @return Pseudo half-open line segment through `points` from origin
-   */
-  std::vector<math::geometry::LineSegment> getInvisibleRay(
-    const std::vector<geometry_msgs::msg::Point> & points) const;
-
-  /**
-   * @brief Get length of grid diagonal
-   */
-  double getDiagonalLength() const;
-
-  template <typename T>
-  void sortAndUnique(std::vector<T> & data) const
-  {
-    std::sort(data.begin(), data.end());
-    data.erase(std::unique(data.begin(), data.end()), data.end());
-  }
-  template <typename T>
-  void append(std::vector<T> & v0, const std::vector<T> & v1) const
-  {
-    v0.insert(v0.end(), v1.begin(), v1.end());
-  }
-  template <typename T>
-  std::vector<T> concat(const std::vector<T> & v0, const std::vector<T> & v1) const
-  {
-    std::vector<T> ret = v0;
-    ret.insert(ret.end(), v1.begin(), v1.end());
-    return ret;
-  }
 };
 }  // namespace simple_sensor_simulator
 
