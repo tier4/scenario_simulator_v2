@@ -202,8 +202,8 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
     }
     // add rays through hull points
     for (const auto & point : hull) {
-      auto v = math::geometry::LineSegment(origin_.position, point).get2DVector();
-      invisible_edges.emplace_back(point, v, diagonal_length);
+      auto ray = math::geometry::LineSegment(origin_.position, point);
+      invisible_edges.emplace_back(point, ray.get2DVector(), diagonal_length);
     }
   }
 
