@@ -30,7 +30,8 @@ Grid::Grid(
   occupied_cost(occupied_cost),
   invisible_cost(invisible_cost),
   values_(height * width)
-{ }
+{
+}
 
 double Grid::getDiagonalLength() const { return std::hypot(width, height) * resolution; }
 
@@ -269,10 +270,7 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
   fillInside(fillByIntersection(line_segments_on_hull, occupied_cost), occupied_cost);
 }
 
-const std::vector<int8_t> &Grid::getData()
-{
-  return values_;
-}
+const std::vector<int8_t> & Grid::getData() { return values_; }
 
 bool Grid::fillByIndex(size_t index, int8_t data)
 {
@@ -312,7 +310,7 @@ void Grid::fillByCol(size_t col, int8_t data)
   }
 }
 
-void Grid::updateOrigin(const geometry_msgs::msg::Pose & origin)
+void Grid::reset(const geometry_msgs::msg::Pose & origin)
 {
   origin_ = origin;
   values_.assign(values_.size(), 0);

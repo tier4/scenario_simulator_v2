@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include "simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp"
+
 namespace simple_sensor_simulator
 {
 class OccupancyGridSensorBase
@@ -68,7 +70,9 @@ public:
     const double current_time,
     const simulation_api_schema::OccupancyGridSensorConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
-  : OccupancyGridSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr)
+  : OccupancyGridSensorBase(current_time, configuration),
+    publisher_ptr_(publisher_ptr),
+    grid_(configuration.resolution(), configuration.height(), configuration.width())
   {
   }
 
@@ -84,6 +88,9 @@ public:
       detected_objects_ = {};
     }
   }
+
+private:
+  mutable Grid grid_;
 };
 
 template <>

@@ -37,8 +37,8 @@ public:
   const int8_t occupied_cost;
   const int8_t invisible_cost;
   void addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive);
-  const std::vector<int8_t> &getData();
-  void updateOrigin(const geometry_msgs::msg::Pose & origin);
+  const std::vector<int8_t> & getData();
+  void reset(const geometry_msgs::msg::Pose & origin);
 
 private:
   geometry_msgs::msg::Pose origin_;
