@@ -45,21 +45,20 @@ struct CatalogReference
 {
   CatalogReference(const pugi::xml_node & node, Scope & scope);
 
-  template <typename T>
-  auto make(const pugi::xml_node & node_) -> Object;
+  auto make(const pugi::xml_node & node) -> const Object;
 
   Scope scope;
-  const pugi::xml_node node;
+
   const std::string catalog_name;
+
   const std::string entry_name;
+
   ParameterAssignments parameter_assignments;
-  std::optional<pugi::xml_node> scope_by_catalog = std::nullopt;
+
+  pugi::xml_node catalog_node;
 };
 
 }  // namespace syntax
-
-auto makeFromCatalogReference(const pugi::xml_node &, Scope &) -> const Object;
-
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
