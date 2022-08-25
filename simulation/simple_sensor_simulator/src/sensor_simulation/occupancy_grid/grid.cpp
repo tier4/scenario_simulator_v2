@@ -37,20 +37,14 @@ double Grid::getDiagonalLength() const { return std::hypot(width, height) * reso
 
 geometry_msgs::msg::Point Grid::transformToGrid(const geometry_msgs::msg::Point & world_point) const
 {
-  auto mat =
-    quaternion_operation::getRotationMatrix(quaternion_operation::conjugate(origin_.orientation));
-  Eigen::VectorXd p(3);
-  p(0) = world_point.x;
-  p(1) = world_point.y;
-  p(2) = world_point.z;
-  p = mat * p;
-  p(0) = p(0) - origin_.position.x;
-  p(1) = p(1) - origin_.position.y;
-  p(2) = p(2) - origin_.position.z;
+  auto conj = quaternion_operation::conjugate(origin_.orientation);
+  auto rot = quaternion_operation::getRotationMatrix(conj);
+  auto p = Eigen::Vector3d(world_point.x, world_point.y, world_point.z);
+  auto q = Eigen::Vector3d(origin_.position.x, origin_.position.y, origin_.position.z);
+  p = rot * p - q;
+
   geometry_msgs::msg::Point ret;
-  ret.x = p(0);
-  ret.y = p(1);
-  ret.z = p(2);
+  ret.x = p(0), ret.y = p(1), ret.z = p(2);
   return ret;
 }
 
@@ -62,19 +56,13 @@ math::geometry::LineSegment Grid::transformToGrid(const math::geometry::LineSegm
 
 geometry_msgs::msg::Point Grid::transformToWorld(const geometry_msgs::msg::Point & grid_point) const
 {
-  auto mat = quaternion_operation::getRotationMatrix(origin_.orientation);
-  Eigen::VectorXd p(3);
-  p(0) = grid_point.x;
-  p(1) = grid_point.y;
-  p(2) = grid_point.z;
-  p = mat * p;
-  p(0) = p(0) + origin_.position.x;
-  p(1) = p(1) + origin_.position.y;
-  p(2) = p(2) + origin_.position.z;
+  auto rot = quaternion_operation::getRotationMatrix(origin_.orientation);
+  auto p = Eigen::Vector3d(grid_point.x, grid_point.y, grid_point.z);
+  auto q = Eigen::Vector3d(origin_.position.x, origin_.position.y, origin_.position.z);
+  p = rot * p + q;
+
   geometry_msgs::msg::Point ret;
-  ret.x = p(0);
-  ret.y = p(1);
-  ret.z = p(2);
+  ret.x = p(0), ret.y = p(1), ret.z = p(2);
   return ret;
 }
 
