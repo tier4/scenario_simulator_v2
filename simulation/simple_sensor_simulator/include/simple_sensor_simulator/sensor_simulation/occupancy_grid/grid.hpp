@@ -49,7 +49,7 @@ public:
    * @brief Get all cell values
    * @return cell values
    */
-  const std::vector<int8_t> &getData();
+  const std::vector<int8_t> & getData();
 
   /**
    * @brief Reset origin and all cell values
