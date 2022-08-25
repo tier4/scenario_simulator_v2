@@ -49,7 +49,7 @@ public:
    * @brief Get all cell values
    * @return cell values
    */
-  const std::vector<int8_t> &getData();
+  const std::vector<int8_t> & getData();
 
   /**
    * @brief Reset origin and all cell values
@@ -69,22 +69,6 @@ private:
    * @note Grid access this 1d vector by calculating an index from a 2d grid coordinate
    */
   std::vector<int8_t> values_;
-
-  /**
-   * @brief Update cell value if index is in range
-   * @return true if cell value is updated otherwise false
-   */
-  bool fillByIndex(size_t index, int8_t data);
-
-  /**
-   * @brief Update values of cells in `row` to `data`
-   */
-  void fillByRow(size_t row, int8_t data);
-
-  /**
-   * @brief Update values of cells in `col` to `data`
-   */
-  void fillByCol(size_t col, int8_t data);
 
   /**
    * @brief Update value of cell locate at (`row`, `col`) to `data`
@@ -108,16 +92,8 @@ private:
 
   /**
    * @brief Update value of cells surrounded by `row_and_cols` to `data`
-   * @return Vector of affected cell coordinates
    */
-  std::vector<std::pair<size_t, size_t>> fillInside(
-    const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data);
-
-  /**
-   * @brief Calculate index of coordinate
-   * @return Index
-   */
-  size_t getIndex(size_t row, size_t col) const;
+  void fillInside(const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data);
 
   /**
    * @brief Convert point in grid coordinate to point in world cooridnate

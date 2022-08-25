@@ -136,8 +136,6 @@ std::vector<math::geometry::LineSegment> Grid::getRayToGridCorner() const
     math::geometry::LineSegment(origin_.position, right_up)};
 }
 
-size_t Grid::getIndex(size_t row, size_t col) const { return width * col + row; }
-
 std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
   const math::geometry::LineSegment & line_segment, int8_t data)
 {
@@ -213,40 +211,34 @@ std::vector<std::pair<size_t, size_t>> Grid::fillByIntersection(
   return filled_cells;
 }
 
-std::vector<std::pair<size_t, size_t>> Grid::fillInside(
+void Grid::fillInside(
   const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data)
 {
-  auto ret = std::vector<std::pair<size_t, size_t>>();
-
-  auto group_by_row = std::map<size_t, std::vector<size_t>>();
+  auto group_by_row = std::vector<std::vector<size_t>>(height);
   for (const auto [row, col] : row_and_cols) {
     group_by_row[row].emplace_back(col);
   }
-  for (const auto & [row, cols] : group_by_row) {
-    if (cols.size() <= 1) continue;
-    auto [min_col_itr, max_col_itr] = std::minmax_element(cols.begin(), cols.end());
-    for (auto col = *min_col_itr; col <= *max_col_itr; col++) {
-      if (fillByRowCol(row, col, data)) {
-        ret.emplace_back(row, col);
+  for (size_t row = 0; row < height; ++row) {
+    if (const auto & cols = group_by_row[row]; cols.size() > 1) {
+      auto [min_col_itr, max_col_itr] = std::minmax_element(cols.begin(), cols.end());
+      for (auto col = *min_col_itr; col <= *max_col_itr; ++col) {
+        fillByRowCol(row, col, data);
       }
     }
   }
 
-  auto group_by_col = std::map<size_t, std::vector<size_t>>();
+  auto group_by_col = std::vector<std::vector<size_t>>(width);
   for (const auto [row, col] : row_and_cols) {
     group_by_col[col].emplace_back(row);
   }
-  for (const auto & [col, rows] : group_by_col) {
-    if (rows.size() <= 1) continue;
-    auto [min_row_itr, max_row_itr] = std::minmax_element(rows.begin(), rows.end());
-    for (auto row = *min_row_itr; row <= *max_row_itr; row++) {
-      if (fillByRowCol(row, col, data)) {
-        ret.emplace_back(row, col);
+  for (size_t col = 0; col < width; ++col) {
+    if (const auto & rows = group_by_col[col]; rows.size() > 1) {
+      auto [min_row_itr, max_row_itr] = std::minmax_element(rows.begin(), rows.end());
+      for (auto row = *min_row_itr; row <= *max_row_itr; ++row) {
+        fillByRowCol(row, col, data);
       }
     }
   }
-
-  return ret;
 }
 
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
@@ -262,52 +254,27 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
       }
     }
   }
-  fillInside(
-    fillByIntersection(
-      concat(line_segments_on_hull, concat(getInvisibleRay(hull), rays_to_grid_corner)),
-      invisible_cost),
-    invisible_cost);
-  fillInside(fillByIntersection(line_segments_on_hull, occupied_cost), occupied_cost);
+
+  auto invisible_edges = std::vector<math::geometry::LineSegment>();
+  append(invisible_edges, line_segments_on_hull);
+  append(invisible_edges, getInvisibleRay(hull));
+  append(invisible_edges, rays_to_grid_corner);
+  auto invisible_edge_cells = fillByIntersection(invisible_edges, invisible_cost);
+  fillInside(invisible_edge_cells, invisible_cost);
+
+  auto occupied_edge_cells = fillByIntersection(line_segments_on_hull, occupied_cost);
+  fillInside(occupied_edge_cells, occupied_cost);
 }
 
 const std::vector<int8_t> & Grid::getData() { return values_; }
 
-bool Grid::fillByIndex(size_t index, int8_t data)
-{
-  if (index < values_.size()) {
-    values_[index] = data;
-    return true;
-  }
-  return false;
-}
-
 bool Grid::fillByRowCol(size_t row, size_t col, int8_t data)
 {
-  if (row >= width) {
+  if (row >= width || col >= height) {
     return false;
   }
-  if (col >= height) {
-    return false;
-  }
-  return fillByIndex(getIndex(row, col), data);
-}
-
-void Grid::fillByRow(size_t row, int8_t data)
-{
-  if (row < height) {
-    for (size_t col = 0; col < width; col++) {
-      fillByRowCol(row, col, data);
-    }
-  }
-}
-
-void Grid::fillByCol(size_t col, int8_t data)
-{
-  if (col < width) {
-    for (size_t row = 0; row < height; row++) {
-      fillByRowCol(row, col, data);
-    }
-  }
+  values_[width * col + row] = data;
+  return true;
 }
 
 void Grid::reset(const geometry_msgs::msg::Pose & origin)
