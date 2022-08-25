@@ -154,7 +154,7 @@ protected:
   template <typename U, typename Node, typename... Ts>
   auto readCatalogedStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
   {
-    auto element = makeFromCatalogReference(node, inner_scope, std::forward<decltype(xs)>(xs)...);
+    auto element = CatalogReference(node, inner_scope).make(node);
     const auto & name = element.template as<U>().name;
 
     if (not unique(name)) {
