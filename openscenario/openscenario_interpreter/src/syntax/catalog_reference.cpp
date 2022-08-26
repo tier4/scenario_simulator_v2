@@ -79,16 +79,24 @@ CatalogReference::CatalogReference(const pugi::xml_node & node, Scope & scope)
   parameter_assignments(readElement<ParameterAssignments>("ParameterAssignments", node, scope))
 {
   if (auto catalog_locations = scope.global().catalog_locations; catalog_locations) {
-    for (auto & p : *catalog_locations) {
-      auto & catalog_location = p.second;
-      auto found_catalog = catalog_location.find(catalog_name);
-
-      if (found_catalog != std::end(catalog_location)) {
-        catalog_node = found_catalog->second;
-        break;
-      }
+    // check if a catalog with a specific name exists
+    if (
+      catalog_locations->end() ==
+      std::find_if(catalog_locations->begin(), catalog_locations->end(), [&](auto && p) {
+        auto catalog_location = p.second;
+        auto found_catalog = catalog_location.find(catalog_name);
+        if (found_catalog != std::end(catalog_location)) {
+          catalog_node = found_catalog->second;
+          return true;
+        }
+        return false;
+      })) {
+      throw SyntaxError(
+        "Required catalog (" + catalog_name +
+        ") not found. Please check the CatalogLocations attribute");
     }
-    throw SyntaxError("");
+  } else {
+    throw SyntaxError("CatalogLocations attribute is not found. Please check your scenario.");
   }
 }
 
