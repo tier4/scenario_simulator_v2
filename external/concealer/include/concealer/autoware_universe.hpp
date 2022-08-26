@@ -93,10 +93,10 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
   using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
 
-  ServiceWithValidation<CooperateCommands> service_cooperate_commands;
-  ServiceWithValidation<Engage> service_engage;
-  // TODO ServiceWithValidation<InitializePose> service_initialize_pose;
-  ServiceWithValidation<SetVelocityLimit> service_set_velocity_limit;
+  ServiceWithValidation<CooperateCommands> requestCooperateCommands;
+  ServiceWithValidation<Engage> requestEngage;
+  // TODO ServiceWithValidation<InitializePose> requestInitializePose;
+  ServiceWithValidation<SetVelocityLimit> requestSetVelocityLimit;
 
 private:
   Cooperator current_cooperator = Cooperator::simulator;
@@ -147,10 +147,10 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
-    service_cooperate_commands("/api/external/set/rtc_commands", *this),
-    service_engage("/api/external/set/engage", *this),
-    // TODO service_initialize_pose("/api/autoware/set/initialize_pose", *this),
-    service_set_velocity_limit("/api/autoware/set/velocity_limit", *this)
+    requestCooperateCommands("/api/external/set/rtc_commands", *this),
+    requestEngage("/api/external/set/engage", *this),
+    // TODO requestInitializePose("/api/autoware/set/initialize_pose", *this),
+    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this)
   // clang-format on
   {
     waitpid_options = 0;
