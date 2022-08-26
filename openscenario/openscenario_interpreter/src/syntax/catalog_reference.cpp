@@ -83,13 +83,14 @@ CatalogReference::CatalogReference(const pugi::xml_node & node, Scope & scope)
     if (
       catalog_locations->end() ==
       std::find_if(catalog_locations->begin(), catalog_locations->end(), [&](auto && p) {
-        auto catalog_location = p.second;
+        auto & catalog_location = p.second;
         auto found_catalog = catalog_location.find(catalog_name);
         if (found_catalog != std::end(catalog_location)) {
           catalog_node = found_catalog->second;
           return true;
+        } else {
+          return false;
         }
-        return false;
       })) {
       throw SyntaxError(
         "Required catalog (" + catalog_name +
