@@ -72,6 +72,8 @@
     "nosetests",
     "rosdoc",
     "Khanh",
-    "approvable"
+    "approvable",
+    "customcommandaction",
+    "prepending"
   ]
 }
