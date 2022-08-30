@@ -2,6 +2,40 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.6 (2022-08-30)
+------------------
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge pull request `#822 <https://github.com/tier4/scenario_simulator_v2/issues/822>`_ from tier4/fix/stop_position
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Merge pull request `#821 <https://github.com/tier4/scenario_simulator_v2/issues/821>`_ from tier4/feature/linelint
+* Merge pull request `#816 <https://github.com/tier4/scenario_simulator_v2/issues/816>`_ from tier4/feature/geometry_lib
+* fix lint error
+* fix namespavce
+* modify namespace
+* move directory
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* update margin
+* add margin
+* add 1.0m margin
+* fix stop position
+* Merge branch 'feature/geometry_lib' of https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* split directory
+* change namespace
+* apply reformat
+* add geometry_math package
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble
