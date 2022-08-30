@@ -2,6 +2,28 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.6 (2022-08-30)
+------------------
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge pull request `#805 <https://github.com/tier4/scenario_simulator_v2/issues/805>`_ from tier4/doc/4th-improvement
+* Add units to configuration document
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge pull request `#813 <https://github.com/tier4/scenario_simulator_v2/issues/813>`_ from tier4/fix/boost_depend
