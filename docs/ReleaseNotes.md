@@ -16,9 +16,9 @@ Bug Fixes:bug:
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| Feature                   | Brief summary                                                                                              | Category   | Pull request                                                    | Contributor                             |
+|---------------------------|------------------------------------------------------------------------------------------------------------|------------|-----------------------------------------------------------------|-----------------------------------------|
+| `lanelet2_extension_psim` | Remove `external/lanelet2_extension_psim` and add dependency to `lanelet2_extension` in `autoware_common`. | `external` | [#863](https://github.com/tier4/scenario_simulator_v2/pull/863) | [HansRobo](https://github.com/HansRobo) |
 
 ## Version 0.6.6
 
@@ -49,8 +49,7 @@ Minor Tweaks :oncoming_police_car:
 | Option `--record`              | Exclude a too large topic `/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/intersection` from bag recording. | `openscenario_interpreter` | [#829](https://github.com/tier4/scenario_simulator_v2/pull/829)                                                                  | [yamacir-kit](https://github.com/yamacir-kit)                                                  |
 | Move to github docker registry | Move from dockerhub to github docker registry.                                                                                                          | `docker`                   | [#843](https://github.com/tier4/scenario_simulator_v2/pull/843), [#844](https://github.com/tier4/scenario_simulator_v2/pull/844) | [hakuturu583](https://github.com/hakuturu583), [kenji-miyake](https://github.com/kenji-miyake) |
 | Update `lanelet2_extension`    | Copy `lanelet2_extension` of Autoware.Universe 0.3.7 as `lanelet2_extension_psim`.                                                                      | `lanelet2_extension`       | [#850](https://github.com/tier4/scenario_simulator_v2/pull/850)                                                                  | [yamacir-kit](https://github.com/yamacir-kit)                                                  |
-| Remove trivial metrics         | Remove `StandstillMetric` and `CollisionMetric`.                                                                                                        | `traffic_simulator`        | [#854](https://github.com/tier4/scenario_simulator_v2/pull/854)                                                                  | [shouth](https://github.com/shouth)                                                            |
-| `lanelet2_extension_psim`      | Remove `external/lanelet2_extension_psim` and add dependency to `lanelet2_extension` in `autoware_common`.                                              | `external`                 | [#863](https://github.com/tier4/scenario_simulator_v2/pull/863)                                                                  | [HansRobo](https://github.com/HansRobo)                                                        |                                                                                                |
+| Remove trivial metrics         | Remove `StandstillMetric` and `CollisionMetric`.                                                                                                        | `traffic_simulator`        | [#854](https://github.com/tier4/scenario_simulator_v2/pull/854)                                                                  | [shouth](https://github.com/shouth)                                                            |                                                                                                |
 
 ## Version 0.6.5
 
