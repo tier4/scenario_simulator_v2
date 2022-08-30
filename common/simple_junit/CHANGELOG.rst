@@ -2,8 +2,8 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
 * Merge remote-tracking branch 'origin/master' into fix/stop_position
 * Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate

@@ -2,8 +2,8 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge branch 'master' into feature/remove_simple_metrics
 * Merge remote-tracking branch 'origin/master' into refactor/catalog
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion

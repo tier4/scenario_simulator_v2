@@ -2,8 +2,8 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge pull request `#870 <https://github.com/tier4/scenario_simulator_v2/issues/870>`_ from tier4/prepare/release_0.6.6
 * modify version
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion

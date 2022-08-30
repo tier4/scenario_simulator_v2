@@ -2,8 +2,8 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge pull request `#794 <https://github.com/tier4/scenario_simulator_v2/issues/794>`_ from tier4/fix/interpreter/transition_assertion
 * Fix typo
 * remove initialize_duration time limit from waitForAutowareStateToBeDriving

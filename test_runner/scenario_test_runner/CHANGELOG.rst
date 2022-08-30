@@ -2,8 +2,8 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
 * Revert change for scenario `sample.yaml`
 * Rename CMake targets to `lanelet2_extension_psim*` from `lanelet2_extension*`

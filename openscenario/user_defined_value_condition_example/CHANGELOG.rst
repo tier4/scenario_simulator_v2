@@ -2,8 +2,8 @@
 Changelog for package user_defined_value_condition_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
 * Merge pull request `#847 <https://github.com/tier4/scenario_simulator_v2/issues/847>`_ from tier4/feature/value_constraint
 * Fix structure of ParameterDeclaration

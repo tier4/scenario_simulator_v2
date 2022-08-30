@@ -2,8 +2,8 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
 * Merge pull request `#850 <https://github.com/tier4/scenario_simulator_v2/issues/850>`_ from tier4/feature/lanelet2_extension_psim
 * Rename CMake targets to `lanelet2_extension_psim*` from `lanelet2_extension*`

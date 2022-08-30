@@ -2,8 +2,8 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge remote-tracking branch 'origin/master' into refactor/catalog
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
 * Merge pull request `#849 <https://github.com/tier4/scenario_simulator_v2/issues/849>`_ from tier4/fix/simple_sensor_simulator/fast_occupancy_grid

@@ -2,8 +2,8 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
 * Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions

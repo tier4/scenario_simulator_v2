@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2022-08-30)
+------------------
 * Merge pull request `#852 <https://github.com/tier4/scenario_simulator_v2/issues/852>`_ from tier4/refactor/catalog
 * Refactor
 * Fix runtime error
