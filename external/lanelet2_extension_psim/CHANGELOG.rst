@@ -2,6 +2,42 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge pull request `#850 <https://github.com/tier4/scenario_simulator_v2/issues/850>`_ from tier4/feature/lanelet2_extension_psim
+* Rename CMake targets to `lanelet2_extension_psim*` from `lanelet2_extension*`
+* Update `query.cpp` to use `tf2_geometry_msgs.hpp` if available
+* Add `tf2_geometry_msgs` to dependency of `lanelet2_extension_psim`
+* Copy `lanelet2_extension` of Autoware.Universe 0.3.7 as `lanelet2_extension_psim`
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Merge pull request `#821 <https://github.com/tier4/scenario_simulator_v2/issues/821>`_ from tier4/feature/linelint
+* add white lines at EOF
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge pull request `#805 <https://github.com/tier4/scenario_simulator_v2/issues/805>`_ from tier4/doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Fix spells
+* Fix spells
+* Fix spells
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Fix typo
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Update custom_spell.json
+* Fix typos
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble

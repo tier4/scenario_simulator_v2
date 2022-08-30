@@ -2,6 +2,76 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#854 <https://github.com/tier4/scenario_simulator_v2/issues/854>`_ from tier4/feature/remove_simple_metrics
+* Merge pull request `#864 <https://github.com/tier4/scenario_simulator_v2/issues/864>`_ from tier4/feature/improve_ego_route_matching
+* apply reformat
+* enable retry toLaneletPose
+* Remove CollisionMetric and StandstillMetric
+* Remove CollisionMetric and StandstillMetric
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge pull request `#850 <https://github.com/tier4/scenario_simulator_v2/issues/850>`_ from tier4/feature/lanelet2_extension_psim
+* Copy `lanelet2_extension` of Autoware.Universe 0.3.7 as `lanelet2_extension_psim`
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* Merge remote-tracking branch 'origin/master' into doc/6th_improvement
+* Merge pull request `#837 <https://github.com/tier4/scenario_simulator_v2/issues/837>`_ from tier4/update/rviz_display
+* Fix runtime errors
+* Fix the way to import rviz config path
+* Merge remote-tracking branch 'tier/master' into fix/obstacle_detection_raycaster
+* Update scenario_simulator_v2.rviz
+* Merge pull request `#836 <https://github.com/tier4/scenario_simulator_v2/issues/836>`_ from tier4/fix/trajectory_offset
+* Merge branch 'master' into fix/trajectory_offset
+* Pass rviz_config to autoware_launch
+* Merge pull request `#834 <https://github.com/tier4/scenario_simulator_v2/issues/834>`_ from tier4/fix/yield_action
+* remove right of way when the lanelet id is same
+* add getLaneletPose API
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Merge pull request `#816 <https://github.com/tier4/scenario_simulator_v2/issues/816>`_ from tier4/feature/geometry_lib
+* fix include guard
+* fix lint error
+* fix namespavce
+* modify namespace
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* move directory
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge pull request `#805 <https://github.com/tier4/scenario_simulator_v2/issues/805>`_ from tier4/doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Fix spells
+* Merge branch 'feature/geometry_lib' of https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* add intersection directory
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* move directory
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge pull request `#809 <https://github.com/tier4/scenario_simulator_v2/issues/809>`_ from tier4/feature/get_relative_pose_with_lane_pose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* add getRelativePose between LaneletPose and entity name
+* add const
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* use std::transform
+* split directory
+* enable pass compile in traffic simulator
+* change namespace
+* apply reformat
+* Merge branch 'feature/get_distance_to_lane_bound' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Update custom_spell.json
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* add geometry_math package
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Shota Minami, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble

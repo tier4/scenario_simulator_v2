@@ -2,6 +2,25 @@
 Changelog for package openscenario_interpreter_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Merge pull request `#821 <https://github.com/tier4/scenario_simulator_v2/issues/821>`_ from tier4/feature/linelint
+* add white lines at EOF
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge pull request `#813 <https://github.com/tier4/scenario_simulator_v2/issues/813>`_ from tier4/fix/boost_depend

@@ -2,6 +2,141 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#852 <https://github.com/tier4/scenario_simulator_v2/issues/852>`_ from tier4/refactor/catalog
+* Refactor
+* Fix runtime error
+* Fix build error
+* Refactor
+* Refactor & Apply linter
+* Clean code
+* Add debug messages
+* Refactor CatalogReference
+* Fix build errors
+* Fix build errors
+* Extract CatalogReference::make function
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge pull request `#847 <https://github.com/tier4/scenario_simulator_v2/issues/847>`_ from tier4/feature/value_constraint
+* Revert parameter_declaration.cpp
+* Revert parameter_declaration.cpp
+* Replace "Tier IV" with "TIER IV"
+* Refactor
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into feature/value_constraint
+* Apply linter
+* Refactor
+* Revert ParameterCondition::compare
+* Refactor
+* Refactor
+* Apply clang-format
+* Fix logic miss
+* Merge pull request `#846 <https://github.com/tier4/scenario_simulator_v2/issues/846>`_ from tier4/refactor/interpreter/scope
+* Update `VehicleCategory` to accept any VehicleCategory identifier OpenSCENARIO specified.
+* Move `EntityObject` implementation into .cpp file
+* Rename header file `openscenario.hpp` to `open_scenario.hpp`
+* Rename struct `Scope::GlobalEnvironment` to `ScenarioDefinition`
+* Apply clang-format
+* Implement evaluate functions of value constraints
+* Fix structure of ParameterDeclaration
+* Implement loading part of ValueConstraintGroup
+* Cleanup
+* Move data member `Scope::pathname` into struct `OpenScenario`
+* Move some member function of `GlobalEnvironment` into `Entities`
+* Update `GlobalEnvironment` to hold pointer to `Entities`
+* Add value_constraint codes
+* Add constraint group to ParameterDeclaration
+* Extract compare function to a single file
+* Move compare function
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* Merge remote-tracking branch 'tier/master' into fix/obstacle_detection_raycaster
+* Merge remote-tracking branch 'origin/master' into update/rviz_display
+* Merge branch 'master' into fix/trajectory_offset
+* Merge pull request `#801 <https://github.com/tier4/scenario_simulator_v2/issues/801>`_ from tier4/feature/openscenario/non_instantaneous_actions
+* Merge pull request `#830 <https://github.com/tier4/scenario_simulator_v2/issues/830>`_ from tier4/feature/interpreter/relative-heading-condition
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Add new NonStandardOperation `evaluateRelativeHeading`
+* Update `UserDefinedValueCondition` to support function-style expression (EXPERIMENTAL)
+* Delete unused variable
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/relative-heading-condition
+* Add new header `regex/function_call_expression.hpp`
+* Merge pull request `#829 <https://github.com/tier4/scenario_simulator_v2/issues/829>`_ from tier4/improve/exclude-too-large-topic-from-ros2-bag-record
+* Update `ros2 bag record` to exclude a large topic
+* Merge pull request `#818 <https://github.com/tier4/scenario_simulator_v2/issues/818>`_ from tier4/feature/autoware/request-to-cooperate
+* Implement Action::endsImmediately
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Lipsticks
+* Rename `CooperatePolicy` to `Cooperator`
+* Fix foolish bugs ,and I hate myself for being so useless
+* Fix logic miss in InitActions::endsImmediately
+* Fix typos
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Add new experimental Controller property `cooperatePolicy`
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Merge pull request `#821 <https://github.com/tier4/scenario_simulator_v2/issues/821>`_ from tier4/feature/linelint
+* remove empty file
+* Fix runtime error
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Demangle type names
+* Demangle type names
+* Fix compile errors and linter errors
+* Implement Init class inferfaces
+* Implement interfaces of InitAction class
+* Implement InitActions::startInstantaneousActions
+* Implement accomplished functions
+* Divide interface of Private class
+* inherited StoryboardElement at InitActions class
+* inherited StoryboardElement at InitActions class
+* Replace all_elements with 3 arrays
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge pull request `#805 <https://github.com/tier4/scenario_simulator_v2/issues/805>`_ from tier4/doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Merge pull request `#783 <https://github.com/tier4/scenario_simulator_v2/issues/783>`_ from tier4/refactor/interpreter/simulator-core
+* Remove `src/procedure.cpp` from `CMakeLists.txt`
+* Update ReleaseNotes
+* Fix spells
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Update `SimulatorCore::core` to be private
+* Rename struct `GeneralCommand` to `CoordinateSystemConversion`
+* Move `getBoundingBoxDistance` into `SimulatorCore::ConditionEvaluation`
+* Move `getLongitudinalDistance` into `SimulatorCore::GeneralCommand`
+* Move `getRelativePose` into `SimulatorCore::GeneralCommand`
+* Rename header `procedure.hpp` to `simulator_core.hpp`
+* Move `getTrafficRelationReferees` into `NonStandardOperation`
+* Fix `activatePerformanceAssertion` to check if `Controller` specified
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Cleanup geometry type conversions
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Refine implementation
+* Divide by instantaneous on load
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Add new function `activatePerformanceAssertion` as `NonStandardOperation`
+* Remove member function `ScenarioObject::activateSensors`
+* Add new struct `SimulatorCore::NonStandardOperation`
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'feature/get_distance_to_lane_bound' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Fix runtime error
+* Fix compile errors
+* Implement non instantaneous init action move
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' into fix/interpreter/transition_assertion
+* Move some free functions into struct `SimulatorCore`
+* Remove member function `Controller::assign` and `ObjectController::assign`
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Move some free functions into struct `SimulatorCore`
+* Move free function `toLanePosition` into struct `SimulatorCore::GeneralCommand`
+* Move free function `getEntityStatus` into struct `SimulatorCore::ConditionEvaluation`
+* Move free function `addMetric` into struct `SimulatorCore::GeneralCommands`
+* Move variable `connection` into new struct `SimulatorCore`
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge pull request `#813 <https://github.com/tier4/scenario_simulator_v2/issues/813>`_ from tier4/fix/boost_depend

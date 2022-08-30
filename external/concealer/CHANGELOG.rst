@@ -2,6 +2,58 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#794 <https://github.com/tier4/scenario_simulator_v2/issues/794>`_ from tier4/fix/interpreter/transition_assertion
+* Fix typo
+* remove initialize_duration time limit from waitForAutowareStateToBeDriving
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into feature/value_constraint
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/scope
+* Merge pull request `#841 <https://github.com/tier4/scenario_simulator_v2/issues/841>`_ from tier4/feature/cooperator
+* Merge remote-tracking branch 'origin/master' into feature/cooperator
+* Merge remote-tracking branch 'origin/master' into feature/use_github_registry
+* Merge pull request `#842 <https://github.com/tier4/scenario_simulator_v2/issues/842>`_ from RobotecAI/fix/concealer-dangling-reference
+* Move some function implementation into `autoware_universe.cpp`
+* clang format
+* Revert some changes
+* Update `RTC` to push request into `cooperate_queue` instead of call it
+* Cleanup
+* Move RTC features into struct `RTC` from `AutowareUniverse`
+* Rename enumeration `Cooperator` to `Cooperator::Is`
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* build fixes
+* concealer getters return value instead of const reference
+* Revert "path subscribtion macros enrolled and returned by value"
+* path subscribtion macros enrolled and returned by value
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge pull request `#818 <https://github.com/tier4/scenario_simulator_v2/issues/818>`_ from tier4/feature/autoware/request-to-cooperate
+* Rename `CooperatePolicy` to `Cooperator`
+* Cleanup
+* Add new experimental Controller property `cooperatePolicy`
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Fix subscription to be compilable with ROS2 Humble
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'feature/get_distance_to_lane_bound' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* fix trivial
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' into fix/interpreter/transition_assertion
+* Update `AutowareUniverse` to subscribe `/api/external/get/rtc_status`
+* TransitionAssertion measures the duration from the start
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge pull request `#813 <https://github.com/tier4/scenario_simulator_v2/issues/813>`_ from tier4/fix/boost_depend
