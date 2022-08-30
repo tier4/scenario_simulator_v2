@@ -59,7 +59,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp,
   const std::vector<std::string> & lidar_detected_entity) -> nav_msgs::msg::OccupancyGrid
 {
-  // check if entities in `status` has unique names
+  // check if entities in `status` have unique names
   {
     auto unique_entities = std::set<std::string>();
     for (const auto & s : status) {
