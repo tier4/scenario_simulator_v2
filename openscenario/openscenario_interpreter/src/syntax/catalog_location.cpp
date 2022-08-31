@@ -17,7 +17,7 @@
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/catalog_location.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
-#include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/syntax/open_scenario.hpp>
 
 namespace openscenario_interpreter
 {

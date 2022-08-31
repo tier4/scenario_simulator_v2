@@ -13,39 +13,23 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/assign_controller_action.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
-#include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/syntax/entity_object.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-AssignControllerAction::AssignControllerAction()  //
-: ComplexType(unspecified)
-{
-}
-
-AssignControllerAction::AssignControllerAction(const ComplexType & controller)
-: ComplexType(controller)
-{
-}
-
-AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scope & scope)
+EntityObject::EntityObject(const pugi::xml_node & node, Scope & scope)
 // clang-format off
-: ComplexType(
+: Group(
     choice(node,
-      std::make_pair("Controller",       [&](const auto & node) { return                               make<Controller>(node, scope); }),
-      std::make_pair("CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make(node);                    })))
+      std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference(node, scope).make(node);                    }),
+      std::make_pair("Vehicle",          [&](auto && node) { return                               make<Vehicle   >(node, scope); }),
+      std::make_pair("Pedestrian",       [&](auto && node) { return                               make<Pedestrian>(node, scope); }),
+      std::make_pair("MiscObject",       [&](auto && node) { return                               make<MiscObject>(node, scope); })))
 // clang-format on
 {
-}
-
-auto AssignControllerAction::operator()(const EntityRef & entity_ref) const -> void
-{
-  if (is<Controller>()) {
-    applyAssignControllerAction(entity_ref, as<Controller>());
-  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

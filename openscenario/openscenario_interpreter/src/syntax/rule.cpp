@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/error.hpp>
+#include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <string>
 

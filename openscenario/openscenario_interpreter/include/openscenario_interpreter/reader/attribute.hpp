@@ -35,9 +35,7 @@ inline namespace reader
 template <typename Scope>
 auto substitute(std::string attribute, Scope & scope)
 {
-  auto dirname = [](auto &&, auto && scope) {
-    return scope.global().pathname.parent_path().string();
-  };
+  auto dirname = [](auto &&, auto && scope) { return scope.dirname(); };
 
   auto find_pkg_share = [](auto && package_name, auto &&) {
     return ament_index_cpp::get_package_share_directory(package_name);

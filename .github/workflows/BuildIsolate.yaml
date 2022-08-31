@@ -23,7 +23,6 @@ jobs:
             concealer,
             cpp_mock_scenarios,
             kashiwanoha_map,
-            lanelet2_extension_psim,
             lanelet2_matching,
             openscenario_interpreter,
             openscenario_interpreter_example,
