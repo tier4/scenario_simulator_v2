@@ -164,11 +164,6 @@ void Autoware::rethrow() const
   }
 }
 
-// bool Autoware::ready() const
-// {
-//   return task_queue.exhausted() and engageable();
-// }
-
 void Autoware::resetTimerCallback()
 {
   updater = create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });

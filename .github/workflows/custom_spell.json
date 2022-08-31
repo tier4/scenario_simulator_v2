@@ -1,6 +1,5 @@
 {
   "ignorePaths": [
-    "external/lanelet2_extension_psim/**",
     "external/lanelet2_matching/**"
   ],
   "words": [
@@ -73,6 +72,8 @@
     "nosetests",
     "rosdoc",
     "Khanh",
-    "approvable"
+    "approvable",
+    "customcommandaction",
+    "prepending"
   ]
 }
