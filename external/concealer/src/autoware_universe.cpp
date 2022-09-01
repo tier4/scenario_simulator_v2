@@ -114,9 +114,17 @@ auto AutowareUniverse::engage() -> void
   });
 }
 
-auto AutowareUniverse::engageable() const -> bool { return isWaitingForEngage(); }
+auto AutowareUniverse::engageable() const -> bool
+{
+  rethrow();
+  return task_queue.exhausted() and isWaitingForEngage();
+}
 
-auto AutowareUniverse::engaged() const -> bool { return isDriving(); }
+auto AutowareUniverse::engaged() const -> bool
+{
+  rethrow();
+  return task_queue.exhausted() and isDriving();
+}
 
 auto AutowareUniverse::update() -> void
 {
