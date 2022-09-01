@@ -75,9 +75,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
-  bool engage_requested = false;
-
-  bool engage_succeeded = false;
+  bool engaging = false;
 
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC
@@ -89,11 +87,11 @@ public:
 
   auto currentScenarioDefinition() const -> const std::shared_ptr<ScenarioDefinition> &;
 
-  auto ready() const -> bool;
-
   auto engage() const -> void;
 
   auto engageable() const -> bool;
+
+  auto engaged() const -> bool;
 
   auto isAnErrorIntended() const -> bool;
 

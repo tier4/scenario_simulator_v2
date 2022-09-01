@@ -156,11 +156,11 @@ public:
 
   ~AutowareUniverse() override;
 
-  auto driving() const -> bool override;
-
   auto engage() -> void override;
 
   auto engageable() const -> bool override;
+
+  auto engaged() const -> bool override;
 
   auto getAcceleration() const -> double override;
 

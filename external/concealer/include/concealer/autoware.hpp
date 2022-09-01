@@ -142,6 +142,8 @@ public:
 
   virtual auto engageable() const -> bool = 0;
 
+  virtual auto engaged() const -> bool = 0;
+
   /* ---- NOTE -------------------------------------------------------------------
    *
    *  Send initial_pose to Autoware.
@@ -160,8 +162,6 @@ public:
    *
    * -------------------------------------------------------------------------- */
   virtual auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void = 0;
-
-  virtual auto driving() const -> bool = 0;
 
   virtual auto getAcceleration() const -> double = 0;
 

@@ -148,7 +148,7 @@ auto Interpreter::engageable() const -> bool
     });
 }
 
-auto Interpreter::ready() const -> bool
+auto Interpreter::engaged() const -> bool
 {
   return std::all_of(
     std::cbegin(currentScenarioDefinition()->entities),
@@ -157,7 +157,7 @@ auto Interpreter::ready() const -> bool
       return not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>()
                    .object_controller.isUserDefinedController() or
-             asAutoware(name).driving();
+             asAutoware(name).engaged();
     });
 }
 
@@ -179,8 +179,6 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       });
   };
 
-  engage_requested = engage_succeeded = false;  // DIRTY HACK
-
   auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
@@ -188,29 +186,25 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         deactivate();
       },
       [this]() {
-        if (std::isnan(evaluateSimulationTime()) and not engage_requested) {
-          if (engageable()) {
-            engage();
-            engage_requested = true;
-          }
-          SimulatorCore::update();
-          publishCurrentContext();
-        } else if (std::isnan(evaluateSimulationTime()) and not engage_succeeded) {
-          if (ready()) {
-            activateNonUserDefinedControllers();
-            engage_succeeded = true;
-          }
-          SimulatorCore::update();
-          publishCurrentContext();
-        } else if (currentScenarioDefinition()) {
-          withTimeoutHandler(defaultTimeoutHandler(), [this]() {
+        withTimeoutHandler(defaultTimeoutHandler(), [this]() {
+          if (std::isnan(evaluateSimulationTime())) {
+            if (not engaging and engageable()) {
+              engage();
+              engaging = true;
+            } else if (engaged()) {
+              activateNonUserDefinedControllers();
+              engaging = false;
+            }
+          } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
-            SimulatorCore::update();
-            publishCurrentContext();
-          });
-        } else {
-          throw Error("No script evaluable.");
-        }
+          } else {
+            throw Error("No script evaluable.");
+          }
+
+          SimulatorCore::update();
+
+          publishCurrentContext();
+        });
       });
   };
 
