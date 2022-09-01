@@ -112,9 +112,8 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
 
-      script = std::make_shared<OpenScenario>(osc_path);
-
-      if (script->category.is<ScenarioDefinition>()) {
+      if (script = std::make_shared<OpenScenario>(osc_path);
+          script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
       } else {
         throw SyntaxError("ParameterValueDistributionDefinition is not yet supported.");
@@ -188,12 +187,12 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [this]() {
         withTimeoutHandler(defaultTimeoutHandler(), [this]() {
           if (std::isnan(evaluateSimulationTime())) {
-            if (not engaging and engageable()) {
+            if (not waiting_for_engagement_to_be_completed and engageable()) {
               engage();
-              engaging = true;
+              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
             } else if (engaged()) {
               activateNonUserDefinedControllers();
-              engaging = false;
+              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
             }
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
