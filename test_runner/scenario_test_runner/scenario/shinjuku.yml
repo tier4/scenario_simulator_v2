@@ -1,0 +1,848 @@
+ScenarioModifiers:
+  ScenarioModifier:
+    - name: __tier4_modifier_Vnm
+      start: 2.7778
+      step: 1.3888999999999996
+      stop: 4.1667
+    - name: __tier4_modifier_Vnl
+      start: 2.7778
+      step: 1.3888999999999996
+      stop: 4.1667
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 1
+    date: '2022-03-29T06:56:30.316Z'
+    description: ''
+    author: ''
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: Vnm
+        parameterType: double
+        value: __tier4_modifier_Vnm
+      - name: Vnl
+        parameterType: double
+        value: __tier4_modifier_Vnl
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: /home/mkielczykowski/HDD/Tier4/code/AJD-520/scenarios/shinjuku/maps/lanelet2_map.osm
+    SceneGraphFile:
+      filepath: /home/mkielczykowski/HDD/Tier4/code/AJD-520/scenarios/shinjuku/maps/pointcloud_map.pcd
+  Entities:
+    ScenarioObject:
+      - name: EgoCar
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 1.526
+              y: 0
+              z: 1.2055
+            Dimensions:
+              width: 1.866
+              length: 4.946
+              height: 2.411
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.5
+              trackWidth: 1.345
+              positionX: 1.323
+              positionZ: 0.25
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.5
+              trackWidth: 1.345
+              positionX: -1.526
+              positionZ: 0.25
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property:
+                - name: isEgo
+                  value: 'true'
+      - name: NpcCarL
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 1.8
+              length: 4
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 2
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: NpcCarM
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 1.8
+              length: 4
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 2
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: BikeL
+        Vehicle:
+          name: ''
+          vehicleCategory: bicycle
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 0.8
+              length: 2
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 0.8
+              positionX: 1
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 0.8
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: PedCrossYoung
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+      - name: PedCrossOld
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: EgoCar
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '206'
+                      s: 15.025
+                      offset: -0.1239
+                      Orientation:
+                        type: relative
+                        h: 0.01
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '193'
+                        s: 5.0278
+                        offset: 0.0782
+                        Orientation:
+                          type: relative
+                          h: -0.0016
+                          p: 0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 5.5556
+          - entityRef: NpcCarL
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '165'
+                      s: 59.6619
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: -0.002
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '195'
+                        s: 105.7262
+                        offset: 0.0366
+                        Orientation:
+                          type: relative
+                          h: -0.0696
+                          p: 0
+                          r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: isBlind
+                            value: 'true'
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: $Vnl
+          - entityRef: NpcCarM
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '171'
+                      s: 15.6141
+                      offset: -0.065
+                      Orientation:
+                        type: relative
+                        h: 0.0156
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '197'
+                        s: 105.9963
+                        offset: 0.1417
+                        Orientation:
+                          type: relative
+                          h: -0.0696
+                          p: 0
+                          r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: isBlind
+                            value: 'true'
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: $Vnm
+          - entityRef: BikeL
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '165'
+                      s: 68.9985
+                      offset: 1.2875
+                      Orientation:
+                        type: relative
+                        h: 0.0336
+                        p: 0
+                        r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: isBlind
+                            value: 'true'
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 2.7778
+          - entityRef: PedCrossYoung
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '618'
+                      s: 7.9183
+                      offset: 1.7445
+                      Orientation:
+                        type: relative
+                        h: -0.0288
+                        p: 0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+          - entityRef: PedCrossOld
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '618'
+                      s: 20.1553
+                      offset: -1.6805
+                      Orientation:
+                        type: relative
+                        h: 3.1052
+                        p: 0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+    Story:
+      - name: ''
+        Act:
+          - name: PedCrossOld-Go
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: PedCrossOld-Go
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: PedCrossOld
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: event_PedCrossOld-Go
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              LongitudinalAction:
+                                SpeedAction:
+                                  SpeedActionDynamics:
+                                    dynamicsDimension: time
+                                    value: 0
+                                    dynamicsShape: step
+                                  SpeedActionTarget:
+                                    AbsoluteTargetSpeed:
+                                      value: 0.4167
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: WalkStraightAction
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByEntityCondition:
+                        TriggeringEntities:
+                          triggeringEntitiesRule: any
+                          EntityRef:
+                            - entityRef: EgoCar
+                        EntityCondition:
+                          ReachPositionCondition:
+                            Position:
+                              LanePosition:
+                                roadId: ''
+                                laneId: '399'
+                                s: 26.2051
+                                offset: -0.4488
+                                Orientation:
+                                  type: relative
+                                  h: 2.4507
+                                  p: 0
+                                  r: 0
+                            tolerance: 2
+          - name: Change-Npc-BrakingMode
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: Change-Npc-BrakingMode
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: NpcCarL
+                    - entityRef: NpcCarM
+                    - entityRef: BikeL
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: event_Enable-Npc-BrakingMode
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              ControllerAction:
+                                AssignControllerAction:
+                                  Controller:
+                                    name: ''
+                                    Properties:
+                                      Property:
+                                        - name: isBlind
+                                          value: 'false'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: AlwaysTrue
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: sticky
+                      ByEntityCondition:
+                        TriggeringEntities:
+                          triggeringEntitiesRule: any
+                          EntityRef:
+                            - entityRef: EgoCar
+                        EntityCondition:
+                          ReachPositionCondition:
+                            Position:
+                              LanePosition:
+                                roadId: ''
+                                laneId: '403'
+                                s: 38.9683
+                                offset: -1.4403
+                                Orientation:
+                                  type: relative
+                                  h: 0.4054
+                                  p: 0
+                                  r: 0
+                            tolerance: 3
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        StoryboardElementStateCondition:
+                          state: completeState
+                          storyboardElementType: act
+                          storyboardElementRef: PedCrossOld-Go
+          - name: PedCrossYoung-Go
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: PedCrossYoung-Go
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: PedCrossYoung
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: event_Set-PedCrossYoung-Speed
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              LongitudinalAction:
+                                SpeedAction:
+                                  SpeedActionDynamics:
+                                    dynamicsDimension: time
+                                    value: 0
+                                    dynamicsShape: step
+                                  SpeedActionTarget:
+                                    AbsoluteTargetSpeed:
+                                      value: 1.3889
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: WalkStraightAction
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: AlwaysTrue
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: sticky
+                      ByEntityCondition:
+                        TriggeringEntities:
+                          triggeringEntitiesRule: any
+                          EntityRef:
+                            - entityRef: EgoCar
+                        EntityCondition:
+                          ReachPositionCondition:
+                            Position:
+                              LanePosition:
+                                roadId: ''
+                                laneId: '502'
+                                s: 33.712
+                                offset: -0.0207
+                                Orientation:
+                                  type: relative
+                                  h: -0.1215
+                                  p: 0
+                                  r: 0
+                            tolerance: 1
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        StoryboardElementStateCondition:
+                          state: completeState
+                          storyboardElementType: act
+                          storyboardElementRef: Change-Npc-BrakingMode
+          - name: act_Check_EgoStop
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: act_Check_EgoStop
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: event_Set-NpcCarDummy-Speed
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: ':'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: AlwaysTrue
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: EgoCar-Stop-Crosswalk
+                      delay: 0
+                      conditionEdge: none
+                      ByEntityCondition:
+                        TriggeringEntities:
+                          triggeringEntitiesRule: any
+                          EntityRef:
+                            - entityRef: EgoCar
+                        EntityCondition:
+                          SpeedCondition:
+                            rule: lessThan
+                            value: 0.0001
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByEntityCondition:
+                        TriggeringEntities:
+                          triggeringEntitiesRule: any
+                          EntityRef:
+                            - entityRef: EgoCar
+                        EntityCondition:
+                          ReachPositionCondition:
+                            Position:
+                              LanePosition:
+                                roadId: ''
+                                laneId: '403'
+                                s: 40.0068
+                                offset: -1.104
+                                Orientation:
+                                  type: relative
+                                  h: 0.161
+                                  p: 0
+                                  r: 0
+                            tolerance: 2
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        StoryboardElementStateCondition:
+                          state: completeState
+                          storyboardElementType: act
+                          storyboardElementRef: PedCrossYoung-Go
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: EgoCar
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      state: completeState
+                                      storyboardElementType: act
+                                      storyboardElementRef: act_Check_EgoStop
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: EgoCar
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '193'
+                                            s: 5.0278
+                                            offset: 0.0782
+                                            Orientation:
+                                              type: relative
+                                              h: -0.0016
+                                              p: 0
+                                              r: 0
+                                        tolerance: 1
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: CBE-NpcCarL
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: EgoCar
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: NpcCarL
+                            - Condition:
+                                - name: CBE-NpcCarM
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: EgoCar
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: NpcCarM
+                            - Condition:
+                                - name: CBE-BikeL
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: EgoCar
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: BikeL
+                            - Condition:
+                                - name: CBE-PecCrossYoung
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: EgoCar
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: PedCrossYoung
+                            - Condition:
+                                - name: CBE-PecCrossOld
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: EgoCar
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: PedCrossOld
+                            - Condition:
+                                - name: Time limit
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 90
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

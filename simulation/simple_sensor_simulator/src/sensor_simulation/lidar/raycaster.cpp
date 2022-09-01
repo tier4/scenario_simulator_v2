@@ -157,44 +157,22 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     }
   }
 
+
+  int number_of_parts = 5;
+  std::vector<std::thread> threads(number_of_parts);
+  int slices = directions.size() / number_of_parts; //481.33
+
   rtcCommitScene(scene_);
   RTCIntersectContext context;
   //TODO try not setting this
-  context.flags = RTCIntersectContextFlags::RTC_INTERSECT_CONTEXT_FLAG_COHERENT;
-  rtcInitIntersectContext(&context);
-  for (const auto & direction : directions) {
-    RTCRayHit rayhit = {};
-    rayhit.ray.org_x = origin.position.x;
-    rayhit.ray.org_y = origin.position.y;
-    rayhit.ray.org_z = origin.position.z;
-    // make raycast interact with all objects
-    rayhit.ray.mask = 0b11111111'11111111'11111111'11111111;
-    rayhit.ray.tfar = max_distance;
-    rayhit.ray.tnear = min_distance;
-    rayhit.ray.flags = false;
-    const auto ray_direction = origin.orientation * direction;
-    const auto rotation_mat = quaternion_operation::getRotationMatrix(ray_direction);
-    const Eigen::Vector3d rotated_direction = rotation_mat * Eigen::Vector3d(1.0, 0.0, 0.0);
-    rayhit.ray.dir_x = rotated_direction[0];
-    rayhit.ray.dir_y = rotated_direction[1];
-    rayhit.ray.dir_z = rotated_direction[2];
-    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
-    rtcIntersect1(scene_, &context, &rayhit);
-    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
-      double distance = rayhit.ray.tfar;
-      const Eigen::Vector3d vector = quaternion_operation::getRotationMatrix(direction) *
-                                     Eigen::Vector3d(1.0, 0.0, 0.0) * distance;
-      pcl::PointXYZI p;
-      {
-        p.x = vector[0];
-        p.y = vector[1];
-        p.z = vector[2];
-      }
-      cloud->emplace_back(p);
-      if (std::count(detected_ids.begin(), detected_ids.end(), rayhit.hit.geomID) == 0) {
-        detected_ids.emplace_back(rayhit.hit.geomID);
-      }
-    }
+    for (int i = 0; i < threads.size(); ++i)
+  {
+    threads[i] = std::thread(intersect, scene_, cloud, context, origin, detected_ids, directions, i * int(std::floor(slices)), std::min((i+1) * int(std::ceil(slices)), int(directions.size()-1)), max_distance, min_distance);
+  }
+
+  for(auto& thread : threads)
+  {
+    thread.join();
   }
   for (const auto & id : detected_ids) {
     detected_objects_.emplace_back(geometry_ids_[id]);

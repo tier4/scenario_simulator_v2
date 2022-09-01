@@ -1,0 +1,195 @@
+ParameterDeclaration: []
+Map: /home/mkielczykowski/HDD/Tier4/code/AJD-520/scenarios/atsugi2/maps
+ScenarioFormatVersion: 0.0.1
+Intersection: []
+Entity:
+  - Name: EgoCar
+    Type: Ego
+    InitialFrameId: ego_car_initial_pose
+  - Name: ObjCar1
+    Type: Vehicle
+    InitialFrameId: obj_car1_initial_pose
+Story:
+  Init:
+    Entity:
+      - Name: EgoCar
+        InitialStates:
+          Pose:
+            Position:
+              X: 90003.6338
+              Y: 43260.8262
+              Z: 10.6118
+            Orientation:
+              X: 0
+              Y: 0
+              Z: 0.2938
+              W: 0.9559
+            FrameId: /map
+          Speed: 4.1667
+        Actions:
+          - Type: FollowRoute
+            Params:
+              GoalPose:
+                Pose:
+                  Position:
+                    X: 90147.8409
+                    Y: 43354.3717
+                    Z: 7.2627
+                  Orientation:
+                    X: 0
+                    Y: 0
+                    Z: 0.2896
+                    W: 0.9571
+                  FrameId: /map
+              CheckPoints: []
+      - Name: ObjCar1
+        InitialStates:
+          Pose:
+            Position:
+              X: 90042.8691
+              Y: 43282.1936
+              Z: 11.1853
+            Orientation:
+              X: 0
+              Y: 0
+              Z: 0.3233
+              W: 0.9463
+            FrameId: /map
+          Speed: 0
+        Actions:
+          - Type: FollowRoute
+            Params:
+              GoalPose:
+                Pose:
+                  Position:
+                    X: 90164.0646
+                    Y: 43365.0508
+                    Z: 6.9092
+                  Orientation:
+                    X: 0
+                    Y: 0
+                    Z: 0.3437
+                    W: 0.9391
+                  FrameId: /map
+              CheckPoints: []
+    Intersection: []
+  Act:
+    - Sequence:
+        Name: Acceleration up
+        Events:
+          - Name: event_Acceleration up
+            Actors:
+              - ObjCar1
+            Condition:
+              Any:
+                - Type: ReachPosition
+                  Keep: false
+                  Trigger: EgoCar
+                  Tolerance: 0.5
+                  Pose:
+                    Position:
+                      X: 90029.1002
+                      Y: 43277.4453
+                      Z: 10.3391
+                    Orientation:
+                      X: 0
+                      Y: 0
+                      Z: 0.292
+                      W: 0.9564
+                    FrameId: /map
+            Actions:
+              - Type: Speed
+                Params:
+                  Value: 2.7778
+        StartCondition:
+          All:
+            - Type: SimulationTime
+              Name: Ignite immediately
+              Keep: false
+              Rule: gt
+              Value: 0
+    - Sequence:
+        Name: LaneChangeSequence
+        Events:
+          - Name: event_LaneChangeSequence
+            Actors:
+              - ObjCar1
+            Condition:
+              Any:
+                - Type: AlwaysTrue
+            Actions:
+              - Type: LaneChange
+                Params:
+                  TargetLanelet: 330
+        StartCondition:
+          Any:
+            - Type: Speed
+              Trigger: ObjCar1
+              Value: 0.0001
+              Rule: gt
+              Keep: false
+    - Sequence:
+        Name: Speed change
+        Events:
+          - Name: event_Speed change
+            Actors:
+              - ObjCar1
+            Condition:
+              Any:
+                - Type: ReachPosition
+                  Keep: true
+                  Name: Speed change
+                  Trigger: ObjCar1
+                  Tolerance: 1
+                  Pose:
+                    Position:
+                      X: 90059.4346
+                      Y: 43297.3306
+                      Z: 10.809
+                    Orientation:
+                      X: 0
+                      Y: 0
+                      Z: 0.2921
+                      W: 0.9564
+                    FrameId: /map
+            Actions:
+              - Type: Speed
+                Params:
+                  Value: 4.1667
+        StartCondition:
+          All:
+            - Type: SimulationTime
+              Name: Ignite immediately
+              Keep: false
+              Rule: gt
+              Value: 0
+  EndCondition:
+    Success:
+      All:
+        - Type: ReachPosition
+          Keep: true
+          Name: EgoReachGoal
+          Trigger: EgoCar
+          Tolerance: 0.5
+          Pose:
+            Position:
+              X: 90147.8409
+              Y: 43354.3717
+              Z: 7.2627
+            Orientation:
+              X: 0
+              Y: 0
+              Z: 0.2896
+              W: 0.9571
+            FrameId: /map
+    Failure:
+      Any:
+        - Type: CollisionByEntity
+          Name: EgoCollideToObjCar1
+          Trigger: EgoCar
+          TargetEntity: ObjCar1
+        - Type: SimulationTime
+          Name: Timeout
+          Value: 150
+          Rule: gt
+ScenarioName: UC-001-0004_PSim_1_case2

@@ -29,6 +29,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <quaternion_operation/quaternion_operation.h>
 
 namespace simple_sensor_simulator
 {
@@ -83,6 +84,51 @@ private:
     double min_distance = 0);
   std::vector<std::string> detected_objects_;
   std::unordered_map<unsigned int, std::string> geometry_ids_;
+
+  static void intersect(RTCScene scene, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, RTCIntersectContext context, geometry_msgs::msg::Pose origin, std::vector<unsigned int> detected_ids, std::vector<geometry_msgs::msg::Quaternion> directions,int directions_start, int directions_end, double max_distance, double min_distance)
+  {
+    for(int i = directions_start; i < directions_end; ++i)
+    {
+      RTCRayHit rayhit = {};
+      rayhit.ray.org_x = origin.position.x;
+      rayhit.ray.org_y = origin.position.y;
+      rayhit.ray.org_z = origin.position.z;
+      // make raycast interact with all objects
+      rayhit.ray.mask = 0b11111111'11111111'11111111'11111111;
+      rayhit.ray.tfar = max_distance;
+      rayhit.ray.tnear = min_distance;
+      rayhit.ray.flags = false;
+      const auto ray_direction = origin.orientation * directions.at(i);
+      const auto rotation_mat = quaternion_operation::getRotationMatrix(ray_direction);
+      const Eigen::Vector3d rotated_direction = rotation_mat * Eigen::Vector3d(1.0, 0.0, 0.0);
+      rayhit.ray.dir_x = rotated_direction[0];
+      rayhit.ray.dir_y = rotated_direction[1];
+      rayhit.ray.dir_z = rotated_direction[2];
+      rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+
+      std::chrono::steady_clock::time_point begin, end;
+      // begin = std::chrono::steady_clock::now();
+      rtcIntersect1(scene, &context, &rayhit);
+      // end = std::chrono::steady_clock::now();
+      // times.push_back(std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count());
+
+      if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
+        double distance = rayhit.ray.tfar;
+        const Eigen::Vector3d vector = quaternion_operation::getRotationMatrix(directions.at(i)) *
+                                      Eigen::Vector3d(1.0, 0.0, 0.0) * distance;
+        pcl::PointXYZI p;
+        {
+          p.x = vector[0];
+          p.y = vector[1];
+          p.z = vector[2];
+        }
+        cloud->emplace_back(p);
+        if (std::count(detected_ids.begin(), detected_ids.end(), rayhit.hit.geomID) == 0) {
+          detected_ids.emplace_back(rayhit.hit.geomID);
+        }
+      }
+    }
+  }
 
 };
 }  // namespace simple_sensor_simulator
