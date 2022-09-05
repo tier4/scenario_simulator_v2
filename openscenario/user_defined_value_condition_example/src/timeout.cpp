@@ -103,7 +103,6 @@ int main(const int argc, char const * const * const argv)
 
     ParameterDeclaration message;
     {
-      message.name = "";
       message.parameter_type.data = ParameterType::BOOLEAN;
       message.value =
         (10 < std::chrono::duration_cast<std::chrono::seconds>(
@@ -111,7 +110,6 @@ int main(const int argc, char const * const * const argv)
                 .count())
           ? "true"
           : "false";
-      // if you want to add constraints for parameter, please add constraints to message.constraint_groups
     }
 
     std::cout << "message.value = " << message.value << std::endl;
