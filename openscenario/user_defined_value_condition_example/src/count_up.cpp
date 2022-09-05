@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
-#include <openscenario_msgs/msg/parameter_declaration.hpp>
-#include <openscenario_msgs/msg/parameter_type.hpp>
+#include <openscenario_msgs/msg/user_defined_value.hpp>
+#include <openscenario_msgs/msg/user_defined_value_type.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 int main(const int argc, char const * const * const argv)
@@ -74,21 +74,21 @@ int main(const int argc, char const * const * const argv)
    *
    * ------------------------------------------------------------------------ */
 
-  using openscenario_msgs::msg::ParameterDeclaration;
-  using openscenario_msgs::msg::ParameterType;
+  using openscenario_msgs::msg::UserDefinedValue;
+  using openscenario_msgs::msg::UserDefinedValueType;
 
   rclcpp::init(argc, argv);
 
   auto node = std::make_shared<rclcpp::Node>("count_up");
 
   auto publisher =
-    node->create_publisher<ParameterDeclaration>("/count_up", rclcpp::QoS(1).reliable());
+    node->create_publisher<UserDefinedValue>("/count_up", rclcpp::QoS(1).reliable());
 
   auto make_message = [&, count = 0]() mutable  //
   {
-    ParameterDeclaration message;
+    UserDefinedValue message;
     {
-      message.parameter_type.data = ParameterType::UNSIGNED_INT;
+      message.type.data = UserDefinedValueType::UNSIGNED_INT;
       message.value = boost::lexical_cast<decltype(message.value)>(++count);
     }
 

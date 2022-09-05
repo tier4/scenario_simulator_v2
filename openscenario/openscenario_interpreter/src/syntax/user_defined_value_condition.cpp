@@ -21,6 +21,8 @@
 #include <openscenario_interpreter/syntax/parameter_condition.hpp>  // for ParameterCondition::compare
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
+#include <openscenario_msgs/msg/user_defined_value.hpp>
+#include <openscenario_msgs/msg/user_defined_value_type.hpp>
 #include <regex>
 #include <unordered_map>
 
@@ -106,17 +108,34 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     evaluate_value =
       curry2(functions.at(result.str(1)))(FunctionCallExpression::splitParameters(result.str(3)));
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
-    evaluate_value =
-      [&, result,
-       current_message =
-         std::make_shared<MagicSubscription<openscenario_msgs::msg::ParameterDeclaration>>(
-           result.str(1) + "_subscription", result.str(0))]() {
-        if (not current_message->value.empty()) {
-          return ParameterDeclaration(*current_message).evaluate();
-        } else {
-          return unspecified;
+    using openscenario_msgs::msg::UserDefinedValue;
+    using openscenario_msgs::msg::UserDefinedValueType;
+
+    evaluate_value = [&, current_message = std::make_shared<MagicSubscription<UserDefinedValue>>(
+                           result.str(1) + "_subscription", result.str(0))]() {
+      auto evaluate = [](const auto & user_defined_value) {
+        switch (user_defined_value.type.data) {
+          case UserDefinedValueType::BOOLEAN:
+            return make<Boolean>(user_defined_value.value);
+          case UserDefinedValueType::DATE_TIME:
+            return make<String>(user_defined_value.value);
+          case UserDefinedValueType::DOUBLE:
+            return make<Double>(user_defined_value.value);
+          case UserDefinedValueType::INTEGER:
+            return make<Integer>(user_defined_value.value);
+          case UserDefinedValueType::STRING:
+            return make<String>(user_defined_value.value);
+          case UserDefinedValueType::UNSIGNED_INT:
+            return make<UnsignedInt>(user_defined_value.value);
+          case UserDefinedValueType::UNSIGNED_SHORT:
+            return make<UnsignedShort>(user_defined_value.value);
+          default:
+            return unspecified;
         }
       };
+
+      return not current_message->value.empty() ? evaluate(*current_message) : unspecified;
+    };
   } else {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }

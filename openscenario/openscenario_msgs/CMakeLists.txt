@@ -15,8 +15,8 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  msg/ParameterDeclaration.msg
-  msg/ParameterType.msg
+  msg/UserDefinedValue.msg
+  msg/UserDefinedValueType.msg
   DEPENDENCIES builtin_interfaces)
 
 ament_auto_package()

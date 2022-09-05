@@ -1,0 +1,2 @@
+openscenario_msgs/UserDefinedValueType type
+string value

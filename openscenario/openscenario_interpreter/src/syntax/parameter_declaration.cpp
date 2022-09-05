@@ -45,20 +45,6 @@ auto checkName(const std::string & name) -> decltype(auto)
   }
 }
 
-ParameterDeclaration::ParameterDeclaration(
-  const openscenario_msgs::msg::ParameterDeclaration & message)
-: name(), parameter_type(message.parameter_type), value(message.value)
-{
-  checkName(name);
-}
-
-ParameterDeclaration::ParameterDeclaration(
-  const openscenario_msgs::msg::ParameterDeclaration & message, Scope & scope)
-: name(), parameter_type(message.parameter_type), value(message.value)
-{
-  scope.insert(checkName(name), evaluate());
-}
-
 ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),

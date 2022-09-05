@@ -14,8 +14,8 @@
 
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <boost/lexical_cast.hpp>
-#include <openscenario_msgs/msg/parameter_declaration.hpp>
-#include <openscenario_msgs/msg/parameter_type.hpp>
+#include <openscenario_msgs/msg/user_defined_value.hpp>
+#include <openscenario_msgs/msg/user_defined_value_type.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 int main(const int argc, char const * const * const argv)
@@ -75,8 +75,8 @@ int main(const int argc, char const * const * const argv)
    *
    * ------------------------------------------------------------------------ */
 
-  using openscenario_msgs::msg::ParameterDeclaration;
-  using openscenario_msgs::msg::ParameterType;
+  using openscenario_msgs::msg::UserDefinedValue;
+  using openscenario_msgs::msg::UserDefinedValueType;
 
   rclcpp::init(argc, argv);
 
@@ -91,7 +91,7 @@ int main(const int argc, char const * const * const argv)
     });
 
   auto publisher =
-    node->create_publisher<ParameterDeclaration>("/timeout", rclcpp::QoS(1).reliable());
+    node->create_publisher<UserDefinedValue>("/timeout", rclcpp::QoS(1).reliable());
 
   auto make_message = [&](const auto & status) mutable  //
   {
@@ -101,9 +101,9 @@ int main(const int argc, char const * const * const argv)
       duration_since_autoware_engaged = std::chrono::high_resolution_clock::now();
     }
 
-    ParameterDeclaration message;
+    UserDefinedValue message;
     {
-      message.parameter_type.data = ParameterType::BOOLEAN;
+      message.type.data = UserDefinedValueType::BOOLEAN;
       message.value =
         (10 < std::chrono::duration_cast<std::chrono::seconds>(
                 std::chrono::high_resolution_clock::now() - duration_since_autoware_engaged)
