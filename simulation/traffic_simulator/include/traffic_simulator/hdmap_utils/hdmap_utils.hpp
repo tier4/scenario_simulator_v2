@@ -41,9 +41,9 @@
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <lanelet2_extension_psim/utility/message_conversion.hpp>
-#include <lanelet2_extension_psim/utility/query.hpp>
-#include <lanelet2_extension_psim/utility/utilities.hpp>
+#include <lanelet2_extension/utility/message_conversion.hpp>
+#include <lanelet2_extension/utility/query.hpp>
+#include <lanelet2_extension/utility/utilities.hpp>
 #include <map>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
