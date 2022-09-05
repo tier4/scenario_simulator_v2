@@ -91,7 +91,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
             boost::lexical_cast<String>(asAutoware(result.str(1)).getTurnIndicatorsCommand()));
         }),
     };
-    evaluateValue = dispatch.at(result.str(2));  // XXX catch
+    evaluate_value = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, FunctionCallExpression::pattern())) {
     const std::unordered_map<std::string, std::function<Object(const std::vector<std::string> &)>>
       functions{
@@ -103,10 +103,10 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
               xs[0], LanePosition("", xs[1], 0, boost::lexical_cast<Double>(xs[2]))));
           }),
       };
-    evaluateValue =
+    evaluate_value =
       curry2(functions.at(result.str(1)))(FunctionCallExpression::splitParameters(result.str(3)));
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
-    evaluateValue =
+    evaluate_value =
       [&, result,
        current_message =
          std::make_shared<MagicSubscription<openscenario_msgs::msg::ParameterDeclaration>>(
@@ -133,7 +133,7 @@ auto UserDefinedValueCondition::description() const -> String
 
 auto UserDefinedValueCondition::evaluate() -> Object
 {
-  if (result = evaluateValue(); result == unspecified) {
+  if (result = evaluate_value(); result == unspecified) {
     return false_v;
   } else {
     return asBoolean(ParameterCondition::compare(result, rule, value));
