@@ -1,4 +1,3 @@
 string name
 openscenario_msgs/ParameterType parameter_type
 string value
-openscenario_msgs/ValueConstraintGroup[] constraint_groups

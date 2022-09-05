@@ -23,21 +23,12 @@ ValueConstraintGroup::ValueConstraintGroup(const pugi::xml_node & node, Scope & 
 {
   traverse<1, unbounded>(node, "ValueConstraint", [&](auto && node) { emplace_back(node, scope); });
 }
-ValueConstraintGroup::ValueConstraintGroup(
-  const openscenario_msgs::msg::ValueConstraintGroup & message)
-{
-  for (auto & constraint : message.constraints) {
-    emplace_back(constraint);
-  }
-}
 
 auto ValueConstraintGroup::evaluate(const Object & value) const -> bool
 {
-  auto ret = std::all_of(std::begin(*this), std::end(*this), [&](auto && constraint) {
+  return std::all_of(std::begin(*this), std::end(*this), [&](auto && constraint) {
     return constraint.evaluate(value);
   });
-  return ret;
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -101,9 +101,10 @@ CatalogReference::CatalogReference(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto CatalogReference::make(const pugi::xml_node & node) -> const Object
+auto CatalogReference::make(const pugi::xml_node &) -> const Object
 {
   using ::openscenario_interpreter::make;
+
   std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
     // clang-format off
           std::make_pair("Vehicle",     [&](auto && node) { return make<Vehicle>   (node, scope); }),
@@ -119,8 +120,7 @@ auto CatalogReference::make(const pugi::xml_node & node) -> const Object
 
   return choice_by_attribute(
     catalog_node, "name", std::make_pair(entry_name, [&](const pugi::xml_node & node) {
-      auto iter = dispatcher.find(node.name());
-      if (iter != std::end(dispatcher)) {
+      if (auto iter = dispatcher.find(node.name()); iter != std::end(dispatcher)) {
         return iter->second(node);
       } else {
         std::stringstream what;
