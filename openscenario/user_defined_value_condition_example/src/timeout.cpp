@@ -90,8 +90,7 @@ int main(const int argc, char const * const * const argv)
       status = *message;
     });
 
-  auto publisher =
-    node->create_publisher<UserDefinedValue>("/timeout", rclcpp::QoS(1).reliable());
+  auto publisher = node->create_publisher<UserDefinedValue>("/timeout", rclcpp::QoS(1).reliable());
 
   auto make_message = [&](const auto & status) mutable  //
   {

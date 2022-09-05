@@ -12,6 +12,7 @@
 
 # external packages
 external/autoware_auto_msgs
+external/scenario_simulator_v2_msgs
 external/tier4_msgs
 external/zmqpp_vendor
 

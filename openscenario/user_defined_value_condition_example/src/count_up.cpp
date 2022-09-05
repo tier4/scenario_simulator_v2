@@ -81,8 +81,7 @@ int main(const int argc, char const * const * const argv)
 
   auto node = std::make_shared<rclcpp::Node>("count_up");
 
-  auto publisher =
-    node->create_publisher<UserDefinedValue>("/count_up", rclcpp::QoS(1).reliable());
+  auto publisher = node->create_publisher<UserDefinedValue>("/count_up", rclcpp::QoS(1).reliable());
 
   auto make_message = [&, count = 0]() mutable  //
   {

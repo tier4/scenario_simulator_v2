@@ -22,9 +22,12 @@
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
 #include <regex>
+#include <unordered_map>
+
+#if __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value.hpp>) and __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>)
 #include <scenario_simulator_v2_msgs/msg/user_defined_value.hpp>
 #include <scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>
-#include <unordered_map>
+#endif
 
 namespace openscenario_interpreter
 {
@@ -108,6 +111,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     evaluate_value =
       curry2(functions.at(result.str(1)))(FunctionCallExpression::splitParameters(result.str(3)));
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
+#if __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value.hpp>) and __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>)
     using scenario_simulator_v2_msgs::msg::UserDefinedValue;
     using scenario_simulator_v2_msgs::msg::UserDefinedValueType;
 
@@ -136,6 +140,11 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
 
       return not current_message->value.empty() ? evaluate(*current_message) : unspecified;
     };
+#else
+    throw Error(
+      "The feature to evaluate ROS2 topics as `UserDefinedValueCondition` is only enabled when the "
+      "package `scenario_simulator_v2_msgs` is present in the build environment.");
+#endif
   } else {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
