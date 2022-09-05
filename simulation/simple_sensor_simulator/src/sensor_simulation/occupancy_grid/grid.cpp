@@ -228,6 +228,64 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
 
 const std::vector<int8_t> & Grid::getData() { return values_; }
 
+std::vector<int8_t> Grid::calculate(const geometry_msgs::msg::Pose & origin, const std::vector<std::unique_ptr<primitives::Primitive>> & primitives) {
+  namespace geom = boost::geometry;
+  using point_t = geom::model::point<double, 2, geom::cs::cartesian>;
+  using polygon_t = geom::model::polygon<point_t>;
+  using multi_polygon_t = geom::model::multi_polygon<polygon_t>;
+  using linestring_t = geom::model::linestring<point_t>;
+  using multi_linestring_t = geom::model::multi_linestring<linestring_t>;
+
+  auto rad_point_lt = [](auto p, auto q) {
+    double p_rad = std::atan2(geom::get<1>(p), geom::get<0>(p));
+    double q_rad = std::atan2(geom::get<1>(q), geom::get<0>(q));
+    return p_rad - q_rad;
+  };
+
+  auto rad_line_lt = [](auto l, auto m) {
+    return rad_point_lt(l[0], m[0]);
+  };
+
+  auto invisible_borders = multi_linestring_t();
+  auto zero_line = linestring_t { { 0.0, 0.0 }, { width, 0.0 } };
+  for (const auto &primitive : primitives) {
+    auto hull = linestring_t();
+    for (auto p : primitive->get2DConvexHull()) {
+      hull.push_back({ p.x, p.y });
+    }
+
+    double min_rad = 0.0, max_rad = 2 * M_PI;
+    point_t min_p, max_p;
+    auto intersection = std::vector<point_t>();
+    if (geom::intersection(hull, zero_line, intersection)) {
+      for (auto p : hull) {
+        auto rad = std::atan2(geom::get<1>(p), geom::get<0>(p));
+        if (rad > M_PI) {
+          if (rad < min_rad) {
+            min_rad = rad;
+            min_p = p;
+          }
+        } else {
+          if (rad > max_rad) {
+            max_rad = rad;
+            max_p = p;
+          }
+        }
+      }
+
+      invisible_borders.push_back({ min_p, intersection[0] });
+      invisible_borders.push_back({ intersection[0], max_p });
+    } else {
+      auto [ min_rad_p, max_rad_p ] = std::minmax_element(hull.begin(), hull.end(), rad_point_lt);
+      invisible_borders.push_back({ *min_rad_p, *max_rad_p });
+    }
+  }
+
+  std::sort(invisible_borders.begin(), invisible_borders.end(), rad_line_lt);
+
+  // TODO: calculate polygon of invisible area
+}
+
 bool Grid::fillByRowCol(size_t row, size_t col, int8_t data)
 {
   if (row >= width || col >= height) {

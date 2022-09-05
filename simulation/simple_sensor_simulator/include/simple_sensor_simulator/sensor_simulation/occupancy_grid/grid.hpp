@@ -51,6 +51,8 @@ public:
    */
   const std::vector<int8_t> & getData();
 
+  std::vector<int8_t> calculate(const geometry_msgs::msg::Pose & origin, const std::vector<std::unique_ptr<primitives::Primitive>> & primitives);
+
   /**
    * @brief Reset origin and all cell values
    * @note Use this function to reuse already allocated memory
