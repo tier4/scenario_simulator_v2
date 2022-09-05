@@ -21,9 +21,9 @@
 #include <openscenario_interpreter/syntax/parameter_condition.hpp>  // for ParameterCondition::compare
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
-#include <openscenario_msgs/msg/user_defined_value.hpp>
-#include <openscenario_msgs/msg/user_defined_value_type.hpp>
 #include <regex>
+#include <scenario_simulator_v2_msgs/msg/user_defined_value.hpp>
+#include <scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -108,8 +108,8 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     evaluate_value =
       curry2(functions.at(result.str(1)))(FunctionCallExpression::splitParameters(result.str(3)));
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
-    using openscenario_msgs::msg::UserDefinedValue;
-    using openscenario_msgs::msg::UserDefinedValueType;
+    using scenario_simulator_v2_msgs::msg::UserDefinedValue;
+    using scenario_simulator_v2_msgs::msg::UserDefinedValueType;
 
     evaluate_value = [&, current_message = std::make_shared<MagicSubscription<UserDefinedValue>>(
                            result.str(1) + "_subscription", result.str(0))]() {

@@ -3,11 +3,15 @@ repositories:
     type: git
     url: https://github.com/tier4/autoware_auto_msgs.git
     version: tier4/main
-  tier4_msgs:
-    type: git
-    url: https://github.com/tier4/tier4_autoware_msgs.git
-    version: tier4/universe # for Autoware.Universe (TIER IV)
   autoware_common:
     type: git
     url: https://github.com/autowarefoundation/autoware_common.git
     version: main
+  scenario_simulator_v2_msgs:
+    type: git
+    url: https://github.com/tier4/scenario_simulator_v2_msgs.git
+    version: main
+  tier4_msgs:
+    type: git
+    url: https://github.com/tier4/tier4_autoware_msgs.git
+    version: tier4/universe # for Autoware.Universe (TIER IV)
