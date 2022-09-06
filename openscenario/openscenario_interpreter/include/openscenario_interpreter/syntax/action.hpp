@@ -55,9 +55,10 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
   auto start() -> void override;
 
   auto stop() -> void override;
+
+  friend auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;
 };
 
-auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;
 
 DEFINE_LAZY_VISITOR(
   Action,                   //

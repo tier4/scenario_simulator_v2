@@ -46,12 +46,16 @@ struct Event : private Scope, public StoryboardElement
 
   const Priority priority;  // Priority of each event.
 
-  explicit Event(const pugi::xml_node &, Scope &);
+  explicit Event(const pugi::xml_node &, Scope &, Maneuver &);
 
   auto start() -> void override;
+
+  friend auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;
+
+private:
+  Maneuver& parent_maneuver;
 };
 
-auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

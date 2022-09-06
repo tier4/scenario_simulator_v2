@@ -35,9 +35,9 @@ inline namespace syntax
 {
 class StoryboardElement : private SimulatorCore::ConditionEvaluation
 {
+protected:
   Trigger stop_trigger;
 
-public:
   const std::size_t maximum_execution_count = 1;
 
   std::size_t current_execution_count = 0;
@@ -48,6 +48,7 @@ public:
 
   Trigger start_trigger{{ConditionGroup()}};
 
+public:
   // Storyboard
   explicit StoryboardElement(const Trigger & stop_trigger)  //
   : stop_trigger(stop_trigger)
@@ -85,10 +86,9 @@ public:
     if (
       not is<StoryboardElementState::standbyState>() and
       not is<StoryboardElementState::stopTransition>()) {
-      return current_state = stop_transition;
-    } else {
-      return current_state;
+      transitionTo(stop_transition);
     }
+    return current_state;
   }
 
 private:
@@ -172,7 +172,7 @@ public:
     StoryboardElementState::value_type, std::vector<std::function<void(const StoryboardElement &)>>>
     callbacks;
 
-  auto transitionTo(const Object & state)
+  auto transitionTo(const Object & state) -> void
   {
     current_state = state;
     for (auto && callback : callbacks[current_state.as<StoryboardElementState>()]) {
