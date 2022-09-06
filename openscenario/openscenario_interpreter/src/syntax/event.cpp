@@ -36,10 +36,18 @@ Event::Event(const pugi::xml_node & node, Scope & scope, Maneuver& maneuver)
 
 auto Event::start() -> void
 {
+  if (priority == Priority::overwrite) {
+    parent_maneuver.override_events();
+  } else if (priority == Priority::skip) {
+    if (parent_maneuver.running_events_count() > 0) {
+      transitionTo(standby_state);
+    }
+  }
+
   for (auto && element : elements) {
     assert(element.template is<Action>());
     assert(element.template is_also<StoryboardElement>());
-    element.template as<StoryboardElement>().current_state = start_transition;
+    element.template as<StoryboardElement>().transitionTo(start_transition);
   }
 }
 
