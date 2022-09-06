@@ -20,7 +20,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Event::Event(const pugi::xml_node & node, Scope & scope, Maneuver& maneuver)
+Event::Event(const pugi::xml_node & node, Scope & scope, Maneuver & maneuver)
 : Scope(readAttribute<String>("name", node, scope), scope),
   StoryboardElement(
     readAttribute<UnsignedInt>("maximumExecutionCount", node, local(), UnsignedInt(1)),

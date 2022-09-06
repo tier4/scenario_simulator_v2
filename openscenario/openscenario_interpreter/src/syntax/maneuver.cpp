@@ -40,11 +40,12 @@ auto Maneuver::override_events() -> void
   }
 }
 
-auto Maneuver::running_events_count() const -> std::size_t {
+auto Maneuver::running_events_count() const -> std::size_t
+{
   std::size_t ret = 0;
   for (auto && element : elements) {
     assert(element.is<Event>());
-    if(element.as<Event>().is<StoryboardElementState::runningState>()){
+    if (element.as<Event>().is<StoryboardElementState::runningState>()) {
       ++ret;
     }
   }

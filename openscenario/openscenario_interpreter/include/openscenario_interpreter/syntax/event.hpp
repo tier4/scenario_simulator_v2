@@ -18,10 +18,10 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/action.hpp>
+#include <openscenario_interpreter/syntax/maneuver.hpp>
 #include <openscenario_interpreter/syntax/priority.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <openscenario_interpreter/syntax/trigger.hpp>
-#include <openscenario_interpreter/syntax/maneuver.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -54,7 +54,7 @@ struct Event : private Scope, public StoryboardElement
   friend auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;
 
 private:
-  Maneuver& parent_maneuver;
+  Maneuver & parent_maneuver;
 };
 
 }  // namespace syntax

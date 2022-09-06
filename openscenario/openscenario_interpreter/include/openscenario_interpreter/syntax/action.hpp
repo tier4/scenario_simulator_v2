@@ -59,7 +59,6 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
   friend auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;
 };
 
-
 DEFINE_LAZY_VISITOR(
   Action,                   //
   CASE(GlobalAction),       //
