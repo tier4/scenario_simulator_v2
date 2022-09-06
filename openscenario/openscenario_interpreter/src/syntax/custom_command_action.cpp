@@ -153,6 +153,8 @@ auto CustomCommandAction::test(const std::vector<std::string> & args, const Scop
     std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter << "\n";
   }
 
+  std::cout << std::flush;
+
   return args.size();
 }
 
