@@ -28,6 +28,7 @@ inline namespace syntax
  *    <xsd:choice>
  *      <xsd:group ref="ScenarioDefinition"/>
  *      <xsd:group ref="CatalogDefinition"/>
+ *      <xsd:group ref="ParameterValueDistributionDefinition"/>
  *    </xsd:choice>
  *  </xsd:group>
  *
