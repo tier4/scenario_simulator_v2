@@ -10,8 +10,11 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>autoware_auto_system_msgs</depend>
+  <depend>boost</depend>
   <depend>libboost-dev</depend>
   <depend>rclcpp</depend>
+  <depend>scenario_simulator_v2_msgs</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>
