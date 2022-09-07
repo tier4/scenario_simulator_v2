@@ -13,9 +13,12 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
-#include <openscenario_msgs/msg/user_defined_value.hpp>
-#include <openscenario_msgs/msg/user_defined_value_type.hpp>
 #include <rclcpp/rclcpp.hpp>
+
+#if __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value.hpp>) and __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>)
+#include <scenario_simulator_v2_msgs/msg/user_defined_value.hpp>
+#include <scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>
+#endif
 
 int main(const int argc, char const * const * const argv)
 {
@@ -74,12 +77,13 @@ int main(const int argc, char const * const * const argv)
    *
    * ------------------------------------------------------------------------ */
 
-  using openscenario_msgs::msg::UserDefinedValue;
-  using openscenario_msgs::msg::UserDefinedValueType;
-
   rclcpp::init(argc, argv);
 
   auto node = std::make_shared<rclcpp::Node>("count_up");
+
+#if __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value.hpp>) and __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>)
+  using scenario_simulator_v2_msgs::msg::UserDefinedValue;
+  using scenario_simulator_v2_msgs::msg::UserDefinedValueType;
 
   auto publisher = node->create_publisher<UserDefinedValue>("/count_up", rclcpp::QoS(1).reliable());
 
@@ -104,6 +108,7 @@ int main(const int argc, char const * const * const argv)
   executor.add_node(node);
 
   executor.spin();
+#endif
 
   return rclcpp::shutdown() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
