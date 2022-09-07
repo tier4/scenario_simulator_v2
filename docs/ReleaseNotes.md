@@ -16,10 +16,11 @@ Bug Fixes:bug:
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature                       | Brief summary                                                                                              | Category                  | Pull request                                                    | Contributor                             |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------- | --------------------------------------------------------------- | --------------------------------------- |
-| `lanelet2_extension_psim`     | Remove `external/lanelet2_extension_psim` and add dependency to `lanelet2_extension` in `autoware_common`. | `external`                | [#863](https://github.com/tier4/scenario_simulator_v2/pull/863) | [HansRobo](https://github.com/HansRobo) |
-| Improve `OccupancyGridSensor` | Improve performance of occupancy grid generation by changing internal data structure.                      | `simple_sensor_simulator` | [#866](https://github.com/tier4/scenario_simulator_v2/pull/866) | [shouth](https://github.com/shouth)     |
+| Feature                                  | Brief summary                                                                                                                         | Category                   | Pull request                                                    | Contributor                                   |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| `lanelet2_extension_psim`                | Remove `external/lanelet2_extension_psim` and add dependency to `lanelet2_extension` in `autoware_common`.                            | `external`                 | [#863](https://github.com/tier4/scenario_simulator_v2/pull/863) | [HansRobo](https://github.com/HansRobo)       |
+| Improve `OccupancyGridSensor`            | Improve performance of occupancy grid generation by changing internal data structure.                                                 | `simple_sensor_simulator`  | [#866](https://github.com/tier4/scenario_simulator_v2/pull/866) | [shouth](https://github.com/shouth)           |
+| OpenSCENARIO `UserDefinedValueCondition` | Remove the message type package `openscenario_msgs` and moved its contents to a new external repository `scenario_simulator_v2_msgs`. | `openscenario_interpreter` | [#874](https://github.com/tier4/scenario_simulator_v2/pull/874) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.6
 
