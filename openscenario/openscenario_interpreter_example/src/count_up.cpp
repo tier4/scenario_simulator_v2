@@ -14,11 +14,8 @@
 
 #include <boost/lexical_cast.hpp>
 #include <rclcpp/rclcpp.hpp>
-
-#if __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value.hpp>) and __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>)
 #include <scenario_simulator_v2_msgs/msg/user_defined_value.hpp>
 #include <scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>
-#endif
 
 int main(const int argc, char const * const * const argv)
 {
@@ -81,7 +78,6 @@ int main(const int argc, char const * const * const argv)
 
   auto node = std::make_shared<rclcpp::Node>("count_up");
 
-#if __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value.hpp>) and __has_include(<scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>)
   using scenario_simulator_v2_msgs::msg::UserDefinedValue;
   using scenario_simulator_v2_msgs::msg::UserDefinedValueType;
 
@@ -108,7 +104,6 @@ int main(const int argc, char const * const * const argv)
   executor.add_node(node);
 
   executor.spin();
-#endif
 
   return rclcpp::shutdown() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
