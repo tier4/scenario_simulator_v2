@@ -33,6 +33,7 @@
 #include <concealer/utility/visibility.hpp>
 #include <exception>
 #include <future>
+#include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <limits>
 #include <mutex>
@@ -81,6 +82,8 @@ protected:
   TaskQueue task_queue;
 
   bool initialize_was_called = false;
+
+  geometry_msgs::msg::Accel current_acceleration;
 
   geometry_msgs::msg::Pose current_pose;
 
@@ -191,6 +194,8 @@ public:
   virtual auto restrictTargetSpeed(double) const -> double = 0;
 
   /*   */ auto rethrow() const noexcept(false) -> void;
+
+  /*   */ auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
 
   /*   */ auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
 

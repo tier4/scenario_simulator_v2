@@ -474,6 +474,12 @@ bool EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
+    autoware->set([this]() {
+      geometry_msgs::msg::Accel message;
+      message.linear.x = vehicle_model_ptr_->getAx();
+      return message;
+    }());
+
     autoware->set(current_pose);
     autoware->set(current_twist);
   }

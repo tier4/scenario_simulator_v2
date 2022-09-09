@@ -116,6 +116,20 @@ auto AutowareUniverse::engage() -> void
 
 auto AutowareUniverse::update() -> void
 {
+  setAcceleration([this]() {
+    Acceleration message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "/base_link";
+    message.accel.accel = current_acceleration;
+    message.accel.covariance.at(6 * 0 + 0) = 0.001;  // linear x
+    message.accel.covariance.at(6 * 1 + 1) = 0.001;  // linear y
+    message.accel.covariance.at(6 * 2 + 2) = 0.001;  // linear z
+    message.accel.covariance.at(6 * 3 + 3) = 0.001;  // angular x
+    message.accel.covariance.at(6 * 4 + 4) = 0.001;  // angular y
+    message.accel.covariance.at(6 * 5 + 5) = 0.001;  // angular z
+    return message;
+  }());
+
   setControlModeReport([this]() {
     ControlModeReport message;
     message.mode = ControlModeReport::AUTONOMOUS;
