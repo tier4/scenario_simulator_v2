@@ -88,6 +88,8 @@ public:
 
   auto getCurrentAction() const -> const std::string override;
 
+  auto getCurrentPose() const -> geometry_msgs::msg::Pose;
+
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
