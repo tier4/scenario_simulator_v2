@@ -175,7 +175,7 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
       double half_rw = static_cast<double>(width) * resolution / 2;
       double half_rh = static_cast<double>(height) * resolution / 2;
 
-      // enumerate normalized corner coordinates
+      // enumerate corner coordinates
       corners[0].x = half_rw, corners[0].y = half_rh;
       corners[1].x = -half_rw, corners[1].y = half_rh;
       corners[2].x = half_rw, corners[2].y = -half_rh;
