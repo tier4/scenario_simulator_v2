@@ -172,18 +172,17 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
   {
     auto corners = std::vector<geometry_msgs::msg::Point>(4);
     {
+      double half_rw = static_cast<double>(width) * resolution / 2;
+      double half_rh = static_cast<double>(height) * resolution / 2;
+
       // enumerate normalized corner coordinates
-      corners[0].x = 0.5, corners[0].y = 0.5;
-      corners[1].x = -0.5, corners[1].y = 0.5;
-      corners[2].x = 0.5, corners[2].y = -0.5;
-      corners[3].x = -0.5, corners[3].y = -0.5;
+      corners[0].x = half_rw, corners[0].y = half_rh;
+      corners[1].x = -half_rw, corners[1].y = half_rh;
+      corners[2].x = half_rw, corners[2].y = -half_rh;
+      corners[3].x = -half_rw, corners[3].y = -half_rh;
 
+      // transform to world coordinate system
       for (auto & corner : corners) {
-        // scale corner coordinates
-        corner.x *= static_cast<double>(width) * resolution;
-        corner.y *= static_cast<double>(height) * resolution;
-
-        // transform to world coordinate system
         corner = transformToWorld(corner);
       }
     }
