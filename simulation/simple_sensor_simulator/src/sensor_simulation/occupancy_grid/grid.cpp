@@ -182,10 +182,13 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
       corners[2].x = 0.5, corners[2].y = -0.5;
       corners[3].x = -0.5, corners[3].y = -0.5;
 
-      // scale corner coordinates
       for (auto & corner : corners) {
+        // scale corner coordinates
         corner.x *= static_cast<double>(width) * resolution;
         corner.y *= static_cast<double>(height) * resolution;
+
+        // transform to world coordinate system
+        corner = transformToWorld(corner);
       }
     }
 
