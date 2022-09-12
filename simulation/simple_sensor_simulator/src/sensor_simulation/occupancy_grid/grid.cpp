@@ -13,10 +13,6 @@
 // limitations under the License.
 
 #include <quaternion_operation/quaternion_operation.h>
-
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 
@@ -231,62 +227,66 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
 
 const std::vector<int8_t> & Grid::getData() { return values_; }
 
+// this function assume that primitives do not overlap each other
 std::vector<int8_t> Grid::calculate(const geometry_msgs::msg::Pose & origin, const std::vector<std::unique_ptr<primitives::Primitive>> & primitives) {
-  namespace geom = boost::geometry;
-  using point_t = geom::model::point<double, 2, geom::cs::cartesian>;
-  using polygon_t = geom::model::polygon<point_t>;
-  using multi_polygon_t = geom::model::multi_polygon<polygon_t>;
-  using linestring_t = geom::model::linestring<point_t>;
-  using multi_linestring_t = geom::model::multi_linestring<linestring_t>;
+  using LineSegment = math::geometry::LineSegment;
+  using Point = geometry_msgs::msg::Point;
 
-  auto rad_point_lt = [](auto p, auto q) {
-    double p_rad = std::atan2(geom::get<1>(p), geom::get<0>(p));
-    double q_rad = std::atan2(geom::get<1>(q), geom::get<0>(q));
-    return p_rad - q_rad;
+  struct sweep_line_event {
+    enum event_type { LineBegin, LineEnd } type;
+    double angle;
+    ssize_t index;
+
+    bool operator<(const sweep_line_event &that) { return this->angle < that.angle; }
   };
 
-  auto rad_line_lt = [](auto l, auto m) {
-    return rad_point_lt(l[0], m[0]);
-  };
+  auto edges = std::vector<LineSegment>();
+  for (auto & primitive : primitives) {
+    auto hull = primitive->get2DConvexHull();
+    for (size_t i = 0; i + 1 < hull.size(); ++i) {
+      auto p = transformToGrid(hull[i]);
+      auto q = transformToGrid(hull[(i + 1) % hull.size()]);
 
-  auto invisible_borders = multi_linestring_t();
-  auto zero_line = linestring_t { { 0.0, 0.0 }, { width, 0.0 } };
-  for (const auto &primitive : primitives) {
-    auto hull = linestring_t();
-    for (auto p : primitive->get2DConvexHull()) {
-      hull.push_back({ p.x, p.y });
-    }
+      auto p_rad = std::atan2(p.y, p.x);
+      auto q_rad = std::atan2(q.y, q.x);
 
-    double min_rad = 0.0, max_rad = 2 * M_PI;
-    point_t min_p, max_p;
-    auto intersection = std::vector<point_t>();
-    if (geom::intersection(hull, zero_line, intersection)) {
-      for (auto p : hull) {
-        auto rad = std::atan2(geom::get<1>(p), geom::get<0>(p));
-        if (rad > M_PI) {
-          if (rad < min_rad) {
-            min_rad = rad;
-            min_p = p;
-          }
-        } else {
-          if (rad > max_rad) {
-            max_rad = rad;
-            max_p = p;
-          }
-        }
+      if ((std::abs(q_rad - p_rad) > M_PI) ^ (p_rad < q_rad)) {
+        edges.emplace_back(p, q);
+      } else {
+        edges.emplace_back(q, p);
       }
-
-      invisible_borders.push_back({ min_p, intersection[0] });
-      invisible_borders.push_back({ intersection[0], max_p });
-    } else {
-      auto [ min_rad_p, max_rad_p ] = std::minmax_element(hull.begin(), hull.end(), rad_point_lt);
-      invisible_borders.push_back({ *min_rad_p, *max_rad_p });
     }
   }
 
-  std::sort(invisible_borders.begin(), invisible_borders.end(), rad_line_lt);
+  auto edge_nearer = [&](size_t i, size_t j) {
+    const auto &[ a, b ] = edges[i];
+    const auto &[ p, q ] = edges[j];
 
-  // TODO: calculate polygon of invisible area
+    auto left_side = [](const Point &a, const Point &b, const Point &p) {
+      return ((b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x)) > 0;
+    };
+    return left_side(a, b, p) && left_side(a, b, q);
+  };
+
+  auto events = std::vector<sweep_line_event>();
+  auto edge_indices = std::set<size_t, decltype(edge_nearer)>(edge_nearer);
+  for (ssize_t i = 0; i < edges.size(); ++i) {
+    const auto &[ p, q ] = edges[i];
+
+    auto p_rad = std::atan2(p.y, p.x);
+    auto q_rad = std::atan2(q.y, q.x);
+
+    if (p_rad - q_rad > M_PI) {
+      edge_indices.emplace(i);
+    }
+
+    events.push_back({ sweep_line_event::LineBegin, p_rad, i });
+    events.push_back({ sweep_line_event::LineEnd, q_rad, i });
+  }
+
+  std::sort(events.begin(), events.end());
+
+  // TODO: implement filling procedure
 }
 
 bool Grid::fillByRowCol(size_t row, size_t col, int8_t data)
