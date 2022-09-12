@@ -232,11 +232,9 @@ std::vector<int8_t> Grid::calculate(const geometry_msgs::msg::Pose & origin, con
   using Point = geometry_msgs::msg::Point;
 
   struct sweep_line_event {
-    enum event_type { LineBegin, LineEnd } type;
+    enum event_type { LineStart, LineEnd } type;
     double angle;
     ssize_t index;
-
-    bool operator<(const sweep_line_event &that) { return this->angle < that.angle; }
   };
 
   auto edges = std::vector<LineSegment>();
@@ -257,7 +255,7 @@ std::vector<int8_t> Grid::calculate(const geometry_msgs::msg::Pose & origin, con
     }
   }
 
-  auto edge_nearer = [&](size_t i, size_t j) {
+  auto edge_index_ord = [&](size_t i, size_t j) {
     const auto &[ a, b ] = edges[i];
     const auto &[ p, q ] = edges[j];
 
@@ -268,7 +266,7 @@ std::vector<int8_t> Grid::calculate(const geometry_msgs::msg::Pose & origin, con
   };
 
   auto events = std::vector<sweep_line_event>();
-  auto edge_indices = std::set<size_t, decltype(edge_nearer)>(edge_nearer);
+  auto edge_indices = std::set<size_t, decltype(edge_index_ord)>(edge_index_ord);
   for (ssize_t i = 0; i < edges.size(); ++i) {
     const auto &[ p, q ] = edges[i];
 
@@ -279,13 +277,30 @@ std::vector<int8_t> Grid::calculate(const geometry_msgs::msg::Pose & origin, con
       edge_indices.emplace(i);
     }
 
-    events.push_back({ sweep_line_event::LineBegin, p_rad, i });
+    events.push_back({ sweep_line_event::LineStart, p_rad, i });
     events.push_back({ sweep_line_event::LineEnd, q_rad, i });
   }
 
-  std::sort(events.begin(), events.end());
+  auto event_ord = [](const auto &a, const auto &b) { return a.angle < b.angle; };
+  std::sort(events.begin(), events.end(), event_ord);
 
-  // TODO: implement filling procedure
+  auto itr = events.begin();
+  auto last_point = Point();
+  for (size_t i = 0; i < 4; ++i) {
+    double corner_angle = (2 * i - 3) * M_PI / 4;
+    for (; itr->angle < corner_angle; ++itr) {
+      switch (itr->type) {
+        case sweep_line_event::LineStart: {
+
+          edge_indices.emplace(itr->index);
+          break;
+        }
+        case sweep_line_event::LineEnd: {
+          break;
+        }
+      }
+    }
+  }
 }
 
 bool Grid::fillByRowCol(size_t row, size_t col, int8_t data)
