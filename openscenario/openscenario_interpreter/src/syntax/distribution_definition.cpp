@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/distribution_definition.hpp>
-#include <openscenario_interpreter/syntax/deterministic.hpp>
-#include <openscenario_interpreter/syntax/stochastic.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
-DistributionDefinition::DistributionDefinition(const pugi::xml_node &tree, Scope & scope)
+DistributionDefinition::DistributionDefinition(const pugi::xml_node & tree, Scope & scope)
+// clang-format off
 : Group(
     choice(tree,
-           std::make_pair("Deterministic", [&tree, &scope](auto && node){return make<Deterministic>(tree,scope);}),
-           std::make_pair("Stochastic",    [&tree, &scope](auto && node){return make<Stochastic>(tree,scope);})))
+           std::make_pair("Deterministic", [&](auto && node){return make<Deterministic>(node,scope);}),
+           std::make_pair("Stochastic",    [&](auto && node){return make<Stochastic   >(node,scope);})))
+// clang-format on
 {
-
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

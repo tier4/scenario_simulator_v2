@@ -15,6 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
 #define OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
 
+#include <openscenario_interpreter/syntax/deterministic.hpp>
+#include <openscenario_interpreter/syntax/stochastic.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
 
@@ -36,6 +38,13 @@ struct DistributionDefinition : public Group
 {
   explicit DistributionDefinition(const pugi::xml_node &, Scope & scope);
 };
+
+DEFINE_LAZY_VISITOR(
+  DistributionDefinition,
+  CASE(Deterministic),
+  CASE(Stochastic),
+);
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
