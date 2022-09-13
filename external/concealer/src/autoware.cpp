@@ -158,15 +158,10 @@ void Autoware::shutdownAutoware()
 void Autoware::rethrow() const
 {
   task_queue.rethrow();
+
   if (is_thrown.load(std::memory_order_acquire)) {
     std::rethrow_exception(thrown);
   }
-}
-
-bool Autoware::ready() const
-{
-  rethrow();
-  return task_queue.exhausted();
 }
 
 void Autoware::resetTimerCallback()

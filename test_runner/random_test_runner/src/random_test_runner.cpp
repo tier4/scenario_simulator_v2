@@ -198,6 +198,14 @@ void RandomTestRunner::update()
     RCLCPP_INFO_STREAM(get_logger(), message);
     current_test_executor_->initialize();
   }
+  if (!api_->isEgoSpawned() && !api_->isNpcLogicStarted()) {
+    api_->startNpcLogic();
+  }
+  if (
+    api_->isEgoSpawned() && !api_->isNpcLogicStarted() &&
+    api_->asAutoware(api_->getEgoName()).engageable()) {
+    api_->startNpcLogic();
+  }
   current_test_executor_->update(api_->getCurrentTime());
 }
 

@@ -22,19 +22,16 @@ TaskQueue::TaskQueue()
 : dispatcher([this] {
     try {
       while (rclcpp::ok() and not is_stop_requested.load(std::memory_order_acquire)) {
-        using namespace std::literals::chrono_literals;
-        std::unique_lock lk(thunks_mutex);
-        if (not thunks.empty()) {
+        if (auto lock = std::unique_lock(thunks_mutex); not thunks.empty()) {
           // NOTE: To ensure that the task to be queued is completed as expected is the
           // responsibility of the side to create a task.
-          auto f = std::move(thunks.front());
+          auto thunk = std::move(thunks.front());
           thunks.pop();
-          lk.unlock();
-
-          f();
+          lock.unlock();
+          thunk();
         } else {
-          lk.unlock();
-          std::this_thread::sleep_for(100ms);
+          lock.unlock();
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
       }
     } catch (...) {

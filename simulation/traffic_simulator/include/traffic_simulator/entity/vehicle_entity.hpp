@@ -122,10 +122,19 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
-  const std::string getCurrentAction() const { return behavior_plugin_ptr_->getCurrentAction(); }
+  const std::string getCurrentAction() const
+  {
+    if (!npc_logic_started_) {
+      return "waiting";
+    }
+    return behavior_plugin_ptr_->getCurrentAction();
+  }
 
   const traffic_simulator_msgs::msg::WaypointsArray getWaypoints() override
   {
+    if (!npc_logic_started_) {
+      return traffic_simulator_msgs::msg::WaypointsArray();
+    }
     try {
       return behavior_plugin_ptr_->getWaypoints();
     } catch (const std::runtime_error & e) {

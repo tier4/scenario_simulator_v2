@@ -129,9 +129,8 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-
-  if (architecture_type == "awf/universe") {
+  if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
+      architecture_type == "awf/universe") {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
@@ -166,7 +165,11 @@ EgoEntity::EgoEntity(
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
-auto EgoEntity::asAutoware() const -> concealer::Autoware & { return *autoware; }
+auto EgoEntity::asAutoware() const -> concealer::Autoware &
+{
+  assert(autoware);
+  return *autoware;
+}
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
@@ -249,16 +252,15 @@ auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Ob
 
 auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 {
-  const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
-  std::vector<std::int64_t> ids = {};
-  if (universe) {
-    const auto points = universe->getPathWithLaneId().points;
-    for (const auto & point : points) {
+  std::vector<std::int64_t> ids{};
+
+  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get()); universe) {
+    for (const auto & point : universe->getPathWithLaneId().points) {
       std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }
-    auto result = std::unique(ids.begin(), ids.end());
-    ids.erase(result, ids.end());
+    ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
   }
+
   return ids;
 }
 
@@ -303,12 +305,10 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   autoware->rethrow();
+
   EntityBase::onUpdate(current_time, step_time);
-  if (current_time < 0) {
-    updateEntityStatusTimestamp(current_time);
-    autoware->set(getCurrentPose());
-    autoware->set(getCurrentTwist());
-  } else {
+
+  if (npc_logic_started_) {
     Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
 
     switch (vehicle_model_type_) {
@@ -337,19 +337,19 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
-
-    setStatus(getEntityStatus(current_time + step_time, step_time));
-    updateStandStillDuration(step_time);
-
-    if (previous_linear_velocity_) {
-      linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
-    } else {
-      linear_jerk_ = 0;
-    }
-
-    previous_linear_velocity_ = vehicle_model_ptr_->getVx();
-    previous_angular_velocity_ = vehicle_model_ptr_->getWz();
   }
+
+  setStatus(getEntityStatus(current_time + step_time, step_time));
+  updateStandStillDuration(step_time);
+
+  if (previous_linear_velocity_) {
+    linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
+  } else {
+    linear_jerk_ = 0;
+  }
+
+  previous_linear_velocity_ = vehicle_model_ptr_->getVx();
+  previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 }
 
 void EgoEntity::requestAcquirePosition(

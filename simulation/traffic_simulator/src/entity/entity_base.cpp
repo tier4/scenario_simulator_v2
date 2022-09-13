@@ -30,7 +30,12 @@ namespace entity
 {
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-: name(name), status_(boost::none), verbose_(true), visibility_(true), entity_subtype_(subtype)
+: name(name),
+  status_(boost::none),
+  verbose_(true),
+  visibility_(true),
+  npc_logic_started_(false),
+  entity_subtype_(subtype)
 {
   status_ = boost::none;
 }
@@ -278,6 +283,10 @@ void EntityBase::requestLaneChange(
 
 void EntityBase::updateStandStillDuration(const double step_time)
 {
+  if (!npc_logic_started_) {
+    stand_still_duration_ = 0;
+    return;
+  }
   if (!status_) {
     stand_still_duration_ = boost::none;
   } else {
@@ -521,5 +530,9 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
     return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
   }
 }
+
+bool EntityBase::isNpcLogicStarted() const { return npc_logic_started_; }
+
+void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 }  // namespace entity
 }  // namespace traffic_simulator

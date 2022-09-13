@@ -110,12 +110,11 @@ return current actions of NPC, this result only use for visualization.
 
 After that, you have to define getter and setters for each data.  
 You can get unique key for each data by calling `BehaviorPluginBase::get(FOO)Key` function, such as `BehaviorPluginBase::getCurrentTimeKey()`.  
-Getter are named as get(FOO), such as `BehaviorPluginClass::getCurrentTime();`.  
-Setters are named as set(Foo), such as `BehaviorPluginClass::setCurrentTime(double value);`.
+Getter are named as get(FOO), such as `BehaviorPluginClass::getDriverModel();`.  
+Setters are named as set(Foo), such as `BehaviorPluginClass::setDriverModel(traffic_simulator_msgs::msg::DriverModel);`.
 
 | Name                 | Description                                           | Type                                                         |
 |----------------------|-------------------------------------------------------|--------------------------------------------------------------|
-| CurrentTime          | Elapsed time in simulation                            | `double`                                                     |
 | DebugMarker          | Rviz marker for debugging NPC behavior                | `std::vector<visualization_msgs::msg::Marker>`               |
 | DriverModel          | Driver behavior parameters                            | `traffic_simulator_msgs::msg::DriverModel`                   |
 | EntityStatus         | Entity status of the NPC you want to control          | `traffic_simulator_msgs::msg::EntityStatus`                  |
