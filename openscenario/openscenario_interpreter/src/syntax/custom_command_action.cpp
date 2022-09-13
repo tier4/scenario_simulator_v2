@@ -95,6 +95,18 @@ auto CustomCommandAction::node() -> rclcpp::Node &
   return node;
 }
 
+auto CustomCommandAction::printParameter(const std::vector<std::string> & args, const Scope & scope)
+  -> int
+{
+  for (auto && arg : args) {
+    std::cout << arg << " = " << scope.ref(arg) << "\n";
+  }
+
+  std::cout << std::flush;
+
+  return args.size();
+}
+
 auto CustomCommandAction::publisher()
   -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &
 {
@@ -158,18 +170,5 @@ auto CustomCommandAction::test(const std::vector<std::string> & args, const Scop
 
   return args.size();
 }
-
-auto CustomCommandAction::printParameter(const std::vector<std::string> & args, const Scope & scope)
-  -> int
-{
-  for (auto && arg : args) {
-    std::cout << arg << " = " << scope.ref(arg) << "\n";
-  }
-
-  std::cout << std::flush;
-
-  return args.size();
-}
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
