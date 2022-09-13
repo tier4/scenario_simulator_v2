@@ -72,6 +72,8 @@ struct CustomCommandAction : private Scope, private SimulatorCore::ActionApplica
   /*  */ auto start() const -> void;
 
   static auto test(const std::vector<std::string> &, const Scope &) -> int;
+
+  static auto printParameter(const std::vector<std::string> &, const Scope &) -> int;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

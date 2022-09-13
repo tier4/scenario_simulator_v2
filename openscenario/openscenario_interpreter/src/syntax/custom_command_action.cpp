@@ -130,6 +130,7 @@ auto CustomCommandAction::start() const -> void
       std::make_pair("exitFailure", exitFailure),
       std::make_pair("exitSuccess", exitSuccess),
       std::make_pair("test", test),
+      std::make_pair("printParameter", printParameter),
     };
 
   std::smatch result{};
@@ -152,6 +153,19 @@ auto CustomCommandAction::test(const std::vector<std::string> & args, const Scop
   for (auto iter = std::cbegin(args); iter != std::cend(args); ++iter) {
     std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter << "\n";
   }
+
+  std::cout << std::flush;
+
+  return args.size();
+}
+
+auto CustomCommandAction::printParameter(const std::vector<std::string> & args, const Scope & scope) -> int
+{
+  for (auto&& arg: args) {
+    std::cout << arg << " = " << scope.ref(arg) << "\n";
+  }
+
+  std::cout << std::flush;
 
   return args.size();
 }
