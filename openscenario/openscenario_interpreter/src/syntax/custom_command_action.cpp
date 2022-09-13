@@ -159,9 +159,10 @@ auto CustomCommandAction::test(const std::vector<std::string> & args, const Scop
   return args.size();
 }
 
-auto CustomCommandAction::printParameter(const std::vector<std::string> & args, const Scope & scope) -> int
+auto CustomCommandAction::printParameter(const std::vector<std::string> & args, const Scope & scope)
+  -> int
 {
-  for (auto&& arg: args) {
+  for (auto && arg : args) {
     std::cout << arg << " = " << scope.ref(arg) << "\n";
   }
 
