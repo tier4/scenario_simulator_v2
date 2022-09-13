@@ -114,6 +114,18 @@ auto AutowareUniverse::engage() -> void
   });
 }
 
+auto AutowareUniverse::engageable() const -> bool
+{
+  rethrow();
+  return task_queue.exhausted() and isWaitingForEngage();
+}
+
+auto AutowareUniverse::engaged() const -> bool
+{
+  rethrow();
+  return task_queue.exhausted() and isDriving();
+}
+
 auto AutowareUniverse::update() -> void
 {
   setControlModeReport([this]() {
@@ -243,11 +255,6 @@ auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
   requestSetVelocityLimit(request);
 }
 
-auto AutowareUniverse::isReady() noexcept -> bool
-{
-  return is_ready or (is_ready = isWaitingForRoute());
-}
-
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
   autoware_auto_control_msgs::msg::AckermannControlCommand,
   autoware_auto_vehicle_msgs::msg::GearCommand>
@@ -277,8 +284,9 @@ auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostr
         "Unsupported EmergencyState, state number : ", static_cast<int>(message.state));
   }
 
-  return out;
 #undef CASE
+
+  return out;
 }
 
 auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
@@ -325,9 +333,11 @@ auto operator<<(std::ostream & out, const TurnIndicatorsCommand & message) -> st
         "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
   }
 
-  return out;
 #undef CASE
+
+  return out;
 }
+
 auto operator>>(std::istream & is, TurnIndicatorsCommand & message) -> std::istream &
 {
 #define STATE(IDENTIFIER) {#IDENTIFIER, TurnIndicatorsCommand::IDENTIFIER}

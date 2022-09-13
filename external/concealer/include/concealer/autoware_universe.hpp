@@ -46,8 +46,6 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 {
   friend class TransitionAssertion<AutowareUniverse>;
 
-  bool is_ready = false;
-
   using Checkpoint = geometry_msgs::msg::PoseStamped;
   using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
   using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
@@ -160,6 +158,10 @@ public:
 
   auto engage() -> void override;
 
+  auto engageable() const -> bool override;
+
+  auto engaged() const -> bool override;
+
   auto getAcceleration() const -> double override;
 
   auto getAutowareStateName() const -> std::string override;
@@ -177,8 +179,6 @@ public:
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void override;
-
-  auto isReady() noexcept -> bool;
 
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
 

@@ -20,6 +20,7 @@
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
@@ -72,10 +73,6 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
     logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
   {
     configuration.auto_sink = false;
-
-    configuration.initialize_duration =
-      ObjectController::ego_count > 0 ? getParameter<int>("initialize_duration") : 0;
-
     configuration.scenario_path = osc_path;
 
     // XXX DIRTY HACK!!!
@@ -115,9 +112,8 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
 
-      script = std::make_shared<OpenScenario>(osc_path);
-
-      if (script->category.is<ScenarioDefinition>()) {
+      if (script = std::make_shared<OpenScenario>(osc_path);
+          script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
       } else {
         throw SyntaxError("ParameterValueDistributionDefinition is not yet supported.");
@@ -127,9 +123,46 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
     });
 }
 
+auto Interpreter::engage() const -> void
+{
+  for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
+    if (
+      scenario_object.template as<ScenarioObject>().is_added and
+      scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
+      asAutoware(name).engage();
+    }
+  }
+}
+
+auto Interpreter::engageable() const -> bool
+{
+  return std::all_of(
+    std::cbegin(currentScenarioDefinition()->entities),
+    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
+      const auto & [name, scenario_object] = each;
+      return not scenario_object.template as<ScenarioObject>().is_added or
+             not scenario_object.template as<ScenarioObject>()
+                   .object_controller.isUserDefinedController() or
+             asAutoware(name).engageable();
+    });
+}
+
+auto Interpreter::engaged() const -> bool
+{
+  return std::all_of(
+    std::cbegin(currentScenarioDefinition()->entities),
+    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
+      const auto & [name, scenario_object] = each;
+      return not scenario_object.template as<ScenarioObject>().is_added or
+             not scenario_object.template as<ScenarioObject>()
+                   .object_controller.isUserDefinedController() or
+             asAutoware(name).engaged();
+    });
+}
+
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  auto initializeStoryboard = [this]() {
+  auto initialize_storyboard = [this]() {
     return withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
@@ -145,25 +178,32 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       });
   };
 
-  auto evaluateStoryboard = [&]() {
+  auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
         deactivate();
       },
       [this]() {
-        if (evaluateSimulationTime() < 0) {
-          SimulatorCore::update();
-          publishCurrentContext();
-        } else if (currentScenarioDefinition()) {
-          withTimeoutHandler(defaultTimeoutHandler(), [this]() {
+        withTimeoutHandler(defaultTimeoutHandler(), [this]() {
+          if (std::isnan(evaluateSimulationTime())) {
+            if (not waiting_for_engagement_to_be_completed and engageable()) {
+              engage();
+              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
+            } else if (engaged()) {
+              activateNonUserDefinedControllers();
+              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
+            }
+          } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
-            SimulatorCore::update();
-            publishCurrentContext();
-          });
-        } else {
-          throw Error("No script evaluable.");
-        }
+          } else {
+            throw Error("No script evaluable.");
+          }
+
+          SimulatorCore::update();
+
+          publishCurrentContext();
+        });
       });
   };
 
@@ -204,9 +244,9 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         assert(publisher_of_context->is_activated());
 
-        initializeStoryboard();
+        initialize_storyboard();
 
-        timer = create_wall_timer(currentLocalFrameRate(), evaluateStoryboard);
+        timer = create_wall_timer(currentLocalFrameRate(), evaluate_storyboard);
 
         return Interpreter::Result::SUCCESS;  // => Active
       });

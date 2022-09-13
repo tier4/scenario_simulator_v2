@@ -51,8 +51,6 @@ struct Storyboard : public Scope,
   explicit Storyboard(const pugi::xml_node &, Scope &);
 
   auto run() -> void override;
-
-  auto start() -> void override;
 };
 
 auto operator<<(nlohmann::json &, const Storyboard &) -> nlohmann::json &;

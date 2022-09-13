@@ -140,6 +140,10 @@ public:
    * -------------------------------------------------------------------------- */
   virtual auto engage() -> void = 0;
 
+  virtual auto engageable() const -> bool = 0;
+
+  virtual auto engaged() const -> bool = 0;
+
   /* ---- NOTE -------------------------------------------------------------------
    *
    *  Send initial_pose to Autoware.
@@ -184,8 +188,6 @@ public:
   virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   /*   */ auto initialized() const noexcept { return initialize_was_called; }
-
-  /*   */ auto ready() const noexcept(false) -> bool;
 
   // different autowares accept different initial target speed
   virtual auto restrictTargetSpeed(double) const -> double = 0;

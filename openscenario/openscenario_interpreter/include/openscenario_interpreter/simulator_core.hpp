@@ -361,6 +361,11 @@ public:
       return core->asAutoware(std::forward<decltype(xs)>(xs)...);
     }
 
+    static auto activateNonUserDefinedControllers() -> decltype(auto)
+    {
+      return core->startNpcLogic();
+    }
+
     template <typename... Ts>
     static auto evaluateCurrentState(Ts &&... xs) -> decltype(auto)
     {

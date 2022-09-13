@@ -144,9 +144,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   if (!status_) {
     return;
   }
-  if (current_time < 0) {
-    updateEntityStatusTimestamp(current_time);
-  } else {
+  if (npc_logic_started_) {
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(status_.get());
@@ -178,6 +176,8 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
     }
     setStatus(status_updated);
     updateStandStillDuration(step_time);
+  } else {
+    updateEntityStatusTimestamp(current_time);
   }
 }
 }  // namespace entity
