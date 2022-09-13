@@ -51,8 +51,6 @@ public:
    */
   const std::vector<int8_t> & getData();
 
-  std::vector<int8_t> calculate(const geometry_msgs::msg::Pose & origin, const std::vector<std::unique_ptr<primitives::Primitive>> & primitives);
-
   /**
    * @brief Reset origin and all cell values
    * @note Use this function to reuse already allocated memory
@@ -90,12 +88,6 @@ private:
    * @brief Update value of cells surrounded by `row_and_cols` to `data`
    */
   void fillInside(const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data);
-
-  /**
-   * @brief Convert point in grid coordinate to point in world cooridnate
-   * @return Point in world coordinate
-   */
-  geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & grid_point) const;
 
   /**
    * @brief Convert point in world coordinate to point in grid cooridnate

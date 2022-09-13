@@ -48,18 +48,6 @@ math::geometry::LineSegment Grid::transformToGrid(const math::geometry::LineSegm
     transformToGrid(line.start_point), transformToGrid(line.end_point));
 }
 
-geometry_msgs::msg::Point Grid::transformToWorld(const geometry_msgs::msg::Point & grid_point) const
-{
-  auto rot = quaternion_operation::getRotationMatrix(origin_.orientation);
-  auto p = Eigen::Vector3d(grid_point.x, grid_point.y, grid_point.z);
-  auto q = Eigen::Vector3d(origin_.position.x, origin_.position.y, origin_.position.z);
-  p = rot * p + q;
-
-  geometry_msgs::msg::Point ret;
-  ret.x = p(0), ret.y = p(1), ret.z = p(2);
-  return ret;
-}
-
 geometry_msgs::msg::Point Grid::transformToPixel(const geometry_msgs::msg::Point & grid_point) const
 {
   geometry_msgs::msg::Point p;
@@ -79,7 +67,7 @@ void Grid::fillByIntersection(
   const math::geometry::LineSegment & line_segment, int8_t data,
   std::vector<std::pair<size_t, size_t>> & ret)
 {
-  const auto line_segment_pixel = transformToPixel(transformToGrid(line_segment));
+  const auto line_segment_pixel = transformToPixel(line_segment);
   int start_row = std::floor(line_segment_pixel.start_point.x);
   int start_col = std::floor(line_segment_pixel.start_point.y);
   int end_row = std::floor(line_segment_pixel.end_point.x);
@@ -165,12 +153,18 @@ void Grid::fillInside(const std::vector<std::pair<size_t, size_t>> & row_and_col
 
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
-  const auto hull = primitive->get2DConvexHull();
+  using math::geometry::LineSegment;
+  using geometry_msgs::msg::Point;
+
+  auto hull = primitive->get2DConvexHull();
+  for (auto &p : hull) {
+    p = transformToGrid(p);
+  }
   const auto occupied_edges = math::geometry::getLineSegments(hull);
 
   auto invisible_edges = occupied_edges;
   {
-    auto corners = std::vector<geometry_msgs::msg::Point>(4);
+    auto corners = std::vector<Point>(4);
     {
       double half_rw = static_cast<double>(width) * resolution / 2;
       double half_rh = static_cast<double>(height) * resolution / 2;
@@ -180,18 +174,13 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
       corners[1].x = -half_rw, corners[1].y = half_rh;
       corners[2].x = half_rw, corners[2].y = -half_rh;
       corners[3].x = -half_rw, corners[3].y = -half_rh;
-
-      // transform to world coordinate system
-      for (auto & corner : corners) {
-        corner = transformToWorld(corner);
-      }
     }
 
     auto diagonal_length = std::hypot(width * resolution, height * resolution);
 
     // add rays through grid corners
     for (const auto & corner : corners) {
-      auto ray = math::geometry::LineSegment(origin_.position, corner);
+      auto ray = LineSegment(Point(), corner);
       for (const auto & line_segment : occupied_edges) {
         if (const auto intersection = ray.getIntersection2D(line_segment)) {
           invisible_edges.emplace_back(intersection.get(), ray.get2DVector(), diagonal_length);
@@ -200,7 +189,7 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
     }
     // add rays through hull points
     for (const auto & point : hull) {
-      auto ray = math::geometry::LineSegment(origin_.position, point);
+      auto ray = LineSegment(Point(), point);
       invisible_edges.emplace_back(point, ray.get2DVector(), diagonal_length);
     }
   }
@@ -225,182 +214,6 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
 }
 
 const std::vector<int8_t> & Grid::getData() { return values_; }
-
-// this function assume that primitives do not overlap each other
-std::vector<int8_t> Grid::calculate(const geometry_msgs::msg::Pose & origin, const std::vector<std::unique_ptr<primitives::Primitive>> & primitives) {
-  origin_ = origin;
-
-  using LineSegment = math::geometry::LineSegment;
-  using Point = geometry_msgs::msg::Point;
-
-  struct Event {
-    enum { LineStart, LineEnd } type;
-    double angle;
-    size_t index;
-  };
-
-  // function that calculate angle of point in interval [-3π/4, 5π/4]
-  const auto angle = [](const Point &p) {
-    auto res = std::atan2(p.y, p.x);
-    if (res < -3 * M_PI / 4) {
-      res += 2 * M_PI;
-    }
-    return res;
-  };
-
-  auto edges = std::vector<LineSegment>();
-  for (auto & primitive : primitives) {
-    auto hull = primitive->get2DConvexHull();
-    for (auto &p : hull) {
-      p = transformToGrid(p);
-    }
-
-    for (size_t i = 0; i + 1 < hull.size(); ++i) {
-      const auto &p = hull[i];
-      const auto &q = hull[(i + 1) % hull.size()];
-
-      auto p_rad = angle(p);
-      auto q_rad = angle(q);
-
-      if ((std::abs(q_rad - p_rad) > M_PI) ^ (p_rad < q_rad)) {
-        edges.emplace_back(p, q);
-      } else {
-        edges.emplace_back(q, p);
-      }
-    }
-  }
-
-  auto edge_index_ord = [&](const size_t i, const size_t j) {
-    const auto &[ a, b ] = edges[i];
-    const auto &[ p, q ] = edges[j];
-
-    auto left_side = [](const Point &a, const Point &b, const Point &p) {
-      return ((b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x)) > 0;
-    };
-    return left_side(a, b, p) && left_side(a, b, q);
-  };
-
-  auto events = std::vector<Event>();
-  auto edge_indices = std::set<size_t, decltype(edge_index_ord)>(edge_index_ord);
-  for (size_t i = 0; i < edges.size(); ++i) {
-    const auto &[ p, q ] = edges[i];
-
-    auto p_rad = angle(p);
-    auto q_rad = angle(q);
-
-    if (p_rad - q_rad > M_PI) {
-      edge_indices.emplace(i);
-    }
-
-    events.push_back({ Event::LineStart, p_rad, i });
-    events.push_back({ Event::LineEnd, q_rad, i });
-  }
-
-  auto event_ord = [](const Event &a, const Event &b) { return a.angle < b.angle; };
-  std::sort(events.begin(), events.end(), event_ord);
-
-  auto cut_line = [&](const size_t index, const double angle) {
-    auto diagonal = std::hypot(width * resolution, height * resolution);
-    auto endpoint = Point();
-    endpoint.x = diagonal * std::cos(angle);
-    endpoint.y = diagonal * std::sin(angle);
-    return LineSegment(Point(), endpoint).getIntersection2D(edges[index]);
-  };
-  auto itr = events.begin();
-  auto last_point = boost::optional<Point>();
-  auto simplified_edges = std::vector<std::vector<LineSegment>>();
-  for (size_t i = 0; i < 4; ++i) {
-    double current_corner = (2 * (i + 1) - 3) * M_PI / 4;
-    double next_corner = (2 * i - 3) * M_PI / 4;
-    if (not edge_indices.empty()) {
-      last_point = cut_line(*edge_indices.begin(), current_corner);
-    }
-
-    auto output = std::stringstream();
-    output << "sweep_line " << i << ": ";
-    for (auto &index : edge_indices) {
-      const auto &[ p, q ] = edges[index];
-      output << "(" << p.x << ", " << p.y << "), " << "(" << q.x << ", " << q.y << "); ";
-    }
-    std::cout << output.str() << std::endl;
-
-    for (; itr->angle < next_corner && itr < events.end(); ++itr) {
-      switch (itr->type) {
-        case Event::LineStart: {
-          auto old_front = edge_indices.begin();
-          edge_indices.emplace(itr->index);
-
-          if (old_front != edge_indices.end() && old_front != edge_indices.begin()) {
-            auto endpoint = cut_line(*old_front, itr->angle);
-            simplified_edges[i].emplace_back(last_point.get(), endpoint.get());
-            last_point = edges[itr->index].start_point;
-          }
-          break;
-        }
-        case Event::LineEnd: {
-          if (itr->index == *edge_indices.begin()) {
-            simplified_edges[i].emplace_back(last_point.get(), edges[itr->index].end_point);
-          }
-          edge_indices.erase(itr->index);
-          if (not edge_indices.empty()) {
-            last_point = cut_line(*edge_indices.begin(), itr->angle);
-          } else {
-            last_point.reset();
-          }
-          break;
-        }
-      }
-    }
-
-    if (not edge_indices.empty()) {
-      auto endpoint = cut_line(*edge_indices.begin(), next_corner);
-      simplified_edges[i].emplace_back(last_point.get(), endpoint.get());
-    }
-  }
-
-  auto corners = std::vector<geometry_msgs::msg::Point>(4);
-  {
-    double half_rw = static_cast<double>(width) * resolution / 2;
-    double half_rh = static_cast<double>(height) * resolution / 2;
-
-    // enumerate corner coordinates
-    corners[0].x = -half_rw, corners[0].y = -half_rh; // -3π/4
-    corners[1].x = half_rw, corners[1].y = -half_rh; // -1π/4
-    corners[2].x = half_rw, corners[2].y = half_rh; // 1π/4
-    corners[3].x = -half_rw, corners[3].y = half_rh; // 3π/4
-  }
-
-  auto side_edge = [&](const LineSegment &grid_edge, const Point &p) {
-    auto rad = angle(p);
-    auto diagonal = std::hypot(width * resolution, height * resolution);
-    auto q = p;
-    q.x += diagonal * std::cos(rad);
-    q.y += diagonal * std::sin(rad);
-    return LineSegment(p, grid_edge.getIntersection2D({ p, q }).get());
-  };
-
-  for (size_t i = 0; i < 4; ++i) {
-    auto grid_edge = LineSegment(corners[i], corners[(i + 1) % 4]);
-
-    for (auto &edge : simplified_edges[i]) {
-      auto filled = std::vector<std::pair<size_t, size_t>>();
-      fillByIntersection(edge, invisible_cost, filled);
-      fillByIntersection(side_edge(grid_edge, edge.start_point), invisible_cost, filled);
-      fillByIntersection(side_edge(grid_edge, edge.end_point), invisible_cost, filled);
-      fillInside(filled, invisible_cost);
-    }
-  }
-
-  for (const auto &primitive : primitives) {
-    auto occupied_edge_cells = std::vector<std::pair<size_t, size_t>>();
-    for (const auto & edge : math::geometry::getLineSegments(primitive->get2DConvexHull())) {
-      fillByIntersection(edge, occupied_cost, occupied_edge_cells);
-    }
-    fillInside(occupied_edge_cells, occupied_cost);
-  }
-
-  return values_;
-}
 
 bool Grid::fillByRowCol(size_t row, size_t col, int8_t data)
 {
