@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Deterministic ---------------------------------------------------
+/* ---- DeterministicParameterDistribution ---------------------------------------------------
  *
  * <xsd:group name="DeterministicParameterDistribution">
  *   <xsd:choice>
