@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
 #define OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
 
+#include <openscenario_interpreter/syntax/deterministic_parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
 
@@ -31,11 +32,9 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Deterministic : public ComplexType
+struct Deterministic : public DeterministicParameterDistribution
 {
-  const DeterministicParameterDistribution deterministic_parameter_distribution;
-
-  explicit Deterministic(const pugi::xml_node &, Scope & scope) {}
+  explicit Deterministic(const pugi::xml_node &, Scope & scope);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
