@@ -32,7 +32,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ParameterValueDistribution : public ComplexType
+struct ParameterValueDistribution : public DistributionDefinition
 {
   const File scenario_file;
 

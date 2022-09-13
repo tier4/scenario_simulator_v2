@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 
-namespace openscenario_interpreter::syntax
+namespace openscenario_interpreter
+{
+inline namespace syntax
 {
 ParameterValueDistribution::ParameterValueDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
+: DistributionDefinition(node, scope), scenario_file(readElement<File>("ScenarioFile", node, scope))
 {
 }
-}  // namespace openscenario_interpreter::syntax
+}  // namespace syntax
+}  // namespace openscenario_interpreter
