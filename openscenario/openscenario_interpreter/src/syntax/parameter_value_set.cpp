@@ -12,31 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
-
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_set.hpp>
-#include <openscenario_interpreter/syntax/file.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ValueSetDistribution ---------------------------------------------------
- *
- * <xsd:complexType name="ValueSetDistribution">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterValueSet" type="ParameterValueSet" maxOccurs="unbounded"/>
- *   </xsd:sequence>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct ValueSetDistribution : public ComplexType
+ParameterValueSet::ParameterValueSet(
+  const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
+: parameter_assignments(readElements<ParameterAssignment, 1>("ParameterAssignment", node, scope))
 {
-  const std::list<ParameterValueSet> parameter_value_sets;
-
-  explicit ValueSetDistribution(const pugi::xml_node &, Scope & scope);
-};
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
