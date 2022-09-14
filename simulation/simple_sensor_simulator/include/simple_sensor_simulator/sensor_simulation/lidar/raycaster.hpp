@@ -85,9 +85,16 @@ private:
   std::vector<std::string> detected_objects_;
   std::unordered_map<unsigned int, std::string> geometry_ids_;
 
-  static void intersect(RTCScene scene, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, RTCIntersectContext context, geometry_msgs::msg::Pose origin, std::vector<unsigned int> detected_ids, std::vector<geometry_msgs::msg::Quaternion> directions,int directions_start, int directions_end, double max_distance, double min_distance)
+  static void intersect(int thread_id, int thread_count,
+                        RTCScene scene,
+                        pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud,
+                        RTCIntersectContext context,
+                        geometry_msgs::msg::Pose origin,
+                        std::set<unsigned int>& thread_detected_ids,
+                        const std::vector<geometry_msgs::msg::Quaternion>& directions,
+                        double max_distance, double min_distance)
   {
-    for(int i = directions_start; i < directions_end; ++i)
+    for(int i = thread_id ; i < directions.size(); i += thread_count)
     {
       RTCRayHit rayhit = {};
       rayhit.ray.org_x = origin.position.x;
@@ -122,10 +129,8 @@ private:
           p.y = vector[1];
           p.z = vector[2];
         }
-        cloud->emplace_back(p);
-        if (std::count(detected_ids.begin(), detected_ids.end(), rayhit.hit.geomID) == 0) {
-          detected_ids.emplace_back(rayhit.hit.geomID);
-        }
+        thread_cloud->emplace_back(p);
+        thread_detected_ids.insert(rayhit.hit.geomID);
       }
     }
   }

@@ -142,7 +142,6 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::vector<geometry_msgs::msg::Quaternion> directions, double max_distance, double min_distance)
 {
   detected_objects_ = {};
-  std::vector<unsigned int> detected_ids = {};
   // scene_ = rtcNewScene(device_);
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
   for (auto & pair : primitive_ptrs_) {
@@ -157,25 +156,32 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     }
   }
 
-
-  int number_of_parts = 5;
-  std::vector<std::thread> threads(number_of_parts);
-  int slices = directions.size() / number_of_parts; //481.33
+  // Run as many threads as physical cores (which is usually /2 virtual threads)
+  // In heavy loads virtual threads (hyperthreading) add little to the overall performance
+  // This also minimizes cost of creating a thread (roughly 10us on Intel/Linux)
+  int thread_count = std::thread::hardware_concurrency() / 2;
+  // Per thread data structures:
+  std::vector<std::thread> threads(thread_count);
+  std::vector<std::set<unsigned int>> thread_detected_ids(thread_count);
+  std::vector<pcl::PointCloud<pcl::PointXYZI>> thread_cloud(thread_count);
 
   rtcCommitScene(scene_);
   RTCIntersectContext context;
   //TODO try not setting this
+  for (int i = 0; i < threads.size(); ++i)
+  {
+    thread_cloud[i] = new pcl::PointCloud<pcl::PointXYZI>();
+    threads[i] = std::thread(intersect, i, thread_count, scene_, thread_cloud[i], context, origin, thread_detected_ids[i], directions, max_distance, min_distance);
+  }
     for (int i = 0; i < threads.size(); ++i)
   {
-    threads[i] = std::thread(intersect, scene_, cloud, context, origin, detected_ids, directions, i * int(std::floor(slices)), std::min((i+1) * int(std::ceil(slices)), int(directions.size()-1)), max_distance, min_distance);
+    threads[i].join();
+    (*cloud) += thread_cloud[i];
   }
-
-  for(auto& thread : threads)
-  {
-    thread.join();
-  }
-  for (const auto & id : detected_ids) {
-    detected_objects_.emplace_back(geometry_ids_[id]);
+  for (auto&& detected_ids_in_thread : thread_detected_ids) {
+      for (const auto & id : detected_ids_in_thread) {
+          detected_objects_.emplace_back(geometry_ids_[id]);
+      }
   }
 
   // for (const auto & id : geometry_ids_) {
