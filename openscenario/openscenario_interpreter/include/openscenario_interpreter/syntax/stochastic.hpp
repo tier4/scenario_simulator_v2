@@ -16,7 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__STOCHASTIC_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/stochastic_distribution.hpp>
+#include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -43,7 +45,7 @@ struct Stochastic : public ComplexType
 
   const Double random_seed;
 
-  explicit Stochastic(const pugi::xml_node &, Scope & scope) {}
+  explicit Stochastic(const pugi::xml_node &, Scope & scope);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
