@@ -90,10 +90,12 @@ private:
                         pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud,
                         RTCIntersectContext context,
                         geometry_msgs::msg::Pose origin,
-                        std::set<unsigned int>& thread_detected_ids,
-                        const std::vector<geometry_msgs::msg::Quaternion>& directions,
+                        std::reference_wrapper<std::set<unsigned int>> ref_thread_detected_ids,
+                        std::reference_wrapper<const std::vector<geometry_msgs::msg::Quaternion>> ref_directions,
                         double max_distance, double min_distance)
   {
+    auto& directions = ref_directions.get();
+    auto& thread_detected_ids = ref_thread_detected_ids.get();
     for(int i = thread_id ; i < directions.size(); i += thread_count)
     {
       RTCRayHit rayhit = {};

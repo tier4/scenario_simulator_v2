@@ -163,20 +163,21 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   // Per thread data structures:
   std::vector<std::thread> threads(thread_count);
   std::vector<std::set<unsigned int>> thread_detected_ids(thread_count);
-  std::vector<pcl::PointCloud<pcl::PointXYZI>> thread_cloud(thread_count);
+  std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> thread_cloud(thread_count);
 
   rtcCommitScene(scene_);
   RTCIntersectContext context;
   //TODO try not setting this
   for (int i = 0; i < threads.size(); ++i)
   {
-    thread_cloud[i] = new pcl::PointCloud<pcl::PointXYZI>();
-    threads[i] = std::thread(intersect, i, thread_count, scene_, thread_cloud[i], context, origin, thread_detected_ids[i], directions, max_distance, min_distance);
+    thread_cloud[i] = boost::make_shared<pcl::PointCloud<pcl::PointXYZI>>();
+    threads[i] = std::thread(intersect, i, thread_count, scene_, thread_cloud[i], context, origin,
+                             std::ref(thread_detected_ids[i]), std::ref(directions), max_distance, min_distance);
   }
     for (int i = 0; i < threads.size(); ++i)
   {
     threads[i].join();
-    (*cloud) += thread_cloud[i];
+    (*cloud) += *(thread_cloud[i]);
   }
   for (auto&& detected_ids_in_thread : thread_detected_ids) {
       for (const auto & id : detected_ids_in_thread) {
