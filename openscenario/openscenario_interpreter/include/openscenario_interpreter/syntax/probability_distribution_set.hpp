@@ -12,31 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
+#define OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
 
-#include <openscenario_interpreter/syntax/parameter_value_set.hpp>
-#include <openscenario_interpreter/syntax/file.hpp>
+#include <openscenario_interpreter/syntax/probability_distribution_set_element.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ProbabilityDistribution ---------------------------------------------------
+/* ---- ProbabilityDistributionSet ---------------------------------------------------
  *
- * <xsd:complexType name="ProbabilityDistribution">
+ * <xsd:complexType name="ProbabilityDistributionSet">
  *   <xsd:sequence>
  *     <xsd:element name="Element" type="ProbabilityDistributionSetElement" maxOccurs="unbounded"/>
  *   </xsd:sequence>
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ProbabilityDistribution : public ComplexType
+struct ProbabilityDistributionSet : public ComplexType
 {
   const std::list<ProbabilityDistributionSetElement> elements;
 
-  explicit ProbabilityDistribution(const pugi::xml_node &, Scope & scope);
+  explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_

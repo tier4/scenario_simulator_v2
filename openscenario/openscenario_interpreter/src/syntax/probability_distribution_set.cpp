@@ -13,13 +13,13 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/probability_distribution.hpp>
+#include <openscenario_interpreter/syntax/probability_distribution_set.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-ProbabilityDistribution::ProbabilityDistribution(
+ProbabilityDistributionSet::ProbabilityDistributionSet(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : elements(readElements<ProbabilityDistributionElement, 1>("Element", node, scope))
 {
