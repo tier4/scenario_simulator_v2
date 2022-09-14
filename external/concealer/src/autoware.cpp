@@ -169,6 +169,12 @@ void Autoware::resetTimerCallback()
   updater = create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });
 }
 
+auto Autoware::set(const geometry_msgs::msg::Accel & acceleration)
+  -> const geometry_msgs::msg::Accel &
+{
+  return current_acceleration = acceleration;
+}
+
 auto Autoware::set(const geometry_msgs::msg::Pose & pose) -> const geometry_msgs::msg::Pose &
 {
   return current_pose = pose;
