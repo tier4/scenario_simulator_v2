@@ -162,22 +162,6 @@ auto Interpreter::engaged() const -> bool
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  auto initialize_storyboard = [this]() {
-    return withExceptionHandler(
-      [this](auto &&...) {
-        publishCurrentContext();
-        deactivate();
-      },
-      [this]() {
-        if (currentScenarioDefinition()) {
-          currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
-          SimulatorCore::update();
-        } else {
-          throw Error("No script evaluable.");
-        }
-      });
-  };
-
   auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
@@ -211,7 +195,10 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
     return Result::FAILURE;
   } else {
     return withExceptionHandler(
-      [this](auto &&...) { return Interpreter::Result::ERROR; },
+      [this](auto &&...) {
+        publishCurrentContext();
+        return Interpreter::Result::ERROR;
+      },
       [&]() {
         if (getParameter<bool>("record", true)) {
           // clang-format off
@@ -236,7 +223,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
            cannot start at exactly zero simulation time, which is a serious
            problem that must be solved in the future.
         */
-        SimulatorCore::update();
+        // SimulatorCore::update();
 
         execution_timer.clear();
 
@@ -244,7 +231,12 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         assert(publisher_of_context->is_activated());
 
-        initialize_storyboard();
+        if (currentScenarioDefinition()) {
+          currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
+          // SimulatorCore::update();
+        } else {
+          throw Error("No script evaluable.");
+        }
 
         timer = create_wall_timer(currentLocalFrameRate(), evaluate_storyboard);
 
