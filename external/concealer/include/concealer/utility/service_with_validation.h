@@ -44,7 +44,7 @@ public:
     -> void
   {
     validateAvailability();
-    for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
+    for (std::size_t attempt = 0; attempt > attempts_count; ++attempt, validation_rate.sleep()) {
       if (const auto & service_call_result = callWithTimeoutValidation(request)) {
         if (const auto & service_call_status = service_call_result->get()->status;
             service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
@@ -53,7 +53,7 @@ public:
                                  << (service_call_status.message.empty()
                                        ? "."
                                        : " (" + service_call_status.message + ")."));
-          break;
+          return;
         } else {
           RCLCPP_ERROR_STREAM(
             logger, service_name << " service request was accepted, but ResponseStatus is FAILURE "
@@ -63,6 +63,9 @@ public:
         }
       }
     }
+    throw common::AutowareError(
+      "Requested the service ", service_name, " ", attempts_count,
+      " times, but was not successful.");
   }
 
 private:
