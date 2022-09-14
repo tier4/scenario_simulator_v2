@@ -71,23 +71,89 @@ private:
   std::vector<int8_t> values_;
 
   /**
-   * @brief Update value of cell locate at (`row`, `col`) to `data`
-   * @return true if cell value is updated otherwise false
-   */
-  bool fillByRowCol(size_t row, size_t col, int8_t data);
-
-  /**
-   * @brief Update value of cells intersect with `line_segment` to `data`
+   * @brief Traverse cells along with `line`
    * @param [out] ret coordinates of filled cells
    */
-  void fillByIntersection(
-    const math::geometry::LineSegment & line_segment, int8_t data,
-    std::vector<std::pair<size_t, size_t>> & ret);
+  template<class F>
+  void traverseLineSegment(const math::geometry::LineSegment & line, const F &f)
+  {
+    // A Fast Voxel Traversal Algorithm for Ray Tracing
+    // https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf
+
+    auto start = transformToPixel(line.start_point);
+    auto end = transformToPixel(line.end_point);
+
+    double start_x = start.x;
+    double start_y = start.y;
+    double end_x = end.x;
+    double end_y = end.y;
+
+    double vx = end_x - start_x;
+    double vy = end_y - start_y;
+
+    if (start_x < 0 || start_x > width) {
+      double dx = start_x < 0 ? -start_x : width - start_x;
+      double dy = vy * dx / vx;
+
+      start_x += dx;
+      start_y += dy;
+    }
+
+    if (start_y < 0 || start_y > height) {
+      double dy = start_y < 0 ? -start_y : height - start_y;
+      double dx = vx * dy / vy;
+
+      start_x += dx;
+      start_y += dy;
+    }
+
+    if (end_x < 0 || end_x > width) {
+      double dx = end_x < 0 ? -end_x : width - end_x;
+      double dy = vy * dx / vx;
+
+      end_x += dx;
+      end_y += dy;
+    }
+
+    if (end_y < 0 || end_y > height) {
+      double dy = end_y < 0 ? -end_y : height - end_y;
+      double dx = vx * dy / vy;
+
+      end_x += dx;
+      end_y += dy;
+    }
+
+    vx = end_x - start_x;
+    vy = end_y - start_y;
+
+    ssize_t col = static_cast<ssize_t>(start_x);
+    ssize_t row = static_cast<ssize_t>(start_y);
+
+    ssize_t step_col = static_cast<ssize_t>(std::copysign(1.0, vx));
+    ssize_t step_row = static_cast<ssize_t>(std::copysign(1.0, vy));
+
+    double tdx = 1.0 / std::abs(vx);
+    double tdy = 1.0 / std::abs(vy);
+
+    double tx = vx > 0 ? (std::ceil(start_x) - start_x) * tdx : (start_x - std::floor(start_x)) * tdx;
+    double ty = vy > 0 ? (std::ceil(start_y) - start_y) * tdy : (start_y - std::floor(start_y)) * tdy;
+
+    while (tx <= 1.0 || ty <= 1.0) {
+      f(col, row);
+      if (tx < ty) {
+        tx += tdx;
+        col += step_col;
+      } else {
+        ty += tdy;
+        row += step_row;
+      }
+    }
+  }
 
   /**
-   * @brief Update value of cells surrounded by `row_and_cols` to `data`
+   * @brief Update value of cells surrounded by `segments` to `data`
    */
-  void fillInside(const std::vector<std::pair<size_t, size_t>> & row_and_cols, int8_t data);
+  void fillInside(const std::vector<math::geometry::LineSegment> & segments, int8_t data);
 
   /**
    * @brief Convert point in world coordinate to point in grid cooridnate
@@ -96,22 +162,11 @@ private:
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
 
   /**
-   * @brief Convert line segment in world coordinate to line segment in grid cooridnate
-   * @return Line segment in grid coordinate
-   */
-  math::geometry::LineSegment transformToGrid(const math::geometry::LineSegment & line) const;
-
-  /**
    * @brief Digitize point in grid coordinate
    * @return Digitized point
    */
   geometry_msgs::msg::Point transformToPixel(const geometry_msgs::msg::Point & grid_point) const;
 
-  /**
-   * @brief Digitize line segment in grid coordinate
-   * @return Digitized line segment
-   */
-  math::geometry::LineSegment transformToPixel(const math::geometry::LineSegment & line) const;
 };
 }  // namespace simple_sensor_simulator
 
