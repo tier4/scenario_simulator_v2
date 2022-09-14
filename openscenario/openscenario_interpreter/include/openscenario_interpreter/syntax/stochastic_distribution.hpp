@@ -35,6 +35,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct StochasticDistribution : public StochasticDistributionType
 {
+  const String parameter_name;
+
   explicit StochasticDistribution(const pugi::xml_node &, Scope & scope);
 };
 }  // namespace syntax

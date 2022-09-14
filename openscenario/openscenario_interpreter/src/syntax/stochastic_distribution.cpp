@@ -19,9 +19,9 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-StochasticDistribution::StochasticDistribution(
-  const pugi::xml_node & node, Scope & scope)
-: StochasticDistributionType(node, scope)
+StochasticDistribution::StochasticDistribution(const pugi::xml_node & node, Scope & scope)
+: StochasticDistributionType(node, scope),
+  parameter_name(readAttribute<String>("parameterName", node, scope))
 {
 }
 }  // namespace syntax
