@@ -33,7 +33,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct UserDefinedDistribution : private Scope
+struct UserDefinedDistribution : private Scope, public ComplexType
 {
   const String type;
 

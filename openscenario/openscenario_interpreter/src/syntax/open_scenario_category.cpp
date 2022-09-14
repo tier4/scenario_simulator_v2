@@ -25,9 +25,9 @@ OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & 
 : Group(
     // clang-format off
     choice(tree,
-            std::make_pair("Storyboard",                [&tree, &scope](auto && node) { return make<ScenarioDefinition>(tree, scope);         }),  // DIRTY HACK!!!
-            std::make_pair("Catalog",                   [&tree, &scope](auto && node) { return make<CatalogDefinition>(tree, scope);          }),
-            std::make_pair("ParameterValueDistribution",[&tree, &scope](auto && node) { return make<ParameterValueDistribution>(tree, scope); })))
+            std::make_pair("Storyboard",                [&](auto && node) { return make<ScenarioDefinition        >(node, scope);         }),  // DIRTY HACK!!!
+            std::make_pair("Catalog",                   [&](auto && node) { return make<CatalogDefinition         >(node, scope);          }),
+            std::make_pair("ParameterValueDistribution",[&](auto && node) { return make<ParameterValueDistribution>(node, scope); })))
 // clang-format on
 {
 }

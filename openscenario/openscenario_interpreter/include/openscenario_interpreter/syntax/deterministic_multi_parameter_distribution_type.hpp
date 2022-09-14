@@ -32,15 +32,15 @@ inline namespace syntax
  * </xsd:group>
  *
  * -------------------------------------------------------------------------- */
-struct DeterministicMultiParameterDistributionType : public Group
+struct DeterministicMultiParameterDistributionType : public ValueSetDistribution
 {
   explicit DeterministicMultiParameterDistributionType(const pugi::xml_node &, Scope & scope);
 };
 
-DEFINE_LAZY_VISITOR(
-  DeterministicMultiParameterDistributionType,
-  CASE(ValueSetDistribution),     //
-);
+//DEFINE_LAZY_VISITOR(
+//  DeterministicMultiParameterDistributionType,
+//  CASE(ValueSetDistribution),     //
+//);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_TYPE_HPP_

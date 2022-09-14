@@ -32,7 +32,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DistributionRange : private Scope
+struct DistributionRange : private Scope, public ComplexType
 {
   const Range range;
 

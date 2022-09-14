@@ -32,8 +32,10 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Deterministic : public DeterministicParameterDistribution
+struct Deterministic
 {
+  const std::list<DeterministicParameterDistribution> deterministic_parameter_distributions;
+
   explicit Deterministic(const pugi::xml_node &, Scope & scope);
 };
 }  // namespace syntax

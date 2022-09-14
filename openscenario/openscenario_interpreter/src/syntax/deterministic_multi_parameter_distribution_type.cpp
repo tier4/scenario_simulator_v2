@@ -21,11 +21,7 @@ inline namespace syntax
 {
 DeterministicMultiParameterDistributionType::DeterministicMultiParameterDistributionType(
   const pugi::xml_node & node, Scope & scope)
-// clang-format off
-: Group(node,
-    choice(node,
-      std::make_pair("ValueSetDistribution", [&](auto && node){return make<ValueSetDistribution>(node, scope);})))
-// clang-format on
+: ValueSetDistribution(readElement<ValueSetDistribution>("ValueSetDistribution", node, scope))
 {
 }
 }  // namespace syntax

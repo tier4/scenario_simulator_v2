@@ -25,7 +25,7 @@ DeterministicParameterDistribution::DeterministicParameterDistribution(
 : Group(node,
     choice(node,
       std::make_pair("DeterministicMultiParameterDistribution",  [&](auto && node){return make<DeterministicMultiParameterDistribution >(node,scope);}),
-      std::make_pair("DeterministicSingleParameterDistribution", [&](auto && node){return make<DeterministicSingleParameterDistribution>(node,scope);}),))
+      std::make_pair("DeterministicSingleParameterDistribution", [&](auto && node){return make<DeterministicSingleParameterDistribution>(node,scope);})))
 // clang-format on
 {
 }
