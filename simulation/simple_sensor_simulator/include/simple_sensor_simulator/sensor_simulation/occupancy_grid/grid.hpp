@@ -80,72 +80,37 @@ private:
     // A Fast Voxel Traversal Algorithm for Ray Tracing
     // https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf
 
-    auto start = transformToPixel(line.start_point);
-    auto end = transformToPixel(line.end_point);
-
-    double start_x = start.x;
-    double start_y = start.y;
-    double end_x = end.x;
-    double end_y = end.y;
+    double start_x = line.start_point.x;
+    double start_y = line.start_point.y;
+    double end_x = line.end_point.x;
+    double end_y = line.end_point.y;
 
     double vx = end_x - start_x;
     double vy = end_y - start_y;
 
-    if (start_x < 0 || start_x > width) {
-      double dx = start_x < 0 ? -start_x : width - start_x;
-      double dy = vy * dx / vx;
+    ssize_t x = ssize_t(start_x);
+    ssize_t y = ssize_t(start_y);
 
-      start_x += dx;
-      start_y += dy;
-    }
+    ssize_t step_x = ssize_t(std::copysign(1.0, vx));
+    ssize_t step_y = ssize_t(std::copysign(1.0, vy));
 
-    if (start_y < 0 || start_y > height) {
-      double dy = start_y < 0 ? -start_y : height - start_y;
-      double dx = vx * dy / vy;
+    double tdx = step_x / vx;
+    double tdy = step_y / vy;
 
-      start_x += dx;
-      start_y += dy;
-    }
+    double tx = vx > 0 ? std::ceil(start_x) : std::floor(start_x);
+    double ty = vy > 0 ? std::ceil(start_y) : std::floor(start_y);
 
-    if (end_x < 0 || end_x > width) {
-      double dx = end_x < 0 ? -end_x : width - end_x;
-      double dy = vy * dx / vx;
-
-      end_x += dx;
-      end_y += dy;
-    }
-
-    if (end_y < 0 || end_y > height) {
-      double dy = end_y < 0 ? -end_y : height - end_y;
-      double dx = vx * dy / vy;
-
-      end_x += dx;
-      end_y += dy;
-    }
-
-    vx = end_x - start_x;
-    vy = end_y - start_y;
-
-    ssize_t col = static_cast<ssize_t>(start_x);
-    ssize_t row = static_cast<ssize_t>(start_y);
-
-    ssize_t step_col = static_cast<ssize_t>(std::copysign(1.0, vx));
-    ssize_t step_row = static_cast<ssize_t>(std::copysign(1.0, vy));
-
-    double tdx = 1.0 / std::abs(vx);
-    double tdy = 1.0 / std::abs(vy);
-
-    double tx = vx > 0 ? (std::ceil(start_x) - start_x) * tdx : (start_x - std::floor(start_x)) * tdx;
-    double ty = vy > 0 ? (std::ceil(start_y) - start_y) * tdy : (start_y - std::floor(start_y)) * tdy;
+    tx = vx != 0 ? (tx - start_x) / vx : tdx;
+    ty = vy != 0 ? (ty - start_y) / vy : tdy;
 
     while (tx <= 1.0 || ty <= 1.0) {
-      f(col, row);
+      f(x, y);
       if (tx < ty) {
         tx += tdx;
-        col += step_col;
+        x += step_x;
       } else {
         ty += tdy;
-        row += step_row;
+        y += step_y;
       }
     }
   }
