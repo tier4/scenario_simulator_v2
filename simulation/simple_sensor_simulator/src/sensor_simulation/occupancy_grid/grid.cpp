@@ -51,11 +51,13 @@ geometry_msgs::msg::Point Grid::transformToPixel(const geometry_msgs::msg::Point
   return p;
 }
 
-void Grid::fillInside(const std::vector<math::geometry::LineSegment> & segments, int8_t data)
+void Grid::fillInside(const std::vector<geometry_msgs::msg::Point> & polygon, int8_t data)
 {
   auto grouped = std::vector<std::vector<size_t>>(height);
-  for (auto & [ p, q ] : segments) {
-    traverse(transformToPixel(p), transformToPixel(q), [&](ssize_t col, ssize_t row) {
+  for (size_t i = 0; i < polygon.size(); ++i) {
+    auto p = transformToPixel(polygon[i]);
+    auto q = transformToPixel(polygon[(i + 1) % polygon.size()]);
+    traverse(p, q, [&](ssize_t col, ssize_t row) {
       if (col >= 0 && col < width && row >= 0 && row < height) {
         grouped.at(row).emplace_back(col);
       }
@@ -83,21 +85,21 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
     return p;
   };
 
-  auto hull = primitive->get2DConvexHull();
-  for (auto &p : hull) {
+  auto occupied_polygon = primitive->get2DConvexHull();
+  for (auto &p : occupied_polygon) {
     p = transformToGrid(p);
   }
 
-  auto invisible_edges = std::vector<LineSegment>();
+  auto invisible_polygon = std::vector<Point>();
   {
-    auto minp = decltype(hull)::iterator();
-    auto maxp = decltype(hull)::iterator();
+    auto minp = decltype(occupied_polygon)::iterator();
+    auto maxp = decltype(occupied_polygon)::iterator();
 
     {
       auto ord = [&](const Point & p, const Point & q) {
         return std::atan2(p.y, p.x) < std::atan2(q.y, q.x);
       };
-      std::tie(minp, maxp) = std::minmax_element(hull.begin(), hull.end(), ord);
+      std::tie(minp, maxp) = std::minmax_element(occupied_polygon.begin(), occupied_polygon.end(), ord);
     }
 
     auto minang = std::atan2(minp->y, minp->x);
@@ -113,7 +115,7 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
 
         return prad < qrad;
       };
-      std::tie(minp, maxp) = std::minmax_element(hull.begin(), hull.end(), ord);
+      std::tie(minp, maxp) = std::minmax_element(occupied_polygon.begin(), occupied_polygon.end(), ord);
       minang = std::atan2(minp->y, minp->x);
       maxang = std::atan2(maxp->y, maxp->x) + 2 * M_PI;
     }
@@ -138,16 +140,12 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
         }
       };
 
-      invisible_edges.emplace_back(*minp, *maxp);
-
       auto i = size_t(0);
-      auto last = Point();
       for (;; ++i) {
         auto & corner = corners[i];
         if (std::atan2(corner.y, corner.x) >= minang) {
-          auto p = projection(*minp, i);
-          invisible_edges.emplace_back(*minp, p);
-          last = p;
+          invisible_polygon.emplace_back(*minp);
+          invisible_polygon.emplace_back(projection(*minp, i));
           break;
         }
       }
@@ -155,23 +153,21 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
       for (;; ++i) {
         auto & corner = corners[i % 4];
         if (std::atan2(corner.y, corner.x) >= maxang) {
-          auto p = projection(*maxp, i % 4);
-          invisible_edges.emplace_back(last, p);
-          invisible_edges.emplace_back(p, *maxp);
+          invisible_polygon.emplace_back(projection(*maxp, i % 4));
+          invisible_polygon.emplace_back(*maxp);
           break;
         }
 
-        invisible_edges.emplace_back(last, corner);
-        last = corner;
+        invisible_polygon.emplace_back(corner);
       }
     }
   }
 
   // fill invisible area
-  fillInside(invisible_edges, invisible_cost);
+  fillInside(invisible_polygon, invisible_cost);
 
   // fill occupied area
-  fillInside(math::geometry::getLineSegments(hull), occupied_cost);
+  fillInside(occupied_polygon, occupied_cost);
 }
 
 const std::vector<int8_t> & Grid::getData() { return values_; }

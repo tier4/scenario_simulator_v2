@@ -113,7 +113,7 @@ private:
   /**
    * @brief Update value of cells surrounded by `segments` to `data`
    */
-  void fillInside(const std::vector<math::geometry::LineSegment> & segments, int8_t data);
+  void fillInside(const std::vector<geometry_msgs::msg::Point> & polygon, int8_t data);
 
   /**
    * @brief Convert point in world coordinate to point in grid cooridnate
