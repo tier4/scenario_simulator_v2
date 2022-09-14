@@ -53,29 +53,20 @@ geometry_msgs::msg::Point Grid::transformToPixel(const geometry_msgs::msg::Point
 
 void Grid::fillInside(const std::vector<math::geometry::LineSegment> & segments, int8_t data)
 {
-  auto group_by_row = std::vector<std::vector<size_t>>(height);
-  auto group_by_col = std::vector<std::vector<size_t>>(width);
-  for (auto & segment : segments) {
-    traverseLineSegment(segment, [&](size_t col, size_t row) {
-      group_by_row[row].emplace_back(col);
-      group_by_col[col].emplace_back(row);
+  auto grouped = std::vector<std::vector<size_t>>(height);
+  for (auto & [ p, q ] : segments) {
+    traverse(transformToPixel(p), transformToPixel(q), [&](ssize_t col, ssize_t row) {
+      if (col >= 0 && col < width && row >= 0 && row < height) {
+        grouped.at(row).emplace_back(col);
+      }
     });
   }
 
   for (size_t row = 0; row < height; ++row) {
-    if (const auto & cols = group_by_row[row]; cols.size() > 1) {
-      auto [min_col_itr, max_col_itr] = std::minmax_element(cols.begin(), cols.end());
-      for (auto col = *min_col_itr; col <= *max_col_itr; ++col) {
-        values_[width * row + col] = data;
-      }
-    }
-  }
-
-  for (size_t col = 0; col < width; ++col) {
-    if (const auto & rows = group_by_col[col]; rows.size() > 1) {
-      auto [min_row_itr, max_row_itr] = std::minmax_element(rows.begin(), rows.end());
-      for (auto row = *min_row_itr; row <= *max_row_itr; ++row) {
-        values_[width * row + col] = data;
+    if (const auto & cols = grouped[row]; cols.size() > 1) {
+      auto [mincol, maxcol] = std::minmax_element(cols.begin(), cols.end());
+      for (auto col = *mincol; col <= *maxcol; ++col) {
+        values_.at(width * row + col) = data;
       }
     }
   }
@@ -83,44 +74,96 @@ void Grid::fillInside(const std::vector<math::geometry::LineSegment> & segments,
 
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
-  using math::geometry::LineSegment;
   using geometry_msgs::msg::Point;
+  using math::geometry::LineSegment;
+
+  auto make_point = [](double x, double y) {
+    auto p = Point();
+    p.x = x, p.y = y;
+    return p;
+  };
 
   auto hull = primitive->get2DConvexHull();
   for (auto &p : hull) {
     p = transformToGrid(p);
   }
-  const auto occupied_edges = math::geometry::getLineSegments(hull);
 
-  auto invisible_edges = occupied_edges;
+  auto invisible_edges = std::vector<LineSegment>();
   {
-    auto corners = std::vector<Point>(4);
-    {
-      double half_rw = static_cast<double>(width) * resolution / 2;
-      double half_rh = static_cast<double>(height) * resolution / 2;
+    auto minp = decltype(hull)::iterator();
+    auto maxp = decltype(hull)::iterator();
 
-      // enumerate corner coordinates
-      corners[0].x = half_rw, corners[0].y = half_rh;
-      corners[1].x = -half_rw, corners[1].y = half_rh;
-      corners[2].x = half_rw, corners[2].y = -half_rh;
-      corners[3].x = -half_rw, corners[3].y = -half_rh;
+    {
+      auto ord = [&](const Point & p, const Point & q) {
+        return std::atan2(p.y, p.x) < std::atan2(q.y, q.x);
+      };
+      std::tie(minp, maxp) = std::minmax_element(hull.begin(), hull.end(), ord);
     }
 
-    auto diagonal_length = std::hypot(width * resolution, height * resolution);
+    auto minang = std::atan2(minp->y, minp->x);
+    auto maxang = std::atan2(maxp->y, maxp->x);
 
-    // add rays through grid corners
-    for (const auto & corner : corners) {
-      auto ray = LineSegment(Point(), corner);
-      for (const auto & line_segment : occupied_edges) {
-        if (const auto intersection = ray.getIntersection2D(line_segment)) {
-          invisible_edges.emplace_back(intersection.get(), ray.get2DVector(), diagonal_length);
+    if (maxang - minang > M_PI) {
+      auto ord = [&](const Point & p, const Point & q) {
+        auto prad = std::atan2(p.y, p.x);
+        auto qrad = std::atan2(q.y, q.x);
+
+        if (prad < 0) prad += 2 * M_PI;
+        if (qrad < 0) qrad += 2 * M_PI;
+
+        return prad < qrad;
+      };
+      std::tie(minp, maxp) = std::minmax_element(hull.begin(), hull.end(), ord);
+      minang = std::atan2(minp->y, minp->x);
+      maxang = std::atan2(maxp->y, maxp->x) + 2 * M_PI;
+    }
+
+    {
+      auto realw = width * resolution / 2;
+      auto realh = height * resolution / 2;
+
+      auto corners = std::vector<Point> {
+        make_point(-realw, -realh), // bottom left
+        make_point(realw, -realh), // bottom right
+        make_point(realw, realh), // top right
+        make_point(-realw, realh), // top left
+      };
+
+      auto projection = [&](const Point & p, size_t wall) {
+        switch (wall) {
+          case 0: return make_point(-realw, p.y * -realw / p.x); // left
+          case 1: return make_point(p.x * -realh / p.y, -realh); // bottom
+          case 2: return make_point(realw, p.y * realw / p.x); // right
+          case 3: return make_point(p.x * realh / p.y, realh); // top
+        }
+      };
+
+      invisible_edges.emplace_back(*minp, *maxp);
+
+      auto i = size_t(0);
+      auto last = Point();
+      for (;; ++i) {
+        auto & corner = corners[i];
+        if (std::atan2(corner.y, corner.x) >= minang) {
+          auto p = projection(*minp, i);
+          invisible_edges.emplace_back(*minp, p);
+          last = p;
+          break;
         }
       }
-    }
-    // add rays through hull points
-    for (const auto & point : hull) {
-      auto ray = LineSegment(Point(), point);
-      invisible_edges.emplace_back(point, ray.get2DVector(), diagonal_length);
+
+      for (;; ++i) {
+        auto & corner = corners[i % 4];
+        if (std::atan2(corner.y, corner.x) >= maxang) {
+          auto p = projection(*maxp, i % 4);
+          invisible_edges.emplace_back(last, p);
+          invisible_edges.emplace_back(p, *maxp);
+          break;
+        }
+
+        invisible_edges.emplace_back(last, corner);
+        last = corner;
+      }
     }
   }
 
@@ -128,7 +171,7 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
   fillInside(invisible_edges, invisible_cost);
 
   // fill occupied area
-  fillInside(occupied_edges, occupied_cost);
+  fillInside(math::geometry::getLineSegments(hull), occupied_cost);
 }
 
 const std::vector<int8_t> & Grid::getData() { return values_; }

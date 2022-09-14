@@ -75,21 +75,13 @@ private:
    * @param [out] ret coordinates of filled cells
    */
   template<class F>
-  void traverseLineSegment(const math::geometry::LineSegment & line, const F &f)
+  void traverse(const geometry_msgs::msg::Point & start, const geometry_msgs::msg::Point & end, const F &f)
   {
     // A Fast Voxel Traversal Algorithm for Ray Tracing
     // https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf
 
-    double start_x = line.start_point.x;
-    double start_y = line.start_point.y;
-    double end_x = line.end_point.x;
-    double end_y = line.end_point.y;
-
-    double vx = end_x - start_x;
-    double vy = end_y - start_y;
-
-    ssize_t x = ssize_t(start_x);
-    ssize_t y = ssize_t(start_y);
+    double vx = end.x - start.x;
+    double vy = end.y - start.y;
 
     ssize_t step_x = ssize_t(std::copysign(1.0, vx));
     ssize_t step_y = ssize_t(std::copysign(1.0, vy));
@@ -97,11 +89,14 @@ private:
     double tdx = step_x / vx;
     double tdy = step_y / vy;
 
-    double tx = vx > 0 ? std::ceil(start_x) : std::floor(start_x);
-    double ty = vy > 0 ? std::ceil(start_y) : std::floor(start_y);
+    double tx = vx > 0 ? std::ceil(start.x) : std::floor(start.x);
+    double ty = vy > 0 ? std::ceil(start.y) : std::floor(start.y);
 
-    tx = vx != 0 ? (tx - start_x) / vx : tdx;
-    ty = vy != 0 ? (ty - start_y) / vy : tdy;
+    tx = vx != 0 ? (tx - start.x) / vx : tdx;
+    ty = vy != 0 ? (ty - start.y) / vy : tdy;
+
+    ssize_t x = ssize_t(start.x);
+    ssize_t y = ssize_t(start.y);
 
     while (tx <= 1.0 || ty <= 1.0) {
       f(x, y);
