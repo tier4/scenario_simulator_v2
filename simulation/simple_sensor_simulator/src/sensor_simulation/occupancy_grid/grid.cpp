@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <quaternion_operation/quaternion_operation.h>
+
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
 
@@ -25,7 +26,8 @@ Grid::Grid(
   width(width),
   occupied_cost(occupied_cost),
   invisible_cost(invisible_cost),
-  values_(height * width)
+  invisible_grid_(height * width),
+  occupied_grid_(height * width)
 {
 }
 
@@ -51,25 +53,28 @@ geometry_msgs::msg::Point Grid::transformToPixel(const geometry_msgs::msg::Point
   return p;
 }
 
-void Grid::fillInside(const std::vector<geometry_msgs::msg::Point> & polygon, int8_t data)
+void Grid::markPolygon(
+  std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & polygon)
 {
-  auto grouped = std::vector<std::vector<size_t>>(height);
+  auto mincols = std::vector<ssize_t>(height, width);
+  auto maxcols = std::vector<ssize_t>(height, -1);
   for (size_t i = 0; i < polygon.size(); ++i) {
     auto p = transformToPixel(polygon[i]);
     auto q = transformToPixel(polygon[(i + 1) % polygon.size()]);
     traverse(p, q, [&](ssize_t col, ssize_t row) {
-      if (col >= 0 && col < width && row >= 0 && row < height) {
-        grouped.at(row).emplace_back(col);
+      if (row >= 0 && row < ssize_t(height)) {
+        mincols[row] = std::min(mincols[row], col);
+        maxcols[row] = std::max(maxcols[row], col);
       }
     });
   }
 
   for (size_t row = 0; row < height; ++row) {
-    if (const auto & cols = grouped[row]; cols.size() > 1) {
-      auto [mincol, maxcol] = std::minmax_element(cols.begin(), cols.end());
-      for (auto col = *mincol; col <= *maxcol; ++col) {
-        values_.at(width * row + col) = data;
-      }
+    if (auto col = mincols[row]; col >= 0 && col < ssize_t(width)) {
+      grid[width * row + col] += 1;
+    }
+    if (auto col = maxcols[row]; col >= 0 && col + 1 < ssize_t(width)) {
+      grid[width * row + col + 1] -= 1;
     }
   }
 }
@@ -77,7 +82,6 @@ void Grid::fillInside(const std::vector<geometry_msgs::msg::Point> & polygon, in
 void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive)
 {
   using geometry_msgs::msg::Point;
-  using math::geometry::LineSegment;
 
   auto make_point = [](double x, double y) {
     auto p = Point();
@@ -86,7 +90,7 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
   };
 
   auto occupied_polygon = primitive->get2DConvexHull();
-  for (auto &p : occupied_polygon) {
+  for (auto & p : occupied_polygon) {
     p = transformToGrid(p);
   }
 
@@ -99,7 +103,8 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
       auto ord = [&](const Point & p, const Point & q) {
         return std::atan2(p.y, p.x) < std::atan2(q.y, q.x);
       };
-      std::tie(minp, maxp) = std::minmax_element(occupied_polygon.begin(), occupied_polygon.end(), ord);
+      std::tie(minp, maxp) =
+        std::minmax_element(occupied_polygon.begin(), occupied_polygon.end(), ord);
     }
 
     auto minang = std::atan2(minp->y, minp->x);
@@ -115,7 +120,8 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
 
         return prad < qrad;
       };
-      std::tie(minp, maxp) = std::minmax_element(occupied_polygon.begin(), occupied_polygon.end(), ord);
+      std::tie(minp, maxp) =
+        std::minmax_element(occupied_polygon.begin(), occupied_polygon.end(), ord);
       minang = std::atan2(minp->y, minp->x);
       maxang = std::atan2(maxp->y, maxp->x) + 2 * M_PI;
     }
@@ -124,19 +130,23 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
       auto realw = width * resolution / 2;
       auto realh = height * resolution / 2;
 
-      auto corners = std::vector<Point> {
-        make_point(-realw, -realh), // bottom left
-        make_point(realw, -realh), // bottom right
-        make_point(realw, realh), // top right
-        make_point(-realw, realh), // top left
+      auto corners = std::vector<Point>{
+        make_point(-realw, -realh),  // bottom left
+        make_point(realw, -realh),   // bottom right
+        make_point(realw, realh),    // top right
+        make_point(-realw, realh),   // top left
       };
 
       auto projection = [&](const Point & p, size_t wall) {
         switch (wall) {
-          case 0: return make_point(-realw, p.y * -realw / p.x); // left
-          case 1: return make_point(p.x * -realh / p.y, -realh); // bottom
-          case 2: return make_point(realw, p.y * realw / p.x); // right
-          case 3: return make_point(p.x * realh / p.y, realh); // top
+          case 0:
+            return make_point(-realw, p.y * -realw / p.x);  // left
+          case 1:
+            return make_point(p.x * -realh / p.y, -realh);  // bottom
+          case 2:
+            return make_point(realw, p.y * realw / p.x);  // right
+          case 3:
+            return make_point(p.x * realh / p.y, realh);  // top
         }
       };
 
@@ -163,19 +173,46 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
     }
   }
 
-  // fill invisible area
-  fillInside(invisible_polygon, invisible_cost);
+  // mark invisible area
+  markPolygon(invisible_grid_, invisible_polygon);
 
-  // fill occupied area
-  fillInside(occupied_polygon, occupied_cost);
+  // mark occupied area
+  markPolygon(occupied_grid_, occupied_polygon);
 }
 
-const std::vector<int8_t> & Grid::getData() { return values_; }
-
-void Grid::reset(const geometry_msgs::msg::Pose & origin)
+const std::vector<int8_t> & Grid::calculate(
+  const geometry_msgs::msg::Pose & origin,
+  const std::vector<std::unique_ptr<primitives::Primitive>> & primitives)
 {
   origin_ = origin;
-  values_.assign(values_.size(), 0);
+  invisible_grid_.assign(invisible_grid_.size(), 0);
+  occupied_grid_.assign(occupied_grid_.size(), 0);
+
+  // Imos Method
+  // https://imoz.jp/algorithms/imos_method.html (Japanese)
+
+  for (const auto & primitive : primitives) {
+    addPrimitive(primitive);
+  }
+
+  for (size_t row = 0; row < height; ++row) {
+    for (size_t col = 0; col + 1 < width; ++col) {
+      invisible_grid_[row * width + col + 1] += invisible_grid_[row * width + col];
+    }
+  }
+
+  for (size_t row = 0; row < height; ++row) {
+    for (size_t col = 0; col + 1 < width; ++col) {
+      occupied_grid_[row * width + col + 1] += occupied_grid_[row * width + col];
+    }
+  }
+
+  for (size_t i = 0; i < height * width; ++i) {
+    invisible_grid_[i] =
+      occupied_grid_[i] ? occupied_cost : invisible_grid_[i] ? invisible_cost : 0;
+  }
+
+  return invisible_grid_;
 }
 
 }  // namespace simple_sensor_simulator

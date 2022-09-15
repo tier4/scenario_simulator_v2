@@ -40,22 +40,9 @@ public:
   const int8_t occupied_cost;
   const int8_t invisible_cost;
 
-  /**
-   * @brief Fill cells occupied by `primitive`
-   */
-  void addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive);
-
-  /**
-   * @brief Get all cell values
-   * @return cell values
-   */
-  const std::vector<int8_t> & getData();
-
-  /**
-   * @brief Reset origin and all cell values
-   * @note Use this function to reuse already allocated memory
-   */
-  void reset(const geometry_msgs::msg::Pose & origin);
+  const std::vector<int8_t> & calculate(
+    const geometry_msgs::msg::Pose & origin,
+    const std::vector<std::unique_ptr<primitives::Primitive>> & primitives);
 
 private:
   /**
@@ -65,17 +52,26 @@ private:
   geometry_msgs::msg::Pose origin_;
 
   /**
-   * @brief a vector which contains cell values
+   * @brief a vector that express cell is invisible
    * @note Grid access this 1d vector by calculating an index from a 2d grid coordinate
    */
-  std::vector<int8_t> values_;
+  std::vector<int8_t> invisible_grid_;
 
   /**
-   * @brief Traverse cells along with `line`
-   * @param [out] ret coordinates of filled cells
+   * @brief a vector that express cell is occupied
+   * @note Grid access this 1d vector by calculating an index from a 2d grid coordinate
    */
-  template<class F>
-  void traverse(const geometry_msgs::msg::Point & start, const geometry_msgs::msg::Point & end, const F &f)
+  std::vector<int8_t> occupied_grid_;
+
+  /**
+   * @brief traverse cells along from start to end
+   * @param start
+   * @param end
+   * @param f a funciton object which takes cell coordinate
+   */
+  template <class F>
+  inline void traverse(
+    const geometry_msgs::msg::Point & start, const geometry_msgs::msg::Point & end, const F & f)
   {
     // A Fast Voxel Traversal Algorithm for Ray Tracing
     // https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf
@@ -111,22 +107,29 @@ private:
   }
 
   /**
-   * @brief Update value of cells surrounded by `segments` to `data`
+   * @brief mark grid area surrounded by polygon
    */
-  void fillInside(const std::vector<geometry_msgs::msg::Point> & polygon, int8_t data);
+  inline void markPolygon(
+    std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & polygon);
+
+  /**
+   * @brief mark invisible area and occpuied area of primitive
+   */
+  inline void addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive);
 
   /**
    * @brief Convert point in world coordinate to point in grid cooridnate
    * @return Point in grid coordinate
    */
-  geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
+  inline geometry_msgs::msg::Point transformToGrid(
+    const geometry_msgs::msg::Point & world_point) const;
 
   /**
    * @brief Digitize point in grid coordinate
    * @return Digitized point
    */
-  geometry_msgs::msg::Point transformToPixel(const geometry_msgs::msg::Point & grid_point) const;
-
+  inline geometry_msgs::msg::Point transformToPixel(
+    const geometry_msgs::msg::Point & grid_point) const;
 };
 }  // namespace simple_sensor_simulator
 
