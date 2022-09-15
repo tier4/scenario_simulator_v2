@@ -27,7 +27,9 @@ public:
   void initialize(double initial_simulation_time, double step_time);
   void update();
   double getCurrentSimulationTime() const { return current_simulation_time_; }
+  double getCurrentScenarioTime() const;
   double getStepTime() const { return step_time_; }
+  void onNpcLogicStart();
   const rclcpp::Time getCurrentRosTime();
   const rosgraph_msgs::msg::Clock getCurrentRosTimeAsMsg();
   const bool use_raw_clock;
@@ -38,7 +40,9 @@ private:
   double current_simulation_time_;
   double initial_simulation_time_;
   double step_time_;
+  double scenario_time_offset_;
   bool initialized_;
+  bool is_npc_logic_started_;
 };
 }  // namespace traffic_simulator
 

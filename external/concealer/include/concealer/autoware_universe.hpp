@@ -33,6 +33,7 @@
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <concealer/task_queue.hpp>
+#include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
@@ -48,8 +49,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
 {
   friend class TransitionAssertion<AutowareUniverse>;
 
-  bool is_ready = false;
-
+  using Acceleration = geometry_msgs::msg::AccelWithCovarianceStamped;
   using Checkpoint = geometry_msgs::msg::PoseStamped;
   using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
   using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
@@ -60,6 +60,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using TurnIndicatorsReport = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
 
+  CONCEALER_DEFINE_PUBLISHER(Acceleration);
   CONCEALER_DEFINE_PUBLISHER(Checkpoint);
   CONCEALER_DEFINE_PUBLISHER(ControlModeReport);
   CONCEALER_DEFINE_PUBLISHER(GearReport);
@@ -130,6 +131,7 @@ public:
   CONCEALER_PUBLIC explicit AutowareUniverse(Ts &&... xs)
   : Autoware(std::forward<decltype(xs)>(xs)...),
     // clang-format off
+    CONCEALER_INIT_PUBLISHER(Acceleration, "/localization/acceleration"),
     CONCEALER_INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     CONCEALER_INIT_PUBLISHER(ControlModeReport, "/vehicle/status/control_mode"),
     CONCEALER_INIT_PUBLISHER(GearReport, "/vehicle/status/gear_status"),
@@ -162,6 +164,10 @@ public:
 
   auto engage() -> void override;
 
+  auto engageable() const -> bool override;
+
+  auto engaged() const -> bool override;
+
   auto getAcceleration() const -> double override;
 
   auto getAutowareStateName() const -> std::string override;
@@ -179,8 +185,6 @@ public:
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void override;
-
-  auto isReady() noexcept -> bool;
 
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
 
