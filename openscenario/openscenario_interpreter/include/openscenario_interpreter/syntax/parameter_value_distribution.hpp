@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__PARAMETER_VALUE_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__PARAMETER_VALUE_DISTRIBUTION_HPP_
 
-#include <openscenario_interpreter/syntax/file.hpp>
 #include <openscenario_interpreter/syntax/distribution_definition.hpp>
+#include <openscenario_interpreter/syntax/file.hpp>
 
 namespace openscenario_interpreter
 {

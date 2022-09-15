@@ -19,8 +19,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-DistributionSet::DistributionSet(
-  const pugi::xml_node & node, Scope & scope)
+DistributionSet::DistributionSet(const pugi::xml_node & node, Scope & scope)
 : Scope(scope), elements(readElements<DistributionSetElement, 1>("Element", node, local()))
 {
 }

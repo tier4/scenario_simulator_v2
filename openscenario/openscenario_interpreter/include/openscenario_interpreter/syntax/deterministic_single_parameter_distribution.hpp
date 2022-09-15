@@ -32,12 +32,11 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DeterministicSingleParameterDistribution : public DeterministicSingleParameterDistributionType
+struct DeterministicSingleParameterDistribution
+: public DeterministicSingleParameterDistributionType
 {
   explicit DeterministicSingleParameterDistribution(const pugi::xml_node &, Scope &);
 };
-
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_SINGLE_PARAMETER_DISTRIBUTION_HPP_

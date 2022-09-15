@@ -36,8 +36,6 @@ struct DeterministicMultiParameterDistribution : public DeterministicMultiParame
 {
   explicit DeterministicMultiParameterDistribution(const pugi::xml_node &, Scope & scope);
 };
-
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_HPP_

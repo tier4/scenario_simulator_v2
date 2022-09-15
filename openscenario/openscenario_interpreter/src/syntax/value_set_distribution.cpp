@@ -21,7 +21,8 @@ inline namespace syntax
 {
 ValueSetDistribution::ValueSetDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: Scope(scope), parameter_value_sets(readElements<ParameterValueSet, 1>("ParameterValueSet", node, scope))
+: Scope(scope),
+  parameter_value_sets(readElements<ParameterValueSet, 1>("ParameterValueSet", node, scope))
 {
 }
 }  // namespace syntax

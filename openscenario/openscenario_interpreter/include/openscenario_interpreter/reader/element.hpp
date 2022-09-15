@@ -15,14 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ELEMENT_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ELEMENT_HPP_
 
+#include <functional>
+#include <iterator>
+#include <limits>
 #include <openscenario_interpreter/iterator/size.hpp>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/type_traits/must_be_default_constructible.hpp>
 #include <pugixml.hpp>
-
-#include <functional>
-#include <iterator>
-#include <limits>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -147,8 +146,8 @@ auto readGroups(const pugi::xml_node & node, Ts &&... xs)
   if (MaxOccurs < groups.size()) {
     throw SyntaxError(
       node.name(), " requires Group ", demangle(typeid(GroupT)), " at most ", MaxOccurs, " element",
-      (1 < MaxOccurs ? "s" : ""), ", but ", groups.size(), " element", (1 < groups.size() ? "s" : ""),
-      " specified");
+      (1 < MaxOccurs ? "s" : ""), ", but ", groups.size(), " element",
+      (1 < groups.size() ? "s" : ""), " specified");
   }
 
   return groups;

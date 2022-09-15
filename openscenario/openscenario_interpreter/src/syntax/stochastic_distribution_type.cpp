@@ -19,8 +19,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-StochasticDistributionType::StochasticDistributionType(
-  const pugi::xml_node & node, Scope & scope)
+StochasticDistributionType::StochasticDistributionType(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : Group(
     choice(node,

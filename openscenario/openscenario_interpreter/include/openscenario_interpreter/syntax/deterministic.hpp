@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
 #define OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
 
-#include <openscenario_interpreter/syntax/deterministic_parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/deterministic_parameter_distribution.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
