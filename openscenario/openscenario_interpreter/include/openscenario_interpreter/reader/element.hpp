@@ -15,13 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ELEMENT_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ELEMENT_HPP_
 
-#include <functional>
-#include <iterator>
-#include <limits>
 #include <openscenario_interpreter/iterator/size.hpp>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/type_traits/must_be_default_constructible.hpp>
 #include <pugixml.hpp>
+
+#include <functional>
+#include <iterator>
+#include <limits>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -121,6 +122,36 @@ auto readElements(const std::string & name, const pugi::xml_node & node, Ts &&..
   });
 
   return elements;
+}
+
+template <typename GroupT, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, typename... Ts>
+auto readGroups(const pugi::xml_node & node, Ts &&... xs)
+{
+  std::list<GroupT> groups;
+
+  for (auto child = node.begin(); child != node.end(); ++child) {
+    try {
+      groups.template emplace_back(
+        std::forward<decltype(*child)>(*child), std::forward<decltype(xs)>(xs)...);
+    } catch (...) {
+    }
+  }
+
+  if (MinOccurs != 0 and groups.size() < MinOccurs) {
+    throw SyntaxError(
+      node.name(), " requires Group ", demangle(typeid(GroupT)), " at least ", MinOccurs,
+      " element", (1 < MinOccurs ? "s" : ""), ", but ", groups.size(), " element",
+      (1 < groups.size() ? "s" : ""), " specified");
+  }
+
+  if (MaxOccurs < groups.size()) {
+    throw SyntaxError(
+      node.name(), " requires Group ", demangle(typeid(GroupT)), " at most ", MaxOccurs, " element",
+      (1 < MaxOccurs ? "s" : ""), ", but ", groups.size(), " element", (1 < groups.size() ? "s" : ""),
+      " specified");
+  }
+
+  return groups;
 }
 
 template <typename... Ts>

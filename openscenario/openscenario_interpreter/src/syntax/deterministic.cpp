@@ -20,7 +20,8 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Deterministic::Deterministic(const pugi::xml_node & node, Scope & scope)
-: DeterministicParameterDistribution(node, scope)
+: deterministic_parameter_distributions(
+    readGroups<DeterministicParameterDistribution, 0>(node, scope))
 {
 }
 }  // namespace syntax
