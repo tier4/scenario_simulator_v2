@@ -21,7 +21,7 @@ inline namespace syntax
 {
 DistributionSet::DistributionSet(
   const pugi::xml_node & node, Scope & scope)
-: element(readElements<DistributionSetElement, 1>("Element", node, scope))
+: Scope(scope), elements(readElements<DistributionSetElement, 1>("Element", node, local()))
 {
 }
 }  // namespace syntax

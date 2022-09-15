@@ -22,7 +22,7 @@ inline namespace syntax
 DeterministicParameterDistribution::DeterministicParameterDistribution(
   const pugi::xml_node & node, Scope & scope)
 // clang-format off
-: Group(node,
+: Group(
     choice(node,
       std::make_pair("DeterministicMultiParameterDistribution",  [&](auto && node){return make<DeterministicMultiParameterDistribution >(node,scope);}),
       std::make_pair("DeterministicSingleParameterDistribution", [&](auto && node){return make<DeterministicSingleParameterDistribution>(node,scope);})))

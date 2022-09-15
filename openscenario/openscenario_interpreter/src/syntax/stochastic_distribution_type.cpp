@@ -22,7 +22,7 @@ inline namespace syntax
 StochasticDistributionType::StochasticDistributionType(
   const pugi::xml_node & node, Scope & scope)
 // clang-format off
-: Group(node,
+: Group(
     choice(node,
       std::make_pair("ProbabilityDistributionSet", [&](auto && node){return make<ProbabilityDistributionSet>(node, scope);}),
       std::make_pair("NormalDistribution",         [&](auto && node){return make<NormalDistribution        >(node, scope);}),

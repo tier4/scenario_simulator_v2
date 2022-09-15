@@ -21,7 +21,7 @@ inline namespace syntax
 {
 ProbabilityDistributionSet::ProbabilityDistributionSet(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: elements(readElements<ProbabilityDistributionElement, 1>("Element", node, scope))
+: elements(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))
 {
 }
 }  // namespace syntax

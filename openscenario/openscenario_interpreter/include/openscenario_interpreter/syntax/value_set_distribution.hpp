@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
 
-#include <openscenario_interpreter/syntax/parameter_value_set.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
+#include <openscenario_interpreter/syntax/parameter_value_set.hpp>
 
 namespace openscenario_interpreter
 {
@@ -31,7 +31,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ValueSetDistribution : public ComplexType
+struct ValueSetDistribution : public Scope, public ComplexType
 {
   const std::list<ParameterValueSet> parameter_value_sets;
 
