@@ -22,13 +22,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- UniformDistribution ---------------------------------------------------
+/* ---- UniformDistribution ----------------------------------------------------
  *
- * <xsd:complexType name="UniformDistribution">
- *   <xsd:sequence>
- *     <xsd:element name="Range" type="Range"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="UniformDistribution">
+ *    <xsd:sequence>
+ *      <xsd:element name="Range" type="Range"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct UniformDistribution : public ComplexType

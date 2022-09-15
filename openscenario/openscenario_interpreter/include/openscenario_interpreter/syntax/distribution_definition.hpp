@@ -24,14 +24,14 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionDefinition ---------------------------------------------------
+/* ---- DistributionDefinition -------------------------------------------------
  *
- * <xsd:group name="DistributionDefinition">
- *   <xsd:choice>
- *     <xsd:element name="Deterministic" type="Deterministic"/>
- *     <xsd:element name="Stochastic" type="Stochastic"/>
- *   </xsd:choice>
- * </xsd:group>
+ *  <xsd:group name="DistributionDefinition">
+ *    <xsd:choice>
+ *      <xsd:element name="Deterministic" type="Deterministic"/>
+ *      <xsd:element name="Stochastic" type="Stochastic"/>
+ *    </xsd:choice>
+ *  </xsd:group>
  *
  * -------------------------------------------------------------------------- */
 struct DistributionDefinition : public Group

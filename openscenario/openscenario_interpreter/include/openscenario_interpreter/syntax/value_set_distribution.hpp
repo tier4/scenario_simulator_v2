@@ -24,11 +24,11 @@ inline namespace syntax
 {
 /* ---- ValueSetDistribution ---------------------------------------------------
  *
- * <xsd:complexType name="ValueSetDistribution">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterValueSet" type="ParameterValueSet" maxOccurs="unbounded"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="ValueSetDistribution">
+ *    <xsd:sequence>
+ *      <xsd:element name="ParameterValueSet" type="ParameterValueSet" maxOccurs="unbounded"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct ValueSetDistribution : public Scope, public ComplexType

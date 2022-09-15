@@ -22,13 +22,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Histogram ---------------------------------------------------
+/* ---- Histogram --------------------------------------------------------------
  *
- * <xsd:complexType name="Histogram">
- *   <xsd:sequence>
- *     <xsd:element name="Bin" type="HistogramBin" maxOccurs="unbounded"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="Histogram">
+ *    <xsd:sequence>
+ *      <xsd:element name="Bin" type="HistogramBin" maxOccurs="unbounded"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct Histogram : public ComplexType

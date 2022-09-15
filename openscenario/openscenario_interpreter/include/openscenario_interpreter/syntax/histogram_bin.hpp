@@ -23,14 +23,14 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- HistogramBin ---------------------------------------------------
+/* ---- HistogramBin -----------------------------------------------------------
  *
- * <xsd:complexType name="HistogramBin">
- *   <xsd:sequence>
- *     <xsd:element name="Range" type="Range"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="weight" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="HistogramBin">
+ *    <xsd:sequence>
+ *      <xsd:element name="Range" type="Range"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="weight" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct HistogramBin : public ComplexType

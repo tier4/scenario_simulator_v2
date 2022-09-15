@@ -21,13 +21,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionSet ---------------------------------------------------
+/* ---- DistributionSet --------------------------------------------------------
  *
- * <xsd:complexType name="DistributionSet">
- *   <xsd:sequence>
- *     <xsd:element name="Element" type="DistributionSetElement" maxOccurs="unbounded"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="DistributionSet">
+ *    <xsd:sequence>
+ *      <xsd:element name="Element" type="DistributionSetElement" maxOccurs="unbounded"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct DistributionSet : private Scope, public ComplexType

@@ -25,16 +25,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicSingleParameterDistributionType
- * ---------------------------------------------------
+/* ---- DeterministicSingleParameterDistributionType ---------------------------
  *
- * <xsd:group name="DeterministicSingleParameterDistributionType">
- *   <xsd:choice>
- *     <xsd:element name="DistributionSet" type="DistributionSet"/>
- *     <xsd:element name="DistributionRange" type="DistributionRange"/>
- *     <xsd:element name="UserDefinedDistribution" type="UserDefinedDistribution"/>
- *   </xsd:choice>
- * </xsd:group>
+ *  <xsd:group name="DeterministicSingleParameterDistributionType">
+ *    <xsd:choice>
+ *      <xsd:element name="DistributionSet" type="DistributionSet"/>
+ *      <xsd:element name="DistributionRange" type="DistributionRange"/>
+ *      <xsd:element name="UserDefinedDistribution" type="UserDefinedDistribution"/>
+ *    </xsd:choice>
+ *  </xsd:group>
  *
  * -------------------------------------------------------------------------- */
 struct DeterministicSingleParameterDistributionType : public Group

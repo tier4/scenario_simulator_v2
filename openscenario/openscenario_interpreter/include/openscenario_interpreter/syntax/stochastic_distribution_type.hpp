@@ -28,18 +28,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- StochasticDistributionType ---------------------------------------------------
+/* ---- StochasticDistributionType ---------------------------------------------
  *
- * <xsd:group name="StochasticDistributionType">
- *   <xsd:sequence>
- *     <xsd:element name="ProbabilityDistributionSet" type="ProbabilityDistributionSet"/>
- *     <xsd:element name="NormalDistribution" type="NormalDistribution"/>
- *     <xsd:element name="UniformDistribution" type="UniformDistribution"/>
- *     <xsd:element name="PoissonDistribution" type="PoissonDistribution"/>
- *     <xsd:element name="Histogram" type="Histogram"/>
- *     <xsd:element name="UserDefinedDistribution" type="UserDefinedDistribution"/>
- *   </xsd:sequence>
- * </xsd:group>
+ *  <xsd:group name="StochasticDistributionType">
+ *    <xsd:sequence>
+ *      <xsd:element name="ProbabilityDistributionSet" type="ProbabilityDistributionSet"/>
+ *      <xsd:element name="NormalDistribution" type="NormalDistribution"/>
+ *      <xsd:element name="UniformDistribution" type="UniformDistribution"/>
+ *      <xsd:element name="PoissonDistribution" type="PoissonDistribution"/>
+ *      <xsd:element name="Histogram" type="Histogram"/>
+ *      <xsd:element name="UserDefinedDistribution" type="UserDefinedDistribution"/>
+ *    </xsd:sequence>
+ *  </xsd:group>
  *
  * -------------------------------------------------------------------------- */
 struct StochasticDistributionType : public Group

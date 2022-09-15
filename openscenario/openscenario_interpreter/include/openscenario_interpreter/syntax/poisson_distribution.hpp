@@ -23,14 +23,14 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- PoissonDistribution ---------------------------------------------------
+/* ---- PoissonDistribution ----------------------------------------------------
  *
- * <xsd:complexType name="PoissonDistribution">
- *   <xsd:sequence>
- *     <xsd:element name="Range" type="Range"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="expectedValue" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="PoissonDistribution">
+ *    <xsd:sequence>
+ *      <xsd:element name="Range" type="Range"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="expectedValue" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct PoissonDistribution : public ComplexType

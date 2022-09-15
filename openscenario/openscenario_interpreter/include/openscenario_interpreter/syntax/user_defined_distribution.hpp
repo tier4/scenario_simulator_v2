@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- UserDefinedDistribution ----------------------------------------------------
+/* ---- UserDefinedDistribution ------------------------------------------------
  *
  *  <xsd:complexType name="UserDefinedDistribution">
  *    <xsd:simpleContent>

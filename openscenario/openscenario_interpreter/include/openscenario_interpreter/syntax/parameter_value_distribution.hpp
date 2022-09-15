@@ -22,14 +22,14 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ParameterValueDistribution ---------------------------------------------------
+/* ---- ParameterValueDistribution ---------------------------------------------
  *
- * <xsd:complexType name="ParameterValueDistribution">
- *   <xsd:sequence>
- *     <xsd:element name="ScenarioFile" type="File"/>
- *     <xsd:group ref="DistributionDefinition"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="ParameterValueDistribution">
+ *    <xsd:sequence>
+ *      <xsd:element name="ScenarioFile" type="File"/>
+ *      <xsd:group ref="DistributionDefinition"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct ParameterValueDistribution : public DistributionDefinition

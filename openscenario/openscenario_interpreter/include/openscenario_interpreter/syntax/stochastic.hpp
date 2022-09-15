@@ -25,16 +25,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Stochastic ---------------------------------------------------
+/* ---- Stochastic -------------------------------------------------------------
  *
- * <xsd:complexType name="Stochastic">
- *   <xsd:sequence>
- *     <xsd:element name="StochasticDistribution" type="StochasticDistribution"
- * maxOccurs="unbounded"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="numberOfTestRuns" type="UnsignedInt" use="required"/>
- *   <xsd:attribute name="randomSeed" type="Double"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Stochastic">
+ *    <xsd:sequence>
+ *      <xsd:element name="StochasticDistribution"
+ *        type="StochasticDistribution" maxOccurs="unbounded"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="numberOfTestRuns" type="UnsignedInt" use="required"/>
+ *    <xsd:attribute name="randomSeed" type="Double"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct Stochastic : public ComplexType

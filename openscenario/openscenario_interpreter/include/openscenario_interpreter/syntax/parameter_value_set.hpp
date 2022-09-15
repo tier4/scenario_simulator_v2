@@ -23,11 +23,11 @@ inline namespace syntax
 {
 /* ---- ParameterValueSet ---------------------------------------------------
  *
- * <xsd:complexType name="ParameterValueSet">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterAssignment" type="ParameterAssignment" maxOccurs="unbounded"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="ParameterValueSet">
+ *    <xsd:sequence>
+ *      <xsd:element name="ParameterAssignment" type="ParameterAssignment" maxOccurs="unbounded"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct ParameterValueSet : public ComplexType

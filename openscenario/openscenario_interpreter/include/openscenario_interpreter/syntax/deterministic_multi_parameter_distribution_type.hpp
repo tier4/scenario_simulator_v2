@@ -23,13 +23,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicMultiParameterDistribution ---------------------------------------------------
+/* ---- DeterministicMultiParameterDistributionType ----------------------------
  *
- * <xsd:group name="DeterministicMultiParameterDistributionType">
- *   <xsd:sequence>
- *     <xsd:element name="ValueSetDistribution" type="ValueSetDistribution"/>
- *   </xsd:sequence>
- * </xsd:group>
+ *  <xsd:group name="DeterministicMultiParameterDistributionType">
+ *    <xsd:sequence>
+ *      <xsd:element name="ValueSetDistribution" type="ValueSetDistribution"/>
+ *    </xsd:sequence>
+ *  </xsd:group>
  *
  * -------------------------------------------------------------------------- */
 struct DeterministicMultiParameterDistributionType : public ValueSetDistribution

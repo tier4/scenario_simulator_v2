@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicSingleParameterDistribution ---------------------------------------------------
+/* ---- DeterministicSingleParameterDistribution -------------------------------
  *
  *  <xsd:complexType name="DeterministicSingleParameterDistribution">
  *    <xsd:sequence>

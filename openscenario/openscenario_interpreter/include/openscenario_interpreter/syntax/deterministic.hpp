@@ -23,13 +23,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Deterministic ---------------------------------------------------
+/* ---- Deterministic ----------------------------------------------------------
  *
- * <xsd:complexType name="Deterministic">
- *   <xsd:sequence>
- *     <xsd:group ref="DeterministicParameterDistribution" minOccurs="0" maxOccurs="unbounded"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="Deterministic">
+ *    <xsd:sequence>
+ *      <xsd:group ref="DeterministicParameterDistribution" minOccurs="0" maxOccurs="unbounded"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct Deterministic

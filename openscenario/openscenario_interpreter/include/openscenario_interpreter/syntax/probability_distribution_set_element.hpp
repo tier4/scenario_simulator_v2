@@ -23,12 +23,12 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ProbabilityDistributionSetElement ---------------------------------------------------
+/* ---- ProbabilityDistributionSetElement --------------------------------------
  *
- * <xsd:complexType name="ParameterValueSet">
- *   <xsd:attribute name="value" type="String" use="required"/>
- *   <xsd:attribute name="weight" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="ParameterValueSet">
+ *    <xsd:attribute name="value" type="String" use="required"/>
+ *    <xsd:attribute name="weight" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct ProbabilityDistributionSetElement : public ComplexType
