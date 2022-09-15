@@ -36,6 +36,9 @@ struct Histogram : public ComplexType
   const std::list<HistogramBin> bins;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
+
+  // TODO: implement evaluate()
+  // Use std::piecewise_constant_distribution from <random>
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -35,6 +35,12 @@ struct ProbabilityDistributionSet : public ComplexType
   const std::list<ProbabilityDistributionSetElement> elements;
 
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
+
+  auto evaluate() -> Object {
+    return noexcept;
+  }
+  // TODO: implement evaluate()
+  // Use std::discrete_distribution from <random>
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

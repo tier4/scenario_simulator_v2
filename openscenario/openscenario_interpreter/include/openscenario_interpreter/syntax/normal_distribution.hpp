@@ -45,6 +45,7 @@ struct NormalDistribution : public ComplexType
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
 
   // TODO: implement evaluate()?
+  // Use std::normal_real_distribution from <random>
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
