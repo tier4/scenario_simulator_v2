@@ -197,7 +197,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
     return withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
-        return Interpreter::Result::ERROR;
+        SimulatorCore::deactivate();
+        return Interpreter::Result::FAILURE;
       },
       [&]() {
         if (getParameter<bool>("record", true)) {
