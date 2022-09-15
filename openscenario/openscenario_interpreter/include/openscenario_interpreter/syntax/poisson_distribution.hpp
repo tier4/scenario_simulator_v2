@@ -43,6 +43,7 @@ struct PoissonDistribution : public ComplexType
 
   // TODO: implement evaluate()
   // Use std::poisson_distribution from <random>
+  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

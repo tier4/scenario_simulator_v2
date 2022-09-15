@@ -21,7 +21,8 @@ inline namespace syntax
 {
 ParameterValueSet::ParameterValueSet(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: parameter_assignments(readElements<ParameterAssignment, 1>("ParameterAssignment", node, scope))
+: Scope(scope),
+  parameter_assignments(readElements<ParameterAssignment, 1>("ParameterAssignment", node, local()))
 {
 }
 }  // namespace syntax

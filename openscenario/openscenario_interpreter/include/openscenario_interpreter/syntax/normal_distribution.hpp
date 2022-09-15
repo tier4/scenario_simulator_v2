@@ -46,6 +46,7 @@ struct NormalDistribution : public ComplexType
 
   // TODO: implement evaluate()?
   // Use std::normal_real_distribution from <random>
+  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
