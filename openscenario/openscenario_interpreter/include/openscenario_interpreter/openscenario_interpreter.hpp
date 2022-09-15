@@ -115,6 +115,8 @@ public:
 
   auto publishCurrentContext() const -> void;
 
+  auto reset() -> void;
+
   template <typename T, typename... Ts>
   auto set(Ts &&... xs) -> void
   {
