@@ -88,8 +88,12 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   // construct a `set` of detected object names to look up entities later
   auto detected_entities = std::set<std::string>();
   {
-    auto v = configuration_.filter_by_range() ? getDetectedObjects(status) : lidar_detected_entity;
-    detected_entities.insert(v.begin(), v.end());
+    if (configuration_.filter_by_range()) {
+      auto v = getDetectedObjects(status);
+      detected_entities.insert(v.begin(), v.end());
+    } else {
+      detected_entities.insert(lidar_detected_entity.begin(), lidar_detected_entity.end());
+    }
   }
 
   // enumerate all primitive shapes of entities
@@ -118,17 +122,11 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
     }
   }
 
-  // reset `Grid` and draw all primitive shapes on `Grid`
-  grid_.reset(ego_pose_north_up);
-  for (const auto & primitive : primitives) {
-    grid_.addPrimitive(primitive);
-  }
-
   // construct `OccupancyGrid`
-  nav_msgs::msg::OccupancyGrid occupancy_grid;
+  auto occupancy_grid = nav_msgs::msg::OccupancyGrid();
   occupancy_grid.header.stamp = stamp;
   occupancy_grid.header.frame_id = "map";
-  occupancy_grid.data = grid_.getData();
+  occupancy_grid.data = grid_.calculate(ego_pose_north_up, primitives);
   occupancy_grid.info.height = configuration_.height();
   occupancy_grid.info.width = configuration_.width();
   occupancy_grid.info.map_load_time = stamp;
