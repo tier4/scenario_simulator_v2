@@ -223,7 +223,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
            cannot start at exactly zero simulation time, which is a serious
            problem that must be solved in the future.
         */
-        // SimulatorCore::update();
+        SimulatorCore::update();
 
         execution_timer.clear();
 
@@ -233,7 +233,6 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         if (currentScenarioDefinition()) {
           currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
-          // SimulatorCore::update();
         } else {
           throw Error("No script evaluable.");
         }
