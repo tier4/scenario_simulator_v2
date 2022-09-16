@@ -162,22 +162,6 @@ auto Interpreter::engaged() const -> bool
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  auto initialize_storyboard = [this]() {
-    return withExceptionHandler(
-      [this](auto &&...) {
-        publishCurrentContext();
-        deactivate();
-      },
-      [this]() {
-        if (currentScenarioDefinition()) {
-          currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
-          SimulatorCore::update();
-        } else {
-          throw Error("No script evaluable.");
-        }
-      });
-  };
-
   auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
@@ -211,7 +195,11 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
     return Result::FAILURE;
   } else {
     return withExceptionHandler(
-      [this](auto &&...) { return Interpreter::Result::ERROR; },
+      [this](auto &&...) {
+        publishCurrentContext();
+        reset();
+        return Interpreter::Result::FAILURE;  // => Inactive
+      },
       [&]() {
         if (getParameter<bool>("record", true)) {
           // clang-format off
@@ -244,7 +232,11 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         assert(publisher_of_context->is_activated());
 
-        initialize_storyboard();
+        if (currentScenarioDefinition()) {
+          currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
+        } else {
+          throw Error("No script evaluable.");
+        }
 
         timer = create_wall_timer(currentLocalFrameRate(), evaluate_storyboard);
 
@@ -255,25 +247,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 {
-  timer.reset();  // Stop scenario evaluation
-
-  publisher_of_context->on_deactivate();
-
-  SimulatorCore::deactivate();
-
-  scenarios.pop_front();
-
-  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
-  boost::apply_visitor(
-    overload(
-      [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
-      [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
-      [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
-    result);
-
-  if (getParameter<bool>("record", true)) {
-    record::stop();
-  }
+  reset();
 
   return Interpreter::Result::SUCCESS;  // => Inactive
 }
@@ -285,7 +259,7 @@ auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
 {
-  deactivate();  // DIRTY HACK!!!
+  reset();
 
   return Interpreter::Result::SUCCESS;  // => Unconfigured
 }
@@ -308,6 +282,31 @@ auto Interpreter::publishCurrentContext() const -> void
   }
 
   publisher_of_context->publish(context);
+}
+
+auto Interpreter::reset() -> void
+{
+  timer.reset();  // Stop scenario evaluation
+
+  if (publisher_of_context->is_activated()) {
+    publisher_of_context->on_deactivate();
+  }
+
+  SimulatorCore::deactivate();
+
+  scenarios.pop_front();
+
+  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+  boost::apply_visitor(
+    overload(
+      [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
+      [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
+      [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
+    result);
+
+  if (getParameter<bool>("record", true)) {
+    record::stop();
+  }
 }
 }  // namespace openscenario_interpreter
 
