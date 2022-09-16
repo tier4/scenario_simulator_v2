@@ -268,8 +268,8 @@ auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
-    // We attempt to resend the service up to 20 times, but this number of times was determined by heuristics, not for any technical reason
-    requestSetVelocityLimit(request, 20);
+    // We attempt to resend the service up to 10 times, but this number of times was determined by heuristics, not for any technical reason
+    requestSetVelocityLimit(request, 10);
   });
 }
 
