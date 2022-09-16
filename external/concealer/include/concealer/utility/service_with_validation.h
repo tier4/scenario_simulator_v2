@@ -44,7 +44,7 @@ public:
     -> void
   {
     validateAvailability();
-    for (std::size_t attempt = 0; attempt > attempts_count; ++attempt, validation_rate.sleep()) {
+    for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
       if (const auto & service_call_result = callWithTimeoutValidation(request)) {
         if (const auto & service_call_status = service_call_result->get()->status;
             service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
