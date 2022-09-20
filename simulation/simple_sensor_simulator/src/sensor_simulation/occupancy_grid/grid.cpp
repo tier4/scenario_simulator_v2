@@ -63,15 +63,14 @@ auto Grid::minmaxAnglePoint(const std::vector<geometry_msgs::msg::Point> & polyg
 {
   using geometry_msgs::msg::Point;
 
-  auto res = std::minmax_element(polygon.begin(), polygon.end(),
-    [&](const Point & p, const Point & q) {
-      return std::atan2(p.y, p.x) < std::atan2(q.y, q.x);
-    });
+  auto res = std::minmax_element(
+    polygon.begin(), polygon.end(),
+    [&](const Point & p, const Point & q) { return std::atan2(p.y, p.x) < std::atan2(q.y, q.x); });
 
-  auto [ minp, maxp ] = res;
+  auto [minp, maxp] = res;
   if (std::atan2(maxp->y, maxp->x) - std::atan2(minp->y, minp->x) > M_PI) {
-    res = std::minmax_element(polygon.begin(), polygon.end(),
-      [&](const Point & p, const Point & q) {
+    res =
+      std::minmax_element(polygon.begin(), polygon.end(), [&](const Point & p, const Point & q) {
         auto prad = std::atan2(p.y, p.x);
         auto qrad = std::atan2(q.y, q.x);
 
@@ -95,12 +94,13 @@ auto Grid::constructOccupiedPolygon(const primitives::Primitive & primitive) con
   return res;
 }
 
-auto Grid::constructInvisiblePolygon(const std::vector<geometry_msgs::msg::Point> & occupied_polygon) const
+auto Grid::constructInvisiblePolygon(
+  const std::vector<geometry_msgs::msg::Point> & occupied_polygon) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   using geometry_msgs::msg::Point;
 
-  auto [ minp, maxp ] = minmaxAnglePoint(occupied_polygon);
+  auto [minp, maxp] = minmaxAnglePoint(occupied_polygon);
   double minang = std::atan2(minp->y, minp->x);
   double maxang = std::atan2(maxp->y, maxp->x);
   if (minang > maxang) maxang += 2 * M_PI;
