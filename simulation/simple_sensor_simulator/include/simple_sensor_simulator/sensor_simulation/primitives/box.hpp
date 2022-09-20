@@ -28,10 +28,9 @@ class Box : public Primitive
 public:
   explicit Box(float depth, float width, float height, const geometry_msgs::msg::Pose & pose);
   ~Box() = default;
-  float depth;
-  float width;
-  float height;
-
+  const float depth;
+  const float width;
+  const float height;
 };
 }  // namespace primitives
 }  // namespace simple_sensor_simulator
