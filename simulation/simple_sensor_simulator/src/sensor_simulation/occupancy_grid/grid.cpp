@@ -185,7 +185,8 @@ auto Grid::add(const PrimitiveType & primitive) -> void
   {
     constexpr auto count_max = std::numeric_limits<MarkerCounterType>::max();
     if (primitive_count_++ == count_max) {
-      throw std::runtime_error("Grid cannot hold more than " + std::to_string(count_max) + " primitives");
+      throw std::runtime_error(
+        "Grid cannot hold more than " + std::to_string(count_max) + " primitives");
     }
   }
 
