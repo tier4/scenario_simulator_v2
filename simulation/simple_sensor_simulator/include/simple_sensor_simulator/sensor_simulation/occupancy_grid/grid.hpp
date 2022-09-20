@@ -118,10 +118,10 @@ private:
   }
 
   /**
-   * @brief mark grid area surrounded by polygon
+   * @brief mark grid area surrounded by convex_hull
    */
-  inline auto markPolygon(
-    std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & polygon) -> void;
+  inline auto markConvexHull(
+    std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & convex_hull) -> void;
 
   /**
    * @brief Convert point in world coordinate to point in grid cooridnate
@@ -144,11 +144,11 @@ private:
   /**
    *
    */
-  inline auto constructOccupiedPolygon(const primitives::Primitive & primitive) const
+  inline auto constructOccupiedConvexHull(const primitives::Primitive & primitive) const
     -> std::vector<geometry_msgs::msg::Point>;
 
-  inline auto constructInvisiblePolygon(
-    const std::vector<geometry_msgs::msg::Point> & occupied_polygon) const
+  inline auto constructInvisibleConvexHull(
+    const std::vector<geometry_msgs::msg::Point> & occupied_convex_hull) const
     -> std::vector<geometry_msgs::msg::Point>;
 };
 }  // namespace simple_sensor_simulator

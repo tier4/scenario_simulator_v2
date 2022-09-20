@@ -84,7 +84,7 @@ auto Grid::minmaxAnglePoint(const std::vector<geometry_msgs::msg::Point> & polyg
   return res;
 }
 
-auto Grid::constructOccupiedPolygon(const primitives::Primitive & primitive) const
+auto Grid::constructOccupiedConvexHull(const primitives::Primitive & primitive) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   auto res = primitive.get2DConvexHull();
@@ -94,16 +94,11 @@ auto Grid::constructOccupiedPolygon(const primitives::Primitive & primitive) con
   return res;
 }
 
-auto Grid::constructInvisiblePolygon(
-  const std::vector<geometry_msgs::msg::Point> & occupied_polygon) const
+auto Grid::constructInvisibleConvexHull(
+  const std::vector<geometry_msgs::msg::Point> & occupied_convex_hull) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   using geometry_msgs::msg::Point;
-
-  auto [minp, maxp] = minmaxAnglePoint(occupied_polygon);
-  double minang = std::atan2(minp->y, minp->x);
-  double maxang = std::atan2(maxp->y, maxp->x);
-  if (minang > maxang) maxang += 2 * M_PI;
 
   const auto realw = width * resolution / 2;
   const auto realh = height * resolution / 2;
@@ -136,38 +131,41 @@ auto Grid::constructInvisiblePolygon(
 
   auto res = std::vector<Point>();
   {
-    auto i = size_t(0);
+    auto [minp, maxp] = minmaxAnglePoint(occupied_convex_hull);
+    double minang = std::atan2(minp->y, minp->x);
+    double maxang = std::atan2(maxp->y, maxp->x);
+    if (minang > maxang) maxang += 2 * M_PI;
+
+    size_t i = 0;
     for (;; ++i) {
       auto corner = corners(i);
-      if (std::atan2(corner.y, corner.x) >= minang) {
-        res.emplace_back(*minp);
-        res.emplace_back(projection(*minp, i));
-        break;
-      }
+      if (std::atan2(corner.y, corner.x) >= minang) break;
     }
+
+    res.emplace_back(*minp);
+    res.emplace_back(projection(*minp, i));
 
     for (;; ++i) {
       auto corner = corners(i);
-      if (std::atan2(corner.y, corner.x) + 2 * M_PI * (i / 4) >= maxang) {
-        res.emplace_back(projection(*maxp, i));
-        res.emplace_back(*maxp);
-        break;
-      }
+      if (std::atan2(corner.y, corner.x) + 2 * M_PI * (i / 4) >= maxang) break;
       res.emplace_back(corner);
     }
+
+    res.emplace_back(projection(*maxp, i));
+    res.emplace_back(*maxp);
   }
   return res;
 }
 
-auto Grid::markPolygon(
-  std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & polygon) -> void
+auto Grid::markConvexHull(
+  std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & convex_hull) -> void
 {
   mincols_.assign(mincols_.size(), width);
   maxcols_.assign(maxcols_.size(), -1);
 
-  for (size_t i = 0; i < polygon.size(); ++i) {
-    const auto p = transformToPixel(polygon[i]);
-    const auto q = transformToPixel(polygon[(i + 1) % polygon.size()]);
+  for (size_t i = 0; i < convex_hull.size(); ++i) {
+    const auto p = transformToPixel(convex_hull[i]);
+    const auto q = transformToPixel(convex_hull[(i + 1) % convex_hull.size()]);
     traverse(p, q, [&](ssize_t col, ssize_t row) {
       if (row >= 0 && row < ssize_t(height)) {
         mincols_[row] = std::min(mincols_[row], col);
@@ -188,14 +186,14 @@ auto Grid::markPolygon(
 
 auto Grid::add(const primitives::Primitive & primitive) -> void
 {
-  auto occupied_polygon = constructOccupiedPolygon(primitive);
-  auto invisible_polygon = constructInvisiblePolygon(occupied_polygon);
+  auto occupied_convex_hull = constructOccupiedConvexHull(primitive);
+  auto invisible_convex_hull = constructInvisibleConvexHull(occupied_convex_hull);
 
   // mark invisible area
-  markPolygon(invisible_grid_, invisible_polygon);
+  markConvexHull(invisible_grid_, invisible_convex_hull);
 
   // mark occupied area
-  markPolygon(occupied_grid_, occupied_polygon);
+  markConvexHull(occupied_grid_, occupied_convex_hull);
 }
 
 auto Grid::construct() -> void
