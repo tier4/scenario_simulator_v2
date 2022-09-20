@@ -37,14 +37,14 @@ Grid::Grid(
 {
 }
 
-auto Grid::constructPoint(double x, double y, double z = 0) const -> point_type
+auto Grid::constructPoint(double x, double y, double z = 0) const -> PointType
 {
-  auto p = point_type();
+  auto p = PointType();
   p.x = x, p.y = y, p.z = z;
   return p;
 }
 
-auto Grid::transformToGrid(const point_type & world_point) const -> point_type
+auto Grid::transformToGrid(const PointType & world_point) const -> PointType
 {
   namespace quat_op = quaternion_operation;
   auto rot = quat_op::getRotationMatrix(quat_op::conjugate(origin_.orientation));
@@ -54,24 +54,24 @@ auto Grid::transformToGrid(const point_type & world_point) const -> point_type
   return constructPoint(p(0), p(1), p(2));
 }
 
-auto Grid::transformToPixel(const point_type & grid_point) const -> point_type
+auto Grid::transformToPixel(const PointType & grid_point) const -> PointType
 {
   return constructPoint(
     (grid_point.x + height * resolution * 0.5) / resolution,
     (grid_point.y + width * resolution * 0.5) / resolution);
 }
 
-auto Grid::minmaxAnglePoint(const polygon_type & polygon) const
+auto Grid::minmaxAnglePoint(const PolygonType & polygon) const
 {
   auto res = std::minmax_element(
-    polygon.begin(), polygon.end(), [&](const point_type & p, const point_type & q) {
+    polygon.begin(), polygon.end(), [&](const PointType & p, const PointType & q) {
       return std::atan2(p.y, p.x) < std::atan2(q.y, q.x);
     });
 
   auto [minp, maxp] = res;
   if (std::atan2(maxp->y, maxp->x) - std::atan2(minp->y, minp->x) > M_PI) {
     res = std::minmax_element(
-      polygon.begin(), polygon.end(), [&](const point_type & p, const point_type & q) {
+      polygon.begin(), polygon.end(), [&](const PointType & p, const PointType & q) {
         auto prad = std::atan2(p.y, p.x);
         auto qrad = std::atan2(q.y, q.x);
 
@@ -85,7 +85,7 @@ auto Grid::minmaxAnglePoint(const polygon_type & polygon) const
   return res;
 }
 
-auto Grid::constructOccupiedConvexHull(const primitive_type & primitive) const -> polygon_type
+auto Grid::constructOccupiedConvexHull(const PrimitiveType & primitive) const -> PolygonType
 {
   auto res = primitive.get2DConvexHull();
   for (auto & p : res) {
@@ -94,8 +94,8 @@ auto Grid::constructOccupiedConvexHull(const primitive_type & primitive) const -
   return res;
 }
 
-auto Grid::constructInvisibleConvexHull(const polygon_type & occupied_convex_hull) const
-  -> polygon_type
+auto Grid::constructInvisibleConvexHull(const PolygonType & occupied_convex_hull) const
+  -> PolygonType
 {
   const auto realw = width * resolution / 2;
   const auto realh = height * resolution / 2;
@@ -113,7 +113,7 @@ auto Grid::constructInvisibleConvexHull(const polygon_type & occupied_convex_hul
     }
   };
 
-  const auto projection = [&](const point_type & p, size_t i) {
+  const auto projection = [&](const PointType & p, size_t i) {
     switch (i % 4) {
       default:
         return constructPoint(-realw, p.y * -realw / p.x);  // left
@@ -126,7 +126,7 @@ auto Grid::constructInvisibleConvexHull(const polygon_type & occupied_convex_hul
     }
   };
 
-  auto res = polygon_type();
+  auto res = PolygonType();
   {
     auto [minp, maxp] = minmaxAnglePoint(occupied_convex_hull);
     double minang = std::atan2(minp->y, minp->x);
@@ -154,7 +154,7 @@ auto Grid::constructInvisibleConvexHull(const polygon_type & occupied_convex_hul
   return res;
 }
 
-auto Grid::markConvexHull(marker_grid_type & grid, const polygon_type & convex_hull) -> void
+auto Grid::markConvexHull(MarkerGridType & grid, const PolygonType & convex_hull) -> void
 {
   mincols_.assign(mincols_.size(), width);
   maxcols_.assign(maxcols_.size(), -1);
@@ -180,7 +180,7 @@ auto Grid::markConvexHull(marker_grid_type & grid, const polygon_type & convex_h
   }
 }
 
-auto Grid::add(const primitive_type & primitive) -> void
+auto Grid::add(const PrimitiveType & primitive) -> void
 {
   auto occupied_convex_hull = constructOccupiedConvexHull(primitive);
   auto invisible_convex_hull = constructInvisibleConvexHull(occupied_convex_hull);
@@ -214,9 +214,9 @@ auto Grid::construct() -> void
   }
 }
 
-auto Grid::get() const -> const occupancy_grid_type & { return values_; }
+auto Grid::get() const -> const OccupancyGridType & { return values_; }
 
-auto Grid::reset(const pose_type & origin) -> void
+auto Grid::reset(const PoseType & origin) -> void
 {
   origin_ = origin;
   invisible_grid_.assign(invisible_grid_.size(), 0);
