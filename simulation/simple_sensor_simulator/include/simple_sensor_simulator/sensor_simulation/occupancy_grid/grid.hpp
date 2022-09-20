@@ -117,7 +117,7 @@ private:
     -> void
   {
     // A Fast Voxel Traversal Algorithm for Ray Tracing
-    // https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf
+    // https://www.researchgate.net/publication/2611491_A_Fast_Voxel_Traversal_Algorithm_for_Ray_Tracing
 
     double vx = end.x - start.x;
     double vy = end.y - start.y;
