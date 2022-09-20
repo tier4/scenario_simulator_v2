@@ -112,6 +112,9 @@ public:
 
   const std::string getCurrentAction() const override
   {
+    if (!npc_logic_started_) {
+      return "waiting";
+    }
     return behavior_plugin_ptr_->getCurrentAction();
   }
 

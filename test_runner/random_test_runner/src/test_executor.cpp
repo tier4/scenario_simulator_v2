@@ -112,20 +112,20 @@ void TestExecutor::initialize()
 
 void TestExecutor::update(double current_time)
 {
-  bool timeout_reached = current_time >= test_timeout;
-
-  if (timeout_reached) {
-    if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-      traffic_simulator_msgs::msg::EntityStatus status = api_->getEntityStatus(ego_name_);
-      if (!goal_reached_metric_.isGoalReached(status)) {
-        RCLCPP_INFO(logger_, "Timeout reached");
-        error_reporter_.reportTimeout();
+  if (!std::isnan(current_time)) {
+    bool timeout_reached = current_time >= test_timeout;
+    if (timeout_reached) {
+      if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
+        traffic_simulator_msgs::msg::EntityStatus status = api_->getEntityStatus(ego_name_);
+        if (!goal_reached_metric_.isGoalReached(status)) {
+          RCLCPP_INFO(logger_, "Timeout reached");
+          error_reporter_.reportTimeout();
+        }
       }
+      scenario_completed_ = true;
+      return;
     }
-    scenario_completed_ = true;
-    return;
   }
-
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
     traffic_simulator_msgs::msg::EntityStatus status = api_->getEntityStatus(ego_name_);
     for (const auto & npc : test_description_.npcs_descriptions) {
@@ -148,7 +148,6 @@ void TestExecutor::update(double current_time)
       scenario_completed_ = true;
     }
   }
-
   api_->updateFrame();
 }
 

@@ -52,8 +52,6 @@ struct Storyboard : public Scope,
 
   auto run() -> void override;
 
-  auto start() -> void override;
-
   friend auto operator<<(nlohmann::json &, const Storyboard &) -> nlohmann::json &;
 };
 }  // namespace syntax
