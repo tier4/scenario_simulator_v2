@@ -96,8 +96,8 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
     }
   }
 
-  // enumerate all primitive shapes of entities
-  auto primitives = std::vector<std::unique_ptr<primitives::Primitive>>();
+  // construct an occupancy grid
+  grid_.reset(ego_pose_north_up);
   for (const auto & s : status) {
     if (configuration_.entity() != s.name()) {
       // skip if entity is not actually detected
@@ -105,37 +105,37 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
         continue;
       }
 
-      geometry_msgs::msg::Pose pose;
-      simulation_interface::toMsg(s.pose(), pose);
-      auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
-      geometry_msgs::msg::Point center_point;
-      simulation_interface::toMsg(s.bounding_box().center(), center_point);
-      Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
-      center = rotation * center;
-      pose.position.x = pose.position.x + center.x();
-      pose.position.y = pose.position.y + center.y();
-      pose.position.z = pose.position.z + center.z();
+      auto pose = geometry_msgs::msg::Pose();
+      {
+        simulation_interface::toMsg(s.pose(), pose);
+        auto point = geometry_msgs::msg::Point();
+        simulation_interface::toMsg(s.bounding_box().center(), point);
+        auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
+        auto center = (rotation * Eigen::Vector3d(point.x, point.y, point.z)).eval();
 
-      primitives.push_back(std::make_unique<primitives::Box>(
-        s.bounding_box().dimensions().x(), s.bounding_box().dimensions().y(),
-        s.bounding_box().dimensions().z(), pose));
+        pose.position.x += center.x();
+        pose.position.y += center.y();
+        pose.position.z += center.z();
+      }
+
+      const auto & v = s.bounding_box().dimensions();
+      grid_.add(primitives::Box(v.x(), v.y(), v.z(), pose));
     }
   }
+  grid_.construct();
 
-  // construct `OccupancyGrid`
-  auto occupancy_grid = nav_msgs::msg::OccupancyGrid();
-  occupancy_grid.header.stamp = stamp;
-  occupancy_grid.header.frame_id = "map";
-  occupancy_grid.data = grid_.calculate(ego_pose_north_up, primitives);
-  occupancy_grid.info.height = configuration_.height();
-  occupancy_grid.info.width = configuration_.width();
-  occupancy_grid.info.map_load_time = stamp;
-  occupancy_grid.info.resolution = configuration_.resolution();
-  occupancy_grid.info.origin = ego_pose_north_up;
-  occupancy_grid.info.origin.position.x -=
-    0.5 * configuration_.height() * configuration_.resolution();
-  occupancy_grid.info.origin.position.y -=
-    0.5 * configuration_.width() * configuration_.resolution();
-  return occupancy_grid;
+  // construct message
+  auto res = nav_msgs::msg::OccupancyGrid();
+  res.header.stamp = stamp;
+  res.header.frame_id = "map";
+  res.data = grid_.get();
+  res.info.height = configuration_.height();
+  res.info.width = configuration_.width();
+  res.info.map_load_time = stamp;
+  res.info.resolution = configuration_.resolution();
+  res.info.origin = ego_pose_north_up;
+  res.info.origin.position.x -= 0.5 * configuration_.height() * configuration_.resolution();
+  res.info.origin.position.y -= 0.5 * configuration_.width() * configuration_.resolution();
+  return res;
 }
 }  // namespace simple_sensor_simulator

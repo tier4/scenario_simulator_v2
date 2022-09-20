@@ -34,15 +34,23 @@ public:
   Grid(
     double resolution, size_t height, size_t width, int8_t occupied_cost = 100,
     int8_t invisible_cost = 50);
+
   const double resolution;
   const size_t height;
   const size_t width;
   const int8_t occupied_cost;
   const int8_t invisible_cost;
 
-  const std::vector<int8_t> & calculate(
-    const geometry_msgs::msg::Pose & origin,
-    const std::vector<std::unique_ptr<primitives::Primitive>> & primitives);
+  /**
+   * @brief mark invisible area and occpuied area of primitive
+   */
+  auto add(const primitives::Primitive & primitive) -> void;
+
+  auto reset(const geometry_msgs::msg::Pose & origin) -> void;
+
+  auto construct() -> void;
+
+  auto get() const -> const std::vector<int8_t> &;
 
 private:
   /**
@@ -63,6 +71,8 @@ private:
    */
   std::vector<int8_t> occupied_grid_;
 
+  std::vector<ssize_t> mincols_, maxcols_;
+
   /**
    * @brief traverse cells along from start to end
    * @param start
@@ -70,8 +80,9 @@ private:
    * @param f a funciton object which takes cell coordinate
    */
   template <class F>
-  inline void traverse(
+  inline auto traverse(
     const geometry_msgs::msg::Point & start, const geometry_msgs::msg::Point & end, const F & f)
+    -> void
   {
     // A Fast Voxel Traversal Algorithm for Ray Tracing
     // https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf
@@ -109,27 +120,36 @@ private:
   /**
    * @brief mark grid area surrounded by polygon
    */
-  inline void markPolygon(
-    std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & polygon);
-
-  /**
-   * @brief mark invisible area and occpuied area of primitive
-   */
-  inline void addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive);
+  inline auto markPolygon(
+    std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & polygon) -> void;
 
   /**
    * @brief Convert point in world coordinate to point in grid cooridnate
    * @return Point in grid coordinate
    */
-  inline geometry_msgs::msg::Point transformToGrid(
-    const geometry_msgs::msg::Point & world_point) const;
+  inline auto transformToGrid(const geometry_msgs::msg::Point & world_point) const
+    -> geometry_msgs::msg::Point;
 
   /**
    * @brief Digitize point in grid coordinate
    * @return Digitized point
    */
-  inline geometry_msgs::msg::Point transformToPixel(
-    const geometry_msgs::msg::Point & grid_point) const;
+  inline auto transformToPixel(const geometry_msgs::msg::Point & grid_point) const
+    -> geometry_msgs::msg::Point;
+
+  inline auto constructPoint(double x, double y, double z) const -> geometry_msgs::msg::Point;
+
+  inline auto minmaxAnglePoint(const std::vector<geometry_msgs::msg::Point> & polygon) const;
+
+  /**
+   *
+   */
+  inline auto constructOccupiedPolygon(const primitives::Primitive & primitive) const
+    -> std::vector<geometry_msgs::msg::Point>;
+
+  inline auto constructInvisiblePolygon(
+    const std::vector<geometry_msgs::msg::Point> & occupied_polygon) const
+    -> std::vector<geometry_msgs::msg::Point>;
 };
 }  // namespace simple_sensor_simulator
 
