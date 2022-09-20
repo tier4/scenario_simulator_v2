@@ -182,6 +182,13 @@ auto Grid::markConvexHull(MarkerGridType & grid, const PolygonType & convex_hull
 
 auto Grid::add(const PrimitiveType & primitive) -> void
 {
+  {
+    constexpr auto count_max = std::numeric_limits<MarkerCounterType>::max();
+    if (primitive_count_++ == count_max) {
+      throw std::runtime_error("Grid cannot hold more than " + std::to_string(count_max) + " primitives");
+    }
+  }
+
   auto occupied_convex_hull = constructOccupiedConvexHull(primitive);
   auto invisible_convex_hull = constructInvisibleConvexHull(occupied_convex_hull);
 
@@ -219,6 +226,7 @@ auto Grid::get() const -> const OccupancyGridType & { return values_; }
 auto Grid::reset(const PoseType & origin) -> void
 {
   origin_ = origin;
+  primitive_count_ = 0;
   invisible_grid_.assign(invisible_grid_.size(), 0);
   occupied_grid_.assign(occupied_grid_.size(), 0);
 }

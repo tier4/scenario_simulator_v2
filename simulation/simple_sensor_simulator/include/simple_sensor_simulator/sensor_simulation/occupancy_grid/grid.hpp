@@ -31,7 +31,8 @@ namespace simple_sensor_simulator
 class Grid
 {
 public:
-  using MarkerGridType = std::vector<int32_t>;
+  using MarkerCounterType = int16_t;
+  using MarkerGridType = std::vector<MarkerCounterType>;
   using OccupancyGridType = std::vector<int8_t>;
   using PointType = geometry_msgs::msg::Point;
   using PoseType = geometry_msgs::msg::Pose;
@@ -75,6 +76,11 @@ private:
    * @brief Grid origin in world coordinate
    */
   PoseType origin_;
+
+  /**
+   * @brief The number of added primitives
+   */
+  MarkerCounterType primitive_count_ = 0;
 
   /**
    * @brief A vector of occupied area
