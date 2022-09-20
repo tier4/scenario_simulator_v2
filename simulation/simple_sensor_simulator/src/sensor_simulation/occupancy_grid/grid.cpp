@@ -37,15 +37,14 @@ Grid::Grid(
 {
 }
 
-auto Grid::constructPoint(double x, double y, double z = 0) const -> geometry_msgs::msg::Point
+auto Grid::constructPoint(double x, double y, double z = 0) const -> point_type
 {
-  auto p = geometry_msgs::msg::Point();
+  auto p = point_type();
   p.x = x, p.y = y, p.z = z;
   return p;
 }
 
-auto Grid::transformToGrid(const geometry_msgs::msg::Point & world_point) const
-  -> geometry_msgs::msg::Point
+auto Grid::transformToGrid(const point_type & world_point) const -> point_type
 {
   namespace quat_op = quaternion_operation;
   auto rot = quat_op::getRotationMatrix(quat_op::conjugate(origin_.orientation));
@@ -55,26 +54,24 @@ auto Grid::transformToGrid(const geometry_msgs::msg::Point & world_point) const
   return constructPoint(p(0), p(1), p(2));
 }
 
-auto Grid::transformToPixel(const geometry_msgs::msg::Point & grid_point) const
-  -> geometry_msgs::msg::Point
+auto Grid::transformToPixel(const point_type & grid_point) const -> point_type
 {
   return constructPoint(
     (grid_point.x + height * resolution * 0.5) / resolution,
     (grid_point.y + width * resolution * 0.5) / resolution);
 }
 
-auto Grid::minmaxAnglePoint(const std::vector<geometry_msgs::msg::Point> & polygon) const
+auto Grid::minmaxAnglePoint(const polygon_type & polygon) const
 {
-  using geometry_msgs::msg::Point;
-
   auto res = std::minmax_element(
-    polygon.begin(), polygon.end(),
-    [&](const Point & p, const Point & q) { return std::atan2(p.y, p.x) < std::atan2(q.y, q.x); });
+    polygon.begin(), polygon.end(), [&](const point_type & p, const point_type & q) {
+      return std::atan2(p.y, p.x) < std::atan2(q.y, q.x);
+    });
 
   auto [minp, maxp] = res;
   if (std::atan2(maxp->y, maxp->x) - std::atan2(minp->y, minp->x) > M_PI) {
-    res =
-      std::minmax_element(polygon.begin(), polygon.end(), [&](const Point & p, const Point & q) {
+    res = std::minmax_element(
+      polygon.begin(), polygon.end(), [&](const point_type & p, const point_type & q) {
         auto prad = std::atan2(p.y, p.x);
         auto qrad = std::atan2(q.y, q.x);
 
@@ -88,8 +85,7 @@ auto Grid::minmaxAnglePoint(const std::vector<geometry_msgs::msg::Point> & polyg
   return res;
 }
 
-auto Grid::constructOccupiedConvexHull(const primitives::Primitive & primitive) const
-  -> std::vector<geometry_msgs::msg::Point>
+auto Grid::constructOccupiedConvexHull(const primitive_type & primitive) const -> polygon_type
 {
   auto res = primitive.get2DConvexHull();
   for (auto & p : res) {
@@ -98,12 +94,9 @@ auto Grid::constructOccupiedConvexHull(const primitives::Primitive & primitive) 
   return res;
 }
 
-auto Grid::constructInvisibleConvexHull(
-  const std::vector<geometry_msgs::msg::Point> & occupied_convex_hull) const
-  -> std::vector<geometry_msgs::msg::Point>
+auto Grid::constructInvisibleConvexHull(const polygon_type & occupied_convex_hull) const
+  -> polygon_type
 {
-  using geometry_msgs::msg::Point;
-
   const auto realw = width * resolution / 2;
   const auto realh = height * resolution / 2;
 
@@ -120,7 +113,7 @@ auto Grid::constructInvisibleConvexHull(
     }
   };
 
-  const auto projection = [&](const Point & p, size_t i) {
+  const auto projection = [&](const point_type & p, size_t i) {
     switch (i % 4) {
       default:
         return constructPoint(-realw, p.y * -realw / p.x);  // left
@@ -133,7 +126,7 @@ auto Grid::constructInvisibleConvexHull(
     }
   };
 
-  auto res = std::vector<Point>();
+  auto res = polygon_type();
   {
     auto [minp, maxp] = minmaxAnglePoint(occupied_convex_hull);
     double minang = std::atan2(minp->y, minp->x);
@@ -161,8 +154,7 @@ auto Grid::constructInvisibleConvexHull(
   return res;
 }
 
-auto Grid::markConvexHull(
-  std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & convex_hull) -> void
+auto Grid::markConvexHull(marker_grid_type & grid, const polygon_type & convex_hull) -> void
 {
   mincols_.assign(mincols_.size(), width);
   maxcols_.assign(maxcols_.size(), -1);
@@ -188,7 +180,7 @@ auto Grid::markConvexHull(
   }
 }
 
-auto Grid::add(const primitives::Primitive & primitive) -> void
+auto Grid::add(const primitive_type & primitive) -> void
 {
   auto occupied_convex_hull = constructOccupiedConvexHull(primitive);
   auto invisible_convex_hull = constructInvisibleConvexHull(occupied_convex_hull);
@@ -222,9 +214,9 @@ auto Grid::construct() -> void
   }
 }
 
-auto Grid::get() const -> const std::vector<int8_t> & { return values_; }
+auto Grid::get() const -> const occupancy_grid_type & { return values_; }
 
-auto Grid::reset(const geometry_msgs::msg::Pose & origin) -> void
+auto Grid::reset(const pose_type & origin) -> void
 {
   origin_ = origin;
   invisible_grid_.assign(invisible_grid_.size(), 0);

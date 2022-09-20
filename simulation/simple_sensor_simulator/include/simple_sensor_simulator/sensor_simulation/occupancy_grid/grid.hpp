@@ -31,6 +31,13 @@ namespace simple_sensor_simulator
 class Grid
 {
 public:
+  using marker_grid_type = std::vector<int32_t>;
+  using occupancy_grid_type = std::vector<int8_t>;
+  using point_type = geometry_msgs::msg::Point;
+  using pose_type = geometry_msgs::msg::Pose;
+  using primitive_type = primitives::Primitive;
+  using polygon_type = std::vector<point_type>;
+
   Grid(
     double resolution, size_t height, size_t width, int8_t occupied_cost = 100,
     int8_t invisible_cost = 50);
@@ -45,13 +52,13 @@ public:
    * @brief Mark invisible area and occpuied area of primitive
    * @param primitive
    */
-  auto add(const primitives::Primitive & primitive) -> void;
+  auto add(const primitive_type & primitive) -> void;
 
   /**
    * @brief Reset all internal state
    * @param origin
    */
-  auto reset(const geometry_msgs::msg::Pose & origin) -> void;
+  auto reset(const pose_type & origin) -> void;
 
   /**
    * @brief Construct occupancy grid
@@ -61,31 +68,31 @@ public:
   /**
    * @return Constructed occupancy grid
    */
-  auto get() const -> const std::vector<int8_t> &;
+  auto get() const -> const occupancy_grid_type &;
 
 private:
   /**
    * @brief Grid origin in world coordinate
    */
-  geometry_msgs::msg::Pose origin_;
-
-  /**
-   * @brief A vector of invisible area
-   * @note This vector is declared as a member in order to reuse allocated memory
-   */
-  std::vector<int8_t> invisible_grid_;
+  pose_type origin_;
 
   /**
    * @brief A vector of occupied area
    * @note This vector is declared as a member in order to reuse allocated memory
    */
-  std::vector<int8_t> occupied_grid_;
+  marker_grid_type occupied_grid_;
+
+  /**
+   * @brief A vector of invisible area
+   * @note This vector is declared as a member in order to reuse allocated memory
+   */
+  marker_grid_type invisible_grid_;
 
   /**
    * @brief A vector of grid values
    * @note This vector is declared as a member in order to reuse allocated memory
    */
-  std::vector<int8_t> values_;
+  occupancy_grid_type values_;
 
   /**
    * @brief Vectors to hold min or max column of rasterized polygon
@@ -100,8 +107,7 @@ private:
    * @param f a funciton object which takes cell coordinate
    */
   template <class F>
-  inline auto traverse(
-    const geometry_msgs::msg::Point & start, const geometry_msgs::msg::Point & end, const F & f)
+  inline auto traverse(const point_type & start, const point_type & end, const F & f)
     -> void
   {
     // A Fast Voxel Traversal Algorithm for Ray Tracing
@@ -143,23 +149,23 @@ private:
    * @param convex_hull Convex hull to mark
    */
   inline auto markConvexHull(
-    std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & convex_hull) -> void;
+    marker_grid_type & grid, const polygon_type & convex_hull) -> void;
 
   /**
    * @brief Convert point in world coordinate to point in grid cooridnate
    * @param world_point
    * @return Point in grid coordinate
    */
-  inline auto transformToGrid(const geometry_msgs::msg::Point & world_point) const
-    -> geometry_msgs::msg::Point;
+  inline auto transformToGrid(const point_type & world_point) const
+    -> point_type;
 
   /**
    * @brief Rasterize point in grid coordinate
    * @param grid_point
    * @return Rasterized point
    */
-  inline auto transformToPixel(const geometry_msgs::msg::Point & grid_point) const
-    -> geometry_msgs::msg::Point;
+  inline auto transformToPixel(const point_type & grid_point) const
+    -> point_type;
 
   /**
    * @brief An utility function to construct a Point
@@ -167,7 +173,7 @@ private:
    * @param y
    * @param z
    */
-  inline auto constructPoint(double x, double y, double z) const -> geometry_msgs::msg::Point;
+  inline auto constructPoint(double x, double y, double z) const -> point_type;
 
   /**
    * @brief Search minmax angle point from a polygon
@@ -176,15 +182,15 @@ private:
    * @note This function use [-pi/2, pi/2] as angle interval by default. If polygon crosses
    *       this interval, this function automatically switch to use [0, 2pi] as angle interval.
    */
-  inline auto minmaxAnglePoint(const std::vector<geometry_msgs::msg::Point> & polygon) const;
+  inline auto minmaxAnglePoint(const polygon_type & polygon) const;
 
   /**
    * @brief Construct a convex hull of the area occupied with primitive
    * @param primitive
    * @return Convex hull polygon
    */
-  inline auto constructOccupiedConvexHull(const primitives::Primitive & primitive) const
-    -> std::vector<geometry_msgs::msg::Point>;
+  inline auto constructOccupiedConvexHull(const primitive_type & primitive) const
+    -> polygon_type;
 
   /**
    * @brief Construct a convex hull of the area made invisible by the occupied area
@@ -192,8 +198,8 @@ private:
    * @return Convex hull polygon
    */
   inline auto constructInvisibleConvexHull(
-    const std::vector<geometry_msgs::msg::Point> & occupied_convex_hull) const
-    -> std::vector<geometry_msgs::msg::Point>;
+    const polygon_type & occupied_convex_hull) const
+    -> polygon_type;
 };
 }  // namespace simple_sensor_simulator
 
