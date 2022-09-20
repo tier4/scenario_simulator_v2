@@ -42,14 +42,25 @@ public:
   const int8_t invisible_cost;
 
   /**
-   * @brief mark invisible area and occpuied area of primitive
+   * @brief Mark invisible area and occpuied area of primitive
+   * @param primitive
    */
   auto add(const primitives::Primitive & primitive) -> void;
 
+  /**
+   * @brief Reset all internal state
+   * @param origin
+   */
   auto reset(const geometry_msgs::msg::Pose & origin) -> void;
 
+  /**
+   * @brief Construct occupancy grid
+   */
   auto construct() -> void;
 
+  /**
+   * @return Constructed occupancy grid
+   */
   auto get() const -> const std::vector<int8_t> &;
 
 private:
@@ -60,17 +71,23 @@ private:
   geometry_msgs::msg::Pose origin_;
 
   /**
-   * @brief a vector that express cell is invisible
+   * @brief A vector that express cell is invisible
    * @note Grid access this 1d vector by calculating an index from a 2d grid coordinate
+   * @note This vector is declared as a member in order to reuse allocated memory
    */
   std::vector<int8_t> invisible_grid_;
 
   /**
-   * @brief a vector that express cell is occupied
+   * @brief A vector that express cell is occupied
    * @note Grid access this 1d vector by calculating an index from a 2d grid coordinate
+   * @note This vector is declared as a member in order to reuse allocated memory
    */
   std::vector<int8_t> occupied_grid_;
 
+  /**
+   * @brief Vectors to hold min or max column of rasterized polygon
+   * @note These vectors are declared as members in order to reuse allocated memory
+   */
   std::vector<ssize_t> mincols_, maxcols_;
 
   /**
@@ -119,12 +136,15 @@ private:
 
   /**
    * @brief mark grid area surrounded by convex_hull
+   * @param grid a grid to be marked
+   * @param convex_hull a convex hull to mark
    */
   inline auto markConvexHull(
     std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & convex_hull) -> void;
 
   /**
    * @brief Convert point in world coordinate to point in grid cooridnate
+   * @param world_point
    * @return Point in grid coordinate
    */
   inline auto transformToGrid(const geometry_msgs::msg::Point & world_point) const
@@ -132,21 +152,42 @@ private:
 
   /**
    * @brief Digitize point in grid coordinate
+   * @param grid_point
    * @return Digitized point
    */
   inline auto transformToPixel(const geometry_msgs::msg::Point & grid_point) const
     -> geometry_msgs::msg::Point;
 
+  /**
+   * @brief An utility function to construct a Point
+   * @param x
+   * @param y
+   * @param z
+   */
   inline auto constructPoint(double x, double y, double z) const -> geometry_msgs::msg::Point;
 
+  /**
+   * @brief Search minmax angle point from a polygon
+   * @param polygon
+   * @return Iterator pair of minmax angle point
+   * @note This function use [-pi/2, pi/2] as angle interval by default. If polygon crosses
+   *       this interval, this function automatically switch to use [0, 2pi] as angle interval.
+   */
   inline auto minmaxAnglePoint(const std::vector<geometry_msgs::msg::Point> & polygon) const;
 
   /**
-   *
+   * @brief Construct a convex hull of the area occupied with primitive
+   * @param primitive
+   * @return convex hull polygon
    */
   inline auto constructOccupiedConvexHull(const primitives::Primitive & primitive) const
     -> std::vector<geometry_msgs::msg::Point>;
 
+  /**
+   * @brief Construct a convex hull of the area made invisible by the occupied area
+   * @param occupied_convex_hull convex hull of occupied area
+   * @return convex hull polygon
+   */
   inline auto constructInvisibleConvexHull(
     const std::vector<geometry_msgs::msg::Point> & occupied_convex_hull) const
     -> std::vector<geometry_msgs::msg::Point>;
