@@ -24,10 +24,14 @@ Grid::Grid(
 : resolution(resolution),
   height(height),
   width(width),
+
   occupied_cost(occupied_cost),
   invisible_cost(invisible_cost),
-  invisible_grid_(height * width),
+
   occupied_grid_(height * width),
+  invisible_grid_(height * width),
+  values_(height * width),
+
   mincols_(height),
   maxcols_(height)
 {
@@ -214,12 +218,11 @@ auto Grid::construct() -> void
   }
 
   for (size_t i = 0; i < height * width; ++i) {
-    invisible_grid_[i] =
-      occupied_grid_[i] ? occupied_cost : invisible_grid_[i] ? invisible_cost : 0;
+    values_[i] = occupied_grid_[i] ? occupied_cost : invisible_grid_[i] ? invisible_cost : 0;
   }
 }
 
-auto Grid::get() const -> const std::vector<int8_t> & { return invisible_grid_; }
+auto Grid::get() const -> const std::vector<int8_t> & { return values_; }
 
 auto Grid::reset(const geometry_msgs::msg::Pose & origin) -> void
 {

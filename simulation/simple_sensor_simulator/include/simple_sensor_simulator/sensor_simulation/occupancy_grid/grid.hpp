@@ -65,24 +65,27 @@ public:
 
 private:
   /**
-   * @brief origin
-   * @note Grid treats Ego's origin as its origin
+   * @brief Grid origin in world coordinate
    */
   geometry_msgs::msg::Pose origin_;
 
   /**
-   * @brief A vector that express cell is invisible
-   * @note Grid access this 1d vector by calculating an index from a 2d grid coordinate
+   * @brief A vector of invisible area
    * @note This vector is declared as a member in order to reuse allocated memory
    */
   std::vector<int8_t> invisible_grid_;
 
   /**
-   * @brief A vector that express cell is occupied
-   * @note Grid access this 1d vector by calculating an index from a 2d grid coordinate
+   * @brief A vector of occupied area
    * @note This vector is declared as a member in order to reuse allocated memory
    */
   std::vector<int8_t> occupied_grid_;
+
+  /**
+   * @brief A vector of grid values
+   * @note This vector is declared as a member in order to reuse allocated memory
+   */
+  std::vector<int8_t> values_;
 
   /**
    * @brief Vectors to hold min or max column of rasterized polygon
@@ -91,7 +94,7 @@ private:
   std::vector<ssize_t> mincols_, maxcols_;
 
   /**
-   * @brief traverse cells along from start to end
+   * @brief Traverse grid cells from start to end
    * @param start
    * @param end
    * @param f a funciton object which takes cell coordinate
@@ -135,9 +138,9 @@ private:
   }
 
   /**
-   * @brief mark grid area surrounded by convex_hull
-   * @param grid a grid to be marked
-   * @param convex_hull a convex hull to mark
+   * @brief Mark grid area of convex hull
+   * @param grid Grid to be marked
+   * @param convex_hull Convex hull to mark
    */
   inline auto markConvexHull(
     std::vector<int8_t> & grid, const std::vector<geometry_msgs::msg::Point> & convex_hull) -> void;
@@ -151,9 +154,9 @@ private:
     -> geometry_msgs::msg::Point;
 
   /**
-   * @brief Digitize point in grid coordinate
+   * @brief Rasterize point in grid coordinate
    * @param grid_point
-   * @return Digitized point
+   * @return Rasterized point
    */
   inline auto transformToPixel(const geometry_msgs::msg::Point & grid_point) const
     -> geometry_msgs::msg::Point;
@@ -178,15 +181,15 @@ private:
   /**
    * @brief Construct a convex hull of the area occupied with primitive
    * @param primitive
-   * @return convex hull polygon
+   * @return Convex hull polygon
    */
   inline auto constructOccupiedConvexHull(const primitives::Primitive & primitive) const
     -> std::vector<geometry_msgs::msg::Point>;
 
   /**
    * @brief Construct a convex hull of the area made invisible by the occupied area
-   * @param occupied_convex_hull convex hull of occupied area
-   * @return convex hull polygon
+   * @param occupied_convex_hull Convex hull of occupied area
+   * @return Convex hull polygon
    */
   inline auto constructInvisibleConvexHull(
     const std::vector<geometry_msgs::msg::Point> & occupied_convex_hull) const
