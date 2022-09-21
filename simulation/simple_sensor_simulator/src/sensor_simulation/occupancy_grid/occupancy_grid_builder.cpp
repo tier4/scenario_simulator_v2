@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <rclcpp/rclcpp.hpp>
-#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_builder.hpp>
+#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid_traversal.hpp>
 
 namespace simple_sensor_simulator
 {
-Grid::Grid(
+OccupancyGridBuilder::OccupancyGridBuilder(
   double resolution, size_t height, size_t width, int8_t occupied_cost, int8_t invisible_cost)
 : resolution(resolution),
   height(height),
@@ -37,55 +38,31 @@ Grid::Grid(
 {
 }
 
-auto Grid::constructPoint(double x, double y, double z = 0) const -> PointType
+auto OccupancyGridBuilder::makePoint(double x, double y, double z = 0) const -> PointType
 {
   auto p = PointType();
   p.x = x, p.y = y, p.z = z;
   return p;
 }
 
-auto Grid::transformToGrid(const PointType & world_point) const -> PointType
+auto OccupancyGridBuilder::transformToGrid(const PointType & world_point) const -> PointType
 {
   namespace quat_op = quaternion_operation;
   auto rot = quat_op::getRotationMatrix(quat_op::conjugate(origin_.orientation));
   auto p = Eigen::Vector3d(world_point.x, world_point.y, world_point.z);
   auto q = Eigen::Vector3d(origin_.position.x, origin_.position.y, origin_.position.z);
   p = rot * p - q;
-  return constructPoint(p(0), p(1), p(2));
+  return makePoint(p(0), p(1), p(2));
 }
 
-auto Grid::transformToPixel(const PointType & grid_point) const -> PointType
+auto OccupancyGridBuilder::transformToPixel(const PointType & grid_point) const -> PointType
 {
-  return constructPoint(
+  return makePoint(
     (grid_point.x + height * resolution * 0.5) / resolution,
     (grid_point.y + width * resolution * 0.5) / resolution);
 }
 
-auto Grid::minmaxAnglePoint(const PolygonType & polygon) const
-{
-  auto res = std::minmax_element(
-    polygon.begin(), polygon.end(), [&](const PointType & p, const PointType & q) {
-      return std::atan2(p.y, p.x) < std::atan2(q.y, q.x);
-    });
-
-  auto [minp, maxp] = res;
-  if (std::atan2(maxp->y, maxp->x) - std::atan2(minp->y, minp->x) > M_PI) {
-    res = std::minmax_element(
-      polygon.begin(), polygon.end(), [&](const PointType & p, const PointType & q) {
-        auto prad = std::atan2(p.y, p.x);
-        auto qrad = std::atan2(q.y, q.x);
-
-        if (prad < 0) prad += 2 * M_PI;
-        if (qrad < 0) qrad += 2 * M_PI;
-
-        return prad < qrad;
-      });
-  }
-
-  return res;
-}
-
-auto Grid::constructOccupiedConvexHull(const PrimitiveType & primitive) const -> PolygonType
+auto OccupancyGridBuilder::makeOccupiedArea(const PrimitiveType & primitive) const -> PolygonType
 {
   auto res = primitive.get2DConvexHull();
   for (auto & p : res) {
@@ -94,8 +71,7 @@ auto Grid::constructOccupiedConvexHull(const PrimitiveType & primitive) const ->
   return res;
 }
 
-auto Grid::constructInvisibleConvexHull(const PolygonType & occupied_convex_hull) const
-  -> PolygonType
+auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied) const -> PolygonType
 {
   const auto realw = width * resolution / 2;
   const auto realh = height * resolution / 2;
@@ -103,32 +79,53 @@ auto Grid::constructInvisibleConvexHull(const PolygonType & occupied_convex_hull
   const auto corners = [&](size_t i) {
     switch (i % 4) {
       default:
-        return constructPoint(-realw, -realh);  // bottom left
+        return makePoint(-realw, -realh);  // bottom left
       case 1:
-        return constructPoint(realw, -realh);  // bottom right
+        return makePoint(realw, -realh);  // bottom right
       case 2:
-        return constructPoint(realw, realh);  // top right
+        return makePoint(realw, realh);  // top right
       case 3:
-        return constructPoint(-realw, realh);  // top left
+        return makePoint(-realw, realh);  // top left
     }
   };
 
   const auto projection = [&](const PointType & p, size_t i) {
     switch (i % 4) {
       default:
-        return constructPoint(-realw, p.y * -realw / p.x);  // left
+        return makePoint(-realw, p.y * -realw / p.x);  // left
       case 1:
-        return constructPoint(p.x * -realh / p.y, -realh);  // bottom
+        return makePoint(p.x * -realh / p.y, -realh);  // bottom
       case 2:
-        return constructPoint(realw, p.y * realw / p.x);  // right
+        return makePoint(realw, p.y * realw / p.x);  // right
       case 3:
-        return constructPoint(p.x * realh / p.y, realh);  // top
+        return makePoint(p.x * realh / p.y, realh);  // top
     }
   };
 
   auto res = PolygonType();
   {
-    auto [minp, maxp] = minmaxAnglePoint(occupied_convex_hull);
+    auto [minp, maxp] = [&] {
+      auto res = std::minmax_element(
+        occupied.begin(), occupied.end(), [&](const PointType & p, const PointType & q) {
+          return std::atan2(p.y, p.x) < std::atan2(q.y, q.x);
+        });
+
+      auto [minp, maxp] = res;
+      if (std::atan2(maxp->y, maxp->x) - std::atan2(minp->y, minp->x) > M_PI) {
+        res = std::minmax_element(
+          occupied.begin(), occupied.end(), [&](const PointType & p, const PointType & q) {
+            auto prad = std::atan2(p.y, p.x);
+            auto qrad = std::atan2(q.y, q.x);
+
+            if (prad < 0) prad += 2 * M_PI;
+            if (qrad < 0) qrad += 2 * M_PI;
+
+            return prad < qrad;
+          });
+      }
+      return res;
+    }();
+
     double minang = std::atan2(minp->y, minp->x);
     double maxang = std::atan2(maxp->y, maxp->x);
     if (minang > maxang) maxang += 2 * M_PI;
@@ -154,7 +151,7 @@ auto Grid::constructInvisibleConvexHull(const PolygonType & occupied_convex_hull
   return res;
 }
 
-auto Grid::markConvexHull(MarkerGridType & grid, const PolygonType & convex_hull) -> void
+auto OccupancyGridBuilder::addPolygon(MarkerGridType & grid, const PolygonType & convex_hull) -> void
 {
   mincols_.assign(mincols_.size(), width);
   maxcols_.assign(maxcols_.size(), -1);
@@ -162,25 +159,25 @@ auto Grid::markConvexHull(MarkerGridType & grid, const PolygonType & convex_hull
   for (size_t i = 0; i < convex_hull.size(); ++i) {
     const auto p = transformToPixel(convex_hull[i]);
     const auto q = transformToPixel(convex_hull[(i + 1) % convex_hull.size()]);
-    traverse(p, q, [&](ssize_t col, ssize_t row) {
-      if (row >= 0 && row < ssize_t(height)) {
+    for (auto [row, col] : GridTraversal(p.x, p.y, q.x, q.y)) {
+      if (row >= 0 && row < int32_t(height)) {
         mincols_[row] = std::min(mincols_[row], col);
         maxcols_[row] = std::max(maxcols_[row], col);
       }
-    });
+    }
   }
 
   for (size_t row = 0; row < height; ++row) {
-    if (auto col = mincols_[row]; col >= 0 && col < ssize_t(width)) {
+    if (auto col = mincols_[row]; col >= 0 && col < int32_t(width)) {
       grid[width * row + col] += 1;
     }
-    if (auto col = maxcols_[row]; col >= 0 && col + 1 < ssize_t(width)) {
+    if (auto col = maxcols_[row]; col >= 0 && col + 1 < int32_t(width)) {
       grid[width * row + col + 1] -= 1;
     }
   }
 }
 
-auto Grid::add(const PrimitiveType & primitive) -> void
+auto OccupancyGridBuilder::add(const PrimitiveType & primitive) -> void
 {
   {
     constexpr auto count_max = std::numeric_limits<MarkerCounterType>::max();
@@ -190,17 +187,18 @@ auto Grid::add(const PrimitiveType & primitive) -> void
     }
   }
 
-  auto occupied_convex_hull = constructOccupiedConvexHull(primitive);
-  auto invisible_convex_hull = constructInvisibleConvexHull(occupied_convex_hull);
+  auto occupied_area = makeOccupiedArea(primitive);
+
+  auto invisible_area = makeInvisibleArea(occupied_area);
 
   // mark invisible area
-  markConvexHull(invisible_grid_, invisible_convex_hull);
+  addPolygon(invisible_grid_, invisible_area);
 
   // mark occupied area
-  markConvexHull(occupied_grid_, occupied_convex_hull);
+  addPolygon(occupied_grid_, occupied_area);
 }
 
-auto Grid::construct() -> void
+auto OccupancyGridBuilder::construct() -> void
 {
   // Imos Method
   // https://imoz.jp/algorithms/imos_method.html (Japanese)
@@ -222,9 +220,9 @@ auto Grid::construct() -> void
   }
 }
 
-auto Grid::get() const -> const OccupancyGridType & { return values_; }
+auto OccupancyGridBuilder::get() const -> const OccupancyGridType & { return values_; }
 
-auto Grid::reset(const PoseType & origin) -> void
+auto OccupancyGridBuilder::reset(const PoseType & origin) -> void
 {
   origin_ = origin;
   primitive_count_ = 0;

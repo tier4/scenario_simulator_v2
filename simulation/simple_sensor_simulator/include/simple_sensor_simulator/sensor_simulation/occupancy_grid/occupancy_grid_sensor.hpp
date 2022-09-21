@@ -15,15 +15,16 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_SENSOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_SENSOR_HPP_
 
-#include <simulation_api_schema.pb.h>
 
 #include <memory>
-#include <nav_msgs/msg/occupancy_grid.hpp>
-#include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <vector>
 
-#include "simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include <nav_msgs/msg/occupancy_grid.hpp>
+
+#include <simulation_api_schema.pb.h>
+#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_builder.hpp>
 
 namespace simple_sensor_simulator
 {
@@ -114,7 +115,7 @@ public:
   }
 
 private:
-  mutable Grid grid_;
+  mutable OccupancyGridBuilder grid_;
 };
 
 template <>
