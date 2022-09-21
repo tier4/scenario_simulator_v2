@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <nav_msgs/msg/occupancy_grid.hpp>
-
-#include <simulation_interface/conversions.hpp>
 #include <quaternion_operation/quaternion_operation.h>
+
+#include <memory>
+#include <nav_msgs/msg/occupancy_grid.hpp>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
+#include <simulation_interface/conversions.hpp>
+#include <string>
+#include <vector>
 
 namespace simple_sensor_simulator
 {

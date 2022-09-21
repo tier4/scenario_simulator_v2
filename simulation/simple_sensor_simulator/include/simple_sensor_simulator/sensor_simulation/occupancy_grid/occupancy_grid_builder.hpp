@@ -15,12 +15,11 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_BUILDER_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_BUILDER_HPP_
 
-#include <vector>
-
+#include <Eigen/Core>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
+#include <vector>
 
 namespace simple_sensor_simulator
 {
@@ -29,15 +28,22 @@ namespace simple_sensor_simulator
  */
 class OccupancyGridBuilder
 {
-public:
+  struct Point : public geometry_msgs::msg::Point
+  {
+    Point(const geometry_msgs::msg::Point & p);
+    Point(double x, double y, double z);
+    double theta() const;
+  };
+
   using MarkerCounterType = int16_t;
   using MarkerGridType = std::vector<MarkerCounterType>;
   using OccupancyGridType = std::vector<int8_t>;
-  using PointType = geometry_msgs::msg::Point;
+  using PointType = Point;
   using PoseType = geometry_msgs::msg::Pose;
   using PrimitiveType = primitives::Primitive;
   using PolygonType = std::vector<PointType>;
 
+public:
   OccupancyGridBuilder(
     double resolution, size_t height, size_t width, int8_t occupied_cost = 100,
     int8_t invisible_cost = 50);
@@ -125,14 +131,6 @@ private:
    * @return Rasterized point
    */
   inline auto transformToPixel(const PointType & grid_point) const -> PointType;
-
-  /**
-   * @brief An utility function to construct a Point
-   * @param x
-   * @param y
-   * @param z
-   */
-  inline auto makePoint(double x, double y, double z) const -> PointType;
 
   /**
    * @brief Construct a convex hull of the area occupied with primitive
