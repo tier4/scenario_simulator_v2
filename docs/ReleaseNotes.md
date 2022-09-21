@@ -4,15 +4,16 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| Feature                     | Brief summary                                                                                                                                                     | Category                                                     | Pull request                                                    | Contributor                                                                                  |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Engagement                  | Changed time management to send engage as soon as autoware state transitions to `WAITING_FOR_ENGAGE` and start simulation as soon as it transitions to `DRIVING`. | `traffic_simulator`, `concealer`, `openscenario_interpreter` | [#823](https://github.com/tier4/scenario_simulator_v2/pull/823) | [hakuturu583](https://github.com/hakuturu583), [yamacir-kit](https://github.com/yamacir-kit) |
+| Publication of Acceleration | Updated concealer to publish acceleration information for Autoware.                                                                                               | `concealer`                                                  | [#875](https://github.com/tier4/scenario_simulator_v2/pull/875) | [yamacir-kit](https://github.com/yamacir-kit)                                                |
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| Feature                      | Brief summary                                                                                                          | Category                   | Pull request                                                    | Contributor                                   |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Interpreter state transition | Fixed a problem with error handling and state transition when an error occurred in the activation phase of simulation. | `openscenario_interpreter` | [#881](https://github.com/tier4/scenario_simulator_v2/pull/881) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 Minor Tweaks :oncoming_police_car:
 

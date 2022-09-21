@@ -218,6 +218,10 @@ public:
     THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support cancel request");
   }
 
+  /*   */ bool isNpcLogicStarted() const;
+
+  virtual void startNpcLogic();
+
 protected:
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> next_waypoint_;
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_;
@@ -231,6 +235,7 @@ protected:
 
   bool verbose_;
   bool visibility_;
+  bool npc_logic_started_;
 
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;

@@ -244,7 +244,12 @@ bool API::setEntityStatus(
   status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
   status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
   status.name = name;
-  status.time = getCurrentTime();
+  const auto current_time = getCurrentTime();
+  if (std::isnan(current_time)) {
+    status.time = current_time;
+  } else {
+    status.time = 0;
+  }
   status.action_status = action_status;
   return setEntityStatus(name, status);
 }
@@ -264,7 +269,12 @@ bool API::setEntityStatus(
   status.pose = map_pose;
   status.name = name;
   status.action_status = action_status;
-  status.time = getCurrentTime();
+  const auto current_time = getCurrentTime();
+  if (std::isnan(current_time)) {
+    status.time = current_time;
+  } else {
+    status.time = 0;
+  }
   status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
   return setEntityStatus(name, status);
 }
@@ -459,6 +469,15 @@ bool API::updateFrame()
     metrics_manager_.calculate();
     return true;
   }
+}
+
+void API::startNpcLogic()
+{
+  if (isNpcLogicStarted()) {
+    THROW_SIMULATION_ERROR("NPC logics are already started.");
+  }
+  entity_manager_ptr_->startNpcLogic();
+  clock_.onNpcLogicStart();
 }
 
 void API::requestLaneChange(const std::string & name, const std::int64_t & lanelet_id)
