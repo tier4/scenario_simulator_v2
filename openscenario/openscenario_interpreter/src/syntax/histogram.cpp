@@ -20,8 +20,13 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Histogram::Histogram(const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: bins(readElements<HistogramBin, 1>("Bin", node, scope))
+: bins(readElements<HistogramBin, 1>("Bin", node, scope)),
+  bin_adaptor(bins),
+  distribution(
+    scope.ref<Double>(std::string("randomSeed")).data, bin_adaptor.intervals.begin(),
+    bin_adaptor.intervals.end(), bin_adaptor.densities.begin())
 {
 }
+auto Histogram::evaluate() -> Object { return make<Double>(distribution.generate()); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

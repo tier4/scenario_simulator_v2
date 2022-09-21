@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/histogram_bin.hpp>
+#include <openscenario_interpreter/utility/distribution.hpp>
 
 namespace openscenario_interpreter
 {
@@ -31,15 +32,34 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+
 struct Histogram : public ComplexType
 {
+  /**
+   * Note: HistogramBin must be stored in continuous range and ascending order, to `bins`
+   */
   const std::list<HistogramBin> bins;
+
+  struct BinAdaptor
+  {
+    explicit BinAdaptor(const std::list<HistogramBin> & bins)
+    {
+      intervals.emplace_back(bins.front().range.lower_limit.data);
+      for (const auto & bin : bins) {
+        intervals.emplace_back(bin.range.lower_limit.data);
+        densities.emplace_back(bin.weight.data);
+      }
+      intervals.emplace_back(bins.back().range.upper_limit.data);
+    }
+    std::vector<double> intervals, densities;
+  } bin_adaptor;
+
+  StochasticDistributionClass<std::piecewise_constant_distribution<Double::value_type>>
+    distribution;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
 
-  // TODO: implement evaluate()
-  // Use std::piecewise_constant_distribution from <random>
-  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
