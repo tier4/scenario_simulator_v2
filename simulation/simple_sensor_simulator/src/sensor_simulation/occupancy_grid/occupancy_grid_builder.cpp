@@ -79,14 +79,14 @@ auto OccupancyGridBuilder::makeOccupiedArea(const PrimitiveType & primitive) con
 auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygon) const
   -> PolygonType
 {
-  const auto realw = width * resolution / 2;
-  const auto realh = height * resolution / 2;
+  const auto real_width = width * resolution / 2;
+  const auto real_height = height * resolution / 2;
 
   const auto corners = PolygonType{
-    {-realw, -realh},  // bottom left
-    {+realw, -realh},  // bottom right
-    {+realw, +realh},  // top right
-    {-realw, +realh},  // top left
+    {-real_width, -real_height},  // bottom left
+    {+real_width, -real_height},  // bottom right
+    {+real_width, +real_height},  // top right
+    {-real_width, +real_height},  // top left
   };
 
   {
@@ -102,13 +102,13 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
   const auto projection = [&](const PointType & p, size_t i) -> PointType {
     switch (i % 4) {
       default:
-        return {-realw, p.y * -realw / p.x};  // left
+        return {-real_width, p.y * -real_width / p.x};  // left
       case 1:
-        return {p.x * -realh / p.y, -realh};  // bottom
+        return {p.x * -real_height / p.y, -real_height};  // bottom
       case 2:
-        return {+realw, p.y * +realw / p.x};  // right
+        return {+real_width, p.y * +real_width / p.x};  // right
       case 3:
-        return {p.x * +realh / p.y, +realh};  // top
+        return {p.x * +real_height / p.y, +real_height};  // top
     }
   };
 
