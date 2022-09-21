@@ -55,7 +55,7 @@ public:
   const int8_t invisible_cost;
 
   /**
-   * @brief Mark invisible area and occpuied area of primitive
+   * @brief Mark invisible area and occupied area of primitive
    * @param primitive
    */
   auto add(const PrimitiveType & primitive) -> void;
