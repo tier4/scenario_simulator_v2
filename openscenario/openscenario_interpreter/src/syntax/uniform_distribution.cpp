@@ -21,8 +21,17 @@ inline namespace syntax
 {
 UniformDistribution::UniformDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: range(readElement<Range>("range", node, scope))
+: range(readElement<Range>("range", node, scope)),
+  distribution(
+    scope.ref<Double>(std::string("randomSeed")).data, range.lower_limit.data,
+    range.upper_limit.data)
 {
+}
+auto UniformDistribution::evaluate() -> Object
+{
+  // Return a value without filtering by this->range here
+  // because it is embedded in distribution
+  return make<Double>(distribution.generate());
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
