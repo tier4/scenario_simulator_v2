@@ -30,7 +30,22 @@ class GridTraversal
   struct Sentinel
   {
   };
-  class Iterator;
+
+  class Iterator
+  {
+  public:
+    Iterator(const GridTraversal * parent, double tx, double ty, int32_t x, int32_t y);
+
+    auto operator*() -> Index;
+    auto operator++() -> Iterator &;
+    auto operator!=(const Sentinel &) -> bool;
+
+  private:
+    const GridTraversal * parent_;
+
+    double tx_, ty_;
+    int32_t x_, y_;
+  };
 
 public:
   GridTraversal(double start_x, double start_y, double end_x, double end_y);
@@ -44,22 +59,6 @@ private:
 
   int32_t step_x_, step_y_;
   double tdx_, tdy_;
-};
-
-class GridTraversal::Iterator
-{
-public:
-  Iterator(const GridTraversal * parent, double tx, double ty, int32_t x, int32_t y);
-
-  auto operator*() -> Index;
-  auto operator++() -> Iterator &;
-  auto operator!=(const Sentinel &) -> bool;
-
-private:
-  const GridTraversal * parent_;
-
-  double tx_, ty_;
-  int32_t x_, y_;
 };
 
 }  // namespace simple_sensor_simulator
