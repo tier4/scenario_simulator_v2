@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
-#define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
+#ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_BUILDER_HPP_
+#define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_BUILDER_HPP_
 
 #include <vector>
 
@@ -61,9 +61,9 @@ public:
   auto reset(const PoseType & origin) -> void;
 
   /**
-   * @brief Construct occupancy grid
+   * @brief Build occupancy grid
    */
-  auto construct() -> void;
+  auto build() -> void;
 
   /**
    * @return Constructed occupancy grid

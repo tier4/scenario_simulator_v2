@@ -97,7 +97,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   }
 
   // construct an occupancy grid
-  grid_.reset(ego_pose_north_up);
+  builder_.reset(ego_pose_north_up);
   for (const auto & s : status) {
     if (configuration_.entity() != s.name()) {
       // skip if entity is not actually detected
@@ -119,16 +119,16 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
       }
 
       const auto & v = s.bounding_box().dimensions();
-      grid_.add(primitives::Box(v.x(), v.y(), v.z(), pose));
+      builder_.add(primitives::Box(v.x(), v.y(), v.z(), pose));
     }
   }
-  grid_.construct();
+  builder_.build();
 
   // construct message
   auto res = nav_msgs::msg::OccupancyGrid();
   res.header.stamp = stamp;
   res.header.frame_id = "map";
-  res.data = grid_.get();
+  res.data = builder_.get();
   res.info.height = configuration_.height();
   res.info.width = configuration_.width();
   res.info.map_load_time = stamp;

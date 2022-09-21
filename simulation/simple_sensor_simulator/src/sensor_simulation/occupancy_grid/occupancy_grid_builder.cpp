@@ -198,7 +198,7 @@ auto OccupancyGridBuilder::add(const PrimitiveType & primitive) -> void
   addPolygon(occupied_grid_, occupied_area);
 }
 
-auto OccupancyGridBuilder::construct() -> void
+auto OccupancyGridBuilder::build() -> void
 {
   // Imos Method
   // https://imoz.jp/algorithms/imos_method.html (Japanese)

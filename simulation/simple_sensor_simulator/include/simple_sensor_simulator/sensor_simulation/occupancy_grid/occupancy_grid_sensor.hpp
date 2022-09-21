@@ -97,7 +97,7 @@ public:
     const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
   : OccupancyGridSensorBase(current_time, configuration),
     publisher_ptr_(publisher_ptr),
-    grid_(configuration.resolution(), configuration.height(), configuration.width())
+    builder_(configuration.resolution(), configuration.height(), configuration.width())
   {
   }
 
@@ -115,7 +115,7 @@ public:
   }
 
 private:
-  mutable OccupancyGridBuilder grid_;
+  mutable OccupancyGridBuilder builder_;
 };
 
 template <>
