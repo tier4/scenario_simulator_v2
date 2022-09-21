@@ -59,32 +59,6 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp,
   const std::vector<std::string> & lidar_detected_entity) -> nav_msgs::msg::OccupancyGrid
 {
-  struct stop_watch
-  {
-    std::chrono::system_clock::time_point start, last;
-    std::string label;
-    stop_watch(std::string label = "end") : label(label)
-    {
-      auto now = std::chrono::system_clock::now();
-      start = last = now;
-    }
-    ~stop_watch() { lap(label); }
-    void lap(std::string label = "")
-    {
-      auto now = std::chrono::system_clock::now();
-      auto elapsed = now - start;
-      auto lap = now - last;
-      last = now;
-      auto elapsed_ms =
-        std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count() / 1000.0;
-      auto lap_ms = std::chrono::duration_cast<std::chrono::microseconds>(lap).count() / 1000.0;
-      RCLCPP_INFO_STREAM(
-        rclcpp::get_logger("simple_sensor_simulator"), (label.empty() ? "(empty)" : label)
-                                                         << " -> elapsed: " << elapsed_ms
-                                                         << "ms, lap: " << lap_ms << "ms");
-    }
-  } watch;
-
   // check if entities in `status` have unique names
   {
     auto unique_entities = std::set<std::string>();
