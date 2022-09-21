@@ -19,6 +19,9 @@
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
 
+#include <random>
+#include <string>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -34,6 +37,22 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+
+template <typename DistributionT>
+struct StochasticDistributionClass
+{
+  template <typename... Ts>
+  StochasticDistributionClass(Scope & scope, Ts... xs)
+  : random_engine(scope.ref<Double>(std::string ("randomSeed")).data), distribution(xs...)
+  {
+  }
+
+  std::mt19937 random_engine;
+
+  DistributionT distribution;
+
+  auto generate() { return distribution(random_engine); }
+};
 struct NormalDistribution : public ComplexType
 {
   const Range range;
@@ -42,11 +61,13 @@ struct NormalDistribution : public ComplexType
 
   const Double variance;
 
+  StochasticDistributionClass<std::normal_distribution<Double::value_type>> distribution;
+
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
 
   // TODO: implement evaluate()?
   // Use std::normal_real_distribution from <random>
-  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

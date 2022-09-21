@@ -23,8 +23,14 @@ NormalDistribution::NormalDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : range(readElement<Range>("range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
-  variance(readAttribute<Double>("variance", node, scope))
+  variance(readAttribute<Double>("variance", node, scope)),
+  distribution(scope, static_cast<double>(expected_value.data), static_cast<double>(variance.data))
 {
+}
+auto NormalDistribution::evaluate() -> Object
+{
+  //  return range.evaluate(distribution.generate());
+  throw common::Error(__func__, "is not implemented yet");
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

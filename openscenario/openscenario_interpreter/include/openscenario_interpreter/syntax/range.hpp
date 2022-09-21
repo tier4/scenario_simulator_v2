@@ -33,11 +33,16 @@ inline namespace syntax
  * ------------------------------------------------------------------------ */
 struct Range
 {
-  const Double lower_limit, upper_limit;
+  const Double lower_limit = Double::infinity();
+  const Double upper_limit = -Double::infinity();
 
   Range() = default;
 
   explicit Range(const pugi::xml_node &, Scope &);
+
+  auto evaluate(const double value) -> double {
+    return std::clamp(value, lower_limit.data, upper_limit.data);
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
