@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
+#include <openscenario_interpreter/utility/distribution.hpp>
 
 namespace openscenario_interpreter
 {
@@ -39,11 +40,11 @@ struct PoissonDistribution : public ComplexType
 
   const Double expected_value;
 
+  StochasticDistributionClass<std::poisson_distribution<>> distribution;
+
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
 
-  // TODO: implement evaluate()
-  // Use std::poisson_distribution from <random>
-  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
