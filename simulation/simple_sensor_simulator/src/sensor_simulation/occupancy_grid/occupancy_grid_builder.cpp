@@ -82,18 +82,22 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
   const auto realw = width * resolution / 2;
   const auto realh = height * resolution / 2;
 
-  const auto corners = [&](size_t i) -> PointType {
-    switch (i % 4) {
-      default:
-        return {-realw, -realh};  // bottom left
-      case 1:
-        return {realw, -realh};  // bottom right
-      case 2:
-        return {realw, realh};  // top right
-      case 3:
-        return {-realw, realh};  // top left
-    }
+  const auto corners = PolygonType{
+    {-realw, -realh},  // bottom left
+    {+realw, -realh},  // bottom right
+    {+realw, +realh},  // top right
+    {-realw, +realh},  // top left
   };
+
+  {
+    bool overlap_origin = true;
+    for (size_t i = 0; i < occupied_polygon.size(); ++i) {
+      const auto & p = occupied_polygon[i];
+      const auto & q = occupied_polygon[(i + 1) % occupied_polygon.size()];
+      overlap_origin &= p.x * q.y - q.x * p.y < 0;
+    }
+    if (overlap_origin) return corners;
+  }
 
   const auto projection = [&](const PointType & p, size_t i) -> PointType {
     switch (i % 4) {
@@ -102,9 +106,9 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
       case 1:
         return {p.x * -realh / p.y, -realh};  // bottom
       case 2:
-        return {realw, p.y * realw / p.x};  // right
+        return {+realw, p.y * +realw / p.x};  // right
       case 3:
-        return {p.x * realh / p.y, realh};  // top
+        return {p.x * +realh / p.y, +realh};  // top
     }
   };
 
@@ -130,14 +134,14 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
 
     size_t i = 0;
     for (;; ++i) {
-      auto corner = corners(i);
+      auto corner = corners[i % 4];
       if (corner.theta() >= minang) break;
     }
     res.emplace_back(*minp);
     res.emplace_back(projection(*minp, i));
 
     for (;; ++i) {
-      auto corner = corners(i);
+      auto corner = corners[i % 4];
       if (corner.theta() + 2 * M_PI * (i / 4) >= maxang) break;
       res.emplace_back(corner);
     }
