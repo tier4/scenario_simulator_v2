@@ -19,7 +19,6 @@
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
 #include <openscenario_interpreter/utility/distribution.hpp>
-
 #include <random>
 #include <string>
 

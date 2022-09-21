@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
-
 #include <random>
 
 namespace openscenario_interpreter
