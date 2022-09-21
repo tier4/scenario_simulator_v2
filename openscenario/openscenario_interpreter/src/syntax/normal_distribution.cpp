@@ -24,13 +24,14 @@ NormalDistribution::NormalDistribution(
 : range(readElement<Range>("range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   variance(readAttribute<Double>("variance", node, scope)),
-  distribution(scope, static_cast<double>(expected_value.data), static_cast<double>(variance.data))
+  distribution(
+    scope.ref<Double>(std::string("randomSeed")).data, static_cast<double>(expected_value.data),
+    static_cast<double>(variance.data))
 {
 }
 auto NormalDistribution::evaluate() -> Object
 {
-  //  return range.evaluate(distribution.generate());
-  throw common::Error(__func__, "is not implemented yet");
+  return make<Double>(range.evaluate(distribution.generate()));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -40,7 +40,8 @@ struct Range
 
   explicit Range(const pugi::xml_node &, Scope &);
 
-  auto evaluate(const double value) -> double {
+  [[nodiscard]] auto evaluate(const Double::value_type value) const -> Double::value_type
+  {
     return std::clamp(value, lower_limit.data, upper_limit.data);
   }
 };
