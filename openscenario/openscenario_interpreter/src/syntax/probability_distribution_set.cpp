@@ -19,14 +19,19 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+
 ProbabilityDistributionSet::ProbabilityDistributionSet(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: elements(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))
+: elements(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope)),
+  adaptor(elements),
+  distribution(
+    scope.ref<Double>(std::string("randomSeed")).data, adaptor.probabilities.begin(),
+    adaptor.probabilities.end())
 {
 }
 [[nodiscard]] auto ProbabilityDistributionSet::evaluate() -> Object
 {
-  throw common::Error(__func__, "is not implemented yet");
+  return make<String>(adaptor.values.at(distribution.generate()));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
