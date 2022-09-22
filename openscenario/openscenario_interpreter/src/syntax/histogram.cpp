@@ -27,6 +27,6 @@ Histogram::Histogram(const pugi::xml_node & node, openscenario_interpreter::Scop
     bin_adaptor.intervals.end(), bin_adaptor.densities.begin())
 {
 }
-auto Histogram::evaluate() -> Object { return make<Double>(distribution.generate()); }
+[[nodiscard]] auto Histogram::evaluate() -> Object { return make<Double>(distribution.generate()); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

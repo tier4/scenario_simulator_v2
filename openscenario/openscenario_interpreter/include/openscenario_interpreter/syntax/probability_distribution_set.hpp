@@ -36,7 +36,7 @@ struct ProbabilityDistributionSet : public ComplexType
 
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
+  auto evaluate() -> Object;
   // TODO: implement evaluate()
   // Use std::discrete_distribution from <random>
 };

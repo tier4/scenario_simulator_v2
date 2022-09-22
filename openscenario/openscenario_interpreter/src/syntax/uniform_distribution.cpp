@@ -27,7 +27,7 @@ UniformDistribution::UniformDistribution(
     range.upper_limit.data)
 {
 }
-auto UniformDistribution::evaluate() -> Object
+[[nodiscard]] auto UniformDistribution::evaluate() -> Object
 {
   // Return a value without filtering by this->range here
   // because it is embedded in distribution

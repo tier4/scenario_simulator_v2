@@ -29,7 +29,7 @@ NormalDistribution::NormalDistribution(
     static_cast<double>(variance.data))
 {
 }
-auto NormalDistribution::evaluate() -> Object
+[[nodiscard]] auto NormalDistribution::evaluate() -> Object
 {
   return make<Double>(range.evaluate(distribution.generate()));
 }

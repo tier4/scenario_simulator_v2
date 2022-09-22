@@ -26,7 +26,7 @@ PoissonDistribution::PoissonDistribution(
   distribution(scope.ref<Double>(std::string("randomSeed")).data, expected_value.data)
 {
 }
-auto PoissonDistribution::evaluate() -> Object
+[[nodiscard]] auto PoissonDistribution::evaluate() -> Object
 {
   return make<Double>(range.evaluate(distribution.generate()));
 }

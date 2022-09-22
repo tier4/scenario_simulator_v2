@@ -24,5 +24,9 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
 : elements(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))
 {
 }
+[[nodiscard]] auto ProbabilityDistributionSet::evaluate() -> Object
+{
+  throw common::Error(__func__, "is not implemented yet");
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
