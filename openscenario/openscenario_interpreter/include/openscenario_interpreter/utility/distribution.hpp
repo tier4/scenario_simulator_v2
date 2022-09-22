@@ -23,7 +23,6 @@ namespace openscenario_interpreter
 {
 inline namespace utility
 {
-
 // TODO : rename class name
 template <typename DistributionT>
 struct StochasticDistributionClass
