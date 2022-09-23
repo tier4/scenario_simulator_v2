@@ -57,10 +57,8 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     for (const auto v : configuration_.vertical_angles()) {
       vertical_angles.emplace_back(v);
     }
-    timer.start();
     const auto pointcloud = raycaster_.raycast(
       "base_link", stamp, ego_pose.get(), configuration_.horizontal_resolution(), vertical_angles);
-    timer.stop();
     detected_objects_ = raycaster_.getDetectedObject();
     return pointcloud;
   }
