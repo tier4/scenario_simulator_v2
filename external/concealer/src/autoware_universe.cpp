@@ -105,6 +105,7 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
 
 auto AutowareUniverse::engage() -> void
 {
+    std::cout << "<<<<<<<<< Calling engage" << std::endl;
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
       auto request = std::make_shared<Engage::Request>();
