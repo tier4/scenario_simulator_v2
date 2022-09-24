@@ -43,14 +43,16 @@ public:
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
     -> void
   {
-    validateAvailability();
+      std::cout << "<<<<<<<<<<<<<< Engage service called" << std::endl;
+      validateAvailability();
+      std::cout << "<<<<<<<<<<<<<< Engage service validated" << std::endl;
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
-        std::cout << "Service called " << attempt << " times" << std::endl;
+        std::cout << "<<<<<<<<<<<<<< Service called " << attempt << " times" << std::endl;
         if (const auto & service_call_result = callWithTimeoutValidation(request)) {
-            std::cout << "Service called without the timeout" << std::endl;
+            std::cout << "<<<<<<<<<<<<<< Service called without the timeout" << std::endl;
         if (const auto & service_call_status = service_call_result->get()->status;
             service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
-            std::cout << "Service called with success reponse" << std::endl;
+            std::cout << "<<<<<<<<<<<<<< Service called with success reponse" << std::endl;
           RCLCPP_INFO_STREAM(
             logger, service_name << " service request has been accepted "
                                  << (service_call_status.message.empty()
@@ -58,7 +60,7 @@ public:
                                        : " (" + service_call_status.message + ")."));
           return;
         } else {
-            std::cout << "Service called with failed response" << std::endl;
+            std::cout << "<<<<<<<<<<<<<< Service called with failed response" << std::endl;
           RCLCPP_ERROR_STREAM(
             logger, service_name << " service request was accepted, but ResponseStatus is FAILURE "
                                  << (service_call_status.message.empty()
@@ -66,10 +68,10 @@ public:
                                        : " (" + service_call_status.message + ")"));
         }
       } else {
-            std::cout << "Service called outside timeout" << std::endl;
+            std::cout << "<<<<<<<<<<<<<< Service called outside timeout" << std::endl;
       }
     }
-      std::cout << "All attempts failed" << std::endl;
+      std::cout << "<<<<<<<<<<<<<< All attempts failed" << std::endl;
       throw common::AutowareError(
       "Requested the service ", service_name, " ", attempts_count,
       " times, but was not successful.");

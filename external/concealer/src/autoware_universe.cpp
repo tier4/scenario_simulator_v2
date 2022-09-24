@@ -108,9 +108,11 @@ auto AutowareUniverse::engage() -> void
     std::cout << "<<<<<<<<< Calling engage" << std::endl;
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
+        std::cout << "<<<<<<<<< Inside task queue engage" << std::endl;
       auto request = std::make_shared<Engage::Request>();
       request->engage = true;
       // We attempt to resend the service up to 10 times, but this number of times was determined by heuristics, not for any technical reason
+        std::cout << "<<<<<<<<< Request Engage" << std::endl;
       requestEngage(request, 10);
     });
   });
