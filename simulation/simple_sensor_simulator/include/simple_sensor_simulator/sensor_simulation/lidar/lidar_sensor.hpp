@@ -30,9 +30,9 @@ class LidarSensorBase
 {
 protected:
   double last_update_stamp_;
-  Raycaster raycaster_;
   simulation_api_schema::LidarConfiguration configuration_;
 
+  Raycaster raycaster_;
   std::vector<std::string> detected_objects_;
 
   explicit LidarSensorBase(

@@ -15,21 +15,21 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 
+
 #include <embree3/rtcore.h>
 #include <pcl_conversions/pcl_conversions.h>
-
+#include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
+#include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
+#include <quaternion_operation/quaternion_operation.h>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <memory>
 #include <random>
-#include <sensor_msgs/msg/point_cloud2.hpp>
-#include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
-#include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <quaternion_operation/quaternion_operation.h>
 
 namespace simple_sensor_simulator
 {
@@ -105,12 +105,7 @@ private:
       rayhit.ray.dir_y = rotated_direction[1];
       rayhit.ray.dir_z = rotated_direction[2];
       rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
-
-      std::chrono::steady_clock::time_point begin, end;
-      // begin = std::chrono::steady_clock::now();
       rtcIntersect1(scene, &context, &rayhit);
-      // end = std::chrono::steady_clock::now();
-      // times.push_back(std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count());
 
       if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
         double distance = rayhit.ray.tfar;

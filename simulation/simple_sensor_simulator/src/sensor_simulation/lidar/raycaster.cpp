@@ -26,18 +26,17 @@
 
 namespace simple_sensor_simulator
 {
-Raycaster::Raycaster() : primitive_ptrs_(0), device_(nullptr), scene_(nullptr), engine_(seed_gen_())
-{
-  device_ = rtcNewDevice(nullptr);
-  scene_ = rtcNewScene(device_);
-}
+Raycaster::Raycaster() : primitive_ptrs_(0),
+                         device_(rtcNewDevice(nullptr)),
+                         scene_(rtcNewScene(device_)),
+                         engine_(seed_gen_())
+{ }
 
-Raycaster::Raycaster(std::string embree_config)
-: primitive_ptrs_(0), device_(nullptr), scene_(nullptr), engine_(seed_gen_())
-{
-  device_ = rtcNewDevice(embree_config.c_str());
-  scene_ = rtcNewScene(device_);
-}
+Raycaster::Raycaster(std::string embree_config) : primitive_ptrs_(0),
+                                                  device_(rtcNewDevice(embree_config.c_str())),
+                                                  scene_(rtcNewScene(device_)),
+                                                  engine_(seed_gen_())
+{ }
 
 Raycaster::~Raycaster()
 {
@@ -46,22 +45,20 @@ Raycaster::~Raycaster()
 }
 
 std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
-    std::vector<double> vertical_angles, double horizontal_angle_start,
-    double horizontal_angle_end, double horizontal_resolution)
+    std::vector<double> vertical_angles,
+    double horizontal_angle_start,
+    double horizontal_angle_end,
+    double horizontal_resolution)
   {
-    // std::cerr << "directions size: " << directions_.size() << std::endl;
-    // std::cerr << "start: " << previous_horizontal_angle_start_ << std::endl;
-    // std::cerr << "end: " << previous_horizontal_angle_end_  << std::endl;
-    // std::cerr << "res: " << previous_horizontal_resolution_  << std::endl;
-    // std::cerr << "ver size: " << previous_vertical_angles_.size() << std::endl;
-    if (directions_.empty() || previous_horizontal_angle_start_ != horizontal_angle_start ||
-        previous_horizontal_angle_end_ != horizontal_angle_end || previous_horizontal_resolution_ != horizontal_resolution ||
+    if (directions_.empty() ||
+        previous_horizontal_angle_start_ != horizontal_angle_start ||
+        previous_horizontal_angle_end_ != horizontal_angle_end ||
+        previous_horizontal_resolution_ != horizontal_resolution ||
         previous_vertical_angles_ != vertical_angles)
     {
-      std::cerr << "Not matching" << std::endl;
       std::vector<geometry_msgs::msg::Quaternion> directions;
       double horizontal_angle = horizontal_angle_start;
-      while (horizontal_angle <= (horizontal_angle_end)) {
+      while (horizontal_angle <= horizontal_angle_end) {
         horizontal_angle = horizontal_angle + horizontal_resolution;
         for (const auto vertical_angle : vertical_angles) {
           geometry_msgs::msg::Vector3 rpy;
@@ -77,19 +74,20 @@ std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
       previous_horizontal_angle_start_ = horizontal_angle_start;
       previous_horizontal_resolution_ = horizontal_resolution;
       previous_vertical_angles_ = vertical_angles;
-     std::cerr << "directions size: " << directions_.size() << std::endl;
-    std::cerr << "start: " << previous_horizontal_angle_start_ << " " << horizontal_angle_start << std::endl;
-    std::cerr << "end: " << previous_horizontal_angle_end_ << " " << horizontal_angle_end << std::endl;
-    std::cerr << "res: " << previous_horizontal_resolution_ << " " << horizontal_resolution << std::endl;
-    std::cerr << "ver size: " << previous_vertical_angles_.size() << " " << vertical_angles.size() << " matching: " << (previous_vertical_angles_ == vertical_angles) <<   std::endl;
     }
     return directions_;
   }
 
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
-  std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
-  double horizontal_resolution, std::vector<double> vertical_angles, double horizontal_angle_start,
-  double horizontal_angle_end, double max_distance, double min_distance)
+  std::string frame_id,
+  const rclcpp::Time & stamp,
+  geometry_msgs::msg::Pose origin,
+  double horizontal_resolution,
+  std::vector<double> vertical_angles,
+  double horizontal_angle_start,
+  double horizontal_angle_end,
+  double max_distance,
+  double min_distance)
 {
   auto directions = getDirections(vertical_angles, horizontal_angle_start, horizontal_angle_end, horizontal_resolution);
   return raycast(frame_id, stamp, origin, directions, max_distance, min_distance);
@@ -102,7 +100,6 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::vector<geometry_msgs::msg::Quaternion> directions, double max_distance, double min_distance)
 {
   detected_objects_ = {};
-  // scene_ = rtcNewScene(device_);
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
   for (auto & pair : primitive_ptrs_) {
     auto id = pair.second->addToScene(device_, scene_);
@@ -147,7 +144,6 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
 
   sensor_msgs::msg::PointCloud2 pointcloud_msg;
   pcl::toROSMsg(*cloud, pointcloud_msg);
-  // rtcReleaseScene(scene_);
   pointcloud_msg.header.frame_id = frame_id;
   pointcloud_msg.header.stamp = stamp;
   return pointcloud_msg;
