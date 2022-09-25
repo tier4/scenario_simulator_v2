@@ -105,14 +105,10 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
 
 auto AutowareUniverse::engage() -> void
 {
-    std::cout << "<<<<<<<<< Calling engage osm" << std::endl;
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
-        std::cout << "<<<<<<<<< Inside task queue engage" << std::endl;
       auto request = std::make_shared<Engage::Request>();
       request->engage = true;
-      // We attempt to resend the service up to 10 times, but this number of times was determined by heuristics, not for any technical reason
-        std::cout << "<<<<<<<<< Request Engage" << std::endl;
       requestEngage(request);
     });
   });
@@ -271,8 +267,8 @@ auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
-    // We attempt to resend the service up to 10 times, but this number of times was determined by heuristics, not for any technical reason
-    requestSetVelocityLimit(request, 10);
+    // We attempt to resend the service up to 30 times, but this number of times was determined by heuristics, not for any technical reason
+    requestSetVelocityLimit(request, 30);
   });
 }
 
