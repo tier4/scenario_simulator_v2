@@ -105,7 +105,7 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
 
 auto AutowareUniverse::engage() -> void
 {
-    std::cout << "<<<<<<<<< Calling engage" << std::endl;
+    std::cout << "<<<<<<<<< Calling engage osm" << std::endl;
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
         std::cout << "<<<<<<<<< Inside task queue engage" << std::endl;
