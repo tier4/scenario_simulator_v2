@@ -113,7 +113,7 @@ auto AutowareUniverse::engage() -> void
       request->engage = true;
       // We attempt to resend the service up to 10 times, but this number of times was determined by heuristics, not for any technical reason
         std::cout << "<<<<<<<<< Request Engage" << std::endl;
-      requestEngage(request, 10);
+      requestEngage(request);
     });
   });
 }
