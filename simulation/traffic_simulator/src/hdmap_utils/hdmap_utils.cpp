@@ -263,7 +263,8 @@ std::vector<std::int64_t> HdMapUtils::getConflictingCrosswalkIds(
 }
 
 std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
-  std::int64_t lanelet_id, double s, const std::vector<std::int64_t> & lanelet_ids, double forward_distance) const
+  std::int64_t lanelet_id, double s, const std::vector<std::int64_t> & lanelet_ids,
+  double forward_distance) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
   bool on_traj = false;
@@ -451,7 +452,8 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  const geometry_msgs::msg::Pose & pose, const std::vector<std::int64_t> & lanelet_ids, double matching_distance) const
+  const geometry_msgs::msg::Pose & pose, const std::vector<std::int64_t> & lanelet_ids,
+  double matching_distance) const
 {
   for (const auto id : lanelet_ids) {
     const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
@@ -582,7 +584,8 @@ boost::optional<std::int64_t> HdMapUtils::getLaneChangeableLaneletId(
   return target;
 }
 
-std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(std::int64_t lanelet_id, double distance) const
+std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(
+  std::int64_t lanelet_id, double distance) const
 {
   std::vector<std::int64_t> ret;
   double total_distance = 0.0;
@@ -1094,7 +1097,8 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::toMapPoints(
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
-  std::int64_t lanelet_id, double s, double offset, const geometry_msgs::msg::Quaternion & quat) const
+  std::int64_t lanelet_id, double s, double offset,
+  const geometry_msgs::msg::Quaternion & quat) const
 {
   geometry_msgs::msg::PoseStamped ret;
   ret.header.frame_id = "map";
@@ -1144,7 +1148,8 @@ bool HdMapUtils::canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lan
 }
 
 boost::optional<double> HdMapUtils::getLongitudinalDistance(
-  const traffic_simulator_msgs::msg::LaneletPose & from, const traffic_simulator_msgs::msg::LaneletPose & to) const
+  const traffic_simulator_msgs::msg::LaneletPose & from,
+  const traffic_simulator_msgs::msg::LaneletPose & to) const
 {
   return getLongitudinalDistance(from.lanelet_id, from.s, to.lanelet_id, to.s);
 }
@@ -1296,8 +1301,8 @@ std::pair<size_t, size_t> HdMapUtils::findNearestIndexPair(
   THROW_SEMANTIC_ERROR("findNearestIndexPair(): No nearest point found.");
 }
 
-std::unordered_map<std::int64_t, std::vector<std::int64_t>>
-HdMapUtils::getRightOfWayLaneletIds(const std::vector<std::int64_t> & lanelet_ids) const
+std::unordered_map<std::int64_t, std::vector<std::int64_t>> HdMapUtils::getRightOfWayLaneletIds(
+  const std::vector<std::int64_t> & lanelet_ids) const
 {
   std::unordered_map<std::int64_t, std::vector<std::int64_t>> ret;
   for (const auto & lanelet_id : lanelet_ids) {
