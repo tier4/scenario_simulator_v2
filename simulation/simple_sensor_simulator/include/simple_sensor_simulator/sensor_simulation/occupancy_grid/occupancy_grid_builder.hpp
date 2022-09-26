@@ -28,17 +28,10 @@ namespace simple_sensor_simulator
  */
 class OccupancyGridBuilder
 {
-  struct Point : public geometry_msgs::msg::Point
-  {
-    Point(const geometry_msgs::msg::Point & p);
-    Point(double x, double y, double z);
-    double theta() const;
-  };
-
   using MarkerCounterType = int16_t;
   using MarkerGridType = std::vector<MarkerCounterType>;
   using OccupancyGridType = std::vector<int8_t>;
-  using PointType = Point;
+  using PointType = geometry_msgs::msg::Point;
   using PoseType = geometry_msgs::msg::Pose;
   using PrimitiveType = primitives::Primitive;
   using PolygonType = std::vector<PointType>;
@@ -89,25 +82,25 @@ private:
 
   /**
    * @brief A vector of occupied area
-   * @note This vector is declared as a member in order to reuse allocated memory
+   * @note This vector is declared as a member to reuse allocated memory
    */
   MarkerGridType occupied_grid_;
 
   /**
    * @brief A vector of invisible area
-   * @note This vector is declared as a member in order to reuse allocated memory
+   * @note This vector is declared as a member to reuse allocated memory
    */
   MarkerGridType invisible_grid_;
 
   /**
    * @brief A vector of grid values
-   * @note This vector is declared as a member in order to reuse allocated memory
+   * @note This vector is declared as a member to reuse allocated memory
    */
   OccupancyGridType values_;
 
   /**
    * @brief Vectors to hold min or max column of rasterized polygon
-   * @note These vectors are declared as members in order to reuse allocated memory
+   * @note These vectors are declared as members to reuse allocated memory
    */
   std::vector<int32_t> mincols_, maxcols_;
 
@@ -133,6 +126,15 @@ private:
   inline auto transformToPixel(const PointType & grid_point) const -> PointType;
 
   /**
+   * @brief Construct a point
+   * @param x
+   * @param y
+   * @param z
+   * @return point
+   */
+  inline auto makePoint(double x, double y, double z = 0) const -> PointType;
+
+  /**
    * @brief Construct a convex hull of the area occupied with primitive
    * @param primitive
    * @return Convex hull polygon
@@ -141,11 +143,11 @@ private:
 
   /**
    * @brief Construct a convex hull of the area made invisible by the occupied area
-   * @param occupied_convex_hull Convex hull of occupied area
+   * @param occupied_polygon Convex hull of occupied area
    * @return Convex hull polygon
    */
-  inline auto makeInvisibleArea(const PolygonType & occupied) const -> PolygonType;
+  inline auto makeInvisibleArea(const PolygonType & occupied_polygon) const -> PolygonType;
 };
 }  // namespace simple_sensor_simulator
 
-#endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
+#endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_BUILDER_HPP_

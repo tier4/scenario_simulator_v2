@@ -20,17 +20,6 @@
 
 namespace simple_sensor_simulator
 {
-OccupancyGridBuilder::Point::Point(const geometry_msgs::msg::Point & p)
-: geometry_msgs::msg::Point(p)
-{
-}
-
-OccupancyGridBuilder::Point::Point(double x, double y, double z = 0)
-{
-  this->x = x, this->y = y, this->z = z;
-}
-
-double OccupancyGridBuilder::Point::theta() const { return std::atan2(y, x); }
 
 OccupancyGridBuilder::OccupancyGridBuilder(
   double resolution, size_t height, size_t width, int8_t occupied_cost, int8_t invisible_cost)
@@ -58,20 +47,26 @@ auto OccupancyGridBuilder::transformToGrid(const PointType & p) const -> PointTy
   const auto & o = origin_.position;
   const auto np =
     (Quat(r.w, r.x, r.y, r.z).conjugate() * Vec3(p.x, p.y, p.z) - Vec3(o.x, o.y, o.z)).eval();
-  return {np.x(), np.y(), np.z()};
+  return makePoint(np.x(), np.y(), np.z());
 }
 
 auto OccupancyGridBuilder::transformToPixel(const PointType & p) const -> PointType
 {
   using Vec2 = Eigen::Vector2d;
   const auto np = ((Vec2(p.x, p.y) + Vec2(width, height) * resolution / 2) / resolution).eval();
-  return {np.x(), np.y()};
+  return makePoint(np.x(), np.y());
+}
+
+auto OccupancyGridBuilder::makePoint(double x, double y, double z) const -> PointType
+{
+  auto res = PointType();
+  res.x = x, res.y = y, res.z = z;
+  return res;
 }
 
 auto OccupancyGridBuilder::makeOccupiedArea(const PrimitiveType & primitive) const -> PolygonType
 {
-  auto hull = primitive.get2DConvexHull();
-  auto res = PolygonType(hull.begin(), hull.end());
+  auto res = primitive.get2DConvexHull();
   for (auto & e : res) e = transformToGrid(e);
   return res;
 }
@@ -83,10 +78,10 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
   const auto real_height = height * resolution / 2;
 
   const auto corners = PolygonType{
-    {-real_width, -real_height},  // bottom left
-    {+real_width, -real_height},  // bottom right
-    {+real_width, +real_height},  // top right
-    {-real_width, +real_height},  // top left
+    makePoint(-real_width, -real_height),  // bottom left
+    makePoint(+real_width, -real_height),  // bottom right
+    makePoint(+real_width, +real_height),  // top right
+    makePoint(-real_width, +real_height),  // top left
   };
 
   {
@@ -102,47 +97,49 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
   const auto projection = [&](const PointType & p, size_t i) -> PointType {
     switch (i % 4) {
       default:
-        return {-real_width, p.y * -real_width / p.x};  // left
+        return makePoint(-real_width, p.y * -real_width / p.x);  // left
       case 1:
-        return {p.x * -real_height / p.y, -real_height};  // bottom
+        return makePoint(p.x * -real_height / p.y, -real_height);  // bottom
       case 2:
-        return {+real_width, p.y * +real_width / p.x};  // right
+        return makePoint(+real_width, p.y * +real_width / p.x);  // right
       case 3:
-        return {p.x * +real_height / p.y, +real_height};  // top
+        return makePoint(p.x * +real_height / p.y, +real_height);  // top
     }
   };
 
   auto res = PolygonType();
   {
+    auto angle = [](const PointType & p) { return std::atan2(p.y, p.x); };
+
     auto minmaxp = std::minmax_element(
       occupied_polygon.begin(), occupied_polygon.end(),
-      [&](const PointType & p, const PointType & q) { return p.theta() < q.theta(); });
+      [&](const PointType & p, const PointType & q) { return angle(p) < angle(q); });
 
-    if (auto [minp, maxp] = minmaxp; maxp->theta() - minp->theta() > M_PI) {
+    if (auto [minp, maxp] = minmaxp; angle(*maxp) - angle(*minp) > M_PI) {
       minmaxp = std::minmax_element(
         occupied_polygon.begin(), occupied_polygon.end(),
         [&](const PointType & p, const PointType & q) {
           auto adjust = [](double theta) { return theta < 0 ? theta + 2 * M_PI : theta; };
-          return adjust(p.theta()) < adjust(q.theta());
+          return adjust(angle(p)) < adjust(angle(q));
         });
     }
 
     auto [minp, maxp] = minmaxp;
-    double minang = minp->theta();
-    double maxang = maxp->theta();
+    double minang = angle(*minp);
+    double maxang = angle(*maxp);
     if (minang > maxang) maxang += 2 * M_PI;
 
     size_t i = 0;
     for (;; ++i) {
       auto corner = corners[i % 4];
-      if (corner.theta() >= minang) break;
+      if (angle(corner) >= minang) break;
     }
     res.emplace_back(*minp);
     res.emplace_back(projection(*minp, i));
 
     for (;; ++i) {
       auto corner = corners[i % 4];
-      if (corner.theta() + 2 * M_PI * (i / 4) >= maxang) break;
+      if (angle(corner) + 2 * M_PI * (i / 4) >= maxang) break;
       res.emplace_back(corner);
     }
     res.emplace_back(projection(*maxp, i));
