@@ -63,4 +63,4 @@ private:
 
 }  // namespace simple_sensor_simulator
 
-#endif
+#endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_TRAVERSAL_HPP_
