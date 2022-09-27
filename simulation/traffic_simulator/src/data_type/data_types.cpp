@@ -93,62 +93,17 @@ double RelativeTargetSpeed::getAbsoluteValue(
 
 namespace lane_change
 {
-AbsoluteTarget::AbsoluteTarget(std::int64_t lanelet_id) : lanelet_id(lanelet_id), offset(0) {}
-
-AbsoluteTarget::AbsoluteTarget(std::int64_t lanelet_id, double offset)
-: lanelet_id(lanelet_id), offset(offset)
-{
-}
-
-AbsoluteTarget::AbsoluteTarget(const AbsoluteTarget & other)
-: lanelet_id(other.lanelet_id), offset(other.offset)
-{
-}
-
-AbsoluteTarget & AbsoluteTarget::operator=(const AbsoluteTarget & other)
-{
-  if (this == &other) {
-    return *this;
-  }
-  this->~AbsoluteTarget();
-  new (this) AbsoluteTarget(other);
-  return *this;
-}
-
-Constraint::Constraint() : type(Type::NONE), policy(Policy::FORCE), value(0) {}
-
 Constraint::Constraint(const Type & type, double value)
 : type(type), policy(Policy::FORCE), value(value)
 {
 }
 
-Constraint::Constraint(const Type & type, const Policy & policy, double value)
-: type(type), policy(policy), value(value)
-{
-}
-
-Constraint::Constraint(const Constraint & other)
-: type(other.type), policy(other.policy), value(other.value)
-{
-}
-
-Constraint & Constraint::operator=(const Constraint & other)
-{
-  if (this == &other) {
-    return *this;
-  }
-  this->~Constraint();
-  new (this) Constraint(other);
-  return *this;
-}
-
 RelativeTarget::RelativeTarget(
-  const std::string & entity_name, const Direction direction, uint8_t shift, double offset)
+  const std::string & entity_name, const Direction direction, const std::uint8_t shift,
+  double offset)
 : entity_name(entity_name), direction(direction), shift(shift), offset(offset)
 {
 }
-
-double Parameter::default_lanechange_distance = 20.0;
 
 Parameter::Parameter()
 : target(AbsoluteTarget(0)), trajectory_shape(TrajectoryShape::CUBIC), constraint(Constraint())
@@ -160,21 +115,6 @@ Parameter::Parameter(
   const Constraint & constraint)
 : target(target), trajectory_shape(trajectory_shape), constraint(constraint)
 {
-}
-
-Parameter::Parameter(const Parameter & other)
-: target(other.target), trajectory_shape(other.trajectory_shape), constraint(other.constraint)
-{
-}
-
-Parameter & Parameter::operator=(const Parameter & other)
-{
-  if (this == &other) {
-    return *this;
-  }
-  this->~Parameter();
-  new (this) Parameter(other);
-  return *this;
 }
 
 std::ostream & operator<<(std::ostream & stream, const Direction & value)
