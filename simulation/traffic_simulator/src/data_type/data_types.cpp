@@ -59,18 +59,14 @@ std::string getRequestString(const Request & value)
 
 namespace speed_change
 {
-Constraint::Constraint(Constraint::Type type, double value) : type(type), value(value) {}
-
-Constraint::Constraint(const Constraint & other) : type(other.type), value(other.value) {}
-
-RelativeTargetSpeed::RelativeTargetSpeed(
-  const std::string & reference_entity_name, RelativeTargetSpeed::Type type, double value)
-: reference_entity_name(reference_entity_name), type(type), value(value)
+Constraint::Constraint(const Constraint::Type type, const double value) : type(type), value(value)
 {
 }
 
-RelativeTargetSpeed::RelativeTargetSpeed(const RelativeTargetSpeed & other)
-: reference_entity_name(other.reference_entity_name), type(other.type), value(other.value)
+RelativeTargetSpeed::RelativeTargetSpeed(
+  const std::string & reference_entity_name, const RelativeTargetSpeed::Type type,
+  const double value)
+: reference_entity_name(reference_entity_name), type(type), value(value)
 {
 }
 
@@ -78,34 +74,20 @@ double RelativeTargetSpeed::getAbsoluteValue(
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
   const
 {
-  if (other_status.find(reference_entity_name) == other_status.end()) {
+  if (const auto iter = other_status.find(reference_entity_name); iter == other_status.end()) {
     THROW_SEMANTIC_ERROR(
-      "reference entity name : ", reference_entity_name,
-      " is invalid. Please check entity : ", reference_entity_name,
+      "Reference entity name ", std::quoted(reference_entity_name),
+      " is invalid. Please check entity ", std::quoted(reference_entity_name),
       " exists and not a same entity you want to request changing target speed.");
+  } else {
+    switch (type) {
+      default:
+      case Type::DELTA:
+        return iter->second.action_status.twist.linear.x + value;
+      case Type::FACTOR:
+        return iter->second.action_status.twist.linear.x * value;
+    }
   }
-  double target_speed = 0;
-  switch (type) {
-    case Type::DELTA:
-      target_speed =
-        other_status.find(reference_entity_name)->second.action_status.twist.linear.x + value;
-      break;
-    case Type::FACTOR:
-      target_speed =
-        other_status.find(reference_entity_name)->second.action_status.twist.linear.x * value;
-      break;
-  }
-  return target_speed;
-}
-
-RelativeTargetSpeed & RelativeTargetSpeed::operator=(const RelativeTargetSpeed & other)
-{
-  if (this == &other) {
-    return *this;
-  }
-  this->~RelativeTargetSpeed();
-  new (this) RelativeTargetSpeed(other);
-  return *this;
 }
 }  // namespace speed_change
 

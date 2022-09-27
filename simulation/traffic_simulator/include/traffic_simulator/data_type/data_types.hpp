@@ -50,8 +50,9 @@ struct Constraint
     LONGITUDINAL_ACCELERATION,
     // @todo TIME,
   };
-  Constraint(Constraint::Type type, double value);
-  Constraint(const Constraint & other);
+  explicit Constraint(const Constraint::Type, const double);
+  Constraint(const Constraint &) = default;
+  Constraint(Constraint &&) = default;
   const Type type;
   const double value;
 };
@@ -62,13 +63,14 @@ struct RelativeTargetSpeed
     DELTA,
     FACTOR,
   };
-  RelativeTargetSpeed(
-    const std::string & reference_entity_name, RelativeTargetSpeed::Type type, double value);
-  RelativeTargetSpeed(const RelativeTargetSpeed & other);
+  explicit RelativeTargetSpeed(const std::string &, const RelativeTargetSpeed::Type, const double);
+  RelativeTargetSpeed(const RelativeTargetSpeed &) = default;
+  RelativeTargetSpeed(RelativeTargetSpeed &&) = default;
   double getAbsoluteValue(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
     const;
-  RelativeTargetSpeed & operator=(const RelativeTargetSpeed & val);
+  auto operator=(const RelativeTargetSpeed &) -> RelativeTargetSpeed & = default;
+  auto operator=(RelativeTargetSpeed &&) -> RelativeTargetSpeed & = default;
   const std::string reference_entity_name;
   const Type type;
   const double value;
