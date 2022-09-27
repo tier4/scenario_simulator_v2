@@ -112,7 +112,6 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
 
   rtcCommitScene(scene_);
   RTCIntersectContext context;
-  //TODO try not setting this
   for (int i = 0; i < threads.size(); ++i) {
     thread_cloud[i] = boost::make_shared<pcl::PointCloud<pcl::PointXYZI>>();
     threads[i] = std::thread(
