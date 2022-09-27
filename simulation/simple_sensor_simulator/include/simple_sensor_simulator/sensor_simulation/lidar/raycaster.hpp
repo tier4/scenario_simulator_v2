@@ -15,17 +15,17 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 
-
 #include <embree3/rtcore.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
-#include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <quaternion_operation/quaternion_operation.h>
-#include <sensor_msgs/msg/point_cloud2.hpp>
+
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <memory>
 #include <random>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
+#include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -57,13 +57,13 @@ public:
 
 private:
   std::vector<geometry_msgs::msg::Quaternion> getDirections(
-    std::vector<double> vertical_angles, double horizontal_angle_start,
-    double horizontal_angle_end, double horizontal_resolution);
+    std::vector<double> vertical_angles, double horizontal_angle_start, double horizontal_angle_end,
+    double horizontal_resolution);
   std::vector<geometry_msgs::msg::Quaternion> directions_;
   double previous_horizontal_angle_start_;
   double previous_horizontal_angle_end_;
   double previous_horizontal_resolution_;
-  std::vector<double>  previous_vertical_angles_;
+  std::vector<double> previous_vertical_angles_;
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
   RTCDevice device_;
   RTCScene scene_;
@@ -76,19 +76,17 @@ private:
   std::vector<std::string> detected_objects_;
   std::unordered_map<unsigned int, std::string> geometry_ids_;
 
-  static void intersect(int thread_id, int thread_count,
-                        RTCScene scene,
-                        pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud,
-                        RTCIntersectContext context,
-                        geometry_msgs::msg::Pose origin,
-                        std::reference_wrapper<std::set<unsigned int>> ref_thread_detected_ids,
-                        std::reference_wrapper<const std::vector<geometry_msgs::msg::Quaternion>> ref_directions,
-                        double max_distance, double min_distance)
+  static void intersect(
+    int thread_id, int thread_count, RTCScene scene,
+    pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud, RTCIntersectContext context,
+    geometry_msgs::msg::Pose origin,
+    std::reference_wrapper<std::set<unsigned int>> ref_thread_detected_ids,
+    std::reference_wrapper<const std::vector<geometry_msgs::msg::Quaternion>> ref_directions,
+    double max_distance, double min_distance)
   {
-    auto& directions = ref_directions.get();
-    auto& thread_detected_ids = ref_thread_detected_ids.get();
-    for(int i = thread_id ; i < directions.size(); i += thread_count)
-    {
+    auto & directions = ref_directions.get();
+    auto & thread_detected_ids = ref_thread_detected_ids.get();
+    for (int i = thread_id; i < directions.size(); i += thread_count) {
       RTCRayHit rayhit = {};
       rayhit.ray.org_x = origin.position.x;
       rayhit.ray.org_y = origin.position.y;
@@ -110,7 +108,7 @@ private:
       if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
         double distance = rayhit.ray.tfar;
         const Eigen::Vector3d vector = quaternion_operation::getRotationMatrix(directions.at(i)) *
-                                      Eigen::Vector3d(1.0, 0.0, 0.0) * distance;
+                                       Eigen::Vector3d(1.0, 0.0, 0.0) * distance;
         pcl::PointXYZI p;
         {
           p.x = vector[0];
@@ -122,7 +120,6 @@ private:
       }
     }
   }
-
 };
 }  // namespace simple_sensor_simulator
 

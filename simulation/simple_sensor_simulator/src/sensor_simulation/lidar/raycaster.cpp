@@ -22,21 +22,24 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <iostream>
 
 namespace simple_sensor_simulator
 {
-Raycaster::Raycaster() : primitive_ptrs_(0),
-                         device_(rtcNewDevice(nullptr)),
-                         scene_(rtcNewScene(device_)),
-                         engine_(seed_gen_())
-{ }
+Raycaster::Raycaster()
+: primitive_ptrs_(0),
+  device_(rtcNewDevice(nullptr)),
+  scene_(rtcNewScene(device_)),
+  engine_(seed_gen_())
+{
+}
 
-Raycaster::Raycaster(std::string embree_config) : primitive_ptrs_(0),
-                                                  device_(rtcNewDevice(embree_config.c_str())),
-                                                  scene_(rtcNewScene(device_)),
-                                                  engine_(seed_gen_())
-{ }
+Raycaster::Raycaster(std::string embree_config)
+: primitive_ptrs_(0),
+  device_(rtcNewDevice(embree_config.c_str())),
+  scene_(rtcNewScene(device_)),
+  engine_(seed_gen_())
+{
+}
 
 Raycaster::~Raycaster()
 {
@@ -45,51 +48,43 @@ Raycaster::~Raycaster()
 }
 
 std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
-    std::vector<double> vertical_angles,
-    double horizontal_angle_start,
-    double horizontal_angle_end,
-    double horizontal_resolution)
-  {
-    if (directions_.empty() ||
-        previous_horizontal_angle_start_ != horizontal_angle_start ||
-        previous_horizontal_angle_end_ != horizontal_angle_end ||
-        previous_horizontal_resolution_ != horizontal_resolution ||
-        previous_vertical_angles_ != vertical_angles)
-    {
-      std::vector<geometry_msgs::msg::Quaternion> directions;
-      double horizontal_angle = horizontal_angle_start;
-      while (horizontal_angle <= horizontal_angle_end) {
-        horizontal_angle = horizontal_angle + horizontal_resolution;
-        for (const auto vertical_angle : vertical_angles) {
-          geometry_msgs::msg::Vector3 rpy;
-          rpy.x = 0;
-          rpy.y = vertical_angle;
-          rpy.z = horizontal_angle;
-          auto quat = quaternion_operation::convertEulerAngleToQuaternion(rpy);
-          directions.emplace_back(quat);
-        }
+  std::vector<double> vertical_angles, double horizontal_angle_start, double horizontal_angle_end,
+  double horizontal_resolution)
+{
+  if (
+    directions_.empty() || previous_horizontal_angle_start_ != horizontal_angle_start ||
+    previous_horizontal_angle_end_ != horizontal_angle_end ||
+    previous_horizontal_resolution_ != horizontal_resolution ||
+    previous_vertical_angles_ != vertical_angles) {
+    std::vector<geometry_msgs::msg::Quaternion> directions;
+    double horizontal_angle = horizontal_angle_start;
+    while (horizontal_angle <= horizontal_angle_end) {
+      horizontal_angle = horizontal_angle + horizontal_resolution;
+      for (const auto vertical_angle : vertical_angles) {
+        geometry_msgs::msg::Vector3 rpy;
+        rpy.x = 0;
+        rpy.y = vertical_angle;
+        rpy.z = horizontal_angle;
+        auto quat = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+        directions.emplace_back(quat);
       }
-      directions_ = directions;
-      previous_horizontal_angle_end_ = horizontal_angle_end;
-      previous_horizontal_angle_start_ = horizontal_angle_start;
-      previous_horizontal_resolution_ = horizontal_resolution;
-      previous_vertical_angles_ = vertical_angles;
     }
-    return directions_;
+    directions_ = directions;
+    previous_horizontal_angle_end_ = horizontal_angle_end;
+    previous_horizontal_angle_start_ = horizontal_angle_start;
+    previous_horizontal_resolution_ = horizontal_resolution;
+    previous_vertical_angles_ = vertical_angles;
   }
+  return directions_;
+}
 
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
-  std::string frame_id,
-  const rclcpp::Time & stamp,
-  geometry_msgs::msg::Pose origin,
-  double horizontal_resolution,
-  std::vector<double> vertical_angles,
-  double horizontal_angle_start,
-  double horizontal_angle_end,
-  double max_distance,
-  double min_distance)
+  std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
+  double horizontal_resolution, std::vector<double> vertical_angles, double horizontal_angle_start,
+  double horizontal_angle_end, double max_distance, double min_distance)
 {
-  auto directions = getDirections(vertical_angles, horizontal_angle_start, horizontal_angle_end, horizontal_resolution);
+  auto directions = getDirections(
+    vertical_angles, horizontal_angle_start, horizontal_angle_end, horizontal_resolution);
   return raycast(frame_id, stamp, origin, directions, max_distance, min_distance);
 }
 
@@ -118,21 +113,20 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   rtcCommitScene(scene_);
   RTCIntersectContext context;
   //TODO try not setting this
-  for (int i = 0; i < threads.size(); ++i)
-  {
+  for (int i = 0; i < threads.size(); ++i) {
     thread_cloud[i] = boost::make_shared<pcl::PointCloud<pcl::PointXYZI>>();
-    threads[i] = std::thread(intersect, i, thread_count, scene_, thread_cloud[i], context, origin,
-                             std::ref(thread_detected_ids[i]), std::ref(directions), max_distance, min_distance);
+    threads[i] = std::thread(
+      intersect, i, thread_count, scene_, thread_cloud[i], context, origin,
+      std::ref(thread_detected_ids[i]), std::ref(directions), max_distance, min_distance);
   }
-    for (int i = 0; i < threads.size(); ++i)
-  {
+  for (int i = 0; i < threads.size(); ++i) {
     threads[i].join();
     (*cloud) += *(thread_cloud[i]);
   }
-  for (auto&& detected_ids_in_thread : thread_detected_ids) {
-      for (const auto & id : detected_ids_in_thread) {
-          detected_objects_.emplace_back(geometry_ids_[id]);
-      }
+  for (auto && detected_ids_in_thread : thread_detected_ids) {
+    for (const auto & id : detected_ids_in_thread) {
+      detected_objects_.emplace_back(geometry_ids_[id]);
+    }
   }
 
   for (const auto & id : geometry_ids_) {
