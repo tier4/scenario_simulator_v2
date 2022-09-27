@@ -1,0 +1,4 @@
+string absolute_file_path
+---
+bool has_succeeded
+string message

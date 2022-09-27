@@ -16,6 +16,8 @@ ament_auto_find_build_dependencies()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   msg/Context.msg
+  srv/PreprocessorDerive.srv
+  srv/PreprocessorLoad.srv
   DEPENDENCIES builtin_interfaces)
 
 ament_auto_package()
