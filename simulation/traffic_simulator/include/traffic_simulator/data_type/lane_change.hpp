@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_
-#define TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_
+#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__LANE_CHANGE_HPP_
+#define TRAFFIC_SIMULATOR__DATA_TYPE__LANE_CHANGE_HPP_
 
 #include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
@@ -110,13 +110,10 @@ static_assert(std::is_move_assignable_v<Parameter>);
 
 std::ostream & operator<<(std::ostream & stream, const Direction & value);
 std::ostream & operator<<(std::ostream & stream, const TrajectoryShape & value);
-std::ostream & operator<<(std::ostream & stream, const AbsoluteTarget & value);
 std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value);
 std::ostream & operator<<(std::ostream & stream, const Constraint::Policy & value);
-std::ostream & operator<<(std::ostream & stream, const Constraint & value);
-std::ostream & operator<<(std::ostream & stream, const RelativeTarget & value);
 std::ostream & operator<<(std::ostream & stream, const Parameter & value);
 }  // namespace lane_change
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__DATA_TYPES_HPP_
+#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__LANE_CHANGE_HPP_
