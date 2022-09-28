@@ -95,8 +95,8 @@ auto CustomCommandAction::node() -> rclcpp::Node &
   return node;
 }
 
-auto CustomCommandAction::printParameter(const std::vector<std::string> & parameters, const Scope & scope)
-  -> int
+auto CustomCommandAction::printParameter(
+  const std::vector<std::string> & parameters, const Scope & scope) -> int
 {
   for (auto && parameter : parameters) {
     std::cout << parameter << " = " << scope.ref(parameter) << std::endl;
@@ -161,7 +161,8 @@ auto CustomCommandAction::test(const std::vector<std::string> & values, const Sc
   std::cout << "test" << std::endl;
 
   for (auto iter = std::cbegin(values); iter != std::cend(values); ++iter) {
-    std::cout << "  values[" << std::distance(std::cbegin(values), iter) << "] = " << *iter << std::endl;
+    std::cout << "  values[" << std::distance(std::cbegin(values), iter) << "] = " << *iter
+              << std::endl;
   }
 
   return values.size();
