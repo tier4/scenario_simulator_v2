@@ -37,39 +37,25 @@ std::ostream & operator<<(std::ostream & stream, const Request & value)
   return stream;
 }
 
-std::string getRequestString(const Request & value)
+std::string getRequestString(const Request & request)
 {
-  switch (value) {
+  switch (request) {
     case Request::NONE:
       return "none";
-      break;
     case Request::LANE_CHANGE:
       return "lane_change";
-      break;
     case Request::FOLLOW_LANE:
       return "follow_lane";
-      break;
     case Request::WALK_STRAIGHT:
       return "walk_straight";
-      break;
+    default:
+      THROW_SEMANTIC_ERROR(request, " is invalid");
   }
-  THROW_SEMANTIC_ERROR(value, " is invalid");
 }
 }  // namespace behavior
 
 namespace speed_change
 {
-Constraint::Constraint(const Constraint::Type type, const double value) : type(type), value(value)
-{
-}
-
-RelativeTargetSpeed::RelativeTargetSpeed(
-  const std::string & reference_entity_name, const RelativeTargetSpeed::Type type,
-  const double value)
-: reference_entity_name(reference_entity_name), type(type), value(value)
-{
-}
-
 double RelativeTargetSpeed::getAbsoluteValue(
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
   const
@@ -93,30 +79,6 @@ double RelativeTargetSpeed::getAbsoluteValue(
 
 namespace lane_change
 {
-Constraint::Constraint(const Type & type, double value)
-: type(type), policy(Policy::FORCE), value(value)
-{
-}
-
-RelativeTarget::RelativeTarget(
-  const std::string & entity_name, const Direction direction, const std::uint8_t shift,
-  double offset)
-: entity_name(entity_name), direction(direction), shift(shift), offset(offset)
-{
-}
-
-Parameter::Parameter()
-: target(AbsoluteTarget(0)), trajectory_shape(TrajectoryShape::CUBIC), constraint(Constraint())
-{
-}
-
-Parameter::Parameter(
-  const AbsoluteTarget & target, const TrajectoryShape trajectory_shape,
-  const Constraint & constraint)
-: target(target), trajectory_shape(trajectory_shape), constraint(constraint)
-{
-}
-
 std::ostream & operator<<(std::ostream & stream, const Direction & value)
 {
   switch (value) {
