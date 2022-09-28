@@ -18,6 +18,30 @@ namespace traffic_simulator
 {
 namespace lane_change
 {
+static_assert(std::is_default_constructible_v<Constraint>);
+static_assert(std::is_copy_constructible_v<Constraint>);
+static_assert(std::is_move_constructible_v<Constraint>);
+static_assert(std::is_copy_assignable_v<Constraint>);
+static_assert(std::is_move_assignable_v<Constraint>);
+
+static_assert(std::is_default_constructible_v<AbsoluteTarget>);
+static_assert(std::is_copy_constructible_v<AbsoluteTarget>);
+static_assert(std::is_move_constructible_v<AbsoluteTarget>);
+static_assert(std::is_copy_assignable_v<AbsoluteTarget>);
+static_assert(std::is_move_assignable_v<AbsoluteTarget>);
+
+static_assert(not std::is_default_constructible_v<RelativeTarget>);
+static_assert(std::is_copy_constructible_v<RelativeTarget>);
+static_assert(std::is_move_constructible_v<RelativeTarget>);
+static_assert(std::is_copy_assignable_v<RelativeTarget>);
+static_assert(std::is_move_assignable_v<RelativeTarget>);
+
+static_assert(std::is_default_constructible_v<Parameter>);
+static_assert(std::is_copy_constructible_v<Parameter>);
+static_assert(std::is_move_constructible_v<Parameter>);
+static_assert(std::is_copy_assignable_v<Parameter>);
+static_assert(std::is_move_assignable_v<Parameter>);
+
 std::ostream & operator<<(std::ostream & stream, const Direction & value)
 {
   switch (value) {

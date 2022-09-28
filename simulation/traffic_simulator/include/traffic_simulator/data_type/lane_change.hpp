@@ -38,12 +38,6 @@ struct AbsoluteTarget
   double offset;
 };
 
-static_assert(std::is_default_constructible_v<AbsoluteTarget>);
-static_assert(std::is_copy_constructible_v<AbsoluteTarget>);
-static_assert(std::is_move_constructible_v<AbsoluteTarget>);
-static_assert(std::is_copy_assignable_v<AbsoluteTarget>);
-static_assert(std::is_move_assignable_v<AbsoluteTarget>);
-
 struct Constraint
 {
   enum class Type { NONE = 0, LATERAL_VELOCITY = 1, LONGITUDINAL_DISTANCE = 2, TIME = 3 };
@@ -58,12 +52,6 @@ struct Constraint
   Policy policy;
 };
 
-static_assert(std::is_default_constructible_v<Constraint>);
-static_assert(std::is_copy_constructible_v<Constraint>);
-static_assert(std::is_move_constructible_v<Constraint>);
-static_assert(std::is_copy_assignable_v<Constraint>);
-static_assert(std::is_move_assignable_v<Constraint>);
-
 struct RelativeTarget
 {
   explicit RelativeTarget(
@@ -77,12 +65,6 @@ struct RelativeTarget
   std::uint8_t shift;
   double offset;
 };
-
-static_assert(not std::is_default_constructible_v<RelativeTarget>);
-static_assert(std::is_copy_constructible_v<RelativeTarget>);
-static_assert(std::is_move_constructible_v<RelativeTarget>);
-static_assert(std::is_copy_assignable_v<RelativeTarget>);
-static_assert(std::is_move_assignable_v<RelativeTarget>);
 
 /**
  * @brief parameters for behavior plugin
@@ -102,17 +84,11 @@ struct Parameter
   static inline constexpr auto default_lanechange_distance = 20.0;
 };
 
-static_assert(std::is_default_constructible_v<Parameter>);
-static_assert(std::is_copy_constructible_v<Parameter>);
-static_assert(std::is_move_constructible_v<Parameter>);
-static_assert(std::is_copy_assignable_v<Parameter>);
-static_assert(std::is_move_assignable_v<Parameter>);
-
-std::ostream & operator<<(std::ostream & stream, const Direction & value);
-std::ostream & operator<<(std::ostream & stream, const TrajectoryShape & value);
-std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value);
-std::ostream & operator<<(std::ostream & stream, const Constraint::Policy & value);
-std::ostream & operator<<(std::ostream & stream, const Parameter & value);
+std::ostream & operator<<(std::ostream &, const Direction &);
+std::ostream & operator<<(std::ostream &, const TrajectoryShape &);
+std::ostream & operator<<(std::ostream &, const Constraint::Type &);
+std::ostream & operator<<(std::ostream &, const Constraint::Policy &);
+std::ostream & operator<<(std::ostream &, const Parameter &);
 }  // namespace lane_change
 }  // namespace traffic_simulator
 
