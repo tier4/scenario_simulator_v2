@@ -39,13 +39,15 @@ public:
   static auto activate(
     const Node & node, const traffic_simulator::Configuration & configuration, Ts &&... xs) -> void
   {
-    if (not core) {
+    if (not active()) {
       core = std::make_unique<traffic_simulator::API>(node, configuration);
       core->initialize(std::forward<decltype(xs)>(xs)...);
     } else {
       throw Error("The simulator core has already been instantiated.");
     }
   }
+
+  static auto active() { return static_cast<bool>(core); }
 
   static auto deactivate() -> void { core.reset(); }
 
