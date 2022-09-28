@@ -172,7 +172,7 @@ class ScenarioTestRunner(LifecycleController):
 
         self.run_scenarios(converted_scenarios)
 
-    def run_scenarios(self, scenarios: List[Scenario]):  # TODO RENAME
+    def run_preprocessed_scenarios(self, scenarios: List[Scenario]):
         """
         Run all given scenarios.
 
