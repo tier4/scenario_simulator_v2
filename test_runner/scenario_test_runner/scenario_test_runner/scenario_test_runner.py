@@ -37,7 +37,7 @@ from scenario_test_runner.workflow import (
 )
 
 
-def convert_scenarios(scenarios: List[Scenario], output_directory: Path):
+def convert_scenarios_to_xosc(scenarios: List[Scenario], output_directory: Path):
 
     result = []
 
@@ -132,7 +132,7 @@ class ScenarioTestRunner(LifecycleController):
             # TODO self.global_real_time_factor,
         )
 
-        converted_scenarios = convert_scenarios(
+        converted_scenarios = convert_scenarios_to_xosc(
             self.current_workflow.scenarios, self.output_directory
         )
 
@@ -162,15 +162,27 @@ class ScenarioTestRunner(LifecycleController):
                     time.sleep(self.SLEEP_RATE)
 
     def run_scenario(self, scenario: Scenario):
-        converted_scenarios = convert_scenarios([scenario], self.output_directory)
 
-        is_valid = XOSCValidator(False)
+        # convert t4v2/xosc to xosc
+        xosc_scenarios = convert_scenarios_to_xosc([scenario], self.output_directory)
 
-        for each in converted_scenarios:
-            if not is_valid(each.path):
+        # post to preprocessor
+        for xosc_scenario in xosc_scenarios:
+            if(self.post_scenarios_to_preprocessor(xosc_scenario)):
+                pass
+                # TODO : implement fetch derived scenario loop
+                # preprocessed_scenarios = []
+                # while client.wait_for_service(timeout_sec=1.0):
+                #     request = PreprocessorDerive.Request()
+                #     request.  = path of scenario
+                #     future = client.call_async(request)
+                #     rclpy.spin_until_future_complete(node, future)
+                #     if future.result() is not None:
+                #         preprocessed_scenario = Scenario()
+                #         preprocessed_scenarios.append(future.result().absolute_file_path)
+                # self.run_preprocessed_scenarios(preprocessed_scenarios)
+            else:
                 exit(1)
-
-        self.run_scenarios(converted_scenarios)
 
     def run_preprocessed_scenarios(self, scenarios: List[Scenario]):
         """
@@ -228,6 +240,9 @@ class ScenarioTestRunner(LifecycleController):
     # def __del__(self):
     #     pass
 
+    def post_scenario_to_preprocessor(self, scenario : Scenario):
+        # TODO : call `load` service and check response status
+        pass
 
 def main(args=None):
     rclpy.init(args=args)
