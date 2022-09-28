@@ -17,69 +17,11 @@
 
 #include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <type_traits>
 #include <unordered_map>
 
 namespace traffic_simulator
 {
-namespace speed_change
-{
-enum class Transition {
-  // @todo CUBIC,
-  LINEAR,
-  // @todo SINUSOIDAL,
-  STEP
-};
-
-struct Constraint
-{
-  enum class Type {
-    // @todo DISTANCE,
-    LONGITUDINAL_ACCELERATION,
-    // @todo TIME,
-  };
-  explicit constexpr Constraint(const Constraint::Type type, const double value)
-  : type(type), value(value)
-  {
-  }
-  Type type;
-  double value;
-};
-
-static_assert(not std::is_default_constructible_v<Constraint>);
-static_assert(std::is_copy_constructible_v<Constraint>);
-static_assert(std::is_move_constructible_v<Constraint>);
-static_assert(std::is_copy_assignable_v<Constraint>);
-static_assert(std::is_move_assignable_v<Constraint>);
-
-struct RelativeTargetSpeed
-{
-  enum class Type {
-    DELTA,
-    FACTOR,
-  };
-  explicit RelativeTargetSpeed(
-    const std::string & reference_entity_name, const RelativeTargetSpeed::Type type,
-    const double value)
-  : reference_entity_name(reference_entity_name), type(type), value(value)
-  {
-  }
-  double getAbsoluteValue(
-    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
-    const;
-  std::string reference_entity_name;
-  Type type;
-  double value;
-};
-
-static_assert(not std::is_default_constructible_v<RelativeTargetSpeed>);
-static_assert(std::is_copy_constructible_v<RelativeTargetSpeed>);
-static_assert(std::is_move_constructible_v<RelativeTargetSpeed>);
-static_assert(std::is_copy_assignable_v<RelativeTargetSpeed>);
-static_assert(std::is_move_assignable_v<RelativeTargetSpeed>);
-}  // namespace speed_change
-
 namespace lane_change
 {
 enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };

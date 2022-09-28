@@ -23,6 +23,7 @@
 #include <queue>
 #include <string>
 #include <traffic_simulator/data_type/data_types.hpp>
+#include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>

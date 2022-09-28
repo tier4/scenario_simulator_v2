@@ -30,6 +30,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/color_utils/color_utils.cpp
   src/data_type/behavior.cpp
   src/data_type/data_types.cpp
+  src/data_type/speed_change.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
   src/entity/entity_manager.cpp

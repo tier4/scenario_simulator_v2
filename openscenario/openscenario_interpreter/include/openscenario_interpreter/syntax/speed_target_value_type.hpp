@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <traffic_simulator/data_type/data_types.hpp>
+#include <traffic_simulator/data_type/speed_change.hpp>
 #include <type_traits>
 
 namespace openscenario_interpreter
