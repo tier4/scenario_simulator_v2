@@ -1,2 +1,2 @@
 ---
-string absolute_file_path
+openscenario_interpreter_msgs/Scenario scenario
