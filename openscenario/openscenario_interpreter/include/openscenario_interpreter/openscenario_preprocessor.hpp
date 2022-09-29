@@ -22,7 +22,7 @@
 
 namespace openscenario_interpreter
 {
-class Preprocessor : rclcpp::Node
+class Preprocessor : public rclcpp::Node
 {
 public:
   //  OPENSCENARIO_INTERPRETER_PUBLIC
@@ -33,6 +33,7 @@ public:
                          const PreprocessorLoad::Request::SharedPtr request,
                          PreprocessorLoad::Response::SharedPtr response) -> void {
       // TODO: implement
+
     };
   }
 
