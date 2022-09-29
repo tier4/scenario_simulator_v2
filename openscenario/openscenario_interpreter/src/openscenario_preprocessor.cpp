@@ -20,7 +20,26 @@
 
 namespace openscenario_interpreter
 {
-
+Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
+: rclcpp::Node("preprocessor", options)
+{
+  using openscenario_interpreter_msgs::srv::PreprocessorLoad;
+  auto handle_load = [this](
+                       const PreprocessorLoad::Request::SharedPtr request,
+                       PreprocessorLoad::Response::SharedPtr response) -> void {
+    // TODO: implement
+  };
+}
+void Preprocessor::createDeriveServer()
+{
+  using openscenario_interpreter_msgs::srv::PreprocessorDerive;
+  auto handle_derive = [this](
+    const PreprocessorDerive::Request::SharedPtr request,
+    PreprocessorDerive::Response::SharedPtr response) -> void {
+    // TODO: implement
+  };
+  derive_server = create_service<PreprocessorDerive>("derive", handle_derive);
+}
 }  // namespace openscenario_interpreter
 
 RCLCPP_COMPONENTS_REGISTER_NODE(openscenario_interpreter::Preprocessor)

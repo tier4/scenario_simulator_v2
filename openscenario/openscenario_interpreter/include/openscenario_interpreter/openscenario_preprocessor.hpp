@@ -26,31 +26,15 @@ class Preprocessor : public rclcpp::Node
 {
 public:
   //  OPENSCENARIO_INTERPRETER_PUBLIC
-  explicit Preprocessor(const rclcpp::NodeOptions & options) : rclcpp::Node("preprocessor", options)
-  {
-    using openscenario_interpreter_msgs::srv::PreprocessorLoad;
-    auto handle_load = [this](
-                         const PreprocessorLoad::Request::SharedPtr request,
-                         PreprocessorLoad::Response::SharedPtr response) -> void {
-      // TODO: implement
-
-    };
-  }
+  explicit Preprocessor(const rclcpp::NodeOptions & options);
 
 private:
-  void createDeriveServer()
-  {
-    using openscenario_interpreter_msgs::srv::PreprocessorDerive;
-    auto handle_derive = [this](
-                           const PreprocessorDerive::Request::SharedPtr request,
-                           PreprocessorDerive::Response::SharedPtr response) -> void {
-      // TODO: implement
-    };
-    derive_server = create_service<PreprocessorDerive>("derive", handle_derive);
-  }
+  void createDeriveServer();
 
   void destroyDeriveServer() { derive_server = nullptr; }
+
   rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorLoad>::SharedPtr load_server;
+
   rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorDerive>::SharedPtr derive_server;
 };
 }  // namespace openscenario_interpreter
