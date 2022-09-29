@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/none.hpp>
-#include <openscenario_interpreter/syntax/time_reference.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/timing.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-TimeReference::TimeReference(const pugi::xml_node & node, Scope & scope)
-// clang-format off
-: ComplexType(
-    choice(node,
-      std::make_pair(  "None", [&](const auto & node) { return make<  None>(node, scope); }),
-      std::make_pair("Timing", [&](const auto & node) { return make<Timing>(node, scope); })))
-// clang-format on
+Timing::Timing(const pugi::xml_node & node, Scope & scope)
+: domain_absolute_relative(readAttribute<ReferenceContext>("domainAbsoluteRelative", node, scope)),
+  offset(readAttribute<Double>("offset", node, scope)),
+  scale(readAttribute<Double>("scale", node, scope))
 {
 }
 }  // namespace syntax
