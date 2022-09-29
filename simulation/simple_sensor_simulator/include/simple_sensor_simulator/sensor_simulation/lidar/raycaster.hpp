@@ -57,8 +57,8 @@ public:
 
 private:
   std::vector<geometry_msgs::msg::Quaternion> getDirections(
-    std::vector<double> vertical_angles, double horizontal_angle_start, double horizontal_angle_end,
-    double horizontal_resolution);
+    const std::vector<double> & vertical_angles, double horizontal_angle_start,
+    double horizontal_angle_end, double horizontal_resolution);
   std::vector<geometry_msgs::msg::Quaternion> directions_;
   double previous_horizontal_angle_start_;
   double previous_horizontal_angle_end_;

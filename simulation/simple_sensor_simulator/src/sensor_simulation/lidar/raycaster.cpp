@@ -48,8 +48,8 @@ Raycaster::~Raycaster()
 }
 
 std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
-  std::vector<double> vertical_angles, double horizontal_angle_start, double horizontal_angle_end,
-  double horizontal_resolution)
+  const std::vector<double> & vertical_angles, double horizontal_angle_start,
+  double horizontal_angle_end, double horizontal_resolution)
 {
   if (
     directions_.empty() || previous_horizontal_angle_start_ != horizontal_angle_start ||
