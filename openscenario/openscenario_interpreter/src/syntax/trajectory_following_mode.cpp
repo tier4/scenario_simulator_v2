@@ -20,7 +20,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 TrajectoryFollowingMode::TrajectoryFollowingMode(const pugi::xml_node & node, Scope & scope)
-// : following_mode(readAttribute<FollowingMode>("followingMode", node, scope))
+: following_mode(readAttribute<FollowingMode>("followingMode", node, scope))
 {
 }
 }  // namespace syntax

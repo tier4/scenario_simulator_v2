@@ -12,31 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAJECTORY_FOLLOWING_MODE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__TRAJECTORY_FOLLOWING_MODE_HPP_
-
-#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/following_mode.hpp>
-#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- TrajectoryFollowingMode 1.2 --------------------------------------------
- *
- *  <xsd:complexType name="TrajectoryFollowingMode">
- *    <xsd:attribute name="followingMode" type="FollowingMode" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct TrajectoryFollowingMode
-{
-  const FollowingMode following_mode;
+static_assert(std::is_standard_layout<FollowingMode>::value);
 
-  explicit TrajectoryFollowingMode(const pugi::xml_node &, Scope &);
-};
+static_assert(std::is_trivial<FollowingMode>::value);
+
+auto operator>>(std::istream & is, FollowingMode & datum) -> std::istream &
+{
+  if (std::string buffer; is >> buffer and buffer == "follow") {
+    datum.value = FollowingMode::follow;
+    return is;
+  } else if (buffer == "position") {
+    datum.value = FollowingMode::position;
+    return is;
+  } else {
+    throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(FollowingMode, buffer);
+  }
+}
+
+auto operator<<(std::ostream & os, const FollowingMode & datum) -> std::ostream &
+{
+  switch (datum) {
+    default:
+    case FollowingMode::follow:
+      return os << "follow";
+    case FollowingMode::position:
+      return os << "position";
+  }
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRAJECTORY_FOLLOWING_MODE_HPP_
