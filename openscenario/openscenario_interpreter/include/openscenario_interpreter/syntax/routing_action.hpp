@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/acquire_position_action.hpp>
 #include <openscenario_interpreter/syntax/assign_route_action.hpp>
+#include <openscenario_interpreter/syntax/follow_trajectory_action.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -49,14 +50,14 @@ struct RoutingAction : public ComplexType
 DEFINE_LAZY_VISITOR(
   RoutingAction,
   CASE(AssignRouteAction),  //
-  // CASE(FollowTrajectoryAction),
+  CASE(FollowTrajectoryAction),
   CASE(AcquirePositionAction),  //
 );
 
 DEFINE_LAZY_VISITOR(
   const RoutingAction,
   CASE(AssignRouteAction),  //
-  // CASE(FollowTrajectoryAction),
+  CASE(FollowTrajectoryAction),
   CASE(AcquirePositionAction),  //
 );
 }  // namespace syntax
