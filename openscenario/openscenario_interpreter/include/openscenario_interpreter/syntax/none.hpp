@@ -12,24 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/none.hpp>
-#include <openscenario_interpreter/syntax/time_reference.hpp>
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__NONE_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__NONE_HPP_
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-TimeReference::TimeReference(const pugi::xml_node & node, Scope & scope)
-// clang-format off
-: ComplexType(
-    choice(node,
-      std::make_pair(  "None", [&](const auto & node) { return make<  None>(node, scope); })
-      // std::make_pair("Timing", [&](const auto & node) { return make<Timing>(node, scope); })
-      )
-    )
-// clang-format on
+/* ---- None 1.2 ---------------------------------------------------------------
+ *
+ *  <xsd:complexType name="None"/>
+ *
+ * -------------------------------------------------------------------------- */
+struct None
 {
-}
+  template <typename... Ts>
+  explicit None(Ts &&...)
+  {
+  }
+};
 }  // namespace syntax
 }  // namespace openscenario_interpreter
+
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__NONE_HPP_
