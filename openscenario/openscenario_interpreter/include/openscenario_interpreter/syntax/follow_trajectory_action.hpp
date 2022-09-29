@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/time_reference.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -53,8 +54,8 @@ struct FollowTrajectoryAction
 {
   const Double initial_distance_offset;
 
-  // const TimeReference time_reference;
-  //
+  const TimeReference time_reference;
+
   // const TrajectoryFollowingMode trajectory_following_mode;
   //
   // const TrajectoryRef trajectory_ref;

@@ -12,25 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/follow_trajectory_action.hpp>
+#include <openscenario_interpreter/syntax/time_reference.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-FollowTrajectoryAction::FollowTrajectoryAction(const pugi::xml_node & node, Scope & scope)
-: initial_distance_offset(readAttribute<Double>("initialDistanceOffset", node, scope)),
-  time_reference(readElement<TimeReference>("TimeReference", node, scope))
+TimeReference::TimeReference(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: ComplexType(
+    // choice(node,
+    //   std::make_pair(  "None", [&](const auto & node) { return make<  None>(node, scope); }),
+    //   std::make_pair("Timing", [&](const auto & node) { return make<Timing>(node, scope); })
+    //   )
+    )
+// clang-format on
 {
 }
-
-auto FollowTrajectoryAction::accomplished() noexcept -> bool { return false; }
-
-auto FollowTrajectoryAction::endsImmediately() noexcept -> bool { return false; }
-
-auto FollowTrajectoryAction::run() -> void {}
-
-auto FollowTrajectoryAction::start() -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
