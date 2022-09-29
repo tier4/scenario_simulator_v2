@@ -1,4 +1,6 @@
-openscenario_interpreter_msgs/Scenario scenario
+string path
+int32 expect
+float64 frame_rate
 ---
 bool has_succeeded
 string message
