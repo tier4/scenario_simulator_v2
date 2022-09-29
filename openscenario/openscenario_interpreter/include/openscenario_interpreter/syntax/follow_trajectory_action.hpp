@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/time_reference.hpp>
+#include <openscenario_interpreter/syntax/trajectory_following_mode.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -56,8 +57,8 @@ struct FollowTrajectoryAction
 
   const TimeReference time_reference;
 
-  // const TrajectoryFollowingMode trajectory_following_mode;
-  //
+  const TrajectoryFollowingMode trajectory_following_mode;
+
   // const TrajectoryRef trajectory_ref;
 
   explicit FollowTrajectoryAction(const pugi::xml_node &, Scope &);

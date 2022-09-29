@@ -13,26 +13,15 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/follow_trajectory_action.hpp>
+#include <openscenario_interpreter/syntax/trajectory_following_mode.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-FollowTrajectoryAction::FollowTrajectoryAction(const pugi::xml_node & node, Scope & scope)
-: initial_distance_offset(readAttribute<Double>("initialDistanceOffset", node, scope)),
-  time_reference(readElement<TimeReference>("TimeReference", node, scope)),
-  trajectory_following_mode(
-    readElement<TrajectoryFollowingMode>("TrajectoryFollowingMode", node, scope))
+TrajectoryFollowingMode::TrajectoryFollowingMode(const pugi::xml_node & node, Scope & scope)
+// : following_mode(readAttribute<FollowingMode>("followingMode", node, scope))
 {
 }
-
-auto FollowTrajectoryAction::accomplished() noexcept -> bool { return false; }
-
-auto FollowTrajectoryAction::endsImmediately() noexcept -> bool { return false; }
-
-auto FollowTrajectoryAction::run() -> void {}
-
-auto FollowTrajectoryAction::start() -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
