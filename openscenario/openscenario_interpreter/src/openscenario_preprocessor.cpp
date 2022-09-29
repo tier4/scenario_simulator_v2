@@ -27,18 +27,42 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
   auto handle_load = [this](
                        const PreprocessorLoad::Request::SharedPtr request,
                        PreprocessorLoad::Response::SharedPtr response) -> void {
-    // TODO: implement
+    auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+    try {
+      preprocessScenario(ScenarioInfo(*request));
+
+    } catch (...) {
+      response->has_succeeded = false;
+      response->message = "Something went wrong";
+    }
   };
-}
-void Preprocessor::createDeriveServer()
-{
+  load_server = create_service<PreprocessorLoad>("load", handle_load);
+
   using openscenario_interpreter_msgs::srv::PreprocessorDerive;
   auto handle_derive = [this](
-    const PreprocessorDerive::Request::SharedPtr request,
-    PreprocessorDerive::Response::SharedPtr response) -> void {
-    // TODO: implement
+                         const PreprocessorDerive::Request::SharedPtr request,
+                         PreprocessorDerive::Response::SharedPtr response) -> void {
+    auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+    if (preprocessed_scenarios.empty()) {
+      response->path = "";
+    } else {
+      *response = preprocessed_scenarios.front().getDeriveResponse();
+      preprocessed_scenarios.pop();
+    }
   };
+
   derive_server = create_service<PreprocessorDerive>("derive", handle_derive);
+
+  using openscenario_interpreter_msgs::srv::PreprocessorCheckDerivationCompleted;
+  auto handle_check =
+    [this](
+      const PreprocessorCheckDerivationCompleted::Request::SharedPtr request,
+      PreprocessorCheckDerivationCompleted::Response::SharedPtr response) -> void {
+    auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+    response->derivation_completed = (preprocessed_scenarios.empty());
+  };
+
+  check_server = create_service<PreprocessorCheckDerivationCompleted>("check", handle_check);
 }
 }  // namespace openscenario_interpreter
 
