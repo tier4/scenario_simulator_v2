@@ -14,20 +14,13 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/polyline.hpp>
-#include <openscenario_interpreter/syntax/shape.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Shape::Shape(const pugi::xml_node & node, Scope & scope)
-// clang-format off
-: ComplexType(
-    choice(node,
-      std::make_pair("Polyline", [&](const auto & node) { return make<Polyline>(node, scope); }),
-      std::make_pair("Clothoid", [&](const auto & node) { return unspecified;                 }),
-      std::make_pair(   "Nurbs", [&](const auto & node) { return unspecified;                 })))
-// clang-format on
+Polyline::Polyline(const pugi::xml_node & node, Scope & scope)
+// : vertex()
 {
 }
 }  // namespace syntax
