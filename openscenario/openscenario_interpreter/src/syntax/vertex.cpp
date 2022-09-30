@@ -12,33 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__POLYLINE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__POLYLINE_HPP_
-
-#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/vertex.hpp>
-#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Polyline 1.2 -----------------------------------------------------------
- *
- *  <xsd:complexType name="Polyline">
- *    <xsd:sequence>
- *      <xsd:element name="Vertex" type="Vertex" minOccurs="2" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct Polyline
+Vertex::Vertex(const pugi::xml_node & node, Scope & scope)
+: time(readAttribute<Double>("time", node, scope)),
+  position(readElement<Position>("Position", node, scope))
 {
-  const std::list<Vertex> vertex;
-
-  explicit Polyline(const pugi::xml_node &, Scope &);
-};
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__POLYLINE_HPP_
