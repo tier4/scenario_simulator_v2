@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/catalog_reference.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/trajectory.hpp>
-#include <openscenario_interpreter/syntax/trajectory_ref.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-TrajectoryRef::TrajectoryRef(const pugi::xml_node & node, Scope & scope)
-// clang-format off
-: trajectory(
-    choice(node,
-      std::make_pair(      "Trajectory", [&](const auto & node) { return                               make<Trajectory>(node, scope); }),
-      std::make_pair("CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make            (node       ); })))
-// clang-format on
+Trajectory::Trajectory(const pugi::xml_node & node, Scope & scope)
+: closed(readAttribute<Boolean>("closed", node, scope)),
+  name(readAttribute<String>("name", node, scope)),
+  parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, scope))
 {
 }
 }  // namespace syntax

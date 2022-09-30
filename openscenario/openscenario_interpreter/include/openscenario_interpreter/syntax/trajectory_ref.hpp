@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- FollowTrajectoryAction 1.2 ---------------------------------------------
+/* ---- TrajectoryRef 1.2 ------------------------------------------------------
  *
  *  <xsd:complexType name="TrajectoryRef">
  *    <xsd:choice>
