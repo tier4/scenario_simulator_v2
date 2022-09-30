@@ -43,27 +43,27 @@ public:
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
     -> void
   {
-      validateAvailability();
+    validateAvailability();
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
-        if (const auto & service_call_result = callWithTimeoutValidation(request)) {
-            if (const auto &service_call_status = service_call_result->get()->status;
-                    service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
-                RCLCPP_INFO_STREAM(
-                        logger, service_name << " service request has been accepted "
-                                             << (service_call_status.message.empty()
-                                                 ? "."
-                                                 : " (" + service_call_status.message + ")."));
-                return;
-            } else {
-                RCLCPP_ERROR_STREAM(
-                        logger, service_name << " service request was accepted, but ResponseStatus is FAILURE "
-                                             << (service_call_status.message.empty()
-                                                 ? ""
-                                                 : " (" + service_call_status.message + ")"));
-            }
+      if (const auto & service_call_result = callWithTimeoutValidation(request)) {
+        if (const auto & service_call_status = service_call_result->get()->status;
+            service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
+          RCLCPP_INFO_STREAM(
+            logger, service_name << " service request has been accepted "
+                                 << (service_call_status.message.empty()
+                                       ? "."
+                                       : " (" + service_call_status.message + ")."));
+          return;
+        } else {
+          RCLCPP_ERROR_STREAM(
+            logger, service_name << " service request was accepted, but ResponseStatus is FAILURE "
+                                 << (service_call_status.message.empty()
+                                       ? ""
+                                       : " (" + service_call_status.message + ")"));
         }
+      }
     }
-      throw common::AutowareError(
+    throw common::AutowareError(
       "Requested the service ", service_name, " ", attempts_count,
       " times, but was not successful.");
   }
