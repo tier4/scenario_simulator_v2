@@ -13,17 +13,22 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/trajectory.hpp>
+#include <openscenario_interpreter/syntax/shape.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Trajectory::Trajectory(const pugi::xml_node & node, Scope & scope)
-: closed(readAttribute<Boolean>("closed", node, scope)),
-  name(readAttribute<String>("name", node, scope)),
-  parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, scope)),
-  shape(readElement<Shape>("Shape", node, scope))
+Shape::Shape(const pugi::xml_node & node, Scope & scope)
+// clang-format off
+: ComplexType(
+    choice(node
+      // std::make_pair("Polyline", [&](const auto & node) { return make<Polyline>(node, scope); }),
+      // std::make_pair("Clothoid", [&](const auto & node) { return make<Clothoid>(node, scope); }),
+      // std::make_pair(   "Nurbs", [&](const auto & node) { return make<   Nurbs>(node, scope); })
+      )
+    )
+// clang-format on
 {
 }
 }  // namespace syntax

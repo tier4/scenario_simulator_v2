@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
+#include <openscenario_interpreter/syntax/shape.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
@@ -45,7 +46,7 @@ struct Trajectory
 
   const ParameterDeclarations parameter_declarations;
 
-  // const Shape shape;
+  const Shape shape;
 
   explicit Trajectory(const pugi::xml_node &, Scope &);
 };
