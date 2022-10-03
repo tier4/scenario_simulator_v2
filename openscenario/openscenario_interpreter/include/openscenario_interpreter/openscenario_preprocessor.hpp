@@ -26,7 +26,6 @@
 
 namespace openscenario_interpreter
 {
-
 struct ScenarioInfo
 {
   ScenarioInfo() {}
