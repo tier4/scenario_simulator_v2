@@ -168,7 +168,7 @@ class ScenarioTestRunner(LifecycleController):
 
         # post to preprocessor
         for xosc_scenario in xosc_scenarios:
-            if(self.post_scenarios_to_preprocessor(xosc_scenario)):
+            if self.post_scenarios_to_preprocessor(xosc_scenario):
                 pass
                 # TODO : implement fetch derived scenario loop
                 # preprocessed_scenarios = []
@@ -240,9 +240,10 @@ class ScenarioTestRunner(LifecycleController):
     # def __del__(self):
     #     pass
 
-    def post_scenario_to_preprocessor(self, scenario : Scenario):
+    def post_scenario_to_preprocessor(self, scenario: Scenario):
         # TODO : call `load` service and check response status
         pass
+
 
 def main(args=None):
     rclpy.init(args=args)
