@@ -219,6 +219,8 @@ class ScenarioTestRunner(LifecycleController):
             else:
                 exit(1)
 
+        self.shutdown()
+
     def run_preprocessed_scenarios(self, scenarios: List[Scenario]):
         """
         Run all given scenarios.
@@ -262,8 +264,6 @@ class ScenarioTestRunner(LifecycleController):
                     self.spin()
 
                 self.cleanup_node()
-
-            self.shutdown()
 
         except KeyboardInterrupt:
             self.get_logger().warn("KeyboardInterrupt")
