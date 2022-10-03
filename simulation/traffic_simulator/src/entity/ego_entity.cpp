@@ -171,7 +171,7 @@ auto EgoEntity::asAutoware() const -> concealer::Autoware &
   return *autoware;
 }
 
-auto EgoEntity::getCurrentAction() const -> const std::string
+auto EgoEntity::getCurrentAction() const -> std::string
 {
   const auto state = autoware->getAutowareStateName();
   return state.empty() ? "Launching" : state;

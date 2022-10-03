@@ -59,7 +59,7 @@ auto VehicleEntity::getBoundingBox() const -> const traffic_simulator_msgs::msg:
   return parameters.bounding_box;
 }
 
-auto VehicleEntity::getCurrentAction() const -> const std::string
+auto VehicleEntity::getCurrentAction() const -> std::string
 {
   if (not npc_logic_started_) {
     return "waiting";

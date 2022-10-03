@@ -110,7 +110,7 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
-  const std::string getCurrentAction() const override
+  std::string getCurrentAction() const override
   {
     if (!npc_logic_started_) {
       return "waiting";

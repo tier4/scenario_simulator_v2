@@ -29,7 +29,7 @@ public:
     const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params);
   void onUpdate(double, double) override;
   auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox override;
-  auto getCurrentAction() const -> const std::string override;
+  auto getCurrentAction() const -> std::string override;
   auto getEntityTypename() const -> const std::string & override
   {
     static const std::string result = "VehicleEntity";

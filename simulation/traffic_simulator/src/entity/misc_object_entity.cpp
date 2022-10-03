@@ -42,7 +42,7 @@ auto MiscObjectEntity::getBoundingBox() const -> const traffic_simulator_msgs::m
   return params_.bounding_box;
 }
 
-auto MiscObjectEntity::getCurrentAction() const -> const std::string
+auto MiscObjectEntity::getCurrentAction() const -> std::string
 {
   if (!npc_logic_started_) {
     return "waiting";

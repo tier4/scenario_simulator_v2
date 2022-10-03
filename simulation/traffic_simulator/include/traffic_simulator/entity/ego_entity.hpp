@@ -86,7 +86,7 @@ public:
 
   auto asAutoware() const -> concealer::Autoware & override;
 
-  auto getCurrentAction() const -> const std::string override;
+  auto getCurrentAction() const -> std::string override;
 
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 

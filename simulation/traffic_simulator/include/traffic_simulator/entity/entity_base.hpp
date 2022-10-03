@@ -64,7 +64,7 @@ public:
 
   virtual auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox = 0;
 
-  virtual auto getCurrentAction() const -> const std::string = 0;
+  virtual auto getCurrentAction() const -> std::string = 0;
 
   /*   */ auto getDistanceToLaneBound() -> double;
 
