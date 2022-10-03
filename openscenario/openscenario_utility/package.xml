@@ -3,7 +3,7 @@
 <package format="3">
   <name>openscenario_utility</name>
   <version>0.6.6</version>
-  <description>Utility tools for ASAM OpenSCENARIO 1.0.0</description>
+  <description>Utility tools for ASAM OpenSCENARIO 1.1.0</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
   <depend>python3-xmlschema</depend>
