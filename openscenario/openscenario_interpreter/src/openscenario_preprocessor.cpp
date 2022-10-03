@@ -54,7 +54,6 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
         response->path = "no output";
       } else {
         *response = preprocessed_scenarios.front().getDeriveResponse();
-        response->expect = preprocessed_scenarios.size();
         preprocessed_scenarios.pop_front();
       }
     });
@@ -79,13 +78,13 @@ void Preprocessor::preprocessScenario(ScenarioInfo & scenario)
 {
   // this function doesn't support ParameterValueDistribution now
   if (validateXOSC(scenario.path)) {
-    //      auto script = OpenScenario(scenario.path);
+    //  auto script = OpenScenario(scenario.path);
     //  if (hasElement("ParameterValueDistribution", scenario.path)) {
-    //      assert( validateXOSC( linked scenario.path );
-    //  auto derive_server = createDeriveServer();
-    //      parameters = evaluate( parameter_value_distribution( given scenario ) )
-    //      for( auto derived_scenario : embedParameter( linked scenario, parameters)
-    //        preprocessed_scenarios.emplace_back({derived_scenario, derive_server});
+    //    assert( validateXOSC( linked scenario.path );
+    //    auto derive_server = createDeriveServer();
+    //    parameters = evaluate( parameter_value_distribution( given scenario ) )
+    //    for( auto derived_scenario : embedParameter( linked scenario, parameters)
+    //      preprocessed_scenarios.emplace_back({derived_scenario, derive_server});
     preprocessed_scenarios.emplace_back(scenario);  // temporary code
   } else {
     throw common::Error("the scenario file is not valid. Please check your scenario");
