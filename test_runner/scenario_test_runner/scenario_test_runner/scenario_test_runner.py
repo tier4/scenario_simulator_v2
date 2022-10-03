@@ -160,12 +160,6 @@ class ScenarioTestRunner(LifecycleController):
             self.current_workflow.scenarios, self.output_directory
         )
 
-        is_valid = XOSCValidator(False)
-
-        for each in converted_scenarios:
-            if not is_valid(each.path):
-                exit(1)
-
         self.run_scenarios(converted_scenarios)
 
     def spin(self):
@@ -185,10 +179,10 @@ class ScenarioTestRunner(LifecycleController):
                 else:
                     time.sleep(self.SLEEP_RATE)
 
-    def run_scenario(self, scenario: Scenario):
+    def run_scenarios(self, scenarios: List[Scenario]):
 
         # convert t4v2/xosc to xosc
-        xosc_scenarios = convert_scenarios_to_xosc([scenario], self.output_directory)
+        xosc_scenarios = convert_scenarios_to_xosc(scenarios, self.output_directory)
 
         # post to preprocessor
         for xosc_scenario in xosc_scenarios:
@@ -352,12 +346,12 @@ def main(args=None):
     if args.scenario != Path("/dev/null"):
         print(str(substitute_ros_package(args.scenario).resolve()))
 
-        test_runner.run_scenario(
-            Scenario(
+        test_runner.run_scenarios(
+            [Scenario(
                 substitute_ros_package(args.scenario).resolve(),
                 Expect["success"],
                 args.global_frame_rate,
-            )
+            )]
         )
 
     elif args.workflow != Path("/dev/null"):
