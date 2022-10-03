@@ -25,7 +25,7 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
 {
   using openscenario_interpreter_msgs::srv::PreprocessorLoad;
   load_server = create_service<PreprocessorLoad>(
-    "load",
+    "~/load",
     [this](
       const PreprocessorLoad::Request::SharedPtr request,
       PreprocessorLoad::Response::SharedPtr response) -> void {
@@ -45,7 +45,7 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
   using openscenario_interpreter_msgs::srv::PreprocessorDerive;
 
   derive_server = create_service<PreprocessorDerive>(
-    "derive",
+    "~/derive",
     [this](
       [[maybe_unused]] const PreprocessorDerive::Request::SharedPtr request,
       PreprocessorDerive::Response::SharedPtr response) -> void {
@@ -62,7 +62,7 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
   using openscenario_interpreter_msgs::srv::PreprocessorCheckDerivationCompleted;
 
   check_server = create_service<PreprocessorCheckDerivationCompleted>(
-    "check",
+    "~/check",
     [this](
       [[maybe_unused]] const PreprocessorCheckDerivationCompleted::Request::SharedPtr request,
       PreprocessorCheckDerivationCompleted::Response::SharedPtr response) -> void {
