@@ -24,45 +24,72 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
 : rclcpp::Node("preprocessor", options)
 {
   using openscenario_interpreter_msgs::srv::PreprocessorLoad;
-  auto handle_load = [this](
-                       const PreprocessorLoad::Request::SharedPtr request,
-                       PreprocessorLoad::Response::SharedPtr response) -> void {
-    auto lock = std::lock_guard(preprocessed_scenarios_mutex);
-    try {
-      preprocessScenario(ScenarioInfo(*request));
-
-    } catch (...) {
-      response->has_succeeded = false;
-      response->message = "Something went wrong";
-    }
-  };
-  load_server = create_service<PreprocessorLoad>("load", handle_load);
+  load_server = create_service<PreprocessorLoad>(
+    "load",
+    [this](
+      const PreprocessorLoad::Request::SharedPtr request,
+      PreprocessorLoad::Response::SharedPtr response) -> void {
+      auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+      try {
+        auto s = ScenarioInfo(*request);
+        preprocessScenario(s);
+        response->has_succeeded = true;
+        response->message = "success";
+      } catch (std::exception & e) {
+        response->has_succeeded = false;
+        response->message = e.what();
+        preprocessed_scenarios.clear();
+      }
+    });
 
   using openscenario_interpreter_msgs::srv::PreprocessorDerive;
-  auto handle_derive = [this](
-                         const PreprocessorDerive::Request::SharedPtr request,
-                         PreprocessorDerive::Response::SharedPtr response) -> void {
-    auto lock = std::lock_guard(preprocessed_scenarios_mutex);
-    if (preprocessed_scenarios.empty()) {
-      response->path = "";
-    } else {
-      *response = preprocessed_scenarios.front().getDeriveResponse();
-      preprocessed_scenarios.pop();
-    }
-  };
 
-  derive_server = create_service<PreprocessorDerive>("derive", handle_derive);
+  derive_server = create_service<PreprocessorDerive>(
+    "derive",
+    [this](
+      [[maybe_unused]] const PreprocessorDerive::Request::SharedPtr request,
+      PreprocessorDerive::Response::SharedPtr response) -> void {
+      auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+      if (preprocessed_scenarios.empty()) {
+        response->path = "no output";
+      } else {
+        *response = preprocessed_scenarios.front().getDeriveResponse();
+        response->expect = preprocessed_scenarios.size();
+        preprocessed_scenarios.pop_front();
+      }
+    });
 
   using openscenario_interpreter_msgs::srv::PreprocessorCheckDerivationCompleted;
-  auto handle_check =
+
+  check_server = create_service<PreprocessorCheckDerivationCompleted>(
+    "check",
     [this](
       [[maybe_unused]] const PreprocessorCheckDerivationCompleted::Request::SharedPtr request,
       PreprocessorCheckDerivationCompleted::Response::SharedPtr response) -> void {
-    auto lock = std::lock_guard(preprocessed_scenarios_mutex);
-    response->derivation_completed = (preprocessed_scenarios.empty());
-  };
-
-  check_server = create_service<PreprocessorCheckDerivationCompleted>("check", handle_check);
+      auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+      response->derivation_completed = (preprocessed_scenarios.empty());
+    });
+}
+bool Preprocessor::validateXOSC(const std::string file_name)
+{
+  return concealer::dollar("ros2 run openscenario_utility validate-xosc " + file_name)
+           .find("All xosc files given are standard compliant.") != std::string::npos;
+}
+void Preprocessor::preprocessScenario(ScenarioInfo & scenario)
+{
+  // this function doesn't support ParameterValueDistribution now
+  if (validateXOSC(scenario.path)) {
+    //      auto script = OpenScenario(scenario.path);
+    //  if (hasElement("ParameterValueDistribution", scenario.path)) {
+    //      assert( validateXOSC( linked scenario.path );
+    //  auto derive_server = createDeriveServer();
+    //      parameters = evaluate( parameter_value_distribution( given scenario ) )
+    //      for( auto derived_scenario : embedParameter( linked scenario, parameters)
+    //        preprocessed_scenarios.emplace_back({derived_scenario, derive_server});
+    preprocessed_scenarios.emplace_back(scenario);  // temporary code
+  } else {
+    throw common::Error("the scenario file is not valid. Please check your scenario");
+  }
 }
 }  // namespace openscenario_interpreter
 

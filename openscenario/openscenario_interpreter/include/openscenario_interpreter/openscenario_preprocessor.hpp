@@ -16,12 +16,12 @@
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_PREPROCESSOR_HPP_
 
 #include <concealer/execute.hpp>
+#include <deque>
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter_msgs/srv/preprocessor_check_derivation_completed.hpp>
 #include <openscenario_interpreter_msgs/srv/preprocessor_derive.hpp>
 #include <openscenario_interpreter_msgs/srv/preprocessor_load.hpp>
-#include <queue>
 #include <rclcpp/rclcpp.hpp>
 
 namespace openscenario_interpreter
@@ -29,6 +29,7 @@ namespace openscenario_interpreter
 
 struct ScenarioInfo
 {
+  ScenarioInfo() {}
   ScenarioInfo(openscenario_interpreter_msgs::srv::PreprocessorLoad::Request & load_request)
   {
     path = load_request.path;
@@ -55,28 +56,9 @@ public:
   explicit Preprocessor(const rclcpp::NodeOptions & options);
 
 private:
-  void preprocessScenario(const ScenarioInfo & scenario)
-  {
-    // this function doesn't support ParameterValueDistribution now
-    assert(validateXOSC(scenario.path));
-    // auto script = OpenScenario(scenario.path);
-    //  if (hasElement("ParameterValueDistribution", scenario.path)) {
-    //      assert( validateXOSC( linked scenario.path );
-    //  auto derive_server = createDeriveServer();
-    //      parameters = evaluate( parameter_value_distribution( given scenario ) )
-    //      for( auto derived_scenario : embedParameter( linked scenario, parameters)
-    //        preprocessed_scenarios.emplace_back({derived_scenario, derive_server});
-    // } else {
-    preprocessed_scenarios.emplace(scenario);
-    // }
-  }
+  void preprocessScenario(ScenarioInfo & scenario);
 
-  [[nodiscard]] bool validateXOSC(const std::string file_name)
-  {
-    return not(
-      concealer::dollar(" ros2 run openscenario_utility validate-xosc " + file_name).find("NG") ==
-      std::string::npos);
-  }
+  [[nodiscard]] bool validateXOSC(const std::string file_name);
 
   rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorLoad>::SharedPtr load_server;
 
@@ -85,7 +67,7 @@ private:
   rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorCheckDerivationCompleted>::
     SharedPtr check_server;
 
-  std::queue<ScenarioInfo> preprocessed_scenarios;
+  std::deque<ScenarioInfo> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
 };
