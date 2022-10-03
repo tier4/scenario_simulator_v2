@@ -49,7 +49,7 @@ public:
 
   const std::string name;
 
-  EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype);
+  explicit EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype &);
 
   virtual ~EntityBase() = default;
 
@@ -158,9 +158,9 @@ public:
 
   virtual void requestWalkStraight();
 
-  virtual void setAccelerationLimit(double acceleration);
+  virtual void setAccelerationLimit(double acceleration) = 0;
 
-  virtual void setDecelerationLimit(double deceleration);
+  virtual void setDecelerationLimit(double deceleration) = 0;
 
   virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) = 0;
 

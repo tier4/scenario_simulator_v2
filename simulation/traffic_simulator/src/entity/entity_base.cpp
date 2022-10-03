@@ -37,7 +37,6 @@ EntityBase::EntityBase(
   npc_logic_started_(false),
   entity_subtype_(subtype)
 {
-  status_ = boost::none;
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -484,18 +483,6 @@ void EntityBase::requestSpeedChange(
 void EntityBase::requestWalkStraight()
 {
   THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
-}
-
-void EntityBase::setAccelerationLimit(double)
-{
-  THROW_SIMULATION_ERROR(
-    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
-}
-
-void EntityBase::setDecelerationLimit(double)
-{
-  THROW_SIMULATION_ERROR(
-    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
 }
 
 void EntityBase::setEntityTypeList(

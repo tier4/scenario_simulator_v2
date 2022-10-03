@@ -99,6 +99,10 @@ public:
 
   void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) override;
 
+  void setAccelerationLimit(double) override {}
+
+  void setDecelerationLimit(double) override {}
+
 private:
   const traffic_simulator_msgs::msg::MiscObjectParameters params_;
 };
