@@ -7,6 +7,9 @@
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
   <depend>python3-xmlschema</depend>
+  <depend>python3-yaml</depend>
+  <depend>python3-numpy</depend>
+  <depend>python3-setuptools</depend>
   <export>
     <build_type>ament_python</build_type>
   </export>
