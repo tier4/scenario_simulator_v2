@@ -59,15 +59,15 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
       }
     });
 
-  using openscenario_interpreter_msgs::srv::PreprocessorCheckDerivationCompleted;
+  using openscenario_interpreter_msgs::srv::PreprocessorCheckDerivativeRemained;
 
-  check_server = create_service<PreprocessorCheckDerivationCompleted>(
+  check_server = create_service<PreprocessorCheckDerivativeRemained>(
     "~/check",
     [this](
-      [[maybe_unused]] const PreprocessorCheckDerivationCompleted::Request::SharedPtr request,
-      PreprocessorCheckDerivationCompleted::Response::SharedPtr response) -> void {
+      [[maybe_unused]] const PreprocessorCheckDerivativeRemained::Request::SharedPtr request,
+      PreprocessorCheckDerivativeRemained::Response::SharedPtr response) -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
-      response->derivation_completed = (preprocessed_scenarios.empty());
+      response->derivative_remained = not preprocessed_scenarios.empty();
     });
 }
 bool Preprocessor::validateXOSC(const std::string file_name)

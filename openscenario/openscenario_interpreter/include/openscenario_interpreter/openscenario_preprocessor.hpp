@@ -19,7 +19,7 @@
 #include <deque>
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_interpreter_msgs/srv/preprocessor_check_derivation_completed.hpp>
+#include <openscenario_interpreter_msgs/srv/preprocessor_check_derivative_remained.hpp>
 #include <openscenario_interpreter_msgs/srv/preprocessor_derive.hpp>
 #include <openscenario_interpreter_msgs/srv/preprocessor_load.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -64,7 +64,7 @@ private:
 
   rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorDerive>::SharedPtr derive_server;
 
-  rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorCheckDerivationCompleted>::
+  rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorCheckDerivativeRemained>::
     SharedPtr check_server;
 
   std::deque<ScenarioInfo> preprocessed_scenarios;
