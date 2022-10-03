@@ -56,7 +56,7 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
   using openscenario_interpreter_msgs::srv::PreprocessorCheckDerivationCompleted;
   auto handle_check =
     [this](
-      const PreprocessorCheckDerivationCompleted::Request::SharedPtr request,
+      [[maybe_unused]] const PreprocessorCheckDerivationCompleted::Request::SharedPtr request,
       PreprocessorCheckDerivationCompleted::Response::SharedPtr response) -> void {
     auto lock = std::lock_guard(preprocessed_scenarios_mutex);
     response->derivation_completed = (preprocessed_scenarios.empty());

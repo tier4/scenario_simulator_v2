@@ -101,7 +101,7 @@ CatalogReference::CatalogReference(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto CatalogReference::make(const pugi::xml_node & node) -> const Object
+auto CatalogReference::make([[maybe_unused]] const pugi::xml_node & node) -> const Object
 {
   using ::openscenario_interpreter::make;
   std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
