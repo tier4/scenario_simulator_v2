@@ -29,7 +29,7 @@ class XOSCValidator:
         self.verbose = verbose
 
         self.schema = xmlschema.XMLSchema(
-            resource_string(__name__, "resources/OpenSCENARIO-1.1.xsd").decode("utf-8")
+            resource_string(__name__, "resources/OpenSCENARIO-1.2.xsd").decode("utf-8")
         )
 
     def __call__(self, xosc: Path) -> bool:
