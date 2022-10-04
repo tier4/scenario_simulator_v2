@@ -16,7 +16,7 @@ setup(
     author_email="tatsuya.yamasaki@tier4.jp",
     maintainer="Tatsuya Yamasaki",
     maintainer_email="tatsuya.yamasaki@tier4.jp",
-    description="Utility tools for ASAM OpenSCENARIO 1.1.0",
+    description="Utility tools for ASAM OpenSCENARIO 1.2.0",
     packages=find_packages(),
     install_requires=["PyYAML", "numpy", "setuptools", "xmlschema"],
     include_package_data=True,

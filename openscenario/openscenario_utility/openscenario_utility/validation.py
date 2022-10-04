@@ -53,7 +53,7 @@ class XOSCValidator:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Validate if the XOSC file complies with the ASAM OpenSCENARIO 1.1.0 standard"
+        description="Validate if the XOSC file complies with the ASAM OpenSCENARIO 1.2.0 standard"
     )
 
     parser.add_argument("paths", metavar="*.xosc", type=Path, nargs="+")
