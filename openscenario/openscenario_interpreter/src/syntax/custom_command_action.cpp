@@ -95,6 +95,16 @@ auto CustomCommandAction::node() -> rclcpp::Node &
   return node;
 }
 
+auto CustomCommandAction::printParameter(
+  const std::vector<std::string> & parameters, const Scope & scope) -> int
+{
+  for (auto && parameter : parameters) {
+    std::cout << parameter << " = " << scope.ref(parameter) << std::endl;
+  }
+
+  return parameters.size();
+}
+
 auto CustomCommandAction::publisher()
   -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &
 {
@@ -129,6 +139,7 @@ auto CustomCommandAction::start() const -> void
       std::make_pair("debugSegmentationFault", debugSegmentationFault),  // DEPRECATED
       std::make_pair("exitFailure", exitFailure),
       std::make_pair("exitSuccess", exitSuccess),
+      std::make_pair("printParameter", printParameter),
       std::make_pair("test", test),
     };
 
@@ -145,16 +156,16 @@ auto CustomCommandAction::start() const -> void
   }
 }
 
-auto CustomCommandAction::test(const std::vector<std::string> & args, const Scope &) -> int
+auto CustomCommandAction::test(const std::vector<std::string> & values, const Scope &) -> int
 {
   std::cout << "test" << std::endl;
 
-  for (auto iter = std::cbegin(args); iter != std::cend(args); ++iter) {
-    std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter << "\n";
+  for (auto iter = std::cbegin(values); iter != std::cend(values); ++iter) {
+    std::cout << "  values[" << std::distance(std::cbegin(values), iter) << "] = " << *iter
+              << std::endl;
   }
 
-  return args.size();
+  return values.size();
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
