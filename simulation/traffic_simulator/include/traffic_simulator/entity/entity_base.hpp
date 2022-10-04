@@ -181,8 +181,6 @@ public:
 
   /*   */ void updateStandStillDuration(const double step_time);
 
-  const std::string type;
-
   const std::string name;
 
   bool verbose;
