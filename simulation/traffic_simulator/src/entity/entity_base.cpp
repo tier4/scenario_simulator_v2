@@ -219,10 +219,7 @@ auto EntityBase::getStatus() const -> traffic_simulator_msgs::msg::EntityStatus
   }
 }
 
-auto EntityBase::getStandStillDuration() const -> boost::optional<double>
-{
-  return stand_still_duration_;
-}
+auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
 
 auto EntityBase::getVehicleParameters() const
   -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
@@ -528,24 +525,14 @@ void EntityBase::updateEntityStatusTimestamp(const double current_time)
   }
 }
 
-void EntityBase::updateStandStillDuration(const double step_time)
+auto EntityBase::updateStandStillDuration(const double step_time) -> double
 {
-  if (!npc_logic_started_) {
-    stand_still_duration_ = 0;
-    return;
-  }
-  if (!status_) {
-    stand_still_duration_ = boost::none;
+  if (
+    npc_logic_started_ and status_ and
+    std::abs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
+    return stand_still_duration_ += step_time;
   } else {
-    if (!stand_still_duration_) {
-      stand_still_duration_ = 0;
-    }
-    if (
-      std::fabs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
-      stand_still_duration_ = step_time + stand_still_duration_.get();
-    } else {
-      stand_still_duration_ = 0;
-    }
+    return stand_still_duration_ = 0.0;
   }
 }
 }  // namespace entity

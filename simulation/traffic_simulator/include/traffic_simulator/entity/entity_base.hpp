@@ -55,7 +55,7 @@ public:
 
   virtual void cancelRequest();
 
-  virtual auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
+  /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 
   virtual auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox = 0;
 
@@ -104,7 +104,7 @@ public:
 
   /*   */ auto getStatus() const -> traffic_simulator_msgs::msg::EntityStatus;
 
-  /*   */ auto getStandStillDuration() const -> boost::optional<double>;
+  /*   */ auto getStandStillDuration() const -> double;
 
   /*   */ auto getVehicleParameters() const
     -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>;
@@ -179,7 +179,7 @@ public:
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
-  /*   */ void updateStandStillDuration(const double step_time);
+  /*   */ auto updateStandStillDuration(const double step_time) -> double;
 
   const std::string name;
 
@@ -200,7 +200,8 @@ protected:
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
   boost::optional<double> linear_jerk_;
-  boost::optional<double> stand_still_duration_;
+
+  double stand_still_duration_ = 0.0;
 
   boost::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
