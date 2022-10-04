@@ -31,8 +31,8 @@ namespace entity
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
 : name(name),
+  verbose(true),
   status_(boost::none),
-  verbose_(true),
   visibility_(true),
   npc_logic_started_(false),
   entity_subtype_(subtype)
@@ -206,10 +206,7 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
   }
 }
 
-auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose
-{
-  return getStatus().pose;
-}
+auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
 
 auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
   -> geometry_msgs::msg::Pose
@@ -525,8 +522,6 @@ void EntityBase::setTrafficLightManager(
 }
 
 auto EntityBase::setVelocityLimit(double) -> void {}
-
-auto EntityBase::setVerbose(const bool verbose) -> bool { return verbose_ = verbose; }
 
 auto EntityBase::setVisibility(const bool visibility) -> bool { return visibility_ = visibility; }
 

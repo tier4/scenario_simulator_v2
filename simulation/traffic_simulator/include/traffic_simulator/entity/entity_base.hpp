@@ -45,15 +45,10 @@ namespace entity
 class EntityBase
 {
 public:
-  const std::string type;
-
-  const std::string name;
-
   explicit EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype &);
 
   virtual ~EntityBase() = default;
 
-public:
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray &);
 
   virtual auto asAutoware() const -> concealer::Autoware &;
@@ -144,13 +139,12 @@ public:
     const lane_change::Constraint &);
 
   virtual void requestSpeedChange(
-    const double target_speed, const speed_change::Transition transition,
-    const speed_change::Constraint constraint, const bool continuous);
+    const double target_speed, const speed_change::Transition, const speed_change::Constraint,
+    const bool continuous);
 
   virtual void requestSpeedChange(
-    const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, const speed_change::Constraint constraint,
-    const bool continuous);
+    const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
+    const speed_change::Constraint, const bool continuous);
 
   virtual void requestSpeedChange(double target_speed, bool continuous);
 
@@ -179,8 +173,6 @@ public:
 
   virtual auto setVelocityLimit(double) -> void;
 
-  /*   */ auto setVerbose(const bool verbose) -> bool;
-
   /*   */ auto setVisibility(const bool visibility) -> bool;
 
   virtual void startNpcLogic();
@@ -193,6 +185,12 @@ public:
 
   /*   */ void updateStandStillDuration(const double step_time);
 
+  const std::string type;
+
+  const std::string name;
+
+  bool verbose;
+
 protected:
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> next_waypoint_;
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_;
@@ -204,7 +202,6 @@ protected:
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 
-  bool verbose_;
   bool visibility_;
   bool npc_logic_started_;
 
