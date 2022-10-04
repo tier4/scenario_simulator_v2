@@ -30,11 +30,7 @@ namespace entity
 {
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-: name(name),
-  verbose(true),
-  status_(boost::none),
-  npc_logic_started_(false),
-  entity_subtype_(subtype)
+: name(name), subtype(subtype), verbose(true), status_(boost::none), npc_logic_started_(false)
 {
 }
 
@@ -184,11 +180,6 @@ auto EntityBase::getEntityStatusBeforeUpdate() const
   return status_before_update_;
 }
 
-auto EntityBase::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  return entity_type_;
-}
-
 auto EntityBase::getLinearJerk() const -> boost::optional<double> { return linear_jerk_; }
 
 auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
@@ -222,8 +213,8 @@ auto EntityBase::getStatus() const -> traffic_simulator_msgs::msg::EntityStatus
   } else {
     auto status = status_.get();
     status.bounding_box = getBoundingBox();
-    status.subtype = entity_subtype_;
-    status.type = entity_type_;
+    status.subtype = subtype;
+    status.type = getEntityType();
     return status;
   }
 }

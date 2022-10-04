@@ -84,7 +84,7 @@ public:
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus> &;
 
-  /*   */ auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &;
+  virtual auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & = 0;
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
@@ -183,6 +183,8 @@ public:
 
   const std::string name;
 
+  const traffic_simulator_msgs::msg::EntitySubtype subtype;
+
   bool verbose;
 
 protected:
@@ -201,9 +203,6 @@ protected:
 
   boost::optional<double> linear_jerk_;
   boost::optional<double> stand_still_duration_;
-
-  traffic_simulator_msgs::msg::EntityType entity_type_;
-  const traffic_simulator_msgs::msg::EntitySubtype entity_subtype_;
 
   boost::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;

@@ -30,6 +30,9 @@ public:
   void onUpdate(double, double) override;
   auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox override;
   auto getCurrentAction() const -> std::string override;
+
+  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
+
   auto getEntityTypename() const -> const std::string & override
   {
     static const std::string result = "VehicleEntity";
