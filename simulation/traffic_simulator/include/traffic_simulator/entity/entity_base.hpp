@@ -191,8 +191,6 @@ protected:
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_;
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_before_update_;
 
-  std::queue<traffic_simulator_msgs::msg::LaneletPose> waypoints_;
-
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
 
