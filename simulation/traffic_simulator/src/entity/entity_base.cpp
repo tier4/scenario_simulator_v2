@@ -128,18 +128,17 @@ auto EntityBase::getDistanceToLeftLaneBound() -> double
 
 auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double
 {
-  const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id);
-  if (bound.empty()) {
+  if (const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
-  }
-  const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
-  if (polygon.empty()) {
+  } else if (const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
+             polygon.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
       " exists and it's definition");
+  } else {
+    return math::geometry::getDistance2D(bound, polygon);
   }
-  return math::geometry::getDistance2D(bound, polygon);
 }
 
 auto EntityBase::getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
@@ -159,19 +158,18 @@ auto EntityBase::getDistanceToRightLaneBound() -> double
 
 auto EntityBase::getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double
 {
-  const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id);
-  if (bound.empty()) {
+  if (const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
-  }
-  const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
-  if (polygon.empty()) {
+  } else if (const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
+             polygon.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
       " exists and it's definition");
+  } else {
+    return math::geometry::getDistance2D(bound, polygon);
   }
-  return math::geometry::getDistance2D(bound, polygon);
 }
 
 auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
@@ -210,16 +208,14 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
 
 auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose
 {
-  const auto status = getStatus();
-  return status.pose;
+  return getStatus().pose;
 }
 
 auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
   -> geometry_msgs::msg::Pose
 {
-  const auto ref_status = getStatus();
   tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(ref_status.pose, ref_transform);
+  tf2::fromMsg(getStatus().pose, ref_transform);
   tf2::fromMsg(relative_pose, relative_transform);
   geometry_msgs::msg::Pose ret;
   tf2::toMsg(ref_transform * relative_transform, ret);
