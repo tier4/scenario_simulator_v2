@@ -106,8 +106,6 @@ public:
 
   /*   */ auto getStandStillDuration() const -> boost::optional<double>;
 
-  /*   */ auto getVisibility() const noexcept -> bool;
-
   /*   */ auto getVehicleParameters() const
     -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>;
 
@@ -173,8 +171,6 @@ public:
 
   virtual auto setVelocityLimit(double) -> void;
 
-  /*   */ auto setVisibility(const bool visibility) -> bool;
-
   virtual void startNpcLogic();
 
   /*   */ auto statusSet() const noexcept -> bool;
@@ -202,7 +198,6 @@ protected:
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 
-  bool visibility_;
   bool npc_logic_started_;
 
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;

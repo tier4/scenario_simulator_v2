@@ -33,7 +33,6 @@ EntityBase::EntityBase(
 : name(name),
   verbose(true),
   status_(boost::none),
-  visibility_(true),
   npc_logic_started_(false),
   entity_subtype_(subtype)
 {
@@ -236,8 +235,6 @@ auto EntityBase::getStandStillDuration() const -> boost::optional<double>
 {
   return stand_still_duration_;
 }
-
-auto EntityBase::getVisibility() const noexcept -> bool { return visibility_; }
 
 auto EntityBase::getVehicleParameters() const
   -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
@@ -522,8 +519,6 @@ void EntityBase::setTrafficLightManager(
 }
 
 auto EntityBase::setVelocityLimit(double) -> void {}
-
-auto EntityBase::setVisibility(const bool visibility) -> bool { return visibility_ = visibility; }
 
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
