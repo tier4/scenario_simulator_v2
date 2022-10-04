@@ -48,10 +48,7 @@ auto EntityBase::asAutoware() const -> concealer::Autoware &
     " is not the entity controlled by Autoware.");
 }
 
-void EntityBase::cancelRequest()
-{
-  THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support cancel request");
-}
+void EntityBase::cancelRequest() {}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
@@ -255,8 +252,7 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const traffic_simulator::lane_change::Constraint & constraint)
 {
-  auto param = traffic_simulator::lane_change::Parameter(target, trajectory_shape, constraint);
-  requestLaneChange(param);
+  requestLaneChange(lane_change::Parameter(target, trajectory_shape, constraint));
 }
 
 void EntityBase::requestLaneChange(
@@ -513,9 +509,9 @@ bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
 }
 
 void EntityBase::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
+  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & traffic_light_manager)
 {
-  traffic_light_manager_ = ptr;
+  traffic_light_manager_ = traffic_light_manager;
 }
 
 auto EntityBase::setVelocityLimit(double) -> void {}

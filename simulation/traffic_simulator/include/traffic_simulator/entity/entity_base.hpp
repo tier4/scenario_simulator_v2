@@ -188,7 +188,6 @@ public:
   bool verbose;
 
 protected:
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> next_waypoint_;
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_;
   boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_before_update_;
 
@@ -196,7 +195,6 @@ protected:
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
-  std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 
   bool npc_logic_started_;
 
@@ -206,7 +204,6 @@ protected:
   boost::optional<double> linear_jerk_;
   boost::optional<double> stand_still_duration_;
 
-  visualization_msgs::msg::MarkerArray current_marker_;
   traffic_simulator_msgs::msg::EntityType entity_type_;
   const traffic_simulator_msgs::msg::EntitySubtype entity_subtype_;
 
