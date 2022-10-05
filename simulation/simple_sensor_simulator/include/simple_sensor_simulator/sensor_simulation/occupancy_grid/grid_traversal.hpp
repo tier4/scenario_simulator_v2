@@ -18,15 +18,12 @@
 #include <cmath>
 #include <cstdint>
 #include <utility>
-
 namespace simple_sensor_simulator
 {
 class GridTraversal
 {
-  struct Index
-  {
-    int32_t x, y;
-  };
+  using Index = std::pair<int32_t, int32_t>;
+
   struct Sentinel
   {
   };
