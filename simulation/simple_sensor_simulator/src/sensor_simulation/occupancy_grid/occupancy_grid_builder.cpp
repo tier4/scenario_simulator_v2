@@ -130,7 +130,7 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
     if (minang > maxang) maxang += 2 * M_PI;
 
     size_t i = 0;
-    for (; angle(corners[i % 4]) <= minang; ++i) {
+    for (; angle(corners[i % 4]) + 2 * M_PI * (i / 4) <= minang; ++i) {
     }
     res.emplace_back(*minp);
     res.emplace_back(projection(*minp, i));
