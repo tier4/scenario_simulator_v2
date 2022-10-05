@@ -35,7 +35,6 @@
 
 #include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
 #include <boost/filesystem.hpp>
-#include <optional>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
@@ -46,6 +45,7 @@
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <map>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/data_type/data_types.hpp>

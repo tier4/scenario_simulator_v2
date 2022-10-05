@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <optional>
 #include <geometry/spline/catmull_rom_subspline.hpp>
+#include <optional>
 #include <vector>
 
 namespace math

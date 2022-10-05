@@ -17,8 +17,8 @@
 #ifndef RANDOM_TEST_RUNNER__GOAL_REACHED_METRIC_H
 #define RANDOM_TEST_RUNNER__GOAL_REACHED_METRIC_H
 
-#include <optional>
 #include <iostream>
+#include <optional>
 
 #include "geometry_msgs/msg/pose.hpp"
 #include "random_test_runner/data_types.hpp"

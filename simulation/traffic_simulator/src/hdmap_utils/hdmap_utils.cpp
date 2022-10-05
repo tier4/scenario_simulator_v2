@@ -932,8 +932,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getRightBound(std::int64_t la
   return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).rightBound());
 }
 
-std::optional<std::pair<math::geometry::HermiteCurve, double>>
-HdMapUtils::getLaneChangeTrajectory(
+std::optional<std::pair<math::geometry::HermiteCurve, double>> HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter) const
 {
@@ -982,8 +981,7 @@ HdMapUtils::getLaneChangeTrajectory(
   return std::make_pair(traj, collision_point.value());
 }
 
-std::optional<std::pair<math::geometry::HermiteCurve, double>>
-HdMapUtils::getLaneChangeTrajectory(
+std::optional<std::pair<math::geometry::HermiteCurve, double>> HdMapUtils::getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter,
   double maximum_curvature_threshold, double target_trajectory_length,

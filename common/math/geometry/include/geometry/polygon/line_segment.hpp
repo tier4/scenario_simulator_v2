@@ -15,10 +15,10 @@
 #ifndef GEOMETRY__POLYGON__LINE_SEGMENT_
 #define GEOMETRY__POLYGON__LINE_SEGMENT_
 
-#include <optional>
 #include <geometry/polygon/polygon.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <optional>
 
 namespace math
 {

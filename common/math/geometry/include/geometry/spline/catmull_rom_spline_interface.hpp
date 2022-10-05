@@ -15,9 +15,9 @@
 #ifndef GEOMETRY__SPLINE__CATMULL_ROM_SPLINE_INTERFACE_HPP_
 #define GEOMETRY__SPLINE__CATMULL_ROM_SPLINE_INTERFACE_HPP_
 
-#include <optional>
 #include <exception>
 #include <geometry_msgs/msg/point.hpp>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>

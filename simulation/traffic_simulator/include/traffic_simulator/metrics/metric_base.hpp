@@ -15,9 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__METRICS__METRIC_BASE_HPP_
 #define TRAFFIC_SIMULATOR__METRICS__METRIC_BASE_HPP_
 
-#include <optional>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>

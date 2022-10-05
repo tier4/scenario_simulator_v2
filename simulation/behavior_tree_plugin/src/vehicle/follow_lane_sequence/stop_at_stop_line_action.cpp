@@ -32,8 +32,8 @@ StopAtStopLineAction::StopAtStopLineAction(
   stopped_ = false;
 }
 
-const std::optional<traffic_simulator_msgs::msg::Obstacle>
-StopAtStopLineAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
+const std::optional<traffic_simulator_msgs::msg::Obstacle> StopAtStopLineAction::calculateObstacle(
+  const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stopline_) {
     return std::nullopt;

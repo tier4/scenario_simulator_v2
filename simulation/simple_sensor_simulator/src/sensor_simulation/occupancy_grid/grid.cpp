@@ -257,8 +257,8 @@ void Grid::addPrimitive(const std::unique_ptr<primitives::Primitive> & primitive
   for (const auto & ray : getRayToGridCorner()) {
     for (const auto & line_segment : line_segments_on_hull) {
       if (const auto intersection = ray.getIntersection2D(line_segment)) {
-        rays_to_grid_corner.emplace_back(
-          math::geometry::LineSegment(intersection.value(), ray.get2DVector(), getDiagonalLength()));
+        rays_to_grid_corner.emplace_back(math::geometry::LineSegment(
+          intersection.value(), ray.get2DVector(), getDiagonalLength()));
       }
     }
   }

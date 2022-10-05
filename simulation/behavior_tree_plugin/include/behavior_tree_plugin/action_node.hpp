@@ -56,8 +56,7 @@ public:
   std::vector<traffic_simulator_msgs::msg::EntityStatus> getRightOfWayEntities();
   std::vector<traffic_simulator_msgs::msg::EntityStatus> getRightOfWayEntities(
     const std::vector<std::int64_t> & following_lanelets);
-  std::optional<double> getYieldStopDistance(
-    const std::vector<std::int64_t> & following_lanelets);
+  std::optional<double> getYieldStopDistance(const std::vector<std::int64_t> & following_lanelets);
   std::vector<traffic_simulator_msgs::msg::EntityStatus> getOtherEntityStatus(
     std::int64_t lanelet_id);
   traffic_simulator_msgs::msg::EntityStatus stopAtEndOfRoad();

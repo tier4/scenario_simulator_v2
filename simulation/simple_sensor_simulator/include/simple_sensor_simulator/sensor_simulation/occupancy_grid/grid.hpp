@@ -15,11 +15,11 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__GRID_HPP_
 
-#include <optional>
 #include <geometry/polygon/line_segment.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <optional>
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <vector>
 

@@ -15,9 +15,9 @@
 #ifndef GEOMETRY__INTERSECTION__INTERSECTION_HPP_
 #define GEOMETRY__INTERSECTION__INTERSECTION_HPP_
 
-#include <optional>
 #include <geometry/polygon/line_segment.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <optional>
 #include <vector>
 
 namespace math

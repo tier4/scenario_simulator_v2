@@ -19,9 +19,9 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
-#include <optional>
 #include <geometry/spline/hermite_curve.hpp>
 #include <memory>
+#include <optional>
 #include <string>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <vector>

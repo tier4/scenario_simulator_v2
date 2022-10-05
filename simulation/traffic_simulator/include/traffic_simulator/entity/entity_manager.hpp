@@ -24,8 +24,8 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <optional>
 #include <memory>
+#include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
 #include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <rclcpp/rclcpp.hpp>

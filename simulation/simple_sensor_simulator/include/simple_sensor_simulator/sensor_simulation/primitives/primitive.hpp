@@ -18,9 +18,9 @@
 #include <embree3/rtcore.h>
 
 #include <algorithm>
-#include <optional>
 #include <geometry/polygon/polygon.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <optional>
 #include <string>
 #include <vector>
 

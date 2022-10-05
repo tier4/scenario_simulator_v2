@@ -112,8 +112,8 @@ BT::NodeStatus LaneChangeAction::tick()
       switch (lane_change_parameters_->constraint.type) {
         case traffic_simulator::lane_change::Constraint::Type::NONE:
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
-            hdmap_utils->toMapPose(entity_status.lanelet_pose).pose, lane_change_parameters_.value(),
-            10.0, 20.0, 1.0);
+            hdmap_utils->toMapPose(entity_status.lanelet_pose).pose,
+            lane_change_parameters_.value(), 10.0, 20.0, 1.0);
           along_pose = hdmap_utils->getAlongLaneletPose(
             entity_status.lanelet_pose,
             traffic_simulator::lane_change::Parameter::default_lanechange_distance);

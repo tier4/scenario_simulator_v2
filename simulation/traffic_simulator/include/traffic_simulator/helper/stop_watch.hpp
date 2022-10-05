@@ -15,9 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__HELPER__STOP_WATCH_HPP_
 #define TRAFFIC_SIMULATOR__HELPER__STOP_WATCH_HPP_
 
-#include <optional>
 #include <chrono>
 #include <iostream>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 
@@ -47,7 +47,8 @@ public:
   {
     if (verbose) {
       if (start_time && end_time) {
-        double elapsed = std::chrono::duration_cast<T>(end_time.value() - start_time.value()).count();
+        double elapsed =
+          std::chrono::duration_cast<T>(end_time.value() - start_time.value()).count();
         if (typeid(T) == typeid(std::chrono::microseconds)) {
           std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " microseconds"
                     << std::endl;

@@ -17,9 +17,9 @@
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <optional>
 #include <concealer/autoware.hpp>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <string>
 #include <traffic_simulator/data_type/data_types.hpp>

@@ -15,8 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 
-#include <optional>
 #include <memory>
+#include <optional>
 #include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
 #include <string>

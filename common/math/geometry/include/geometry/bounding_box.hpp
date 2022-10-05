@@ -21,9 +21,9 @@
 #include <boost/geometry/algorithms/disjoint.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
-#include <optional>
 #include <geometry/transform.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <optional>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
 

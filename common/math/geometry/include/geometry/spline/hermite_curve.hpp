@@ -18,11 +18,11 @@
 #include <gtest/gtest.h>
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <optional>
 #include <geometry/solver/polynomial_solver.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <optional>
 #include <vector>
 
 namespace math

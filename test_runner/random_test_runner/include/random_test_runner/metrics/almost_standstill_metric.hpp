@@ -17,8 +17,8 @@
 #ifndef RANDOM_TEST_RUNNER__ALMOST_STANDSTILL_METRIC_H
 #define RANDOM_TEST_RUNNER__ALMOST_STANDSTILL_METRIC_H
 
-#include <optional>
 #include <iostream>
+#include <optional>
 
 #include "random_test_runner/data_types.hpp"
 
