@@ -18,6 +18,7 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <iostream>
 #include <limits>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
 

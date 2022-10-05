@@ -38,6 +38,7 @@
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
 #include <memory>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>

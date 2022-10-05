@@ -17,6 +17,7 @@
 #include <boost/lexical_cast.hpp>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <system_error>
 #include <thread>

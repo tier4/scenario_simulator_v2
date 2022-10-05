@@ -21,6 +21,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_subspline.hpp>
 #include <memory>
+#include <optional>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator_msgs/msg/driver_model.hpp>

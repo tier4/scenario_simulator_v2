@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <geometry/intersection/intersection.hpp>
+#include <optional>
 
 namespace math
 {

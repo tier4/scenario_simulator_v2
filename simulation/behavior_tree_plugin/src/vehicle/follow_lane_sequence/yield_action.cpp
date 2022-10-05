@@ -16,6 +16,7 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
 #include <boost/algorithm/clamp.hpp>
 #include <memory>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <vector>

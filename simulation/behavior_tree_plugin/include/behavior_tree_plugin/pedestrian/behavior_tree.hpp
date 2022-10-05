@@ -25,6 +25,7 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>

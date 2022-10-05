@@ -20,6 +20,7 @@
 #include <boost/algorithm/clamp.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <memory>
+#include <optional>
 #include <string>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>

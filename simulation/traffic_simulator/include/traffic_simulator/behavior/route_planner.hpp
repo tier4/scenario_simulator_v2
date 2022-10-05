@@ -16,6 +16,7 @@
 #define BEHAVIOR_TREE_PLUGIN__ROUTE_PLANNER_HPP_
 
 #include <memory>
+#include <optional>
 #include <queue>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>

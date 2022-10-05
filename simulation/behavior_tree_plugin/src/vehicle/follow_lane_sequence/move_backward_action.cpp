@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/move_backward_action.hpp>
+#include <optional>
 
 namespace entity_behavior
 {

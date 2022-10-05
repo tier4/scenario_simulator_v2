@@ -18,6 +18,7 @@
 #include <behavior_tree_plugin/action_node.hpp>
 #include <geometry/bounding_box.hpp>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>

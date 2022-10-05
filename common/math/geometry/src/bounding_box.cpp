@@ -19,6 +19,7 @@
 // headers in Eigen
 #define EIGEN_MPL2_ONLY
 #include <Eigen/Core>
+#include <optional>
 #include <vector>
 
 namespace math

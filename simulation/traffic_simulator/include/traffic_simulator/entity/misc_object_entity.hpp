@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__MISC_OBJECT_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__MISC_OBJECT_ENTITY_HPP_
 
+#include <optional>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator_msgs/msg/misc_object_parameters.hpp>
 

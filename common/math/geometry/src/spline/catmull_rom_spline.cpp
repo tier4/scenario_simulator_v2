@@ -16,6 +16,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <iostream>
 #include <limits>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>

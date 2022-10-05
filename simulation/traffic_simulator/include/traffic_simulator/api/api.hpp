@@ -22,6 +22,7 @@
 #include <boost/variant.hpp>
 #include <cassert>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>

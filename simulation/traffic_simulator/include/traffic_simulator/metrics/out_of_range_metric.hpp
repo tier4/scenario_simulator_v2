@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__METRICS__OUT_OF_RANGE_METRIC_HPP_
 
 #include <limits>
+#include <optional>
 #include <rclcpp/qos.hpp>
 #include <string>
 #include <tier4_debug_msgs/msg/float32_stamped.hpp>

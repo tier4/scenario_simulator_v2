@@ -16,6 +16,7 @@
 #include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
+#include <optional>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>

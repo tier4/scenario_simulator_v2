@@ -21,6 +21,7 @@
 #include <lanelet2_routing/RoutingGraph.h>
 
 #include <boost/filesystem.hpp>
+#include <optional>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "random_test_runner/data_types.hpp"

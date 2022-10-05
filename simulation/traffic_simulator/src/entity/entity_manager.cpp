@@ -18,6 +18,7 @@
 #include <geometry/transform.hpp>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <scenario_simulator_exception/exception.hpp>
 #include <sstream>

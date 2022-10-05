@@ -18,6 +18,7 @@
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>

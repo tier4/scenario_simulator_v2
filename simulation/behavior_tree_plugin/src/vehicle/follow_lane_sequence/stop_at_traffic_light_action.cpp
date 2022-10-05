@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <utility>

@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
 #include <memory>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>

@@ -19,6 +19,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/transform.hpp>
 #include <memory>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <vector>

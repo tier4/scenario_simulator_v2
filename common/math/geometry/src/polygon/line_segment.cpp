@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <optional>
 
 namespace math
 {
