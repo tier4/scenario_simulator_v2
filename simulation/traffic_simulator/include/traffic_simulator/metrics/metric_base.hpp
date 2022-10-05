@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__METRICS__METRIC_BASE_HPP_
 #define TRAFFIC_SIMULATOR__METRICS__METRIC_BASE_HPP_
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -49,7 +49,7 @@ protected:
   std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
 
 private:
-  boost::optional<common::scenario_simulator_exception::SpecificationViolation> error_;
+  std::optional<common::scenario_simulator_exception::SpecificationViolation> error_;
   MetricLifecycle lifecycle_;
 };
 }  // namespace metrics

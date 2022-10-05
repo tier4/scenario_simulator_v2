@@ -64,14 +64,14 @@ public:
   DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
   DEFINE_GETTER_SETTER(HdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)
-  DEFINE_GETTER_SETTER(Obstacle, boost::optional<traffic_simulator_msgs::msg::Obstacle>)
+  DEFINE_GETTER_SETTER(Obstacle, std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus, EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters, traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(Request, std::string)
   DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(ReferenceTrajectory, std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(StepTime, double)
-  DEFINE_GETTER_SETTER(TargetSpeed, boost::optional<double>)
+  DEFINE_GETTER_SETTER(TargetSpeed, std::optional<double>)
   DEFINE_GETTER_SETTER(ToLaneletId, std::int64_t)
   DEFINE_GETTER_SETTER(TrafficLightManager,std::shared_ptr<traffic_simulator::TrafficLightManager>)
   DEFINE_GETTER_SETTER(UpdatedStatus, traffic_simulator_msgs::msg::EntityStatus)
@@ -121,14 +121,14 @@ Setters are named as set(Foo), such as `BehaviorPluginClass::setDriverModel(traf
 | EntityTypeList       | Dictionary of NPC name and it's type.                 | `EntityTypeDict`                                             |
 | GoalPoses            | Goal poses of entity.                                 | `std::vector<geometry_msgs::msg::Pose>`                      |
 | HdMapUtils           | Shared pointer of HdMapUtils class.                   | `std::shared_ptr<hdmap_utils::HdMapUtils>`                   |
-| Obstacle             | Target obstacle of your NPC.                          | `boost::optional<traffic_simulator_msgs::msg::Obstacle>`     |
+| Obstacle             | Target obstacle of your NPC.                          | `std::optional<traffic_simulator_msgs::msg::Obstacle>`       |
 | OtherEntityStatus    | Dictionary of other entity status.                    | `EntityStatusDict`                                           |
 | PedestrianParameters | Entity parameters for pedestrian.                     | `traffic_simulator_msgs::msg::PedestrianParameters`          |
 | Request              | Request to the NPC you want to control                | `std::string`                                                |
 | RouteLanelets        | Lanelet ids on entity route                           | `std::vector<std::int64_t>`                                  |
 | ReferenceTrajectory  | Trajectory precalculated for RouteLanelets.           | `std::shared_ptr<math::geometry::CatmullRomSpline>` |
 | StepTime             | Step time of the simulation.                          | `double`                                                     |
-| TargetSpeed          | Target speed of the NPC you want to control           | `boost::optional<double>`                                    |
+| TargetSpeed          | Target speed of the NPC you want to control           | `std::optional<double>`                                      |
 | ToLaneletId          | Goal lanelet ID                                       | `std::int64_t`                                               |
 | TrafficLightManager  | Shared pointer to the traffic light manager           | `std::shared_ptr<traffic_simulator::TrafficLightManager>`    |
 | UpdatedStatus        | Updated entity status of the NPC you want to control. | `traffic_simulator_msgs::msg::EntityStatus`                  |

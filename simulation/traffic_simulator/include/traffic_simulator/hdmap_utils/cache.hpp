@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__HDMAP_UTILS__CACHE_HPP_
 #define TRAFFIC_SIMULATOR__HDMAP_UTILS__CACHE_HPP_
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <mutex>

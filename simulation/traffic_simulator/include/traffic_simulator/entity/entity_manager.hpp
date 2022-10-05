@@ -24,7 +24,7 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <memory>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
 #include <rclcpp/node_interfaces/node_topics_interface.hpp>
@@ -274,20 +274,20 @@ public:
   bool entityStatusSet(const std::string & name) const;
 
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
-    -> boost::optional<double>;
+    -> std::optional<double>;
 
   auto getCurrentTime() const noexcept -> double;
 
   auto getDistanceToCrosswalk(const std::string & name, const std::int64_t target_crosswalk_id)
-    -> boost::optional<double>;
+    -> std::optional<double>;
 
   auto getDistanceToStopLine(const std::string & name, const std::int64_t target_stop_line_id)
-    -> boost::optional<double>;
+    -> std::optional<double>;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntityStatus(const std::string & name) const
-    -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>;
+    -> const std::optional<traffic_simulator_msgs::msg::EntityStatus>;
 
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
@@ -295,16 +295,16 @@ public:
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   // clang-format off
-  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &, const double = 100) -> boost::optional<double>;
-  auto getLongitudinalDistance(const LaneletPose &, const std::string &, const double = 100) -> boost::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const LaneletPose &, const double = 100) -> boost::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const std::string &, const double = 100) -> boost::optional<double>;
+  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &, const double = 100) -> std::optional<double>;
+  auto getLongitudinalDistance(const LaneletPose &, const std::string &, const double = 100) -> std::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const LaneletPose &, const double = 100) -> std::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const std::string &, const double = 100) -> std::optional<double>;
   // clang-format on
 
   auto getNumberOfEgo() const -> std::size_t;
 
   auto getObstacle(const std::string & name)
-    -> boost::optional<traffic_simulator_msgs::msg::Obstacle>;
+    -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
 
   // clang-format off
   auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose;

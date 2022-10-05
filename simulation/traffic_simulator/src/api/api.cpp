@@ -151,7 +151,7 @@ traffic_simulator_msgs::msg::EntityStatus API::getEntityStatus(const std::string
   if (!status) {
     THROW_SEMANTIC_ERROR("entity : ", name, " status is empty");
   }
-  return status.get();
+  return status.value();
 }
 
 bool API::setEntityStatus(
@@ -186,21 +186,21 @@ bool API::setEntityStatus(
   status.action_status = action_status;
   if (lanelet_pose) {
     status.lanelet_pose_valid = true;
-    status.lanelet_pose = lanelet_pose.get();
+    status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
   }
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
 
-boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
+std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
 {
   if (!entity_manager_ptr_->entityStatusSet(from) || !entity_manager_ptr_->entityStatusSet(to)) {
-    return boost::none;
+    return std::nullopt;
   }
   geometry_msgs::msg::Pose pose = getRelativePose(from, to);
   if (pose.position.x > 0) {
-    return boost::none;
+    return std::nullopt;
   }
   traffic_simulator_msgs::msg::EntityStatus to_status = getEntityStatus(to);
   double ret = (pose.position.x * -1) / (to_status.action_status.twist.linear.x);
@@ -262,7 +262,7 @@ bool API::setEntityStatus(
     entity_manager_ptr_->toLaneletPose(map_pose, entity_manager_ptr_->getBoundingBox(name), false);
   traffic_simulator_msgs::msg::EntityStatus status;
   if (lanelet_pose) {
-    status.lanelet_pose = lanelet_pose.get();
+    status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
   }
@@ -392,7 +392,7 @@ bool API::updateEntityStatusInSim()
     if (ego_status_before_update) {
       req.set_ego_entity_status_before_update_is_empty(false);
       simulation_interface::toProto(
-        ego_status_before_update.get(), *req.mutable_ego_entity_status_before_update());
+        ego_status_before_update.value(), *req.mutable_ego_entity_status_before_update());
     } else {
       req.set_ego_entity_status_before_update_is_empty(true);
     }
@@ -402,8 +402,8 @@ bool API::updateEntityStatusInSim()
     auto status = entity_manager_ptr_->getEntityStatus(name);
     if (status) {
       traffic_simulator_msgs::EntityStatus proto;
-      status.get().name = name;
-      simulation_interface::toProto(status.get(), proto);
+      status.value().name = name;
+      simulation_interface::toProto(status.value(), proto);
       *req.add_status() = proto;
     }
   }
@@ -415,7 +415,7 @@ bool API::updateEntityStatusInSim()
       continue;
     }
     traffic_simulator_msgs::msg::EntityStatus status_msg;
-    status_msg = entity_status.get();
+    status_msg = entity_status.value();
     geometry_msgs::msg::Pose pose;
     simulation_interface::toMsg(status.pose(), pose);
     status_msg.pose = pose;
@@ -423,7 +423,7 @@ bool API::updateEntityStatusInSim()
       pose, entity_manager_ptr_->getBoundingBox(status.name()), false);
     if (lanelet_pose) {
       status_msg.lanelet_pose_valid = true;
-      status_msg.lanelet_pose = lanelet_pose.get();
+      status_msg.lanelet_pose = lanelet_pose.value();
     } else {
       status_msg.lanelet_pose_valid = false;
       status_msg.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
@@ -437,7 +437,7 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = boost::none;
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = std::nullopt;
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 

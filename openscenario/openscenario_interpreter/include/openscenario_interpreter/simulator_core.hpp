@@ -68,7 +68,7 @@ public:
     static auto convert(const geometry_msgs::msg::Pose & pose)
     {
       if (const auto result = core->toLaneletPose(pose, false); result) {
-        return result.get();
+        return result.value();
       } else {
         throw Error(
           "The specified WorldPosition = [", pose.position.x, ", ", pose.position.y, ", ",
@@ -145,7 +145,7 @@ public:
       auto s = [](auto &&... xs) {
         if (const auto result = core->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
             result) {
-          return result.get();
+          return result.value();
         } else {
           using value_type = typename std::decay<decltype(result)>::type::value_type;
           return std::numeric_limits<value_type>::quiet_NaN();
@@ -291,7 +291,7 @@ public:
     {
       if (const auto result = core->getBoundingBoxDistance(std::forward<decltype(xs)>(xs)...);
           result) {
-        return result.get();
+        return result.value();
       } else {
         using value_type = typename std::decay<decltype(result)>::type::value_type;
         return std::numeric_limits<value_type>::quiet_NaN();
@@ -315,7 +315,7 @@ public:
     {
       if (const auto result = core->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
           result) {
-        return result.get();
+        return result.value();
       } else {
         using value_type = typename std::decay<decltype(result)>::type::value_type;
         return std::numeric_limits<value_type>::quiet_NaN();
@@ -326,7 +326,7 @@ public:
     static auto evaluateTimeHeadway(Ts &&... xs)
     {
       if (const auto result = core->getTimeHeadway(std::forward<decltype(xs)>(xs)...); result) {
-        return result.get();
+        return result.value();
       } else {
         using value_type = typename std::decay<decltype(result)>::type::value_type;
         return std::numeric_limits<value_type>::quiet_NaN();

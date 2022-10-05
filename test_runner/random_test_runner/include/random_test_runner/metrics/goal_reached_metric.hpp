@@ -17,7 +17,7 @@
 #ifndef RANDOM_TEST_RUNNER__GOAL_REACHED_METRIC_H
 #define RANDOM_TEST_RUNNER__GOAL_REACHED_METRIC_H
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <iostream>
 
 #include "geometry_msgs/msg/pose.hpp"
@@ -48,7 +48,7 @@ public:
 private:
   const double goal_reaching_accuracy_threshold_ = 3.0;
 
-  boost::optional<geometry_msgs::msg::Pose> goal_pose_;
+  std::optional<geometry_msgs::msg::Pose> goal_pose_;
 
   static double distance(
     const geometry_msgs::msg::Point & lhs, const geometry_msgs::msg::Point & rhs)

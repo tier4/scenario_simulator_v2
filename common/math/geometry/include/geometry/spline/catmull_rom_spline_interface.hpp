@@ -15,7 +15,7 @@
 #ifndef GEOMETRY__SPLINE__CATMULL_ROM_SPLINE_INTERFACE_HPP_
 #define GEOMETRY__SPLINE__CATMULL_ROM_SPLINE_INTERFACE_HPP_
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <exception>
 #include <geometry_msgs/msg/point.hpp>
 #include <string>
@@ -30,7 +30,7 @@ class CatmullRomSplineInterface
 {
 public:
   virtual double getLength() const = 0;
-  virtual boost::optional<double> getCollisionPointIn2D(
+  virtual std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const = 0;
 };

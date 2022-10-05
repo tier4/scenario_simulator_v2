@@ -31,13 +31,13 @@ namespace entity
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
 : name(name),
-  status_(boost::none),
+  status_(std::nullopt),
   verbose_(true),
   visibility_(true),
   npc_logic_started_(false),
   entity_subtype_(subtype)
 {
-  status_ = boost::none;
+  status_ = std::nullopt;
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
@@ -59,7 +59,7 @@ void EntityBase::onUpdate(double, double)
   status_before_update_ = status_;
 }
 
-boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
+std::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
 void EntityBase::requestSpeedChange(
   const double target_speed, const speed_change::Transition transition,
@@ -190,7 +190,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+      [this]() { target_speed_ = std::nullopt; }, job::Type::LINEAR_VELOCITY, true);
   }
 }
 
@@ -230,7 +230,7 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief Cansel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+      [this]() { target_speed_ = std::nullopt; }, job::Type::LINEAR_VELOCITY, true);
   }
 }
 
@@ -273,7 +273,7 @@ void EntityBase::requestLaneChange(
     reference_lanelet_id, target.direction, target.shift);
   if (lane_change_target_id) {
     requestLaneChange(
-      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
+      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);
   } else {
     THROW_SEMANTIC_ERROR(
@@ -288,14 +288,14 @@ void EntityBase::updateStandStillDuration(const double step_time)
     return;
   }
   if (!status_) {
-    stand_still_duration_ = boost::none;
+    stand_still_duration_ = std::nullopt;
   } else {
     if (!stand_still_duration_) {
       stand_still_duration_ = 0;
     }
     if (
       std::fabs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
-      stand_still_duration_ = step_time + stand_still_duration_.get();
+      stand_still_duration_ = step_time + stand_still_duration_.value();
     } else {
       stand_still_duration_ = 0;
     }
@@ -317,7 +317,7 @@ void EntityBase::setOtherStatus(
     for (const auto & each : status) {
       if (each.first != name) {
         const auto p0 = each.second.pose.position;
-        const auto p1 = status_.get().pose.position;
+        const auto p1 = status_.value().pose.position;
         double distance =
           std::sqrt(std::pow(p0.x - p1.x, 2) + std::pow(p0.y - p1.y, 2) + std::pow(p0.z - p1.z, 2));
         if (distance < 30) {
@@ -333,7 +333,7 @@ const traffic_simulator_msgs::msg::EntityStatus EntityBase::getStatus() const
   if (!status_) {
     THROW_SEMANTIC_ERROR("status is not set");
   } else {
-    auto status = this->status_.get();
+    auto status = this->status_.value();
     status.bounding_box = getBoundingBox();
     status.subtype = entity_subtype_;
     status.type = entity_type_;
@@ -501,8 +501,8 @@ void EntityBase::stopAtEndOfRoad()
   if (!status_) {
     THROW_SEMANTIC_ERROR("status is not set");
   } else {
-    status_.get().action_status.twist = geometry_msgs::msg::Twist();
-    status_.get().action_status.accel = geometry_msgs::msg::Accel();
+    status_.value().action_status.twist = geometry_msgs::msg::Twist();
+    status_.value().action_status.accel = geometry_msgs::msg::Accel();
   }
 }
 
@@ -518,7 +518,7 @@ void EntityBase::setDecelerationLimit(double)
     "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
 }
 
-auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+auto EntityBase::getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   const auto status = getStatus();
   if (status.lanelet_pose_valid) {

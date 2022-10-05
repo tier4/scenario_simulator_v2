@@ -81,7 +81,7 @@ bool LaneletUtils::isInLanelet(int64_t lanelet_id, double s)
   return hdmap_utils_ptr_->isInLanelet(lanelet_id, s);
 }
 
-boost::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOppositeLaneLet(
+std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOppositeLaneLet(
   const traffic_simulator_msgs::msg::LaneletPose & pose)
 {
   // Assumptions:
@@ -183,7 +183,7 @@ std::vector<LaneletPart> LaneletUtils::getLanesWithinDistance(
   lanelets_to_test.emplace(
     starting_lanelet, min_distance, max_distance, SearchDirection::BACKWARD, pose.s);
 
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> opposite_lane_pose =
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> opposite_lane_pose =
     getOppositeLaneLet(pose);
   if (opposite_lane_pose) {
     lanelet::ConstLanelet opposite_lanelet =

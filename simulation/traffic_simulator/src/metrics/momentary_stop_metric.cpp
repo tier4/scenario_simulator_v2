@@ -24,7 +24,7 @@ void MomentaryStopMetric::update()
     THROW_SIMULATION_ERROR("failed to get target entity status.");
     return;
   }
-  boost::optional<double> distance;
+  std::optional<double> distance;
   switch (stop_target_lanelet_type) {
     case StopTargetLaneletType::STOP_LINE:
       distance = entity_manager_ptr_->getDistanceToStopLine(target_entity, stop_target_lanelet_id);
@@ -39,20 +39,20 @@ void MomentaryStopMetric::update()
   if (!distance) {
     THROW_SIMULATION_ERROR("failed to calculate distance to stop line.");
   }
-  distance_to_stopline_ = distance.get();
+  distance_to_stopline_ = distance.value();
   linear_acceleration_ = status->action_status.accel.linear.x;
   if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
     auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
     if (!standstill_duration) {
       THROW_SIMULATION_ERROR("failed to calculate standstill duration.");
     }
-    standstill_duration_ = standstill_duration.get();
+    standstill_duration_ = standstill_duration.value();
     if (
       entity_manager_ptr_->isStopping(target_entity) &&
-      standstill_duration.get() >= stop_duration) {
+      standstill_duration.value() >= stop_duration) {
       success();
     }
-    if (distance.get() <= stop_sequence_end_distance) {
+    if (distance.value() <= stop_sequence_end_distance) {
       failure(SPECIFICATION_VIOLATION("overrun detected"));
     }
     return;
@@ -67,7 +67,7 @@ bool MomentaryStopMetric::activateTrigger()
   if (!status) {
     return false;
   }
-  boost::optional<double> distance;
+  std::optional<double> distance;
   switch (stop_target_lanelet_type) {
     case StopTargetLaneletType::STOP_LINE:
       distance = entity_manager_ptr_->getDistanceToStopLine(target_entity, stop_target_lanelet_id);
@@ -82,7 +82,7 @@ bool MomentaryStopMetric::activateTrigger()
   if (!distance) {
     return false;
   }
-  if (distance.get() <= stop_sequence_start_distance) {
+  if (distance.value() <= stop_sequence_start_distance) {
     return true;
   }
   return false;

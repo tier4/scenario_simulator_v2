@@ -14,7 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <memory>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <simple_sensor_simulator/exception.hpp>

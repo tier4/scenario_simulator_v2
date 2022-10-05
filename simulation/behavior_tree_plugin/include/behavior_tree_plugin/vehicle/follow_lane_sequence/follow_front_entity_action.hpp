@@ -41,11 +41,11 @@ public:
     return ports;
   }
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;
-  const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
+  const std::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
 
 private:
-  boost::optional<double> distance_to_front_entity_;
+  std::optional<double> distance_to_front_entity_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

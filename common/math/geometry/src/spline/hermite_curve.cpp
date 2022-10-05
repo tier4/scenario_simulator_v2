@@ -86,13 +86,13 @@ geometry_msgs::msg::Vector3 HermiteCurve::getSquaredDistanceVector(
   return ret;
 }
 
-boost::optional<double> HermiteCurve::getCollisionPointIn2D(
+std::optional<double> HermiteCurve::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
   bool close_start_end) const
 {
   size_t n = polygon.size();
   if (n <= 1) {
-    return boost::none;
+    return std::nullopt;
   }
   std::vector<double> s_values;
   for (size_t i = 0; i < (n - 1); i++) {
@@ -100,7 +100,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     const auto p1 = polygon[i + 1];
     auto s = getCollisionPointIn2D(p0, p1, search_backward);
     if (s) {
-      s_values.emplace_back(s.get());
+      s_values.emplace_back(s.value());
     }
   }
   if (close_start_end) {
@@ -108,11 +108,11 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     const auto p1 = polygon[0];
     auto s = getCollisionPointIn2D(p0, p1, search_backward);
     if (s) {
-      s_values.emplace_back(s.get());
+      s_values.emplace_back(s.value());
     }
   }
   if (s_values.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   if (search_backward) {
     return *std::max_element(s_values.begin(), s_values.end());
@@ -120,7 +120,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   return *std::min_element(s_values.begin(), s_values.end());
 }
 
-boost::optional<double> HermiteCurve::getCollisionPointIn2D(
+std::optional<double> HermiteCurve::getCollisionPointIn2D(
   const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
   bool search_backward) const
 {
@@ -155,7 +155,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     }
   }
   if (s_values.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   if (search_backward) {
     return *std::max_element(s_values.begin(), s_values.end());
@@ -163,7 +163,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   return *std::min_element(s_values.begin(), s_values.end());
 }
 
-boost::optional<double> HermiteCurve::getSValue(
+std::optional<double> HermiteCurve::getSValue(
   const geometry_msgs::msg::Pose & pose, double threshold_distance, bool autoscale) const
 {
   geometry_msgs::msg::Point p0, p1;
@@ -172,12 +172,12 @@ boost::optional<double> HermiteCurve::getSValue(
   const auto line = math::geometry::transformPoints(pose, {p0, p1});
   const auto s = getCollisionPointIn2D(line[0], line[1], false);
   if (!s) {
-    return boost::none;
+    return std::nullopt;
   }
   if (autoscale) {
-    return s.get() * getLength();
+    return s.value() * getLength();
   }
-  return s.get();
+  return s.value();
 }
 
 const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(
@@ -294,7 +294,7 @@ double HermiteCurve::getMaximum2DCurvature() const
 
 /**
  * @brief get length of the hermite curve. Calculate distance of two points on hermite curve and accumulate it's distance
- * @param num_points 
+ * @param num_points
  * @return double length
  */
 double HermiteCurve::getLength(size_t num_points) const

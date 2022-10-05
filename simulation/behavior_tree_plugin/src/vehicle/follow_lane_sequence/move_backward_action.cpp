@@ -26,10 +26,10 @@ MoveBackwardAction::MoveBackwardAction(
 {
 }
 
-const boost::optional<traffic_simulator_msgs::msg::Obstacle> MoveBackwardAction::calculateObstacle(
+const std::optional<traffic_simulator_msgs::msg::Obstacle> MoveBackwardAction::calculateObstacle(
   const traffic_simulator_msgs::msg::WaypointsArray &)
 {
-  return boost::none;
+  return std::nullopt;
 }
 
 const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoints()
@@ -75,7 +75,7 @@ BT::NodeStatus MoveBackwardAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.value()));
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

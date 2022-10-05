@@ -255,7 +255,7 @@ struct TrafficLight
 
   std::set<Bulb> bulbs;
 
-  const std::map<Bulb::Hash, boost::optional<geometry_msgs::msg::Point>> positions;
+  const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
 
   explicit TrafficLight(const std::int64_t, hdmap_utils::HdMapUtils &);
 
@@ -275,7 +275,7 @@ struct TrafficLight
   {
     auto position = [this](auto && bulb) {
       try {
-        return positions.at(bulb.hash() & 0b1111'0000'1111'1111).get();  // NOTE: Ignore status
+        return positions.at(bulb.hash() & 0b1111'0000'1111'1111).value();  // NOTE: Ignore status
       } catch (const std::out_of_range &) {
         throw common::scenario_simulator_exception::Error(
           "There is no position for bulb {", bulb, "}.");

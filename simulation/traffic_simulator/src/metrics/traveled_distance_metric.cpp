@@ -31,7 +31,7 @@ void TraveledDistanceMetric::update()
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
   if (status) {
     traveled_distance =
-      traveled_distance + std::fabs(status.get().action_status.twist.linear.x) * step_time;
+      traveled_distance + std::fabs(status.value().action_status.twist.linear.x) * step_time;
   }
 }
 

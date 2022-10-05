@@ -15,7 +15,7 @@
 #ifndef SIMPLE_JUNIT__JUNIT5_HPP_
 #define SIMPLE_JUNIT__JUNIT5_HPP_
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <pugixml.hpp>
 #include <stdexcept>
 #include <string>

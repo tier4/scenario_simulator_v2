@@ -15,7 +15,7 @@
 #ifndef GEOMETRY__INTERSECTION__INTERSECTION_HPP_
 #define GEOMETRY__INTERSECTION__INTERSECTION_HPP_
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <geometry/polygon/line_segment.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <vector>
@@ -26,7 +26,7 @@ namespace geometry
 {
 bool isIntersect2D(const LineSegment & line0, const LineSegment & line1);
 bool isIntersect2D(const std::vector<LineSegment> & lines);
-boost::optional<geometry_msgs::msg::Point> getIntersection2D(
+std::optional<geometry_msgs::msg::Point> getIntersection2D(
   const LineSegment & line0, const LineSegment & line1);
 std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines);
 }  // namespace geometry

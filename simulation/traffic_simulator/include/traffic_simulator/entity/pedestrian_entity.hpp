@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <memory>
 #include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
@@ -127,9 +127,9 @@ public:
     }
   }
 
-  boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
+  std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
-    return boost::none;
+    return std::nullopt;
   }
 
   std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override

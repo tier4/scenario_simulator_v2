@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <memory>
 #include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
@@ -82,7 +82,7 @@ public:
 
   void cancelRequest() override;
 
-  const boost::optional<traffic_simulator_msgs::msg::VehicleParameters> getVehicleParameters() const
+  const std::optional<traffic_simulator_msgs::msg::VehicleParameters> getVehicleParameters() const
   {
     return parameters;
   }
@@ -155,7 +155,7 @@ public:
     return route_planner_ptr_->getGoalPoses();
   }
 
-  boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
+  std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
     return behavior_plugin_ptr_->getObstacle();
   }

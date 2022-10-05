@@ -39,7 +39,7 @@ public:
 
   double getLength() const override;
 
-  boost::optional<double> getCollisionPointIn2D(
+  std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const override;
 

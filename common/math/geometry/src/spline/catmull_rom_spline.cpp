@@ -269,7 +269,7 @@ double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
   THROW_SEMANTIC_ERROR("curve index does not match");  // LCOV_EXCL_LINE
 }
 
-boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
+std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
   bool close_start_end) const
 {
@@ -278,23 +278,23 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
     for (size_t i = 0; i < n; i++) {
       auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward, close_start_end);
       if (s) {
-        return getSInSplineCurve(n - 1 - i, s.get());
+        return getSInSplineCurve(n - 1 - i, s.value());
       }
     }
-    return boost::none;
+    return std::nullopt;
   } else {
     for (size_t i = 0; i < n; i++) {
       auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward, close_start_end);
       if (s) {
-        return getSInSplineCurve(i, s.get());
+        return getSInSplineCurve(i, s.value());
       }
     }
-    return boost::none;
+    return std::nullopt;
   }
-  return boost::none;
+  return std::nullopt;
 }
 
-boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
+std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
   bool search_backward) const
 {
@@ -303,35 +303,35 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
     for (size_t i = 0; i < n; i++) {
       auto s = curves_[n - 1 - i].getCollisionPointIn2D(point0, point1, search_backward);
       if (s) {
-        return getSInSplineCurve(n - 1 - i, s.get());
+        return getSInSplineCurve(n - 1 - i, s.value());
       }
     }
-    return boost::none;
+    return std::nullopt;
   } else {
     for (size_t i = 0; i < n; i++) {
       auto s = curves_[i].getCollisionPointIn2D(point0, point1, search_backward);
       if (s) {
-        return getSInSplineCurve(i, s.get());
+        return getSInSplineCurve(i, s.value());
       }
     }
-    return boost::none;
+    return std::nullopt;
   }
-  return boost::none;
+  return std::nullopt;
 }
 
-boost::optional<double> CatmullRomSpline::getSValue(
+std::optional<double> CatmullRomSpline::getSValue(
   const geometry_msgs::msg::Pose & pose, double threshold_distance)
 {
   double s = 0;
   for (size_t i = 0; i < curves_.size(); i++) {
     auto s_value = curves_[i].getSValue(pose, threshold_distance, true);
     if (s_value) {
-      s = s + s_value.get();
+      s = s + s_value.value();
       return s;
     }
     s = s + curves_[i].getLength();
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 double CatmullRomSpline::getSquaredDistanceIn2D(

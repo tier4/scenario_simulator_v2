@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__HELPER__STOP_WATCH_HPP_
 #define TRAFFIC_SIMULATOR__HELPER__STOP_WATCH_HPP_
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <chrono>
 #include <iostream>
 #include <rclcpp/rclcpp.hpp>
@@ -39,7 +39,7 @@ public:
 
   void start()
   {
-    end_time = boost::none;
+    end_time = std::nullopt;
     start_time = std::chrono::system_clock::now();
   }
   void stop() { end_time = std::chrono::system_clock::now(); }
@@ -47,7 +47,7 @@ public:
   {
     if (verbose) {
       if (start_time && end_time) {
-        double elapsed = std::chrono::duration_cast<T>(end_time.get() - start_time.get()).count();
+        double elapsed = std::chrono::duration_cast<T>(end_time.value() - start_time.value()).count();
         if (typeid(T) == typeid(std::chrono::microseconds)) {
           std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " microseconds"
                     << std::endl;
@@ -78,7 +78,7 @@ public:
   const bool verbose;
 
 private:
-  boost::optional<std::chrono::system_clock::time_point> start_time, end_time;
+  std::optional<std::chrono::system_clock::time_point> start_time, end_time;
 };
 }  // namespace helper
 }  // namespace traffic_simulator

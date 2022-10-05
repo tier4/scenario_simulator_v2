@@ -51,7 +51,7 @@ public:
   double computeDistance(
     const traffic_simulator_msgs::msg::LaneletPose & p1,
     const traffic_simulator_msgs::msg::LaneletPose & p2);
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> getOppositeLaneLet(
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> getOppositeLaneLet(
     const traffic_simulator_msgs::msg::LaneletPose & pose);
   std::vector<LaneletPart> getLanesWithinDistance(
     const traffic_simulator_msgs::msg::LaneletPose & pose, double min_distance,

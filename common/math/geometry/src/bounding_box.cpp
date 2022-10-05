@@ -32,25 +32,25 @@ namespace geometry
  * @param bbox0 size of the first bounding box
  * @param pose1 pose of the second bounding box
  * @param bbox1 size of the second bounding box
- * @retval boost::none bounding box intersects
+ * @retval std::nullopt bounding box intersects
  * @retval 0 <= distance between two bounding boxes
  */
-boost::optional<double> getPolygonDistance(
+std::optional<double> getPolygonDistance(
   const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
   const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1)
 {
   const auto poly0 = get2DPolygon(pose0, bbox0);
   const auto poly1 = get2DPolygon(pose1, bbox1);
   if (boost::geometry::intersects(poly0, poly1)) {
-    return boost::none;
+    return std::nullopt;
   }
   if (boost::geometry::intersects(poly1, poly0)) {
-    return boost::none;
+    return std::nullopt;
   }
   if (boost::geometry::disjoint(poly0, poly1)) {
     return boost::geometry::distance(poly0, poly1);
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> get2DPolygon(

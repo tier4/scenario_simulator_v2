@@ -35,7 +35,7 @@
 
 #include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
@@ -72,19 +72,19 @@ public:
     const visualization_msgs::msg::MarkerArray & a2) const;
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id, const std::vector<double> & s) const;
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     const geometry_msgs::msg::Pose & pose, bool include_crosswalk,
     double matching_distance = 1.0) const;
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
     bool include_crosswalk, double matching_distance = 1.0) const;
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     const geometry_msgs::msg::Pose & pose, std::int64_t lanelet_id,
     double matching_distance = 1.0) const;
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     const geometry_msgs::msg::Pose & pose, const std::vector<std::int64_t> & lanelet_ids,
     double matching_distance = 1.0) const;
-  boost::optional<std::int64_t> matchToLane(
+  std::optional<std::int64_t> matchToLane(
     const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
     bool include_crosswalk, double reduction_ratio = 0.8) const;
   geometry_msgs::msg::PoseStamped toMapPose(
@@ -101,23 +101,23 @@ public:
   std::vector<std::int64_t> getPreviousLaneletIds(
     std::int64_t lanelet_id, const std::string & turn_direction) const;
   std::vector<std::int64_t> getPreviousLaneletIds(std::int64_t lanelet_id) const;
-  boost::optional<int64_t> getLaneChangeableLaneletId(
+  std::optional<int64_t> getLaneChangeableLaneletId(
     std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction) const;
-  boost::optional<int64_t> getLaneChangeableLaneletId(
+  std::optional<int64_t> getLaneChangeableLaneletId(
     std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction,
     uint8_t shift) const;
-  boost::optional<double> getDistanceToStopLine(
+  std::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
-  boost::optional<double> getDistanceToStopLine(
+  std::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const;
   double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s) const;
-  boost::optional<double> getLongitudinalDistance(
+  std::optional<double> getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
     const traffic_simulator_msgs::msg::LaneletPose & to) const;
-  boost::optional<double> getLongitudinalDistance(
+  std::optional<double> getLongitudinalDistance(
     std::int64_t from_lanelet_id, double from_s, std::int64_t to_lanelet_id, double to_s) const;
   double getSpeedLimit(const std::vector<std::int64_t> & lanelet_ids) const;
   bool isInRoute(std::int64_t lanelet_id, const std::vector<std::int64_t> & route) const;
@@ -137,15 +137,15 @@ public:
     std::int64_t lanelet_id, double s, const std::vector<std::int64_t> & lanelet_ids,
     double forward_distance = 20) const;
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id) const;
-  boost::optional<std::pair<math::geometry::HermiteCurve, double>> getLaneChangeTrajectory(
+  std::optional<std::pair<math::geometry::HermiteCurve, double>> getLaneChangeTrajectory(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter) const;
-  boost::optional<std::pair<math::geometry::HermiteCurve, double>> getLaneChangeTrajectory(
+  std::optional<std::pair<math::geometry::HermiteCurve, double>> getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from_pose,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter,
     double maximum_curvature_threshold, double target_trajectory_length,
     double forward_distance_threshold) const;
-  boost::optional<geometry_msgs::msg::Vector3> getTangentVector(
+  std::optional<geometry_msgs::msg::Vector3> getTangentVector(
     std::int64_t lanelet_id, double s) const;
   std::vector<std::int64_t> getRoute(
     std::int64_t from_lanelet_id, std::int64_t to_lanelet_id) const;
@@ -153,13 +153,13 @@ public:
     const std::vector<std::int64_t> & lanelet_ids) const;
   std::vector<std::int64_t> getConflictingLaneIds(
     const std::vector<std::int64_t> & lanelet_ids) const;
-  boost::optional<double> getCollisionPointInLaneCoordinate(
+  std::optional<double> getCollisionPointInLaneCoordinate(
     std::int64_t lanelet_id, std::int64_t crossing_lanelet_id) const;
   visualization_msgs::msg::MarkerArray generateMarker() const;
   std::vector<std::int64_t> getRightOfWayLaneletIds(std::int64_t lanelet_id) const;
   std::unordered_map<std::int64_t, std::vector<std::int64_t>> getRightOfWayLaneletIds(
     const std::vector<std::int64_t> & lanelet_ids) const;
-  boost::optional<std::int64_t> getClosestLaneletId(
+  std::optional<std::int64_t> getClosestLaneletId(
     const geometry_msgs::msg::Pose & pose, double distance_thresh = 30.0,
     bool include_crosswalk = false) const;
   std::vector<std::int64_t> getNearbyLaneletIds(
@@ -172,21 +172,21 @@ public:
   std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getTrafficLightIds() const;
-  boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
+  std::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, const std::string &) const;
   std::vector<std::int64_t> getTrafficLightStopLineIds(const std::int64_t traffic_light_id) const;
   std::vector<std::vector<geometry_msgs::msg::Point>> getTrafficLightStopLinesPoints(
     std::int64_t traffic_light_id) const;
-  boost::optional<double> getDistanceToTrafficLightStopLine(
+  std::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<geometry_msgs::msg::Point> & waypoints,
     const std::int64_t traffic_light_id) const;
-  boost::optional<double> getDistanceToTrafficLightStopLine(
+  std::optional<double> getDistanceToTrafficLightStopLine(
     const math::geometry::CatmullRomSplineInterface & spline,
     const std::int64_t traffic_light_id) const;
-  boost::optional<double> getDistanceToTrafficLightStopLine(
+  std::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
-  boost::optional<double> getDistanceToTrafficLightStopLine(
+  std::optional<double> getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const;
   std::vector<std::int64_t> getTrafficLightIdsOnPath(

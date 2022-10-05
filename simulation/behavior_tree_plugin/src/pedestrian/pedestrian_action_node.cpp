@@ -163,7 +163,7 @@ PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_spe
   entity_status_updated.pose = pose_new;
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
   if (entity_status.lanelet_pose_valid) {
     lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.lanelet_pose.lanelet_id, 1.0);
   } else {
@@ -174,7 +174,7 @@ PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_spe
   }
   if (lanelet_pose) {
     entity_status_updated.lanelet_pose_valid = true;
-    entity_status_updated.lanelet_pose = lanelet_pose.get();
+    entity_status_updated.lanelet_pose = lanelet_pose.value();
   } else {
     entity_status_updated.lanelet_pose_valid = false;
   }

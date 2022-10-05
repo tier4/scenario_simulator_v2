@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <geometry/solver/polynomial_solver.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -56,17 +56,17 @@ public:
   double getMaximum2DCurvature() const;
   double getLength(size_t num_points) const;
   double getLength() const { return length_; }
-  boost::optional<double> getSValue(
+  std::optional<double> getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0,
     bool autoscale = false) const;
   double getSquaredDistanceIn2D(
     const geometry_msgs::msg::Point & point, double s, bool autoscale = false) const;
   geometry_msgs::msg::Vector3 getSquaredDistanceVector(
     const geometry_msgs::msg::Point & point, double s, bool autoscale = false) const;
-  boost::optional<double> getCollisionPointIn2D(
+  std::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     bool search_backward = false) const;
-  boost::optional<double> getCollisionPointIn2D(
+  std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const;
 

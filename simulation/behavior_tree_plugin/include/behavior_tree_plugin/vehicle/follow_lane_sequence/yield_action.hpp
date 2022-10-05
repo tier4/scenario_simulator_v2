@@ -40,13 +40,13 @@ public:
     }
     return ports;
   }
-  boost::optional<double> calculateTargetSpeed();
+  std::optional<double> calculateTargetSpeed();
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;
-  const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
+  const std::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
 
 private:
-  boost::optional<double> distance_to_stop_target_;
+  std::optional<double> distance_to_stop_target_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

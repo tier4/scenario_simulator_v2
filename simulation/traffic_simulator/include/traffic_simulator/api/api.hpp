@@ -132,7 +132,7 @@ public:
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus());
 
-  boost::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
+  std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
   bool reachPosition(
     const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance);

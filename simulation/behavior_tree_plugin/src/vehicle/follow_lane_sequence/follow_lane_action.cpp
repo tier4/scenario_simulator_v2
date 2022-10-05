@@ -30,10 +30,10 @@ FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfi
 {
 }
 
-const boost::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
+const std::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
   const traffic_simulator_msgs::msg::WaypointsArray &)
 {
-  return boost::none;
+  return std::nullopt;
 }
 
 const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints()
@@ -61,7 +61,7 @@ void FollowLaneAction::getBlackBoardValues()
   VehicleActionNode::getBlackBoardValues();
   if (!getInput<traffic_simulator_msgs::msg::LaneletPose>(
         "target_lanelet_pose", target_lanelet_pose)) {
-    target_lanelet_pose_ = boost::none;
+    target_lanelet_pose_ = std::nullopt;
   } else {
     target_lanelet_pose_ = target_lanelet_pose;
   }
@@ -93,7 +93,7 @@ BT::NodeStatus FollowLaneAction::tick()
     auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
     if (distance_to_front_entity) {
       if (
-        distance_to_front_entity.get() <= calculateStopDistance(driver_model.deceleration) +
+        distance_to_front_entity.value() <= calculateStopDistance(driver_model.deceleration) +
                                             vehicle_parameters.bounding_box.dimensions.x + 5) {
         return BT::NodeStatus::FAILURE;
       }
@@ -101,7 +101,7 @@ BT::NodeStatus FollowLaneAction::tick()
     const auto distance_to_traffic_stop_line =
       getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
     if (distance_to_traffic_stop_line) {
-      if (distance_to_traffic_stop_line.get() <= getHorizon()) {
+      if (distance_to_traffic_stop_line.value() <= getHorizon()) {
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -110,14 +110,14 @@ BT::NodeStatus FollowLaneAction::tick()
       getDistanceToConflictingEntity(route_lanelets, *trajectory);
     if (distance_to_stopline) {
       if (
-        distance_to_stopline.get() <= calculateStopDistance(driver_model.deceleration) +
+        distance_to_stopline.value() <= calculateStopDistance(driver_model.deceleration) +
                                         vehicle_parameters.bounding_box.dimensions.x * 0.5 + 5) {
         return BT::NodeStatus::FAILURE;
       }
     }
     if (distance_to_conflicting_entity) {
       if (
-        distance_to_conflicting_entity.get() < (vehicle_parameters.bounding_box.dimensions.x +
+        distance_to_conflicting_entity.value() < (vehicle_parameters.bounding_box.dimensions.x +
                                                 calculateStopDistance(driver_model.deceleration))) {
         return BT::NodeStatus::FAILURE;
       }
@@ -126,7 +126,7 @@ BT::NodeStatus FollowLaneAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  auto updated_status = calculateEntityStatusUpdated(target_speed.get());
+  auto updated_status = calculateEntityStatusUpdated(target_speed.value());
   setOutput("updated_status", updated_status);
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);

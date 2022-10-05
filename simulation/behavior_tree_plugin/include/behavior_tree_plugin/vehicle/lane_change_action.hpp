@@ -19,7 +19,7 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 #include <geometry/spline/hermite_curve.hpp>
 #include <memory>
 #include <string>
@@ -46,16 +46,16 @@ public:
     return ports;
   }
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;
-  const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
+  const std::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
   void getBlackBoardValues();
 
 private:
-  boost::optional<math::geometry::HermiteCurve> curve_;
+  std::optional<math::geometry::HermiteCurve> curve_;
   double current_s_;
   double target_s_;
   double lane_change_velocity_;
-  boost::optional<traffic_simulator::lane_change::Parameter> lane_change_parameters_;
+  std::optional<traffic_simulator::lane_change::Parameter> lane_change_parameters_;
 };
 }  // namespace vehicle
 }  // namespace entity_behavior

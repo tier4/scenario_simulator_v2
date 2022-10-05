@@ -32,7 +32,7 @@ auto demangle(const char * name) -> std::string
     abi::__cxa_demangle(name, nullptr, nullptr, &failed),
     [](void * x) noexcept -> void { std::free(x); }};
 
-  return std::string(failed ? name : demangled.get());
+  return std::string(failed ? name : demangled.value());
 #else
   return std::string(name);
 #endif

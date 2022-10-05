@@ -40,15 +40,15 @@ public:
   const geometry_msgs::msg::Pose getPose(double s) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution, double offset = 0.0) const;
-  boost::optional<double> getSValue(
+  std::optional<double> getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0);
   double getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, double s) const;
   geometry_msgs::msg::Vector3 getSquaredDistanceVector(
     const geometry_msgs::msg::Point & point, double s) const;
-  boost::optional<double> getCollisionPointIn2D(
+  std::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     bool search_backward = false) const;
-  boost::optional<double> getCollisionPointIn2D(
+  std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const override;
   const geometry_msgs::msg::Point getRightBoundsPoint(

@@ -43,9 +43,9 @@ public:
     return {};
   }  //return {}?
 
-  boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
+  std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
-    return boost::none;
+    return std::nullopt;
   }
 
   auto getRouteLanelets(const double) -> std::vector<std::int64_t> override

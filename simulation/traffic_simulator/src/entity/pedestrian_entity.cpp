@@ -66,7 +66,7 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   for (const auto & waypoint : waypoints) {
     const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint, getBoundingBox(), true);
     if (lanelet_waypoint) {
-      route.emplace_back(lanelet_waypoint.get());
+      route.emplace_back(lanelet_waypoint.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
     }
@@ -96,7 +96,7 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 {
   const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), true);
   if (lanelet_pose) {
-    requestAcquirePosition(lanelet_pose.get());
+    requestAcquirePosition(lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
   }
@@ -147,7 +147,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   if (npc_logic_started_) {
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
-    behavior_plugin_ptr_->setEntityStatus(status_.get());
+    behavior_plugin_ptr_->setEntityStatus(status_.value());
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
     if (status_->lanelet_pose_valid) {
       auto route = route_planner_ptr_->getRouteLanelets(status_->lanelet_pose);

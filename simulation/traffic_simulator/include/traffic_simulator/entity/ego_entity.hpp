@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 #include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <string>
@@ -61,9 +61,9 @@ class EgoEntity : public VehicleEntity
 
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
-  boost::optional<geometry_msgs::msg::Pose> initial_pose_;
+  std::optional<geometry_msgs::msg::Pose> initial_pose_;
 
-  boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
+  std::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 
 public:
   explicit EgoEntity() = delete;
@@ -99,7 +99,7 @@ public:
 
   auto getEntityTypename() const -> const std::string & override;
 
-  auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
+  auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 

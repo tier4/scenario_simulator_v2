@@ -39,12 +39,12 @@ void ReactionTimeMetric::update()
   if (!jerk) {
     THROW_SIMULATION_ERROR("failed to calculate linear jerk.");
   }
-  current_linear_jerk_ = jerk.get();
-  if (check_lower_threshold && jerk_lower_threshold >= jerk.get()) {
+  current_linear_jerk_ = jerk.value();
+  if (check_lower_threshold && jerk_lower_threshold >= jerk.value()) {
     success();
     return;
   }
-  if (check_upper_threshold && jerk_upper_threshold <= jerk.get()) {
+  if (check_upper_threshold && jerk_upper_threshold <= jerk.value()) {
     success();
     return;
   }

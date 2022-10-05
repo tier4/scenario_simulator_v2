@@ -17,7 +17,7 @@
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 #include <concealer/autoware.hpp>
 #include <memory>
 #include <queue>
@@ -62,7 +62,7 @@ public:
   virtual auto getCurrentAction() const -> const std::string = 0;
 
   /*   */ auto getEntityStatusBeforeUpdate() const
-    -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>
+    -> const std::optional<traffic_simulator_msgs::msg::EntityStatus>
   {
     return status_before_update_;
   }
@@ -73,22 +73,22 @@ public:
 
   /*   */ auto getLinearJerk() const { return linear_jerk_; }
 
-  /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+  /*   */ auto getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
-  virtual auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
+  virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
 
   /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus;
 
-  /*   */ auto getStandStillDuration() const -> boost::optional<double>;
+  /*   */ auto getStandStillDuration() const -> std::optional<double>;
 
   /*   */ auto getVisibility() { return visibility_; }
 
   /*   */ auto getVehicleParameters() const
-    -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
+    -> const std::optional<traffic_simulator_msgs::msg::VehicleParameters>
   {
-    return boost::none;
+    return std::nullopt;
   }
 
   virtual auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
@@ -223,9 +223,9 @@ public:
   virtual void startNpcLogic();
 
 protected:
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> next_waypoint_;
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_;
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_before_update_;
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> next_waypoint_;
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> status_;
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> status_before_update_;
 
   std::queue<traffic_simulator_msgs::msg::LaneletPose> waypoints_;
 
@@ -240,14 +240,14 @@ protected:
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
-  boost::optional<double> linear_jerk_;
-  boost::optional<double> stand_still_duration_;
+  std::optional<double> linear_jerk_;
+  std::optional<double> stand_still_duration_;
 
   visualization_msgs::msg::MarkerArray current_marker_;
   traffic_simulator_msgs::msg::EntityType entity_type_;
   const traffic_simulator_msgs::msg::EntitySubtype entity_subtype_;
 
-  boost::optional<double> target_speed_;
+  std::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
 };
 }  // namespace entity
