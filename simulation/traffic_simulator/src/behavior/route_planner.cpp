@@ -19,14 +19,14 @@
 
 namespace traffic_simulator
 {
-RoutePlanner::RoutePlanner(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr)
+RoutePlanner::RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+: hdmap_utils_ptr_(hdmap_utils_ptr)
 {
-  hdmap_utils_ptr_ = hdmap_utils_ptr;
 }
 
 std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
-  traffic_simulator_msgs::msg::LaneletPose entity_lanelet_pose,
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> waypoints, double horizon)
+  const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon)
 {
   waypoint_queue_ = {};
   if (waypoints.empty()) {
@@ -39,7 +39,7 @@ std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
 }
 
 std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
-  traffic_simulator_msgs::msg::LaneletPose entity_lanelet_pose, double horizon)
+  const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon)
 {
   if (!whole_route_) {
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
@@ -61,20 +61,20 @@ std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
   return getRouteLanelets(entity_lanelet_pose, waypoint_queue_.front(), horizon);
 }
 
-std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
-  traffic_simulator_msgs::msg::LaneletPose entity_lanelet_pose,
-  traffic_simulator_msgs::msg::LaneletPose target_lanelet_pose, double horizon)
+auto RoutePlanner::getRouteLanelets(
+  const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
+  const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon)
+  -> std::vector<std::int64_t>
 {
   plan(entity_lanelet_pose, target_lanelet_pose);
-  if (!whole_route_) {
-    return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
-  }
-  if (whole_route_->size() == 0) {
+
+  if (not whole_route_ or whole_route_->empty()) {
     whole_route_ = boost::none;
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
+  } else {
+    return hdmap_utils_ptr_->getFollowingLanelets(
+      entity_lanelet_pose.lanelet_id, whole_route_.get(), horizon, true);
   }
-  return hdmap_utils_ptr_->getFollowingLanelets(
-    entity_lanelet_pose.lanelet_id, whole_route_.get(), horizon, true);
 }
 
 void RoutePlanner::cancelGoal() { whole_route_ = boost::none; }
@@ -118,8 +118,8 @@ std::vector<traffic_simulator_msgs::msg::LaneletPose> RoutePlanner::getGoalPoses
 }
 
 void RoutePlanner::plan(
-  traffic_simulator_msgs::msg::LaneletPose entity_lanelet_pose,
-  traffic_simulator_msgs::msg::LaneletPose target_lanelet_pose)
+  const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
+  const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose)
 {
   if (
     target_lanelet_pose.lanelet_id == entity_lanelet_pose.lanelet_id &&
