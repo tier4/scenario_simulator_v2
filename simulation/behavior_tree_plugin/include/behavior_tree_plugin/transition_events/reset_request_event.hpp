@@ -18,7 +18,7 @@
 #include <behavior_tree_plugin/transition_events/transition_event.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/data_type/data_types.hpp>
+#include <traffic_simulator/data_type/behavior.hpp>
 
 namespace behavior_tree_plugin
 {

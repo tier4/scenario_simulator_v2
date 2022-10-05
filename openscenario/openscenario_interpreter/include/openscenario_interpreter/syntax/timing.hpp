@@ -12,36 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TIMING_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__TIMING_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/reference_context.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator/data_type/lane_change.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeTargetLane -----------------------------------------------------
+/* ---- Timing 1.2 -------------------------------------------------------------
  *
- *  <xsd:complexType name="RelativeTargetLane">
- *    <xsd:attribute name="entityRef" type="String" use="required"/>
- *    <xsd:attribute name="value" type="Int" use="required"/>
- *  </xsd:complexType>*
+ *
+ *  <xsd:complexType name="Timing">
+ *    <xsd:attribute name="domainAbsoluteRelative" type="ReferenceContext" use="required"/>
+ *    <xsd:attribute name="offset" type="Double" use="required"/>
+ *    <xsd:attribute name="scale" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeTargetLane
+struct Timing
 {
-  const String entity_ref;
+  const ReferenceContext domain_absolute_relative;
 
-  const Integer value;
+  const Double offset;
 
-  explicit RelativeTargetLane(const pugi::xml_node &, Scope &);
+  const Double scale;
 
-  explicit operator traffic_simulator::lane_change::Direction() const;
+  explicit Timing(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TIMING_HPP_

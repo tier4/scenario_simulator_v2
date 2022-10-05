@@ -19,9 +19,9 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-static_assert(std::is_standard_layout<DynamicsDimension>::value, "");
+static_assert(std::is_standard_layout<DynamicsDimension>::value);
 
-static_assert(std::is_trivial<DynamicsDimension>::value, "");
+static_assert(std::is_trivial<DynamicsDimension>::value);
 
 auto operator>>(std::istream & is, DynamicsDimension & datum) -> std::istream &
 {
