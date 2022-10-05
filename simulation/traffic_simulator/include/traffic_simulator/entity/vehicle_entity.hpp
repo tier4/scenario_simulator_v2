@@ -38,24 +38,23 @@ class VehicleEntity : public EntityBase
 public:
   struct BuiltinBehavior
   {
-    static auto behaviorTree() noexcept -> const std::string &
+    static auto behaviorTree() -> const std::string &
     {
       static const std::string name = "behavior_tree_plugin/VehicleBehaviorTree";
       return name;
     }
 
-    static auto contextGamma() noexcept -> const std::string &
+    static auto contextGamma() -> const std::string &
     {
       static const std::string name = "TODO";
       return name;
     }
 
-    static auto defaultBehavior() noexcept -> const std::string & { return behaviorTree(); }
+    static auto defaultBehavior() -> const std::string & { return behaviorTree(); }
   };
 
   explicit VehicleEntity(
-    const std::string & name,                                //
-    const traffic_simulator_msgs::msg::VehicleParameters &,  //
+    const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters &,
     const std::string & = BuiltinBehavior::defaultBehavior());
 
   ~VehicleEntity() override = default;
@@ -112,11 +111,11 @@ public:
 
   const traffic_simulator_msgs::msg::VehicleParameters parameters;
 
-  const std::string plugin_name;
-
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
-  std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
+
+  const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
+
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;

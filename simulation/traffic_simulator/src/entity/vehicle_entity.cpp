@@ -30,7 +30,6 @@ VehicleEntity::VehicleEntity(
   const std::string & plugin_name)
 : EntityBase(name, params.subtype),
   parameters(params),
-  plugin_name(plugin_name),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
@@ -220,9 +219,9 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> route;
   for (const auto & waypoint : waypoints) {
-    const auto lanelet_waypoint =
-      hdmap_utils_ptr_->toLaneletPose(waypoint, getBoundingBox(), false);
-    if (lanelet_waypoint) {
+    if (const auto lanelet_waypoint =
+          hdmap_utils_ptr_->toLaneletPose(waypoint, getBoundingBox(), false);
+        lanelet_waypoint) {
       route.emplace_back(lanelet_waypoint.get());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
