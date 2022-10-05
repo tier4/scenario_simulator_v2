@@ -14,13 +14,13 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <boost/geometry.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/grid_traversal.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_builder.hpp>
 
 namespace simple_sensor_simulator
 {
-
 OccupancyGridBuilder::OccupancyGridBuilder(
   double resolution, size_t height, size_t width, int8_t occupied_cost, int8_t invisible_cost)
 : resolution(resolution),
@@ -66,9 +66,34 @@ auto OccupancyGridBuilder::makePoint(double x, double y, double z) const -> Poin
 
 auto OccupancyGridBuilder::makeOccupiedArea(const PrimitiveType & primitive) const -> PolygonType
 {
-  auto res = primitive.get2DConvexHull();
-  for (auto & e : res) e = transformToGrid(e);
-  return res;
+  namespace bg = boost::geometry;
+  using Point = bg::model::d2::point_xy<double>;
+  using Ring = bg::model::ring<Point>;
+
+  auto primitive_ring = Ring();
+  for (auto & e : primitive.get2DConvexHull()) {
+    auto p = transformToGrid(e);
+    primitive_ring.emplace_back(p.x, p.y);
+  }
+
+  const auto real_width = width * resolution / 2;
+  const auto real_height = height * resolution / 2;
+
+  auto grid_ring = Ring{
+    {+real_width, +real_height},  // top right
+    {+real_width, -real_height},  // bottom right
+    {-real_width, -real_height},  // bottom left
+    {-real_width, +real_height},  // top left
+  };
+
+  auto intersection_polygon = std::vector<Ring>();
+  bg::intersection(primitive_ring, grid_ring, intersection_polygon);
+
+  auto result = PolygonType();
+  for (auto & p : intersection_polygon.front()) {
+    result.emplace_back(makePoint(p.x(), p.y()));
+  }
+  return result;
 }
 
 auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygon) const
