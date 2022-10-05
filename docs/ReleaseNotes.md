@@ -11,9 +11,10 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature                      | Brief summary                                                                                                          | Category                   | Pull request                                                    | Contributor                                   |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
-| Interpreter state transition | Fixed a problem with error handling and state transition when an error occurred in the activation phase of simulation. | `openscenario_interpreter` | [#881](https://github.com/tier4/scenario_simulator_v2/pull/881) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Feature                       | Brief summary                                                                                                          | Category                   | Pull request                                                    | Contributor                                   |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Interpreter state transition  | Fixed a problem with error handling and state transition when an error occurred in the activation phase of simulation. | `openscenario_interpreter` | [#881](https://github.com/tier4/scenario_simulator_v2/pull/881) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Correct bounding box position | Fixed bounding box shifting on Rviz                                                                                    | `simple_sensor_simulator`  | [#888](https://github.com/tier4/scenario_simulator_v2/pull/888) | [shouth](https://github.com/shouth)           |
 
 Minor Tweaks :oncoming_police_car:
 
