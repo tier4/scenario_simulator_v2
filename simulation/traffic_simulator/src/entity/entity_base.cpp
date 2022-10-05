@@ -121,8 +121,8 @@ void EntityBase::requestSpeedChange(
     case speed_change::Transition::LINEAR: {
       job_list_.append(
         /**
-           * @brief Checking if the entity reaches target speed.
-           */
+         * @brief Checking if the entity reaches target speed.
+         */
         [this, target_speed, constraint]() {
           double diff =
             target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;

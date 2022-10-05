@@ -33,7 +33,8 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
-#include <traffic_simulator/data_type/data_types.hpp>
+#include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>

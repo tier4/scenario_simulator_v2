@@ -12,36 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
-
-#include <openscenario_interpreter/scope.hpp>
-#include <pugixml.hpp>
-#include <traffic_simulator/data_type/lane_change.hpp>
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__NONE_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__NONE_HPP_
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeTargetLane -----------------------------------------------------
+/* ---- None 1.2 ---------------------------------------------------------------
  *
- *  <xsd:complexType name="RelativeTargetLane">
- *    <xsd:attribute name="entityRef" type="String" use="required"/>
- *    <xsd:attribute name="value" type="Int" use="required"/>
- *  </xsd:complexType>*
+ *  <xsd:complexType name="None"/>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeTargetLane
+struct None
 {
-  const String entity_ref;
-
-  const Integer value;
-
-  explicit RelativeTargetLane(const pugi::xml_node &, Scope &);
-
-  explicit operator traffic_simulator::lane_change::Direction() const;
+  template <typename... Ts>
+  explicit None(Ts &&...)
+  {
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__NONE_HPP_
