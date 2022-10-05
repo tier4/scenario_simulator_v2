@@ -162,11 +162,19 @@ auto OccupancyGridBuilder::addPolygon(MarkerGridType & grid, const PolygonType &
   }
 
   for (size_t row = 0; row < height; ++row) {
-    if (auto col = mincols_[row]; col >= 0 && col < int32_t(width)) {
-      grid[width * row + col] += 1;
+    auto mincol = mincols_[row];
+    auto maxcol = maxcols_[row] + 1;
+
+    if (maxcol <= 0 || mincol >= int32_t(width)) {
+      continue;
     }
-    if (auto col = maxcols_[row]; col >= 0 && col + 1 < int32_t(width)) {
-      grid[width * row + col + 1] -= 1;
+    if (mincol <= 0) {
+      ++grid[width * row];
+    } else {
+      ++grid[width * row + mincol];
+    }
+    if (maxcol < int32_t(width)) {
+      --grid[width * row + maxcol];
     }
   }
 }
