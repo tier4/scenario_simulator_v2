@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <memory>
-#include <queue>
 #include <traffic_simulator/behavior/route_planner.hpp>
-#include <vector>
 
 namespace traffic_simulator
 {
@@ -28,12 +25,12 @@ std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
   const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon)
 {
-  waypoint_queue_ = {};
+  waypoint_queue_.clear();
   if (waypoints.empty()) {
     return getRouteLanelets(entity_lanelet_pose, horizon);
   }
   for (const auto & waypoint : waypoints) {
-    waypoint_queue_.push(waypoint);
+    waypoint_queue_.push_back(waypoint);
   }
   return getRouteLanelets(entity_lanelet_pose, waypoint_queue_.front(), horizon);
 }
@@ -87,7 +84,7 @@ void RoutePlanner::cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & e
       break;
     }
     if (waypoint_queue_.front().lanelet_id == entity_lanelet_pose.lanelet_id) {
-      waypoint_queue_.pop();
+      waypoint_queue_.pop_front();
       continue;
     } else {
       break;
@@ -97,9 +94,8 @@ void RoutePlanner::cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & e
 
 std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame()
 {
-  const auto lanelet_poses = getGoalPoses();
   std::vector<geometry_msgs::msg::Pose> ret;
-  for (const auto & lanelet_pose : lanelet_poses) {
+  for (const auto & lanelet_pose : waypoint_queue_) {
     ret.emplace_back(hdmap_utils_ptr_->toMapPose(lanelet_pose).pose);
   }
   return ret;
@@ -108,12 +104,8 @@ std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame()
 std::vector<traffic_simulator_msgs::msg::LaneletPose> RoutePlanner::getGoalPoses()
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> goal_poses;
-  goal_poses = {};
-  auto waypoint_queue_tmp_ = waypoint_queue_;
-  for (int i = 0; !waypoint_queue_tmp_.empty(); i++) {
-    goal_poses.push_back(waypoint_queue_tmp_.front());
-    waypoint_queue_tmp_.pop();
-  }
+  std::copy(
+    std::cbegin(waypoint_queue_), std::cend(waypoint_queue_), std::back_inserter(goal_poses));
   return goal_poses;
 }
 
