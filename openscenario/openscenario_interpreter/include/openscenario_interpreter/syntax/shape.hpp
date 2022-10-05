@@ -12,36 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SHAPE_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__SHAPE_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator/data_type/lane_change.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeTargetLane -----------------------------------------------------
+/* ---- Shape 1.2 --------------------------------------------------------------
  *
- *  <xsd:complexType name="RelativeTargetLane">
- *    <xsd:attribute name="entityRef" type="String" use="required"/>
- *    <xsd:attribute name="value" type="Int" use="required"/>
- *  </xsd:complexType>*
+ *  <xsd:complexType name="Shape">
+ *    <xsd:choice>
+ *      <xsd:element name="Polyline" type="Polyline" minOccurs="0"/>
+ *      <xsd:element name="Clothoid" type="Clothoid" minOccurs="0"/>
+ *      <xsd:element name="Nurbs" type="Nurbs" minOccurs="0"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeTargetLane
+struct Shape : public ComplexType
 {
-  const String entity_ref;
-
-  const Integer value;
-
-  explicit RelativeTargetLane(const pugi::xml_node &, Scope &);
-
-  explicit operator traffic_simulator::lane_change::Direction() const;
+  explicit Shape(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SHAPE_HPP_
