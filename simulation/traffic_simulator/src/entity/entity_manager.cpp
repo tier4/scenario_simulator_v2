@@ -615,7 +615,7 @@ void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;
   for (auto & entity : entities_) {
-    entity.second->verbose = verbose;
+    entity.second->setVerbose(verbose);
   }
 }
 

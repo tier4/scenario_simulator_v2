@@ -24,8 +24,8 @@ TrajectoryRef::TrajectoryRef(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : trajectory(
     choice(node,
-      std::make_pair(      "Trajectory", [&](const auto & node) { return make<Trajectory>(node, scope);        }),
-      std::make_pair("CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make(); })))
+      std::make_pair(      "Trajectory", [&](const auto & node) { return                               make<Trajectory>(node, scope); }),
+      std::make_pair("CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make            (node       ); })))
 // clang-format on
 {
 }
