@@ -115,7 +115,32 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  const std::string & name,  //
+  const std::string & name, const geometry_msgs::msg::Pose &,
+  const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
+{
+  auto register_to_entity_manager = [&]() {
+    using traffic_simulator::entity::MiscObjectEntity;
+    return entity_manager_ptr_->spawnEntity<MiscObjectEntity>(name, parameters);
+  };
+
+  auto register_to_environment_simulator = [&]() {
+    if (configuration.standalone_mode) {
+      return true;
+    } else {
+      simulation_api_schema::SpawnMiscObjectEntityRequest req;
+      simulation_api_schema::SpawnMiscObjectEntityResponse res;
+      simulation_interface::toProto(parameters, *req.mutable_parameters());
+      req.mutable_parameters()->set_name(name);
+      zeromq_client_.call(req, res);
+      return res.result().success();
+    }
+  };
+
+  return register_to_entity_manager() and register_to_environment_simulator();
+}
+
+bool API::spawn(
+  const std::string & name, const traffic_simulator_msgs::msg::LaneletPose &,
   const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
 {
   auto register_to_entity_manager = [&]() {

@@ -102,7 +102,13 @@ public:
     const traffic_simulator_msgs::msg::PedestrianParameters &,  //
     const std::string & = PedestrianBehavior::defaultBehavior());
 
-  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
+  bool spawn(
+    const std::string & name, const geometry_msgs::msg::Pose &,
+    const traffic_simulator_msgs::msg::MiscObjectParameters &);
+
+  bool spawn(
+    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose &,
+    const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
   bool despawn(const std::string & name);
 

@@ -127,7 +127,9 @@ private:
       "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0),
       traffic_simulator::helper::constructActionStatus(10));
 
-    api_.spawn("obstacle", getMiscObjectParameters());
+    api_.spawn(
+      "obstacle", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
+      getMiscObjectParameters());
     api_.setEntityStatus(
       "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
