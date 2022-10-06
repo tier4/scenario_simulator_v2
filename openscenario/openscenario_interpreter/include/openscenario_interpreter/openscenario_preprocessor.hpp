@@ -26,6 +26,7 @@
 
 namespace openscenario_interpreter
 {
+// TODO : rename
 struct ScenarioInfo
 {
   ScenarioInfo() {}
