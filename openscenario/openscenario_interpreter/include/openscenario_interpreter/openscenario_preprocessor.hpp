@@ -29,13 +29,16 @@ namespace openscenario_interpreter
 // TODO : rename
 struct ScenarioInfo
 {
-  ScenarioInfo() {}
-  ScenarioInfo(openscenario_interpreter_msgs::srv::PreprocessorLoad::Request & load_request)
+  ScenarioInfo() = default;
+
+  explicit ScenarioInfo(
+    openscenario_interpreter_msgs::srv::PreprocessorLoad::Request & load_request)
   {
     path = load_request.path;
     expect = load_request.expect;
     frame_rate = load_request.frame_rate;
   }
+
   auto getDeriveResponse() -> openscenario_interpreter_msgs::srv::PreprocessorDerive::Response
   {
     openscenario_interpreter_msgs::srv::PreprocessorDerive::Response response;
@@ -44,8 +47,11 @@ struct ScenarioInfo
     response.frame_rate = frame_rate;
     return response;
   }
+
   std::string path;
+
   int expect;
+
   float frame_rate;
 };
 
@@ -58,7 +64,7 @@ public:
 private:
   void preprocessScenario(ScenarioInfo & scenario);
 
-  [[nodiscard]] bool validateXOSC(const std::string file_name);
+  [[nodiscard]] bool validateXOSC(const std::string & file_name);
 
   rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorLoad>::SharedPtr load_server;
 

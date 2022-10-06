@@ -43,11 +43,10 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
     });
 
   using openscenario_interpreter_msgs::srv::PreprocessorDerive;
-
   derive_server = create_service<PreprocessorDerive>(
     "~/derive",
     [this](
-      [[maybe_unused]] const PreprocessorDerive::Request::SharedPtr request,
+      const PreprocessorDerive::Request::SharedPtr,
       PreprocessorDerive::Response::SharedPtr response) -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       if (preprocessed_scenarios.empty()) {
@@ -59,21 +58,22 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
     });
 
   using openscenario_interpreter_msgs::srv::PreprocessorCheckDerivativeRemained;
-
   check_server = create_service<PreprocessorCheckDerivativeRemained>(
     "~/check",
     [this](
-      [[maybe_unused]] const PreprocessorCheckDerivativeRemained::Request::SharedPtr request,
+      const PreprocessorCheckDerivativeRemained::Request::SharedPtr,
       PreprocessorCheckDerivativeRemained::Response::SharedPtr response) -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       response->derivative_remained = not preprocessed_scenarios.empty();
     });
 }
-bool Preprocessor::validateXOSC(const std::string file_name)
+
+bool Preprocessor::validateXOSC(const std::string & file_name)
 {
   return concealer::dollar("ros2 run openscenario_utility validate-xosc " + file_name)
            .find("All xosc files given are standard compliant.") != std::string::npos;
 }
+
 void Preprocessor::preprocessScenario(ScenarioInfo & scenario)
 {
   // this function doesn't support ParameterValueDistribution now
