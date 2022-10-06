@@ -103,15 +103,32 @@ public:
     const traffic_simulator_msgs::msg::VehicleParameters &,
     const std::string & = VehicleBehavior::defaultBehavior());
 
-  bool spawn(
-    const std::string & name, const geometry_msgs::msg::Pose &,
-    const traffic_simulator_msgs::msg::PedestrianParameters &,
-    const std::string & = PedestrianBehavior::defaultBehavior());
+  template <typename Pose>
+  auto spawn(
+    const std::string & name, const Pose & pose,
+    const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
+    const std::string & behavior = PedestrianBehavior::defaultBehavior())
+  {
+    auto register_to_entity_manager = [&]() {
+      using traffic_simulator::entity::PedestrianEntity;
+      return entity_manager_ptr_->spawnEntity<PedestrianEntity>(name, pose, parameters, behavior);
+    };
 
-  bool spawn(
-    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose &,
-    const traffic_simulator_msgs::msg::PedestrianParameters &,
-    const std::string & = PedestrianBehavior::defaultBehavior());
+    auto register_to_environment_simulator = [&]() {
+      if (configuration.standalone_mode) {
+        return true;
+      } else {
+        simulation_api_schema::SpawnPedestrianEntityRequest req;
+        simulation_api_schema::SpawnPedestrianEntityResponse res;
+        simulation_interface::toProto(parameters, *req.mutable_parameters());
+        req.mutable_parameters()->set_name(name);
+        zeromq_client_.call(req, res);
+        return res.result().success();
+      }
+    };
+
+    return register_to_entity_manager() and register_to_environment_simulator();
+  }
 
   template <typename Pose>
   auto spawn(

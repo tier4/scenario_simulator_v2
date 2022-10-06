@@ -119,58 +119,6 @@ bool API::spawn(
   return register_to_entity_manager() and register_to_environment_simulator();
 }
 
-bool API::spawn(
-  const std::string & name, const geometry_msgs::msg::Pose &,
-  const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
-  const std::string & behavior)
-{
-  auto register_to_entity_manager = [&]() {
-    using traffic_simulator::entity::PedestrianEntity;
-    return entity_manager_ptr_->spawnEntity<PedestrianEntity>(name, parameters, behavior);
-  };
-
-  auto register_to_environment_simulator = [&]() {
-    if (configuration.standalone_mode) {
-      return true;
-    } else {
-      simulation_api_schema::SpawnPedestrianEntityRequest req;
-      simulation_api_schema::SpawnPedestrianEntityResponse res;
-      simulation_interface::toProto(parameters, *req.mutable_parameters());
-      req.mutable_parameters()->set_name(name);
-      zeromq_client_.call(req, res);
-      return res.result().success();
-    }
-  };
-
-  return register_to_entity_manager() and register_to_environment_simulator();
-}
-
-bool API::spawn(
-  const std::string & name, const traffic_simulator_msgs::msg::LaneletPose &,
-  const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
-  const std::string & behavior)
-{
-  auto register_to_entity_manager = [&]() {
-    using traffic_simulator::entity::PedestrianEntity;
-    return entity_manager_ptr_->spawnEntity<PedestrianEntity>(name, parameters, behavior);
-  };
-
-  auto register_to_environment_simulator = [&]() {
-    if (configuration.standalone_mode) {
-      return true;
-    } else {
-      simulation_api_schema::SpawnPedestrianEntityRequest req;
-      simulation_api_schema::SpawnPedestrianEntityResponse res;
-      simulation_interface::toProto(parameters, *req.mutable_parameters());
-      req.mutable_parameters()->set_name(name);
-      zeromq_client_.call(req, res);
-      return res.result().success();
-    }
-  };
-
-  return register_to_entity_manager() and register_to_environment_simulator();
-}
-
 geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
 {
   auto status = getEntityStatus(name);

@@ -603,12 +603,14 @@ void EntityManager::requestSpeedChange(
 bool EntityManager::setEntityStatus(
   const std::string & name, traffic_simulator_msgs::msg::EntityStatus status)
 {
-  status.name = name;  // XXX UGLY CODE
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR(
-      "You cannot set entity status to the ego vehicle name:", name, " after starting scenario.");
+      "You cannot set entity status to the ego vehicle name ", std::quoted(name),
+      " after starting scenario.");
+  } else {
+    status.name = name;  // FIXME UGLY CODE!!!
+    return entities_.at(name)->setStatus(status);
   }
-  return entities_.at(name)->setStatus(status);
 }
 
 void EntityManager::setVerbose(const bool verbose)
