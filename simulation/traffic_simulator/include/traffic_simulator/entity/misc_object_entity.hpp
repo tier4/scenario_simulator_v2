@@ -25,8 +25,14 @@ namespace entity
 class MiscObjectEntity : public EntityBase
 {
 public:
-  MiscObjectEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params);
+  template <typename Pose>
+  explicit MiscObjectEntity(
+    const std::string & name, const Pose &,
+    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
+  : EntityBase(name, parameters.subtype), params_(parameters)
+  {
+  }
+
   void onUpdate(double, double) override;
   auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox override;
   auto getCurrentAction() const -> std::string override;
