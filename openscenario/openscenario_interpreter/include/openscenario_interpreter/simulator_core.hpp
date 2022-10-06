@@ -39,13 +39,15 @@ public:
   static auto activate(
     const Node & node, const traffic_simulator::Configuration & configuration, Ts &&... xs) -> void
   {
-    if (not core) {
+    if (not active()) {
       core = std::make_unique<traffic_simulator::API>(node, configuration);
       core->initialize(std::forward<decltype(xs)>(xs)...);
     } else {
       throw Error("The simulator core has already been instantiated.");
     }
   }
+
+  static auto active() { return static_cast<bool>(core); }
 
   static auto deactivate() -> void { core.reset(); }
 
@@ -311,13 +313,7 @@ public:
     template <typename... Ts>
     static auto evaluateStandStill(Ts &&... xs)
     {
-      if (const auto result = core->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
-          result) {
-        return result.get();
-      } else {
-        using value_type = typename std::decay<decltype(result)>::type::value_type;
-        return std::numeric_limits<value_type>::quiet_NaN();
-      }
+      return core->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -359,6 +355,11 @@ public:
     static auto asAutoware(Ts &&... xs) -> decltype(auto)
     {
       return core->asAutoware(std::forward<decltype(xs)>(xs)...);
+    }
+
+    static auto activateNonUserDefinedControllers() -> decltype(auto)
+    {
+      return core->startNpcLogic();
     }
 
     template <typename... Ts>

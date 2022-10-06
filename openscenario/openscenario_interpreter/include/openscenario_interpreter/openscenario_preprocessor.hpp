@@ -15,31 +15,60 @@
 #ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_PREPROCESSOR_HPP_
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_PREPROCESSOR_HPP_
 
+#include <concealer/execute.hpp>
+#include <deque>
 #include <memory>
-#include <openscenario_interpreter_msgs/srv/preprocess.hpp>
+#include <openscenario_interpreter/syntax/open_scenario.hpp>
+#include <openscenario_interpreter_msgs/srv/preprocessor_check_derivative_remained.hpp>
+#include <openscenario_interpreter_msgs/srv/preprocessor_derive.hpp>
+#include <openscenario_interpreter_msgs/srv/preprocessor_load.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 namespace openscenario_interpreter
 {
-class Preprocessor : rclcpp::Node
+struct ScenarioInfo
+{
+  ScenarioInfo() {}
+  ScenarioInfo(openscenario_interpreter_msgs::srv::PreprocessorLoad::Request & load_request)
+  {
+    path = load_request.path;
+    expect = load_request.expect;
+    frame_rate = load_request.frame_rate;
+  }
+  auto getDeriveResponse() -> openscenario_interpreter_msgs::srv::PreprocessorDerive::Response
+  {
+    openscenario_interpreter_msgs::srv::PreprocessorDerive::Response response;
+    response.path = path;
+    response.expect = expect;
+    response.frame_rate = frame_rate;
+    return response;
+  }
+  std::string path;
+  int expect;
+  float frame_rate;
+};
+
+class Preprocessor : public rclcpp::Node
 {
 public:
   //  OPENSCENARIO_INTERPRETER_PUBLIC
-  explicit Preprocessor(const rclcpp::NodeOptions & options) : rclcpp::Node("preprocessor", options)
-  {
-    using openscenario_interpreter_msgs::srv::Preprocess;
-    auto handle_preprocess = [this](
-                               const Preprocess::Request::SharedPtr request,
-                               Preprocess::Response::SharedPtr response) -> void {
-      // TODO: implement
-    };
-    server = create_service<Preprocess>("preprocess", handle_preprocess);
-  }
-
-  ~Preprocessor();
+  explicit Preprocessor(const rclcpp::NodeOptions & options);
 
 private:
-  rclcpp::Service<openscenario_interpreter_msgs::srv::Preprocess>::SharedPtr server;
+  void preprocessScenario(ScenarioInfo & scenario);
+
+  [[nodiscard]] bool validateXOSC(const std::string file_name);
+
+  rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorLoad>::SharedPtr load_server;
+
+  rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorDerive>::SharedPtr derive_server;
+
+  rclcpp::Service<openscenario_interpreter_msgs::srv::PreprocessorCheckDerivativeRemained>::
+    SharedPtr check_server;
+
+  std::deque<ScenarioInfo> preprocessed_scenarios;
+
+  std::mutex preprocessed_scenarios_mutex;
 };
 }  // namespace openscenario_interpreter
 

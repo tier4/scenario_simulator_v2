@@ -25,6 +25,7 @@
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/helper/stop_watch.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -326,7 +327,7 @@ const std::string EntityManager::getEgoName() const
 auto EntityManager::getObstacle(const std::string & name)
   -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  if (current_time_ < 0) {
+  if (!npc_logic_started_) {
     return boost::none;
   }
   return entities_.at(name)->getObstacle();
@@ -410,7 +411,7 @@ auto EntityManager::getStepTime() const noexcept -> double { return step_time_; 
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  if (current_time_ < 0) {
+  if (!npc_logic_started_) {
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
   return entities_.at(name)->getWaypoints();
@@ -419,7 +420,7 @@ auto EntityManager::getWaypoints(const std::string & name)
 void EntityManager::getGoalPoses(
   const std::string & name, std::vector<traffic_simulator_msgs::msg::LaneletPose> & goals)
 {
-  if (current_time_ < 0) {
+  if (!npc_logic_started_) {
     goals = std::vector<traffic_simulator_msgs::msg::LaneletPose>();
   }
   goals = entities_.at(name)->getGoalPoses();
@@ -429,7 +430,7 @@ void EntityManager::getGoalPoses(
   const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals)
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> lanelet_poses;
-  if (current_time_ < 0) {
+  if (!npc_logic_started_) {
     goals = std::vector<geometry_msgs::msg::Pose>();
   }
   getGoalPoses(name, lanelet_poses);
@@ -443,6 +444,16 @@ bool EntityManager::isEgo(const std::string & name) const
   using traffic_simulator_msgs::msg::EntityType;
   return getEntityType(name).type == EntityType::EGO and
          dynamic_cast<EgoEntity const *>(entities_.at(name).get());
+}
+
+bool EntityManager::isEgoSpawned() const
+{
+  for (const auto & name : getEntityNames()) {
+    if (isEgo(name)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool EntityManager::isInLanelet(
@@ -604,7 +615,7 @@ void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;
   for (auto & entity : entities_) {
-    entity.second->setVerbose(verbose);
+    entity.second->verbose = verbose;
   }
 }
 
@@ -631,21 +642,17 @@ traffic_simulator_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
 
 void EntityManager::update(const double current_time, const double step_time)
 {
-  std::chrono::system_clock::time_point start, end;
-  start = std::chrono::system_clock::now();
+  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
+    "EntityManager::update", configuration.verbose);
   step_time_ = step_time;
   current_time_ = current_time;
-  if (configuration.verbose) {
-    std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
-    std::cout << "current_time : " << current_time_ << std::endl;
-  }
+  setVerbose(configuration.verbose);
   if (getNumberOfEgo() >= 2) {
     THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
   }
-  if (current_time_ >= 0) {
+  if (npc_logic_started_) {
     traffic_light_manager_ptr_->update(step_time_);
   }
-  setVerbose(configuration.verbose);
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
@@ -706,10 +713,9 @@ void EntityManager::update(const double current_time, const double step_time)
     status_array_msg.data.emplace_back(status_with_traj);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
-  end = std::chrono::system_clock::now();
-  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+  stop_watch_update.stop();
   if (configuration.verbose) {
-    std::cout << "elapsed " << elapsed / 1000 << " seconds in update function." << std::endl;
+    stop_watch_update.print();
   }
 }
 
@@ -723,6 +729,14 @@ void EntityManager::updateHdmapMarker()
     markers.markers.emplace_back(marker);
   }
   lanelet_marker_pub_ptr_->publish(markers);
+}
+
+void EntityManager::startNpcLogic()
+{
+  npc_logic_started_ = true;
+  for (auto it = entities_.begin(); it != entities_.end(); it++) {
+    it->second->startNpcLogic();
+  }
 }
 }  // namespace entity
 }  // namespace traffic_simulator

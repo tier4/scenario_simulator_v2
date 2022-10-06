@@ -22,7 +22,17 @@ MiscObjectEntity::MiscObjectEntity(
   const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params)
 : EntityBase(name, params.subtype), params_(params)
 {
-  entity_type_.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
+}
+
+auto MiscObjectEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
+{
+  static const auto entity_type = []() {
+    traffic_simulator_msgs::msg::EntityType entity_type;
+    entity_type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
+    return entity_type;
+  }();
+
+  return entity_type;
 }
 
 void MiscObjectEntity::onUpdate(double, double)
@@ -42,8 +52,11 @@ auto MiscObjectEntity::getBoundingBox() const -> const traffic_simulator_msgs::m
   return params_.bounding_box;
 }
 
-auto MiscObjectEntity::getCurrentAction() const -> const std::string
+auto MiscObjectEntity::getCurrentAction() const -> std::string
 {
+  if (!npc_logic_started_) {
+    return "waiting";
+  }
   if (status_) {
     return status_->action_status.current_action;
   }

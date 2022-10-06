@@ -26,6 +26,11 @@ from typing import List
 import os
 
 import rclpy
+from openscenario_interpreter_msgs.srv import (
+    PreprocessorCheckDerivativeRemained,
+    PreprocessorDerive,
+    PreprocessorLoad
+)
 from openscenario_utility.conversion import convert
 from openscenario_utility.validation import XOSCValidator
 from scenario_test_runner.lifecycle_controller import LifecycleController
@@ -37,7 +42,7 @@ from scenario_test_runner.workflow import (
 )
 
 
-def convert_scenarios(scenarios: List[Scenario], output_directory: Path):
+def convert_scenarios_to_xosc(scenarios: List[Scenario], output_directory: Path):
 
     result = []
 
@@ -72,6 +77,7 @@ class ScenarioTestRunner(LifecycleController):
         global_real_time_factor: float,
         global_timeout: int,  # [sec]
         output_directory: Path,
+        verbose_debug: bool
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -97,6 +103,7 @@ class ScenarioTestRunner(LifecycleController):
         self.global_frame_rate = global_frame_rate
         self.global_real_time_factor = global_real_time_factor
         self.global_timeout = global_timeout
+        self.verbose_debug = verbose_debug
 
         self.output_directory = substitute_ros_package(output_directory)
 
@@ -111,6 +118,23 @@ class ScenarioTestRunner(LifecycleController):
         self.output_directory.mkdir(parents=True, exist_ok=True)
 
         self.current_workflow = None
+
+        self.check_preprocessor_client = self.create_client(PreprocessorCheckDerivativeRemained,
+                                                            '/simulation/openscenario_preprocessor/check')
+        while not self.check_preprocessor_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().warn('/simulation/openscenario_preprocessor/check service not available, waiting again...')
+
+        self.derive_preprocessor_client = self.create_client(PreprocessorDerive,
+                                                             '/simulation/openscenario_preprocessor/derive')
+        while not self.derive_preprocessor_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().warn('/simulation/openscenario_preprocessor/derive service not available, waiting again...')
+
+        self.load_preprocessor_client = self.create_client(PreprocessorLoad,
+                                                           '/simulation/openscenario_preprocessor/load')
+        while not self.load_preprocessor_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().warn('/simulation/openscenario_preprocessor/load service not available, waiting again...')
+
+        self.print_debug('connection established with preprocessor')
 
     def run_workflow(self, path: Path):
         """
@@ -132,15 +156,9 @@ class ScenarioTestRunner(LifecycleController):
             # TODO self.global_real_time_factor,
         )
 
-        converted_scenarios = convert_scenarios(
+        converted_scenarios = convert_scenarios_to_xosc(
             self.current_workflow.scenarios, self.output_directory
         )
-
-        is_valid = XOSCValidator(False)
-
-        for each in converted_scenarios:
-            if not is_valid(each.path):
-                exit(1)
 
         self.run_scenarios(converted_scenarios)
 
@@ -161,18 +179,43 @@ class ScenarioTestRunner(LifecycleController):
                 else:
                     time.sleep(self.SLEEP_RATE)
 
-    def run_scenario(self, scenario: Scenario):
-        converted_scenarios = convert_scenarios([scenario], self.output_directory)
+    def run_scenarios(self, scenarios: List[Scenario]):
 
-        is_valid = XOSCValidator(False)
+        # convert t4v2/xosc to xosc
+        xosc_scenarios = convert_scenarios_to_xosc(scenarios, self.output_directory)
 
-        for each in converted_scenarios:
-            if not is_valid(each.path):
+        # post to preprocessor
+        for xosc_scenario in xosc_scenarios:
+            if self.post_scenario_to_preprocessor(xosc_scenario):
+                preprocessed_scenarios = []
+                while self.derivative_remained_on_preprocessor():
+                    future = self.derive_preprocessor_client.call_async(PreprocessorDerive.Request())
+                    rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
+
+                    if future.result() is not None:
+                        result = Scenario(future.result().path,
+                                          Expect(future.result().expect),
+                                          future.result().frame_rate)
+                        self.print_debug("derived : " + str(future.result().path))
+                        preprocessed_scenarios.append(result)
+                    else:
+                        self.print_debug(
+                            'Exception while calling service /simulation/openscenario_preprocessor/derive: '
+                            + str(future.exception()))
+                        exit(1)
+                self.print_debug('finish derivation')
+
+                for preprocessed_scenario in preprocessed_scenarios:
+                    self.print_debug(preprocessed_scenario.path)
+
+                self.run_preprocessed_scenarios(preprocessed_scenarios)
+                self.print_debug('finish execution')
+            else:
                 exit(1)
 
-        self.run_scenarios(converted_scenarios)
+        self.shutdown()
 
-    def run_scenarios(self, scenarios: List[Scenario]):  # TODO RENAME
+    def run_preprocessed_scenarios(self, scenarios: List[Scenario]):
         """
         Run all given scenarios.
 
@@ -216,8 +259,6 @@ class ScenarioTestRunner(LifecycleController):
 
                 self.cleanup_node()
 
-            self.shutdown()
-
         except KeyboardInterrupt:
             self.get_logger().warn("KeyboardInterrupt")
         except OSError as e:
@@ -228,8 +269,44 @@ class ScenarioTestRunner(LifecycleController):
     # def __del__(self):
     #     pass
 
+    def post_scenario_to_preprocessor(self, scenario: Scenario):
+
+        request = PreprocessorLoad.Request()
+        request.path = str(scenario.path.absolute())
+        request.expect = scenario.expect
+        request.frame_rate = scenario.frame_rate
+
+        future = self.load_preprocessor_client.call_async(request)
+        rclpy.spin_until_future_complete(self, future)
+        if future.result() is not None:
+            self.print_debug('Result of /simulation/openscenario_preprocessor/load: '
+                             + str(future.result().message))
+            return True
+        else:
+            self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/load: '
+                             + str(future.exception()))
+            return False
+
+    def derivative_remained_on_preprocessor(self):
+
+        future = self.check_preprocessor_client.call_async(PreprocessorCheckDerivativeRemained.Request())
+        rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
+        if future.result() is not None:
+            self.print_debug('Result of /simulation/openscenario_preprocessor/check: '
+                             + str(future.result().derivative_remained))
+            return future.result().derivative_remained
+        else:
+            self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/check: '
+                             + str(future.exception()))
+            exit(1)
+
+    def print_debug(self, message):
+        if self.verbose_debug:
+            self.get_logger().info(message)
+
 
 def main(args=None):
+
     rclpy.init(args=args)
 
     parser = argparse.ArgumentParser()
@@ -254,6 +331,8 @@ def main(args=None):
     parser.add_argument("--ros-args", nargs="*")  # XXX DIRTY HACK
     parser.add_argument("-r", nargs="*")  # XXX DIRTY HACK
 
+    parser.add_argument("-v", "--verbose-debug", default=False, type=bool)
+
     args = parser.parse_args()
 
     test_runner = ScenarioTestRunner(
@@ -261,17 +340,18 @@ def main(args=None):
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
         output_directory=args.output_directory / "scenario_test_runner",
+        verbose_debug=args.verbose_debug
     )
 
     if args.scenario != Path("/dev/null"):
         print(str(substitute_ros_package(args.scenario).resolve()))
 
-        test_runner.run_scenario(
-            Scenario(
+        test_runner.run_scenarios(
+            [Scenario(
                 substitute_ros_package(args.scenario).resolve(),
                 Expect["success"],
                 args.global_frame_rate,
-            )
+            )]
         )
 
     elif args.workflow != Path("/dev/null"):

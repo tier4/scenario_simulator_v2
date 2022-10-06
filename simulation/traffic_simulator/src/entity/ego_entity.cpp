@@ -129,9 +129,8 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-
-  if (architecture_type == "awf/universe") {
+  if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
+      architecture_type == "awf/universe") {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<concealer::AutowareUniverse>(
@@ -163,12 +162,15 @@ EgoEntity::EgoEntity(
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
-  entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
-auto EgoEntity::asAutoware() const -> concealer::Autoware & { return *autoware; }
+auto EgoEntity::asAutoware() const -> concealer::Autoware &
+{
+  assert(autoware);
+  return *autoware;
+}
 
-auto EgoEntity::getCurrentAction() const -> const std::string
+auto EgoEntity::getCurrentAction() const -> std::string
 {
   const auto state = autoware->getAutowareStateName();
   return state.empty() ? "Launching" : state;
@@ -189,56 +191,22 @@ auto EgoEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverMod
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   -> const traffic_simulator_msgs::msg::EntityStatus
 {
-  geometry_msgs::msg::Vector3 rpy;
-  {
-    rpy.x = 0;
-    rpy.y = 0;
-    rpy.z = vehicle_model_ptr_->getYaw();
-  }
-
-  geometry_msgs::msg::Pose pose;
-  {
-    pose.position.x = vehicle_model_ptr_->getX();
-    pose.position.y = vehicle_model_ptr_->getY();
-    pose.position.z = 0.0;
-    pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
-  }
-
-  geometry_msgs::msg::Twist twist;
-  {
-    twist.linear.x = vehicle_model_ptr_->getVx();
-    twist.angular.z = vehicle_model_ptr_->getWz();
-  }
-
-  geometry_msgs::msg::Accel accel;
-  {
-    if (previous_angular_velocity_ && previous_linear_velocity_) {
-      accel.linear.x = (twist.linear.x - previous_linear_velocity_.get()) / step_time;
-      accel.angular.z = (twist.angular.z - previous_angular_velocity_.get()) / step_time;
-    }
-  }
-
-  Eigen::VectorXd v(3);
-  {
-    v(0) = pose.position.x;
-    v(1) = pose.position.y;
-    v(2) = pose.position.z;
-
-    v = quaternion_operation::getRotationMatrix((*initial_pose_).orientation) * v;
-  }
-
   traffic_simulator_msgs::msg::EntityStatus status;
   {
     status.time = time;
-    status.type.type = entity_type_.type;
+    status.type = getEntityType();
     status.bounding_box = getBoundingBox();
-    status.action_status.twist = twist;
-    status.action_status.accel = accel;
-    status.pose.position.x = v(0) + initial_pose_.get().position.x;
-    status.pose.position.y = v(1) + initial_pose_.get().position.y;
-    status.pose.position.z = v(2) + initial_pose_.get().position.z;
-
-    status.pose.orientation = initial_pose_.get().orientation * pose.orientation;
+    status.pose = getCurrentPose();
+    status.action_status.twist = getCurrentTwist();
+    status.action_status.accel = [&]() {
+      geometry_msgs::msg::Accel accel;
+      if (previous_angular_velocity_) {
+        accel.linear.x = vehicle_model_ptr_->getAx();
+        accel.angular.z =
+          (vehicle_model_ptr_->getWz() - previous_angular_velocity_.get()) / step_time;
+      }
+      return accel;
+    }();
 
     const auto route_lanelets = getRouteLanelets();
 
@@ -270,6 +238,17 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   return status;
 }
 
+auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
+{
+  static const auto entity_type = []() {
+    traffic_simulator_msgs::msg::EntityType entity_type;
+    entity_type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+    return entity_type;
+  }();
+
+  return entity_type;
+}
+
 auto EgoEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "EgoEntity";
@@ -283,17 +262,49 @@ auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Ob
 
 auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 {
-  const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
-  std::vector<std::int64_t> ids = {};
-  if (universe) {
-    const auto points = universe->getPathWithLaneId().points;
-    for (const auto & point : points) {
+  std::vector<std::int64_t> ids{};
+
+  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get()); universe) {
+    for (const auto & point : universe->getPathWithLaneId().points) {
       std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }
-    auto result = std::unique(ids.begin(), ids.end());
-    ids.erase(result, ids.end());
+    ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
   }
+
   return ids;
+}
+
+auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
+{
+  Eigen::VectorXd relative_position(3);
+  relative_position(0) = vehicle_model_ptr_->getX();
+  relative_position(1) = vehicle_model_ptr_->getY();
+  relative_position(2) = 0.0;
+  relative_position =
+    quaternion_operation::getRotationMatrix(initial_pose_->orientation) * relative_position;
+
+  geometry_msgs::msg::Pose current_pose;
+  current_pose.position.x = initial_pose_.get().position.x + relative_position(0);
+  current_pose.position.y = initial_pose_.get().position.y + relative_position(1);
+  current_pose.position.z = initial_pose_.get().position.z + relative_position(2);
+  current_pose.orientation = [this]() {
+    geometry_msgs::msg::Vector3 rpy;
+    rpy.x = 0;
+    rpy.y = 0;
+    rpy.z = vehicle_model_ptr_->getYaw();
+    return initial_pose_.get().orientation *
+           quaternion_operation::convertEulerAngleToQuaternion(rpy);
+  }();
+
+  return current_pose;
+}
+
+auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
+{
+  geometry_msgs::msg::Twist current_twist;
+  current_twist.linear.x = vehicle_model_ptr_->getVx();
+  current_twist.angular.z = vehicle_model_ptr_->getWz();
+  return current_twist;
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
@@ -304,37 +315,10 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   autoware->rethrow();
+
   EntityBase::onUpdate(current_time, step_time);
-  if (current_time < 0) {
-    updateEntityStatusTimestamp(current_time);
 
-    geometry_msgs::msg::Pose current_pose;
-    {
-      geometry_msgs::msg::Vector3 rpy;
-      {
-        rpy.x = 0;
-        rpy.y = 0;
-        rpy.z = vehicle_model_ptr_->getYaw();
-      }
-
-      current_pose.position.x = (*vehicle_model_ptr_).getX() + initial_pose_.get().position.x;
-      current_pose.position.y = (*vehicle_model_ptr_).getY() + initial_pose_.get().position.y;
-      current_pose.position.z = /*                          */ initial_pose_.get().position.z;
-
-      current_pose.orientation =
-        initial_pose_.get().orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
-    }
-
-    autoware->set(current_pose);
-
-    geometry_msgs::msg::Twist current_twist;
-    {
-      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
-      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
-    }
-
-    autoware->set(current_twist);
-  } else {
+  if (npc_logic_started_) {
     Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
 
     switch (vehicle_model_type_) {
@@ -363,19 +347,19 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
-
-    setStatus(getEntityStatus(current_time + step_time, step_time));
-    updateStandStillDuration(step_time);
-
-    if (previous_linear_velocity_) {
-      linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
-    } else {
-      linear_jerk_ = 0;
-    }
-
-    previous_linear_velocity_ = vehicle_model_ptr_->getVx();
-    previous_angular_velocity_ = vehicle_model_ptr_->getWz();
   }
+
+  setStatus(getEntityStatus(current_time + step_time, step_time));
+  updateStandStillDuration(step_time);
+
+  if (previous_linear_velocity_) {
+    linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
+  } else {
+    linear_jerk_ = 0;
+  }
+
+  previous_linear_velocity_ = vehicle_model_ptr_->getVx();
+  previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 }
 
 void EgoEntity::requestAcquirePosition(
@@ -468,14 +452,15 @@ bool EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
   const auto current_pose = getStatus().pose;
 
   if (autoware->initialized()) {
-    geometry_msgs::msg::Twist current_twist;
-    {
-      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
-      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
-    }
+    autoware->set([this]() {
+      geometry_msgs::msg::Accel message;
+      message.linear.x = vehicle_model_ptr_->getAx();
+      return message;
+    }());
 
     autoware->set(current_pose);
-    autoware->set(current_twist);
+
+    autoware->set(getCurrentTwist());
   }
 
   if (not initial_pose_) {

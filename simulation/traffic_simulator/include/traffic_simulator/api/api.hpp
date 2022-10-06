@@ -28,7 +28,7 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
-#include <traffic_simulator/data_type/data_types.hpp>
+#include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -155,7 +155,9 @@ public:
 
   bool updateFrame();
 
-  double getCurrentTime() const noexcept { return clock_.getCurrentSimulationTime(); }
+  double getCurrentTime() const noexcept { return clock_.getCurrentScenarioTime(); }
+
+  void startNpcLogic();
 
   void requestLaneChange(const std::string & name, const std::int64_t & lanelet_id);
 
@@ -204,7 +206,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
+  FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
+  FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);

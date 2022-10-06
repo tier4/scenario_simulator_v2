@@ -33,7 +33,8 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
-#include <traffic_simulator/data_type/data_types.hpp>
+#include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
@@ -84,6 +85,8 @@ class EntityManager
   double step_time_;
 
   double current_time_;
+
+  bool npc_logic_started_;
 
   using EntityStatusWithTrajectoryArray =
     traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray;
@@ -141,7 +144,8 @@ public:
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
-    current_time_(0),
+    current_time_(std::numeric_limits<double>::quiet_NaN()),
+    npc_logic_started_(false),
     entity_status_array_pub_ptr_(rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
       node, "entity/status", EntityMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
@@ -325,6 +329,8 @@ public:
 
   bool isEgo(const std::string & name) const;
 
+  bool isEgoSpawned() const;
+
   const std::string getEgoName() const;
 
   bool isInLanelet(const std::string & name, const std::int64_t lanelet_id, const double tolerance);
@@ -355,6 +361,9 @@ public:
     if (result.second) {
       result.first->second->setHdMapUtils(hdmap_utils_ptr_);
       result.first->second->setTrafficLightManager(traffic_light_manager_ptr_);
+      if (npc_logic_started_ && !isEgo(name)) {
+        result.first->second->startNpcLogic();
+      }
       return result.second;
     } else {
       THROW_SEMANTIC_ERROR("entity : ", name, " is already exists.");
@@ -380,6 +389,10 @@ public:
   void update(const double current_time, const double step_time);
 
   void updateHdmapMarker();
+
+  void startNpcLogic();
+
+  auto isNpcLogicStarted() const { return npc_logic_started_; }
 };
 }  // namespace entity
 }  // namespace traffic_simulator
