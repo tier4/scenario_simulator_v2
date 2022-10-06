@@ -93,8 +93,13 @@ public:
   void setVerbose(const bool verbose);
 
   bool spawn(
-    const std::string & name,                                //
-    const traffic_simulator_msgs::msg::VehicleParameters &,  //
+    const std::string & name, const geometry_msgs::msg::Pose &,
+    const traffic_simulator_msgs::msg::VehicleParameters &,
+    const std::string & = VehicleBehavior::defaultBehavior());
+
+  bool spawn(
+    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose &,
+    const traffic_simulator_msgs::msg::VehicleParameters &,
     const std::string & = VehicleBehavior::defaultBehavior());
 
   bool spawn(
