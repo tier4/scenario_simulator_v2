@@ -65,14 +65,28 @@ class EgoEntity : public VehicleEntity
 
   boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 
+  static auto getVehicleModelType() -> VehicleModelType;
+
+  static auto makeAutoware(const Configuration &) -> std::unique_ptr<concealer::Autoware>;
+
+  static auto makeSimulationModel(
+    const VehicleModelType, const double step_time,
+    const traffic_simulator_msgs::msg::VehicleParameters &)
+    -> const std::shared_ptr<SimModelInterface>;
+
 public:
   explicit EgoEntity() = delete;
 
+  template <typename Pose>
   explicit EgoEntity(
-    const std::string & name,             //
-    const Configuration & configuration,  //
-    const double step_time,               //
-    const traffic_simulator_msgs::msg::VehicleParameters & parameters);
+    const std::string & name, const Pose & pose, const Configuration & configuration,
+    const double step_time, const traffic_simulator_msgs::msg::VehicleParameters & parameters)
+  : VehicleEntity(name, pose, parameters),
+    autoware(makeAutoware(configuration)),
+    vehicle_model_type_(getVehicleModelType()),
+    vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
+  {
+  }
 
   explicit EgoEntity(EgoEntity &&) = delete;
 

@@ -51,7 +51,7 @@ auto toString(const VehicleModelType datum) -> std::string
   THROW_SIMULATION_ERROR("Unsupported vehicle model type, failed to convert to string");
 }
 
-auto getVehicleModelType()
+auto EgoEntity::getVehicleModelType() -> VehicleModelType
 {
   const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
@@ -76,9 +76,8 @@ auto getVehicleModelType()
   }
 }
 
-auto makeSimulationModel(
-  const VehicleModelType vehicle_model_type,
-  const double step_time,  //
+auto EgoEntity::makeSimulationModel(
+  const VehicleModelType vehicle_model_type, const double step_time,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
   -> const std::shared_ptr<SimModelInterface>
 {
@@ -127,7 +126,8 @@ auto makeSimulationModel(
   }
 }
 
-auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
+auto EgoEntity::makeAutoware(const Configuration & configuration)
+  -> std::unique_ptr<concealer::Autoware>
 {
   if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
       architecture_type == "awf/universe") {
@@ -150,18 +150,6 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
     throw common::SemanticError(
       "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
   }
-}
-
-EgoEntity::EgoEntity(
-  const std::string & name,             //
-  const Configuration & configuration,  //
-  const double step_time,               //
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
-: VehicleEntity(name, parameters),
-  autoware(makeAutoware(configuration)),
-  vehicle_model_type_(getVehicleModelType()),
-  vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
-{
 }
 
 auto EgoEntity::asAutoware() const -> concealer::Autoware &

@@ -25,21 +25,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-VehicleEntity::VehicleEntity(
-  const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & params,
-  const std::string & plugin_name)
-: EntityBase(name, params.subtype),
-  parameters(params),
-  loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
-    "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
-  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
-{
-  behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
-  behavior_plugin_ptr_->setVehicleParameters(parameters);
-  behavior_plugin_ptr_->setDebugMarker({});
-  behavior_plugin_ptr_->setDriverModel(traffic_simulator_msgs::msg::DriverModel());
-}
-
 void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
 {
   const auto marker = behavior_plugin_ptr_->getDebugMarker();

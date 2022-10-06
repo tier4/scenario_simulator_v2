@@ -53,9 +53,22 @@ public:
     static auto defaultBehavior() -> const std::string & { return behaviorTree(); }
   };
 
+  template <typename Pose>
   explicit VehicleEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters &,
-    const std::string & = BuiltinBehavior::defaultBehavior());
+    const std::string & name, const Pose &,
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+    const std::string & plugin_name = BuiltinBehavior::defaultBehavior())
+  : EntityBase(name, parameters.subtype),
+    parameters(parameters),
+    loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
+      "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
+    behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
+  {
+    behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
+    behavior_plugin_ptr_->setVehicleParameters(parameters);
+    behavior_plugin_ptr_->setDebugMarker({});
+    behavior_plugin_ptr_->setDriverModel(traffic_simulator_msgs::msg::DriverModel());
+  }
 
   ~VehicleEntity() override = default;
 

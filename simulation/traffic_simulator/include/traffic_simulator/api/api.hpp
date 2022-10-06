@@ -93,15 +93,39 @@ public:
 
   void setVerbose(const bool verbose);
 
-  bool spawn(
-    const std::string & name, const geometry_msgs::msg::Pose &,
-    const traffic_simulator_msgs::msg::VehicleParameters &,
-    const std::string & = VehicleBehavior::defaultBehavior());
+  template <typename Pose>
+  auto spawn(
+    const std::string & name, const Pose & pose,
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+    const std::string & behavior = VehicleBehavior::defaultBehavior())
+  {
+    auto register_to_entity_manager = [&]() {
+      if (behavior == VehicleBehavior::autoware()) {
+        return entity_manager_ptr_->entityExists(name) or
+               entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
+                 name, pose, configuration, clock_.getStepTime(), parameters);
+      } else {
+        return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
+          name, pose, parameters, behavior);
+      }
+    };
 
-  bool spawn(
-    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose &,
-    const traffic_simulator_msgs::msg::VehicleParameters &,
-    const std::string & = VehicleBehavior::defaultBehavior());
+    auto register_to_environment_simulator = [&]() {
+      if (configuration.standalone_mode) {
+        return true;
+      } else {
+        simulation_api_schema::SpawnVehicleEntityRequest req;
+        simulation_api_schema::SpawnVehicleEntityResponse res;
+        simulation_interface::toProto(parameters, *req.mutable_parameters());
+        req.mutable_parameters()->set_name(name);
+        req.set_is_ego(behavior == VehicleBehavior::autoware());
+        zeromq_client_.call(req, res);
+        return res.result().success();
+      }
+    };
+
+    return register_to_entity_manager() and register_to_environment_simulator();
+  }
 
   template <typename Pose>
   auto spawn(
