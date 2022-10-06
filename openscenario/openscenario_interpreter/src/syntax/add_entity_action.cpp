@@ -66,15 +66,29 @@ try {
           : Properties());
     },
     [&](const Pedestrian & pedestrian) {
-      applyAddEntityAction(
-        entity_ref, static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+      if (position.is<WorldPosition>()) {
+        applyAddEntityAction(
+          entity_ref, static_cast<NativeWorldPosition>(position.as<WorldPosition>()),
+          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+      } else if (position.is<RelativeWorldPosition>()) {
+        applyAddEntityAction(
+          entity_ref,
+          static_cast<NativeRelativeWorldPosition>(position.as<RelativeWorldPosition>()),
+          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+      } else if (position.is<LanePosition>()) {
+        applyAddEntityAction(
+          entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
+          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+      } else {
+        throw common::Error(__FILE__);
+      }
+
       TeleportAction::teleport(entity_ref, position);
     },
     [&](const MiscObject & misc_object) {
       if (position.is<WorldPosition>()) {
         applyAddEntityAction(
-          entity_ref,
-          static_cast<NativeWorldPosition>(position.as<WorldPosition>()),
+          entity_ref, static_cast<NativeWorldPosition>(position.as<WorldPosition>()),
           static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
       } else if (position.is<RelativeWorldPosition>()) {
         applyAddEntityAction(
@@ -83,8 +97,7 @@ try {
           static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
-          entity_ref,
-          static_cast<NativeLanePosition>(position.as<LanePosition>()),
+          entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
           static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
       } else {
         throw common::Error(__FILE__);

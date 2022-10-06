@@ -75,7 +75,9 @@ private:
                traffic_simulator::helper::constructLaneletPose(34675, 0.0),
                traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
 
-    api_.spawn("bob", getPedestrianParameters());
+    api_.spawn(
+      "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+      getPedestrianParameters());
     api_.setEntityStatus(
       "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(0));
