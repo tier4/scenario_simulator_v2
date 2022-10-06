@@ -356,15 +356,15 @@ public:
   template <typename Entity, typename... Ts>
   auto spawnEntity(const std::string & name, Ts &&... xs)
   {
-    const auto result =
-      entities_.emplace(name, std::make_unique<Entity>(name, std::forward<decltype(xs)>(xs)...));
-    if (result.second) {
-      result.first->second->setHdMapUtils(hdmap_utils_ptr_);
-      result.first->second->setTrafficLightManager(traffic_light_manager_ptr_);
-      if (npc_logic_started_ && !isEgo(name)) {
-        result.first->second->startNpcLogic();
+    if (const auto [iter, success] = entities_.emplace(
+          name, std::make_unique<Entity>(name, std::forward<decltype(xs)>(xs)...));
+        success) {
+      iter->second->setHdMapUtils(hdmap_utils_ptr_);
+      iter->second->setTrafficLightManager(traffic_light_manager_ptr_);
+      if (npc_logic_started_ && not isEgo(name)) {
+        iter->second->startNpcLogic();
       }
-      return result.second;
+      return success;
     } else {
       THROW_SEMANTIC_ERROR("entity : ", name, " is already exists.");
     }
