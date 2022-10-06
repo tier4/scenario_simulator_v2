@@ -34,7 +34,6 @@ PedestrianEntity::PedestrianEntity(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
 {
-  entity_type_.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
@@ -45,6 +44,17 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
 {
   const auto marker = behavior_plugin_ptr_->getDebugMarker();
   std::copy(marker.begin(), marker.end(), std::back_inserter(marker_array.markers));
+}
+
+auto PedestrianEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
+{
+  static const auto entity_type = []() {
+    traffic_simulator_msgs::msg::EntityType entity_type;
+    entity_type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+    return entity_type;
+  }();
+
+  return entity_type;
 }
 
 void PedestrianEntity::requestAssignRoute(

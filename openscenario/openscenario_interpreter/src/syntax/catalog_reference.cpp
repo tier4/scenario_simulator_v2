@@ -101,7 +101,7 @@ CatalogReference::CatalogReference(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto CatalogReference::make([[maybe_unused]] const pugi::xml_node & node) -> const Object
+auto CatalogReference::make() -> const Object
 {
   using ::openscenario_interpreter::make;
 
