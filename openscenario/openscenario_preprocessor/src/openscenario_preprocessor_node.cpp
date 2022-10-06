@@ -16,7 +16,8 @@
 
 #include <cstdlib>
 #include <memory>
-#include <openscenario_interpreter/openscenario_preprocessor.hpp>
+
+#include <openscenario_preprocessor/openscenario_preprocessor.hpp>
 
 int main(const int argc, char const * const * const argv)
 {
@@ -29,7 +30,7 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::NodeOptions options{};
 
-  auto node = std::make_shared<openscenario_interpreter::Preprocessor>(options);
+  auto node = std::make_shared<openscenario_preprocessor::Preprocessor>(options);
 
   executor.add_node((*node).get_node_base_interface());
 

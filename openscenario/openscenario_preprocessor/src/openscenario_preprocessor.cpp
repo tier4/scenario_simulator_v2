@@ -15,10 +15,10 @@
 //#define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <algorithm>
-#include <openscenario_interpreter/openscenario_preprocessor.hpp>
+#include <openscenario_preprocessor/openscenario_preprocessor.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
-namespace openscenario_interpreter
+namespace openscenario_preprocessor
 {
 Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
 : rclcpp::Node("preprocessor", options)
@@ -90,6 +90,6 @@ void Preprocessor::preprocessScenario(ScenarioInfo & scenario)
     throw common::Error("the scenario file is not valid. Please check your scenario");
   }
 }
-}  // namespace openscenario_interpreter
+}  // namespace openscenario_preprocessor
 
-RCLCPP_COMPONENTS_REGISTER_NODE(openscenario_interpreter::Preprocessor)
+RCLCPP_COMPONENTS_REGISTER_NODE(openscenario_preprocessor::Preprocessor)

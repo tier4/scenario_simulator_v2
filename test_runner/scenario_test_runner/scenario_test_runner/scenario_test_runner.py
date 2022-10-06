@@ -76,8 +76,7 @@ class ScenarioTestRunner(LifecycleController):
         global_frame_rate: float,
         global_real_time_factor: float,
         global_timeout: int,  # [sec]
-        output_directory: Path,
-        verbose_debug: bool
+        output_directory: Path
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -103,7 +102,6 @@ class ScenarioTestRunner(LifecycleController):
         self.global_frame_rate = global_frame_rate
         self.global_real_time_factor = global_real_time_factor
         self.global_timeout = global_timeout
-        self.verbose_debug = verbose_debug
 
         self.output_directory = substitute_ros_package(output_directory)
 
@@ -206,7 +204,7 @@ class ScenarioTestRunner(LifecycleController):
                 self.print_debug('finish derivation')
 
                 for preprocessed_scenario in preprocessed_scenarios:
-                    self.print_debug(preprocessed_scenario.path)
+                    self.print_debug(str(preprocessed_scenario.path))
 
                 self.run_preprocessed_scenarios(preprocessed_scenarios)
                 self.print_debug('finish execution')
@@ -300,9 +298,8 @@ class ScenarioTestRunner(LifecycleController):
                              + str(future.exception()))
             exit(1)
 
-    def print_debug(self, message):
-        if self.verbose_debug:
-            self.get_logger().info(message)
+    def print_debug(self, message: str):
+        self.get_logger().info(message)
 
 
 def main(args=None):
@@ -331,8 +328,6 @@ def main(args=None):
     parser.add_argument("--ros-args", nargs="*")  # XXX DIRTY HACK
     parser.add_argument("-r", nargs="*")  # XXX DIRTY HACK
 
-    parser.add_argument("-v", "--verbose-debug", default=False, type=bool)
-
     args = parser.parse_args()
 
     test_runner = ScenarioTestRunner(
@@ -340,7 +335,6 @@ def main(args=None):
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
         output_directory=args.output_directory / "scenario_test_runner",
-        verbose_debug=args.verbose_debug
     )
 
     if args.scenario != Path("/dev/null"):

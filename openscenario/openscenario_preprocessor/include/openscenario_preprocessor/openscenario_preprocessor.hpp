@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_PREPROCESSOR_HPP_
-#define OPENSCENARIO_INTERPRETER__OPENSCENARIO_PREPROCESSOR_HPP_
+#ifndef OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
+#define OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 
 #include <concealer/execute.hpp>
 #include <deque>
@@ -24,7 +24,7 @@
 #include <openscenario_interpreter_msgs/srv/preprocessor_load.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-namespace openscenario_interpreter
+namespace openscenario_preprocessor
 {
 // TODO : rename
 struct ScenarioInfo
@@ -77,6 +77,6 @@ private:
 
   std::mutex preprocessed_scenarios_mutex;
 };
-}  // namespace openscenario_interpreter
+}  // namespace openscenario_preprocessor
 
-#endif  // OPENSCENARIO_INTERPRETER__OPENSCENARIO_PREPROCESSOR_HPP_
+#endif  // OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
