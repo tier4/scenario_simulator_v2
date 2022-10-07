@@ -67,6 +67,8 @@ struct CustomCommandAction : private Scope, private SimulatorCore::ActionApplica
 
   static auto run() noexcept -> void;
 
+  static auto printParameter(const std::vector<std::string> &, const Scope &) -> int;
+
   static auto publisher() -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &;
 
   /*  */ auto start() const -> void;
