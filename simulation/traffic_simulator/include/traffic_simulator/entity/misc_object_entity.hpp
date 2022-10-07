@@ -27,9 +27,9 @@ class MiscObjectEntity : public EntityBase
 public:
   template <typename Pose>
   explicit MiscObjectEntity(
-    const std::string & name, const Pose &,
+    const std::string & name, const Pose & pose,
     const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
-  : EntityBase(name, parameters.subtype), params_(parameters)
+  : EntityBase(name, pose, parameters.subtype), params_(parameters)
   {
   }
 

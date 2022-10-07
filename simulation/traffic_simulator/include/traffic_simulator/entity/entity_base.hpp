@@ -45,7 +45,13 @@ namespace entity
 class EntityBase
 {
 public:
-  explicit EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype &);
+  template <typename Pose>
+  explicit EntityBase(
+    const std::string & name, const Pose &,
+    const traffic_simulator_msgs::msg::EntitySubtype & subtype)
+  : name(name), subtype(subtype), verbose(true), status_(boost::none), npc_logic_started_(false)
+  {
+  }
 
   virtual ~EntityBase() = default;
 

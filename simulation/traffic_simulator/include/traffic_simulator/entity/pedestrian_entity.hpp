@@ -52,10 +52,10 @@ public:
 
   template <typename Pose>
   explicit PedestrianEntity(
-    const std::string & name, const Pose &,
+    const std::string & name, const Pose & pose,
     const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior())
-  : EntityBase(name, parameters.subtype),
+  : EntityBase(name, pose, parameters.subtype),
     parameters(parameters),
     plugin_name(plugin_name),
     loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(

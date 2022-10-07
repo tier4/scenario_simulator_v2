@@ -28,12 +28,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-EntityBase::EntityBase(
-  const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-: name(name), subtype(subtype), verbose(true), status_(boost::none), npc_logic_started_(false)
-{
-}
-
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
 
 auto EntityBase::asAutoware() const -> concealer::Autoware &
