@@ -104,8 +104,7 @@ auto EntityManager::getCurrentTime() const noexcept -> double { return current_t
 auto EntityManager::getDistanceToCrosswalk(
   const std::string & name, const std::int64_t target_crosswalk_id) -> boost::optional<double>
 {
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
+  if (entities_.find(name) == entities_.end()) {
     return boost::none;
   }
   if (getWaypoints(name).waypoints.empty()) {
@@ -119,8 +118,7 @@ auto EntityManager::getDistanceToCrosswalk(
 auto EntityManager::getDistanceToStopLine(
   const std::string & name, const std::int64_t target_stop_line_id) -> boost::optional<double>
 {
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
+  if (entities_.find(name) == entities_.end()) {
     return boost::none;
   }
   if (getWaypoints(name).waypoints.empty()) {
@@ -171,8 +169,8 @@ auto EntityManager::getEntityTypeList() const
   -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>
 {
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> ret;
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    ret.emplace(it->first, it->second->getEntityType());
+  for (auto && [name, entity] : entities_) {
+    ret.emplace(name, entity->getEntityType());
   }
   return ret;
 }
@@ -402,15 +400,11 @@ bool EntityManager::isInLanelet(
       lanelet_id, l, status.lanelet_pose.lanelet_id, status.lanelet_pose.s);
     auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(
       status.lanelet_pose.lanelet_id, status.lanelet_pose.s, lanelet_id, 0);
-    if (dist0) {
-      if (dist0.get() < tolerance) {
-        return true;
-      }
+    if (dist0 and dist0.get() < tolerance) {
+      return true;
     }
-    if (dist1) {
-      if (dist1.get() < tolerance) {
-        return true;
-      }
+    if (dist1 and dist1.get() < tolerance) {
+      return true;
     }
   }
   return false;
