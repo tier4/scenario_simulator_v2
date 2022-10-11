@@ -85,8 +85,8 @@ auto VehicleEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg
 
 auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t>
 {
-  if (status_ and status_->lanelet_pose_valid) {
-    return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
+  if (status_.lanelet_pose_valid) {
+    return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
   } else {
     return {};
   }
@@ -106,33 +106,28 @@ auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::Waypoin
   try {
     return behavior_plugin_ptr_->getWaypoints();
   } catch (const std::runtime_error & e) {
-    if (!status_) {
-      THROW_SIMULATION_ERROR("Entity : ", name, " status is empty.");
-    }
-    if (status_ && status_->lanelet_pose_valid == false) {
+    if (not status_.lanelet_pose_valid) {
       THROW_SIMULATION_ERROR(
         "Failed to calculate waypoints in NPC logics, please check Entity : ", name,
         " is in a lane coordinate.");
+    } else {
+      THROW_SIMULATION_ERROR("Failed to calculate waypoint in NPC logics.");
     }
-    THROW_SIMULATION_ERROR("Failed to calculate waypoint in NPC logics.");
   }
 }
 
 void VehicleEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
-  if (!status_) {
-    return;
-  }
   if (npc_logic_started_) {
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
-    behavior_plugin_ptr_->setEntityStatus(status_.get());
+    behavior_plugin_ptr_->setEntityStatus(status_);
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
 
     std::vector<std::int64_t> route_lanelets = {};
-    if (status_->lanelet_pose_valid) {
-      route_lanelets = route_planner_ptr_->getRouteLanelets(status_->lanelet_pose);
+    if (status_.lanelet_pose_valid) {
+      route_lanelets = route_planner_ptr_->getRouteLanelets(status_.lanelet_pose);
     }
     behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
 
@@ -160,13 +155,9 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    if (!status_) {
-      linear_jerk_ = 0;
-    } else {
-      linear_jerk_ =
-        (status_updated.action_status.accel.linear.x - status_->action_status.accel.linear.x) /
-        step_time;
-    }
+    linear_jerk_ =
+      (status_updated.action_status.accel.linear.x - status_.action_status.accel.linear.x) /
+      step_time;
     setStatus(status_updated);
     updateStandStillDuration(step_time);
   } else {
@@ -177,15 +168,15 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
 void VehicleEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
-  if (status_ and status_->lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
+  if (status_.lanelet_pose_valid) {
+    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, lanelet_pose);
   }
 }
 
 void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
-  const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false);
-  if (lanelet_pose) {
+  if (const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false);
+      lanelet_pose) {
     requestAcquirePosition(lanelet_pose.get());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
@@ -195,8 +186,8 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 void VehicleEntity::requestAssignRoute(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
-  if (status_ and status_->lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
+  if (status_.lanelet_pose_valid) {
+    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints);
   }
 }
 

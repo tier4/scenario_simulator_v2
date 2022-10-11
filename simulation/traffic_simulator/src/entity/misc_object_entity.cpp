@@ -31,14 +31,10 @@ auto MiscObjectEntity::getEntityType() const -> const traffic_simulator_msgs::ms
 
 void MiscObjectEntity::onUpdate(double, double)
 {
-  if (status_) {
-    status_->action_status.accel = geometry_msgs::msg::Accel();
-    status_->action_status.twist = geometry_msgs::msg::Twist();
-    status_->action_status.current_action = "static";
-    status_before_update_ = status_;
-  } else {
-    status_before_update_ = status_;
-  }
+  status_.action_status.accel = geometry_msgs::msg::Accel();
+  status_.action_status.twist = geometry_msgs::msg::Twist();
+  status_.action_status.current_action = "static";
+  status_before_update_ = status_;
 }
 
 auto MiscObjectEntity::getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox
@@ -48,13 +44,11 @@ auto MiscObjectEntity::getBoundingBox() const -> const traffic_simulator_msgs::m
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string
 {
-  if (!npc_logic_started_) {
+  if (not npc_logic_started_) {
     return "waiting";
+  } else {
+    return status_.action_status.current_action;
   }
-  if (status_) {
-    return status_->action_status.current_action;
-  }
-  return "";
 }
 
 auto MiscObjectEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel

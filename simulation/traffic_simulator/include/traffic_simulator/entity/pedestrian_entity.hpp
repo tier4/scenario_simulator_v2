@@ -134,8 +134,8 @@ public:
 
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
-    if (status_ and status_->lanelet_pose_valid) {
-      return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
+    if (status_.lanelet_pose_valid) {
+      return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
     } else {
       return {};
     }

@@ -202,15 +202,11 @@ auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
 
 auto EntityBase::getStatus() const -> traffic_simulator_msgs::msg::EntityStatus
 {
-  if (!status_) {
-    THROW_SEMANTIC_ERROR("status is not set");
-  } else {
-    auto status = status_.get();
-    status.bounding_box = getBoundingBox();
-    status.subtype = subtype;
-    status.type = getEntityType();
-    return status;
-  }
+  auto status = status_;
+  status.bounding_box = getBoundingBox();
+  status.subtype = subtype;
+  status.type = getEntityType();
+  return status;
 }
 
 auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
@@ -468,16 +464,14 @@ void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
 {
   other_status_.clear();
-  if (status_) {
-    for (const auto & each : status) {
-      if (each.first != name) {
-        const auto p0 = each.second.pose.position;
-        const auto p1 = status_.get().pose.position;
-        double distance =
-          std::sqrt(std::pow(p0.x - p1.x, 2) + std::pow(p0.y - p1.y, 2) + std::pow(p0.z - p1.z, 2));
-        if (distance < 30) {
-          other_status_.insert(each);
-        }
+  for (const auto & each : status) {
+    if (each.first != name) {
+      const auto p0 = each.second.pose.position;
+      const auto p1 = status_.pose.position;
+      const auto distance =
+        std::sqrt(std::pow(p0.x - p1.x, 2) + std::pow(p0.y - p1.y, 2) + std::pow(p0.z - p1.z, 2));
+      if (distance < 30) {
+        other_status_.insert(each);
       }
     }
   }
@@ -486,7 +480,7 @@ void EntityBase::setOtherStatus(
 bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
 {
   status_ = status;
-  status_->name = name;
+  status_.name = name;
   return true;
 }
 
@@ -500,30 +494,24 @@ auto EntityBase::setVelocityLimit(double) -> void {}
 
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
-auto EntityBase::statusSet() const noexcept -> bool { return static_cast<bool>(status_); }
+auto EntityBase::statusSet() const noexcept -> bool { return true; }
 
 void EntityBase::stopAtEndOfRoad()
 {
-  if (!status_) {
-    THROW_SEMANTIC_ERROR("status is not set");
-  } else {
-    status_.get().action_status.twist = geometry_msgs::msg::Twist();
-    status_.get().action_status.accel = geometry_msgs::msg::Accel();
-  }
+  status_.action_status.twist = geometry_msgs::msg::Twist();
+  status_.action_status.accel = geometry_msgs::msg::Accel();
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
-  if (status_) {
-    status_->time = current_time;
-  }
+  status_.time = current_time;
 }
 
 auto EntityBase::updateStandStillDuration(const double step_time) -> double
 {
   if (
-    npc_logic_started_ and status_ and
-    std::abs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
+    npc_logic_started_ and
+    std::abs(status_.action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
     return stand_still_duration_ += step_time;
   } else {
     return stand_still_duration_ = 0.0;
