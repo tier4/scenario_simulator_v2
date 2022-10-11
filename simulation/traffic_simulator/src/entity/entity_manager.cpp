@@ -36,16 +36,13 @@ namespace entity
 void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
-  for (auto it = names.begin(); it != names.end(); it++) {
-    if (entityStatusSet(*it)) {
-      auto status = getEntityStatus(*it);
-      if (status) {
-        geometry_msgs::msg::PoseStamped pose;
-        pose.pose = status->pose;
-        pose.header.stamp = clock_ptr_->now();
-        pose.header.frame_id = *it;
-        broadcastTransform(pose);
-      }
+  for (const auto & name : names) {
+    if (auto status = getEntityStatus(name); status) {
+      geometry_msgs::msg::PoseStamped pose;
+      pose.pose = status->pose;
+      pose.header.stamp = clock_ptr_->now();
+      pose.header.frame_id = name;
+      broadcastTransform(pose);
     }
   }
 }
@@ -73,7 +70,7 @@ void EntityManager::broadcastTransform(
 
 bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
 {
-  if (name0 == name1 or not entityStatusSet(name0) or not entityStatusSet(name1)) {
+  if (name0 == name1) {
     return false;
   }
   auto status0 = getEntityStatus(name0);
@@ -107,8 +104,6 @@ bool EntityManager::entityExists(const std::string & name)
 {
   return entities_.find(name) != std::end(entities_);
 }
-
-bool EntityManager::entityStatusSet(const std::string &) const { return true; }
 
 auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::string & to)
   -> boost::optional<double>
@@ -238,12 +233,9 @@ auto EntityManager::getLongitudinalDistance(
   if (!laneMatchingSucceed(to)) {
     return boost::none;
   }
-  if (entityStatusSet(to)) {
-    if (const auto status = getEntityStatus(to)) {
-      return getLongitudinalDistance(from, status->lanelet_pose, max_distance);
-    }
+  if (const auto status = getEntityStatus(to)) {
+    return getLongitudinalDistance(from, status->lanelet_pose, max_distance);
   }
-
   return boost::none;
 }
 
@@ -254,12 +246,9 @@ auto EntityManager::getLongitudinalDistance(
   if (!laneMatchingSucceed(from)) {
     return boost::none;
   }
-  if (entityStatusSet(from)) {
-    if (const auto status = getEntityStatus(from)) {
-      return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
-    }
+  if (const auto status = getEntityStatus(from)) {
+    return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
   }
-
   return boost::none;
 }
 
@@ -273,12 +262,9 @@ auto EntityManager::getLongitudinalDistance(
   if (!laneMatchingSucceed(to)) {
     return boost::none;
   }
-  if (entityStatusSet(from)) {
-    if (const auto status = getEntityStatus(from)) {
-      return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
-    }
+  if (const auto status = getEntityStatus(from)) {
+    return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
   }
-
   return boost::none;
 }
 
@@ -453,9 +439,6 @@ bool EntityManager::isEgoSpawned() const
 bool EntityManager::isInLanelet(
   const std::string & name, const std::int64_t lanelet_id, const double tolerance)
 {
-  if (!entityStatusSet(name)) {
-    return false;
-  }
   double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
   auto status = getEntityStatus(name);
   if (!status) {
