@@ -79,8 +79,9 @@ public:
 
   template <typename Pose>
   explicit EgoEntity(
-    const std::string & name, const Pose & pose, const Configuration & configuration,
-    const double step_time, const traffic_simulator_msgs::msg::VehicleParameters & parameters)
+    const std::string & name, const Pose & pose,
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+    const Configuration & configuration, const double step_time)
   : VehicleEntity(name, pose, parameters),
     autoware(makeAutoware(configuration)),
     vehicle_model_type_(getVehicleModelType()),

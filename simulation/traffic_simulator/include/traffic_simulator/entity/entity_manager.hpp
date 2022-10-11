@@ -16,13 +16,14 @@
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
 
 #include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/static_transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.h>
+
 #ifdef USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #else
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #endif
-#include <tf2_ros/static_transform_broadcaster.h>
-#include <tf2_ros/transform_broadcaster.h>
 
 #include <boost/optional.hpp>
 #include <memory>
@@ -353,11 +354,11 @@ public:
 
   void setVerbose(const bool verbose);
 
-  template <typename Entity, typename... Ts>
-  auto spawnEntity(const std::string & name, Ts &&... xs)
+  template <typename Entity, typename Pose, typename Parameters, typename... Ts>
+  auto spawnEntity(const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
   {
     if (const auto [iter, success] = entities_.emplace(
-          name, std::make_unique<Entity>(name, std::forward<decltype(xs)>(xs)...));
+          name, std::make_unique<Entity>(name, pose, parameters, std::forward<decltype(xs)>(xs)...));
         success) {
       iter->second->setHdMapUtils(hdmap_utils_ptr_);
       iter->second->setTrafficLightManager(traffic_light_manager_ptr_);
@@ -366,7 +367,7 @@ public:
       }
       return success;
     } else {
-      THROW_SEMANTIC_ERROR("entity : ", name, " is already exists.");
+      THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");
     }
   }
 
