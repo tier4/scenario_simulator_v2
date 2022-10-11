@@ -45,11 +45,10 @@ namespace entity
 class EntityBase
 {
 public:
-  template <typename Pose>
   explicit EntityBase(
-    const std::string & name, const Pose &,
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-  : name(name), subtype(subtype), verbose(true), status_(boost::none), npc_logic_started_(false)
+  : name(name), subtype(subtype), verbose(true), status_(entity_status), npc_logic_started_(false)
   {
   }
 

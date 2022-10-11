@@ -53,12 +53,11 @@ public:
     static auto defaultBehavior() -> const std::string & { return behaviorTree(); }
   };
 
-  template <typename Pose>
   explicit VehicleEntity(
-    const std::string & name, const Pose & pose,
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::VehicleParameters & parameters,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior())
-  : EntityBase(name, pose, parameters.subtype),
+  : EntityBase(name, entity_status, parameters.subtype),
     parameters(parameters),
     loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
       "traffic_simulator", "entity_behavior::BehaviorPluginBase")),

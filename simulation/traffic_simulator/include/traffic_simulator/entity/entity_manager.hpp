@@ -355,10 +355,54 @@ public:
   void setVerbose(const bool verbose);
 
   template <typename Entity, typename Pose, typename Parameters, typename... Ts>
-  auto spawnEntity(const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
+  auto spawnEntity(
+    const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
   {
+    auto makeEntityStatus = [&]() {
+      traffic_simulator_msgs::msg::EntityStatus entity_status;
+
+      if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
+        entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+      } else if constexpr (std::is_same_v<std::decay_t<Entity>, VehicleEntity>) {
+        entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+      } else if constexpr (std::is_same_v<std::decay_t<Entity>, PedestrianEntity>) {
+        entity_status.type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+      } else {
+        entity_status.type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
+      }
+
+      entity_status.subtype = parameters.subtype;
+
+      entity_status.time = getCurrentTime();
+
+      entity_status.name = parameters.name;
+
+      entity_status.bounding_box = parameters.bounding_box;
+
+      entity_status.action_status = traffic_simulator_msgs::msg::ActionStatus();
+
+      if constexpr (std::is_same_v<std::decay_t<Pose>, traffic_simulator_msgs::msg::LaneletPose>) {
+        entity_status.pose = toMapPose(pose);
+        entity_status.lanelet_pose = pose;
+        entity_status.lanelet_pose_valid = false;
+      } else {
+        entity_status.pose = pose;
+
+        if (const auto lanelet_pose = toLaneletPose(pose, parameters.bounding_box, false);
+            lanelet_pose) {
+          entity_status.lanelet_pose = *lanelet_pose;
+          entity_status.lanelet_pose_valid = true;
+        } else {
+          entity_status.lanelet_pose_valid = false;
+        }
+      }
+
+      return entity_status;
+    };
+
     if (const auto [iter, success] = entities_.emplace(
-          name, std::make_unique<Entity>(name, pose, parameters, std::forward<decltype(xs)>(xs)...));
+          name, std::make_unique<Entity>(
+                  name, makeEntityStatus(), parameters, std::forward<decltype(xs)>(xs)...));
         success) {
       iter->second->setHdMapUtils(hdmap_utils_ptr_);
       iter->second->setTrafficLightManager(traffic_light_manager_ptr_);

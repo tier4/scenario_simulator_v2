@@ -25,11 +25,10 @@ namespace entity
 class MiscObjectEntity : public EntityBase
 {
 public:
-  template <typename Pose>
   explicit MiscObjectEntity(
-    const std::string & name, const Pose & pose,
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
-  : EntityBase(name, pose, parameters.subtype), params_(parameters)
+  : EntityBase(name, entity_status, parameters.subtype), params_(parameters)
   {
   }
 

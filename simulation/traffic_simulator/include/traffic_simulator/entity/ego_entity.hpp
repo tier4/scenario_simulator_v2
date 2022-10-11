@@ -77,12 +77,11 @@ class EgoEntity : public VehicleEntity
 public:
   explicit EgoEntity() = delete;
 
-  template <typename Pose>
   explicit EgoEntity(
-    const std::string & name, const Pose & pose,
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::VehicleParameters & parameters,
     const Configuration & configuration, const double step_time)
-  : VehicleEntity(name, pose, parameters),
+  : VehicleEntity(name, entity_status, parameters),
     autoware(makeAutoware(configuration)),
     vehicle_model_type_(getVehicleModelType()),
     vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))

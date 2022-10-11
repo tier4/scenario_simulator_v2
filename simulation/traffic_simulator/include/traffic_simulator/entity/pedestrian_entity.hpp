@@ -50,12 +50,11 @@ public:
     static auto defaultBehavior() noexcept -> const std::string & { return behaviorTree(); }
   };
 
-  template <typename Pose>
   explicit PedestrianEntity(
-    const std::string & name, const Pose & pose,
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior())
-  : EntityBase(name, pose, parameters.subtype),
+  : EntityBase(name, entity_status, parameters.subtype),
     parameters(parameters),
     plugin_name(plugin_name),
     loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
