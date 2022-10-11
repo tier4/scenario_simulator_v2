@@ -108,19 +108,13 @@ bool EntityManager::entityExists(const std::string & name)
   return entities_.find(name) != std::end(entities_);
 }
 
-bool EntityManager::entityStatusSet(const std::string & name) const
-{
-  return entities_.at(name)->statusSet();
-}
+bool EntityManager::entityStatusSet(const std::string &) const { return true; }
 
 auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::string & to)
   -> boost::optional<double>
 {
-  const auto bbox0 = getBoundingBox(from);
-  const auto pose0 = getMapPose(from);
-  const auto bbox1 = getBoundingBox(to);
-  const auto pose1 = getMapPose(to);
-  return math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1);
+  return math::geometry::getPolygonDistance(
+    getMapPose(from), getBoundingBox(from), getMapPose(to), getBoundingBox(to));
 }
 
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
@@ -636,10 +630,7 @@ traffic_simulator_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
   }
   entities_[name]->setEntityTypeList(type_list);
   entities_[name]->onUpdate(current_time_, step_time_);
-  if (entities_[name]->statusSet()) {
-    return entities_[name]->getStatus();
-  }
-  THROW_SIMULATION_ERROR("status of entity ", name, "is empty");
+  return entities_[name]->getStatus();
 }
 
 void EntityManager::update(const double current_time, const double step_time)
@@ -659,20 +650,16 @@ void EntityManager::update(const double current_time, const double step_time)
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
   for (const auto & entity_name : entity_names) {
-    if (entities_[entity_name]->statusSet()) {
-      all_status.emplace(entity_name, entities_[entity_name]->getStatus());
-    }
+    all_status.emplace(entity_name, entities_[entity_name]->getStatus());
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     it->second->setOtherStatus(all_status);
   }
   all_status.clear();
   for (const auto & entity_name : entity_names) {
-    if (entities_[entity_name]->statusSet()) {
-      auto status = updateNpcLogic(entity_name, type_list);
-      status.bounding_box = getBoundingBox(entity_name);
-      all_status.emplace(entity_name, status);
-    }
+    auto status = updateNpcLogic(entity_name, type_list);
+    status.bounding_box = getBoundingBox(entity_name);
+    all_status.emplace(entity_name, status);
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     it->second->setOtherStatus(all_status);

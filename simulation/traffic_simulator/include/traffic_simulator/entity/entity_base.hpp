@@ -178,8 +178,6 @@ public:
 
   virtual void startNpcLogic();
 
-  /*   */ auto statusSet() const noexcept -> bool;
-
   /*   */ void stopAtEndOfRoad();
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);

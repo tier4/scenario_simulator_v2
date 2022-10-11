@@ -494,8 +494,6 @@ auto EntityBase::setVelocityLimit(double) -> void {}
 
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
-auto EntityBase::statusSet() const noexcept -> bool { return true; }
-
 void EntityBase::stopAtEndOfRoad()
 {
   status_.action_status.twist = geometry_msgs::msg::Twist();
