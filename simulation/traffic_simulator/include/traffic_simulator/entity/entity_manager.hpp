@@ -285,8 +285,7 @@ public:
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
-  auto getEntityStatus(const std::string & name) const
-    -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>;
+  auto getEntityStatus(const std::string & name) const -> traffic_simulator_msgs::msg::EntityStatus;
 
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;

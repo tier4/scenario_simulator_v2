@@ -61,11 +61,7 @@ geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
 
 traffic_simulator_msgs::msg::EntityStatus API::getEntityStatus(const std::string & name)
 {
-  auto status = entity_manager_ptr_->getEntityStatus(name);
-  if (!status) {
-    THROW_SEMANTIC_ERROR("entity : ", name, " status is empty");
-  }
-  return status.get();
+  return entity_manager_ptr_->getEntityStatus(name);
 }
 
 bool API::setEntityStatus(
@@ -132,7 +128,7 @@ bool API::reachPosition(
   const double tolerance)
 {
   return entity_manager_ptr_->reachPosition(
-           name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
+    name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
 }
 
 bool API::reachPosition(
@@ -307,22 +303,16 @@ bool API::updateEntityStatusInSim()
   const auto names = entity_manager_ptr_->getEntityNames();
   for (const auto & name : names) {
     auto status = entity_manager_ptr_->getEntityStatus(name);
-    if (status) {
-      traffic_simulator_msgs::EntityStatus proto;
-      status.get().name = name;
-      simulation_interface::toProto(status.get(), proto);
-      *req.add_status() = proto;
-    }
+    traffic_simulator_msgs::EntityStatus proto;
+    status.name = name;
+    simulation_interface::toProto(status, proto);
+    *req.add_status() = proto;
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
   for (const auto & status : res.status()) {
-    auto entity_status = entity_manager_ptr_->getEntityStatus(status.name());
-    if (!entity_status) {
-      continue;
-    }
     traffic_simulator_msgs::msg::EntityStatus status_msg;
-    status_msg = entity_status.get();
+    status_msg = entity_manager_ptr_->getEntityStatus(status.name());
     geometry_msgs::msg::Pose pose;
     simulation_interface::toMsg(status.pose(), pose);
     status_msg.pose = pose;

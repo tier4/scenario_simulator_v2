@@ -37,13 +37,11 @@ void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
   for (const auto & name : names) {
-    if (auto status = getEntityStatus(name); status) {
-      geometry_msgs::msg::PoseStamped pose;
-      pose.pose = status->pose;
-      pose.header.stamp = clock_ptr_->now();
-      pose.header.frame_id = name;
-      broadcastTransform(pose);
-    }
+    geometry_msgs::msg::PoseStamped pose;
+    pose.pose = getEntityStatus(name).pose;
+    pose.header.stamp = clock_ptr_->now();
+    pose.header.frame_id = name;
+    broadcastTransform(pose);
   }
 }
 
@@ -70,20 +68,9 @@ void EntityManager::broadcastTransform(
 
 bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
 {
-  if (name0 == name1) {
-    return false;
-  }
-  auto status0 = getEntityStatus(name0);
-  if (!status0) {
-    THROW_SEMANTIC_ERROR("entity : ", name0, " status does not exist.");
-  }
-  auto status1 = getEntityStatus(name1);
-  if (!status1) {
-    THROW_SEMANTIC_ERROR("failed to calculate map pose : " + name1);
-  }
-  auto bbox0 = getBoundingBox(name0);
-  auto bbox1 = getBoundingBox(name1);
-  return math::geometry::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
+  return name0 != name1 and math::geometry::checkCollision2D(
+                              getEntityStatus(name0).pose, getBoundingBox(name0),
+                              getEntityStatus(name1).pose, getBoundingBox(name1));
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
@@ -154,7 +141,7 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 }
 
 auto EntityManager::getEntityStatus(const std::string & name) const
-  -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>
+  -> traffic_simulator_msgs::msg::EntityStatus
 {
   traffic_simulator_msgs::msg::EntityStatus status_msg;
   auto it = entities_.find(name);
@@ -232,11 +219,9 @@ auto EntityManager::getLongitudinalDistance(
 {
   if (!laneMatchingSucceed(to)) {
     return boost::none;
+  } else {
+    return getLongitudinalDistance(from, getEntityStatus(to).lanelet_pose, max_distance);
   }
-  if (const auto status = getEntityStatus(to)) {
-    return getLongitudinalDistance(from, status->lanelet_pose, max_distance);
-  }
-  return boost::none;
 }
 
 auto EntityManager::getLongitudinalDistance(
@@ -245,27 +230,20 @@ auto EntityManager::getLongitudinalDistance(
 {
   if (!laneMatchingSucceed(from)) {
     return boost::none;
+  } else {
+    return getLongitudinalDistance(getEntityStatus(from).lanelet_pose, to, max_distance);
   }
-  if (const auto status = getEntityStatus(from)) {
-    return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
-  }
-  return boost::none;
 }
 
 auto EntityManager::getLongitudinalDistance(
   const std::string & from, const std::string & to, const double max_distance)
   -> boost::optional<double>
 {
-  if (!laneMatchingSucceed(from)) {
+  if (laneMatchingSucceed(from) and laneMatchingSucceed(to)) {
+    return getLongitudinalDistance(getEntityStatus(from).lanelet_pose, to, max_distance);
+  } else {
     return boost::none;
   }
-  if (!laneMatchingSucceed(to)) {
-    return boost::none;
-  }
-  if (const auto status = getEntityStatus(from)) {
-    return getLongitudinalDistance(status->lanelet_pose, to, max_distance);
-  }
-  return boost::none;
 }
 
 /**
@@ -277,11 +255,7 @@ auto EntityManager::getLongitudinalDistance(
  */
 bool EntityManager::laneMatchingSucceed(const std::string & name)
 {
-  const auto status = getEntityStatus(name);
-  if (status && status->lanelet_pose_valid) {
-    return true;
-  }
-  return false;
+  return getEntityStatus(name).lanelet_pose_valid;
 }
 
 auto EntityManager::getNumberOfEgo() const -> std::size_t
@@ -323,35 +297,19 @@ auto EntityManager::getRelativePose(
 auto EntityManager::getRelativePose(
   const geometry_msgs::msg::Pose & from, const std::string & to) const -> geometry_msgs::msg::Pose
 {
-  const auto to_status = getEntityStatus(to);
-  if (!to_status) {
-    THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
-  }
-  return getRelativePose(from, to_status->pose);
+  return getRelativePose(from, getEntityStatus(to).pose);
 }
 
 auto EntityManager::getRelativePose(
   const std::string & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose
 {
-  const auto from_status = getEntityStatus(from);
-  if (!from_status) {
-    THROW_SEMANTIC_ERROR("entity : " + from + " status is empty");
-  }
-  return getRelativePose(from_status->pose, to);
+  return getRelativePose(getEntityStatus(from).pose, to);
 }
 
 auto EntityManager::getRelativePose(const std::string & from, const std::string & to) const
   -> geometry_msgs::msg::Pose
 {
-  const auto from_status = getEntityStatus(from);
-  const auto to_status = getEntityStatus(to);
-  if (!from_status) {
-    THROW_SEMANTIC_ERROR("entity : " + from + " status is empty");
-  }
-  if (!to_status) {
-    THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
-  }
-  return getRelativePose(from_status->pose, to_status->pose);
+  return getRelativePose(getEntityStatus(from).pose, getEntityStatus(to).pose);
 }
 
 auto EntityManager::getRelativePose(
@@ -369,21 +327,13 @@ auto EntityManager::getRelativePose(
 auto EntityManager::getRelativePose(const std::string & from, const LaneletPose & to) const
   -> geometry_msgs::msg::Pose
 {
-  const auto from_status = getEntityStatus(from);
-  if (!from_status) {
-    THROW_SEMANTIC_ERROR("entity : " + from + " status is empty");
-  }
-  return getRelativePose(from_status->pose, to);
+  return getRelativePose(getEntityStatus(from).pose, to);
 }
 
 auto EntityManager::getRelativePose(const LaneletPose & from, const std::string & to) const
   -> geometry_msgs::msg::Pose
 {
-  const auto to_status = getEntityStatus(to);
-  if (!to_status) {
-    THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
-  }
-  return getRelativePose(from, to_status->pose);
+  return getRelativePose(from, getEntityStatus(to).pose);
 }
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
@@ -441,19 +391,17 @@ bool EntityManager::isInLanelet(
 {
   double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
   auto status = getEntityStatus(name);
-  if (!status) {
+
+  if (not status.lanelet_pose_valid) {
     return false;
   }
-  if (!status->lanelet_pose_valid) {
-    return false;
-  }
-  if (status->lanelet_pose.lanelet_id == lanelet_id) {
+  if (status.lanelet_pose.lanelet_id == lanelet_id) {
     return true;
   } else {
     auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(
-      lanelet_id, l, status->lanelet_pose.lanelet_id, status->lanelet_pose.s);
+      lanelet_id, l, status.lanelet_pose.lanelet_id, status.lanelet_pose.s);
     auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(
-      status->lanelet_pose.lanelet_id, status->lanelet_pose.s, lanelet_id, 0);
+      status.lanelet_pose.lanelet_id, status.lanelet_pose.s, lanelet_id, 0);
     if (dist0) {
       if (dist0.get() < tolerance) {
         return true;
@@ -470,30 +418,21 @@ bool EntityManager::isInLanelet(
 
 bool EntityManager::isStopping(const std::string & name) const
 {
-  const auto status = getEntityStatus(name);
-  if (!status) {
-    THROW_SEMANTIC_ERROR("entity : " + name + " status is empty");
-  }
-  return std::fabs(status->action_status.twist.linear.x) < std::numeric_limits<double>::epsilon();
+  return std::fabs(getEntityStatus(name).action_status.twist.linear.x) <
+         std::numeric_limits<double>::epsilon();
 }
 
 bool EntityManager::reachPosition(
   const std::string & name, const std::string & target_name, const double tolerance) const
 {
-  const auto status = getEntityStatus(target_name);
-  return status && reachPosition(name, status->pose, tolerance);
+  return reachPosition(name, getEntityStatus(target_name).pose, tolerance);
 }
 
 bool EntityManager::reachPosition(
   const std::string & name, const geometry_msgs::msg::Pose & target_pose,
   const double tolerance) const
 {
-  const auto status = getEntityStatus(name);
-  if (!status) {
-    THROW_SEMANTIC_ERROR("entity : " + name + " status is empty");
-  }
-
-  const auto pose = status->pose;
+  const auto pose = getEntityStatus(name).pose;
 
   const double distance = std::sqrt(
     std::pow(pose.position.x - target_pose.position.x, 2) +
@@ -522,14 +461,10 @@ bool EntityManager::reachPosition(
 void EntityManager::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
-  auto status = getEntityStatus(name);
-
-  if (status) {
-    const auto target =
-      hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, direction);
-    if (target) {
-      requestLaneChange(name, target.get());
-    }
+  if (const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+        getEntityStatus(name).lanelet_pose.lanelet_id, direction);
+      target) {
+    requestLaneChange(name, target.get());
   }
 }
 
