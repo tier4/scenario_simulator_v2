@@ -483,6 +483,112 @@ OpenSCENARIO:
                         SimulationTimeCondition:
                           rule: greaterThan
                           value: 0
+          - name: LaneChange
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: vehicle-1
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: "lane change"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle-1
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        rule: lessThan
+                                        value: 1
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34507'
+                                            s: 10
+                                            offset: 0
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: 0
+                                              r: 0
+                        Action:
+                          - name: ""
+                            PrivateAction:
+                              LateralAction:
+                                LaneChangeAction:
+                                  LaneChangeActionDynamics:
+                                    dynamicsDimension: distance
+                                    dynamicsShape: cubic
+                                    value: 20
+                                  LaneChangeTarget:
+                                    AbsoluteTargetLane:
+                                      value: 34468
+                      - name: "lane change 2"
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle-1
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: entity
+                                        freespace: false
+                                        rule: lessThan
+                                        value: 3
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34507'
+                                            s: 20
+                                            offset: 0
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: 0
+                                              r: 0
+                        Action:
+                          - name: ""
+                            PrivateAction:
+                              LateralAction:
+                                LaneChangeAction:
+                                  LaneChangeActionDynamics:
+                                    dynamicsDimension: distance
+                                    dynamicsShape: cubic
+                                    value: 3
+                                  LaneChangeTarget:
+                                    AbsoluteTargetLane:
+                                      value: 34507
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name:
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          rule: greaterThan
+                          value: 0
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
