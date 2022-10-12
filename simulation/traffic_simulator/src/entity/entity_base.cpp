@@ -200,13 +200,9 @@ auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
   return ret;
 }
 
-auto EntityBase::getStatus() const -> traffic_simulator_msgs::msg::EntityStatus
+auto EntityBase::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &
 {
-  auto status = status_;
-  status.bounding_box = getBoundingBox();
-  status.subtype = subtype;
-  status.type = getEntityType();
-  return status;
+  return status_;
 }
 
 auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
