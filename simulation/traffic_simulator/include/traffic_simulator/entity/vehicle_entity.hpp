@@ -75,12 +75,12 @@ public:
 
   auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> override;
 
-  auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
+  auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
 
   auto getVehicleParameters() const
-    -> boost::optional<traffic_simulator_msgs::msg::VehicleParameters>;
+    -> std::optional<traffic_simulator_msgs::msg::VehicleParameters>;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 

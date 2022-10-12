@@ -66,11 +66,11 @@ auto RoutePlanner::getRouteLanelets(
   plan(entity_lanelet_pose, target_lanelet_pose);
 
   if (not whole_route_ or whole_route_->empty()) {
-    whole_route_ = boost::none;
+    whole_route_ = std::nullopt;
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   } else {
     return hdmap_utils_ptr_->getFollowingLanelets(
-      entity_lanelet_pose.lanelet_id, whole_route_.get(), horizon, true);
+      entity_lanelet_pose.lanelet_id, whole_route_.value(), horizon, true);
   }
 }
 

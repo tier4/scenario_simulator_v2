@@ -31,7 +31,7 @@ namespace entity
 {
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-: name(name), subtype(subtype), verbose(true), status_(boost::none), npc_logic_started_(false)
+: name(name), subtype(subtype), verbose(true), status_(std::nullopt), npc_logic_started_(false)
 {
 }
 
@@ -176,14 +176,14 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
 }
 
 auto EntityBase::getEntityStatusBeforeUpdate() const
-  -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus> &
+  -> const std::optional<traffic_simulator_msgs::msg::EntityStatus> &
 {
   return status_before_update_;
 }
 
-auto EntityBase::getLinearJerk() const -> boost::optional<double> { return linear_jerk_; }
+auto EntityBase::getLinearJerk() const -> std::optional<double> { return linear_jerk_; }
 
-auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+auto EntityBase::getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   if (const auto status = getStatus(); status.lanelet_pose_valid) {
     return status.lanelet_pose;
@@ -212,7 +212,7 @@ auto EntityBase::getStatus() const -> traffic_simulator_msgs::msg::EntityStatus
   if (!status_) {
     THROW_SEMANTIC_ERROR("status is not set");
   } else {
-    auto status = status_.get();
+    auto status = status_.value();
     status.bounding_box = getBoundingBox();
     status.subtype = subtype;
     status.type = getEntityType();
@@ -223,9 +223,9 @@ auto EntityBase::getStatus() const -> traffic_simulator_msgs::msg::EntityStatus
 auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
 
 auto EntityBase::getVehicleParameters() const
-  -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
+  -> const std::optional<traffic_simulator_msgs::msg::VehicleParameters>
 {
-  return boost::none;
+  return std::nullopt;
 }
 
 auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
@@ -274,7 +274,7 @@ void EntityBase::requestLaneChange(
     reference_lanelet_id, target.direction, target.shift);
   if (lane_change_target_id) {
     requestLaneChange(
-      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
+      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);
   } else {
     THROW_SEMANTIC_ERROR(

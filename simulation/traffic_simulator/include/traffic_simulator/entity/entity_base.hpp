@@ -82,7 +82,7 @@ public:
   virtual auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel = 0;
 
   /*   */ auto getEntityStatusBeforeUpdate() const
-    -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus> &;
+    -> const std::optional<traffic_simulator_msgs::msg::EntityStatus> &;
 
   virtual auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & = 0;
 
@@ -90,15 +90,15 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
 
-  /*   */ auto getLinearJerk() const -> boost::optional<double>;
+  /*   */ auto getLinearJerk() const -> std::optional<double>;
 
-  /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+  /*   */ auto getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 
   /*   */ auto getMapPose(const geometry_msgs::msg::Pose &) -> geometry_msgs::msg::Pose;
 
-  virtual auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
+  virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
 
@@ -107,7 +107,7 @@ public:
   /*   */ auto getStandStillDuration() const -> double;
 
   /*   */ auto getVehicleParameters() const
-    -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>;
+    -> const std::optional<traffic_simulator_msgs::msg::VehicleParameters>;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
