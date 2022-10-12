@@ -183,7 +183,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   {
     status.time = time;
     status.type = getEntityType();
-    status.bounding_box = getBoundingBox();
+    status.bounding_box = getStatus().bounding_box;
     status.pose = getCurrentPose();
     status.action_status.twist = getCurrentTwist();
     status.action_status.accel = [&]() {
@@ -201,11 +201,13 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
     if (route_lanelets.empty()) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
+      lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
     } else {
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, route_lanelets, 1.0);
       if (!lanelet_pose) {
-        lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
+        lanelet_pose =
+          hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
       }
     }
 

@@ -65,8 +65,6 @@ public:
 
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 
-  virtual auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox = 0;
-
   virtual auto getCurrentAction() const -> std::string = 0;
 
   /*   */ auto getDistanceToLaneBound() -> double;

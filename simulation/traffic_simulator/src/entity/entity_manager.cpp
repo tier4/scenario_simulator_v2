@@ -69,8 +69,8 @@ void EntityManager::broadcastTransform(
 bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
 {
   return name0 != name1 and math::geometry::checkCollision2D(
-                              getEntityStatus(name0).pose, getBoundingBox(name0),
-                              getEntityStatus(name1).pose, getBoundingBox(name1));
+                              getEntityStatus(name0).pose, getEntityStatus(name0).bounding_box,
+                              getEntityStatus(name1).pose, getEntityStatus(name1).bounding_box);
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
@@ -96,7 +96,8 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
   -> boost::optional<double>
 {
   return math::geometry::getPolygonDistance(
-    getMapPose(from), getBoundingBox(from), getMapPose(to), getBoundingBox(to));
+    getMapPose(from), getEntityStatus(from).bounding_box, getMapPose(to),
+    getEntityStatus(to).bounding_box);
 }
 
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
@@ -141,28 +142,14 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 auto EntityManager::getEntityStatus(const std::string & name) const
   -> traffic_simulator_msgs::msg::EntityStatus
 {
-  traffic_simulator_msgs::msg::EntityStatus status_msg;
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    THROW_SEMANTIC_ERROR("entity : ", name, " does not exist.");
+  if (const auto iter = entities_.find(name); iter == entities_.end()) {
+    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
+  } else {
+    auto entity_status = iter->second->getStatus();
+    entity_status.action_status.current_action = getCurrentAction(name);
+    entity_status.time = current_time_;
+    return entity_status;
   }
-  status_msg = it->second->getStatus();
-  status_msg.bounding_box = getBoundingBox(name);
-  status_msg.action_status.current_action = getCurrentAction(name);
-  switch (getEntityType(name).type) {
-    case traffic_simulator_msgs::msg::EntityType::EGO:
-      status_msg.type.type = status_msg.type.EGO;
-      break;
-    case traffic_simulator_msgs::msg::EntityType::VEHICLE:
-      status_msg.type.type = status_msg.type.VEHICLE;
-      break;
-    case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
-      status_msg.type.type = status_msg.type.PEDESTRIAN;
-      break;
-  }
-  status_msg.time = current_time_;
-  status_msg.name = name;
-  return status_msg;
 }
 
 auto EntityManager::getEntityTypeList() const
@@ -570,7 +557,7 @@ void EntityManager::update(const double current_time, const double step_time)
   all_status.clear();
   for (const auto & entity_name : entity_names) {
     auto status = updateNpcLogic(entity_name, type_list);
-    status.bounding_box = getBoundingBox(entity_name);
+    status.bounding_box = getEntityStatus(entity_name).bounding_box;
     all_status.emplace(entity_name, status);
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
@@ -582,7 +569,7 @@ void EntityManager::update(const double current_time, const double step_time)
     traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_traj;
     auto status_msg = status.second;
     status_msg.name = status.first;
-    status_msg.bounding_box = getBoundingBox(status.first);
+    status_msg.bounding_box = getEntityStatus(status.first).bounding_box;
     status_msg.action_status.current_action = getCurrentAction(status.first);
     switch (getEntityType(status.first).type) {
       case traffic_simulator_msgs::msg::EntityType::EGO:

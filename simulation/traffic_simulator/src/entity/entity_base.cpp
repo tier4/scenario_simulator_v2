@@ -181,9 +181,9 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
   if (const auto status = getStatus(); status.lanelet_pose_valid) {
     return status.lanelet_pose;
   } else if (getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
+    return hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false);
   } else {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
+    return hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, true);
   }
 }
 

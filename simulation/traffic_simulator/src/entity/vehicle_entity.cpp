@@ -37,11 +37,6 @@ void VehicleEntity::cancelRequest()
   route_planner_ptr_->cancelGoal();
 }
 
-auto VehicleEntity::getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox
-{
-  return parameters.bounding_box;
-}
-
 auto VehicleEntity::getCurrentAction() const -> std::string
 {
   if (not npc_logic_started_) {
@@ -175,7 +170,8 @@ void VehicleEntity::requestAcquirePosition(
 
 void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
-  if (const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false);
+  if (const auto lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(map_pose, getStatus().bounding_box, false);
       lanelet_pose) {
     requestAcquirePosition(lanelet_pose.get());
   } else {
@@ -196,7 +192,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   std::vector<traffic_simulator_msgs::msg::LaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (const auto lanelet_waypoint =
-          hdmap_utils_ptr_->toLaneletPose(waypoint, getBoundingBox(), false);
+          hdmap_utils_ptr_->toLaneletPose(waypoint, getStatus().bounding_box, false);
         lanelet_waypoint) {
       route.emplace_back(lanelet_waypoint.get());
     } else {

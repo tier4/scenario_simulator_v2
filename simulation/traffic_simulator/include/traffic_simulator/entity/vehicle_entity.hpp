@@ -75,8 +75,6 @@ public:
 
   void cancelRequest() override;
 
-  auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox override;
-
   auto getCurrentAction() const -> std::string override;
 
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;

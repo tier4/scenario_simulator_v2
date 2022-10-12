@@ -106,11 +106,6 @@ public:
     behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
   }
 
-  const traffic_simulator_msgs::msg::BoundingBox getBoundingBox() const override
-  {
-    return parameters.bounding_box;
-  }
-
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel;
 
   void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);

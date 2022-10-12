@@ -208,7 +208,6 @@ public:
   FORWARD_TO_ENTITY(asAutoware, const);
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(get2DPolygon, const);
-  FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getDistanceToLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToLaneBound, const);

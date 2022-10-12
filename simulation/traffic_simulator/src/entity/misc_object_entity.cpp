@@ -37,11 +37,6 @@ void MiscObjectEntity::onUpdate(double, double)
   status_before_update_ = status_;
 }
 
-auto MiscObjectEntity::getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox
-{
-  return params_.bounding_box;
-}
-
 auto MiscObjectEntity::getCurrentAction() const -> std::string
 {
   if (not npc_logic_started_) {
