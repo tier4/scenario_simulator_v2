@@ -54,7 +54,7 @@ public:
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior())
-  : EntityBase(name, entity_status, parameters.subtype),
+  : EntityBase(name, entity_status),
     parameters(parameters),
     plugin_name(plugin_name),
     loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(

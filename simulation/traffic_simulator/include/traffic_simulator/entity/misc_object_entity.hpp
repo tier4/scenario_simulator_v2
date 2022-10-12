@@ -28,7 +28,7 @@ public:
   explicit MiscObjectEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
-  : EntityBase(name, entity_status, parameters.subtype), params_(parameters)
+  : EntityBase(name, entity_status), params_(parameters)
   {
   }
 

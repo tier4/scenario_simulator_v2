@@ -46,10 +46,8 @@ class EntityBase
 {
 public:
   explicit EntityBase(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-    const traffic_simulator_msgs::msg::EntitySubtype & subtype)
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
   : name(name),
-    subtype(subtype),
     verbose(true),
     status_(entity_status),
     status_before_update_(status_),
@@ -190,8 +188,6 @@ public:
   /*   */ auto updateStandStillDuration(const double step_time) -> double;
 
   const std::string name;
-
-  const traffic_simulator_msgs::msg::EntitySubtype subtype;
 
   bool verbose;
 
