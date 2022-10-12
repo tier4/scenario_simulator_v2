@@ -90,8 +90,6 @@ public:
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const traffic_simulator_msgs::msg::EntityStatus &;
 
-  virtual auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & = 0;
-
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;

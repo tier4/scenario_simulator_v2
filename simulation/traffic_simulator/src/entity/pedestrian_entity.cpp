@@ -30,17 +30,6 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
   std::copy(marker.begin(), marker.end(), std::back_inserter(marker_array.markers));
 }
 
-auto PedestrianEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static const auto entity_type = []() {
-    traffic_simulator_msgs::msg::EntityType entity_type;
-    entity_type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-    return entity_type;
-  }();
-
-  return entity_type;
-}
-
 void PedestrianEntity::requestAssignRoute(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {

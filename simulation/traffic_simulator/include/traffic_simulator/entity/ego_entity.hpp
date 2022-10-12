@@ -111,8 +111,6 @@ public:
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
-
   auto getEntityTypename() const -> const std::string & override;
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;

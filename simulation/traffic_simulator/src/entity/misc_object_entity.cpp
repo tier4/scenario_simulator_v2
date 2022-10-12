@@ -18,17 +18,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-auto MiscObjectEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static const auto entity_type = []() {
-    traffic_simulator_msgs::msg::EntityType entity_type;
-    entity_type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
-    return entity_type;
-  }();
-
-  return entity_type;
-}
-
 void MiscObjectEntity::onUpdate(double, double)
 {
   status_.action_status.accel = geometry_msgs::msg::Accel();

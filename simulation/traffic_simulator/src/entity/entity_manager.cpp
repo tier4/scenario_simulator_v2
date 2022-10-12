@@ -157,7 +157,7 @@ auto EntityManager::getEntityTypeList() const
 {
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> ret;
   for (auto && [name, entity] : entities_) {
-    ret.emplace(name, entity->getEntityType());
+    ret.emplace(name, entity->getStatus().type);
   }
   return ret;
 }
@@ -357,7 +357,7 @@ void EntityManager::getGoalPoses(
 bool EntityManager::isEgo(const std::string & name) const
 {
   using traffic_simulator_msgs::msg::EntityType;
-  return getEntityType(name).type == EntityType::EGO and
+  return getEntityStatus(name).type.type == EntityType::EGO and
          dynamic_cast<EgoEntity const *>(entities_.at(name).get());
 }
 
@@ -571,17 +571,7 @@ void EntityManager::update(const double current_time, const double step_time)
     status_msg.name = status.first;
     status_msg.bounding_box = getEntityStatus(status.first).bounding_box;
     status_msg.action_status.current_action = getCurrentAction(status.first);
-    switch (getEntityType(status.first).type) {
-      case traffic_simulator_msgs::msg::EntityType::EGO:
-        status_msg.type.type = status_msg.type.EGO;
-        break;
-      case traffic_simulator_msgs::msg::EntityType::VEHICLE:
-        status_msg.type.type = status_msg.type.VEHICLE;
-        break;
-      case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
-        status_msg.type.type = status_msg.type.PEDESTRIAN;
-        break;
-    }
+    status_msg.type = getEntityStatus(status.first).type;
     status_with_traj.waypoint = getWaypoints(status.first);
     std::vector<geometry_msgs::msg::Pose> goals;
     getGoalPoses(status.first, goals);

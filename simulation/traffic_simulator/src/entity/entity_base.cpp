@@ -178,12 +178,12 @@ auto EntityBase::getLinearJerk() const -> boost::optional<double> { return linea
 
 auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  if (const auto status = getStatus(); status.lanelet_pose_valid) {
-    return status.lanelet_pose;
-  } else if (getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false);
+  if (status_.lanelet_pose_valid) {
+    return status_.lanelet_pose;
+  } else if (status_.type.type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
+    return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, false);
   } else {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, true);
+    return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, true);
   }
 }
 

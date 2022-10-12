@@ -79,8 +79,6 @@ public:
 
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
-
   auto getEntityTypename() const -> const std::string & override;
 
   auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> override;
