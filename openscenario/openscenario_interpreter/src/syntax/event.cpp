@@ -41,6 +41,7 @@ auto Event::start() -> void
   } else if (priority == Priority::skip) {
     if (parent_maneuver.running_events_count() > 0) {
       transitionTo(standby_state);
+      return;
     }
   }
 

@@ -33,10 +33,7 @@ auto Maneuver::override_events() -> void
 {
   for (auto && element : elements) {
     assert(element.is<Event>());
-    auto & event = element.as<Event>();
-    if (event.is<StoryboardElementState::runningState>()) {
-      event.transitionTo(stop_transition);
-    }
+    element.as<Event>().override();
   }
 }
 
