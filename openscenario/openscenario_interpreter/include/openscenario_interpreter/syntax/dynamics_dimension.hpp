@@ -16,7 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_DIMENSION_HPP_
 
 #include <iostream>
-#include <traffic_simulator/data_type/data_types.hpp>
+#include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/speed_change.hpp>
 
 namespace openscenario_interpreter
 {
