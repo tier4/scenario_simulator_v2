@@ -200,12 +200,9 @@ auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
   return ret;
 }
 
-auto EntityBase::getStatus() const -> traffic_simulator_msgs::msg::EntityStatus
+auto EntityBase::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &
 {
-  auto status = status_;
-  status.bounding_box = getBoundingBox();
-  status.type = getEntityType();
-  return status;
+  return status_;
 }
 
 auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
@@ -478,8 +475,22 @@ void EntityBase::setOtherStatus(
 
 bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
 {
-  status_ = status;
-  status_.name = name;
+  auto new_status = status;
+
+  /*
+     FIXME: DIRTY HACK!!!
+
+     It seems that some operations set an incomplete status without respecting
+     the original status obtained by getStatus. Below is the code to compensate
+     for the lack of set status.
+  */
+  new_status.name = name;
+  new_status.type = status_.type;
+  new_status.subtype = status_.subtype;
+  new_status.bounding_box = status_.bounding_box;
+
+  status_ = new_status;
+
   return true;
 }
 

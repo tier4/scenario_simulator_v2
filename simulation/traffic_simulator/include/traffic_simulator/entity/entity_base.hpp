@@ -110,7 +110,7 @@ public:
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
 
-  /*   */ auto getStatus() const -> traffic_simulator_msgs::msg::EntityStatus;
+  /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
 
   /*   */ auto getStandStillDuration() const -> double;
 
