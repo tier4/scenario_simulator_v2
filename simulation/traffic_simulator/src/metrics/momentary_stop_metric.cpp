@@ -43,14 +43,8 @@ void MomentaryStopMetric::update()
   distance_to_stopline_ = distance.value();
   linear_acceleration_ = status->action_status.accel.linear.x;
   if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
-    auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
-    if (!standstill_duration) {
-      THROW_SIMULATION_ERROR("failed to calculate standstill duration.");
-    }
-    standstill_duration_ = standstill_duration.value();
-    if (
-      entity_manager_ptr_->isStopping(target_entity) &&
-      standstill_duration.value() >= stop_duration) {
+    if (standstill_duration_ = entity_manager_ptr_->getStandStillDuration(target_entity);
+        entity_manager_ptr_->isStopping(target_entity) && standstill_duration_ >= stop_duration) {
       success();
     }
     if (distance.value() <= stop_sequence_end_distance) {

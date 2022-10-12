@@ -15,9 +15,8 @@
 #ifndef BEHAVIOR_TREE_PLUGIN__ROUTE_PLANNER_HPP_
 #define BEHAVIOR_TREE_PLUGIN__ROUTE_PLANNER_HPP_
 
+#include <deque>
 #include <memory>
-#include <optional>
-#include <queue>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 
@@ -26,27 +25,39 @@ namespace traffic_simulator
 class RoutePlanner
 {
 public:
-  explicit RoutePlanner(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
+  explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+
   std::vector<std::int64_t> getRouteLanelets(
-    traffic_simulator_msgs::msg::LaneletPose entity_lanelet_pose,
-    std::vector<traffic_simulator_msgs::msg::LaneletPose> waypoints, double horizon = 100);
+    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon = 100);
+
   std::vector<std::int64_t> getRouteLanelets(
-    traffic_simulator_msgs::msg::LaneletPose entity_lanelet_pose,
-    traffic_simulator_msgs::msg::LaneletPose target_lanelet_pose, double horizon = 100);
+    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon = 100);
+
   std::vector<std::int64_t> getRouteLanelets(
-    traffic_simulator_msgs::msg::LaneletPose entity_lanelet_pose, double horizon = 100);
+    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
+    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon = 100);
+
   void cancelGoal();
   std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses();
   std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame();
 
 private:
   void cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
+
   void plan(
-    traffic_simulator_msgs::msg::LaneletPose entity_lanelet_pose,
-    traffic_simulator_msgs::msg::LaneletPose target_lanelet_pose);
+    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
+    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose);
+
   std::optional<std::vector<std::int64_t>> whole_route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-  std::queue<traffic_simulator_msgs::msg::LaneletPose> waypoint_queue_;
+
+  /*
+     What we need is a queue, but we need to be able to iterate over the
+     elements for getGoalPoses, so we use std::deque instead of std::queue
+     which is not iterable.
+  */
+  std::deque<traffic_simulator_msgs::msg::LaneletPose> waypoint_queue_;
 };
 }  // namespace traffic_simulator
 

@@ -163,7 +163,6 @@ EgoEntity::EgoEntity(
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
-  entity_type_.type = traffic_simulator_msgs::msg::EntityType::EGO;
 }
 
 auto EgoEntity::asAutoware() const -> concealer::Autoware &
@@ -172,7 +171,7 @@ auto EgoEntity::asAutoware() const -> concealer::Autoware &
   return *autoware;
 }
 
-auto EgoEntity::getCurrentAction() const -> const std::string
+auto EgoEntity::getCurrentAction() const -> std::string
 {
   const auto state = autoware->getAutowareStateName();
   return state.empty() ? "Launching" : state;
@@ -196,7 +195,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   traffic_simulator_msgs::msg::EntityStatus status;
   {
     status.time = time;
-    status.type.type = entity_type_.type;
+    status.type = getEntityType();
     status.bounding_box = getBoundingBox();
     status.pose = getCurrentPose();
     status.action_status.twist = getCurrentTwist();
@@ -238,6 +237,17 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   }
 
   return status;
+}
+
+auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
+{
+  static const auto entity_type = []() {
+    traffic_simulator_msgs::msg::EntityType entity_type;
+    entity_type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+    return entity_type;
+  }();
+
+  return entity_type;
 }
 
 auto EgoEntity::getEntityTypename() const -> const std::string &

@@ -313,13 +313,7 @@ public:
     template <typename... Ts>
     static auto evaluateStandStill(Ts &&... xs)
     {
-      if (const auto result = core->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
-          result) {
-        return result.value();
-      } else {
-        using value_type = typename std::decay<decltype(result)>::type::value_type;
-        return std::numeric_limits<value_type>::quiet_NaN();
-      }
+      return core->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>

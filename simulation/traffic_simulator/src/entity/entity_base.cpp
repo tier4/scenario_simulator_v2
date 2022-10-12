@@ -31,20 +31,11 @@ namespace entity
 {
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-: name(name),
-  status_(std::nullopt),
-  verbose_(true),
-  visibility_(true),
-  npc_logic_started_(false),
-  entity_subtype_(subtype)
+: name(name), subtype(subtype), verbose(true), status_(boost::none), npc_logic_started_(false)
 {
-  status_ = std::nullopt;
 }
 
-void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
-{
-  return;
-}
+void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
 
 auto EntityBase::asAutoware() const -> concealer::Autoware &
 {
@@ -54,13 +45,242 @@ auto EntityBase::asAutoware() const -> concealer::Autoware &
     " is not the entity controlled by Autoware.");
 }
 
+void EntityBase::cancelRequest() {}
+
+auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
+{
+  const auto status = getStatus();
+
+  std::vector<geometry_msgs::msg::Point> points_bbox;
+  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
+
+  p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p0.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p0.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p0);
+
+  p1.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p1.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p1.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p1);
+
+  p2.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p2.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p2.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p2);
+
+  p3.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p3.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p3.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p3);
+
+  p4.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p4.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p4.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p4);
+
+  p5.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p5.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p5.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p5);
+
+  p6.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p6.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p6.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p6);
+
+  p7.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p7.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p7.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p7);
+
+  return math::geometry::get2DConvexHull(points_bbox);
+}
+
+auto EntityBase::getDistanceToLaneBound() -> double
+{
+  return std::min(getDistanceToLeftLaneBound(), getDistanceToRightLaneBound());
+}
+
+auto EntityBase::getDistanceToLaneBound(std::int64_t lanelet_id) const -> double
+{
+  return std::min(getDistanceToLeftLaneBound(lanelet_id), getDistanceToRightLaneBound(lanelet_id));
+}
+
+auto EntityBase::getDistanceToLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+  -> double
+{
+  return std::min(
+    getDistanceToLeftLaneBound(lanelet_ids), getDistanceToRightLaneBound(lanelet_ids));
+}
+
+auto EntityBase::getDistanceToLeftLaneBound() -> double
+{
+  return getDistanceToLeftLaneBound(getRouteLanelets());
+}
+
+auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double
+{
+  if (const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id); bound.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
+  } else if (const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
+             polygon.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
+      " exists and it's definition");
+  } else {
+    return math::geometry::getDistance2D(bound, polygon);
+  }
+}
+
+auto EntityBase::getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+  -> double
+{
+  std::vector<double> distances;
+  std::transform(
+    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
+    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
+  return *std::min_element(distances.begin(), distances.end());
+}
+
+auto EntityBase::getDistanceToRightLaneBound() -> double
+{
+  return getDistanceToRightLaneBound(getRouteLanelets());
+}
+
+auto EntityBase::getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double
+{
+  if (const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id); bound.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
+      " please check lanelet map.");
+  } else if (const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
+             polygon.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
+      " exists and it's definition");
+  } else {
+    return math::geometry::getDistance2D(bound, polygon);
+  }
+}
+
+auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
+  -> double
+{
+  std::vector<double> distances;
+  std::transform(
+    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
+    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
+  return *std::min_element(distances.begin(), distances.end());
+}
+
+auto EntityBase::getEntityStatusBeforeUpdate() const
+  -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus> &
+{
+  return status_before_update_;
+}
+
+auto EntityBase::getLinearJerk() const -> boost::optional<double> { return linear_jerk_; }
+
+auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  if (const auto status = getStatus(); status.lanelet_pose_valid) {
+    return status.lanelet_pose;
+  } else if (getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
+    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
+  } else {
+    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
+  }
+}
+
+auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
+
+auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
+  -> geometry_msgs::msg::Pose
+{
+  tf2::Transform ref_transform, relative_transform;
+  tf2::fromMsg(getStatus().pose, ref_transform);
+  tf2::fromMsg(relative_pose, relative_transform);
+  geometry_msgs::msg::Pose ret;
+  tf2::toMsg(ref_transform * relative_transform, ret);
+  return ret;
+}
+
+auto EntityBase::getStatus() const -> traffic_simulator_msgs::msg::EntityStatus
+{
+  if (!status_) {
+    THROW_SEMANTIC_ERROR("status is not set");
+  } else {
+    auto status = status_.get();
+    status.bounding_box = getBoundingBox();
+    status.subtype = subtype;
+    status.type = getEntityType();
+    return status;
+  }
+}
+
+auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
+
+auto EntityBase::getVehicleParameters() const
+  -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
+{
+  return boost::none;
+}
+
+auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
+
 void EntityBase::onUpdate(double, double)
 {
   job_list_.update();
   status_before_update_ = status_;
 }
 
-std::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
+void EntityBase::requestLaneChange(
+  const traffic_simulator::lane_change::AbsoluteTarget & target,
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+  const traffic_simulator::lane_change::Constraint & constraint)
+{
+  requestLaneChange(lane_change::Parameter(target, trajectory_shape, constraint));
+}
+
+void EntityBase::requestLaneChange(
+  const traffic_simulator::lane_change::RelativeTarget & target,
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+  const traffic_simulator::lane_change::Constraint & constraint)
+{
+  std::int64_t reference_lanelet_id = 0;
+  if (target.entity_name == name) {
+    if (!getStatus().lanelet_pose_valid) {
+      THROW_SEMANTIC_ERROR(
+        "Target entity does not assigned to lanelet. Please check Target entity name : ",
+        target.entity_name, " exists on lane.");
+    }
+    reference_lanelet_id = getStatus().lanelet_pose.lanelet_id;
+  } else {
+    if (other_status_.find(target.entity_name) == other_status_.end()) {
+      THROW_SEMANTIC_ERROR(
+        "Target entity : ", target.entity_name, " does not exist. Please check ",
+        target.entity_name, " exists.");
+    }
+    if (!other_status_.at(target.entity_name).lanelet_pose_valid) {
+      THROW_SEMANTIC_ERROR(
+        "Target entity does not assigned to lanelet. Please check Target entity name : ",
+        target.entity_name, " exists on lane.");
+    }
+    reference_lanelet_id = other_status_.at(target.entity_name).lanelet_pose.lanelet_id;
+  }
+  const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+    reference_lanelet_id, target.direction, target.shift);
+  if (lane_change_target_id) {
+    requestLaneChange(
+      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
+      trajectory_shape, constraint);
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate absolute target lane. Please check the target lane exists.");
+  }
+}
 
 void EntityBase::requestSpeedChange(
   const double target_speed, const speed_change::Transition transition,
@@ -235,79 +455,20 @@ void EntityBase::requestSpeedChange(
   }
 }
 
-void EntityBase::requestLaneChange(
-  const traffic_simulator::lane_change::AbsoluteTarget & target,
-  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const traffic_simulator::lane_change::Constraint & constraint)
+void EntityBase::requestWalkStraight()
 {
-  auto param = traffic_simulator::lane_change::Parameter(target, trajectory_shape, constraint);
-  requestLaneChange(param);
+  THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
 }
 
-void EntityBase::requestLaneChange(
-  const traffic_simulator::lane_change::RelativeTarget & target,
-  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const traffic_simulator::lane_change::Constraint & constraint)
+void EntityBase::setEntityTypeList(
+  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & entity_type_list)
 {
-  std::int64_t reference_lanelet_id = 0;
-  if (target.entity_name == name) {
-    if (!getStatus().lanelet_pose_valid) {
-      THROW_SEMANTIC_ERROR(
-        "Target entity does not assigned to lanelet. Please check Target entity name : ",
-        target.entity_name, " exists on lane.");
-    }
-    reference_lanelet_id = getStatus().lanelet_pose.lanelet_id;
-  } else {
-    if (other_status_.find(target.entity_name) == other_status_.end()) {
-      THROW_SEMANTIC_ERROR(
-        "Target entity : ", target.entity_name, " does not exist. Please check ",
-        target.entity_name, " exists.");
-    }
-    if (!other_status_.at(target.entity_name).lanelet_pose_valid) {
-      THROW_SEMANTIC_ERROR(
-        "Target entity does not assigned to lanelet. Please check Target entity name : ",
-        target.entity_name, " exists on lane.");
-    }
-    reference_lanelet_id = other_status_.at(target.entity_name).lanelet_pose.lanelet_id;
-  }
-  const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-    reference_lanelet_id, target.direction, target.shift);
-  if (lane_change_target_id) {
-    requestLaneChange(
-      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
-      trajectory_shape, constraint);
-  } else {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate absolute target lane. Please check the target lane exists.");
-  }
+  entity_type_list_ = entity_type_list;
 }
 
-void EntityBase::updateStandStillDuration(const double step_time)
+void EntityBase::setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
 {
-  if (!npc_logic_started_) {
-    stand_still_duration_ = 0;
-    return;
-  }
-  if (!status_) {
-    stand_still_duration_ = std::nullopt;
-  } else {
-    if (!stand_still_duration_) {
-      stand_still_duration_ = 0;
-    }
-    if (
-      std::fabs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
-      stand_still_duration_ = step_time + stand_still_duration_.value();
-    } else {
-      stand_still_duration_ = 0;
-    }
-  }
-}
-
-void EntityBase::updateEntityStatusTimestamp(const double current_time)
-{
-  if (status_) {
-    status_->time = current_time;
-  }
+  hdmap_utils_ptr_ = ptr;
 }
 
 void EntityBase::setOtherStatus(
@@ -329,19 +490,6 @@ void EntityBase::setOtherStatus(
   }
 }
 
-const traffic_simulator_msgs::msg::EntityStatus EntityBase::getStatus() const
-{
-  if (!status_) {
-    THROW_SEMANTIC_ERROR("status is not set");
-  } else {
-    auto status = this->status_.value();
-    status.bounding_box = getBoundingBox();
-    status.subtype = entity_subtype_;
-    status.type = entity_type_;
-    return status;
-  }
-}
-
 bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
 {
   status_ = status;
@@ -349,153 +497,17 @@ bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   return true;
 }
 
-auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose
+void EntityBase::setTrafficLightManager(
+  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & traffic_light_manager)
 {
-  const auto status = getStatus();
-  return status.pose;
+  traffic_light_manager_ = traffic_light_manager;
 }
 
-auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
-  -> geometry_msgs::msg::Pose
-{
-  const auto ref_status = getStatus();
-  tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(ref_status.pose, ref_transform);
-  tf2::fromMsg(relative_pose, relative_transform);
-  geometry_msgs::msg::Pose ret;
-  tf2::toMsg(ref_transform * relative_transform, ret);
-  return ret;
-}
+auto EntityBase::setVelocityLimit(double) -> void {}
 
-auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
-{
-  const auto status = getStatus();
+void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
-  std::vector<geometry_msgs::msg::Point> points_bbox;
-  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
-
-  p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p0.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p0.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p0);
-
-  p1.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p1.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p1.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p1);
-
-  p2.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p2.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p2.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p2);
-
-  p3.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p3.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p3.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p3);
-
-  p4.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p4.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p4.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p4);
-
-  p5.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p5.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p5.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p5);
-
-  p6.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p6.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p6.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p6);
-
-  p7.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p7.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p7.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p7);
-
-  return math::geometry::get2DConvexHull(points_bbox);
-}
-
-auto EntityBase::getDistanceToLaneBound() -> double
-{
-  return std::min(getDistanceToLeftLaneBound(), getDistanceToRightLaneBound());
-}
-
-auto EntityBase::getDistanceToLaneBound(std::int64_t lanelet_id) const -> double
-{
-  return std::min(getDistanceToLeftLaneBound(lanelet_id), getDistanceToRightLaneBound(lanelet_id));
-}
-
-auto EntityBase::getDistanceToLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
-  -> double
-{
-  return std::min(
-    getDistanceToLeftLaneBound(lanelet_ids), getDistanceToRightLaneBound(lanelet_ids));
-}
-
-auto EntityBase::getDistanceToLeftLaneBound() -> double
-{
-  return getDistanceToLeftLaneBound(getRouteLanelets());
-}
-
-auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double
-{
-  const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id);
-  if (bound.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
-  }
-  const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
-  if (polygon.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
-      " exists and it's definition");
-  }
-  return math::geometry::getDistance2D(bound, polygon);
-}
-
-auto EntityBase::getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
-  -> double
-{
-  std::vector<double> distances;
-  std::transform(
-    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
-  return *std::min_element(distances.begin(), distances.end());
-}
-
-auto EntityBase::getDistanceToRightLaneBound() -> double
-{
-  return getDistanceToRightLaneBound(getRouteLanelets());
-}
-
-auto EntityBase::getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double
-{
-  const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id);
-  if (bound.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
-      " please check lanelet map.");
-  }
-  const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
-  if (polygon.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
-      " exists and it's definition");
-  }
-  return math::geometry::getDistance2D(bound, polygon);
-}
-
-auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
-  -> double
-{
-  std::vector<double> distances;
-  std::transform(
-    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
-  return *std::min_element(distances.begin(), distances.end());
-}
+auto EntityBase::statusSet() const noexcept -> bool { return static_cast<bool>(status_); }
 
 void EntityBase::stopAtEndOfRoad()
 {
@@ -507,33 +519,22 @@ void EntityBase::stopAtEndOfRoad()
   }
 }
 
-void EntityBase::setAccelerationLimit(double)
+void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
-  THROW_SIMULATION_ERROR(
-    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
-}
-
-void EntityBase::setDecelerationLimit(double)
-{
-  THROW_SIMULATION_ERROR(
-    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
-}
-
-auto EntityBase::getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
-{
-  const auto status = getStatus();
-  if (status.lanelet_pose_valid) {
-    return status.lanelet_pose;
+  if (status_) {
+    status_->time = current_time;
   }
-  if (getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
+}
+
+auto EntityBase::updateStandStillDuration(const double step_time) -> double
+{
+  if (
+    npc_logic_started_ and status_ and
+    std::abs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
+    return stand_still_duration_ += step_time;
   } else {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
+    return stand_still_duration_ = 0.0;
   }
 }
-
-bool EntityBase::isNpcLogicStarted() const { return npc_logic_started_; }
-
-void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 }  // namespace entity
 }  // namespace traffic_simulator
