@@ -48,7 +48,12 @@ public:
   explicit EntityBase(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-  : name(name), subtype(subtype), verbose(true), status_(entity_status), npc_logic_started_(false)
+  : name(name),
+    subtype(subtype),
+    verbose(true),
+    status_(entity_status),
+    status_before_update_(status_),
+    npc_logic_started_(false)
   {
   }
 
@@ -87,7 +92,7 @@ public:
   virtual auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel = 0;
 
   /*   */ auto getEntityStatusBeforeUpdate() const
-    -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus> &;
+    -> const traffic_simulator_msgs::msg::EntityStatus &;
 
   virtual auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & = 0;
 
@@ -193,7 +198,7 @@ public:
 protected:
   traffic_simulator_msgs::msg::EntityStatus status_;
 
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_before_update_;
+  traffic_simulator_msgs::msg::EntityStatus status_before_update_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;

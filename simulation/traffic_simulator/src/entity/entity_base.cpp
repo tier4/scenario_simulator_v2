@@ -169,7 +169,7 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
 }
 
 auto EntityBase::getEntityStatusBeforeUpdate() const
-  -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus> &
+  -> const traffic_simulator_msgs::msg::EntityStatus &
 {
   return status_before_update_;
 }

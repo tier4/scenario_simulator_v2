@@ -290,18 +290,12 @@ bool API::updateEntityStatusInSim()
     simulation_interface::toProto(
       asAutoware(entity_manager_ptr_->getEgoName()).getVehicleCommand(),
       *req.mutable_vehicle_command());
-    const auto ego_status_before_update =
-      entity_manager_ptr_->getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName());
-    if (ego_status_before_update) {
-      req.set_ego_entity_status_before_update_is_empty(false);
-      simulation_interface::toProto(
-        ego_status_before_update.get(), *req.mutable_ego_entity_status_before_update());
-    } else {
-      req.set_ego_entity_status_before_update_is_empty(true);
-    }
+    req.set_ego_entity_status_before_update_is_empty(false);
+    simulation_interface::toProto(
+      entity_manager_ptr_->getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName()),
+      *req.mutable_ego_entity_status_before_update());
   }
-  const auto names = entity_manager_ptr_->getEntityNames();
-  for (const auto & name : names) {
+  for (const auto & name : entity_manager_ptr_->getEntityNames()) {
     auto status = entity_manager_ptr_->getEntityStatus(name);
     traffic_simulator_msgs::EntityStatus proto;
     status.name = name;
