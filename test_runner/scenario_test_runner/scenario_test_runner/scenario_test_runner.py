@@ -32,7 +32,6 @@ from openscenario_interpreter_msgs.srv import (
     PreprocessorLoad
 )
 from openscenario_utility.conversion import convert
-from openscenario_utility.validation import XOSCValidator
 from scenario_test_runner.lifecycle_controller import LifecycleController
 from scenario_test_runner.workflow import (
     Expect,
