@@ -222,7 +222,6 @@ public:
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );

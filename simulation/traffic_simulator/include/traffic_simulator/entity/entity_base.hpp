@@ -110,9 +110,6 @@ public:
 
   /*   */ auto getStandStillDuration() const -> double;
 
-  /*   */ auto getVehicleParameters() const
-    -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>;
-
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   /*   */ auto isNpcLogicStarted() const -> bool;

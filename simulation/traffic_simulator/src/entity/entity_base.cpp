@@ -16,7 +16,6 @@
 #include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
-#include <queue>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -206,12 +205,6 @@ auto EntityBase::getStatus() const -> const traffic_simulator_msgs::msg::EntityS
 }
 
 auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
-
-auto EntityBase::getVehicleParameters() const
-  -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
-{
-  return boost::none;
-}
 
 auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 

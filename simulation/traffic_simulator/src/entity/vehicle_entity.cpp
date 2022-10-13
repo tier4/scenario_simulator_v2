@@ -76,12 +76,6 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t
   }
 }
 
-auto VehicleEntity::getVehicleParameters() const
-  -> boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
-{
-  return parameters;
-}
-
 auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   if (!npc_logic_started_) {

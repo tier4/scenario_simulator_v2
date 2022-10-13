@@ -87,9 +87,6 @@ public:
 
   auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
 
-  auto getVehicleParameters() const
-    -> boost::optional<traffic_simulator_msgs::msg::VehicleParameters>;
-
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   void onUpdate(double current_time, double step_time) override;
