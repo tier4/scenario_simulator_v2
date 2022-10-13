@@ -55,7 +55,6 @@ public:
     const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior())
   : EntityBase(name, entity_status),
-    parameters(parameters),
     plugin_name(plugin_name),
     loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
       "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
@@ -68,8 +67,6 @@ public:
   }
 
   ~PedestrianEntity() override = default;
-
-  const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
 

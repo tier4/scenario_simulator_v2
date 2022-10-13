@@ -58,7 +58,6 @@ public:
     const traffic_simulator_msgs::msg::VehicleParameters & parameters,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior())
   : EntityBase(name, entity_status),
-    parameters(parameters),
     loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
       "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
     behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
@@ -113,8 +112,6 @@ public:
 
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
-
-  const traffic_simulator_msgs::msg::VehicleParameters parameters;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;

@@ -27,8 +27,8 @@ class MiscObjectEntity : public EntityBase
 public:
   explicit MiscObjectEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
-  : EntityBase(name, entity_status), params_(parameters)
+    const traffic_simulator_msgs::msg::MiscObjectParameters &)
+  : EntityBase(name, entity_status)
   {
   }
 
@@ -38,7 +38,7 @@ public:
 
   auto getEntityTypename() const -> const std::string & override
   {
-    static const std::string result = "VehicleEntity";
+    static const std::string result = "MiscObjectEntity";
     return result;
   }
 
@@ -108,9 +108,6 @@ public:
   void setAccelerationLimit(double) override {}
 
   void setDecelerationLimit(double) override {}
-
-private:
-  const traffic_simulator_msgs::msg::MiscObjectParameters params_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
