@@ -45,15 +45,7 @@ namespace entity
 class EntityBase
 {
 public:
-  explicit EntityBase(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
-  : name(name),
-    verbose(true),
-    status_(entity_status),
-    status_before_update_(status_),
-    npc_logic_started_(false)
-  {
-  }
+  explicit EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &);
 
   virtual ~EntityBase() = default;
 

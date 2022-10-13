@@ -78,15 +78,9 @@ public:
   explicit EgoEntity() = delete;
 
   explicit EgoEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-    const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-    const Configuration & configuration, const double step_time)
-  : VehicleEntity(name, entity_status, parameters),
-    autoware(makeAutoware(configuration)),
-    vehicle_model_type_(getVehicleModelType()),
-    vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
-  {
-  }
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
+    const double step_time);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 

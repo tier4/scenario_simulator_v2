@@ -26,11 +26,8 @@ class MiscObjectEntity : public EntityBase
 {
 public:
   explicit MiscObjectEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-    const traffic_simulator_msgs::msg::MiscObjectParameters &)
-  : EntityBase(name, entity_status)
-  {
-  }
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
   void onUpdate(double, double) override;
 

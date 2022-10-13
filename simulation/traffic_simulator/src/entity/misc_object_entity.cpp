@@ -18,6 +18,13 @@ namespace traffic_simulator
 {
 namespace entity
 {
+MiscObjectEntity::MiscObjectEntity(
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const traffic_simulator_msgs::msg::MiscObjectParameters &)
+: EntityBase(name, entity_status)
+{
+}
+
 void MiscObjectEntity::onUpdate(double, double)
 {
   status_.action_status.accel = geometry_msgs::msg::Accel();
