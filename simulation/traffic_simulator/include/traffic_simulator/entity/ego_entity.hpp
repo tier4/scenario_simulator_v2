@@ -137,7 +137,7 @@ public:
 
   auto setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void override;
 
-  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool override;
+  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
 
   void requestSpeedChange(double, bool) override;
 

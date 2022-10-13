@@ -157,7 +157,7 @@ public:
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &);
 
-  virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> bool;
+  virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> void;
 
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);

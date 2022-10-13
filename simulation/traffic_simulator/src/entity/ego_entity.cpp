@@ -435,9 +435,9 @@ auto EgoEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &)
 {
 }
 
-bool EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
+auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
-  const bool success = VehicleEntity::setStatus(status);  // NOTE: setStatus always succeeds.
+  VehicleEntity::setStatus(status);
 
   const auto current_pose = getStatus().pose;
 
@@ -456,8 +456,6 @@ bool EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
   if (not initial_pose_) {
     initial_pose_ = current_pose;
   }
-
-  return success;
 }
 
 void EgoEntity::requestSpeedChange(double value, bool)

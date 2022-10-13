@@ -64,28 +64,28 @@ traffic_simulator_msgs::msg::EntityStatus API::getEntityStatus(const std::string
   return entity_manager_ptr_->getEntityStatus(name);
 }
 
-bool API::setEntityStatus(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status)
+auto API::setEntityStatus(
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
-  return entity_manager_ptr_->setEntityStatus(name, status);
+  entity_manager_ptr_->setEntityStatus(name, status);
 }
 
-bool API::setEntityStatus(
+auto API::setEntityStatus(
   const std::string & name, const std::string & reference_entity_name,
   const geometry_msgs::msg::Point & relative_position,
   const geometry_msgs::msg::Vector3 & relative_rpy,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status)
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   geometry_msgs::msg::Pose relative_pose;
   relative_pose.position = relative_position;
   relative_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(relative_rpy);
-  return setEntityStatus(name, reference_entity_name, relative_pose, action_status);
+  setEntityStatus(name, reference_entity_name, relative_pose, action_status);
 }
 
-bool API::setEntityStatus(
+auto API::setEntityStatus(
   const std::string & name, const std::string & reference_entity_name,
   const geometry_msgs::msg::Pose & relative_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status)
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
   traffic_simulator_msgs::msg::EntityStatus status;
@@ -100,7 +100,7 @@ bool API::setEntityStatus(
   } else {
     status.lanelet_pose_valid = false;
   }
-  return entity_manager_ptr_->setEntityStatus(name, status);
+  entity_manager_ptr_->setEntityStatus(name, status);
 }
 
 boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
@@ -137,9 +137,9 @@ bool API::reachPosition(
   return entity_manager_ptr_->reachPosition(name, target_name, tolerance);
 }
 
-bool API::setEntityStatus(
+auto API::setEntityStatus(
   const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status)
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   traffic_simulator_msgs::msg::EntityStatus status;
   status.lanelet_pose = lanelet_pose;
@@ -154,12 +154,12 @@ bool API::setEntityStatus(
     status.time = 0;
   }
   status.action_status = action_status;
-  return setEntityStatus(name, status);
+  setEntityStatus(name, status);
 }
 
-bool API::setEntityStatus(
+auto API::setEntityStatus(
   const std::string & name, const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status)
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
     map_pose, entity_manager_ptr_->getEntityStatus(name).bounding_box, false);
@@ -179,7 +179,7 @@ bool API::setEntityStatus(
     status.time = 0;
   }
   status.bounding_box = entity_manager_ptr_->getEntityStatus(name).bounding_box;
-  return setEntityStatus(name, status);
+  setEntityStatus(name, status);
 }
 
 bool API::initialize(double realtime_factor, double step_time)

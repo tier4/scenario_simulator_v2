@@ -476,7 +476,7 @@ void EntityBase::setOtherStatus(
   }
 }
 
-bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
+auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   auto new_status = status;
 
@@ -493,8 +493,6 @@ bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   new_status.bounding_box = status_.bounding_box;
 
   status_ = new_status;
-
-  return true;
 }
 
 void EntityBase::setTrafficLightManager(

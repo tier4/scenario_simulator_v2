@@ -186,27 +186,27 @@ public:
 
   geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
-  bool setEntityStatus(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status);
-  bool setEntityStatus(
+  auto setEntityStatus(
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+  auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      traffic_simulator::helper::constructActionStatus());
-  bool setEntityStatus(
+      traffic_simulator::helper::constructActionStatus()) -> void;
+  auto setEntityStatus(
     const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      traffic_simulator::helper::constructActionStatus());
-  bool setEntityStatus(
+      traffic_simulator::helper::constructActionStatus()) -> void;
+  auto setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
     const geometry_msgs::msg::Pose & relative_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      traffic_simulator::helper::constructActionStatus());
-  bool setEntityStatus(
+      traffic_simulator::helper::constructActionStatus()) -> void;
+  auto setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
     const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      traffic_simulator::helper::constructActionStatus());
+      traffic_simulator::helper::constructActionStatus()) -> void;
 
   boost::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
