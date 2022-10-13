@@ -27,12 +27,10 @@ bool TraveledDistanceMetric::activateTrigger() { return true; }
 
 void TraveledDistanceMetric::update()
 {
-  double step_time = entity_manager_ptr_->getStepTime();
-  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  if (status) {
-    traveled_distance =
-      traveled_distance + std::fabs(status.get().action_status.twist.linear.x) * step_time;
-  }
+  traveled_distance =
+    traveled_distance +
+    std::fabs(entity_manager_ptr_->getEntityStatus(target_entity).action_status.twist.linear.x) *
+      entity_manager_ptr_->getStepTime();
 }
 
 nlohmann::json TraveledDistanceMetric::toJson()

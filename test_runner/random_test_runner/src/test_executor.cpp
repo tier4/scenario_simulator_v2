@@ -73,7 +73,9 @@ void TestExecutor::initialize()
   api_->updateFrame();
 
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-    api_->spawn(ego_name_, getVehicleParameters(), traffic_simulator::VehicleBehavior::autoware());
+    api_->spawn(
+      ego_name_, test_description_.ego_start_position, getVehicleParameters(),
+      traffic_simulator::VehicleBehavior::autoware());
     api_->setEntityStatus(
       ego_name_, test_description_.ego_start_position,
       traffic_simulator::helper::constructActionStatus());
@@ -102,7 +104,7 @@ void TestExecutor::initialize()
 
   for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
     const auto & npc_descr = test_description_.npcs_descriptions[i];
-    api_->spawn(npc_descr.name, getVehicleParameters());
+    api_->spawn(npc_descr.name, npc_descr.start_position, getVehicleParameters());
     api_->setEntityStatus(
       npc_descr.name, npc_descr.start_position,
       traffic_simulator::helper::constructActionStatus(npc_descr.speed));

@@ -58,7 +58,8 @@ private:
 
   void onInitialize() override
   {
-    api_.spawn("ego", getVehicleParameters());
+    api_.spawn(
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
@@ -67,7 +68,10 @@ private:
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
-    api_.spawn("front", getVehicleParameters());
+
+    api_.spawn(
+      "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
+      getVehicleParameters());
     api_.setEntityStatus(
       "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
       traffic_simulator::helper::constructActionStatus(0));
