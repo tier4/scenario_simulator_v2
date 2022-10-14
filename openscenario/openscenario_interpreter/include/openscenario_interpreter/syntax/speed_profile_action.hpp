@@ -46,7 +46,7 @@ struct SpeedProfileAction
 
   const DynamicConstraints dynamic_constraints;
 
-  const SpeedProfileEntry speed_profile_entry;
+  const std::list<SpeedProfileEntry> speed_profile_entry;
 
   explicit SpeedProfileAction(const pugi::xml_node &, Scope &);
 

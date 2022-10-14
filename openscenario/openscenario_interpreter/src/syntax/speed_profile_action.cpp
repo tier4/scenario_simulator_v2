@@ -24,7 +24,7 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
 : entity_ref(readAttribute<EntityRef>("entityRef", node, scope)),
   following_mode(readAttribute<FollowingMode>("followingMode", node, scope)),
   dynamic_constraints(readElement<DynamicConstraints>("DynamicConstraints", node, scope)),
-  speed_profile_entry(readElement<SpeedProfileEntry>("SpeedProfileEntry", node, scope))
+  speed_profile_entry(readElements<SpeedProfileEntry, 1>("SpeedProfileEntry", node, scope))
 {
 }
 
