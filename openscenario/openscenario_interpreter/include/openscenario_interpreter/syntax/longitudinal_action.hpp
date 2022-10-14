@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
+#include <openscenario_interpreter/syntax/speed_profile_action.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -48,16 +49,14 @@ struct LongitudinalAction : public ComplexType
 DEFINE_LAZY_VISITOR(
   LongitudinalAction,
   CASE(SpeedAction),  //
-  // CASE(LongitudinalDistanceAction),
-  // CASE(SpeedProfileAction)
-);
+  // CASE(LongitudinalDistanceAction),  //
+  CASE(SpeedProfileAction));
 
 DEFINE_LAZY_VISITOR(
   const LongitudinalAction,
   CASE(SpeedAction),  //
-  // CASE(LongitudinalDistanceAction),
-  // CASE(SpeedProfileAction)
-);
+  // CASE(LongitudinalDistanceAction),  //
+  CASE(SpeedProfileAction));
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

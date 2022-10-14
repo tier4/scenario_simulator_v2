@@ -25,7 +25,7 @@ LongitudinalAction::LongitudinalAction(const pugi::xml_node & node, Scope & scop
     choice(node,
       std::make_pair(               "SpeedAction", [&](const auto & node) { return make<SpeedAction>(node, scope); }),
       std::make_pair("LongitudinalDistanceAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-      std::make_pair(        "SpeedProfileAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+      std::make_pair(        "SpeedProfileAction", [&](const auto & node) { return make<SpeedProfileAction>(node, scope); })))
 // clang-format on
 {
 }
