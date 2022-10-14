@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/dynamic_constraints.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/following_mode.hpp>
+#include <openscenario_interpreter/syntax/speed_profile_entry.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -44,6 +45,8 @@ struct SpeedProfileAction
   const FollowingMode following_mode;
 
   const DynamicConstraints dynamic_constraints;
+
+  const SpeedProfileEntry speed_profile_entry;
 
   explicit SpeedProfileAction(const pugi::xml_node &, Scope &);
 
