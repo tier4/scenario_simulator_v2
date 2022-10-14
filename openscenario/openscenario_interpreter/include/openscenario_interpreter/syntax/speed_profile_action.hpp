@@ -16,6 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_PROFILE_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/dynamic_constraints.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/following_mode.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -36,7 +39,13 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct SpeedProfileAction
 {
-  explicit SpeedProfileAction(const pugi::xml_node &, const Scope &);
+  const EntityRef entity_ref;
+
+  const FollowingMode following_mode;
+
+  const DynamicConstraints dynamic_constraints;
+
+  explicit SpeedProfileAction(const pugi::xml_node &, Scope &);
 
   auto accomplished() -> bool;
 

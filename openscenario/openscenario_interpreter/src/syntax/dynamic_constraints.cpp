@@ -13,32 +13,19 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/speed_profile_action.hpp>
+#include <openscenario_interpreter/syntax/dynamic_constraints.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scope)
-: entity_ref(readAttribute<EntityRef>("entityRef", node, scope)),
-  following_mode(readAttribute<FollowingMode>("followingMode", node, scope)),
-  dynamic_constraints(readElement<DynamicConstraints>("DynamicConstraints", node, scope))
+DynamicConstraints::DynamicConstraints(const pugi::xml_node & node, Scope & scope)
+: max_acceleration(readAttribute<Double>("maxAcceleration", node, scope)),
+  max_acceleration_rate(readAttribute<Double>("maxAccelerationRate", node, scope)),
+  max_deceleration(readAttribute<Double>("maxDeceleration", node, scope)),
+  max_deceleration_rate(readAttribute<Double>("maxDecelerationRate", node, scope)),
+  max_speed(readAttribute<Double>("maxSpeed", node, scope))
 {
 }
-
-auto SpeedProfileAction::accomplished() -> bool
-{
-  return true;  // TODO
-}
-
-auto SpeedProfileAction::endsImmediately() const -> bool
-{
-  return true;  // TODO
-}
-
-auto SpeedProfileAction::run() -> void {}
-
-auto SpeedProfileAction::start() -> void {}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
