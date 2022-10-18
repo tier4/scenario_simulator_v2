@@ -463,15 +463,21 @@ void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
 {
   other_status_.clear();
-  for (const auto & each : status) {
-    if (each.first != name) {
-      const auto p0 = each.second.pose.position;
-      const auto p1 = status_.pose.position;
-      const auto distance =
-        std::sqrt(std::pow(p0.x - p1.x, 2) + std::pow(p0.y - p1.y, 2) + std::pow(p0.z - p1.z, 2));
-      if (distance < 30) {
-        other_status_.insert(each);
-      }
+
+  for (const auto & [other_name, other_status] : status) {
+    if (other_name != name) {
+      /*
+         The following filtering is the code written for the purpose of
+         reducing the calculation load, but it is commented out experimentally
+         because it adversely affects "processing that needs to identify other
+         entities regardless of distance" such as RelativeTargetSpeed of
+         requestSpeedChange.
+      */
+      // const auto p0 = other_status.pose.position;
+      // const auto p1 = status_.pose.position;
+      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance < 30) {
+      other_status_.emplace(other_name, other_status);
+      // }
     }
   }
 }
@@ -491,6 +497,7 @@ auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   new_status.type = status_.type;
   new_status.subtype = status_.subtype;
   new_status.bounding_box = status_.bounding_box;
+  new_status.action_status.current_action = getCurrentAction();
 
   status_ = new_status;
 }
