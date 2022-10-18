@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iterator>  // std::distance
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
@@ -20,128 +19,163 @@
 #include <openscenario_interpreter/regex/function_call_expression.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
+
+#include <iterator>  // std::distance
 #include <unordered_map>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+
+struct ApplyFaultInjection : public CustomCommandActionBase
+{
+private:
+  static auto node() -> rclcpp::Node &
+  {
+    static rclcpp::Node node{"custom_command_action", "simulation"};
+    return node;
+  }
+
+  static auto publisher() -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &
+  {
+    static auto publisher = node().create_publisher<tier4_simulation_msgs::msg::SimulationEvents>(
+      "/simulation/events", rclcpp::QoS(1).reliable());
+    return *publisher;
+  }
+
+public:
+  auto start(const std::vector<std::string> & events, const Scope &) const -> int override
+  {
+    const auto now = node().now();
+
+    auto makeFaultInjectionEvent = [](const auto & name) {
+      tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
+      {
+        fault_injection_event.level = tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+        fault_injection_event.name = name;
+      }
+
+      return fault_injection_event;
+    };
+
+    auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
+      tier4_simulation_msgs::msg::SimulationEvents simulation_events;
+      {
+        simulation_events.stamp = now;
+
+        for (const auto & event : events) {
+          simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
+        }
+      }
+
+      return simulation_events;
+    };
+
+    publisher().publish(makeFaultInjectionEvents(events));
+
+    return events.size();
+  }
+};
+
+struct ApplyWalkStraightAction : public CustomCommandActionBase, private SimulatorCore::ActionApplication
+{
+  auto start(const std::vector<std::string> & actors, const Scope & scope) const -> int override
+  {
+    for (const auto & actor : actors) {
+      applyWalkStraightAction(actor);
+    }
+
+    for (const auto & actor : scope.actors) {
+      applyWalkStraightAction(actor);
+    }
+
+    return scope.actors.size();
+  };
+};
+
+struct DebugError : public CustomCommandActionBase
+{
+  auto start(const std::vector<std::string> &, const Scope &) const -> int override
+  {
+    throw Error(__FILE__, ":", __LINE__);
+  }
+};
+
+struct DebugSegmentationFault : public CustomCommandActionBase
+{
+  auto start(const std::vector<std::string> &, const Scope &) const -> int override
+  {
+    return *reinterpret_cast<std::add_pointer<int>::type>(0);
+  }
+};
+
+struct ExitSuccess : public CustomCommandActionBase
+{
+  auto start(const std::vector<std::string> &, const Scope &) const -> int override
+  {
+    throw SpecialAction<EXIT_SUCCESS>();
+  }
+};
+
+struct ExitFailure : public CustomCommandActionBase
+{
+  auto start(const std::vector<std::string> &, const Scope &) const -> int override
+  {
+    throw SpecialAction<EXIT_FAILURE>();
+  }
+};
+
+struct PrintParameter : public CustomCommandActionBase
+{
+  auto start(const std::vector<std::string> & parameters, const Scope & scope) const -> int override
+  {
+    for (auto && parameter : parameters) {
+      std::cout << parameter << " = " << scope.ref(parameter) << std::endl;
+    }
+
+    return parameters.size();
+  }
+};
+
+struct TestCommand : public CustomCommandActionBase
+{
+  auto start(const std::vector<std::string> & values, const Scope &) const -> int override
+  {
+    std::cout << "test" << std::endl;
+
+    for (auto iter = std::cbegin(values); iter != std::cend(values); ++iter) {
+      std::cout << "  values[" << std::distance(std::cbegin(values), iter) << "] = " << *iter
+                << std::endl;
+    }
+
+    return values.size();
+  }
+};
+
 CustomCommandAction::CustomCommandAction(const pugi::xml_node & node, const Scope & scope)
 : Scope(scope),
   type(readAttribute<String>("type", node, local())),
-  content(readContent<String>(node, local()))
+  content(readContent<String>(node, local())),
+  base(new CustomCommandActionBase())
 {
 }
 
-auto CustomCommandAction::accomplished() noexcept -> bool { return true; }
-
-auto CustomCommandAction::applyFaultInjectionAction(
-  const std::vector<std::string> & events, const Scope &) -> int
+auto CustomCommandAction::start() -> void
 {
-  const auto now = node().now();
+#define ELEMENT(NAME, TYPE) \
+  std::make_pair(NAME, [] { return std::shared_ptr<CustomCommandActionBase>(new TYPE()); })
 
-  auto makeFaultInjectionEvent = [](const auto & name) {
-    tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
-    {
-      fault_injection_event.level = tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
-      fault_injection_event.name = name;
-    }
-
-    return fault_injection_event;
+  static const std::unordered_map<std::string, std::function<std::shared_ptr<CustomCommandActionBase>()>> commands{
+    ELEMENT("FaultInjectionAction", ApplyFaultInjection),
+    ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
+    ELEMENT("debugError", DebugError),
+    ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED
+    ELEMENT("exitFailure", ExitFailure),
+    ELEMENT("exitSuccess", ExitSuccess),
+    ELEMENT("printParameter", PrintParameter),
+    ELEMENT("test", TestCommand),
   };
-
-  auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
-    tier4_simulation_msgs::msg::SimulationEvents simulation_events;
-    {
-      simulation_events.stamp = now;
-
-      for (const auto & event : events) {
-        simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
-      }
-    }
-
-    return simulation_events;
-  };
-
-  publisher().publish(makeFaultInjectionEvents(events));
-
-  return events.size();
-}
-
-auto CustomCommandAction::debugError(const std::vector<std::string> &, const Scope &) -> int
-{
-  throw Error(__FILE__, ":", __LINE__);
-}
-
-auto CustomCommandAction::debugSegmentationFault(const std::vector<std::string> &, const Scope &)
-  -> int
-{
-  return *reinterpret_cast<std::add_pointer<int>::type>(0);
-}
-
-auto CustomCommandAction::exitSuccess(const std::vector<std::string> &, const Scope &) -> int
-{
-  throw SpecialAction<EXIT_SUCCESS>();
-}
-
-auto CustomCommandAction::exitFailure(const std::vector<std::string> &, const Scope &) -> int
-{
-  throw SpecialAction<EXIT_FAILURE>();
-}
-
-auto CustomCommandAction::node() -> rclcpp::Node &
-{
-  static rclcpp::Node node{"custom_command_action", "simulation"};
-  return node;
-}
-
-auto CustomCommandAction::printParameter(
-  const std::vector<std::string> & parameters, const Scope & scope) -> int
-{
-  for (auto && parameter : parameters) {
-    std::cout << parameter << " = " << scope.ref(parameter) << std::endl;
-  }
-
-  return parameters.size();
-}
-
-auto CustomCommandAction::publisher()
-  -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &
-{
-  static auto publisher = node().create_publisher<tier4_simulation_msgs::msg::SimulationEvents>(
-    "/simulation/events", rclcpp::QoS(1).reliable());
-  return *publisher;
-}
-
-auto CustomCommandAction::run() noexcept -> void {}
-
-auto CustomCommandAction::start() const -> void
-{
-  auto apply_walk_straight_action =
-    [this](const std::vector<std::string> & actors, const Scope & scope) {
-      for (const auto & actor : actors) {
-        applyWalkStraightAction(actor);
-      }
-
-      for (const auto & actor : scope.actors) {
-        applyWalkStraightAction(actor);
-      }
-
-      return scope.actors.size();
-    };
-
-  static const std::unordered_map<
-    std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
-    commands{
-      std::make_pair("FaultInjectionAction", applyFaultInjectionAction),
-      std::make_pair("WalkStraightAction", apply_walk_straight_action),
-      std::make_pair("debugError", debugError),
-      std::make_pair("debugSegmentationFault", debugSegmentationFault),  // DEPRECATED
-      std::make_pair("exitFailure", exitFailure),
-      std::make_pair("exitSuccess", exitSuccess),
-      std::make_pair("printParameter", printParameter),
-      std::make_pair("test", test),
-    };
 
   std::smatch result{};
 
@@ -150,22 +184,12 @@ auto CustomCommandAction::start() const -> void
   } else if (
     std::regex_match(type, result, FunctionCallExpression::pattern()) and
     commands.find(result[1]) != std::end(commands)) {
-    commands.at(result[1])(FunctionCallExpression::splitParameters(result[3]), local());
+    base = commands.at(result[1])();
+    base->start(FunctionCallExpression::splitParameters(result[3]), local());
   } else {
     fork_exec(type, content);
   }
 }
 
-auto CustomCommandAction::test(const std::vector<std::string> & values, const Scope &) -> int
-{
-  std::cout << "test" << std::endl;
-
-  for (auto iter = std::cbegin(values); iter != std::cend(values); ++iter) {
-    std::cout << "  values[" << std::distance(std::cbegin(values), iter) << "] = " << *iter
-              << std::endl;
-  }
-
-  return values.size();
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
