@@ -19,12 +19,25 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+DynamicConstraints::DynamicConstraints(
+  const Double max_acceleration, const Double max_acceleration_rate, const Double max_deceleration,
+  const Double max_deceleration_rate, const Double max_speed)
+: max_acceleration(max_acceleration),
+  max_acceleration_rate(max_acceleration_rate),
+  max_deceleration(max_deceleration),
+  max_deceleration_rate(max_deceleration_rate),
+  max_speed(max_speed)
+{
+}
+
 DynamicConstraints::DynamicConstraints(const pugi::xml_node & node, Scope & scope)
-: max_acceleration(readAttribute<Double>("maxAcceleration", node, scope)),
-  max_acceleration_rate(readAttribute<Double>("maxAccelerationRate", node, scope)),
-  max_deceleration(readAttribute<Double>("maxDeceleration", node, scope)),
-  max_deceleration_rate(readAttribute<Double>("maxDecelerationRate", node, scope)),
-  max_speed(readAttribute<Double>("maxSpeed", node, scope))
+: max_acceleration(readAttribute<Double>("maxAcceleration", node, scope, Double::infinity())),
+  max_acceleration_rate(
+    readAttribute<Double>("maxAccelerationRate", node, scope, Double::infinity())),
+  max_deceleration(readAttribute<Double>("maxDeceleration", node, scope, Double::infinity())),
+  max_deceleration_rate(
+    readAttribute<Double>("maxDecelerationRate", node, scope, Double::infinity())),
+  max_speed(readAttribute<Double>("maxSpeed", node, scope, Double::infinity()))
 {
 }
 }  // namespace syntax

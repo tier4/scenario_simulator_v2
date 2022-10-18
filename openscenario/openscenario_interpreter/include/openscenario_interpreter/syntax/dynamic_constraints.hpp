@@ -46,6 +46,13 @@ struct DynamicConstraints
 
   const Double max_speed;
 
+  explicit DynamicConstraints(
+    const Double max_acceleration = Double::infinity(),
+    const Double max_acceleration_rate = Double::infinity(),
+    const Double max_deceleration = Double::infinity(),
+    const Double max_deceleration_rate = Double::infinity(),
+    const Double max_speed = Double::infinity());
+
   explicit DynamicConstraints(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax

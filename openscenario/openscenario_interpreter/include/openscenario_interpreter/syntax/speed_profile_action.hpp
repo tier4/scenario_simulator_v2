@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_PROFILE_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/dynamic_constraints.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/following_mode.hpp>
@@ -38,7 +39,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SpeedProfileAction
+struct SpeedProfileAction : private Scope,  // NOTE: Required for access to actors
+                            private SimulatorCore::ActionApplication,
+                            private SimulatorCore::ConditionEvaluation
 {
   const EntityRef entity_ref;
 
@@ -47,6 +50,8 @@ struct SpeedProfileAction
   const DynamicConstraints dynamic_constraints;
 
   const std::list<SpeedProfileEntry> speed_profile_entry;
+
+  std::unordered_map<String, std::list<SpeedProfileEntry>::const_iterator> accomplishments;
 
   explicit SpeedProfileAction(const pugi::xml_node &, Scope &);
 
