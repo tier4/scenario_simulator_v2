@@ -356,7 +356,14 @@ public:
       traffic_simulator_msgs::msg::EntityStatus entity_status;
 
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
-        entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+        if (auto iter = std::find_if(
+              std::begin(entities_), std::end(entities_),
+              [this](auto && each) { return isEgo(each.first); });
+            iter != std::end(entities_)) {
+          THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
+        } else {
+          entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+        }
       } else if constexpr (std::is_same_v<std::decay_t<Entity>, VehicleEntity>) {
         entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
       } else if constexpr (std::is_same_v<std::decay_t<Entity>, PedestrianEntity>) {
