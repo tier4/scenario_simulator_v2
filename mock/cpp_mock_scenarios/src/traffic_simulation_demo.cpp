@@ -85,7 +85,8 @@ private:
   {
     lanechange_executed_ = false;
 
-    api_.spawn("ego", getVehicleParameters());
+    api_.spawn(
+      "ego", traffic_simulator::helper::constructLaneletPose(120545, 0), getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(120545, 0),
       traffic_simulator::helper::constructActionStatus(10));
@@ -95,20 +96,25 @@ private:
                traffic_simulator::helper::constructLaneletPose(34675, 0.0),
                traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
 
-    api_.spawn("tom", getPedestrianParameters());
+    api_.spawn(
+      "tom", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
+      getPedestrianParameters());
     api_.setEntityStatus(
       "tom", "ego", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
     api_.requestWalkStraight("tom");
     api_.requestSpeedChange("tom", 3, true);
 
-    api_.spawn("bob", getPedestrianParameters());
+    api_.spawn(
+      "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+      getPedestrianParameters());
     api_.setEntityStatus(
       "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(1));
     api_.requestSpeedChange("bob", 1, true);
 
-    api_.spawn("npc1", getVehicleParameters());
+    api_.spawn(
+      "npc1", traffic_simulator::helper::constructLaneletPose(34579, 20.0), getVehicleParameters());
     api_.setEntityStatus(
       "npc1", traffic_simulator::helper::constructLaneletPose(34579, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
@@ -116,18 +122,22 @@ private:
     api_.requestAcquirePosition(
       "npc1", traffic_simulator::helper::constructLaneletPose(34675, 0.0));
 
-    api_.spawn("npc2", getVehicleParameters());
+    api_.spawn(
+      "npc2", traffic_simulator::helper::constructLaneletPose(34606, 20.0), getVehicleParameters());
     api_.setEntityStatus(
       "npc2", traffic_simulator::helper::constructLaneletPose(34606, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.requestSpeedChange("npc2", 0, true);
 
-    api_.spawn("npc3", getVehicleParameters());
+    api_.spawn(
+      "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0), getVehicleParameters());
     api_.setEntityStatus(
       "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0),
       traffic_simulator::helper::constructActionStatus(10));
 
-    api_.spawn("obstacle", getMiscObjectParameters());
+    api_.spawn(
+      "obstacle", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
+      getMiscObjectParameters());
     api_.setEntityStatus(
       "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());

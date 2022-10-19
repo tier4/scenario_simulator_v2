@@ -16,7 +16,6 @@
 #include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
-#include <queue>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -29,8 +28,12 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
-: name(name), subtype(subtype), verbose(true), status_(boost::none), npc_logic_started_(false)
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
+: name(name),
+  verbose(true),
+  status_(entity_status),
+  status_before_update_(status_),
+  npc_logic_started_(false)
 {
 }
 
@@ -175,7 +178,7 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
 }
 
 auto EntityBase::getEntityStatusBeforeUpdate() const
-  -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus> &
+  -> const traffic_simulator_msgs::msg::EntityStatus &
 {
   return status_before_update_;
 }
@@ -184,12 +187,12 @@ auto EntityBase::getLinearJerk() const -> boost::optional<double> { return linea
 
 auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  if (const auto status = getStatus(); status.lanelet_pose_valid) {
-    return status.lanelet_pose;
-  } else if (getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
+  if (status_.lanelet_pose_valid) {
+    return status_.lanelet_pose;
+  } else if (status_.type.type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
+    return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, false);
   } else {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
+    return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, true);
   }
 }
 
@@ -206,26 +209,12 @@ auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
   return ret;
 }
 
-auto EntityBase::getStatus() const -> traffic_simulator_msgs::msg::EntityStatus
+auto EntityBase::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &
 {
-  if (!status_) {
-    THROW_SEMANTIC_ERROR("status is not set");
-  } else {
-    auto status = status_.get();
-    status.bounding_box = getBoundingBox();
-    status.subtype = subtype;
-    status.type = getEntityType();
-    return status;
-  }
+  return status_;
 }
 
 auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
-
-auto EntityBase::getVehicleParameters() const
-  -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
-{
-  return boost::none;
-}
 
 auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 
@@ -474,26 +463,36 @@ void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
 {
   other_status_.clear();
-  if (status_) {
-    for (const auto & each : status) {
-      if (each.first != name) {
-        const auto p0 = each.second.pose.position;
-        const auto p1 = status_.get().pose.position;
-        double distance =
-          std::sqrt(std::pow(p0.x - p1.x, 2) + std::pow(p0.y - p1.y, 2) + std::pow(p0.z - p1.z, 2));
-        if (distance < 30) {
-          other_status_.insert(each);
-        }
+  for (const auto & each : status) {
+    if (each.first != name) {
+      const auto p0 = each.second.pose.position;
+      const auto p1 = status_.pose.position;
+      const auto distance =
+        std::sqrt(std::pow(p0.x - p1.x, 2) + std::pow(p0.y - p1.y, 2) + std::pow(p0.z - p1.z, 2));
+      if (distance < 30) {
+        other_status_.insert(each);
       }
     }
   }
 }
 
-bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
+auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
-  status_ = status;
-  status_->name = name;
-  return true;
+  auto new_status = status;
+
+  /*
+     FIXME: DIRTY HACK!!!
+
+     It seems that some operations set an incomplete status without respecting
+     the original status obtained by getStatus. Below is the code to compensate
+     for the lack of set status.
+  */
+  new_status.name = name;
+  new_status.type = status_.type;
+  new_status.subtype = status_.subtype;
+  new_status.bounding_box = status_.bounding_box;
+
+  status_ = new_status;
 }
 
 void EntityBase::setTrafficLightManager(
@@ -506,30 +505,22 @@ auto EntityBase::setVelocityLimit(double) -> void {}
 
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
-auto EntityBase::statusSet() const noexcept -> bool { return static_cast<bool>(status_); }
-
 void EntityBase::stopAtEndOfRoad()
 {
-  if (!status_) {
-    THROW_SEMANTIC_ERROR("status is not set");
-  } else {
-    status_.get().action_status.twist = geometry_msgs::msg::Twist();
-    status_.get().action_status.accel = geometry_msgs::msg::Accel();
-  }
+  status_.action_status.twist = geometry_msgs::msg::Twist();
+  status_.action_status.accel = geometry_msgs::msg::Accel();
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
-  if (status_) {
-    status_->time = current_time;
-  }
+  status_.time = current_time;
 }
 
 auto EntityBase::updateStandStillDuration(const double step_time) -> double
 {
   if (
-    npc_logic_started_ and status_ and
-    std::abs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
+    npc_logic_started_ and
+    std::abs(status_.action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
     return stand_still_duration_ += step_time;
   } else {
     return stand_still_duration_ = 0.0;

@@ -24,6 +24,7 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <stdexcept>
 #include <string>
@@ -92,17 +93,92 @@ public:
 
   void setVerbose(const bool verbose);
 
-  bool spawn(
-    const std::string & name,                                //
-    const traffic_simulator_msgs::msg::VehicleParameters &,  //
-    const std::string & = VehicleBehavior::defaultBehavior());
+  template <typename Pose>
+  auto spawn(
+    const std::string & name, const Pose & pose,
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+    const std::string & behavior = VehicleBehavior::defaultBehavior())
+  {
+    auto register_to_entity_manager = [&]() {
+      if (behavior == VehicleBehavior::autoware()) {
+        return entity_manager_ptr_->entityExists(name) or
+               entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
+                 name, pose, parameters, configuration, clock_.getStepTime());
+      } else {
+        return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
+          name, pose, parameters, behavior);
+      }
+    };
 
-  bool spawn(
-    const std::string & name,                                   //
-    const traffic_simulator_msgs::msg::PedestrianParameters &,  //
-    const std::string & = PedestrianBehavior::defaultBehavior());
+    auto register_to_environment_simulator = [&]() {
+      if (configuration.standalone_mode) {
+        return true;
+      } else {
+        simulation_api_schema::SpawnVehicleEntityRequest req;
+        simulation_api_schema::SpawnVehicleEntityResponse res;
+        simulation_interface::toProto(parameters, *req.mutable_parameters());
+        req.mutable_parameters()->set_name(name);
+        req.set_is_ego(behavior == VehicleBehavior::autoware());
+        zeromq_client_.call(req, res);
+        return res.result().success();
+      }
+    };
 
-  bool spawn(const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters &);
+    return register_to_entity_manager() and register_to_environment_simulator();
+  }
+
+  template <typename Pose>
+  auto spawn(
+    const std::string & name, const Pose & pose,
+    const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
+    const std::string & behavior = PedestrianBehavior::defaultBehavior())
+  {
+    auto register_to_entity_manager = [&]() {
+      using traffic_simulator::entity::PedestrianEntity;
+      return entity_manager_ptr_->spawnEntity<PedestrianEntity>(name, pose, parameters, behavior);
+    };
+
+    auto register_to_environment_simulator = [&]() {
+      if (configuration.standalone_mode) {
+        return true;
+      } else {
+        simulation_api_schema::SpawnPedestrianEntityRequest req;
+        simulation_api_schema::SpawnPedestrianEntityResponse res;
+        simulation_interface::toProto(parameters, *req.mutable_parameters());
+        req.mutable_parameters()->set_name(name);
+        zeromq_client_.call(req, res);
+        return res.result().success();
+      }
+    };
+
+    return register_to_entity_manager() and register_to_environment_simulator();
+  }
+
+  template <typename Pose>
+  auto spawn(
+    const std::string & name, const Pose & pose,
+    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
+  {
+    auto register_to_entity_manager = [&]() {
+      using traffic_simulator::entity::MiscObjectEntity;
+      return entity_manager_ptr_->spawnEntity<MiscObjectEntity>(name, pose, parameters);
+    };
+
+    auto register_to_environment_simulator = [&]() {
+      if (configuration.standalone_mode) {
+        return true;
+      } else {
+        simulation_api_schema::SpawnMiscObjectEntityRequest req;
+        simulation_api_schema::SpawnMiscObjectEntityResponse res;
+        simulation_interface::toProto(parameters, *req.mutable_parameters());
+        req.mutable_parameters()->set_name(name);
+        zeromq_client_.call(req, res);
+        return res.result().success();
+      }
+    };
+
+    return register_to_entity_manager() and register_to_environment_simulator();
+  }
 
   bool despawn(const std::string & name);
 
@@ -110,27 +186,27 @@ public:
 
   geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
-  bool setEntityStatus(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status);
-  bool setEntityStatus(
+  auto setEntityStatus(
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+  auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      traffic_simulator::helper::constructActionStatus());
-  bool setEntityStatus(
+      traffic_simulator::helper::constructActionStatus()) -> void;
+  auto setEntityStatus(
     const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      traffic_simulator::helper::constructActionStatus());
-  bool setEntityStatus(
+      traffic_simulator::helper::constructActionStatus()) -> void;
+  auto setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
     const geometry_msgs::msg::Pose & relative_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      traffic_simulator::helper::constructActionStatus());
-  bool setEntityStatus(
+      traffic_simulator::helper::constructActionStatus()) -> void;
+  auto setEntityStatus(
     const std::string & name, const std::string & reference_entity_name,
     const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      traffic_simulator::helper::constructActionStatus());
+      traffic_simulator::helper::constructActionStatus()) -> void;
 
   boost::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 

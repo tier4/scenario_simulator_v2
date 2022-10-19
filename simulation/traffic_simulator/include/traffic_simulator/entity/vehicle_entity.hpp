@@ -54,8 +54,9 @@ public:
   };
 
   explicit VehicleEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters &,
-    const std::string & = BuiltinBehavior::defaultBehavior());
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const traffic_simulator_msgs::msg::VehicleParameters &,
+    const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 
   ~VehicleEntity() override = default;
 
@@ -63,13 +64,9 @@ public:
 
   void cancelRequest() override;
 
-  auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox override;
-
   auto getCurrentAction() const -> std::string override;
 
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
-
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
 
   auto getEntityTypename() const -> const std::string & override;
 
@@ -78,9 +75,6 @@ public:
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
-
-  auto getVehicleParameters() const
-    -> boost::optional<traffic_simulator_msgs::msg::VehicleParameters>;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
@@ -108,8 +102,6 @@ public:
 
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
-
-  const traffic_simulator_msgs::msg::VehicleParameters parameters;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;

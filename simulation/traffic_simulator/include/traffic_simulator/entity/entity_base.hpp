@@ -45,7 +45,7 @@ namespace entity
 class EntityBase
 {
 public:
-  explicit EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype &);
+  explicit EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &);
 
   virtual ~EntityBase() = default;
 
@@ -56,8 +56,6 @@ public:
   virtual void cancelRequest();
 
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
-
-  virtual auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox = 0;
 
   virtual auto getCurrentAction() const -> std::string = 0;
 
@@ -82,9 +80,7 @@ public:
   virtual auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel = 0;
 
   /*   */ auto getEntityStatusBeforeUpdate() const
-    -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus> &;
-
-  virtual auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & = 0;
+    -> const traffic_simulator_msgs::msg::EntityStatus &;
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
@@ -102,12 +98,9 @@ public:
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
 
-  /*   */ auto getStatus() const -> traffic_simulator_msgs::msg::EntityStatus;
+  /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
 
   /*   */ auto getStandStillDuration() const -> double;
-
-  /*   */ auto getVehicleParameters() const
-    -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
@@ -164,7 +157,7 @@ public:
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &);
 
-  virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> bool;
+  virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> void;
 
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
@@ -172,8 +165,6 @@ public:
   virtual auto setVelocityLimit(double) -> void;
 
   virtual void startNpcLogic();
-
-  /*   */ auto statusSet() const noexcept -> bool;
 
   /*   */ void stopAtEndOfRoad();
 
@@ -183,13 +174,12 @@ public:
 
   const std::string name;
 
-  const traffic_simulator_msgs::msg::EntitySubtype subtype;
-
   bool verbose;
 
 protected:
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_;
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> status_before_update_;
+  traffic_simulator_msgs::msg::EntityStatus status_;
+
+  traffic_simulator_msgs::msg::EntityStatus status_before_update_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
