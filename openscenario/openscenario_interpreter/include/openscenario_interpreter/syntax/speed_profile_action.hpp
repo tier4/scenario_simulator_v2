@@ -43,19 +43,40 @@ struct SpeedProfileAction : private Scope,  // NOTE: Required for access to acto
                             private SimulatorCore::ActionApplication,
                             private SimulatorCore::ConditionEvaluation
 {
+  /*
+     Reference entity. If set, the speed values will be interpreted as relative
+     delta to the speed of the referenced entity.
+  */
   const EntityRef entity_ref;
 
+  /*
+     Defines whether to apply strictly linear interpolation between speed
+     target values (mode=position), or to apply jerk (change rate of
+     acceleration/deceleration) and other optional constraints of the
+     Performance class of a Vehicle entity resulting in a smoother speed
+     profile curve (mode=follow). For mode=follow the acceleration is zero at
+     the start and end of the profile.
+
+     NOTE: Currently ignored.
+  */
   const FollowingMode following_mode;
 
+  /*
+     Defines limitations to the action in terms of acceleration, deceleration,
+     speed and/or jerk. These settings has precedence over any Performance
+     settings (applies to vehicles only).
+  */
   const DynamicConstraints dynamic_constraints;
 
-  const std::list<SpeedProfileEntry> speed_profile_entry;
+  const std::list<SpeedProfileEntry> speed_profile_entry;  // Defines a series of speed targets.
 
   std::unordered_map<String, std::list<SpeedProfileEntry>::const_iterator> accomplishments;
 
   explicit SpeedProfileAction(const pugi::xml_node &, Scope &);
 
   auto accomplished() -> bool;
+
+  auto apply(const EntityRef &, const SpeedProfileEntry &) -> void;
 
   auto endsImmediately() const -> bool;
 
