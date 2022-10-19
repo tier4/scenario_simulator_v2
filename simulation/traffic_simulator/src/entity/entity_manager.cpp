@@ -543,48 +543,38 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;
-  const std::vector<std::string> entity_names = getEntityNames();
-  for (const auto & entity_name : entity_names) {
-    all_status.emplace(entity_name, entities_[entity_name]->getStatus());
+  for (auto && [name, entity] : entities_) {
+    all_status.emplace(name, entity->getStatus());
   }
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    it->second->setOtherStatus(all_status);
+  for (auto && [name, entity] : entities_) {
+    entity->setOtherStatus(all_status);
   }
   all_status.clear();
-  for (const auto & entity_name : entity_names) {
-    auto status = updateNpcLogic(entity_name, type_list);
-    status.bounding_box = getEntityStatus(entity_name).bounding_box;
-    all_status.emplace(entity_name, status);
+  for (auto && [name, entity] : entities_) {
+    all_status.emplace(name, updateNpcLogic(name, type_list));
   }
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    it->second->setOtherStatus(all_status);
+  for (auto && [name, entity] : entities_) {
+    entity->setOtherStatus(all_status);
   }
-  auto entity_type_list = getEntityTypeList();
   traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
-  for (const auto & status : all_status) {
-    traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_traj;
-    auto status_msg = status.second;
-    status_msg.name = status.first;
-    status_msg.bounding_box = getEntityStatus(status.first).bounding_box;
-    status_msg.action_status.current_action = getCurrentAction(status.first);
-    status_msg.type = getEntityStatus(status.first).type;
-    status_with_traj.waypoint = getWaypoints(status.first);
+  for (auto && [name, status] : all_status) {
+    traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_trajectory;
+    status_with_trajectory.waypoint = getWaypoints(name);
     std::vector<geometry_msgs::msg::Pose> goals;
-    getGoalPoses(status.first, goals);
+    getGoalPoses(name, goals);
     for (const auto goal : goals) {
-      status_with_traj.goal_pose.push_back(goal);
+      status_with_trajectory.goal_pose.push_back(goal);
     }
-    const auto obstacle = getObstacle(status.first);
-    if (obstacle) {
-      status_with_traj.obstacle = obstacle.get();
-      status_with_traj.obstacle_find = true;
+    if (const auto obstacle = getObstacle(name); obstacle) {
+      status_with_trajectory.obstacle = obstacle.get();
+      status_with_trajectory.obstacle_find = true;
     } else {
-      status_with_traj.obstacle_find = false;
+      status_with_trajectory.obstacle_find = false;
     }
-    status_with_traj.status = status_msg;
-    status_with_traj.name = status.first;
-    status_with_traj.time = current_time + step_time;
-    status_array_msg.data.emplace_back(status_with_traj);
+    status_with_trajectory.status = status;
+    status_with_trajectory.name = name;
+    status_with_trajectory.time = current_time + step_time;
+    status_array_msg.data.emplace_back(status_with_trajectory);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
   stop_watch_update.stop();
