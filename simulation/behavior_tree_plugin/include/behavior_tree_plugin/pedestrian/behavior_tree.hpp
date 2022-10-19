@@ -74,6 +74,7 @@ public:
 
 private:
   BT::NodeStatus tickOnce(double current_time, double step_time);
+  auto createBehaviorTree(const std::string & format_path) -> BT::Tree;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
   std::unique_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;

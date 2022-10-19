@@ -24,6 +24,8 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <iostream>
+#include <pugixml.hpp>
+#include <sstream>
 #include <string>
 #include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <utility>
@@ -32,33 +34,64 @@ namespace entity_behavior
 {
 void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
 {
-  std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
-                     "/config/vehicle_entity_behavior.xml";
-  factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::FollowLaneAction>(
-    "FollowLane");
-  factory_
-    .registerNodeType<entity_behavior::vehicle::follow_lane_sequence::FollowFrontEntityAction>(
-      "FollowFrontEntity");
-  factory_
-    .registerNodeType<entity_behavior::vehicle::follow_lane_sequence::StopAtCrossingEntityAction>(
-      "StopAtCrossingEntity");
-  factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::StopAtStopLineAction>(
-    "StopAtStopLine");
-  factory_
-    .registerNodeType<entity_behavior::vehicle::follow_lane_sequence::StopAtTrafficLightAction>(
-      "StopAtTrafficLight");
-  factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::YieldAction>("Yield");
-  factory_.registerNodeType<entity_behavior::vehicle::follow_lane_sequence::MoveBackwardAction>(
-    "MoveBackward");
-  factory_.registerNodeType<entity_behavior::vehicle::LaneChangeAction>("LaneChange");
-  tree_ = factory_.createTreeFromFile(path);
+  namespace vehicle = entity_behavior::vehicle;
+  factory_.registerNodeType<vehicle::follow_lane_sequence::FollowLaneAction>("FollowLane");
+  factory_.registerNodeType<vehicle::follow_lane_sequence::FollowFrontEntityAction>(
+    "FollowFrontEntity");
+  factory_.registerNodeType<vehicle::follow_lane_sequence::StopAtCrossingEntityAction>(
+    "StopAtCrossingEntity");
+  factory_.registerNodeType<vehicle::follow_lane_sequence::StopAtStopLineAction>("StopAtStopLine");
+  factory_.registerNodeType<vehicle::follow_lane_sequence::StopAtTrafficLightAction>(
+    "StopAtTrafficLight");
+  factory_.registerNodeType<vehicle::follow_lane_sequence::YieldAction>("Yield");
+  factory_.registerNodeType<vehicle::follow_lane_sequence::MoveBackwardAction>("MoveBackward");
+  factory_.registerNodeType<vehicle::LaneChangeAction>("LaneChange");
 
+  auto base_path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin");
+  auto format_path = base_path + "/config/vehicle_entity_behavior.xml";
+  tree_ = createBehaviorTree(format_path);
   logging_event_ptr_ =
     std::make_unique<behavior_tree_plugin::LoggingEvent>(tree_.rootNode(), logger);
   reset_request_event_ptr_ = std::make_unique<behavior_tree_plugin::ResetRequestEvent>(
     tree_.rootNode(), [&]() { return getRequest(); },
     [&]() { setRequest(traffic_simulator::behavior::Request::NONE); });
   setRequest(traffic_simulator::behavior::Request::NONE);
+}
+
+auto VehicleBehaviorTree::createBehaviorTree(const std::string & format_path) -> BT::Tree
+{
+  auto xml_doc = pugi::xml_document();
+  xml_doc.load_file(format_path.c_str());
+
+  class XMLTreeWalker : public pugi::xml_tree_walker
+  {
+  public:
+    explicit XMLTreeWalker(const BT::TreeNodeManifest & manifest) : manifest_(manifest) {}
+
+  private:
+    bool for_each(pugi::xml_node & node) final
+    {
+      if (node.name() == manifest_.registration_ID) {
+        for (const auto & [port, info] : manifest_.ports) {
+          node.append_attribute(port.c_str()) = std::string("{" + port + "}").c_str();
+        }
+      }
+      return true;
+    }
+
+    const BT::TreeNodeManifest & manifest_;
+  };
+
+  for (const auto & [id, manifest] : factory_.manifests()) {
+    if (factory_.builtinNodes().count(id) == 0) {
+      auto walker = XMLTreeWalker(manifest);
+      xml_doc.traverse(walker);
+    }
+  }
+
+  auto xml_str = std::stringstream();
+  xml_doc.save(xml_str);
+  return factory_.createTreeFromText(xml_str.str());
 }
 
 const std::string & VehicleBehaviorTree::getCurrentAction() const
