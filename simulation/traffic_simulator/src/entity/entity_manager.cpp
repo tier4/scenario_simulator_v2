@@ -332,28 +332,6 @@ auto EntityManager::getWaypoints(const std::string & name)
   return entities_.at(name)->getWaypoints();
 }
 
-void EntityManager::getGoalPoses(
-  const std::string & name, std::vector<traffic_simulator_msgs::msg::LaneletPose> & goals)
-{
-  if (!npc_logic_started_) {
-    goals = std::vector<traffic_simulator_msgs::msg::LaneletPose>();
-  }
-  goals = entities_.at(name)->getGoalPoses();
-}
-
-void EntityManager::getGoalPoses(
-  const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals)
-{
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> lanelet_poses;
-  if (!npc_logic_started_) {
-    goals = std::vector<geometry_msgs::msg::Pose>();
-  }
-  getGoalPoses(name, lanelet_poses);
-  for (const auto lanelet_pose : lanelet_poses) {
-    goals.push_back(toMapPose(lanelet_pose));
-  }
-}
-
 bool EntityManager::isEgo(const std::string & name) const
 {
   using traffic_simulator_msgs::msg::EntityType;
@@ -560,9 +538,7 @@ void EntityManager::update(const double current_time, const double step_time)
   for (auto && [name, status] : all_status) {
     traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_trajectory;
     status_with_trajectory.waypoint = getWaypoints(name);
-    std::vector<geometry_msgs::msg::Pose> goals;
-    getGoalPoses(name, goals);
-    for (const auto goal : goals) {
+    for (const auto & goal : getGoalPoses<geometry_msgs::msg::Pose>(name)) {
       status_with_trajectory.goal_pose.push_back(goal);
     }
     if (const auto obstacle = getObstacle(name); obstacle) {

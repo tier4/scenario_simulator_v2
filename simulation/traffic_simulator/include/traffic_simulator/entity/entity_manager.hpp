@@ -316,10 +316,28 @@ public:
 
   auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
 
-  void getGoalPoses(
-    const std::string & name, std::vector<traffic_simulator_msgs::msg::LaneletPose> & goals);
-
-  void getGoalPoses(const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals);
+  template <typename T>
+  auto getGoalPoses(const std::string & name) -> std::vector<T>
+  {
+    if constexpr (std::is_same_v<std::decay_t<T>, traffic_simulator_msgs::msg::LaneletPose>) {
+      if (not npc_logic_started_) {
+        return {};
+      } else {
+        return entities_.at(name)->getGoalPoses();
+      }
+    } else {
+      if (not npc_logic_started_) {
+        return {};
+      } else {
+        std::vector<geometry_msgs::msg::Pose> poses;
+        for (const auto & lanelet_pose :
+             getGoalPoses<traffic_simulator_msgs::msg::LaneletPose>(name)) {
+          poses.push_back(toMapPose(lanelet_pose));
+        }
+        return poses;
+      }
+    }
+  }
 
   bool isEgo(const std::string & name) const;
 
