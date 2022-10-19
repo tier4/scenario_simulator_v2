@@ -45,17 +45,38 @@ auto SpeedProfileAction::endsImmediately() const -> bool { return false; }
 
 auto SpeedProfileAction::run() -> void
 {
+  auto compare = [this](const auto & actor, const auto & speed_profile_entry) {
+    if (entity_ref.empty()) {
+      return equal_to<double>()(evaluateSpeed(actor), speed_profile_entry.speed);
+    } else {
+      return equal_to<double>()(
+        evaluateSpeed(actor), speed_profile_entry.speed + evaluateSpeed(entity_ref));
+    }
+  };
+
   for (auto && [actor, iter] : accomplishments) {
     if (
-      iter != std::end(speed_profile_entry) and
-      equal_to<double>()(iter->speed, evaluateSpeed(actor)) and
+      iter != std::end(speed_profile_entry) and compare(actor, *iter) and
       ++iter != std::end(speed_profile_entry)) {
-      applySpeedAction(
-        actor, iter->speed, traffic_simulator::speed_change::Transition::LINEAR,
-        traffic_simulator::speed_change::Constraint(
-          traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
-          traffic_simulator_msgs::msg::DriverModel().acceleration),
-        true);
+      if (entity_ref.empty()) {
+        applySpeedAction(
+          actor, iter->speed, traffic_simulator::speed_change::Transition::LINEAR,
+          traffic_simulator::speed_change::Constraint(
+            traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
+            traffic_simulator_msgs::msg::DriverModel().acceleration),
+          true);
+      } else {
+        applySpeedAction(
+          actor,
+          traffic_simulator::speed_change::RelativeTargetSpeed(
+            entity_ref, traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA,
+            iter->speed),
+          traffic_simulator::speed_change::Transition::LINEAR,
+          traffic_simulator::speed_change::Constraint(
+            traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
+            traffic_simulator_msgs::msg::DriverModel().acceleration),
+          true);
+      }
     }
   }
 
@@ -63,7 +84,10 @@ auto SpeedProfileAction::run() -> void
     std::cout << "actor " << std::quoted(actor) << "\n"
               << "  current speed = " << evaluateSpeed(actor) << "\n"
               << "  target speed = "
-              << (iter == std::end(speed_profile_entry) ? Double::nan() : iter->speed) << "\n"
+              << (iter == std::end(speed_profile_entry) ? Double::nan()
+                  : entity_ref.empty()                  ? iter->speed
+                                       : Double(evaluateSpeed(entity_ref) + iter->speed))
+              << "\n"
               << "  entry = " << std::distance(std::begin(speed_profile_entry), iter) << "/"
               << speed_profile_entry.size() << "\n"
               << std::flush;
@@ -79,12 +103,25 @@ auto SpeedProfileAction::start() -> void
   for (const auto & actor : actors) {
     accomplishments.emplace(actor, std::begin(speed_profile_entry));
 
-    applySpeedAction(
-      actor, accomplishments[actor]->speed, traffic_simulator::speed_change::Transition::LINEAR,
-      traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
-        traffic_simulator_msgs::msg::DriverModel().acceleration),
-      true);
+    if (entity_ref.empty()) {
+      applySpeedAction(
+        actor, accomplishments[actor]->speed, traffic_simulator::speed_change::Transition::LINEAR,
+        traffic_simulator::speed_change::Constraint(
+          traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
+          traffic_simulator_msgs::msg::DriverModel().acceleration),
+        true);
+    } else {
+      applySpeedAction(
+        actor,
+        traffic_simulator::speed_change::RelativeTargetSpeed(
+          entity_ref, traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA,
+          accomplishments[actor]->speed),
+        traffic_simulator::speed_change::Transition::LINEAR,
+        traffic_simulator::speed_change::Constraint(
+          traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
+          traffic_simulator_msgs::msg::DriverModel().acceleration),
+        true);
+    }
   }
 }
 }  // namespace syntax

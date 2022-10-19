@@ -286,7 +286,7 @@ bool API::updateTrafficLightsInSim()
 bool API::updateEntityStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
-  if (entity_manager_ptr_->getNumberOfEgo() != 0) {
+  if (entity_manager_ptr_->isEgoSpawned()) {
     simulation_interface::toProto(
       asAutoware(entity_manager_ptr_->getEgoName()).getVehicleCommand(),
       *req.mutable_vehicle_command());
