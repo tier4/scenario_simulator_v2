@@ -33,6 +33,11 @@ inline namespace syntax
  *    <xsd:attribute name="maxSpeed" type="Double"/>
  *  </xsd:complexType>
  *
+ *  syntax `Vehicle.Performance` has exactly the same elements as
+ *  this syntax `DynamicsConstraints`, but `Vehicle.Performance` expresses the
+ *  maximum design performance of the vehicle, whereas `DynamicsConstraints`
+ *  expresses how much of it the driver is allowed to use.
+ *
  * -------------------------------------------------------------------------- */
 struct DynamicConstraints
 {
