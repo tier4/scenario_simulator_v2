@@ -42,7 +42,6 @@ struct UniformDistribution : public ComplexType
 
   // TODO: implement evaluate()
   // Use std::uniform_real_distribution from <random>
-  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

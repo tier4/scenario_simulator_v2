@@ -43,8 +43,6 @@ struct PoissonDistribution : public ComplexType
   StochasticDistributionClass<std::poisson_distribution<>> distribution;
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
-
-  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
