@@ -35,9 +35,6 @@ struct DistributionSet : private Scope, public ComplexType
   const std::list<DistributionSetElement> elements;
 
   explicit DistributionSet(const pugi::xml_node &, Scope & scope);
-
-  // TODO: implement evaluate()
-  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
