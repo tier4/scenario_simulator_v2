@@ -9,8 +9,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/ActionStatus.msg
   msg/Axle.msg
   msg/Axles.msg
+  msg/BehaviorParameter.msg
   msg/BoundingBox.msg
-  msg/DriverModel.msg
   msg/EntityStatus.msg
   msg/EntityStatusWithTrajectory.msg
   msg/EntityStatusWithTrajectoryArray.msg

@@ -44,8 +44,8 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <type_traits>
@@ -215,7 +215,7 @@ public:
   FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, const);
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
-  FORWARD_TO_ENTITY(getDriverModel, const);
+  FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
@@ -228,7 +228,7 @@ public:
   FORWARD_TO_ENTITY(requestWalkStraight, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
-  FORWARD_TO_ENTITY(setDriverModel, );
+  FORWARD_TO_ENTITY(setBehaviorParameter, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_ENTITY

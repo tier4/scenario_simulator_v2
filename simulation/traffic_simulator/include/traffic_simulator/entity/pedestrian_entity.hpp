@@ -90,9 +90,9 @@ public:
     behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
   }
 
-  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel;
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
 
-  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);
+  void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &);
 
   void setAccelerationLimit(double acceleration) override;
 

@@ -289,7 +289,7 @@ void EntityBase::requestSpeedChange(
            * @brief Resets acceleration limit.
            */
           [this]() {
-            setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration);
+            setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
           },
           job::Type::LINEAR_ACCELERATION, true);
       } else if (getStatus().action_status.twist.linear.x > target_speed) {
@@ -305,7 +305,7 @@ void EntityBase::requestSpeedChange(
            * @brief Resets deceleration limit.
            */
           [this]() {
-            setDecelerationLimit(traffic_simulator_msgs::msg::DriverModel().deceleration);
+            setDecelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().deceleration);
           },
           job::Type::LINEAR_ACCELERATION, true);
       }
@@ -354,7 +354,9 @@ void EntityBase::requestSpeedChange(
         /**
            * @brief Resets acceleration limit.
            */
-        [this]() { setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration); },
+        [this]() {
+          setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
+        },
         job::Type::LINEAR_ACCELERATION, true);
       requestSpeedChange(target_speed, continuous);
       break;

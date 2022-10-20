@@ -17,7 +17,7 @@
             route_lanelets="{route_lanelets}"
             reference_trajectory="{reference_trajectory}"
             obstacle="{obstacle}"
-            driver_model="{driver_model}"
+            behavior_parameter="{behavior_parameter}"
             traffic_light_manager="{traffic_light_manager}"/>
         <Fallback name="follow_lane_sequence">
             <FollowLane name="follow_lane"
@@ -35,7 +35,7 @@
                 route_lanelets="{route_lanelets}"
                 reference_trajectory="{reference_trajectory}"
                 obstacle="{obstacle}"
-                driver_model="{driver_model}"
+                behavior_parameter="{behavior_parameter}"
                 traffic_light_manager="{traffic_light_manager}"/>
             <Fallback name="follow_lane_behavior_selector">
                 <FollowFrontEntity name="follow_front_entity"
@@ -53,7 +53,7 @@
                     route_lanelets="{route_lanelets}"
                     reference_trajectory="{reference_trajectory}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"
+                    behavior_parameter="{behavior_parameter}"
                     traffic_light_manager="{traffic_light_manager}"/>
                 <StopAtTrafficLight name="stop_at_traffic_light"
                     waypoints="{waypoints}"
@@ -70,7 +70,7 @@
                     route_lanelets="{route_lanelets}"
                     reference_trajectory="{reference_trajectory}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"
+                    behavior_parameter="{behavior_parameter}"
                     traffic_light_manager="{traffic_light_manager}"/>
                 <StopAtStopLine name="stop_at_stop_line"
                     waypoints="{waypoints}"
@@ -87,7 +87,7 @@
                     route_lanelets="{route_lanelets}"
                     reference_trajectory="{reference_trajectory}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"
+                    behavior_parameter="{behavior_parameter}"
                     traffic_light_manager="{traffic_light_manager}"/>
                 <StopAtCrossingEntity name="stop_at_crossing_entity"
                     waypoints="{waypoints}"
@@ -104,7 +104,7 @@
                     route_lanelets="{route_lanelets}"
                     reference_trajectory="{reference_trajectory}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"
+                    behavior_parameter="{behavior_parameter}"
                     traffic_light_manager="{traffic_light_manager}"/>
                 <Yield name="yield"
                     waypoints="{waypoints}"
@@ -121,7 +121,7 @@
                     route_lanelets="{route_lanelets}"
                     reference_trajectory="{reference_trajectory}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"
+                    behavior_parameter="{behavior_parameter}"
                     traffic_light_manager="{traffic_light_manager}"/>
                 <MoveBackward name="move_backward"
                     waypoints="{waypoints}"
@@ -138,7 +138,7 @@
                     route_lanelets="{route_lanelets}"
                     reference_trajectory="{reference_trajectory}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"
+                    behavior_parameter="{behavior_parameter}"
                     traffic_light_manager="{traffic_light_manager}"/>
             </Fallback>
         </Fallback>

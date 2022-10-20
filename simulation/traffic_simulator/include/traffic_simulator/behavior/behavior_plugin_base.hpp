@@ -20,7 +20,7 @@
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
@@ -52,7 +52,7 @@ public:
   // clang-format off
   DEFINE_GETTER_SETTER(CurrentTime, "current_time", double)
   DEFINE_GETTER_SETTER(DebugMarker, "debug_marker", std::vector<visualization_msgs::msg::Marker>)
-  DEFINE_GETTER_SETTER(DriverModel, "driver_model", traffic_simulator_msgs::msg::DriverModel)
+  DEFINE_GETTER_SETTER(BehaviorParameter, "behavior_parameter", traffic_simulator_msgs::msg::BehaviorParameter)
   DEFINE_GETTER_SETTER(EntityStatus, "entity_status", traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, "entity_type_list", EntityTypeDict)
   DEFINE_GETTER_SETTER(GoalPoses, "goal_poses", std::vector<geometry_msgs::msg::Pose>)
