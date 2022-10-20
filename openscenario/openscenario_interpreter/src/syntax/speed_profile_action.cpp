@@ -90,16 +90,23 @@ auto SpeedProfileAction::run() -> void
   }
 
   for (auto && [actor, iter] : accomplishments) {
+    auto target_speed = [&]() -> double {
+      if (iter == std::end(speed_profile_entry)) {
+        return Double::nan();
+      } else if (entity_ref.empty()) {
+        return iter->speed;
+      } else {
+        return evaluateSpeed(entity_ref) + iter->speed;
+      }
+    };
+
+    // clang-format off
     std::cout << "actor " << std::quoted(actor) << "\n"
               << "  current speed = " << evaluateSpeed(actor) << "\n"
-              << "  target speed = "
-              << (iter == std::end(speed_profile_entry) ? Double::nan()
-                  : entity_ref.empty()                  ? iter->speed
-                                       : Double(evaluateSpeed(entity_ref) + iter->speed))
-              << "\n"
-              << "  entry = " << std::distance(std::begin(speed_profile_entry), iter) << "/"
-              << speed_profile_entry.size() << "\n"
+              << "  target speed = " << target_speed() << "\n"
+              << "  entry = " << std::distance(std::begin(speed_profile_entry), iter) << "/" << speed_profile_entry.size() << "\n"
               << std::flush;
+    // clang-format on
   }
 }
 
