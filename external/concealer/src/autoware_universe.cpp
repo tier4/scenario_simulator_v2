@@ -45,7 +45,7 @@ auto AutowareUniverse::approve(const CooperateStatusArray & cooperate_status_arr
   }
 
   if (not request->commands.empty()) {
-    requestCooperateCommands(request);
+    task_queue.delay([this, request]() { requestCooperateCommands(request); });
   }
 }
 
@@ -264,9 +264,12 @@ auto AutowareUniverse::sendSIGINT() -> void  //
 
 auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
 {
-  auto request = std::make_shared<SetVelocityLimit::Request>();
-  request->velocity = velocity_limit;
-  requestSetVelocityLimit(request);
+  task_queue.delay([this, velocity_limit]() {
+    auto request = std::make_shared<SetVelocityLimit::Request>();
+    request->velocity = velocity_limit;
+    // We attempt to resend the service up to 30 times, but this number of times was determined by heuristics, not for any technical reason
+    requestSetVelocityLimit(request, 30);
+  });
 }
 
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
