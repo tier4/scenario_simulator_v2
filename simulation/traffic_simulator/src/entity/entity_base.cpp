@@ -346,9 +346,9 @@ void EntityBase::requestSpeedChange(
   }
 }
 
-void EntityBase::requestSpeedChange(
+void EntityBase::requestSpeedChangeWithConstantAcceleration(
   const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
-  const speed_change::Constraint constraint, const bool continuous)
+  double acceleration, const bool continuous)
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
@@ -356,7 +356,7 @@ void EntityBase::requestSpeedChange(
         /**
          * @brief Checking if the entity reaches target speed.
          */
-        [this, target_speed, constraint]() {
+        [this, target_speed, acceleration]() {
           double diff =
             target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
           /**
@@ -366,11 +366,11 @@ void EntityBase::requestSpeedChange(
             return true;
           }
           if (diff > 0) {
-            setAccelerationLimit(std::abs(constraint.value));
+            setAccelerationLimit(std::abs(acceleration));
             return false;
           }
           if (diff < 0) {
-            setDecelerationLimit(std::abs(constraint.value));
+            setDecelerationLimit(std::abs(acceleration));
             return false;
           }
           return false;
@@ -392,6 +392,21 @@ void EntityBase::requestSpeedChange(
       setStatus(status);
       break;
     }
+  }
+}
+
+void EntityBase::requestSpeedChange(
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
+{
+  switch (constraint.type) {
+    case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed, transition, constraint.value, continuous);
+      break;
+    case speed_change::Constraint::Type::TIME:
+      // requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value, continuous);
+      break;
   }
 }
 

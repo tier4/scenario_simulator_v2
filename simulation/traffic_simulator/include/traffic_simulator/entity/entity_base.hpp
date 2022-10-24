@@ -200,6 +200,9 @@ private:
   virtual void requestSpeedChangeWithConstantAcceleration(
     const double target_speed, const speed_change::Transition, double acceleration,
     const bool continuous);
+  virtual void requestSpeedChangeWithConstantAcceleration(
+    const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, double acceleration, const bool continuous);
   virtual void requestSpeedChangeWithTimeConstraint(
     const double target_speed, const speed_change::Transition, double acceleration_time,
     const bool continuous);
