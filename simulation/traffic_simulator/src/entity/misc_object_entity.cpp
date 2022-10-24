@@ -42,14 +42,15 @@ auto MiscObjectEntity::getCurrentAction() const -> std::string
   }
 }
 
-auto MiscObjectEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
+auto MiscObjectEntity::getBehaviorParameter() const
+  -> traffic_simulator_msgs::msg::BehaviorParameter
 {
-  THROW_SEMANTIC_ERROR("getDriverModel function does not support in MiscObjectEntity.");
+  THROW_SEMANTIC_ERROR("getBehaviorParameter function does not support in MiscObjectEntity.");
 }
 
-void MiscObjectEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &)
+void MiscObjectEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
 {
-  THROW_SEMANTIC_ERROR("setDriverModel function does not support in MiscObjectEntity.");
+  THROW_SEMANTIC_ERROR("setBehaviorParameter function does not support in MiscObjectEntity.");
 }
 }  // namespace entity
 }  // namespace traffic_simulator

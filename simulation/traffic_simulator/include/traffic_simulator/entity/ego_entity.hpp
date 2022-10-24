@@ -99,7 +99,7 @@ public:
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
-  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
@@ -134,7 +134,8 @@ public:
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool) -> void override;
 
-  auto setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void override;
+  auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
+    -> void override;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
 

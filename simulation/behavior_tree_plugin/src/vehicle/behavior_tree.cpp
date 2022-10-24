@@ -27,7 +27,7 @@
 #include <pugixml.hpp>
 #include <sstream>
 #include <string>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <utility>
 
 namespace entity_behavior

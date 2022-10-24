@@ -37,7 +37,7 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
-  behavior_plugin_ptr_->setDriverModel(traffic_simulator_msgs::msg::DriverModel());
+  behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
 }
 
 void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
@@ -101,14 +101,16 @@ void PedestrianEntity::cancelRequest()
   route_planner_ptr_->cancelGoal();
 }
 
-auto PedestrianEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
+auto PedestrianEntity::getBehaviorParameter() const
+  -> traffic_simulator_msgs::msg::BehaviorParameter
 {
-  return behavior_plugin_ptr_->getDriverModel();
+  return behavior_plugin_ptr_->getBehaviorParameter();
 }
 
-void PedestrianEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel & driver_model)
+void PedestrianEntity::setBehaviorParameter(
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter)
 {
-  behavior_plugin_ptr_->setDriverModel(driver_model);
+  behavior_plugin_ptr_->setBehaviorParameter(behavior_parameter);
 }
 
 void PedestrianEntity::setAccelerationLimit(double acceleration)
@@ -116,9 +118,9 @@ void PedestrianEntity::setAccelerationLimit(double acceleration)
   if (acceleration <= 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
   }
-  auto driver_model = getDriverModel();
-  driver_model.acceleration = acceleration;
-  setDriverModel(driver_model);
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.acceleration = acceleration;
+  setBehaviorParameter(behavior_parameter);
 }
 
 void PedestrianEntity::setDecelerationLimit(double deceleration)
@@ -126,9 +128,9 @@ void PedestrianEntity::setDecelerationLimit(double deceleration)
   if (deceleration <= 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
   }
-  auto driver_model = getDriverModel();
-  driver_model.deceleration = deceleration;
-  setDriverModel(driver_model);
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.deceleration = deceleration;
+  setBehaviorParameter(behavior_parameter);
 }
 
 void PedestrianEntity::onUpdate(double current_time, double step_time)

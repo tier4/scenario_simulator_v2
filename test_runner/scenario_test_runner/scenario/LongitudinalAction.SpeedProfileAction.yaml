@@ -1,0 +1,231 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 1
+    date: '2022-10-17T06:15:51.241Z'
+    description: ''
+    author: Tatsuya Yamasaki
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+    ScenarioObject:
+      - name: npc1
+        Vehicle: &Vehicle
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 1.8
+              length: 4
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 2
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController: &ObjectController
+          Controller:
+            name: ''
+            Properties:
+              Property:
+                - name: 'isBlind'
+                  value: 'true'
+      - name: npc2
+        Vehicle: *Vehicle
+        ObjectController: *ObjectController
+      - name: npc3
+        Vehicle: *Vehicle
+        ObjectController: *ObjectController
+      - name: ego
+        Vehicle: *Vehicle
+        ObjectController: *ObjectController
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: npc1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 0
+                      offset: 0
+                      Orientation: &Orientation
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedProfileAction:
+                    followingMode: follow
+                    SpeedProfileEntry:
+                      - speed: 20
+          - entityRef: npc2
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34675'
+                      s: 0
+                      offset: 0
+                      Orientation: *Orientation
+              - LongitudinalAction:
+                  SpeedProfileAction:
+                    followingMode: follow
+                    SpeedProfileEntry:
+                      - speed:  5
+                      - speed: 10
+                      - speed: 15
+                      - speed: 20
+          - entityRef: npc3
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34690'
+                      s: 0
+                      offset: 0
+                      Orientation: *Orientation
+              - LongitudinalAction:
+                  SpeedProfileAction:
+                    followingMode: follow
+                    SpeedProfileEntry:
+                      - speed:  1
+                      - speed:  2
+                      - speed:  3
+                      - speed:  5
+                      - speed:  8
+                      - speed: 13
+                      - speed: 21
+                      - speed: 34
+                      - speed: 55
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34615'
+                      s: 0
+                      offset: 0
+                      Orientation: *Orientation
+              # - LongitudinalAction:
+              #     SpeedProfileAction:
+              #       entityRef: npc3
+              #       followingMode: follow
+              #       SpeedProfileEntry:
+              #         - speed: 1
+              #         - speed: 2
+              #         - speed: 3
+              #         - speed: 4
+              #         - speed: 5
+    Story:
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              - LongitudinalAction:
+                                  SpeedProfileAction:
+                                    entityRef: npc1
+                                    followingMode: follow
+                                    SpeedProfileEntry:
+                                      - speed:   5
+                                      - speed: -10
+                                      - speed:  15
+                                      - speed: -20
+                                      - speed:  25
+                        StartTrigger: &StartTrigger
+                          ConditionGroup:
+                            - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    rule: greaterThan
+                                    value: 0
+            StartTrigger: *StartTrigger
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 30
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

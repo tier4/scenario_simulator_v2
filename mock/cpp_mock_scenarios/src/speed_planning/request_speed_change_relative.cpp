@@ -19,7 +19,7 @@
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 // headers in STL
 #include <memory>
