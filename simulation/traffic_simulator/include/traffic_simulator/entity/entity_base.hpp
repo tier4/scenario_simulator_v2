@@ -159,6 +159,8 @@ public:
 
   virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> void;
 
+  virtual auto setLinearVelocity(const double linear_velocity) -> void;
+
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
 
@@ -206,6 +208,9 @@ private:
   virtual void requestSpeedChangeWithTimeConstraint(
     const double target_speed, const speed_change::Transition, double acceleration_time,
     const bool continuous);
+  virtual void requestSpeedChangeWithTimeConstraint(
+    const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, double time, const bool continuous);
 };
 }  // namespace entity
 }  // namespace traffic_simulator

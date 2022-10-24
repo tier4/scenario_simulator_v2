@@ -313,10 +313,8 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
       break;
     }
     case speed_change::Transition::STEP: {
-      auto status = getStatus();
-      status.action_status.twist.linear.x = target_speed;
       requestSpeedChange(target_speed, continuous);
-      setStatus(status);
+      setLinearVelocity(target_speed);
       break;
     }
   }
@@ -386,13 +384,17 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
       break;
     }
     case speed_change::Transition::STEP: {
-      auto status = getStatus();
-      status.action_status.twist.linear.x = target_speed.getAbsoluteValue(other_status_);
       requestSpeedChange(target_speed, continuous);
-      setStatus(status);
+      setLinearVelocity(target_speed.getAbsoluteValue(other_status_));
       break;
     }
   }
+}
+
+void EntityBase::requestSpeedChangeWithTimeConstraint(
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  double time, const bool continuous)
+{
 }
 
 void EntityBase::requestSpeedChange(
@@ -405,7 +407,7 @@ void EntityBase::requestSpeedChange(
         target_speed, transition, constraint.value, continuous);
       break;
     case speed_change::Constraint::Type::TIME:
-      // requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value, continuous);
+      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value, continuous);
       break;
   }
 }
@@ -541,6 +543,13 @@ auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   new_status.action_status.current_action = getCurrentAction();
 
   status_ = new_status;
+}
+
+auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
+{
+  auto status = getStatus();
+  status.action_status.twist.linear.x = linear_velocity;
+  setStatus(status);
 }
 
 void EntityBase::setTrafficLightManager(
