@@ -195,6 +195,11 @@ protected:
 
   boost::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
+
+private:
+  virtual void requestSpeedChangeWithConstantAcceleration(
+    const double target_speed, const speed_change::Transition, double acceleration,
+    const bool continuous);
 };
 }  // namespace entity
 }  // namespace traffic_simulator

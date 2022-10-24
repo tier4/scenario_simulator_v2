@@ -270,14 +270,14 @@ void EntityBase::requestLaneChange(
   }
 }
 
-void EntityBase::requestSpeedChange(
-  const double target_speed, const speed_change::Transition transition,
-  const speed_change::Constraint constraint, const bool continuous)
+void EntityBase::requestSpeedChangeWithConstantAcceleration(
+  const double target_speed, const speed_change::Transition transition, double acceleration,
+  const bool continuous)
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       if (getStatus().action_status.twist.linear.x < target_speed) {
-        setAccelerationLimit(std::abs(constraint.value));
+        setAccelerationLimit(std::abs(acceleration));
         job_list_.append(
           /**
            * @brief Checking if the entity reaches target speed.
@@ -293,7 +293,7 @@ void EntityBase::requestSpeedChange(
           },
           job::Type::LINEAR_ACCELERATION, true);
       } else if (getStatus().action_status.twist.linear.x > target_speed) {
-        setDecelerationLimit(std::abs(constraint.value));
+        setDecelerationLimit(std::abs(acceleration));
         job_list_.append(
           /**
            * @brief Checking if the entity reaches target speed.
@@ -319,6 +319,20 @@ void EntityBase::requestSpeedChange(
       setStatus(status);
       break;
     }
+  }
+}
+
+void EntityBase::requestSpeedChange(
+  const double target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
+{
+  switch (constraint.type) {
+    case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed, transition, constraint.value, continuous);
+      break;
+    case speed_change::Constraint::Type::TIME:
+      break;
   }
 }
 
