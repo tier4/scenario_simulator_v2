@@ -34,8 +34,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  *  syntax `Vehicle.Performance` has exactly the same elements as
- *  this syntax `DynamicsConstraints`, but `Vehicle.Performance` expresses the
- *  maximum design performance of the vehicle, whereas `DynamicsConstraints`
+ *  this syntax `DynamicConstraints`, but `Vehicle.Performance` expresses the
+ *  maximum design performance of the vehicle, whereas `DynamicConstraints`
  *  expresses how much of it the driver is allowed to use.
  *
  * -------------------------------------------------------------------------- */
