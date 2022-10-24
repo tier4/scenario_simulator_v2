@@ -184,6 +184,24 @@ public:
       return core->spawn(std::forward<decltype(xs)>(xs)...);
     }
 
+    template <typename EntityRef, typename DynamicConstraints, typename... Ts>
+    static auto applySpeedProfileAction(
+      const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints, Ts &&... xs)
+      -> void
+    {
+      core->setBehaviorParameter(entity_ref, [&]() {
+        auto behavior_parameter = core->getBehaviorParameter(entity_ref);
+        behavior_parameter.max_acceleration = dynamic_constraints.max_acceleration;
+        behavior_parameter.max_acceleration_rate = dynamic_constraints.max_acceleration_rate;
+        behavior_parameter.max_deceleration = dynamic_constraints.max_deceleration;
+        behavior_parameter.max_deceleration_rate = dynamic_constraints.max_deceleration_rate;
+        behavior_parameter.max_speed = dynamic_constraints.max_speed;
+        return behavior_parameter;
+      }());
+
+      applySpeedAction(entity_ref, std::forward<decltype(xs)>(xs)...);
+    }
+
     template <typename Controller>
     static auto applyAssignControllerAction(
       const std::string & entity_ref, Controller && controller) -> void
