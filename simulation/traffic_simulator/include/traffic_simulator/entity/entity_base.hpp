@@ -206,11 +206,10 @@ private:
     const speed_change::RelativeTargetSpeed & target_speed,
     const speed_change::Transition transition, double acceleration, const bool continuous);
   virtual void requestSpeedChangeWithTimeConstraint(
-    const double target_speed, const speed_change::Transition, double acceleration_time,
-    const bool continuous);
+    const double target_speed, const speed_change::Transition, double acceleration_time);
   virtual void requestSpeedChangeWithTimeConstraint(
     const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, double time, const bool continuous);
+    const speed_change::Transition transition, double time);
 };
 }  // namespace entity
 }  // namespace traffic_simulator
