@@ -45,9 +45,11 @@ Performance::operator traffic_simulator_msgs::msg::Performance() const
 {
   traffic_simulator_msgs::msg::Performance performance;
   {
-    performance.max_speed = max_speed;
     performance.max_acceleration = max_acceleration;
+    performance.max_acceleration_rate = max_acceleration_rate;
     performance.max_deceleration = max_deceleration;
+    performance.max_deceleration_rate = max_deceleration_rate;
+    performance.max_speed = max_speed;
   }
 
   return performance;
