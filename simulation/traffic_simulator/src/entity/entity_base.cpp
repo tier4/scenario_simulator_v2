@@ -322,6 +322,15 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
   }
 }
 
+void EntityBase::requestSpeedChangeWithTimeConstraint(
+  const double target_speed, const speed_change::Transition transition, double acceleration_time,
+  const bool continuous)
+{
+  requestSpeedChangeWithConstantAcceleration(
+    target_speed, transition,
+    (target_speed - getStatus().action_status.twist.linear.x) / acceleration_time, continuous);
+}
+
 void EntityBase::requestSpeedChange(
   const double target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
@@ -332,6 +341,7 @@ void EntityBase::requestSpeedChange(
         target_speed, transition, constraint.value, continuous);
       break;
     case speed_change::Constraint::Type::TIME:
+      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value, continuous);
       break;
   }
 }
