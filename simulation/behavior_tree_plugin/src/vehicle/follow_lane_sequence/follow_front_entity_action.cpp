@@ -80,7 +80,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (getRightOfWayEntities(route_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!driver_model.see_around) {
+  if (!behavior_parameter.see_around) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
@@ -124,7 +124,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   if (
-    distance_to_front_entity_.get() >= (calculateStopDistance(driver_model.deceleration) +
+    distance_to_front_entity_.get() >= (calculateStopDistance(behavior_parameter.deceleration) +
                                         vehicle_parameters.bounding_box.dimensions.x + 5)) {
     auto entity_status_updated =
       calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x + 2);
@@ -133,7 +133,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
-  } else if (distance_to_front_entity_.get() <= calculateStopDistance(driver_model.deceleration)) {
+  } else if (
+    distance_to_front_entity_.get() <= calculateStopDistance(behavior_parameter.deceleration)) {
     auto entity_status_updated =
       calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x - 2);
     setOutput("updated_status", entity_status_updated);

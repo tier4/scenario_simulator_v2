@@ -98,9 +98,9 @@ public:
     THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
   }
 
-  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
-  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) override;
+  void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
   void setAccelerationLimit(double) override {}
 

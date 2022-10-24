@@ -192,8 +192,8 @@ public:
         entity_ref, controller.properties.template get<Double>(
                       "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
-      core->setDriverModel(entity_ref, [&]() {
-        auto message = core->getDriverModel(entity_ref);
+      core->setBehaviorParameter(entity_ref, [&]() {
+        auto message = core->getBehaviorParameter(entity_ref);
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
         return message;
       }());

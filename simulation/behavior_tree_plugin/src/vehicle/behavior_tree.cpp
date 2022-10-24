@@ -25,7 +25,7 @@
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <iostream>
 #include <string>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <utility>
 
 namespace entity_behavior
