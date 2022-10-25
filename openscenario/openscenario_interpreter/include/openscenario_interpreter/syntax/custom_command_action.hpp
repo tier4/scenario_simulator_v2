@@ -74,18 +74,18 @@ struct CustomCommandAction : private Scope
   const String content;
 
 private:
-  std::shared_ptr<ICustomCommand> base;
+  std::shared_ptr<ICustomCommand> entity;
 
 public:
   explicit CustomCommandAction(const pugi::xml_node &, const Scope &);
 
-  auto accomplished() noexcept -> bool { return base->accomplished(); }
+  auto accomplished() noexcept -> bool { return entity->accomplished(); }
 
-  auto endsImmediately() const -> bool { return base->endsImmediately(); }
+  auto endsImmediately() const -> bool { return entity->endsImmediately(); }
 
-  auto run() noexcept -> void { return base->run(); }
+  auto run() noexcept -> void { return entity->run(); }
 
-  auto start() -> void { base->start(local()); }
+  auto start() -> void { entity->start(local()); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

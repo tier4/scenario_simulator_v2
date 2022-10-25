@@ -217,7 +217,7 @@ CustomCommandAction::CustomCommandAction(const pugi::xml_node & node, const Scop
 : Scope(scope),
   type(readAttribute<String>("type", node, local())),
   content(readContent<String>(node, local())),
-  base(dispatchCustomCommand(type, content))
+  entity(dispatchCustomCommand(type, content))
 {
 }
 
