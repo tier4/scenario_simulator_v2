@@ -54,7 +54,7 @@ private:
   std::function<bool(double)> func_on_update_;
   std::function<void()> func_on_cleanup_;
   Status status_;
-  double active_duration_;
+  double job_duration_;
 
 public:
   const job::Type type;

@@ -23,7 +23,7 @@ Job::Job(
   const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive)
 : func_on_update_(func_on_update),
   func_on_cleanup_(func_on_cleanup),
-  active_duration_(0.0),
+  job_duration_(0.0),
   type(type),
   exclusive(exclusive)
 {
@@ -40,10 +40,10 @@ void Job::onUpdate(const double step_time)
 {
   switch (status_) {
     case Status::ACTIVE:
-      if (func_on_update_(active_duration_)) {
+      if (func_on_update_(job_duration_)) {
         inactivate();
       }
-      active_duration_ = active_duration_ + step_time;
+      job_duration_ = job_duration_ + step_time;
       return;
     case Status::INACTIVE:
       return;

@@ -400,14 +400,14 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
         /**
          * @brief Checking if the entity reaches target speed.
          */
-        [this, target_speed, time](double) {
+        [this, target_speed, time](double job_duration) {
           double diff =
             target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
           double acceleration = diff / time;
           /**
            * @brief Hard coded parameter, threashold for difference
            */
-          if (std::abs(diff) <= 0.1) {
+          if (job_duration >= time) {
             return true;
           }
           if (diff > 0) {
