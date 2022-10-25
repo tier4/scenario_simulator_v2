@@ -19,8 +19,8 @@ namespace traffic_simulator
 namespace job
 {
 Job::Job(
-  const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
-  job::Type type, bool exclusive)
+  const std::function<bool(const double)> & func_on_update,
+  const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive)
 : func_on_update_(func_on_update),
   func_on_cleanup_(func_on_cleanup),
   type(type),
@@ -35,11 +35,11 @@ void Job::inactivate()
   func_on_cleanup_();
 }
 
-void Job::onUpdate()
+void Job::onUpdate(const double step_time)
 {
   switch (status_) {
     case Status::ACTIVE:
-      if (func_on_update_()) {
+      if (func_on_update_(step_time)) {
         inactivate();
       }
       return;

@@ -218,9 +218,9 @@ auto EntityBase::getStandStillDuration() const -> double { return stand_still_du
 
 auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 
-void EntityBase::onUpdate(double, double)
+void EntityBase::onUpdate(double /*current_time*/, double step_time)
 {
-  job_list_.update();
+  job_list_.update(step_time);
   status_before_update_ = status_;
 }
 
@@ -282,7 +282,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           /**
            * @brief Checking if the entity reaches target speed.
            */
-          [this, target_speed]() {
+          [this, target_speed](double) {
             return getStatus().action_status.twist.linear.x >= target_speed;
           },
           /**
@@ -298,7 +298,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           /**
            * @brief Checking if the entity reaches target speed.
            */
-          [this, target_speed]() {
+          [this, target_speed](double) {
             return getStatus().action_status.twist.linear.x <= target_speed;
           },
           /**
@@ -353,7 +353,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
         /**
          * @brief Checking if the entity reaches target speed.
          */
-        [this, target_speed, acceleration]() {
+        [this, target_speed, acceleration](double) {
           double diff =
             target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
           /**
@@ -400,7 +400,7 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
         /**
          * @brief Checking if the entity reaches target speed.
          */
-        [this, target_speed, time]() {
+        [this, target_speed, time](double) {
           double diff =
             target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
           double acceleration = diff / time;
@@ -460,7 +460,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
-      [this, target_speed]() {
+      [this, target_speed](double) {
         target_speed_ = target_speed;
         return false;
       },
@@ -473,7 +473,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
-      [this, target_speed]() {
+      [this, target_speed](double) {
         if (getStatus().action_status.twist.linear.x >= target_speed) {
           return true;
         }
@@ -495,7 +495,7 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
-      [this, target_speed]() {
+      [this, target_speed](double) {
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
           return true;
         }
@@ -508,7 +508,7 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
-      [this, target_speed]() {
+      [this, target_speed](double) {
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
           return true;
         }

@@ -45,13 +45,13 @@ public:
    * @param exclusive If true, the Job works exclusively by type.
    */
   Job(
-    const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
-    job::Type type, bool exclusive);
-  void onUpdate();
+    const std::function<bool(double)> & func_on_update,
+    const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive);
+  void onUpdate(const double step_time);
   void inactivate();
 
 private:
-  std::function<bool()> func_on_update_;
+  std::function<bool(double)> func_on_update_;
   std::function<void()> func_on_cleanup_;
   Status status_;
 
