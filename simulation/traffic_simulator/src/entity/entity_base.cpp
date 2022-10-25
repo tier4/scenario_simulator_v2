@@ -391,9 +391,51 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 }
 
 void EntityBase::requestSpeedChangeWithTimeConstraint(
-  const speed_change::RelativeTargetSpeed & /*target_speed*/,
-  const speed_change::Transition /*transition*/, double /*time*/)
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  double time)
 {
+  switch (transition) {
+    case speed_change::Transition::LINEAR: {
+      job_list_.append(
+        /**
+         * @brief Checking if the entity reaches target speed.
+         */
+        [this, target_speed, time]() {
+          double diff =
+            target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
+          double acceleration = diff / time;
+          /**
+           * @brief Hard coded parameter, threashold for difference
+           */
+          if (std::abs(diff) <= 0.1) {
+            return true;
+          }
+          if (diff > 0) {
+            setAccelerationLimit(std::abs(acceleration));
+            return false;
+          }
+          if (diff < 0) {
+            setDecelerationLimit(std::abs(acceleration));
+            return false;
+          }
+          return false;
+        },
+        /**
+           * @brief Resets acceleration limit.
+           */
+        [this]() {
+          setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
+        },
+        job::Type::LINEAR_ACCELERATION, true);
+      requestSpeedChange(target_speed, false);
+      break;
+    }
+    case speed_change::Transition::STEP: {
+      requestSpeedChange(target_speed, false);
+      setLinearVelocity(target_speed.getAbsoluteValue(other_status_));
+      break;
+    }
+  }
 }
 
 void EntityBase::requestSpeedChange(
