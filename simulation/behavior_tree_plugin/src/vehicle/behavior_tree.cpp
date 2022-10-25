@@ -96,6 +96,52 @@ auto VehicleBehaviorTree::createBehaviorTree(const std::string & format_path) ->
   return factory_.createTreeFromText(xml_str.str());
 }
 
+auto VehicleBehaviorTree::getBehaviorParameter() -> traffic_simulator_msgs::msg::BehaviorParameter
+{
+  return tree_.rootBlackboard()->get<traffic_simulator_msgs::msg::BehaviorParameter>(
+    getBehaviorParameterKey());
+}
+
+auto VehicleBehaviorTree::setBehaviorParameter(
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) -> void
+{
+  const auto vehicle_parameters = getVehicleParameters();
+
+  auto clamp = [&](const auto & behavior_parameter) {
+    auto result = behavior_parameter;
+
+    result.dynamic_constraints.max_acceleration = std::clamp(
+      result.dynamic_constraints.max_acceleration, 0.0,
+      vehicle_parameters.performance.max_acceleration);
+
+    result.dynamic_constraints.max_acceleration_rate = std::clamp(
+      result.dynamic_constraints.max_acceleration_rate, 0.0,
+      vehicle_parameters.performance.max_acceleration_rate);
+
+    result.dynamic_constraints.max_deceleration = std::clamp(
+      result.dynamic_constraints.max_deceleration, 0.0,
+      vehicle_parameters.performance.max_deceleration);
+
+    result.dynamic_constraints.max_deceleration_rate = std::clamp(
+      result.dynamic_constraints.max_deceleration_rate, 0.0,
+      vehicle_parameters.performance.max_deceleration_rate);
+
+    result.dynamic_constraints.max_speed = std::clamp(
+      result.dynamic_constraints.max_speed, 0.0, vehicle_parameters.performance.max_speed);
+
+    result.acceleration =
+      std::clamp(result.acceleration, 0.0, result.dynamic_constraints.max_acceleration);
+
+    result.deceleration =
+      std::clamp(result.deceleration, 0.0, result.dynamic_constraints.max_deceleration);
+
+    return result;
+  };
+
+  tree_.rootBlackboard()->set<traffic_simulator_msgs::msg::BehaviorParameter>(
+    getBehaviorParameterKey(), clamp(behavior_parameter));
+}
+
 const std::string & VehicleBehaviorTree::getCurrentAction() const
 {
   return logging_event_ptr_->getCurrentAction();

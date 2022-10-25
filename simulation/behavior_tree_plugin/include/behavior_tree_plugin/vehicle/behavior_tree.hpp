@@ -41,6 +41,11 @@ public:
   void configure(const rclcpp::Logger & logger) override;
   const std::string & getCurrentAction() const override;
 
+  auto getBehaviorParameter() -> traffic_simulator_msgs::msg::BehaviorParameter override;
+
+  auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
+    -> void override;
+
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \
   void set##NAME(const TYPE & value) override                                               \
@@ -49,7 +54,7 @@ public:
   }
 
   // clang-format off
-  DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter)
+  // DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter)
   DEFINE_GETTER_SETTER(CurrentTime, double)
   DEFINE_GETTER_SETTER(DebugMarker, std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
