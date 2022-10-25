@@ -27,8 +27,8 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
@@ -77,7 +77,7 @@ public:
 
   /*   */ auto getDistanceToRightLaneBound(const std::vector<std::int64_t> &) const -> double;
 
-  virtual auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel = 0;
+  virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const traffic_simulator_msgs::msg::EntityStatus &;
@@ -147,7 +147,7 @@ public:
 
   virtual void setDecelerationLimit(double deceleration) = 0;
 
-  virtual void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) = 0;
+  virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
 
   /*   */ void setEntityTypeList(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);

@@ -175,16 +175,16 @@ auto EgoEntity::getCurrentAction() const -> std::string
   return state.empty() ? "Launching" : state;
 }
 
-auto EgoEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
+auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
-  traffic_simulator_msgs::msg::DriverModel model;
+  traffic_simulator_msgs::msg::BehaviorParameter parameter;
   /**
    * @brief TODO, Input values get from autoware.
    */
-  model.see_around = true;
-  model.acceleration = 0;
-  model.deceleration = 0;
-  return model;
+  parameter.see_around = true;
+  parameter.acceleration = 0;
+  parameter.deceleration = 0;
+  return parameter;
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
@@ -431,7 +431,7 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
-auto EgoEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void  //
+auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) -> void
 {
 }
 

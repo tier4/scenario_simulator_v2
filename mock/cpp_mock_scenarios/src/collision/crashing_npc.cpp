@@ -19,7 +19,7 @@
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 // headers in STL
 #include <memory>
@@ -59,9 +59,9 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.requestSpeedChange("ego", 15, true);
-    traffic_simulator_msgs::msg::DriverModel driver_model;
-    driver_model.see_around = false;
-    api_.setDriverModel("ego", driver_model);
+    traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+    behavior_parameter.see_around = false;
+    api_.setBehaviorParameter("ego", behavior_parameter);
 
     api_.spawn(
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0), getVehicleParameters());
