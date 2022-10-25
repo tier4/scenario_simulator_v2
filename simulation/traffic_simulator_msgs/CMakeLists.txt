@@ -11,6 +11,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/Axles.msg
   msg/BehaviorParameter.msg
   msg/BoundingBox.msg
+  msg/DynamicConstraints.msg
   msg/EntityStatus.msg
   msg/EntityStatusWithTrajectory.msg
   msg/EntityStatusWithTrajectoryArray.msg

@@ -40,5 +40,16 @@ DynamicConstraints::DynamicConstraints(const pugi::xml_node & node, Scope & scop
   max_speed(readAttribute<Double>("maxSpeed", node, scope, Double::infinity()))
 {
 }
+
+DynamicConstraints::operator traffic_simulator_msgs::msg::DynamicConstraints() const
+{
+  traffic_simulator_msgs::msg::DynamicConstraints dynamic_constraints;
+  dynamic_constraints.max_acceleration = max_acceleration;
+  dynamic_constraints.max_acceleration_rate = max_acceleration_rate;
+  dynamic_constraints.max_deceleration = max_deceleration;
+  dynamic_constraints.max_deceleration_rate = max_deceleration_rate;
+  dynamic_constraints.max_speed = max_speed;
+  return dynamic_constraints;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

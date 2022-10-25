@@ -44,10 +44,14 @@ public:
   typedef std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus>
     EntityStatusDict;
 
-#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)     \
-  virtual TYPE get##NAME() = 0;                   \
-  virtual void set##NAME(const TYPE & value) = 0; \
-  const std::string get##NAME##Key() const { return KEY; };
+#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
+  virtual TYPE get##NAME() = 0;                    \
+  virtual void set##NAME(const TYPE & value) = 0;  \
+  auto get##NAME##Key() const->const std::string & \
+  {                                                \
+    static const std::string key = KEY;            \
+    return key;                                    \
+  }
 
   // clang-format off
   DEFINE_GETTER_SETTER(CurrentTime, "current_time", double)

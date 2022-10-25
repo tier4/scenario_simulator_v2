@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/dynamic_constraints.hpp>
 
 namespace openscenario_interpreter
 {
@@ -59,6 +60,8 @@ struct DynamicConstraints
     const Double max_speed = Double::infinity());
 
   explicit DynamicConstraints(const pugi::xml_node &, Scope &);
+
+  explicit operator traffic_simulator_msgs::msg::DynamicConstraints() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

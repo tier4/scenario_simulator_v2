@@ -191,11 +191,8 @@ public:
     {
       core->setBehaviorParameter(entity_ref, [&]() {
         auto behavior_parameter = core->getBehaviorParameter(entity_ref);
-        behavior_parameter.max_acceleration = dynamic_constraints.max_acceleration;
-        behavior_parameter.max_acceleration_rate = dynamic_constraints.max_acceleration_rate;
-        behavior_parameter.max_deceleration = dynamic_constraints.max_deceleration;
-        behavior_parameter.max_deceleration_rate = dynamic_constraints.max_deceleration_rate;
-        behavior_parameter.max_speed = dynamic_constraints.max_speed;
+        behavior_parameter.dynamic_constraints =
+          static_cast<traffic_simulator_msgs::msg::DynamicConstraints>(dynamic_constraints);
         return behavior_parameter;
       }());
 
