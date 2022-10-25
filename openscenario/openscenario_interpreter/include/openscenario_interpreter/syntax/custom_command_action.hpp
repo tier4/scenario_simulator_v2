@@ -50,7 +50,7 @@ struct ICustomCommand
 
   virtual auto run() noexcept -> void {}
 
-  virtual auto start(const Scope &) const -> int { return 0; }
+  virtual auto start(const Scope &) -> int { return 0; }
 
 protected:
   std::vector<std::string> parameters;

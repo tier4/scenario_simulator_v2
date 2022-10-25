@@ -48,6 +48,11 @@ protected:
 
   Trigger start_trigger{{ConditionGroup()}};
 
+private:
+  std::unordered_map<
+    StoryboardElementState::value_type, std::vector<std::function<void(const StoryboardElement &)>>>
+    callbacks;
+
 public:
   // Storyboard
   explicit StoryboardElement(const Trigger & stop_trigger)  //
@@ -169,16 +174,20 @@ protected:
   }
 
 public:
-  std::unordered_map<
-    StoryboardElementState::value_type, std::vector<std::function<void(const StoryboardElement &)>>>
-    callbacks;
+  void addTransitionCallback(
+    StoryboardElementState::value_type transition,
+    std::function<void(const StoryboardElement &)> callback)
+  {
+    callbacks[transition].push_back(std::move(callback));
+  }
 
-  auto transitionTo(const Object & state) -> void
+  auto transitionTo(const Object & state) -> bool
   {
     current_state = state;
     for (auto && callback : callbacks[current_state.as<StoryboardElementState>()]) {
       callback(std::as_const(*this));
     }
+    return current_state == state;
   }
 
   auto evaluate()
@@ -204,8 +213,7 @@ public:
         *  Story element instantaneously transitions into the runningState.
         *
         * ------------------------------------------------------------------- */
-        if (start_trigger.evaluate().as<Boolean>()) {
-          transitionTo(start_transition);
+        if (start_trigger.evaluate().as<Boolean>() and transitionTo(start_transition)) {
           goto dispatch;
         } else {
           return current_state;
@@ -219,8 +227,7 @@ public:
         *
         * ------------------------------------------------------------------- */
         start();
-        ++current_execution_count;
-        transitionTo(running_state);
+        if (transitionTo(running_state)) ++current_execution_count;
         goto dispatch;
 
       case StoryboardElementState::runningState: /* ----------------------------

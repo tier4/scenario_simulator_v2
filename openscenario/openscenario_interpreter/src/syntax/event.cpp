@@ -32,17 +32,20 @@ Event::Event(const pugi::xml_node & node, Scope & scope, Maneuver & maneuver)
   traverse<1, unbounded>(node, "Action", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Action>(node, local()));
   });
+
+  if (priority == Priority::skip) {
+    addTransitionCallback(StoryboardElementState::startTransition, [this](auto &&) {
+      if (parent_maneuver.running_events_count() > 0) {
+        transitionTo(standby_state);
+      }
+    });
+  }
 }
 
 auto Event::start() -> void
 {
   if (priority == Priority::overwrite) {
     parent_maneuver.override_events();
-  } else if (priority == Priority::skip) {
-    if (parent_maneuver.running_events_count() > 0) {
-      transitionTo(standby_state);
-      return;
-    }
   }
 
   for (auto && element : elements) {

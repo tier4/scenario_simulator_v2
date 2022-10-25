@@ -47,7 +47,7 @@ private:
   }
 
 public:
-  auto start(const Scope &) const -> int override
+  auto start(const Scope &) -> int override
   {
     auto & events = parameters;
     const auto now = node().now();
@@ -85,7 +85,7 @@ struct ApplyWalkStraightAction : public ICustomCommand, private SimulatorCore::A
 {
   using ICustomCommand::ICustomCommand;
 
-  auto start(const Scope & scope) const -> int override
+  auto start(const Scope & scope) -> int override
   {
     for (const auto & actor : parameters) {
       applyWalkStraightAction(actor);
@@ -103,38 +103,76 @@ struct DebugError : public ICustomCommand
 {
   using ICustomCommand::ICustomCommand;
 
-  auto start(const Scope &) const -> int override { throw Error(__FILE__, ":", __LINE__); }
+  auto start(const Scope &) -> int override { throw Error(__FILE__, ":", __LINE__); }
 };
 
 struct DebugSegmentationFault : public ICustomCommand
 {
   using ICustomCommand::ICustomCommand;
 
-  auto start(const Scope &) const -> int override
+  auto start(const Scope &) -> int override
   {
     return *reinterpret_cast<std::add_pointer<int>::type>(0);
   }
+};
+
+struct DummyLongRunningAction : public ICustomCommand, private SimulatorCore::ConditionEvaluation
+{
+  using ICustomCommand::ICustomCommand;
+
+  auto accomplished() noexcept -> bool override { return end_time < evaluateSimulationTime(); }
+
+  auto endsImmediately() const -> bool override { return false; }
+
+  auto start(const Scope & scope) -> int override
+  {
+    auto duration = std::stod(parameters.at(0));
+    auto now = evaluateSimulationTime();
+    end_time = now + duration;
+
+    if (!scope.name.empty()) {
+      auto e = scope.ref(scope.name);
+      if (e.is_also<StoryboardElement>()) {
+        auto & storyboard_element = e.as<StoryboardElement>();
+        storyboard_element.addTransitionCallback(
+          StoryboardElementState::runningState, [name = scope.name](auto &&) {
+            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s]" << name
+                      << " transitions to runningState" << std::endl;
+          });
+        storyboard_element.addTransitionCallback(
+          StoryboardElementState::completeState, [name = scope.name](auto &&) {
+            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s]" << name
+                      << " transitions to completeState" << std::endl;
+          });
+      }
+    }
+
+    return 0;
+  }
+
+private:
+  double end_time = std::numeric_limits<double>::max();
 };
 
 struct ExitSuccess : public ICustomCommand
 {
   using ICustomCommand::ICustomCommand;
 
-  auto start(const Scope &) const -> int override { throw SpecialAction<EXIT_SUCCESS>(); }
+  auto start(const Scope &) -> int override { throw SpecialAction<EXIT_SUCCESS>(); }
 };
 
 struct ExitFailure : public ICustomCommand
 {
   using ICustomCommand::ICustomCommand;
 
-  auto start(const Scope &) const -> int override { throw SpecialAction<EXIT_FAILURE>(); }
+  auto start(const Scope &) -> int override { throw SpecialAction<EXIT_FAILURE>(); }
 };
 
 struct PrintParameter : public ICustomCommand
 {
   using ICustomCommand::ICustomCommand;
 
-  auto start(const Scope & scope) const -> int override
+  auto start(const Scope & scope) -> int override
   {
     for (auto && parameter : parameters) {
       std::cout << parameter << " = " << scope.ref(parameter) << std::endl;
@@ -148,7 +186,7 @@ struct TestCommand : public ICustomCommand
 {
   using ICustomCommand::ICustomCommand;
 
-  auto start(const Scope &) const -> int override
+  auto start(const Scope &) -> int override
   {
     std::cout << "test" << std::endl;
 
@@ -168,7 +206,7 @@ struct ForkExecCommand : public ICustomCommand
   {
   }
 
-  auto start(const Scope &) const -> int override { return fork_exec(type, content); }
+  auto start(const Scope &) -> int override { return fork_exec(type, content); }
 
 private:
   std::string type;
@@ -194,6 +232,7 @@ auto dispatchCustomCommand(const std::string & type, const std::string & content
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
       ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED
+      ELEMENT("dummyLongRunningAction", DummyLongRunningAction),
       ELEMENT("exitFailure", ExitFailure),
       ELEMENT("exitSuccess", ExitSuccess),
       ELEMENT("printParameter", PrintParameter),
