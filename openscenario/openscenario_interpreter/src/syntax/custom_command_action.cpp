@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/regex/function_call_expression.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
+#include <openscenario_interpreter/syntax/storyboard_element.hpp>
 
 #include <iterator>  // std::distance
 #include <unordered_map>

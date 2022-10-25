@@ -483,6 +483,95 @@ OpenSCENARIO:
                         SimulationTimeCondition:
                           rule: greaterThan
                           value: 0
+          - name: Priority
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: Maneuver1
+                    Event:
+                      - name: Event0
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    rule: greaterThan
+                                    value: 0
+                        Action:
+                          - name: (parallel 0s->10s)
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: dummyLongRunningAction(10)
+                      - name: Event1
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    rule: greaterThan
+                                    value: 0
+                        Action:
+                          - name: (parallel 0s->5s)
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: dummyLongRunningAction(5)
+                      - name: Event2
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    rule: greaterThan
+                                    value: 2
+                        Action:
+                          - name: (overwrite 2s->7s)
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: dummyLongRunningAction(5)
+                      - name: Event3
+                        priority: skip
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    rule: greaterThan
+                                    value: 5
+                        Action:
+                          - name: (skip 5s->10s)
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: dummyLongRunningAction(5)
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name:
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          rule: greaterThan
+                          value: 0
+
           - name: LaneChange
             ManeuverGroup:
               - maximumExecutionCount: 1
