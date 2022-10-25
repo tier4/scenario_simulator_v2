@@ -40,6 +40,7 @@ public:
   void update(double current_time, double step_time) override;
   void configure(const rclcpp::Logger & logger) override;
   const std::string & getCurrentAction() const override;
+
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \
   void set##NAME(const TYPE & value) override                                               \
@@ -69,8 +70,8 @@ public:
   DEFINE_GETTER_SETTER(VehicleParameters, traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints, traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on
-
 #undef DEFINE_GETTER_SETTER
+
 private:
   BT::NodeStatus tickOnce(double current_time, double step_time);
   auto createBehaviorTree(const std::string & format_path) -> BT::Tree;

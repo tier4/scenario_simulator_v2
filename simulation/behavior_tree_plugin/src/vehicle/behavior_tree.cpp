@@ -34,7 +34,6 @@ namespace entity_behavior
 {
 void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
 {
-  namespace vehicle = entity_behavior::vehicle;
   factory_.registerNodeType<vehicle::follow_lane_sequence::FollowLaneAction>("FollowLane");
   factory_.registerNodeType<vehicle::follow_lane_sequence::FollowFrontEntityAction>(
     "FollowFrontEntity");
@@ -47,14 +46,17 @@ void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
   factory_.registerNodeType<vehicle::follow_lane_sequence::MoveBackwardAction>("MoveBackward");
   factory_.registerNodeType<vehicle::LaneChangeAction>("LaneChange");
 
-  auto base_path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin");
-  auto format_path = base_path + "/config/vehicle_entity_behavior.xml";
-  tree_ = createBehaviorTree(format_path);
+  tree_ = createBehaviorTree(
+    ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
+    "/config/vehicle_entity_behavior.xml");
+
   logging_event_ptr_ =
     std::make_unique<behavior_tree_plugin::LoggingEvent>(tree_.rootNode(), logger);
+
   reset_request_event_ptr_ = std::make_unique<behavior_tree_plugin::ResetRequestEvent>(
     tree_.rootNode(), [&]() { return getRequest(); },
     [&]() { setRequest(traffic_simulator::behavior::Request::NONE); });
+
   setRequest(traffic_simulator::behavior::Request::NONE);
 }
 
@@ -111,8 +113,7 @@ BT::NodeStatus VehicleBehaviorTree::tickOnce(double current_time, double step_ti
 {
   setCurrentTime(current_time);
   setStepTime(step_time);
-  const auto ret = tree_.rootNode()->executeTick();
-  return ret;
+  return tree_.rootNode()->executeTick();
 }
 }  // namespace entity_behavior
 
