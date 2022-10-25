@@ -130,16 +130,15 @@ public:
     const lane_change::Constraint &);
 
   virtual void requestSpeedChange(
-    const double target_speed, const speed_change::Transition, const speed_change::Constraint,
-    const bool continuous);
+    const double, const speed_change::Transition, const speed_change::Constraint, const bool);
 
   virtual void requestSpeedChange(
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
-    const speed_change::Constraint, const bool continuous);
+    const speed_change::Constraint, const bool);
 
-  virtual void requestSpeedChange(double target_speed, bool continuous);
+  virtual void requestSpeedChange(double, bool);
 
-  virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool continuous);
+  virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
   virtual void requestWalkStraight();
 

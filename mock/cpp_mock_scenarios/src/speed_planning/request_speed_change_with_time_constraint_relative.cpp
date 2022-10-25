@@ -31,7 +31,7 @@ class RequestSpeedChangeScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit RequestSpeedChangeScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "request_speed_change_with_time_constraint",
+      "request_speed_change_with_time_constraint_relative",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option)
   {
@@ -61,7 +61,10 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
     api_.setLinearVelocity("ego", 0);
     api_.requestSpeedChange(
-      "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      "ego",
+      traffic_simulator::speed_change::RelativeTargetSpeed(
+        "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
+      traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
       false);

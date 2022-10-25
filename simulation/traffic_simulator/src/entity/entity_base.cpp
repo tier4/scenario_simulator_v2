@@ -448,6 +448,9 @@ void EntityBase::requestSpeedChange(
         target_speed, transition, constraint.value, continuous);
       break;
     case speed_change::Constraint::Type::TIME:
+      if (continuous) {
+        THROW_SEMANTIC_ERROR("continuous = true is not allowed with time constraint.");
+      }
       requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
       break;
   }
