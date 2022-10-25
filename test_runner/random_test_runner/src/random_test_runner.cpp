@@ -28,7 +28,7 @@
 #include "rclcpp/logger.hpp"
 #include "spdlog/fmt/fmt.h"
 #include "traffic_simulator/api/configuration.hpp"
-#include "traffic_simulator_msgs/msg/driver_model.hpp"
+#include "traffic_simulator_msgs/msg/behavior_parameter.hpp"
 
 RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 : Node("random_test_runner", option), error_reporter_(get_logger())

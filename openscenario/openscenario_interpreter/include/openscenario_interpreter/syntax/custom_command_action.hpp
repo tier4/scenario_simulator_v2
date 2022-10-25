@@ -32,6 +32,30 @@ struct SpecialAction : public std::integral_constant<int, Value>
 {
 };
 
+struct ICustomCommand
+{
+  ICustomCommand() = default;
+
+  ICustomCommand(const ICustomCommand &) = default;
+
+  ICustomCommand(ICustomCommand &&) = default;
+
+  ICustomCommand(std::vector<std::string> parameters) : parameters(std::move(parameters)) {}
+
+  virtual ~ICustomCommand() = default;
+
+  virtual auto accomplished() noexcept -> bool { return true; }
+
+  virtual auto endsImmediately() const -> bool { return true; }
+
+  virtual auto run() noexcept -> void {}
+
+  virtual auto start(const Scope &) const -> int { return 0; }
+
+protected:
+  std::vector<std::string> parameters;
+};
+
 /* ---- CustomCommandAction ----------------------------------------------------
  *
  *  <xsd:complexType name="CustomCommandAction">
@@ -43,37 +67,25 @@ struct SpecialAction : public std::integral_constant<int, Value>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct CustomCommandAction : private Scope, private SimulatorCore::ActionApplication
+struct CustomCommandAction : private Scope
 {
   const String type;
 
   const String content;
 
+private:
+  std::shared_ptr<ICustomCommand> entity;
+
+public:
   explicit CustomCommandAction(const pugi::xml_node &, const Scope &);
 
-  static auto accomplished() noexcept -> bool;
+  auto accomplished() noexcept -> bool { return entity->accomplished(); }
 
-  static auto applyFaultInjectionAction(const std::vector<std::string> &, const Scope &) -> int;
+  auto endsImmediately() const -> bool { return entity->endsImmediately(); }
 
-  static auto debugError(const std::vector<std::string> &, const Scope &) -> int;
+  auto run() noexcept -> void { return entity->run(); }
 
-  static auto debugSegmentationFault(const std::vector<std::string> &, const Scope &) -> int;
-
-  static auto exitFailure(const std::vector<std::string> &, const Scope &) -> int;
-
-  static auto exitSuccess(const std::vector<std::string> &, const Scope &) -> int;
-
-  static auto node() -> rclcpp::Node &;
-
-  static auto run() noexcept -> void;
-
-  static auto printParameter(const std::vector<std::string> &, const Scope &) -> int;
-
-  static auto publisher() -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &;
-
-  /*  */ auto start() const -> void;
-
-  static auto test(const std::vector<std::string> &, const Scope &) -> int;
+  auto start() -> void { entity->start(local()); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

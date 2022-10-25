@@ -25,7 +25,6 @@
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
 
@@ -65,14 +64,22 @@ class EgoEntity : public VehicleEntity
 
   boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 
+  static auto getVehicleModelType() -> VehicleModelType;
+
+  static auto makeAutoware(const Configuration &) -> std::unique_ptr<concealer::Autoware>;
+
+  static auto makeSimulationModel(
+    const VehicleModelType, const double step_time,
+    const traffic_simulator_msgs::msg::VehicleParameters &)
+    -> const std::shared_ptr<SimModelInterface>;
+
 public:
   explicit EgoEntity() = delete;
 
   explicit EgoEntity(
-    const std::string & name,             //
-    const Configuration & configuration,  //
-    const double step_time,               //
-    const traffic_simulator_msgs::msg::VehicleParameters & parameters);
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
+    const double step_time);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 
@@ -92,12 +99,10 @@ public:
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
-  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
-
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
 
   auto getEntityTypename() const -> const std::string & override;
 
@@ -129,9 +134,10 @@ public:
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool) -> void override;
 
-  auto setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void override;
+  auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
+    -> void override;
 
-  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> bool override;
+  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
 
   void requestSpeedChange(double, bool) override;
 

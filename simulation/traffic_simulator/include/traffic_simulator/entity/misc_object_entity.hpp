@@ -25,17 +25,17 @@ namespace entity
 class MiscObjectEntity : public EntityBase
 {
 public:
-  MiscObjectEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params);
-  void onUpdate(double, double) override;
-  auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox override;
-  auto getCurrentAction() const -> std::string override;
+  explicit MiscObjectEntity(
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
+  void onUpdate(double, double) override;
+
+  auto getCurrentAction() const -> std::string override;
 
   auto getEntityTypename() const -> const std::string & override
   {
-    static const std::string result = "VehicleEntity";
+    static const std::string result = "MiscObjectEntity";
     return result;
   }
 
@@ -98,16 +98,13 @@ public:
     THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
   }
 
-  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
-  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) override;
+  void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
   void setAccelerationLimit(double) override {}
 
   void setDecelerationLimit(double) override {}
-
-private:
-  const traffic_simulator_msgs::msg::MiscObjectParameters params_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

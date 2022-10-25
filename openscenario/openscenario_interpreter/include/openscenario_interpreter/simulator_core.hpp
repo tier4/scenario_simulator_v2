@@ -30,6 +30,14 @@
 
 namespace openscenario_interpreter
 {
+using NativeWorldPosition = geometry_msgs::msg::Pose;
+
+using NativeRelativeWorldPosition = NativeWorldPosition;
+
+using NativeLanePosition = traffic_simulator_msgs::msg::LaneletPose;
+
+using NativeRelativeLanePosition = NativeLanePosition;
+
 class SimulatorCore
 {
   static inline std::unique_ptr<traffic_simulator::API> core = nullptr;
@@ -56,14 +64,6 @@ public:
   class CoordinateSystemConversion
   {
   protected:
-    using NativeWorldPosition = geometry_msgs::msg::Pose;
-
-    using NativeRelativeWorldPosition = NativeWorldPosition;
-
-    using NativeLanePosition = traffic_simulator_msgs::msg::LaneletPose;
-
-    using NativeRelativeLanePosition = NativeLanePosition;
-
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const geometry_msgs::msg::Pose & pose)
     {
@@ -192,8 +192,8 @@ public:
         entity_ref, controller.properties.template get<Double>(
                       "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
-      core->setDriverModel(entity_ref, [&]() {
-        auto message = core->getDriverModel(entity_ref);
+      core->setBehaviorParameter(entity_ref, [&]() {
+        auto message = core->getBehaviorParameter(entity_ref);
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
         return message;
       }());
