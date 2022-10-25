@@ -28,8 +28,10 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 
-struct ApplyFaultInjection : public CustomCommandActionBase
+struct ApplyFaultInjection : public ICustomCommand
 {
+  using ICustomCommand::ICustomCommand;
+
 private:
   static auto node() -> rclcpp::Node &
   {
@@ -45,8 +47,9 @@ private:
   }
 
 public:
-  auto start(const std::vector<std::string> & events, const Scope &) const -> int override
+  auto start(const Scope &) const -> int override
   {
+    auto & events = parameters;
     const auto now = node().now();
 
     auto makeFaultInjectionEvent = [](const auto & name) {
@@ -78,11 +81,13 @@ public:
   }
 };
 
-struct ApplyWalkStraightAction : public CustomCommandActionBase, private SimulatorCore::ActionApplication
+struct ApplyWalkStraightAction : public ICustomCommand, private SimulatorCore::ActionApplication
 {
-  auto start(const std::vector<std::string> & actors, const Scope & scope) const -> int override
+  using ICustomCommand::ICustomCommand;
+
+  auto start(const Scope & scope) const -> int override
   {
-    for (const auto & actor : actors) {
+    for (const auto & actor : parameters) {
       applyWalkStraightAction(actor);
     }
 
@@ -94,41 +99,42 @@ struct ApplyWalkStraightAction : public CustomCommandActionBase, private Simulat
   };
 };
 
-struct DebugError : public CustomCommandActionBase
+struct DebugError : public ICustomCommand
 {
-  auto start(const std::vector<std::string> &, const Scope &) const -> int override
-  {
-    throw Error(__FILE__, ":", __LINE__);
-  }
+  using ICustomCommand::ICustomCommand;
+
+  auto start(const Scope &) const -> int override { throw Error(__FILE__, ":", __LINE__); }
 };
 
-struct DebugSegmentationFault : public CustomCommandActionBase
+struct DebugSegmentationFault : public ICustomCommand
 {
-  auto start(const std::vector<std::string> &, const Scope &) const -> int override
+  using ICustomCommand::ICustomCommand;
+
+  auto start(const Scope &) const -> int override
   {
     return *reinterpret_cast<std::add_pointer<int>::type>(0);
   }
 };
 
-struct ExitSuccess : public CustomCommandActionBase
+struct ExitSuccess : public ICustomCommand
 {
-  auto start(const std::vector<std::string> &, const Scope &) const -> int override
-  {
-    throw SpecialAction<EXIT_SUCCESS>();
-  }
+  using ICustomCommand::ICustomCommand;
+
+  auto start(const Scope &) const -> int override { throw SpecialAction<EXIT_SUCCESS>(); }
 };
 
-struct ExitFailure : public CustomCommandActionBase
+struct ExitFailure : public ICustomCommand
 {
-  auto start(const std::vector<std::string> &, const Scope &) const -> int override
-  {
-    throw SpecialAction<EXIT_FAILURE>();
-  }
+  using ICustomCommand::ICustomCommand;
+
+  auto start(const Scope &) const -> int override { throw SpecialAction<EXIT_FAILURE>(); }
 };
 
-struct PrintParameter : public CustomCommandActionBase
+struct PrintParameter : public ICustomCommand
 {
-  auto start(const std::vector<std::string> & parameters, const Scope & scope) const -> int override
+  using ICustomCommand::ICustomCommand;
+
+  auto start(const Scope & scope) const -> int override
   {
     for (auto && parameter : parameters) {
       std::cout << parameter << " = " << scope.ref(parameter) << std::endl;
@@ -138,57 +144,81 @@ struct PrintParameter : public CustomCommandActionBase
   }
 };
 
-struct TestCommand : public CustomCommandActionBase
+struct TestCommand : public ICustomCommand
 {
-  auto start(const std::vector<std::string> & values, const Scope &) const -> int override
+  using ICustomCommand::ICustomCommand;
+
+  auto start(const Scope &) const -> int override
   {
     std::cout << "test" << std::endl;
 
-    for (auto iter = std::cbegin(values); iter != std::cend(values); ++iter) {
-      std::cout << "  values[" << std::distance(std::cbegin(values), iter) << "] = " << *iter
-                << std::endl;
+    for (auto iter = std::cbegin(parameters); iter != std::cend(parameters); ++iter) {
+      std::cout << "  parameters[" << std::distance(std::cbegin(parameters), iter)
+                << "] = " << *iter << std::endl;
     }
 
-    return values.size();
+    return parameters.size();
   }
 };
+
+struct ForkExecCommand : public ICustomCommand
+{
+  ForkExecCommand(const std::string & type, const std::string & content)
+  : type(type), content(content)
+  {
+  }
+
+  auto start(const Scope &) const -> int override { return fork_exec(type, content); }
+
+private:
+  std::string type;
+  std::string content;
+};
+
+namespace
+{
+auto dispatchCustomCommand(const std::string & type, const std::string & content)
+  -> std::shared_ptr<ICustomCommand>
+{
+  std::smatch result{};
+
+#define ELEMENT(NAME, TYPE)                                                  \
+  std::make_pair(NAME, [](std::vector<std::string> parameters) {             \
+    return std::shared_ptr<ICustomCommand>(new TYPE(std::move(parameters))); \
+  })
+
+  static const std::unordered_map<
+    std::string, std::function<std::shared_ptr<ICustomCommand>(std::vector<std::string>)>>
+    commands{
+      ELEMENT("FaultInjectionAction", ApplyFaultInjection),
+      ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
+      ELEMENT("debugError", DebugError),
+      ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED
+      ELEMENT("exitFailure", ExitFailure),
+      ELEMENT("exitSuccess", ExitSuccess),
+      ELEMENT("printParameter", PrintParameter),
+      ELEMENT("test", TestCommand),
+    };
+#undef ELEMENT
+
+  if (type == ":") {
+    return std::make_shared<ICustomCommand>();
+  } else if (
+    std::regex_match(type, result, FunctionCallExpression::pattern()) and
+    commands.find(result[1]) != std::end(commands)) {
+    return commands.at(result[1])(FunctionCallExpression::splitParameters(result[3]));
+  } else {
+    return std::make_shared<ForkExecCommand>(type, content);
+  }
+}
+}  // namespace
 
 CustomCommandAction::CustomCommandAction(const pugi::xml_node & node, const Scope & scope)
 : Scope(scope),
   type(readAttribute<String>("type", node, local())),
   content(readContent<String>(node, local())),
-  base(new CustomCommandActionBase())
+  base(dispatchCustomCommand(type, content))
 {
-}
-
-auto CustomCommandAction::start() -> void
-{
-#define ELEMENT(NAME, TYPE) \
-  std::make_pair(NAME, [] { return std::shared_ptr<CustomCommandActionBase>(new TYPE()); })
-
-  static const std::unordered_map<std::string, std::function<std::shared_ptr<CustomCommandActionBase>()>> commands{
-    ELEMENT("FaultInjectionAction", ApplyFaultInjection),
-    ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
-    ELEMENT("debugError", DebugError),
-    ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED
-    ELEMENT("exitFailure", ExitFailure),
-    ELEMENT("exitSuccess", ExitSuccess),
-    ELEMENT("printParameter", PrintParameter),
-    ELEMENT("test", TestCommand),
-  };
-
-  std::smatch result{};
-
-  if (type == ":") {
-    return;
-  } else if (
-    std::regex_match(type, result, FunctionCallExpression::pattern()) and
-    commands.find(result[1]) != std::end(commands)) {
-    base = commands.at(result[1])();
-    base->start(FunctionCallExpression::splitParameters(result[3]), local());
-  } else {
-    fork_exec(type, content);
-  }
 }
 
 }  // namespace syntax

@@ -32,15 +32,28 @@ struct SpecialAction : public std::integral_constant<int, Value>
 {
 };
 
-struct CustomCommandActionBase
+struct ICustomCommand
 {
-  virtual ~CustomCommandActionBase() = default;
+  ICustomCommand() = default;
+
+  ICustomCommand(const ICustomCommand &) = default;
+
+  ICustomCommand(ICustomCommand &&) = default;
+
+  ICustomCommand(std::vector<std::string> parameters) : parameters(std::move(parameters)) {}
+
+  virtual ~ICustomCommand() = default;
 
   virtual auto accomplished() noexcept -> bool { return true; }
 
+  virtual auto endsImmediately() const -> bool { return true; }
+
   virtual auto run() noexcept -> void {}
 
-  virtual auto start(const std::vector<std::string> &, const Scope &) const -> int { return 0; }
+  virtual auto start(const Scope &) const -> int { return 0; }
+
+protected:
+  std::vector<std::string> parameters;
 };
 
 /* ---- CustomCommandAction ----------------------------------------------------
@@ -61,16 +74,18 @@ struct CustomCommandAction : private Scope
   const String content;
 
 private:
-  std::shared_ptr<CustomCommandActionBase> base;
+  std::shared_ptr<ICustomCommand> base;
 
 public:
   explicit CustomCommandAction(const pugi::xml_node &, const Scope &);
 
   auto accomplished() noexcept -> bool { return base->accomplished(); }
 
+  auto endsImmediately() const -> bool { return base->endsImmediately(); }
+
   auto run() noexcept -> void { return base->run(); }
 
-  auto start() -> void;
+  auto start() -> void { base->start(local()); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
