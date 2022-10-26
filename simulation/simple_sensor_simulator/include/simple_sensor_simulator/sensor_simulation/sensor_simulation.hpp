@@ -23,6 +23,7 @@
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/noise_generator/noise_generator.hpp>
 #include <vector>
 
 namespace simple_sensor_simulator
@@ -86,11 +87,30 @@ public:
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,
     const std::vector<traffic_simulator_msgs::EntityStatus> & status);
+  
+  auto attachNoiseGenerator(
+    const double current_simulation_time,
+    const simulation_api_schema::NoiseGeneratorConfiguration & configuration,
+    rclcpp::Node & node) -> void
+  {
+    if (configuration.architecture_type() == "awf/universe") {
+      using Message = autoware_auto_perception_msgs::msg::DetectedObjects
+      noise_generator_ = std::make_unique<NoiseGenerator<Message>>(
+        current_simulation_time, configuration,
+        node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1));
+    } else {
+      std::stringstream ss;
+      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
+         << " given.";
+      throw std::runtime_error(ss.str());
+    }
+  }
 
 private:
   std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
   std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
   std::vector<std::unique_ptr<OccupancyGridSensorBase>> occupancy_grid_sensors_;
+  std::unique_ptr<NoiseGeneratorBase> noise_generator_;
 };
 }  // namespace simple_sensor_simulator
 

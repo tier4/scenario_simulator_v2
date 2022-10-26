@@ -15,14 +15,16 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__NOISE_GENERATOR__NOISE_GENERATOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__NOISE_GENERATOR__NOISE_GENERATOR_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
+
+#include <simulation_api_schema.pb.h>
+
 #include <memory>
-#include <rclcpp/rclcpp.hpp>
+#include <random>
 #include <string>
 #include <vector>
-#include <random>
 
 namespace simple_sensor_simulator
 {
@@ -31,7 +33,8 @@ class NoiseGeneratorBase
 protected:
   double last_update_stamp_;
 
-  simulation_api_schema::NoiseGeneratorConfiguration configuration_; //TODO add NoiseGeneratorConfiguration
+  simulation_api_schema::NoiseGeneratorConfiguration
+    configuration_;  // TODO add NoiseGeneratorConfiguration
 
   NoiseGeneratorBase(
     const double last_update_stamp,
@@ -58,7 +61,8 @@ public:
   {
   }
 
-  auto publish_with_noise(T);
+  auto publish_with_noise(T) -> void;
+};
 
 template <>
 void NoiseGenerator<autoware_auto_perception_msgs::msg::DetectedObjects>::publish_with_noise(

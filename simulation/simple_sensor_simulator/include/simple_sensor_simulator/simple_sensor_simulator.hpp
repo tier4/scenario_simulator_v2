@@ -122,6 +122,9 @@ private:
   void updateTrafficLights(
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);
+  void attachNoiseGenerator(
+    const simulation_api_schema::AttachNoiseGeneratorRequest & req,
+    simulation_api_schema::AttachNoiseGeneratorResponse & res);
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
   std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians_;

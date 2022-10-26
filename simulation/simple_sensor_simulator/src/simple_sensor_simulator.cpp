@@ -58,7 +58,10 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       &ScenarioSimulator::attachOccupancyGridSensor, this, std::placeholders::_1,
       std::placeholders::_2),
     std::bind(
-      &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2))
+      &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::attachNoiseGenerator, this, std::placeholders::_1, std::placeholders::_2)
+      )
 {
 }
 
@@ -240,6 +243,16 @@ void ScenarioSimulator::updateTrafficLights(
   res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
 }
+
+void ScenarioSimulator::attachNoiseGenerator(
+  const simulation_api_schema::AttachNoiseGeneratorRequest & req,
+  simulation_api_schema::AttachNoiseGeneratorResponse & res)
+{
+  res = simulation_api_schema::AttachNoiseGeneratorResponse();
+  sensor_sim_.attachNoiseGenerator(current_time_, req.configuration(), *this);
+  res.mutable_result()->set_success(true);
+}
+
 }  // namespace simple_sensor_simulator
 
 RCLCPP_COMPONENTS_REGISTER_NODE(simple_sensor_simulator::ScenarioSimulator)
