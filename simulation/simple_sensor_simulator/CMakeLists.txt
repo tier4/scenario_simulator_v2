@@ -31,6 +31,7 @@ include_directories(
 )
 
 ament_auto_add_library(simple_sensor_simulator_component SHARED
+  src/sensor_simulation/noise_generator/noise_generator.cpp
   src/sensor_simulation/detection_sensor/detection_sensor.cpp
   src/sensor_simulation/lidar/lidar_sensor.cpp
   src/sensor_simulation/lidar/raycaster.cpp

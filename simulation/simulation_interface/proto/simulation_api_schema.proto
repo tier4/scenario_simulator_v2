@@ -51,6 +51,15 @@ message OccupancyGridSensorConfiguration {
 }
 
 /**
+ * Parameter configuration of the noise generator
+ **/
+message NoiseGeneratorConfiguration {
+  string entity = 1;             // Name of the entity which you want to attach detection sensor.
+  double pos_noise_stddev = 2;   // standard deviation of position noise.
+  string architecture_type = 3;  // Autoware architecture type.
+}
+
+/**
  * Updated entity status by the simulator.
  **/
 message UpdatedEntityStatus {
