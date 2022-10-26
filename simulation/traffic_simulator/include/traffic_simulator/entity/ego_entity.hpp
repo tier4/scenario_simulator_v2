@@ -127,19 +127,19 @@ public:
   auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
 
   auto requestSpeedChange(
-    const double, const speed_change::Transition, const speed_change::Constraint, const bool)
-    -> void override;
+    const double, const speed_change::Transition, const speed_change::Constraint,
+    const bool continuous) -> void override;
 
   auto requestSpeedChange(
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
-    const speed_change::Constraint, const bool) -> void override;
+    const speed_change::Constraint, const bool continuous) -> void override;
 
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
 
-  void requestSpeedChange(double, bool) override;
+  void requestSpeedChange(double, bool continuous) override;
 
   void requestSpeedChange(
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;

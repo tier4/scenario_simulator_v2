@@ -208,6 +208,7 @@ public:
   FORWARD_TO_ENTITY(asAutoware, const);
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(get2DPolygon, const);
+  FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getDistanceToLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
@@ -215,7 +216,6 @@ public:
   FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, const);
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
-  FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
@@ -227,8 +227,9 @@ public:
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
-  FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setBehaviorParameter, );
+  FORWARD_TO_ENTITY(setDecelerationLimit, );
+  FORWARD_TO_ENTITY(setLinearVelocity, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_ENTITY
@@ -403,7 +404,7 @@ public:
       if constexpr (std::is_same_v<std::decay_t<Pose>, traffic_simulator_msgs::msg::LaneletPose>) {
         entity_status.pose = toMapPose(pose);
         entity_status.lanelet_pose = pose;
-        entity_status.lanelet_pose_valid = false;
+        entity_status.lanelet_pose_valid = true;
       } else {
         entity_status.pose = pose;
 

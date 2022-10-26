@@ -58,18 +58,14 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
       getVehicleParameters());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
-      traffic_simulator::helper::constructActionStatus(5));
+    api_.setLinearVelocity("ego", 5);
     api_.requestSpeedChange("ego", 5, true);
     api_.requestLaneChange("ego", 34513);
 
     api_.spawn(
       "npc", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
       getVehicleParameters());
-    api_.setEntityStatus(
-      "npc", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
-      traffic_simulator::helper::constructActionStatus(10));
+    api_.setLinearVelocity("npc", 10);
   }
 };
 
