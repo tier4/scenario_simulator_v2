@@ -184,6 +184,21 @@ public:
       return core->spawn(std::forward<decltype(xs)>(xs)...);
     }
 
+    template <typename EntityRef, typename DynamicConstraints, typename... Ts>
+    static auto applySpeedProfileAction(
+      const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints, Ts &&... xs)
+      -> void
+    {
+      core->setBehaviorParameter(entity_ref, [&]() {
+        auto behavior_parameter = core->getBehaviorParameter(entity_ref);
+        behavior_parameter.dynamic_constraints =
+          static_cast<traffic_simulator_msgs::msg::DynamicConstraints>(dynamic_constraints);
+        return behavior_parameter;
+      }());
+
+      applySpeedAction(entity_ref, std::forward<decltype(xs)>(xs)...);
+    }
+
     template <typename Controller>
     static auto applyAssignControllerAction(
       const std::string & entity_ref, Controller && controller) -> void

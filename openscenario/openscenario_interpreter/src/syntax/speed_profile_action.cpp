@@ -59,15 +59,17 @@ auto SpeedProfileAction::apply(
   };
 
   if (entity_ref.empty()) {
-    applySpeedAction(
+    applySpeedProfileAction(
       actor,
+      dynamic_constraints,      //
       absolute_target_speed(),  //
       traffic_simulator::speed_change::Transition::LINEAR,
       constraint(),  //
       true);
   } else {
-    applySpeedAction(
+    applySpeedProfileAction(
       actor,
+      dynamic_constraints,      //
       relative_target_speed(),  //
       traffic_simulator::speed_change::Transition::LINEAR,
       constraint(),  //

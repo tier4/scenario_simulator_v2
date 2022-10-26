@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator_msgs/msg/dynamic_constraints.hpp>
 
 namespace openscenario_interpreter
 {
@@ -34,8 +35,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  *  syntax `Vehicle.Performance` has exactly the same elements as
- *  this syntax `DynamicsConstraints`, but `Vehicle.Performance` expresses the
- *  maximum design performance of the vehicle, whereas `DynamicsConstraints`
+ *  this syntax `DynamicConstraints`, but `Vehicle.Performance` expresses the
+ *  maximum design performance of the vehicle, whereas `DynamicConstraints`
  *  expresses how much of it the driver is allowed to use.
  *
  * -------------------------------------------------------------------------- */
@@ -59,6 +60,8 @@ struct DynamicConstraints
     const Double max_speed = Double::infinity());
 
   explicit DynamicConstraints(const pugi::xml_node &, Scope &);
+
+  explicit operator traffic_simulator_msgs::msg::DynamicConstraints() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
