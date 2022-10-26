@@ -54,7 +54,6 @@ public:
   }
 
   // clang-format off
-  // DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter)
   DEFINE_GETTER_SETTER(CurrentTime, double)
   DEFINE_GETTER_SETTER(DebugMarker, std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
