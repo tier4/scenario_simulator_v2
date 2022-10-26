@@ -130,16 +130,15 @@ public:
     const lane_change::Constraint &);
 
   virtual void requestSpeedChange(
-    const double target_speed, const speed_change::Transition, const speed_change::Constraint,
-    const bool continuous);
+    const double, const speed_change::Transition, const speed_change::Constraint, const bool);
 
   virtual void requestSpeedChange(
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
-    const speed_change::Constraint, const bool continuous);
+    const speed_change::Constraint, const bool);
 
-  virtual void requestSpeedChange(double target_speed, bool continuous);
+  virtual void requestSpeedChange(double, bool);
 
-  virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool continuous);
+  virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
   virtual void requestWalkStraight();
 
@@ -158,6 +157,8 @@ public:
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &);
 
   virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> void;
+
+  virtual auto setLinearVelocity(const double linear_velocity) -> void;
 
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
@@ -195,6 +196,19 @@ protected:
 
   boost::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
+
+private:
+  virtual void requestSpeedChangeWithConstantAcceleration(
+    const double target_speed, const speed_change::Transition, double acceleration,
+    const bool continuous);
+  virtual void requestSpeedChangeWithConstantAcceleration(
+    const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, double acceleration, const bool continuous);
+  virtual void requestSpeedChangeWithTimeConstraint(
+    const double target_speed, const speed_change::Transition, double acceleration_time);
+  virtual void requestSpeedChangeWithTimeConstraint(
+    const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, double time);
 };
 }  // namespace entity
 }  // namespace traffic_simulator

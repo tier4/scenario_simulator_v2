@@ -55,9 +55,7 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
       getVehicleParameters());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
-      traffic_simulator::helper::constructActionStatus(10));
+    api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 10, true);
     api_.requestLaneChange("ego", 34513);
   }

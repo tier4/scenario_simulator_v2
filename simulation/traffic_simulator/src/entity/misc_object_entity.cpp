@@ -52,5 +52,21 @@ void MiscObjectEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::B
 {
   THROW_SEMANTIC_ERROR("setBehaviorParameter function does not support in MiscObjectEntity.");
 }
+
+void MiscObjectEntity::requestSpeedChange(double, bool)
+{
+  THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
+}
+
+void MiscObjectEntity::requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool)
+{
+  THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
+}
+
+void MiscObjectEntity::requestSpeedChange(
+  const double, const speed_change::Transition, const speed_change::Constraint, const bool)
+{
+  THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
+}
 }  // namespace entity
 }  // namespace traffic_simulator

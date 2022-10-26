@@ -26,52 +26,55 @@
 #include <string>
 #include <vector>
 
-class LaneChangeLeftScenario : public cpp_mock_scenarios::CppScenarioNode
+class RequestSpeedChangeScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit LaneChangeLeftScenario(const rclcpp::NodeOptions & option)
+  explicit RequestSpeedChangeScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option)
+      "request_speed_change_with_time_constraint",
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option)
   {
     start();
   }
 
 private:
-  int lanechange_frames = 0;
   void onUpdate() override
   {
-    if (api_.getCurrentAction("ego") == "lane_change") {
-      lanechange_frames++;
+    if (
+      api_.getCurrentTime() <= 3.9 &&
+      api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (api_.getCurrentAction("ego") != "lane_change" && api_.getCurrentTime() >= 2.0) {
-      double duration = static_cast<double>(lanechange_frames) * 0.05;
-      if (duration >= 3.05 && 3.1 >= duration) {
+    if (api_.getCurrentTime() >= 4.0) {
+      if (api_.getEntityStatus("ego").action_status.twist.linear.x <= 10.0) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
-    // LCOV_EXCL_START
-    if (api_.getCurrentTime() >= 10.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    // LCOV_EXCL_STOP
   }
+
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
+    api_.setLinearVelocity("ego", 0);
+    api_.requestSpeedChange(
+      "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      traffic_simulator::speed_change::Constraint(
+        traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
+      false);
+
+    api_.spawn(
+      "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 10);
-    api_.requestSpeedChange("ego", 10, true);
-    api_.requestLaneChange(
-      "ego",
-      traffic_simulator::lane_change::RelativeTarget(
-        "ego", traffic_simulator::lane_change::Direction::LEFT, 1, 0),
-      traffic_simulator::lane_change::TrajectoryShape::LINEAR,
-      traffic_simulator::lane_change::Constraint(
-        traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY, 1.0));
+    api_.setLinearVelocity("front", 10);
+    api_.requestSpeedChange(
+      "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      traffic_simulator::speed_change::Constraint(
+        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 4.0),
+      true);
   }
 };
 
@@ -79,7 +82,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<LaneChangeLeftScenario>(options);
+  auto component = std::make_shared<RequestSpeedChangeScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

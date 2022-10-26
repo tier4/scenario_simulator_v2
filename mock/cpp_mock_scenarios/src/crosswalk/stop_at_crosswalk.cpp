@@ -74,9 +74,7 @@ private:
   {
     api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(120545, 0), getVehicleParameters());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(120545, 0),
-      traffic_simulator::helper::constructActionStatus(10));
+    api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 8, true);
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator_msgs::msg::LaneletPose>{
@@ -86,9 +84,7 @@ private:
     api_.spawn(
       "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       getPedestrianParameters());
-    api_.setEntityStatus(
-      "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
-      traffic_simulator::helper::constructActionStatus(0));
+    api_.setLinearVelocity("bob", 0);
     api_.requestSpeedChange(
       "bob", 1.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(

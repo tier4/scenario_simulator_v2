@@ -87,9 +87,7 @@ private:
 
     api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(120545, 0), getVehicleParameters());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(120545, 0),
-      traffic_simulator::helper::constructActionStatus(10));
+    api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 8, true);
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator_msgs::msg::LaneletPose>{
@@ -108,32 +106,24 @@ private:
     api_.spawn(
       "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       getPedestrianParameters());
-    api_.setEntityStatus(
-      "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
-      traffic_simulator::helper::constructActionStatus(1));
+    api_.setLinearVelocity("bob", 1.0);
     api_.requestSpeedChange("bob", 1, true);
 
     api_.spawn(
       "npc1", traffic_simulator::helper::constructLaneletPose(34579, 20.0), getVehicleParameters());
-    api_.setEntityStatus(
-      "npc1", traffic_simulator::helper::constructLaneletPose(34579, 20.0),
-      traffic_simulator::helper::constructActionStatus(5));
+    api_.setLinearVelocity("npc1", 5.0);
     api_.requestSpeedChange("npc1", 5, true);
     api_.requestAcquirePosition(
       "npc1", traffic_simulator::helper::constructLaneletPose(34675, 0.0));
 
     api_.spawn(
       "npc2", traffic_simulator::helper::constructLaneletPose(34606, 20.0), getVehicleParameters());
-    api_.setEntityStatus(
-      "npc2", traffic_simulator::helper::constructLaneletPose(34606, 20.0),
-      traffic_simulator::helper::constructActionStatus(5));
+    api_.setLinearVelocity("npc2", 5);
     api_.requestSpeedChange("npc2", 0, true);
 
     api_.spawn(
       "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0), getVehicleParameters());
-    api_.setEntityStatus(
-      "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0),
-      traffic_simulator::helper::constructActionStatus(10));
+    api_.setLinearVelocity("npc3", 10);
 
     api_.spawn(
       "obstacle", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),

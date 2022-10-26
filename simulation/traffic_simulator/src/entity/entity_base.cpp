@@ -218,9 +218,9 @@ auto EntityBase::getStandStillDuration() const -> double { return stand_still_du
 
 auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 
-void EntityBase::onUpdate(double, double)
+void EntityBase::onUpdate(double /*current_time*/, double step_time)
 {
-  job_list_.update();
+  job_list_.update(step_time);
   status_before_update_ = status_;
 }
 
@@ -270,19 +270,19 @@ void EntityBase::requestLaneChange(
   }
 }
 
-void EntityBase::requestSpeedChange(
-  const double target_speed, const speed_change::Transition transition,
-  const speed_change::Constraint constraint, const bool continuous)
+void EntityBase::requestSpeedChangeWithConstantAcceleration(
+  const double target_speed, const speed_change::Transition transition, double acceleration,
+  const bool continuous)
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       if (getStatus().action_status.twist.linear.x < target_speed) {
-        setAccelerationLimit(std::abs(constraint.value));
+        setAccelerationLimit(std::abs(acceleration));
         job_list_.append(
           /**
            * @brief Checking if the entity reaches target speed.
            */
-          [this, target_speed]() {
+          [this, target_speed](double) {
             return getStatus().action_status.twist.linear.x >= target_speed;
           },
           /**
@@ -293,12 +293,12 @@ void EntityBase::requestSpeedChange(
           },
           job::Type::LINEAR_ACCELERATION, true);
       } else if (getStatus().action_status.twist.linear.x > target_speed) {
-        setDecelerationLimit(std::abs(constraint.value));
+        setDecelerationLimit(std::abs(acceleration));
         job_list_.append(
           /**
            * @brief Checking if the entity reaches target speed.
            */
-          [this, target_speed]() {
+          [this, target_speed](double) {
             return getStatus().action_status.twist.linear.x <= target_speed;
           },
           /**
@@ -313,18 +313,39 @@ void EntityBase::requestSpeedChange(
       break;
     }
     case speed_change::Transition::STEP: {
-      auto status = getStatus();
-      status.action_status.twist.linear.x = target_speed;
       requestSpeedChange(target_speed, continuous);
-      setStatus(status);
+      setLinearVelocity(target_speed);
       break;
     }
   }
 }
 
+void EntityBase::requestSpeedChangeWithTimeConstraint(
+  const double target_speed, const speed_change::Transition transition, double acceleration_time)
+{
+  requestSpeedChangeWithConstantAcceleration(
+    target_speed, transition,
+    (target_speed - getStatus().action_status.twist.linear.x) / acceleration_time, false);
+}
+
 void EntityBase::requestSpeedChange(
-  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  const double target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
+{
+  switch (constraint.type) {
+    case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed, transition, constraint.value, continuous);
+      break;
+    case speed_change::Constraint::Type::TIME:
+      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
+      break;
+  }
+}
+
+void EntityBase::requestSpeedChangeWithConstantAcceleration(
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  double acceleration, const bool continuous)
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
@@ -332,7 +353,7 @@ void EntityBase::requestSpeedChange(
         /**
          * @brief Checking if the entity reaches target speed.
          */
-        [this, target_speed, constraint]() {
+        [this, target_speed, acceleration](double) {
           double diff =
             target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
           /**
@@ -342,11 +363,11 @@ void EntityBase::requestSpeedChange(
             return true;
           }
           if (diff > 0) {
-            setAccelerationLimit(std::abs(constraint.value));
+            setAccelerationLimit(std::abs(acceleration));
             return false;
           }
           if (diff < 0) {
-            setDecelerationLimit(std::abs(constraint.value));
+            setDecelerationLimit(std::abs(acceleration));
             return false;
           }
           return false;
@@ -362,12 +383,76 @@ void EntityBase::requestSpeedChange(
       break;
     }
     case speed_change::Transition::STEP: {
-      auto status = getStatus();
-      status.action_status.twist.linear.x = target_speed.getAbsoluteValue(other_status_);
       requestSpeedChange(target_speed, continuous);
-      setStatus(status);
+      setLinearVelocity(target_speed.getAbsoluteValue(other_status_));
       break;
     }
+  }
+}
+
+void EntityBase::requestSpeedChangeWithTimeConstraint(
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  double time)
+{
+  switch (transition) {
+    case speed_change::Transition::LINEAR: {
+      job_list_.append(
+        /**
+         * @brief Checking if the entity reaches target speed.
+         */
+        [this, target_speed, time](double job_duration) {
+          double diff =
+            target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
+          double acceleration = diff / time;
+          /**
+           * @brief Hard coded parameter, threashold for difference
+           */
+          if (job_duration >= time) {
+            return true;
+          }
+          if (diff > 0) {
+            setAccelerationLimit(std::abs(acceleration));
+            return false;
+          }
+          if (diff < 0) {
+            setDecelerationLimit(std::abs(acceleration));
+            return false;
+          }
+          return false;
+        },
+        /**
+           * @brief Resets acceleration limit.
+           */
+        [this]() {
+          setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
+        },
+        job::Type::LINEAR_ACCELERATION, true);
+      requestSpeedChange(target_speed, false);
+      break;
+    }
+    case speed_change::Transition::STEP: {
+      requestSpeedChange(target_speed, false);
+      setLinearVelocity(target_speed.getAbsoluteValue(other_status_));
+      break;
+    }
+  }
+}
+
+void EntityBase::requestSpeedChange(
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
+{
+  switch (constraint.type) {
+    case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed, transition, constraint.value, continuous);
+      break;
+    case speed_change::Constraint::Type::TIME:
+      if (continuous) {
+        THROW_SEMANTIC_ERROR("continuous = true is not allowed with time constraint.");
+      }
+      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
+      break;
   }
 }
 
@@ -378,7 +463,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
-      [this, target_speed]() {
+      [this, target_speed](double) {
         target_speed_ = target_speed;
         return false;
       },
@@ -391,7 +476,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
-      [this, target_speed]() {
+      [this, target_speed](double) {
         if (getStatus().action_status.twist.linear.x >= target_speed) {
           return true;
         }
@@ -413,7 +498,7 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
-      [this, target_speed]() {
+      [this, target_speed](double) {
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
           return true;
         }
@@ -426,7 +511,7 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
-      [this, target_speed]() {
+      [this, target_speed](double) {
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
           return true;
         }
@@ -502,6 +587,13 @@ auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   new_status.action_status.current_action = getCurrentAction();
 
   status_ = new_status;
+}
+
+auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
+{
+  auto status = getStatus();
+  status.action_status.twist.linear.x = linear_velocity;
+  setStatus(status);
 }
 
 void EntityBase::setTrafficLightManager(
