@@ -44,7 +44,7 @@ struct ApplyFaultInjection : public CustomCommand
     return *publisher;
   }
 
-  auto start(const Scope &) -> int override
+  auto start(const Scope &) -> void override
   {
     auto & events = parameters;
     const auto now = node().now();
@@ -73,8 +73,6 @@ struct ApplyFaultInjection : public CustomCommand
     };
 
     publisher().publish(makeFaultInjectionEvents(events));
-
-    return events.size();
   }
 };
 
@@ -82,7 +80,7 @@ struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::Ac
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope & scope) -> int override
+  auto start(const Scope & scope) -> void override
   {
     for (const auto & actor : parameters) {
       applyWalkStraightAction(actor);
@@ -91,8 +89,6 @@ struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::Ac
     for (const auto & actor : scope.actors) {
       applyWalkStraightAction(actor);
     }
-
-    return scope.actors.size();
   };
 };
 
@@ -100,16 +96,17 @@ struct DebugError : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> int override { throw Error(__FILE__, ":", __LINE__); }
+  auto start(const Scope &) -> void override { throw Error(__FILE__, ":", __LINE__); }
 };
 
 struct DebugSegmentationFault : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> int override
+  auto start(const Scope &) -> void override
   {
-    return *reinterpret_cast<std::add_pointer_t<int>>(0);  // NOTE: Access null-pointer explicitly.
+    [[maybe_unused]] auto x =
+      *reinterpret_cast<std::add_pointer_t<int>>(0);  // NOTE: Access null-pointer explicitly.
   }
 };
 
@@ -123,7 +120,7 @@ struct DummyLongRunningAction : public CustomCommand, private SimulatorCore::Con
 
   auto endsImmediately() const -> bool override { return false; }
 
-  auto start(const Scope & scope) -> int override
+  auto start(const Scope & scope) -> void override
   {
     end_time = evaluateSimulationTime() + boost::lexical_cast<double>(parameters.at(0));
 
@@ -141,8 +138,6 @@ struct DummyLongRunningAction : public CustomCommand, private SimulatorCore::Con
           });
       }
     }
-
-    return 0;
   }
 };
 
@@ -150,27 +145,25 @@ struct ExitSuccess : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> int override { throw SpecialAction<EXIT_SUCCESS>(); }
+  auto start(const Scope &) -> void override { throw SpecialAction<EXIT_SUCCESS>(); }
 };
 
 struct ExitFailure : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> int override { throw SpecialAction<EXIT_FAILURE>(); }
+  auto start(const Scope &) -> void override { throw SpecialAction<EXIT_FAILURE>(); }
 };
 
 struct PrintParameter : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope & scope) -> int override
+  auto start(const Scope & scope) -> void override
   {
     for (auto && parameter : parameters) {
       std::cout << parameter << " = " << scope.ref(parameter) << std::endl;
     }
-
-    return parameters.size();
   }
 };
 
@@ -178,7 +171,7 @@ struct TestCommand : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> int override
+  auto start(const Scope &) -> void override
   {
     std::cout << "test" << std::endl;
 
@@ -186,8 +179,6 @@ struct TestCommand : public CustomCommand
       std::cout << "  parameters[" << std::distance(std::cbegin(parameters), iter)
                 << "] = " << *iter << std::endl;
     }
-
-    return parameters.size();
   }
 };
 
@@ -202,7 +193,7 @@ struct ForkExecCommand : public CustomCommand
   {
   }
 
-  auto start(const Scope &) -> int override { return fork_exec(type, content); }
+  auto start(const Scope &) -> void override { fork_exec(type, content); }
 };
 
 auto makeCustomCommand(const std::string & type, const std::string & content)

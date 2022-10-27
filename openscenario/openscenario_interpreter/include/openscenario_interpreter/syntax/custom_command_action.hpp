@@ -52,7 +52,7 @@ struct CustomCommand
 
   virtual auto run() noexcept -> void {}
 
-  virtual auto start(const Scope &) -> int { return 0; }
+  virtual auto start(const Scope &) -> void {}
 };
 
 /* ---- CustomCommandAction ----------------------------------------------------
