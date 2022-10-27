@@ -42,7 +42,7 @@ struct CustomCommand
 
   CustomCommand(CustomCommand &&) = default;
 
-  CustomCommand(std::vector<std::string> parameters) : parameters(std::move(parameters)) {}
+  explicit CustomCommand(const std::vector<std::string> & parameters) : parameters(parameters) {}
 
   virtual ~CustomCommand() = default;
 

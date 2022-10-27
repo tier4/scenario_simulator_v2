@@ -45,7 +45,7 @@ Event::Event(const pugi::xml_node & node, Scope & scope, Maneuver & maneuver)
 auto Event::start() -> void
 {
   if (priority == Priority::overwrite) {
-    parent_maneuver.override_events();
+    parent_maneuver.overrideEvents();
   }
 
   for (auto && element : elements) {

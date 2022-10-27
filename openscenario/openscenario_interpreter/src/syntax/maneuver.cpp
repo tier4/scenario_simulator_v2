@@ -29,7 +29,7 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto Maneuver::override_events() -> void
+auto Maneuver::overrideEvents() -> void
 {
   for (auto && element : elements) {
     assert(element.is<Event>());

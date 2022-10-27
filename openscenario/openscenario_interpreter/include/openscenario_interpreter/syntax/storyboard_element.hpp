@@ -143,9 +143,7 @@ protected:
   template <typename U, typename Node, typename... Ts>
   auto readStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
   {
-    const auto name = rename(readAttribute<String>("name", node, inner_scope));
-
-    if (unique(name)) {
+    if (const auto name = rename(readAttribute<String>("name", node, inner_scope)); unique(name)) {
       auto element = make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
       inner_scope.insert(name, element);
       return element;
@@ -159,18 +157,15 @@ protected:
   template <typename U, typename Node, typename... Ts>
   auto readCatalogedStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
   {
-    auto element = CatalogReference(node, inner_scope).make();
-
-    const auto & name = element.template as<U>().name;
-
-    if (not unique(name)) {
+    if (auto element = CatalogReference(node, inner_scope).make();
+        not unique(element.template as<U>().name)) {
       throw SyntaxError(
-        "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
-        makeTypename(typeid(U)), ")");
+        "Detected redefinition of StoryboardElement named ",
+        std::quoted(element.template as<U>().name), " (class ", makeTypename(typeid(U)), ")");
+    } else {
+      inner_scope.insert(element.template as<U>().name, element);
+      return element;
     }
-
-    inner_scope.insert(name, element);
-    return element;
   }
 
 public:
@@ -178,7 +173,7 @@ public:
     StoryboardElementState::value_type transition,
     std::function<void(const StoryboardElement &)> callback)
   {
-    callbacks[transition].push_back(std::move(callback));
+    callbacks[transition].push_back(callback);
   }
 
   auto transitionTo(const Object & state) -> bool
