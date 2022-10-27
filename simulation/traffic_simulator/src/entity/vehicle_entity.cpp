@@ -231,7 +231,7 @@ void VehicleEntity::setDecelerationLimit(double deceleration)
     THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
-  behavior_parameter.deceleration = deceleration;
+  behavior_parameter.dynamic_constraints.max_deceleration = deceleration;
   setBehaviorParameter(behavior_parameter);
 }
 

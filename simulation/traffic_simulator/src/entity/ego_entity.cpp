@@ -182,8 +182,8 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
    * @brief TODO, Input values get from autoware.
    */
   parameter.see_around = true;
-  parameter.acceleration = 0;
-  parameter.deceleration = 0;
+  parameter.dynamic_constraints.max_acceleration = 0;
+  parameter.dynamic_constraints.max_deceleration = 0;
   return parameter;
 }
 

@@ -119,7 +119,7 @@ void PedestrianEntity::setAccelerationLimit(double acceleration)
     THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
-  behavior_parameter.acceleration = acceleration;
+  behavior_parameter.dynamic_constraints.max_acceleration = acceleration;
   setBehaviorParameter(behavior_parameter);
 }
 
@@ -129,7 +129,7 @@ void PedestrianEntity::setDecelerationLimit(double deceleration)
     THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
-  behavior_parameter.deceleration = deceleration;
+  behavior_parameter.dynamic_constraints.max_deceleration = deceleration;
   setBehaviorParameter(behavior_parameter);
 }
 
