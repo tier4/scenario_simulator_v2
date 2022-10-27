@@ -100,8 +100,7 @@ traffic_simulator_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStat
             new_s = new_s - length;
             auto next_ids = hdmap_utils->getNextLaneletIds(route_lanelets[i]);
             if (next_ids.empty()) {
-              const auto ret = stopAtEndOfRoad();
-              return ret;
+              return stopAtEndOfRoad();
             }
             new_lanelet_id = next_ids[0];
             break;

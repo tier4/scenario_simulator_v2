@@ -605,6 +605,7 @@ void EntityBase::stopAtEndOfRoad()
 {
   status_.action_status.twist = geometry_msgs::msg::Twist();
   status_.action_status.accel = geometry_msgs::msg::Accel();
+  status_.action_status.linear_jerk = 0;
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
