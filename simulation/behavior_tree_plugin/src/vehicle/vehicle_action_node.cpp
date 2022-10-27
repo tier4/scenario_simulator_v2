@@ -50,9 +50,11 @@ traffic_simulator_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStat
   accel_new = entity_status.action_status.accel;
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(target_accel, behavior_parameter.deceleration * -1, 0);
+    target_accel = boost::algorithm::clamp(
+      target_accel, behavior_parameter.dynamic_constraints.max_deceleration * -1, 0);
   } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, behavior_parameter.acceleration);
+    target_accel = boost::algorithm::clamp(
+      target_accel, 0, behavior_parameter.dynamic_constraints.max_acceleration);
   }
   accel_new.linear.x = target_accel;
   geometry_msgs::msg::Twist twist_new;
@@ -135,9 +137,11 @@ VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_speed)
   }
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(target_accel, -1 * behavior_parameter.deceleration, 0);
+    target_accel = boost::algorithm::clamp(
+      target_accel, -1 * behavior_parameter.dynamic_constraints.max_deceleration, 0);
   } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, behavior_parameter.acceleration);
+    target_accel = boost::algorithm::clamp(
+      target_accel, 0, behavior_parameter.dynamic_constraints.max_acceleration);
   }
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;

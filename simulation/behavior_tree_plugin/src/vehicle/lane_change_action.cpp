@@ -186,10 +186,11 @@ BT::NodeStatus LaneChangeAction::tick()
         target_accel =
           (lane_change_velocity_ - entity_status.action_status.twist.linear.x) / step_time;
         if (entity_status.action_status.twist.linear.x > target_speed) {
-          target_accel =
-            boost::algorithm::clamp(target_accel, behavior_parameter.deceleration * -1, 0);
+          target_accel = boost::algorithm::clamp(
+            target_accel, behavior_parameter.dynamic_constraints.max_deceleration * -1, 0);
         } else {
-          target_accel = boost::algorithm::clamp(target_accel, 0, behavior_parameter.acceleration);
+          target_accel = boost::algorithm::clamp(
+            target_accel, 0, behavior_parameter.dynamic_constraints.max_acceleration);
         }
         geometry_msgs::msg::Accel accel_new;
         accel_new.linear.x = target_accel;
