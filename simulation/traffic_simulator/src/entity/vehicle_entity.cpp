@@ -221,7 +221,7 @@ void VehicleEntity::setAccelerationLimit(double acceleration)
     THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
-  behavior_parameter.acceleration = acceleration;
+  behavior_parameter.dynamic_constraints.max_acceleration = acceleration;
   setBehaviorParameter(behavior_parameter);
 }
 
