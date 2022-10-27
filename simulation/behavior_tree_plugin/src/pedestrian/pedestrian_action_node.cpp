@@ -124,58 +124,19 @@ traffic_simulator_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityS
 traffic_simulator_msgs::msg::EntityStatus
 PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_speed)
 {
-  double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
-  if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(
-      target_accel, behavior_parameter.dynamic_constraints.max_deceleration * -1, 0);
-  } else {
-    target_accel = boost::algorithm::clamp(
-      target_accel, 0, behavior_parameter.dynamic_constraints.max_acceleration);
-  }
-  geometry_msgs::msg::Accel accel_new;
-  accel_new = entity_status.action_status.accel;
-  accel_new.linear.x = target_accel;
-
-  geometry_msgs::msg::Twist twist_new;
-  twist_new.linear.x = entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time;
-  twist_new.linear.y = entity_status.action_status.twist.linear.y + accel_new.linear.y * step_time;
-  twist_new.linear.z = entity_status.action_status.twist.linear.z + accel_new.linear.z * step_time;
-  twist_new.angular.x =
-    entity_status.action_status.twist.angular.x + accel_new.angular.x * step_time;
-  twist_new.angular.y =
-    entity_status.action_status.twist.angular.y + accel_new.angular.y * step_time;
-  twist_new.angular.z =
-    entity_status.action_status.twist.angular.z + accel_new.angular.z * step_time;
-
-  geometry_msgs::msg::Pose pose_new;
-  geometry_msgs::msg::Vector3 angular_trans_vec;
-  angular_trans_vec.z = twist_new.angular.z * step_time;
-  geometry_msgs::msg::Quaternion angular_trans_quat =
-    quaternion_operation::convertEulerAngleToQuaternion(angular_trans_vec);
-  pose_new.orientation =
-    quaternion_operation::rotation(entity_status.pose.orientation, angular_trans_quat);
-  Eigen::Vector3d trans_vec;
-  trans_vec(0) = twist_new.linear.x * step_time;
-  trans_vec(1) = twist_new.linear.y * step_time;
-  trans_vec(2) = 0;
-  Eigen::Matrix3d rotation_mat = quaternion_operation::getRotationMatrix(pose_new.orientation);
-  trans_vec = rotation_mat * trans_vec;
-  pose_new.position.x = trans_vec(0) + entity_status.pose.position.x;
-  pose_new.position.y = trans_vec(1) + entity_status.pose.position.y;
-  pose_new.position.z = trans_vec(2) + entity_status.pose.position.z;
-  traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
-  entity_status_updated.time = current_time + step_time;
-  entity_status_updated.pose = pose_new;
-  entity_status_updated.action_status.twist = twist_new;
-  entity_status_updated.action_status.accel = accel_new;
+  traffic_simulator_msgs::msg::EntityStatus entity_status_updated =
+    ActionNode::calculateEntityStatusUpdatedInWorldFrame(
+      target_speed, behavior_parameter.dynamic_constraints);
   boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
   if (entity_status.lanelet_pose_valid) {
-    lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.lanelet_pose.lanelet_id, 1.0);
+    lanelet_pose = hdmap_utils->toLaneletPose(
+      entity_status_updated.pose, entity_status.lanelet_pose.lanelet_id, 1.0);
   } else {
-    lanelet_pose = hdmap_utils->toLaneletPose(pose_new, entity_status.bounding_box, true);
+    lanelet_pose =
+      hdmap_utils->toLaneletPose(entity_status_updated.pose, entity_status.bounding_box, true);
   }
   if (!lanelet_pose) {
-    lanelet_pose = hdmap_utils->toLaneletPose(pose_new, true, 2.0);
+    lanelet_pose = hdmap_utils->toLaneletPose(entity_status_updated.pose, true, 2.0);
   }
   if (lanelet_pose) {
     entity_status_updated.lanelet_pose_valid = true;

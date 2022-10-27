@@ -106,6 +106,8 @@ public:
     const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
     double width_extension_right = 0.0, double width_extension_left = 0.0,
     double length_extension_front = 0.0, double length_extension_rear = 0.0);
+  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
+    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const;
 
 private:
   boost::optional<double> getDistanceToTargetEntityOnCrosswalk(
