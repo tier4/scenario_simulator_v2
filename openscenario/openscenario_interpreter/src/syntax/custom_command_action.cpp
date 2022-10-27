@@ -31,7 +31,6 @@ struct ApplyFaultInjection : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-private:
   static auto node() -> rclcpp::Node &
   {
     static rclcpp::Node node{"custom_command_action", "simulation"};
@@ -45,7 +44,6 @@ private:
     return *publisher;
   }
 
-public:
   auto start(const Scope &) -> int override
   {
     auto & events = parameters;
@@ -111,12 +109,14 @@ struct DebugSegmentationFault : public CustomCommand
 
   auto start(const Scope &) -> int override
   {
-    return *reinterpret_cast<std::add_pointer<int>::type>(0);
+    return *reinterpret_cast<std::add_pointer_t<int>>(0);  // NOTE: Access null-pointer explicitly.
   }
 };
 
 struct DummyLongRunningAction : public CustomCommand, private SimulatorCore::ConditionEvaluation
 {
+  double end_time = std::numeric_limits<double>::max();
+
   using CustomCommand::CustomCommand;
 
   auto accomplished() noexcept -> bool override { return end_time < evaluateSimulationTime(); }
@@ -125,22 +125,18 @@ struct DummyLongRunningAction : public CustomCommand, private SimulatorCore::Con
 
   auto start(const Scope & scope) -> int override
   {
-    auto duration = std::stod(parameters.at(0));
-    auto now = evaluateSimulationTime();
-    end_time = now + duration;
+    end_time = evaluateSimulationTime() + boost::lexical_cast<double>(parameters.at(0));
 
-    if (!scope.name.empty()) {
-      auto e = scope.ref(scope.name);
-      if (e.is_also<StoryboardElement>()) {
-        auto & storyboard_element = e.as<StoryboardElement>();
-        storyboard_element.addTransitionCallback(
+    if (not scope.name.empty()) {
+      if (auto e = scope.ref(scope.name); e.is_also<StoryboardElement>()) {
+        e.as<StoryboardElement>().addTransitionCallback(
           StoryboardElementState::runningState, [name = scope.name](auto &&) {
-            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s]" << name
+            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
                       << " transitions to runningState" << std::endl;
           });
-        storyboard_element.addTransitionCallback(
+        e.as<StoryboardElement>().addTransitionCallback(
           StoryboardElementState::completeState, [name = scope.name](auto &&) {
-            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s]" << name
+            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
                       << " transitions to completeState" << std::endl;
           });
       }
@@ -148,9 +144,6 @@ struct DummyLongRunningAction : public CustomCommand, private SimulatorCore::Con
 
     return 0;
   }
-
-private:
-  double end_time = std::numeric_limits<double>::max();
 };
 
 struct ExitSuccess : public CustomCommand
@@ -200,30 +193,28 @@ struct TestCommand : public CustomCommand
 
 struct ForkExecCommand : public CustomCommand
 {
-  ForkExecCommand(const std::string & type, const std::string & content)
+  const std::string type;
+
+  const std::string content;
+
+  explicit ForkExecCommand(const std::string & type, const std::string & content)
   : type(type), content(content)
   {
   }
 
   auto start(const Scope &) -> int override { return fork_exec(type, content); }
-
-private:
-  std::string type;
-  std::string content;
 };
 
-auto dispatchCustomCommand(const std::string & type, const std::string & content)
+auto makeCustomCommand(const std::string & type, const std::string & content)
   -> std::shared_ptr<CustomCommand>
 {
-  std::smatch result{};
-
-#define ELEMENT(NAME, TYPE)                                                 \
-  std::make_pair(NAME, [](std::vector<std::string> parameters) {            \
-    return std::shared_ptr<CustomCommand>(new TYPE(std::move(parameters))); \
+#define ELEMENT(NAME, TYPE)                                                             \
+  std::make_pair(NAME, [](auto &&... xs) {                                              \
+    return std::shared_ptr<CustomCommand>(new TYPE(std::forward<decltype(xs)>(xs)...)); \
   })
 
   static const std::unordered_map<
-    std::string, std::function<std::shared_ptr<CustomCommand>(std::vector<std::string>)>>
+    std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
     commands{
       ELEMENT("FaultInjectionAction", ApplyFaultInjection),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
@@ -239,9 +230,9 @@ auto dispatchCustomCommand(const std::string & type, const std::string & content
 
   if (type == ":") {
     return std::make_shared<CustomCommand>();
-  } else if (
-    std::regex_match(type, result, FunctionCallExpression::pattern()) and
-    commands.find(result[1]) != std::end(commands)) {
+  } else if (std::smatch result;
+             std::regex_match(type, result, FunctionCallExpression::pattern()) and
+             commands.find(result[1]) != std::end(commands)) {
     return commands.at(result[1])(FunctionCallExpression::splitParameters(result[3]));
   } else {
     return std::make_shared<ForkExecCommand>(type, content);
@@ -252,7 +243,7 @@ CustomCommandAction::CustomCommandAction(const pugi::xml_node & node, const Scop
 : Scope(scope),
   type(readAttribute<String>("type", node, local())),
   content(readContent<String>(node, local())),
-  command(dispatchCustomCommand(type, content))
+  command(makeCustomCommand(type, content))
 {
 }
 }  // namespace syntax

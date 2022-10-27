@@ -34,6 +34,8 @@ struct SpecialAction : public std::integral_constant<int, Value>
 
 struct CustomCommand
 {
+  const std::vector<std::string> parameters;
+
   CustomCommand() = default;
 
   CustomCommand(const CustomCommand &) = default;
@@ -51,9 +53,6 @@ struct CustomCommand
   virtual auto run() noexcept -> void {}
 
   virtual auto start(const Scope &) -> int { return 0; }
-
-protected:
-  std::vector<std::string> parameters;
 };
 
 /* ---- CustomCommandAction ----------------------------------------------------
