@@ -431,6 +431,12 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
+auto EgoEntity::getDefaultDynamicConstraints() const
+  -> const traffic_simulator_msgs::msg::DynamicConstraints &
+{
+  THROW_SEMANTIC_ERROR("getDefaultDynamicConstraints function does not support EgoEntity");
+}
+
 auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) -> void
 {
 }

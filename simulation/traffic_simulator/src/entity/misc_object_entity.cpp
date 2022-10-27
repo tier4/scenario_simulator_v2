@@ -53,6 +53,13 @@ void MiscObjectEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::B
   THROW_SEMANTIC_ERROR("setBehaviorParameter function does not support in MiscObjectEntity.");
 }
 
+auto MiscObjectEntity::getDefaultDynamicConstraints() const
+  -> const traffic_simulator_msgs::msg::DynamicConstraints &
+{
+  THROW_SEMANTIC_ERROR(
+    "getDefaultDynamicConstraints function does not support in MiscObjectEntity.");
+}
+
 void MiscObjectEntity::requestSpeedChange(double, bool)
 {
   THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");

@@ -224,6 +224,13 @@ void EntityBase::onUpdate(double /*current_time*/, double step_time)
   status_before_update_ = status_;
 }
 
+void EntityBase::resetDynamicConstraints()
+{
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.dynamic_constraints = getDefaultDynamicConstraints();
+  setBehaviorParameter(behavior_parameter);
+}
+
 void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::AbsoluteTarget & target,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
@@ -288,11 +295,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           /**
            * @brief Resets acceleration limit.
            */
-          [this]() {
-            // TODO : @hakuturu583
-            // setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
-          },
-          job::Type::LINEAR_ACCELERATION, true);
+          [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
       } else if (getStatus().action_status.twist.linear.x > target_speed) {
         setDecelerationLimit(std::abs(acceleration));
         job_list_.append(
@@ -305,11 +308,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           /**
            * @brief Resets deceleration limit.
            */
-          [this]() {
-            // TODO : @hakuturu583
-            // setDecelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().deceleration);
-          },
-          job::Type::LINEAR_ACCELERATION, true);
+          [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
       }
       requestSpeedChange(target_speed, continuous);
       break;
@@ -377,11 +376,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
         /**
            * @brief Resets acceleration limit.
            */
-        [this]() {
-          // TODO : @hakuturu583
-          // setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
-        },
-        job::Type::LINEAR_ACCELERATION, true);
+        [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
       requestSpeedChange(target_speed, continuous);
       break;
     }
@@ -426,11 +421,7 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
         /**
            * @brief Resets acceleration limit.
            */
-        [this]() {
-          // TODO : @hakuturu583
-          // setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
-        },
-        job::Type::LINEAR_ACCELERATION, true);
+        [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
       requestSpeedChange(target_speed, false);
       break;
     }

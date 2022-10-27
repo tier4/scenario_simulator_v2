@@ -79,6 +79,9 @@ public:
 
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
+  virtual auto getDefaultDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
+
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const traffic_simulator_msgs::msg::EntityStatus &;
 
@@ -107,6 +110,8 @@ public:
   /*   */ auto isNpcLogicStarted() const -> bool;
 
   virtual void onUpdate(double current_time, double step_time);
+
+  /*   */ void resetDynamicConstraints();
 
   virtual void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) = 0;
 

@@ -61,6 +61,13 @@ auto VehicleEntity::getCurrentAction() const -> std::string
   }
 }
 
+auto VehicleEntity::getDefaultDynamicConstraints() const
+  -> const traffic_simulator_msgs::msg::DynamicConstraints &
+{
+  static auto default_dynamic_constraints = traffic_simulator_msgs::msg::DynamicConstraints();
+  return default_dynamic_constraints;
+}
+
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
   return behavior_plugin_ptr_->getBehaviorParameter();

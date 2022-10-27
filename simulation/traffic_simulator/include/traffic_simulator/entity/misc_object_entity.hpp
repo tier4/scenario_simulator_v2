@@ -33,6 +33,9 @@ public:
 
   auto getCurrentAction() const -> std::string override;
 
+  auto getDefaultDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
+
   auto getEntityTypename() const -> const std::string & override
   {
     static const std::string result = "MiscObjectEntity";

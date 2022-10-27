@@ -70,6 +70,49 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   requestAssignRoute(route);
 }
 
+std::string PedestrianEntity::getCurrentAction() const
+{
+  if (!npc_logic_started_) {
+    return "waiting";
+  }
+  return behavior_plugin_ptr_->getCurrentAction();
+}
+
+auto PedestrianEntity::getDefaultDynamicConstraints() const
+  -> const traffic_simulator_msgs::msg::DynamicConstraints &
+{
+  static auto default_dynamic_constraints = traffic_simulator_msgs::msg::DynamicConstraints();
+  default_dynamic_constraints.max_acceleration = 1.0;
+  default_dynamic_constraints.max_acceleration_rate = 1.0;
+  default_dynamic_constraints.max_deceleration = 1.0;
+  default_dynamic_constraints.max_deceleration_rate = 1.0;
+  return default_dynamic_constraints;
+}
+
+std::vector<std::int64_t> PedestrianEntity::getRouteLanelets(double horizon)
+{
+  if (status_.lanelet_pose_valid) {
+    return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
+  } else {
+    return {};
+  }
+}
+
+boost::optional<traffic_simulator_msgs::msg::Obstacle> PedestrianEntity::getObstacle()
+{
+  return boost::none;
+}
+
+std::vector<traffic_simulator_msgs::msg::LaneletPose> PedestrianEntity::getGoalPoses()
+{
+  return route_planner_ptr_->getGoalPoses();
+}
+
+const traffic_simulator_msgs::msg::WaypointsArray PedestrianEntity::getWaypoints()
+{
+  return traffic_simulator_msgs::msg::WaypointsArray();
+}
+
 void PedestrianEntity::requestWalkStraight()
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::WALK_STRAIGHT);
@@ -99,6 +142,26 @@ void PedestrianEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
   route_planner_ptr_->cancelGoal();
+}
+
+auto PedestrianEntity::getEntityTypename() const -> const std::string &
+{
+  static const std::string result = "PedestrianEntity";
+  return result;
+}
+
+void PedestrianEntity::setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
+{
+  EntityBase::setHdMapUtils(ptr);
+  route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
+  behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
+}
+
+void PedestrianEntity::setTrafficLightManager(
+  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
+{
+  EntityBase::setTrafficLightManager(ptr);
+  behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
 }
 
 auto PedestrianEntity::getBehaviorParameter() const
