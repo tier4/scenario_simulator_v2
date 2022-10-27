@@ -44,7 +44,7 @@ public:
     const math::geometry::CatmullRomSplineInterface & spline);
   boost::optional<std::string> getFrontEntityName(
     const math::geometry::CatmullRomSplineInterface & spline);
-  double calculateStopDistance(double deceleration) const;
+  double calculateStopDistance(const traffic_simulator_msgs::msg::DynamicConstraints &) const;
   boost::optional<double> getDistanceToFrontEntity(
     const math::geometry::CatmullRomSplineInterface & spline);
   boost::optional<double> getDistanceToStopLine(

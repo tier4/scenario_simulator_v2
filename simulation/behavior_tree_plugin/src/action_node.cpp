@@ -365,9 +365,37 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   return false;
 }
 
-double ActionNode::calculateStopDistance(double deceleration) const
+double ActionNode::calculateStopDistance(
+  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
-  return (entity_status.action_status.twist.linear.x * entity_status.action_status.twist.linear.x) /
-         (2 * std::fabs(deceleration));
+  double v = entity_status.action_status.twist.linear.x;
+  /**
+   * @brief When the entity moving forward.
+   */
+  if (v >= 0) {
+    double t = std::sqrt(2 * v) / constraints.max_deceleration_rate;
+    if (t * constraints.max_deceleration_rate <= constraints.max_deceleration) {
+      return (t * t * t) / 6.0 * constraints.max_deceleration_rate;
+    } else {
+      double t1 = constraints.max_deceleration / constraints.max_deceleration_rate;
+      double v1 = v - t1 * constraints.max_deceleration_rate;
+      return (t1 * t1 * t1) / 6.0 * constraints.max_deceleration_rate +
+             (v1 * v1) / (2 * std::fabs(constraints.max_deceleration));
+    }
+  }
+  /**
+   * @brief When the entity moving backward.
+   */
+  else {
+    double t = std::sqrt(2 * v) / constraints.max_acceleration_rate;
+    if (t * constraints.max_acceleration_rate <= constraints.max_acceleration) {
+      return (t * t * t) / 6.0 * constraints.max_acceleration_rate;
+    } else {
+      double t1 = constraints.max_acceleration / constraints.max_acceleration_rate;
+      double v1 = v - t1 * constraints.max_acceleration_rate;
+      return (t1 * t1 * t1) / 6.0 * constraints.max_acceleration_rate +
+             (v1 * v1) / (2 * std::fabs(constraints.max_acceleration));
+    }
+  }
 }
 }  // namespace entity_behavior
