@@ -28,7 +28,7 @@
 #include "rclcpp/logger.hpp"
 #include "spdlog/fmt/fmt.h"
 #include "traffic_simulator/api/configuration.hpp"
-#include "traffic_simulator_msgs/msg/driver_model.hpp"
+#include "traffic_simulator_msgs/msg/behavior_parameter.hpp"
 
 RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 : Node("random_test_runner", option), error_reporter_(get_logger())
@@ -197,6 +197,14 @@ void RandomTestRunner::update()
       test_executors_.size());
     RCLCPP_INFO_STREAM(get_logger(), message);
     current_test_executor_->initialize();
+  }
+  if (!api_->isEgoSpawned() && !api_->isNpcLogicStarted()) {
+    api_->startNpcLogic();
+  }
+  if (
+    api_->isEgoSpawned() && !api_->isNpcLogicStarted() &&
+    api_->asAutoware(api_->getEgoName()).engageable()) {
+    api_->startNpcLogic();
   }
   current_test_executor_->update(api_->getCurrentTime());
 }

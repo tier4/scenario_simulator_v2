@@ -1,4 +1,4 @@
-// Copyright 2015 Autoware Foundation. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/vehicle_model/sim_model_util.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/vertex.hpp>
 
-namespace sim_model_util
+namespace openscenario_interpreter
 {
-double getDummySteerCommandWithFriction(
-  const double steer, const double steer_command, const double deadzone_delta_steer)
+inline namespace syntax
 {
-  const double delta_steer = std::fabs(steer_command - steer);
-  // if delta steer is too small, ignore steer command (send current steer as steer command)
-  if (delta_steer < deadzone_delta_steer) {
-    return steer;
-  }
-  return steer_command;
+Vertex::Vertex(const pugi::xml_node & node, Scope & scope)
+: time(readAttribute<Double>("time", node, scope)),
+  position(readElement<Position>("Position", node, scope))
+{
 }
-
-}  // namespace sim_model_util
+}  // namespace syntax
+}  // namespace openscenario_interpreter

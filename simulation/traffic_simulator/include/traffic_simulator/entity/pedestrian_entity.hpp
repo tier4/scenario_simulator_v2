@@ -51,13 +51,11 @@ public:
   };
 
   explicit PedestrianEntity(
-    const std::string & name,                                   //
-    const traffic_simulator_msgs::msg::PedestrianParameters &,  //
-    const std::string & = BuiltinBehavior::defaultBehavior());
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const traffic_simulator_msgs::msg::PedestrianParameters &,
+    const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 
   ~PedestrianEntity() override = default;
-
-  const traffic_simulator_msgs::msg::PedestrianParameters parameters;
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
 
@@ -92,14 +90,9 @@ public:
     behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
   }
 
-  const traffic_simulator_msgs::msg::BoundingBox getBoundingBox() const override
-  {
-    return parameters.bounding_box;
-  }
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
 
-  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel;
-
-  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &);
+  void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &);
 
   void setAccelerationLimit(double acceleration) override;
 
@@ -110,15 +103,18 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
-  const std::string getCurrentAction() const override
+  std::string getCurrentAction() const override
   {
+    if (!npc_logic_started_) {
+      return "waiting";
+    }
     return behavior_plugin_ptr_->getCurrentAction();
   }
 
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
-    if (status_ and status_->lanelet_pose_valid) {
-      return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
+    if (status_.lanelet_pose_valid) {
+      return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
     } else {
       return {};
     }

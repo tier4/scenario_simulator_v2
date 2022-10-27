@@ -101,20 +101,20 @@ CatalogReference::CatalogReference(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto CatalogReference::make(const pugi::xml_node &) -> const Object
+auto CatalogReference::make() -> const Object
 {
   using ::openscenario_interpreter::make;
 
-  std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
+  const std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> dispatcher{
     // clang-format off
-          std::make_pair("Vehicle",     [&](auto && node) { return make<Vehicle>   (node, scope); }),
-          std::make_pair("Controller",  [&](auto && node) { return make<Controller>(node, scope); }),
-          std::make_pair("Pedestrian",  [&](auto && node) { return make<Pedestrian>(node, scope); }),
-          std::make_pair("MiscObject",  [&](auto && node) { return make<MiscObject>(node, scope); }),
-          std::make_pair("Environment", [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
-          std::make_pair("Maneuver",    [&](auto && node) { return make<Maneuver>  (node, scope); }),
-          std::make_pair("Trajectory",  [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
-          std::make_pair("Route",       [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;})
+    std::make_pair("Vehicle",     [&](auto && node) { return make<Vehicle>   (node, scope); }),
+    std::make_pair("Controller",  [&](auto && node) { return make<Controller>(node, scope); }),
+    std::make_pair("Pedestrian",  [&](auto && node) { return make<Pedestrian>(node, scope); }),
+    std::make_pair("MiscObject",  [&](auto && node) { return make<MiscObject>(node, scope); }),
+    std::make_pair("Environment", [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
+    std::make_pair("Maneuver",    [&](auto && node) { return make<Maneuver>  (node, scope); }),
+    std::make_pair("Trajectory",  [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;}),
+    std::make_pair("Route",       [ ](auto && node) { throw UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(node.name()); return unspecified;})
     // clang-format on
   };
 

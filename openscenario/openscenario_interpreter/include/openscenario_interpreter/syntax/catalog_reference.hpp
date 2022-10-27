@@ -43,9 +43,9 @@ inline namespace syntax
 
 struct CatalogReference
 {
-  CatalogReference(const pugi::xml_node & node, Scope & scope);
+  CatalogReference(const pugi::xml_node &, Scope &);
 
-  auto make(const pugi::xml_node & node) -> const Object;
+  auto make() -> const Object;
 
   Scope scope;
 

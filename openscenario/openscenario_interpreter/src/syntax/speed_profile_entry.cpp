@@ -1,4 +1,4 @@
-// Copyright 2015 Autoware Foundation. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_UTIL_HPP_
-#define TRAFFIC_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_UTIL_HPP_
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/speed_profile_entry.hpp>
 
-#include <math.h>
-
-namespace sim_model_util
+namespace openscenario_interpreter
 {
-double getDummySteerCommandWithFriction(
-  const double steer, const double steer_command, const double deadzone_delta_steer);
+inline namespace syntax
+{
+SpeedProfileEntry::SpeedProfileEntry(const pugi::xml_node & node, Scope & scope)
+: speed(readAttribute<Double>("speed", node, scope)),
+  time(readAttribute<Double>("time", node, scope, Double::nan()))
+{
 }
-
-#endif  // TRAFFIC_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_UTIL_HPP_
+}  // namespace syntax
+}  // namespace openscenario_interpreter
