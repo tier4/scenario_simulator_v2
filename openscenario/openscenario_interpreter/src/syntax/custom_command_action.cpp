@@ -27,9 +27,9 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct ApplyFaultInjection : public ICustomCommand
+struct ApplyFaultInjection : public CustomCommand
 {
-  using ICustomCommand::ICustomCommand;
+  using CustomCommand::CustomCommand;
 
 private:
   static auto node() -> rclcpp::Node &
@@ -80,9 +80,9 @@ public:
   }
 };
 
-struct ApplyWalkStraightAction : public ICustomCommand, private SimulatorCore::ActionApplication
+struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::ActionApplication
 {
-  using ICustomCommand::ICustomCommand;
+  using CustomCommand::CustomCommand;
 
   auto start(const Scope & scope) -> int override
   {
@@ -98,16 +98,16 @@ struct ApplyWalkStraightAction : public ICustomCommand, private SimulatorCore::A
   };
 };
 
-struct DebugError : public ICustomCommand
+struct DebugError : public CustomCommand
 {
-  using ICustomCommand::ICustomCommand;
+  using CustomCommand::CustomCommand;
 
   auto start(const Scope &) -> int override { throw Error(__FILE__, ":", __LINE__); }
 };
 
-struct DebugSegmentationFault : public ICustomCommand
+struct DebugSegmentationFault : public CustomCommand
 {
-  using ICustomCommand::ICustomCommand;
+  using CustomCommand::CustomCommand;
 
   auto start(const Scope &) -> int override
   {
@@ -115,9 +115,9 @@ struct DebugSegmentationFault : public ICustomCommand
   }
 };
 
-struct DummyLongRunningAction : public ICustomCommand, private SimulatorCore::ConditionEvaluation
+struct DummyLongRunningAction : public CustomCommand, private SimulatorCore::ConditionEvaluation
 {
-  using ICustomCommand::ICustomCommand;
+  using CustomCommand::CustomCommand;
 
   auto accomplished() noexcept -> bool override { return end_time < evaluateSimulationTime(); }
 
@@ -153,23 +153,23 @@ private:
   double end_time = std::numeric_limits<double>::max();
 };
 
-struct ExitSuccess : public ICustomCommand
+struct ExitSuccess : public CustomCommand
 {
-  using ICustomCommand::ICustomCommand;
+  using CustomCommand::CustomCommand;
 
   auto start(const Scope &) -> int override { throw SpecialAction<EXIT_SUCCESS>(); }
 };
 
-struct ExitFailure : public ICustomCommand
+struct ExitFailure : public CustomCommand
 {
-  using ICustomCommand::ICustomCommand;
+  using CustomCommand::CustomCommand;
 
   auto start(const Scope &) -> int override { throw SpecialAction<EXIT_FAILURE>(); }
 };
 
-struct PrintParameter : public ICustomCommand
+struct PrintParameter : public CustomCommand
 {
-  using ICustomCommand::ICustomCommand;
+  using CustomCommand::CustomCommand;
 
   auto start(const Scope & scope) -> int override
   {
@@ -181,9 +181,9 @@ struct PrintParameter : public ICustomCommand
   }
 };
 
-struct TestCommand : public ICustomCommand
+struct TestCommand : public CustomCommand
 {
-  using ICustomCommand::ICustomCommand;
+  using CustomCommand::CustomCommand;
 
   auto start(const Scope &) -> int override
   {
@@ -198,7 +198,7 @@ struct TestCommand : public ICustomCommand
   }
 };
 
-struct ForkExecCommand : public ICustomCommand
+struct ForkExecCommand : public CustomCommand
 {
   ForkExecCommand(const std::string & type, const std::string & content)
   : type(type), content(content)
@@ -212,20 +212,18 @@ private:
   std::string content;
 };
 
-namespace
-{
 auto dispatchCustomCommand(const std::string & type, const std::string & content)
-  -> std::shared_ptr<ICustomCommand>
+  -> std::shared_ptr<CustomCommand>
 {
   std::smatch result{};
 
-#define ELEMENT(NAME, TYPE)                                                  \
-  std::make_pair(NAME, [](std::vector<std::string> parameters) {             \
-    return std::shared_ptr<ICustomCommand>(new TYPE(std::move(parameters))); \
+#define ELEMENT(NAME, TYPE)                                                 \
+  std::make_pair(NAME, [](std::vector<std::string> parameters) {            \
+    return std::shared_ptr<CustomCommand>(new TYPE(std::move(parameters))); \
   })
 
   static const std::unordered_map<
-    std::string, std::function<std::shared_ptr<ICustomCommand>(std::vector<std::string>)>>
+    std::string, std::function<std::shared_ptr<CustomCommand>(std::vector<std::string>)>>
     commands{
       ELEMENT("FaultInjectionAction", ApplyFaultInjection),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
@@ -240,7 +238,7 @@ auto dispatchCustomCommand(const std::string & type, const std::string & content
 #undef ELEMENT
 
   if (type == ":") {
-    return std::make_shared<ICustomCommand>();
+    return std::make_shared<CustomCommand>();
   } else if (
     std::regex_match(type, result, FunctionCallExpression::pattern()) and
     commands.find(result[1]) != std::end(commands)) {
@@ -249,13 +247,12 @@ auto dispatchCustomCommand(const std::string & type, const std::string & content
     return std::make_shared<ForkExecCommand>(type, content);
   }
 }
-}  // namespace
 
 CustomCommandAction::CustomCommandAction(const pugi::xml_node & node, const Scope & scope)
 : Scope(scope),
   type(readAttribute<String>("type", node, local())),
   content(readContent<String>(node, local())),
-  entity(dispatchCustomCommand(type, content))
+  command(dispatchCustomCommand(type, content))
 {
 }
 }  // namespace syntax

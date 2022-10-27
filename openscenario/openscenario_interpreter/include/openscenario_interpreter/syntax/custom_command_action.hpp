@@ -32,17 +32,17 @@ struct SpecialAction : public std::integral_constant<int, Value>
 {
 };
 
-struct ICustomCommand
+struct CustomCommand
 {
-  ICustomCommand() = default;
+  CustomCommand() = default;
 
-  ICustomCommand(const ICustomCommand &) = default;
+  CustomCommand(const CustomCommand &) = default;
 
-  ICustomCommand(ICustomCommand &&) = default;
+  CustomCommand(CustomCommand &&) = default;
 
-  ICustomCommand(std::vector<std::string> parameters) : parameters(std::move(parameters)) {}
+  CustomCommand(std::vector<std::string> parameters) : parameters(std::move(parameters)) {}
 
-  virtual ~ICustomCommand() = default;
+  virtual ~CustomCommand() = default;
 
   virtual auto accomplished() noexcept -> bool { return true; }
 
@@ -74,18 +74,18 @@ struct CustomCommandAction : private Scope
   const String content;
 
 private:
-  std::shared_ptr<ICustomCommand> entity;
+  const std::shared_ptr<CustomCommand> command;
 
 public:
   explicit CustomCommandAction(const pugi::xml_node &, const Scope &);
 
-  auto accomplished() noexcept -> bool { return entity->accomplished(); }
+  auto accomplished() noexcept -> bool { return command->accomplished(); }
 
-  auto endsImmediately() const -> bool { return entity->endsImmediately(); }
+  auto endsImmediately() const -> bool { return command->endsImmediately(); }
 
-  auto run() noexcept -> void { return entity->run(); }
+  auto run() noexcept -> void { return command->run(); }
 
-  auto start() -> void { entity->start(local()); }
+  auto start() -> void { command->start(local()); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
