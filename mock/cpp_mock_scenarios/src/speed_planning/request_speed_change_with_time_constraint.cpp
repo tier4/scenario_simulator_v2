@@ -41,7 +41,7 @@ public:
 private:
   void onUpdate() override
   {
-    std::cout << api_.getEntityStatus("ego").action_status.twist.linear.x << std::endl;
+    std::cout << api_.getCurrentTime() << "," << api_.getEntityStatus("ego").action_status.twist.linear.x << std::endl;
     if (
       api_.getCurrentTime() <= 3.9 &&
       api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {
@@ -60,7 +60,7 @@ private:
   {
     api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
-    RCLCPP_ERROR_STREAM(get_logger(), rosidl_generator_traits::to_yaml(api_.getBehaviorParameter("ego")));
+    // RCLCPP_ERROR_STREAM(get_logger(), rosidl_generator_traits::to_yaml(api_.getBehaviorParameter("ego")));
     api_.setLinearVelocity("ego", 0);
     api_.requestSpeedChange(
       "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
