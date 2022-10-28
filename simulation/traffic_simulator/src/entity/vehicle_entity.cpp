@@ -232,6 +232,16 @@ void VehicleEntity::setAccelerationLimit(double acceleration)
   setBehaviorParameter(behavior_parameter);
 }
 
+void VehicleEntity::setAccelerationRateLimit(double acceleration_rate)
+{
+  if (acceleration_rate <= 0.0) {
+    THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
+  }
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.dynamic_constraints.max_acceleration_rate = acceleration_rate;
+  setBehaviorParameter(behavior_parameter);
+}
+
 void VehicleEntity::setDecelerationLimit(double deceleration)
 {
   if (deceleration <= 0.0) {
@@ -239,6 +249,16 @@ void VehicleEntity::setDecelerationLimit(double deceleration)
   }
   auto behavior_parameter = getBehaviorParameter();
   behavior_parameter.dynamic_constraints.max_deceleration = deceleration;
+  setBehaviorParameter(behavior_parameter);
+}
+
+void VehicleEntity::setDecelerationRateLimit(double deceleration_rate)
+{
+  if (deceleration_rate <= 0.0) {
+    THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
+  }
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.dynamic_constraints.max_deceleration_rate = deceleration_rate;
   setBehaviorParameter(behavior_parameter);
 }
 

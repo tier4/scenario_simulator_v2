@@ -149,7 +149,11 @@ public:
 
   virtual void setAccelerationLimit(double acceleration) = 0;
 
+  virtual void setAccelerationRateLimit(double acceleration_rate) = 0;
+
   virtual void setDecelerationLimit(double deceleration) = 0;
+
+  virtual void setDecelerationRateLimit(double deceleration_rate) = 0;
 
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
 

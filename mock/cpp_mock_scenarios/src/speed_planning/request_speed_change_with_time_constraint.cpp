@@ -41,6 +41,7 @@ public:
 private:
   void onUpdate() override
   {
+    std::cout << api_.getEntityStatus("ego").action_status.twist.linear.x << std::endl;
     if (
       api_.getCurrentTime() <= 3.9 &&
       api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {

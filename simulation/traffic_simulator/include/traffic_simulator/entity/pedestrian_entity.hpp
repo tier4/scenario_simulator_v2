@@ -83,7 +83,11 @@ public:
 
   void setAccelerationLimit(double acceleration) override;
 
+  void setAccelerationRateLimit(double acceleration_rate) override;
+
   void setDecelerationLimit(double deceleration) override;
+
+  void setDecelerationRateLimit(double deceleration) override;
 
   void requestAssignRoute(
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) override;

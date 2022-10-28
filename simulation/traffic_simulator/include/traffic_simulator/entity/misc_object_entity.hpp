@@ -98,7 +98,11 @@ public:
 
   void setAccelerationLimit(double) override {}
 
+  void setAccelerationRateLimit(double) override {}
+
   void setDecelerationLimit(double) override {}
+
+  void setDecelerationRateLimit(double) override {}
 };
 }  // namespace entity
 }  // namespace traffic_simulator
