@@ -38,9 +38,9 @@ inline namespace syntax
 struct Story : public Scope, public StoryboardElement
 {
   explicit Story(const pugi::xml_node &, Scope &);
-};
 
-auto operator<<(nlohmann::json &, const Story &) -> nlohmann::json &;
+  friend auto operator<<(nlohmann::json &, const Story &) -> nlohmann::json &;
+};
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
