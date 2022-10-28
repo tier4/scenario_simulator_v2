@@ -18,6 +18,7 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/action.hpp>
+#include <openscenario_interpreter/syntax/maneuver.hpp>
 #include <openscenario_interpreter/syntax/priority.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <openscenario_interpreter/syntax/trigger.hpp>
@@ -46,12 +47,16 @@ struct Event : private Scope, public StoryboardElement
 
   const Priority priority;  // Priority of each event.
 
-  explicit Event(const pugi::xml_node &, Scope &);
+  explicit Event(const pugi::xml_node &, Scope &, Maneuver &);
 
   auto start() -> void override;
+
+  friend auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;
+
+private:
+  Maneuver & parent_maneuver;
 };
 
-auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
