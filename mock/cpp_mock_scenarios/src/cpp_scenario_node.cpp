@@ -95,4 +95,11 @@ void CppScenarioNode::checkConfiguration(const traffic_simulator::Configuration 
     stop(Result::FAILURE);
   }
 }
+
+void CppScenarioNode::expectTrue(bool value)
+{
+  if (value) {
+    stop(Result::FAILURE);
+  }
+}
 }  // namespace cpp_mock_scenarios
