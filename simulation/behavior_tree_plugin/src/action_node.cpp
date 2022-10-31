@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <geometry/bounding_box.hpp>
+#include <geometry/linear_algebra.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -365,7 +366,7 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   return false;
 }
 
-double ActionNode::planJerk(
+double ActionNode::planLinearJerk(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
   double accel_x_new = 0;
@@ -384,6 +385,22 @@ double ActionNode::planJerk(
         (target_speed - entity_status.action_status.twist.linear.x) / step_time));
   }
   return (accel_x_new - entity_status.action_status.twist.linear.x) / step_time;
+}
+
+geometry_msgs::msg::Accel ActionNode::planAccel(
+  double linear_jerk, const geometry_msgs::msg::Accel & accel) const
+{
+  geometry_msgs::msg::Accel ret = accel;
+  ret.linear.x = accel.linear.x + step_time * linear_jerk;
+  return ret;
+}
+
+geometry_msgs::msg::Twist ActionNode::planTwist(
+  const geometry_msgs::msg::Accel & accel, const geometry_msgs::msg::Twist & twist) const
+{
+  geometry_msgs::msg::Twist ret = twist;
+  ret.linear + accel.linear * step_time;
+  return ret;
 }
 
 traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
