@@ -39,7 +39,6 @@ public:
   void stop(Result result, const std::string & description = "");
   void expectThrow() { exception_expect_ = true; }
   void expectNoThrow() { exception_expect_ = false; }
-  void expectTrue(bool value, bool finis_on_success = false);
 
 protected:
   traffic_simulator::API api_;
