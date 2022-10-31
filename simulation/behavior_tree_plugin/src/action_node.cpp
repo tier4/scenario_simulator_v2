@@ -394,7 +394,7 @@ geometry_msgs::msg::Accel ActionNode::planAccel(
   geometry_msgs::msg::Accel ret = accel;
   ret.linear.x = accel.linear.x + step_time * linear_jerk;
   ret.linear.x = boost::algorithm::clamp(
-    ret.linear.linear.x, constraints.max_deceleration * -1, constraints.max_acceleration);
+    ret.linear.x, constraints.max_deceleration * -1, constraints.max_acceleration);
   return ret;
 }
 
@@ -404,25 +404,28 @@ geometry_msgs::msg::Twist ActionNode::planTwist(
 {
   geometry_msgs::msg::Twist ret = twist;
   ret.linear = ret.linear + accel.linear * step_time;
-  ret.linear.x = boost::algorithm::clamp(ret.linear.linear.x, -10, constraints.max_speed);
+  ret.linear.x = boost::algorithm::clamp(ret.linear.x, -10, constraints.max_speed);
   ret.angular = ret.angular + accel.angular * step_time;
+  return ret;
+}
+
+geometry_msgs::msg::Accel ActionNode::timeDerivative(
+  const geometry_msgs::msg::Twist & before, const geometry_msgs::msg::Twist & after) const
+{
+  geometry_msgs::msg::Accel ret;
+  ret.linear = (after.linear - before.linear) / step_time;
+  ret.angular = (after.angular - before.angular) / step_time;
   return ret;
 }
 
 traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
-  double liner_jerk_new = planLinearJerk(target_speed, constraints);
-  geometry_msgs::msg::Accel accel_new = planAccel(linear_jerk, entity_status.action_status.accel);
-  geometry_msgs::msg::Twist twist_new;
-  twist_new.linear.x = boost::algorithm::clamp(
-    entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10,
-    constraints.max_speed);
-  twist_new.linear.y = 0.0;
-  twist_new.linear.z = 0.0;
-  twist_new.angular.x = 0.0;
-  twist_new.angular.y = 0.0;
-  twist_new.angular.z = 0.0;
+  double linear_jerk_new = planLinearJerk(target_speed, constraints);
+  geometry_msgs::msg::Accel accel_new =
+    planAccel(linear_jerk_new, entity_status.action_status.accel, constraints);
+  geometry_msgs::msg::Twist twist_new =
+    planTwist(accel_new, entity_status.action_status.twist, constraints);
   std::int64_t new_lanelet_id = entity_status.lanelet_pose.lanelet_id;
   double new_s =
     entity_status.lanelet_pose.s +
@@ -440,7 +443,7 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
     entity_status_updated.lanelet_pose.rpy = entity_status.lanelet_pose.rpy;
     entity_status_updated.action_status.twist = twist_new;
     entity_status_updated.action_status.accel = accel_new;
-    entity_status_updated.action_status.linear_jerk = liner_jerk_new;
+    entity_status_updated.action_status.linear_jerk = linear_jerk_new;
     entity_status_updated.pose = hdmap_utils->toMapPose(entity_status_updated.lanelet_pose).pose;
     return entity_status_updated;
   } else {
@@ -479,7 +482,7 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
     entity_status_updated.pose = hdmap_utils->toMapPose(entity_status_updated.lanelet_pose).pose;
     entity_status_updated.action_status.twist = twist_new;
     entity_status_updated.action_status.accel = accel_new;
-    entity_status_updated.action_status.linear_jerk = liner_jerk_new;
+    entity_status_updated.action_status.linear_jerk = linear_jerk_new;
     return entity_status_updated;
   }
   THROW_SIMULATION_ERROR("failed to calculate next status calculateEntityStatusUpdated function");
