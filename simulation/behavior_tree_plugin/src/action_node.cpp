@@ -371,30 +371,19 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
 {
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;
-  // double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
-    accel_new.linear.x = accel_new.linear.x - step_time * constraints.max_deceleration_rate;
     accel_new.linear.x = boost::algorithm::clamp(
-      accel_new.linear.x,
+      entity_status.action_status.accel.linear.x - step_time * constraints.max_deceleration_rate,
       std::max(
         constraints.max_deceleration * -1,
         (target_speed - entity_status.action_status.twist.linear.x) / step_time),
       0);
-    /*
-    target_accel = target_accel - step_time * constraints.max_deceleration_rate;
-    target_accel = boost::algorithm::clamp(target_accel, constraints.max_deceleration * -1, 0);
-    */
   } else {
-    accel_new.linear.x = accel_new.linear.x + step_time * constraints.max_acceleration_rate;
     accel_new.linear.x = boost::algorithm::clamp(
-      accel_new.linear.x, 0,
+      entity_status.action_status.accel.linear.x + step_time * constraints.max_acceleration_rate, 0,
       std::min(
         constraints.max_acceleration,
         (target_speed - entity_status.action_status.twist.linear.x) / step_time));
-    /*
-    target_accel = target_accel + step_time * constraints.max_acceleration_rate;
-    target_accel = boost::algorithm::clamp(target_accel, 0, constraints.max_acceleration);
-    */
   }
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = boost::algorithm::clamp(
