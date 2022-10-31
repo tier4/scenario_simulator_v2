@@ -365,6 +365,27 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   return false;
 }
 
+double ActionNode::planJerk(
+  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
+{
+  double accel_x_new = 0;
+  if (entity_status.action_status.twist.linear.x > target_speed) {
+    accel_x_new = boost::algorithm::clamp(
+      entity_status.action_status.twist.linear.x - step_time * constraints.max_deceleration_rate,
+      std::max(
+        constraints.max_deceleration * -1,
+        (target_speed - entity_status.action_status.twist.linear.x) / step_time),
+      0);
+  } else {
+    accel_x_new = boost::algorithm::clamp(
+      entity_status.action_status.accel.linear.x + step_time * constraints.max_acceleration_rate, 0,
+      std::min(
+        constraints.max_acceleration,
+        (target_speed - entity_status.action_status.twist.linear.x) / step_time));
+  }
+  return (accel_x_new - entity_status.action_status.twist.linear.x) / step_time;
+}
+
 traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
