@@ -107,12 +107,13 @@ public:
     double width_extension_right = 0.0, double width_extension_left = 0.0,
     double length_extension_front = 0.0, double length_extension_rear = 0.0);
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(
-    double target_speed, double max_speed,
-    const traffic_simulator_msgs::msg::DynamicConstraints &) const;
+    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const;
   traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const;
 
 private:
+  double planJerk(
+    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const;
   boost::optional<double> getDistanceToTargetEntityOnCrosswalk(
     const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator_msgs::msg::EntityStatus & status);

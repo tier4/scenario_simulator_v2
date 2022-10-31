@@ -366,8 +366,7 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
 }
 
 traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
-  double target_speed, double max_speed,
-  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
+  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;
@@ -389,7 +388,8 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
     (accel_new.linear.x - entity_status.action_status.twist.linear.x) / step_time;
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = boost::algorithm::clamp(
-    entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10, max_speed);
+    entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10,
+    constraints.max_speed);
   twist_new.linear.y = 0.0;
   twist_new.linear.z = 0.0;
   twist_new.angular.x = 0.0;

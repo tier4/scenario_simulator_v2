@@ -47,7 +47,7 @@ traffic_simulator_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStat
   double target_speed)
 {
   return ActionNode::calculateEntityStatusUpdated(
-    target_speed, vehicle_parameters.performance.max_speed, behavior_parameter.dynamic_constraints);
+    target_speed, behavior_parameter.dynamic_constraints);
 }
 
 traffic_simulator_msgs::msg::EntityStatus

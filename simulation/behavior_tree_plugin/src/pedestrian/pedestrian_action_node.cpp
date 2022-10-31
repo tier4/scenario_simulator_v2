@@ -43,6 +43,6 @@ traffic_simulator_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityS
   double target_speed)
 {
   return ActionNode::calculateEntityStatusUpdated(
-    target_speed, 10, behavior_parameter.dynamic_constraints);
+    target_speed, behavior_parameter.dynamic_constraints);
 }
 }  // namespace entity_behavior
