@@ -388,42 +388,32 @@ double ActionNode::planLinearJerk(
 }
 
 geometry_msgs::msg::Accel ActionNode::planAccel(
-  double linear_jerk, const geometry_msgs::msg::Accel & accel) const
+  double linear_jerk, const geometry_msgs::msg::Accel & accel,
+  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
   geometry_msgs::msg::Accel ret = accel;
   ret.linear.x = accel.linear.x + step_time * linear_jerk;
+  ret.linear.x = boost::algorithm::clamp(
+    ret.linear.linear.x, constraints.max_deceleration * -1, constraints.max_acceleration);
   return ret;
 }
 
 geometry_msgs::msg::Twist ActionNode::planTwist(
-  const geometry_msgs::msg::Accel & accel, const geometry_msgs::msg::Twist & twist) const
+  const geometry_msgs::msg::Accel & accel, const geometry_msgs::msg::Twist & twist,
+  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
   geometry_msgs::msg::Twist ret = twist;
-  ret.linear + accel.linear * step_time;
+  ret.linear = ret.linear + accel.linear * step_time;
+  ret.linear.x = boost::algorithm::clamp(ret.linear.linear.x, -10, constraints.max_speed);
+  ret.angular = ret.angular + accel.angular * step_time;
   return ret;
 }
 
 traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
-  geometry_msgs::msg::Accel accel_new;
-  accel_new = entity_status.action_status.accel;
-  if (entity_status.action_status.twist.linear.x > target_speed) {
-    accel_new.linear.x = boost::algorithm::clamp(
-      entity_status.action_status.accel.linear.x - step_time * constraints.max_deceleration_rate,
-      std::max(
-        constraints.max_deceleration * -1,
-        (target_speed - entity_status.action_status.twist.linear.x) / step_time),
-      0);
-  } else {
-    accel_new.linear.x = boost::algorithm::clamp(
-      entity_status.action_status.accel.linear.x + step_time * constraints.max_acceleration_rate, 0,
-      std::min(
-        constraints.max_acceleration,
-        (target_speed - entity_status.action_status.twist.linear.x) / step_time));
-  }
-  double liner_jerk_new =
-    (accel_new.linear.x - entity_status.action_status.twist.linear.x) / step_time;
+  double liner_jerk_new = planLinearJerk(target_speed, constraints);
+  geometry_msgs::msg::Accel accel_new = planAccel(linear_jerk, entity_status.action_status.accel);
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = boost::algorithm::clamp(
     entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10,
