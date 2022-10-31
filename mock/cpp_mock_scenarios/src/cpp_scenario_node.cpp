@@ -98,7 +98,7 @@ void CppScenarioNode::checkConfiguration(const traffic_simulator::Configuration 
 
 void CppScenarioNode::expectTrue(bool value)
 {
-  if (value) {
+  if (!value) {
     stop(Result::FAILURE);
   }
 }
