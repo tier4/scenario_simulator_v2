@@ -14,8 +14,8 @@
 
 #include <boost/algorithm/clamp.hpp>
 #include <geometry/linear_algebra.hpp>
-#include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <iostream>
+#include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 
 namespace traffic_simulator
 {
@@ -30,11 +30,67 @@ LongitudinalSpeedPlanner::getDynamicStates(
   const geometry_msgs::msg::Accel & current_accel) const
 {
   double linear_jerk = planLinearJerk(target_speed, constraints, current_twist, current_accel);
-  auto accel = planAccel(linear_jerk, current_accel, constraints);
-  auto twist = planTwist(accel, current_twist, constraints);
+  auto accel = forward(linear_jerk, current_accel, constraints);
+  auto twist = forward(accel, current_twist, constraints);
   accel = timeDerivative(current_twist, twist);
   linear_jerk = timeDerivative(current_accel, accel);
   return std::make_tuple(twist, accel, linear_jerk);
+}
+
+double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
+  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
+  const geometry_msgs::msg::Twist & current_twist,
+  const geometry_msgs::msg::Accel & current_accel) const
+{
+  if (isAccelerating(target_speed, current_twist)) {
+    double duration =
+      (constraints.max_acceleration - current_accel.linear.x) / constraints.max_acceleration_rate;
+    double v = 0.5 * constraints.max_acceleration_rate * duration * duration +
+               current_accel.linear.x * duration;
+    if (constraints.max_speed <= std::abs(v)) {
+      return duration;
+    } else {
+      return (-current_accel.linear.x +
+              std::sqrt(
+                current_accel.linear.x * current_accel.linear.x +
+                2 * constraints.max_acceleration_rate * constraints.max_speed)) /
+             constraints.max_acceleration_rate;
+    }
+  } else {
+    double duration =
+      (current_accel.linear.x - constraints.max_deceleration) / constraints.max_deceleration_rate;
+    double v = -0.5 * constraints.max_deceleration_rate * duration * duration +
+               current_accel.linear.x * duration;
+    if (constraints.max_speed <= std::abs(v)) {
+      return duration;
+    } else {
+      return (-current_accel.linear.x +
+              std::sqrt(
+                current_accel.linear.x * current_accel.linear.x +
+                2 * constraints.max_deceleration_rate * constraints.max_speed)) /
+             constraints.max_deceleration_rate;
+    }
+  }
+}
+
+double LongitudinalSpeedPlanner::getLinearAccelerationDuration(
+  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
+  const geometry_msgs::msg::Twist & current_twist,
+  const geometry_msgs::msg::Accel & current_accel) const
+{
+  const double quad_duration =
+    getQuadraticAccelerationDuration(target_speed, constraints, current_twist, current_accel);
+  // const auto v = quad_duration *
+  return quad_duration;
+}
+
+bool LongitudinalSpeedPlanner::isAccelerating(
+  double target_speed, const geometry_msgs::msg::Twist & current_twist) const
+{
+  if (current_twist.linear.x > target_speed) {
+    return false;
+  }
+  return true;
 }
 
 double LongitudinalSpeedPlanner::planLinearJerk(
@@ -43,21 +99,21 @@ double LongitudinalSpeedPlanner::planLinearJerk(
   const geometry_msgs::msg::Accel & current_accel) const
 {
   double accel_x_new = 0;
-  if (current_twist.linear.x > target_speed) {
+  if (isAccelerating(target_speed, current_twist)) {
+    accel_x_new = boost::algorithm::clamp(
+      current_accel.linear.x + step_time * constraints.max_acceleration_rate, 0,
+      std::min(constraints.max_acceleration, (target_speed - current_twist.linear.x) / step_time));
+  } else {
     accel_x_new = boost::algorithm::clamp(
       current_twist.linear.x - step_time * constraints.max_deceleration_rate,
       std::max(
         constraints.max_deceleration * -1, (target_speed - current_twist.linear.x) / step_time),
       0);
-  } else {
-    accel_x_new = boost::algorithm::clamp(
-      current_accel.linear.x + step_time * constraints.max_acceleration_rate, 0,
-      std::min(constraints.max_acceleration, (target_speed - current_twist.linear.x) / step_time));
   }
   return (accel_x_new - current_accel.linear.x) / step_time;
 }
 
-geometry_msgs::msg::Accel LongitudinalSpeedPlanner::planAccel(
+geometry_msgs::msg::Accel LongitudinalSpeedPlanner::forward(
   double linear_jerk, const geometry_msgs::msg::Accel & accel,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
@@ -68,13 +124,14 @@ geometry_msgs::msg::Accel LongitudinalSpeedPlanner::planAccel(
   return ret;
 }
 
-geometry_msgs::msg::Twist LongitudinalSpeedPlanner::planTwist(
+geometry_msgs::msg::Twist LongitudinalSpeedPlanner::forward(
   const geometry_msgs::msg::Accel & accel, const geometry_msgs::msg::Twist & twist,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
   geometry_msgs::msg::Twist ret = twist;
   ret.linear = ret.linear + accel.linear * step_time;
-  ret.linear.x = boost::algorithm::clamp(ret.linear.x, -10, constraints.max_speed);
+  ret.linear.x =
+    boost::algorithm::clamp(ret.linear.x, -1 * constraints.max_speed, constraints.max_speed);
   ret.angular = ret.angular + accel.angular * step_time;
   return ret;
 }
