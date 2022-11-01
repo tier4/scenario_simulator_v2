@@ -384,7 +384,7 @@ double ActionNode::planLinearJerk(
         constraints.max_acceleration,
         (target_speed - entity_status.action_status.twist.linear.x) / step_time));
   }
-  return (accel_x_new - entity_status.action_status.twist.linear.x) / step_time;
+  return (accel_x_new - entity_status.action_status.accel.linear.x) / step_time;
 }
 
 geometry_msgs::msg::Accel ActionNode::planAccel(

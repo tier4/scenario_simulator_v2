@@ -226,9 +226,11 @@ void EntityBase::onUpdate(double /*current_time*/, double step_time)
 
 void EntityBase::resetDynamicConstraints()
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   auto behavior_parameter = getBehaviorParameter();
   behavior_parameter.dynamic_constraints = getDefaultDynamicConstraints();
   setBehaviorParameter(behavior_parameter);
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
 }
 
 void EntityBase::requestLaneChange(
