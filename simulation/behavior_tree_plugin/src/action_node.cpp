@@ -378,8 +378,6 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
-  std::cout << entity_status.name << "," << target_speed << "," << twist_new.linear.x << std::endl;
-  std::cout << "accel : " << accel_new.linear.x << "," << linear_jerk_new << std::endl;
 
   std::int64_t new_lanelet_id = entity_status.lanelet_pose.lanelet_id;
   double new_s =

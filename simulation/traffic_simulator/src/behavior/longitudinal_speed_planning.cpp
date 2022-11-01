@@ -32,8 +32,8 @@ LongitudinalSpeedPlanner::getDynamicStates(
   double linear_jerk = planLinearJerk(target_speed, constraints, current_twist, current_accel);
   auto accel = planAccel(linear_jerk, current_accel, constraints);
   auto twist = planTwist(accel, current_twist, constraints);
-  // accel = timeDerivative(current_twist, twist);
-  // linear_jerk = timeDerivative(current_accel, accel);
+  accel = timeDerivative(current_twist, twist);
+  linear_jerk = timeDerivative(current_accel, accel);
   return std::make_tuple(twist, accel, linear_jerk);
 }
 
