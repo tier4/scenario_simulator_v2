@@ -15,6 +15,7 @@
 #include <boost/algorithm/clamp.hpp>
 #include <geometry/linear_algebra.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
+#include <iostream>
 
 namespace traffic_simulator
 {
@@ -23,7 +24,7 @@ namespace longitudinal_speed_planning
 LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(double step_time) : step_time(step_time) {}
 
 std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
-LongitudinalSpeedPlanner::getDynamicState(
+LongitudinalSpeedPlanner::getDynamicStates(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist,
   const geometry_msgs::msg::Accel & current_accel) const
@@ -31,8 +32,8 @@ LongitudinalSpeedPlanner::getDynamicState(
   double linear_jerk = planLinearJerk(target_speed, constraints, current_twist, current_accel);
   auto accel = planAccel(linear_jerk, current_accel, constraints);
   auto twist = planTwist(accel, current_twist, constraints);
-  accel = timeDerivative(twist, current_twist);
-  linear_jerk = timeDerivative(accel, current_accel);
+  // accel = timeDerivative(current_twist, twist);
+  // linear_jerk = timeDerivative(current_accel, accel);
   return std::make_tuple(twist, accel, linear_jerk);
 }
 

@@ -27,7 +27,7 @@ class LongitudinalSpeedPlanner
 {
 public:
   explicit LongitudinalSpeedPlanner(double step_time);
-  std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double> getDynamicState(
+  std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double> getDynamicStates(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;

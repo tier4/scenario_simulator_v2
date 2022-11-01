@@ -22,6 +22,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
+#include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -368,13 +369,17 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
 traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
-  double linear_jerk_new = planLinearJerk(target_speed, constraints);
-  geometry_msgs::msg::Accel accel_new =
-    planAccel(linear_jerk_new, entity_status.action_status.accel, constraints);
-  geometry_msgs::msg::Twist twist_new =
-    planTwist(accel_new, entity_status.action_status.twist, constraints);
-  accel_new = timeDerivative(twist_new, entity_status.action_status.twist);
-  linear_jerk_new = timeDerivative(accel_new, entity_status.action_status.accel);
+  const auto speed_planner =
+    traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(step_time);
+  const auto dynamics = speed_planner.getDynamicStates(
+    target_speed, constraints, entity_status.action_status.twist,
+    entity_status.action_status.accel);
+
+  double linear_jerk_new = std::get<2>(dynamics);
+  geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
+  geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
+  std::cout << entity_status.name << "," << target_speed << "," << twist_new.linear.x << std::endl;
+  std::cout << "accel : " << accel_new.linear.x << "," << linear_jerk_new << std::endl;
 
   std::int64_t new_lanelet_id = entity_status.lanelet_pose.lanelet_id;
   double new_s =

@@ -48,7 +48,8 @@ private:
     }
     if (
       api_.getCurrentTime() >= 3.0 &&
-      api_.getEntityStatus("front").action_status.twist.linear.x <= 6.0) {
+      api_.getEntityStatus("front").action_status.twist.linear.x <= 6.0 &&
+      api_.getEntityStatus("front").action_status.twist.linear.x >= 5.9) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
