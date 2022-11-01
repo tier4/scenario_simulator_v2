@@ -141,6 +141,7 @@ private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
   std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
+  std::vector<geometry_msgs::msg::Pose> goal_poses_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
