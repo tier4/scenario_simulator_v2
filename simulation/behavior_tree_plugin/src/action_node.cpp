@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <geometry/bounding_box.hpp>
-#include <geometry/linear_algebra.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -364,64 +363,6 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
     }
   }
   return false;
-}
-
-double ActionNode::planLinearJerk(
-  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
-{
-  double accel_x_new = 0;
-  if (entity_status.action_status.twist.linear.x > target_speed) {
-    accel_x_new = boost::algorithm::clamp(
-      entity_status.action_status.twist.linear.x - step_time * constraints.max_deceleration_rate,
-      std::max(
-        constraints.max_deceleration * -1,
-        (target_speed - entity_status.action_status.twist.linear.x) / step_time),
-      0);
-  } else {
-    accel_x_new = boost::algorithm::clamp(
-      entity_status.action_status.accel.linear.x + step_time * constraints.max_acceleration_rate, 0,
-      std::min(
-        constraints.max_acceleration,
-        (target_speed - entity_status.action_status.twist.linear.x) / step_time));
-  }
-  return (accel_x_new - entity_status.action_status.accel.linear.x) / step_time;
-}
-
-geometry_msgs::msg::Accel ActionNode::planAccel(
-  double linear_jerk, const geometry_msgs::msg::Accel & accel,
-  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
-{
-  geometry_msgs::msg::Accel ret = accel;
-  ret.linear.x = accel.linear.x + step_time * linear_jerk;
-  ret.linear.x = boost::algorithm::clamp(
-    ret.linear.x, constraints.max_deceleration * -1, constraints.max_acceleration);
-  return ret;
-}
-
-geometry_msgs::msg::Twist ActionNode::planTwist(
-  const geometry_msgs::msg::Accel & accel, const geometry_msgs::msg::Twist & twist,
-  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
-{
-  geometry_msgs::msg::Twist ret = twist;
-  ret.linear = ret.linear + accel.linear * step_time;
-  ret.linear.x = boost::algorithm::clamp(ret.linear.x, -10, constraints.max_speed);
-  ret.angular = ret.angular + accel.angular * step_time;
-  return ret;
-}
-
-geometry_msgs::msg::Accel ActionNode::timeDerivative(
-  const geometry_msgs::msg::Twist & before, const geometry_msgs::msg::Twist & after) const
-{
-  geometry_msgs::msg::Accel ret;
-  ret.linear = (after.linear - before.linear) / step_time;
-  ret.angular = (after.angular - before.angular) / step_time;
-  return ret;
-}
-
-double ActionNode::timeDerivative(
-  const geometry_msgs::msg::Accel & before, const geometry_msgs::msg::Accel & after) const
-{
-  return (after.linear.x - before.linear.x) / step_time;
 }
 
 traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
