@@ -24,11 +24,16 @@ LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(double step_time) : step_time
 
 std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
 LongitudinalSpeedPlanner::getDynamicState(
-  double /*target_speed*/, const traffic_simulator_msgs::msg::DynamicConstraints &,
-  const geometry_msgs::msg::Twist & /*current_twist*/,
-  const geometry_msgs::msg::Accel & /*current_accel*/) const
+  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
+  const geometry_msgs::msg::Twist & current_twist,
+  const geometry_msgs::msg::Accel & current_accel) const
 {
-  return std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>();
+  double linear_jerk = planLinearJerk(target_speed, constraints, current_twist, current_accel);
+  auto accel = planAccel(linear_jerk, current_accel, constraints);
+  auto twist = planTwist(accel, current_twist, constraints);
+  accel = timeDerivative(twist, current_twist);
+  linear_jerk = timeDerivative(accel, current_accel);
+  return std::make_tuple(twist, accel, linear_jerk);
 }
 
 double LongitudinalSpeedPlanner::planLinearJerk(
