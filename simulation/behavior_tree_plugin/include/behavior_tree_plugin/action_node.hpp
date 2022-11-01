@@ -122,6 +122,8 @@ private:
     const traffic_simulator_msgs::msg::DynamicConstraints &) const;
   geometry_msgs::msg::Accel timeDerivative(
     const geometry_msgs::msg::Twist & before, const geometry_msgs::msg::Twist & after) const;
+  double timeDerivative(
+    const geometry_msgs::msg::Accel & before, const geometry_msgs::msg::Accel & after) const;
   boost::optional<double> getDistanceToTargetEntityOnCrosswalk(
     const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator_msgs::msg::EntityStatus & status);

@@ -418,6 +418,12 @@ geometry_msgs::msg::Accel ActionNode::timeDerivative(
   return ret;
 }
 
+double ActionNode::timeDerivative(
+  const geometry_msgs::msg::Accel & before, const geometry_msgs::msg::Accel & after) const
+{
+  return (after.linear.x - before.linear.x) / step_time;
+}
+
 traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
@@ -426,6 +432,9 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
     planAccel(linear_jerk_new, entity_status.action_status.accel, constraints);
   geometry_msgs::msg::Twist twist_new =
     planTwist(accel_new, entity_status.action_status.twist, constraints);
+  accel_new = timeDerivative(twist_new, entity_status.action_status.twist);
+  linear_jerk_new = timeDerivative(accel_new, entity_status.action_status.accel);
+
   std::int64_t new_lanelet_id = entity_status.lanelet_pose.lanelet_id;
   double new_s =
     entity_status.lanelet_pose.s +
