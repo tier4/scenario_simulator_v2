@@ -261,6 +261,12 @@ public:
     }
 
     template <typename... Ts>
+    static auto applyFollowTrajectoryAction(Ts &&... xs)
+    {
+      return core->requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
     static auto applyLaneChangeAction(Ts &&... xs)
     {
       return core->requestLaneChange(std::forward<decltype(xs)>(xs)...);

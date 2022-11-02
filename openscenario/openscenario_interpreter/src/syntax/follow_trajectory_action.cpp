@@ -14,6 +14,9 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/follow_trajectory_action.hpp>
+#include <openscenario_interpreter/syntax/polyline.hpp>
+#include <openscenario_interpreter/syntax/timing.hpp>
+#include <openscenario_interpreter/syntax/trajectory.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,6 +38,60 @@ auto FollowTrajectoryAction::endsImmediately() noexcept -> bool { return false; 
 
 auto FollowTrajectoryAction::run() -> void { LINE(); }
 
-auto FollowTrajectoryAction::start() -> void { LINE(); }
+auto FollowTrajectoryAction::start() -> void
+{
+  for (auto && actor : actors)
+  {
+    if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>())
+    {
+      auto polyline = [this]()
+      {
+        auto absolute = [this](auto && time) -> std::optional<double>
+        {
+          if (time_reference.is<Timing>())
+          {
+            switch (time_reference.as<Timing>().domain_absolute_relative)
+            {
+            case ReferenceContext::relative:
+              return evaluateSimulationTime() + time_reference.as<Timing>().offset + time;
+
+            default:
+            case ReferenceContext::absolute:
+              return time_reference.as<Timing>().offset + time;
+            }
+          }
+          else
+          {
+            return std::nullopt;
+          }
+        };
+
+        auto && polyline = traffic_simulator::follow_trajectory::Polyline();
+
+        for (auto && vertex : trajectory_ref.trajectory.as<Trajectory>().shape.as<Polyline>().vertices)
+        {
+          polyline.vertices.push_back(
+            traffic_simulator::follow_trajectory::Vertex(
+              absolute(vertex.time),
+              static_cast<geometry_msgs::msg::Pose>(vertex.position)
+              )
+            );
+        }
+
+        return polyline;
+      };
+
+      applyFollowTrajectoryAction(
+        actor,
+        traffic_simulator::follow_trajectory::Parameter(
+          initial_distance_offset,
+          trajectory_following_mode.following_mode == FollowingMode::position,
+          trajectory_ref.trajectory.as<Trajectory>().closed,
+          polyline()
+          )
+        );
+    }
+  }
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
