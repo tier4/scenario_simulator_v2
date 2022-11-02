@@ -19,58 +19,54 @@ namespace traffic_simulator
 namespace entity
 {
 MiscObjectEntity::MiscObjectEntity(
-  const std::string & name, const traffic_simulator_msgs::msg::MiscObjectParameters & params)
-: EntityBase(name, params.subtype), params_(params)
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const traffic_simulator_msgs::msg::MiscObjectParameters &)
+: EntityBase(name, entity_status)
 {
-}
-
-auto MiscObjectEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static const auto entity_type = []() {
-    traffic_simulator_msgs::msg::EntityType entity_type;
-    entity_type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
-    return entity_type;
-  }();
-
-  return entity_type;
 }
 
 void MiscObjectEntity::onUpdate(double, double)
 {
-  if (status_) {
-    status_->action_status.accel = geometry_msgs::msg::Accel();
-    status_->action_status.twist = geometry_msgs::msg::Twist();
-    status_->action_status.current_action = "static";
-    status_before_update_ = status_;
-  } else {
-    status_before_update_ = status_;
-  }
-}
-
-auto MiscObjectEntity::getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox
-{
-  return params_.bounding_box;
+  status_.action_status.accel = geometry_msgs::msg::Accel();
+  status_.action_status.twist = geometry_msgs::msg::Twist();
+  status_.action_status.current_action = "static";
+  status_before_update_ = status_;
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string
 {
-  if (!npc_logic_started_) {
+  if (not npc_logic_started_) {
     return "waiting";
+  } else {
+    return status_.action_status.current_action;
   }
-  if (status_) {
-    return status_->action_status.current_action;
-  }
-  return "";
 }
 
-auto MiscObjectEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
+auto MiscObjectEntity::getBehaviorParameter() const
+  -> traffic_simulator_msgs::msg::BehaviorParameter
 {
-  THROW_SEMANTIC_ERROR("getDriverModel function does not support in MiscObjectEntity.");
+  THROW_SEMANTIC_ERROR("getBehaviorParameter function does not support in MiscObjectEntity.");
 }
 
-void MiscObjectEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &)
+void MiscObjectEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
 {
-  THROW_SEMANTIC_ERROR("setDriverModel function does not support in MiscObjectEntity.");
+  THROW_SEMANTIC_ERROR("setBehaviorParameter function does not support in MiscObjectEntity.");
+}
+
+void MiscObjectEntity::requestSpeedChange(double, bool)
+{
+  THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
+}
+
+void MiscObjectEntity::requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool)
+{
+  THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
+}
+
+void MiscObjectEntity::requestSpeedChange(
+  const double, const speed_change::Transition, const speed_change::Constraint, const bool)
+{
+  THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
 }
 }  // namespace entity
 }  // namespace traffic_simulator

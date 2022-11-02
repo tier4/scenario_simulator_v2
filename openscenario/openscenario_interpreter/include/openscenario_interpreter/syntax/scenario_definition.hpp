@@ -55,11 +55,12 @@ struct ScenarioDefinition
   explicit ScenarioDefinition(const pugi::xml_node &, Scope &);
 
   auto evaluate() -> Object;
+
+  friend auto operator<<(std::ostream &, const ScenarioDefinition &) -> std::ostream &;
+
+  friend auto operator<<(nlohmann::json &, const ScenarioDefinition &) -> nlohmann::json &;
 };
 
-auto operator<<(std::ostream &, const ScenarioDefinition &) -> std::ostream &;
-
-auto operator<<(nlohmann::json &, const ScenarioDefinition &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -123,12 +123,12 @@ public:
   /**
    * @brief get vehicle lateral velocity
    */
-  virtual float64_t getVy() { return 0; }  // DIRTY HACK
+  virtual float64_t getVy() = 0;
 
   /**
    * @brief get vehicle longitudinal acceleration
    */
-  virtual float64_t getAx() { return 0; }  // DIRTY HACK
+  virtual float64_t getAx() = 0;
 
   /**
    * @brief get vehicle angular-velocity wz
@@ -141,12 +141,17 @@ public:
   virtual float64_t getSteer() = 0;
 
   /**
+   * @brief get vehicle gear
+   */
+  uint8_t getGear() const;
+
+  /**
    * @brief get state vector dimension
    */
   inline int getDimX() { return dim_x_; }
 
   /**
-   * @brief get input vector demension
+   * @brief get input vector dimension
    */
   inline int getDimU() { return dim_u_; }
 
