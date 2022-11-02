@@ -34,6 +34,11 @@ public:
   const double step_time;
 
 private:
+  bool isReachedToTargetSpeed(
+    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
+    const geometry_msgs::msg::Twist & current_twist,
+    const geometry_msgs::msg::Accel & current_accel, double duration,
+    double torelance = 0.01) const;
   double getVelocityWithConstantJerk(
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel, double linear_jerk, double duration) const;

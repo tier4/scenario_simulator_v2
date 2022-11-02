@@ -102,8 +102,29 @@ double LongitudinalSpeedPlanner::getLinearAccelerationDuration(
 {
   const double quad_duration =
     getQuadraticAccelerationDuration(target_speed, constraints, current_twist, current_accel);
-  // const auto v = quad_duration *
-  return quad_duration;
+  if (isReachedToTargetSpeed(
+        target_speed, constraints, current_twist, current_accel, quad_duration)) {
+  }
+  return 0;
+}
+
+bool LongitudinalSpeedPlanner::isReachedToTargetSpeed(
+  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
+  const geometry_msgs::msg::Twist & current_twist, const geometry_msgs::msg::Accel & current_accel,
+  double duration, double torelance) const
+{
+  double v = 0;
+  if (isAccelerating(target_speed, current_twist)) {
+    v = getVelocityWithConstantJerk(
+      current_twist, current_accel, constraints.max_acceleration_rate, duration);
+  } else {
+    v = getVelocityWithConstantJerk(
+      current_twist, current_accel, constraints.max_deceleration_rate, duration);
+  }
+  if (std::abs(v - target_speed) <= std::abs(torelance)) {
+    return true;
+  }
+  return false;
 }
 
 bool LongitudinalSpeedPlanner::isAccelerating(
