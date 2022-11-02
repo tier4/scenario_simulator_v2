@@ -24,7 +24,7 @@
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <vector>
@@ -54,8 +54,9 @@ public:
   };
 
   explicit VehicleEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters &,
-    const std::string & = BuiltinBehavior::defaultBehavior());
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const traffic_simulator_msgs::msg::VehicleParameters &,
+    const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 
   ~VehicleEntity() override = default;
 
@@ -63,13 +64,9 @@ public:
 
   void cancelRequest() override;
 
-  auto getBoundingBox() const -> const traffic_simulator_msgs::msg::BoundingBox override;
-
   auto getCurrentAction() const -> std::string override;
 
-  auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
-
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityTypename() const -> const std::string & override;
 
@@ -78,9 +75,6 @@ public:
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
-
-  auto getVehicleParameters() const
-    -> std::optional<traffic_simulator_msgs::msg::VehicleParameters>;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
@@ -102,14 +96,12 @@ public:
 
   void setDecelerationLimit(double deceleration) override;
 
-  void setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) override;
+  void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &) override;
 
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
-
-  const traffic_simulator_msgs::msg::VehicleParameters parameters;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;

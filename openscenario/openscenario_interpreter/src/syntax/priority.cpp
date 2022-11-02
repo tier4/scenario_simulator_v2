@@ -38,6 +38,7 @@ auto operator>>(std::istream & is, Priority & priority) -> std::istream &
 
   BOILERPLATE(overwrite);
   BOILERPLATE(parallel);
+  BOILERPLATE(skip);
 
 #undef BOILERPLATE
 
@@ -46,8 +47,6 @@ auto operator>>(std::istream & is, Priority & priority) -> std::istream &
     throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(Priority, buffer); \
   }                                                                  \
   static_assert(true, "")
-
-  BOILERPLATE(skip);
 
 #undef BOILERPLATE
 

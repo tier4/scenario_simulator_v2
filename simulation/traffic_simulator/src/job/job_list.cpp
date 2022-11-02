@@ -19,7 +19,7 @@ namespace traffic_simulator
 namespace job
 {
 void JobList::append(
-  const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
+  const std::function<bool(double)> & func_on_update, const std::function<void()> & func_on_cleanup,
   job::Type type, bool exclusive)
 {
   for (auto & job : list_) {
@@ -30,10 +30,10 @@ void JobList::append(
   list_.emplace_back(Job(func_on_update, func_on_cleanup, type, exclusive));
 }
 
-void JobList::update()
+void JobList::update(const double step_time)
 {
   for (auto & job : list_) {
-    job.onUpdate();
+    job.onUpdate(step_time);
   }
 }
 }  // namespace job

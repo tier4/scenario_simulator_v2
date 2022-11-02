@@ -29,8 +29,9 @@ VehicleActionNode::VehicleActionNode(const std::string & name, const BT::NodeCon
 void VehicleActionNode::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
-  if (!getInput<traffic_simulator_msgs::msg::DriverModel>("driver_model", driver_model)) {
-    driver_model = traffic_simulator_msgs::msg::DriverModel();
+  if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
+        "behavior_parameter", behavior_parameter)) {
+    behavior_parameter = traffic_simulator_msgs::msg::BehaviorParameter();
   }
   if (!getInput<traffic_simulator_msgs::msg::VehicleParameters>(
         "vehicle_parameters", vehicle_parameters)) {
@@ -49,9 +50,9 @@ traffic_simulator_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStat
   accel_new = entity_status.action_status.accel;
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(target_accel, driver_model.deceleration * -1, 0);
+    target_accel = boost::algorithm::clamp(target_accel, behavior_parameter.deceleration * -1, 0);
   } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, driver_model.acceleration);
+    target_accel = boost::algorithm::clamp(target_accel, 0, behavior_parameter.acceleration);
   }
   accel_new.linear.x = target_accel;
   geometry_msgs::msg::Twist twist_new;
@@ -134,9 +135,9 @@ VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_speed)
   }
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(target_accel, -1 * driver_model.deceleration, 0);
+    target_accel = boost::algorithm::clamp(target_accel, -1 * behavior_parameter.deceleration, 0);
   } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, driver_model.acceleration);
+    target_accel = boost::algorithm::clamp(target_accel, 0, behavior_parameter.acceleration);
   }
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;

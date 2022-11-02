@@ -26,7 +26,10 @@ UserDefinedAction::UserDefinedAction(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto UserDefinedAction::endsImmediately() -> bool { return true; }
+auto UserDefinedAction::endsImmediately() const -> bool
+{
+  return apply<bool>([](auto && action) { return action.endsImmediately(); }, *this);
+}
 
 auto UserDefinedAction::evaluate() -> Object
 {

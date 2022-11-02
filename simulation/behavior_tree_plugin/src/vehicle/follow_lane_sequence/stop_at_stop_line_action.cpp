@@ -81,9 +81,9 @@ std::optional<double> StopAtStopLineAction::calculateTargetSpeed(double current_
    */
   double rest_distance =
     distance_to_stopline_.value() - vehicle_parameters.bounding_box.dimensions.x * 0.5 - 1.0;
-  if (rest_distance < calculateStopDistance(driver_model.deceleration)) {
+  if (rest_distance < calculateStopDistance(behavior_parameter.deceleration)) {
     if (rest_distance > 0) {
-      return std::sqrt(2 * driver_model.deceleration * rest_distance);
+      return std::sqrt(2 * behavior_parameter.deceleration * rest_distance);
     } else {
       return 0;
     }
@@ -100,7 +100,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if (!driver_model.see_around) {
+  if (!behavior_parameter.see_around) {
     return BT::NodeStatus::FAILURE;
   }
   if (getRightOfWayEntities(route_lanelets).size() != 0) {

@@ -84,7 +84,7 @@ BT::NodeStatus FollowLaneAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  if (driver_model.see_around) {
+  if (behavior_parameter.see_around) {
     if (getRightOfWayEntities(route_lanelets).size() != 0) {
       return BT::NodeStatus::FAILURE;
     }
@@ -94,8 +94,8 @@ BT::NodeStatus FollowLaneAction::tick()
     auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
     if (distance_to_front_entity) {
       if (
-        distance_to_front_entity.value() <= calculateStopDistance(driver_model.deceleration) +
-                                              vehicle_parameters.bounding_box.dimensions.x + 5) {
+        distance_to_front_entity.value() <= calculateStopDistance(behavior_parameter.deceleration) +
+                                            vehicle_parameters.bounding_box.dimensions.x + 5) {
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -111,8 +111,8 @@ BT::NodeStatus FollowLaneAction::tick()
       getDistanceToConflictingEntity(route_lanelets, *trajectory);
     if (distance_to_stopline) {
       if (
-        distance_to_stopline.value() <= calculateStopDistance(driver_model.deceleration) +
-                                          vehicle_parameters.bounding_box.dimensions.x * 0.5 + 5) {
+        distance_to_stopline.value() <= calculateStopDistance(behavior_parameter.deceleration) +
+                                        vehicle_parameters.bounding_box.dimensions.x * 0.5 + 5) {
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -120,7 +120,7 @@ BT::NodeStatus FollowLaneAction::tick()
       if (
         distance_to_conflicting_entity.value() <
         (vehicle_parameters.bounding_box.dimensions.x +
-         calculateStopDistance(driver_model.deceleration))) {
+         calculateStopDistance(behavior_parameter.deceleration))) {
         return BT::NodeStatus::FAILURE;
       }
     }

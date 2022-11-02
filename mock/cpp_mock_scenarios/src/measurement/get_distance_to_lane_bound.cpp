@@ -19,7 +19,7 @@
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 // headers in STL
 #include <memory>
@@ -54,10 +54,10 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn("ego", getVehicleParameters());
-    api_.setEntityStatus(
+    api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34513, 5, 0, 0, 0, 0),
-      traffic_simulator::helper::constructActionStatus(10));
+      getVehicleParameters());
+    api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 3, true);
   }
 };

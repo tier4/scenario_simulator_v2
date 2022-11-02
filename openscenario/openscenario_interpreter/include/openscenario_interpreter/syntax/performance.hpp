@@ -24,22 +24,35 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Performance ------------------------------------------------------------
+/* ---- Performance 1.2 --------------------------------------------------------
  *
  *  <xsd:complexType name="Performance">
- *    <xsd:attribute name="maxSpeed" type="Double" use="required"/>
  *    <xsd:attribute name="maxAcceleration" type="Double" use="required"/>
+ *    <xsd:attribute name="maxAccelerationRate" type="Double"/>
  *    <xsd:attribute name="maxDeceleration" type="Double" use="required"/>
+ *    <xsd:attribute name="maxDecelerationRate" type="Double"/>
+ *    <xsd:attribute name="maxSpeed" type="Double" use="required"/>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct Performance
 {
-  const Double max_speed;
   const Double max_acceleration;
+
+  const Double max_acceleration_rate;
+
   const Double max_deceleration;
 
-  Performance() = default;
+  const Double max_deceleration_rate;
+
+  const Double max_speed;
+
+  explicit Performance(
+    const Double max_acceleration = Double::infinity(),
+    const Double max_acceleration_rate = Double::infinity(),
+    const Double max_deceleration = Double::infinity(),
+    const Double max_deceleration_rate = Double::infinity(),
+    const Double max_speed = Double::infinity());
 
   explicit Performance(const pugi::xml_node &, Scope &);
 

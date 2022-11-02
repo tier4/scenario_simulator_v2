@@ -49,9 +49,9 @@ public:
   }
 
   // clang-format off
+  DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter)
   DEFINE_GETTER_SETTER(CurrentTime, double)
   DEFINE_GETTER_SETTER(DebugMarker, std::vector<visualization_msgs::msg::Marker>)
-  DEFINE_GETTER_SETTER(DriverModel, traffic_simulator_msgs::msg::DriverModel)
   DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
   DEFINE_GETTER_SETTER(GoalPoses, std::vector<geometry_msgs::msg::Pose>)
@@ -60,9 +60,9 @@ public:
   DEFINE_GETTER_SETTER(Obstacle, std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus, EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters, traffic_simulator_msgs::msg::PedestrianParameters)
+  DEFINE_GETTER_SETTER(ReferenceTrajectory, std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(Request, traffic_simulator::behavior::Request)
   DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
-  DEFINE_GETTER_SETTER(ReferenceTrajectory, std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(StepTime, double)
   DEFINE_GETTER_SETTER(TargetSpeed, std::optional<double>)
   DEFINE_GETTER_SETTER(TrafficLightManager, std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
@@ -75,6 +75,7 @@ public:
 
 private:
   BT::NodeStatus tickOnce(double current_time, double step_time);
+  auto createBehaviorTree(const std::string & format_path) -> BT::Tree;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
   std::unique_ptr<behavior_tree_plugin::LoggingEvent> logging_event_ptr_;

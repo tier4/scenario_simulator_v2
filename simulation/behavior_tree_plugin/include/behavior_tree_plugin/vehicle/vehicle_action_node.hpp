@@ -24,7 +24,7 @@
 #include <optional>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
@@ -41,7 +41,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
-      BT::InputPort<traffic_simulator_msgs::msg::DriverModel>("driver_model"),
+      BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
       BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters"),
       BT::InputPort<std::shared_ptr<math::geometry::CatmullRomSpline>>("reference_trajectory")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
@@ -60,7 +60,7 @@ public:
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) = 0;
 
 protected:
-  traffic_simulator_msgs::msg::DriverModel driver_model;
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
   std::shared_ptr<math::geometry::CatmullRomSpline> reference_trajectory;
   std::unique_ptr<math::geometry::CatmullRomSubspline> trajectory;

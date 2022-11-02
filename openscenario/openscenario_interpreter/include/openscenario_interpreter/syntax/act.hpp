@@ -40,9 +40,9 @@ inline namespace syntax
 struct Act : public Scope, public StoryboardElement
 {
   explicit Act(const pugi::xml_node &, Scope &);
-};
 
-auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;
+  friend auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;
+};
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
