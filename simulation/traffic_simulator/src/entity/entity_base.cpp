@@ -530,6 +530,11 @@ void EntityBase::requestSpeedChange(
   }
 }
 
+auto EntityBase::requestFollowTrajectory(
+  const follow_trajectory::Parameter<follow_trajectory::Polyline> &) -> void
+{
+}
+
 void EntityBase::requestWalkStraight()
 {
   THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");

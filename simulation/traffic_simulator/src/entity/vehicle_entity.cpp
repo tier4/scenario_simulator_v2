@@ -200,6 +200,12 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   requestAssignRoute(route);
 }
 
+auto VehicleEntity::requestFollowTrajectory(
+  const follow_trajectory::Parameter<follow_trajectory::Polyline> &) -> void
+{
+  // TODO
+}
+
 void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
