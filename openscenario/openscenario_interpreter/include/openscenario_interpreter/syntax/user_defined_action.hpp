@@ -36,7 +36,7 @@ struct UserDefinedAction : public ComplexType
 {
   explicit UserDefinedAction(const pugi::xml_node &, Scope &);
 
-  static auto endsImmediately() -> bool;
+  /*  */ auto endsImmediately() const -> bool;
 
   /*  */ auto evaluate() -> Object;
 

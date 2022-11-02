@@ -35,7 +35,7 @@ struct Constraint
   enum class Type {
     // @todo DISTANCE,
     LONGITUDINAL_ACCELERATION,
-    // @todo TIME,
+    TIME
   };
   explicit constexpr Constraint(const Constraint::Type type, const double value)
   : type(type), value(value)
