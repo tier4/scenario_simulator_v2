@@ -95,7 +95,7 @@ BT::NodeStatus FollowLaneAction::tick()
     if (distance_to_front_entity) {
       if (
         distance_to_front_entity.value() <= calculateStopDistance(behavior_parameter.deceleration) +
-                                            vehicle_parameters.bounding_box.dimensions.x + 5) {
+                                              vehicle_parameters.bounding_box.dimensions.x + 5) {
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -112,7 +112,7 @@ BT::NodeStatus FollowLaneAction::tick()
     if (distance_to_stopline) {
       if (
         distance_to_stopline.value() <= calculateStopDistance(behavior_parameter.deceleration) +
-                                        vehicle_parameters.bounding_box.dimensions.x * 0.5 + 5) {
+                                          vehicle_parameters.bounding_box.dimensions.x * 0.5 + 5) {
         return BT::NodeStatus::FAILURE;
       }
     }
