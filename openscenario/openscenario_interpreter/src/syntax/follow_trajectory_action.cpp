@@ -20,11 +20,12 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 FollowTrajectoryAction::FollowTrajectoryAction(const pugi::xml_node & node, Scope & scope)
-: initial_distance_offset(readAttribute<Double>("initialDistanceOffset", node, scope)),
-  time_reference(readElement<TimeReference>("TimeReference", node, scope)),
+: Scope(scope),
+  initial_distance_offset(readAttribute<Double>("initialDistanceOffset", node, local())),
+  time_reference(readElement<TimeReference>("TimeReference", node, local())),
   trajectory_following_mode(
-    readElement<TrajectoryFollowingMode>("TrajectoryFollowingMode", node, scope)),
-  trajectory_ref(readElement<TrajectoryRef>("TrajectoryRef", node, scope))
+    readElement<TrajectoryFollowingMode>("TrajectoryFollowingMode", node, local())),
+  trajectory_ref(readElement<TrajectoryRef>("TrajectoryRef", node, local()))
 {
 }
 

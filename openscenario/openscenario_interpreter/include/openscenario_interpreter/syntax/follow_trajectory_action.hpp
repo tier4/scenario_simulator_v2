@@ -52,7 +52,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct FollowTrajectoryAction
+struct FollowTrajectoryAction : private Scope,
+                                private SimulatorCore::ActionApplication,
+                                private SimulatorCore::ConditionEvaluation
 {
   const Double initial_distance_offset;
 
