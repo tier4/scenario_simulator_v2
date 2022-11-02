@@ -26,6 +26,7 @@ enum class Request {
   NONE,
   LANE_CHANGE,
   FOLLOW_LANE,
+  FOLLOW_TRAJECTORY,
   WALK_STRAIGHT,
 };
 
