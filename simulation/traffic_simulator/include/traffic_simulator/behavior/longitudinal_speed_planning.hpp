@@ -34,8 +34,15 @@ public:
   const double step_time;
 
 private:
+  double getVelocityWithConstantJerk(
+    const geometry_msgs::msg::Twist & current_twist,
+    const geometry_msgs::msg::Accel & current_accel, double linear_jerk, double duration) const;
   bool isAccelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
   double getQuadraticAccelerationDuration(
+    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
+    const geometry_msgs::msg::Twist & current_twist,
+    const geometry_msgs::msg::Accel & current_accel) const;
+  double getQuadraticAccelerationDurationToBound(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;

@@ -37,6 +37,34 @@ LongitudinalSpeedPlanner::getDynamicStates(
   return std::make_tuple(twist, accel, linear_jerk);
 }
 
+double LongitudinalSpeedPlanner::getVelocityWithConstantJerk(
+  const geometry_msgs::msg::Twist & current_twist, const geometry_msgs::msg::Accel & current_accel,
+  double linear_jerk, double duration) const
+{
+  return current_twist.linear.x + 0.5 * linear_jerk * duration * duration +
+         current_accel.linear.x * duration;
+}
+
+double LongitudinalSpeedPlanner::getQuadraticAccelerationDurationToBound(
+  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
+  const geometry_msgs::msg::Twist & current_twist,
+  const geometry_msgs::msg::Accel & current_accel) const
+{
+  if (isAccelerating(target_speed, current_twist)) {
+    return (-current_accel.linear.x + std::sqrt(
+                                        current_accel.linear.x * current_accel.linear.x +
+                                        2 * constraints.max_acceleration_rate *
+                                          (constraints.max_speed - current_twist.linear.x))) /
+           constraints.max_acceleration_rate;
+  } else {
+    return (-current_accel.linear.x + std::sqrt(
+                                        current_accel.linear.x * current_accel.linear.x +
+                                        2 * constraints.max_deceleration_rate *
+                                          (-constraints.max_speed - current_twist.linear.x))) /
+           constraints.max_deceleration_rate;
+  }
+}
+
 double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist,
@@ -45,30 +73,24 @@ double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
   if (isAccelerating(target_speed, current_twist)) {
     double duration =
       (constraints.max_acceleration - current_accel.linear.x) / constraints.max_acceleration_rate;
-    double v = 0.5 * constraints.max_acceleration_rate * duration * duration +
-               current_accel.linear.x * duration;
+    double v = getVelocityWithConstantJerk(
+      current_twist, current_accel, constraints.max_acceleration_rate, duration);
     if (constraints.max_speed <= std::abs(v)) {
       return duration;
     } else {
-      return (-current_accel.linear.x +
-              std::sqrt(
-                current_accel.linear.x * current_accel.linear.x +
-                2 * constraints.max_acceleration_rate * constraints.max_speed)) /
-             constraints.max_acceleration_rate;
+      return getQuadraticAccelerationDurationToBound(
+        target_speed, constraints, current_twist, current_accel);
     }
   } else {
     double duration =
       (current_accel.linear.x - constraints.max_deceleration) / constraints.max_deceleration_rate;
-    double v = -0.5 * constraints.max_deceleration_rate * duration * duration +
-               current_accel.linear.x * duration;
+    double v = getVelocityWithConstantJerk(
+      current_twist, current_accel, -constraints.max_deceleration_rate, duration);
     if (constraints.max_speed <= std::abs(v)) {
       return duration;
     } else {
-      return (-current_accel.linear.x +
-              std::sqrt(
-                current_accel.linear.x * current_accel.linear.x +
-                2 * constraints.max_deceleration_rate * constraints.max_speed)) /
-             constraints.max_deceleration_rate;
+      return getQuadraticAccelerationDurationToBound(
+        target_speed, constraints, current_twist, current_accel);
     }
   }
 }
