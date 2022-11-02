@@ -35,9 +35,9 @@ inline namespace syntax
 {
 class StoryboardElement : private SimulatorCore::ConditionEvaluation
 {
+protected:
   Trigger stop_trigger;
 
-public:
   const std::size_t maximum_execution_count = 1;
 
   std::size_t current_execution_count = 0;
@@ -48,6 +48,12 @@ public:
 
   Trigger start_trigger{{ConditionGroup()}};
 
+private:
+  std::unordered_map<
+    StoryboardElementState::value_type, std::vector<std::function<void(const StoryboardElement &)>>>
+    callbacks;
+
+public:
   // Storyboard
   explicit StoryboardElement(const Trigger & stop_trigger)  //
   : stop_trigger(stop_trigger)
@@ -85,10 +91,9 @@ public:
     if (
       not is<StoryboardElementState::standbyState>() and
       not is<StoryboardElementState::stopTransition>()) {
-      return current_state = stop_transition;
-    } else {
-      return current_state;
+      transitionTo(stop_transition);
     }
+    return current_state;
   }
 
 private:
@@ -138,9 +143,7 @@ protected:
   template <typename U, typename Node, typename... Ts>
   auto readStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
   {
-    const auto name = rename(readAttribute<String>("name", node, inner_scope));
-
-    if (unique(name)) {
+    if (const auto name = rename(readAttribute<String>("name", node, inner_scope)); unique(name)) {
       auto element = make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
       inner_scope.insert(name, element);
       return element;
@@ -154,30 +157,32 @@ protected:
   template <typename U, typename Node, typename... Ts>
   auto readCatalogedStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
   {
-    auto element = CatalogReference(node, inner_scope).make(node);
-    const auto & name = element.template as<U>().name;
-
-    if (not unique(name)) {
+    if (auto element = CatalogReference(node, inner_scope).make();
+        not unique(element.template as<U>().name)) {
       throw SyntaxError(
-        "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
-        makeTypename(typeid(U)), ")");
+        "Detected redefinition of StoryboardElement named ",
+        std::quoted(element.template as<U>().name), " (class ", makeTypename(typeid(U)), ")");
+    } else {
+      inner_scope.insert(element.template as<U>().name, element);
+      return element;
     }
-
-    inner_scope.insert(name, element);
-    return element;
   }
 
 public:
-  std::unordered_map<
-    StoryboardElementState::value_type, std::vector<std::function<void(const StoryboardElement &)>>>
-    callbacks;
+  void addTransitionCallback(
+    StoryboardElementState::value_type transition,
+    std::function<void(const StoryboardElement &)> callback)
+  {
+    callbacks[transition].push_back(callback);
+  }
 
-  auto transitionTo(const Object & state)
+  auto transitionTo(const Object & state) -> bool
   {
     current_state = state;
     for (auto && callback : callbacks[current_state.as<StoryboardElementState>()]) {
       callback(std::as_const(*this));
     }
+    return current_state == state;
   }
 
   auto evaluate()
@@ -203,8 +208,7 @@ public:
         *  Story element instantaneously transitions into the runningState.
         *
         * ------------------------------------------------------------------- */
-        if (start_trigger.evaluate().as<Boolean>()) {
-          transitionTo(start_transition);
+        if (start_trigger.evaluate().as<Boolean>() and transitionTo(start_transition)) {
           goto dispatch;
         } else {
           return current_state;
@@ -218,8 +222,7 @@ public:
         *
         * ------------------------------------------------------------------- */
         start();
-        ++current_execution_count;
-        transitionTo(running_state);
+        if (transitionTo(running_state)) ++current_execution_count;
         goto dispatch;
 
       case StoryboardElementState::runningState: /* ----------------------------

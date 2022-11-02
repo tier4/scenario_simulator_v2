@@ -16,7 +16,6 @@
 #include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
-#include <queue>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -29,21 +28,16 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
 : name(name),
-  status_(boost::none),
-  verbose_(true),
-  visibility_(true),
-  npc_logic_started_(false),
-  entity_subtype_(subtype)
+  verbose(true),
+  status_(entity_status),
+  status_before_update_(status_),
+  npc_logic_started_(false)
 {
-  status_ = boost::none;
 }
 
-void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)
-{
-  return;
-}
+void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
 
 auto EntityBase::asAutoware() const -> concealer::Autoware &
 {
@@ -53,318 +47,7 @@ auto EntityBase::asAutoware() const -> concealer::Autoware &
     " is not the entity controlled by Autoware.");
 }
 
-void EntityBase::onUpdate(double, double)
-{
-  job_list_.update();
-  status_before_update_ = status_;
-}
-
-boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
-
-void EntityBase::requestSpeedChange(
-  const double target_speed, const speed_change::Transition transition,
-  const speed_change::Constraint constraint, const bool continuous)
-{
-  switch (transition) {
-    case speed_change::Transition::LINEAR: {
-      if (getStatus().action_status.twist.linear.x < target_speed) {
-        setAccelerationLimit(std::abs(constraint.value));
-        job_list_.append(
-          /**
-           * @brief Checking if the entity reaches target speed.
-           */
-          [this, target_speed]() {
-            return getStatus().action_status.twist.linear.x >= target_speed;
-          },
-          /**
-           * @brief Resets acceleration limit.
-           */
-          [this]() {
-            setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration);
-          },
-          job::Type::LINEAR_ACCELERATION, true);
-      } else if (getStatus().action_status.twist.linear.x > target_speed) {
-        setDecelerationLimit(std::abs(constraint.value));
-        job_list_.append(
-          /**
-           * @brief Checking if the entity reaches target speed.
-           */
-          [this, target_speed]() {
-            return getStatus().action_status.twist.linear.x <= target_speed;
-          },
-          /**
-           * @brief Resets deceleration limit.
-           */
-          [this]() {
-            setDecelerationLimit(traffic_simulator_msgs::msg::DriverModel().deceleration);
-          },
-          job::Type::LINEAR_ACCELERATION, true);
-      }
-      requestSpeedChange(target_speed, continuous);
-      break;
-    }
-    case speed_change::Transition::STEP: {
-      auto status = getStatus();
-      status.action_status.twist.linear.x = target_speed;
-      requestSpeedChange(target_speed, continuous);
-      setStatus(status);
-      break;
-    }
-  }
-}
-
-void EntityBase::requestSpeedChange(
-  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
-  const speed_change::Constraint constraint, const bool continuous)
-{
-  switch (transition) {
-    case speed_change::Transition::LINEAR: {
-      job_list_.append(
-        /**
-         * @brief Checking if the entity reaches target speed.
-         */
-        [this, target_speed, constraint]() {
-          double diff =
-            target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
-          /**
-           * @brief Hard coded parameter, threashold for difference
-           */
-          if (std::abs(diff) <= 0.1) {
-            return true;
-          }
-          if (diff > 0) {
-            setAccelerationLimit(std::abs(constraint.value));
-            return false;
-          }
-          if (diff < 0) {
-            setDecelerationLimit(std::abs(constraint.value));
-            return false;
-          }
-          return false;
-        },
-        /**
-           * @brief Resets acceleration limit.
-           */
-        [this]() { setAccelerationLimit(traffic_simulator_msgs::msg::DriverModel().acceleration); },
-        job::Type::LINEAR_ACCELERATION, true);
-      requestSpeedChange(target_speed, continuous);
-      break;
-    }
-    case speed_change::Transition::STEP: {
-      auto status = getStatus();
-      status.action_status.twist.linear.x = target_speed.getAbsoluteValue(other_status_);
-      requestSpeedChange(target_speed, continuous);
-      setStatus(status);
-      break;
-    }
-  }
-}
-
-void EntityBase::requestSpeedChange(double target_speed, bool continuous)
-{
-  if (continuous) {
-    job_list_.append(
-      /**
-       * @brief If the target entity reaches the target speed, return true.
-       */
-      [this, target_speed]() {
-        target_speed_ = target_speed;
-        return false;
-      },
-      /**
-       * @brief Cansel speed change request.
-       */
-      [this]() {}, job::Type::LINEAR_VELOCITY, true);
-  } else {
-    job_list_.append(
-      /**
-       * @brief If the target entity reaches the target speed, return true.
-       */
-      [this, target_speed]() {
-        if (getStatus().action_status.twist.linear.x >= target_speed) {
-          return true;
-        }
-        target_speed_ = target_speed;
-        return false;
-      },
-      /**
-       * @brief Cansel speed change request.
-       */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
-  }
-}
-
-void EntityBase::requestSpeedChange(
-  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
-{
-  if (continuous) {
-    job_list_.append(
-      /**
-       * @brief If the target entity reaches the target speed, return true.
-       */
-      [this, target_speed]() {
-        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
-          return true;
-        }
-        target_speed_ = target_speed.getAbsoluteValue(other_status_);
-        return false;
-      },
-      [this]() {}, job::Type::LINEAR_VELOCITY, true);
-  } else {
-    job_list_.append(
-      /**
-       * @brief If the target entity reaches the target speed, return true.
-       */
-      [this, target_speed]() {
-        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
-          return true;
-        }
-        if (
-          getStatus().action_status.twist.linear.x >=
-          target_speed.getAbsoluteValue(other_status_)) {
-          target_speed_ = target_speed.getAbsoluteValue(other_status_);
-          return true;
-        }
-        return false;
-      },
-      /**
-       * @brief Cansel speed change request.
-       */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
-  }
-}
-
-void EntityBase::requestLaneChange(
-  const traffic_simulator::lane_change::AbsoluteTarget & target,
-  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const traffic_simulator::lane_change::Constraint & constraint)
-{
-  auto param = traffic_simulator::lane_change::Parameter(target, trajectory_shape, constraint);
-  requestLaneChange(param);
-}
-
-void EntityBase::requestLaneChange(
-  const traffic_simulator::lane_change::RelativeTarget & target,
-  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const traffic_simulator::lane_change::Constraint & constraint)
-{
-  std::int64_t reference_lanelet_id = 0;
-  if (target.entity_name == name) {
-    if (!getStatus().lanelet_pose_valid) {
-      THROW_SEMANTIC_ERROR(
-        "Target entity does not assigned to lanelet. Please check Target entity name : ",
-        target.entity_name, " exists on lane.");
-    }
-    reference_lanelet_id = getStatus().lanelet_pose.lanelet_id;
-  } else {
-    if (other_status_.find(target.entity_name) == other_status_.end()) {
-      THROW_SEMANTIC_ERROR(
-        "Target entity : ", target.entity_name, " does not exist. Please check ",
-        target.entity_name, " exists.");
-    }
-    if (!other_status_.at(target.entity_name).lanelet_pose_valid) {
-      THROW_SEMANTIC_ERROR(
-        "Target entity does not assigned to lanelet. Please check Target entity name : ",
-        target.entity_name, " exists on lane.");
-    }
-    reference_lanelet_id = other_status_.at(target.entity_name).lanelet_pose.lanelet_id;
-  }
-  const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-    reference_lanelet_id, target.direction, target.shift);
-  if (lane_change_target_id) {
-    requestLaneChange(
-      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
-      trajectory_shape, constraint);
-  } else {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate absolute target lane. Please check the target lane exists.");
-  }
-}
-
-void EntityBase::updateStandStillDuration(const double step_time)
-{
-  if (!npc_logic_started_) {
-    stand_still_duration_ = 0;
-    return;
-  }
-  if (!status_) {
-    stand_still_duration_ = boost::none;
-  } else {
-    if (!stand_still_duration_) {
-      stand_still_duration_ = 0;
-    }
-    if (
-      std::fabs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
-      stand_still_duration_ = step_time + stand_still_duration_.get();
-    } else {
-      stand_still_duration_ = 0;
-    }
-  }
-}
-
-void EntityBase::updateEntityStatusTimestamp(const double current_time)
-{
-  if (status_) {
-    status_->time = current_time;
-  }
-}
-
-void EntityBase::setOtherStatus(
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
-{
-  other_status_.clear();
-  if (status_) {
-    for (const auto & each : status) {
-      if (each.first != name) {
-        const auto p0 = each.second.pose.position;
-        const auto p1 = status_.get().pose.position;
-        double distance =
-          std::sqrt(std::pow(p0.x - p1.x, 2) + std::pow(p0.y - p1.y, 2) + std::pow(p0.z - p1.z, 2));
-        if (distance < 30) {
-          other_status_.insert(each);
-        }
-      }
-    }
-  }
-}
-
-const traffic_simulator_msgs::msg::EntityStatus EntityBase::getStatus() const
-{
-  if (!status_) {
-    THROW_SEMANTIC_ERROR("status is not set");
-  } else {
-    auto status = this->status_.get();
-    status.bounding_box = getBoundingBox();
-    status.subtype = entity_subtype_;
-    status.type = entity_type_;
-    return status;
-  }
-}
-
-bool EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
-{
-  status_ = status;
-  status_->name = name;
-  return true;
-}
-
-auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose
-{
-  const auto status = getStatus();
-  return status.pose;
-}
-
-auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
-  -> geometry_msgs::msg::Pose
-{
-  const auto ref_status = getStatus();
-  tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(ref_status.pose, ref_transform);
-  tf2::fromMsg(relative_pose, relative_transform);
-  geometry_msgs::msg::Pose ret;
-  tf2::toMsg(ref_transform * relative_transform, ret);
-  return ret;
-}
+void EntityBase::cancelRequest() {}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
@@ -440,18 +123,17 @@ auto EntityBase::getDistanceToLeftLaneBound() -> double
 
 auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double
 {
-  const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id);
-  if (bound.empty()) {
+  if (const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
-  }
-  const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
-  if (polygon.empty()) {
+  } else if (const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
+             polygon.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
       " exists and it's definition");
+  } else {
+    return math::geometry::getDistance2D(bound, polygon);
   }
-  return math::geometry::getDistance2D(bound, polygon);
 }
 
 auto EntityBase::getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
@@ -471,19 +153,18 @@ auto EntityBase::getDistanceToRightLaneBound() -> double
 
 auto EntityBase::getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double
 {
-  const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id);
-  if (bound.empty()) {
+  if (const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
-  }
-  const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
-  if (polygon.empty()) {
+  } else if (const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
+             polygon.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
       " exists and it's definition");
+  } else {
+    return math::geometry::getDistance2D(bound, polygon);
   }
-  return math::geometry::getDistance2D(bound, polygon);
 }
 
 auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
@@ -496,43 +177,455 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
   return *std::min_element(distances.begin(), distances.end());
 }
 
-void EntityBase::stopAtEndOfRoad()
+auto EntityBase::getEntityStatusBeforeUpdate() const
+  -> const traffic_simulator_msgs::msg::EntityStatus &
 {
-  if (!status_) {
-    THROW_SEMANTIC_ERROR("status is not set");
-  } else {
-    status_.get().action_status.twist = geometry_msgs::msg::Twist();
-    status_.get().action_status.accel = geometry_msgs::msg::Accel();
-  }
+  return status_before_update_;
 }
 
-void EntityBase::setAccelerationLimit(double)
-{
-  THROW_SIMULATION_ERROR(
-    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
-}
-
-void EntityBase::setDecelerationLimit(double)
-{
-  THROW_SIMULATION_ERROR(
-    "setAccelerationLimit function can be used with only ego/vehicle/pedestrian entity.");
-}
+auto EntityBase::getLinearJerk() const -> boost::optional<double> { return linear_jerk_; }
 
 auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  const auto status = getStatus();
-  if (status.lanelet_pose_valid) {
-    return status.lanelet_pose;
-  }
-  if (getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false);
+  if (status_.lanelet_pose_valid) {
+    return status_.lanelet_pose;
+  } else if (status_.type.type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
+    return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, false);
   } else {
-    return hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), true);
+    return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, true);
   }
 }
 
-bool EntityBase::isNpcLogicStarted() const { return npc_logic_started_; }
+auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
+
+auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
+  -> geometry_msgs::msg::Pose
+{
+  tf2::Transform ref_transform, relative_transform;
+  tf2::fromMsg(getStatus().pose, ref_transform);
+  tf2::fromMsg(relative_pose, relative_transform);
+  geometry_msgs::msg::Pose ret;
+  tf2::toMsg(ref_transform * relative_transform, ret);
+  return ret;
+}
+
+auto EntityBase::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &
+{
+  return status_;
+}
+
+auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
+
+auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
+
+void EntityBase::onUpdate(double /*current_time*/, double step_time)
+{
+  job_list_.update(step_time);
+  status_before_update_ = status_;
+}
+
+void EntityBase::requestLaneChange(
+  const traffic_simulator::lane_change::AbsoluteTarget & target,
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+  const traffic_simulator::lane_change::Constraint & constraint)
+{
+  requestLaneChange(lane_change::Parameter(target, trajectory_shape, constraint));
+}
+
+void EntityBase::requestLaneChange(
+  const traffic_simulator::lane_change::RelativeTarget & target,
+  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+  const traffic_simulator::lane_change::Constraint & constraint)
+{
+  std::int64_t reference_lanelet_id = 0;
+  if (target.entity_name == name) {
+    if (!getStatus().lanelet_pose_valid) {
+      THROW_SEMANTIC_ERROR(
+        "Target entity does not assigned to lanelet. Please check Target entity name : ",
+        target.entity_name, " exists on lane.");
+    }
+    reference_lanelet_id = getStatus().lanelet_pose.lanelet_id;
+  } else {
+    if (other_status_.find(target.entity_name) == other_status_.end()) {
+      THROW_SEMANTIC_ERROR(
+        "Target entity : ", target.entity_name, " does not exist. Please check ",
+        target.entity_name, " exists.");
+    }
+    if (!other_status_.at(target.entity_name).lanelet_pose_valid) {
+      THROW_SEMANTIC_ERROR(
+        "Target entity does not assigned to lanelet. Please check Target entity name : ",
+        target.entity_name, " exists on lane.");
+    }
+    reference_lanelet_id = other_status_.at(target.entity_name).lanelet_pose.lanelet_id;
+  }
+  const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+    reference_lanelet_id, target.direction, target.shift);
+  if (lane_change_target_id) {
+    requestLaneChange(
+      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
+      trajectory_shape, constraint);
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Failed to calculate absolute target lane. Please check the target lane exists.");
+  }
+}
+
+void EntityBase::requestSpeedChangeWithConstantAcceleration(
+  const double target_speed, const speed_change::Transition transition, double acceleration,
+  const bool continuous)
+{
+  switch (transition) {
+    case speed_change::Transition::LINEAR: {
+      if (getStatus().action_status.twist.linear.x < target_speed) {
+        setAccelerationLimit(std::abs(acceleration));
+        job_list_.append(
+          /**
+           * @brief Checking if the entity reaches target speed.
+           */
+          [this, target_speed](double) {
+            return getStatus().action_status.twist.linear.x >= target_speed;
+          },
+          /**
+           * @brief Resets acceleration limit.
+           */
+          [this]() {
+            setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
+          },
+          job::Type::LINEAR_ACCELERATION, true);
+      } else if (getStatus().action_status.twist.linear.x > target_speed) {
+        setDecelerationLimit(std::abs(acceleration));
+        job_list_.append(
+          /**
+           * @brief Checking if the entity reaches target speed.
+           */
+          [this, target_speed](double) {
+            return getStatus().action_status.twist.linear.x <= target_speed;
+          },
+          /**
+           * @brief Resets deceleration limit.
+           */
+          [this]() {
+            setDecelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().deceleration);
+          },
+          job::Type::LINEAR_ACCELERATION, true);
+      }
+      requestSpeedChange(target_speed, continuous);
+      break;
+    }
+    case speed_change::Transition::STEP: {
+      requestSpeedChange(target_speed, continuous);
+      setLinearVelocity(target_speed);
+      break;
+    }
+  }
+}
+
+void EntityBase::requestSpeedChangeWithTimeConstraint(
+  const double target_speed, const speed_change::Transition transition, double acceleration_time)
+{
+  requestSpeedChangeWithConstantAcceleration(
+    target_speed, transition,
+    (target_speed - getStatus().action_status.twist.linear.x) / acceleration_time, false);
+}
+
+void EntityBase::requestSpeedChange(
+  const double target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
+{
+  switch (constraint.type) {
+    case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed, transition, constraint.value, continuous);
+      break;
+    case speed_change::Constraint::Type::TIME:
+      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
+      break;
+  }
+}
+
+void EntityBase::requestSpeedChangeWithConstantAcceleration(
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  double acceleration, const bool continuous)
+{
+  switch (transition) {
+    case speed_change::Transition::LINEAR: {
+      job_list_.append(
+        /**
+         * @brief Checking if the entity reaches target speed.
+         */
+        [this, target_speed, acceleration](double) {
+          double diff =
+            target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
+          /**
+           * @brief Hard coded parameter, threashold for difference
+           */
+          if (std::abs(diff) <= 0.1) {
+            return true;
+          }
+          if (diff > 0) {
+            setAccelerationLimit(std::abs(acceleration));
+            return false;
+          }
+          if (diff < 0) {
+            setDecelerationLimit(std::abs(acceleration));
+            return false;
+          }
+          return false;
+        },
+        /**
+           * @brief Resets acceleration limit.
+           */
+        [this]() {
+          setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
+        },
+        job::Type::LINEAR_ACCELERATION, true);
+      requestSpeedChange(target_speed, continuous);
+      break;
+    }
+    case speed_change::Transition::STEP: {
+      requestSpeedChange(target_speed, continuous);
+      setLinearVelocity(target_speed.getAbsoluteValue(other_status_));
+      break;
+    }
+  }
+}
+
+void EntityBase::requestSpeedChangeWithTimeConstraint(
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  double time)
+{
+  switch (transition) {
+    case speed_change::Transition::LINEAR: {
+      job_list_.append(
+        /**
+         * @brief Checking if the entity reaches target speed.
+         */
+        [this, target_speed, time](double job_duration) {
+          double diff =
+            target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
+          double acceleration = diff / time;
+          /**
+           * @brief Hard coded parameter, threashold for difference
+           */
+          if (job_duration >= time) {
+            return true;
+          }
+          if (diff > 0) {
+            setAccelerationLimit(std::abs(acceleration));
+            return false;
+          }
+          if (diff < 0) {
+            setDecelerationLimit(std::abs(acceleration));
+            return false;
+          }
+          return false;
+        },
+        /**
+           * @brief Resets acceleration limit.
+           */
+        [this]() {
+          setAccelerationLimit(traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
+        },
+        job::Type::LINEAR_ACCELERATION, true);
+      requestSpeedChange(target_speed, false);
+      break;
+    }
+    case speed_change::Transition::STEP: {
+      requestSpeedChange(target_speed, false);
+      setLinearVelocity(target_speed.getAbsoluteValue(other_status_));
+      break;
+    }
+  }
+}
+
+void EntityBase::requestSpeedChange(
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
+{
+  switch (constraint.type) {
+    case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed, transition, constraint.value, continuous);
+      break;
+    case speed_change::Constraint::Type::TIME:
+      if (continuous) {
+        THROW_SEMANTIC_ERROR("continuous = true is not allowed with time constraint.");
+      }
+      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
+      break;
+  }
+}
+
+void EntityBase::requestSpeedChange(double target_speed, bool continuous)
+{
+  if (continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed](double) {
+        target_speed_ = target_speed;
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+  } else {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed](double) {
+        if (getStatus().action_status.twist.linear.x >= target_speed) {
+          return true;
+        }
+        target_speed_ = target_speed;
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+  }
+}
+
+void EntityBase::requestSpeedChange(
+  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
+{
+  if (continuous) {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed](double) {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        target_speed_ = target_speed.getAbsoluteValue(other_status_);
+        return false;
+      },
+      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+  } else {
+    job_list_.append(
+      /**
+       * @brief If the target entity reaches the target speed, return true.
+       */
+      [this, target_speed](double) {
+        if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
+          return true;
+        }
+        if (
+          getStatus().action_status.twist.linear.x >=
+          target_speed.getAbsoluteValue(other_status_)) {
+          target_speed_ = target_speed.getAbsoluteValue(other_status_);
+          return true;
+        }
+        return false;
+      },
+      /**
+       * @brief Cansel speed change request.
+       */
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+  }
+}
+
+void EntityBase::requestWalkStraight()
+{
+  THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
+}
+
+void EntityBase::setEntityTypeList(
+  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & entity_type_list)
+{
+  entity_type_list_ = entity_type_list;
+}
+
+void EntityBase::setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
+{
+  hdmap_utils_ptr_ = ptr;
+}
+
+void EntityBase::setOtherStatus(
+  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
+{
+  other_status_.clear();
+
+  for (const auto & [other_name, other_status] : status) {
+    if (other_name != name) {
+      /*
+         The following filtering is the code written for the purpose of
+         reducing the calculation load, but it is commented out experimentally
+         because it adversely affects "processing that needs to identify other
+         entities regardless of distance" such as RelativeTargetSpeed of
+         requestSpeedChange.
+      */
+      // const auto p0 = other_status.pose.position;
+      // const auto p1 = status_.pose.position;
+      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance < 30) {
+      other_status_.emplace(other_name, other_status);
+      // }
+    }
+  }
+}
+
+auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+{
+  auto new_status = status;
+
+  /*
+     FIXME: DIRTY HACK!!!
+
+     It seems that some operations set an incomplete status without respecting
+     the original status obtained by getStatus. Below is the code to compensate
+     for the lack of set status.
+  */
+  new_status.name = name;
+  new_status.type = status_.type;
+  new_status.subtype = status_.subtype;
+  new_status.bounding_box = status_.bounding_box;
+  new_status.action_status.current_action = getCurrentAction();
+
+  status_ = new_status;
+}
+
+auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
+{
+  auto status = getStatus();
+  status.action_status.twist.linear.x = linear_velocity;
+  setStatus(status);
+}
+
+void EntityBase::setTrafficLightManager(
+  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & traffic_light_manager)
+{
+  traffic_light_manager_ = traffic_light_manager;
+}
+
+auto EntityBase::setVelocityLimit(double) -> void {}
 
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
+
+void EntityBase::stopAtEndOfRoad()
+{
+  status_.action_status.twist = geometry_msgs::msg::Twist();
+  status_.action_status.accel = geometry_msgs::msg::Accel();
+}
+
+void EntityBase::updateEntityStatusTimestamp(const double current_time)
+{
+  status_.time = current_time;
+}
+
+auto EntityBase::updateStandStillDuration(const double step_time) -> double
+{
+  if (
+    npc_logic_started_ and
+    std::abs(status_.action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
+    return stand_still_duration_ += step_time;
+  } else {
+    return stand_still_duration_ = 0.0;
+  }
+}
 }  // namespace entity
 }  // namespace traffic_simulator

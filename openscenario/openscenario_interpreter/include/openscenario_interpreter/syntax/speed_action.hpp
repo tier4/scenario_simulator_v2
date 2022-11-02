@@ -37,7 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SpeedAction : private Scope,
+struct SpeedAction : private Scope,  // NOTE: Required for access to actors
                      private SimulatorCore::ActionApplication,
                      private SimulatorCore::ConditionEvaluation
 {

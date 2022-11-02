@@ -31,8 +31,7 @@ ScenarioDefinition::ScenarioDefinition(const pugi::xml_node & node, Scope & scop
 auto ScenarioDefinition::evaluate() -> Object
 {
   road_network.evaluate();
-  storyboard.evaluate();
-  return storyboard.current_state;
+  return storyboard.evaluate();
 }
 
 auto operator<<(std::ostream & os, const ScenarioDefinition & datum) -> std::ostream &
