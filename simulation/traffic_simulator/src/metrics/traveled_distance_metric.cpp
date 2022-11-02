@@ -29,7 +29,7 @@ void TraveledDistanceMetric::update()
 {
   traveled_distance =
     traveled_distance +
-    std::fabs(entity_manager_ptr_->getEntityStatus(target_entity)->action_status.twist.linear.x) *
+    std::fabs(entity_manager_ptr_->getEntityStatus(target_entity).action_status.twist.linear.x) *
       entity_manager_ptr_->getStepTime();
 }
 
