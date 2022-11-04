@@ -370,7 +370,8 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
   const auto speed_planner =
-    traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(step_time);
+    traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
+      step_time, entity_status.name);
   const auto dynamics = speed_planner.getDynamicStates(
     target_speed, constraints, entity_status.action_status.twist,
     entity_status.action_status.accel);

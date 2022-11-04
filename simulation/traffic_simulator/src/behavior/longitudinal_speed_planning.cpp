@@ -15,13 +15,17 @@
 #include <boost/algorithm/clamp.hpp>
 #include <geometry/linear_algebra.hpp>
 #include <iostream>
+#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 
 namespace traffic_simulator
 {
 namespace longitudinal_speed_planning
 {
-LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(double step_time) : step_time(step_time) {}
+LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(double step_time, const std::string & entity)
+: step_time(step_time), entity(entity)
+{
+}
 
 std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
 LongitudinalSpeedPlanner::getDynamicStates(
@@ -29,6 +33,11 @@ LongitudinalSpeedPlanner::getDynamicStates(
   const geometry_msgs::msg::Twist & current_twist,
   const geometry_msgs::msg::Accel & current_accel) const
 {
+  if (std::fabs(target_speed) > constraints.max_speed) {
+    THROW_SEMANTIC_ERROR(
+      "Target speed is ", std::to_string(target_speed), " , it overs ", entity,
+      "'s max_speed:", std::to_string(constraints.max_speed));
+  }
   double linear_jerk = planLinearJerk(target_speed, constraints, current_twist, current_accel);
   auto accel = forward(linear_jerk, current_accel, constraints);
   auto twist = forward(accel, current_twist, constraints);
