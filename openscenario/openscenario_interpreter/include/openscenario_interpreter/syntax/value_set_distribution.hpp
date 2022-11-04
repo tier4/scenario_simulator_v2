@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ValueSetDistribution ---------------------------------------------------
+/* ---- ValueSetDistribution 1.2 -----------------------------------------------
  *
  *  <xsd:complexType name="ValueSetDistribution">
  *    <xsd:sequence>

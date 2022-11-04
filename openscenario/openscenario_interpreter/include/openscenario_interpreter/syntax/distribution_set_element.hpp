@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionSetElement -----------------------------------------------
+/* ---- DistributionSetElement 1.2 ---------------------------------------------
  *
  *  <xsd:complexType name="DistributionSetElement">
  *    <xsd:attribute name="value" type="String" use="required"/>

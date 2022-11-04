@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Range ----------------------------------------------------------------
+/* ---- Range 1.2 --------------------------------------------------------------
  *
  *  <xsd:complexType name="Range">
  *    <xsd:attribute name="lowerLimit" type="Double" use="required"/>

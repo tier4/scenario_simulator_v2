@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ParameterValueDistribution ---------------------------------------------
+/* ---- ParameterValueDistribution 1.2 -----------------------------------------
  *
  *  <xsd:complexType name="ParameterValueDistribution">
  *    <xsd:sequence>

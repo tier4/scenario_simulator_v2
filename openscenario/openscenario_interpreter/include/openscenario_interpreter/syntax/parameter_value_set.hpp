@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ParameterValueSet ---------------------------------------------------
+/* ---- ParameterValueSet 1.2 --------------------------------------------------
  *
  *  <xsd:complexType name="ParameterValueSet">
  *    <xsd:sequence>

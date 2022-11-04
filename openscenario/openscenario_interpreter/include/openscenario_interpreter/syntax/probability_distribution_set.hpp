@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ProbabilityDistributionSet ---------------------------------------------
+/* ---- ProbabilityDistributionSet 1.2 -----------------------------------------
  *
  *  <xsd:complexType name="ProbabilityDistributionSet">
  *    <xsd:sequence>

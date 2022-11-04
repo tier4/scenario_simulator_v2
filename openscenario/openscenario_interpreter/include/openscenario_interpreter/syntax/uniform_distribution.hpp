@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- UniformDistribution ----------------------------------------------------
+/* ---- UniformDistribution 1.2 ------------------------------------------------
  *
  *  <xsd:complexType name="UniformDistribution">
  *    <xsd:sequence>

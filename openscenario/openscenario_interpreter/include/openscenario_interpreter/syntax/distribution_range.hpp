@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionRange ------------------------------------------------------
+/* ---- DistributionRange 1.2 --------------------------------------------------
  *
  *  <xsd:complexType name="DistributionRange">
  *    <xsd:all>

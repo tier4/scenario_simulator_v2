@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionSet --------------------------------------------------------
+/* ---- DistributionSet 1.2 ----------------------------------------------------
  *
  *  <xsd:complexType name="DistributionSet">
  *    <xsd:sequence>

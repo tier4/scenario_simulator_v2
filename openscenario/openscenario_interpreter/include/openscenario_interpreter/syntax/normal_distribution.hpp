@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- NormalDistribution -----------------------------------------------------
+/* ---- NormalDistribution 1.2 -------------------------------------------------
  *
  *  <xsd:complexType name="NormalDistribution">
  *    <xsd:sequence>

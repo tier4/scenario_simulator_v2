@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- HistogramBin -----------------------------------------------------------
+/* ---- HistogramBin 1.2 -------------------------------------------------------
  *
  *  <xsd:complexType name="HistogramBin">
  *    <xsd:sequence>

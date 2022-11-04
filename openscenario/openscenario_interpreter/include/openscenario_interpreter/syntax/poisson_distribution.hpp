@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- PoissonDistribution ----------------------------------------------------
+/* ---- PoissonDistribution 1.2 ------------------------------------------------
  *
  *  <xsd:complexType name="PoissonDistribution">
  *    <xsd:sequence>
