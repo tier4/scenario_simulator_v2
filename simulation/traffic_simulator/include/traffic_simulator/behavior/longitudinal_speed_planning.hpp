@@ -41,6 +41,10 @@ private:
     const geometry_msgs::msg::Accel & current_accel, double duration,
     double torelance = 0.01) const;
   double getVelocityWithConstantJerk(
+    double target_speed, const geometry_msgs::msg::Twist & current_twist,
+    const geometry_msgs::msg::Accel & current_accel,
+    const traffic_simulator_msgs::msg::DynamicConstraints &, double duration) const;
+  double getVelocityWithConstantJerk(
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel, double linear_jerk, double duration) const;
   bool isAccelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
@@ -48,14 +52,14 @@ private:
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;
-  double getLinearAccelerationDuration(
+  double getLinearAccelerationDurationToBound(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist) const;
   double getQuadraticAccelerationDurationToBound(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;
-  double getLinearAccelerationDuration(
+  double getLinearAccelerationDurationToBound(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;
