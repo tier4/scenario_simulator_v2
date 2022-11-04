@@ -17,7 +17,7 @@
 
 #include <string>
 #include <vector>
-// TODO : move to new package for common utility
+
 namespace concealer
 {
 auto execute(const std::vector<std::string> &) -> int;

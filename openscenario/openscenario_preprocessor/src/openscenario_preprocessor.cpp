@@ -31,7 +31,7 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
     [this](const Load::Request::SharedPtr request, Load::Response::SharedPtr response) -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       try {
-        auto s = ScenarioInfo(*request);
+        auto s = ScenarioSet(*request);
         preprocessScenario(s);
         response->has_succeeded = true;
         response->message = "success";
@@ -76,7 +76,7 @@ bool Preprocessor::validateXOSC(const boost::filesystem::path & file_name, bool 
   return result.find("All xosc files given are standard compliant.") != std::string::npos;
 }
 
-void Preprocessor::preprocessScenario(ScenarioInfo & scenario)
+void Preprocessor::preprocessScenario(ScenarioSet & scenario)
 {
   using openscenario_interpreter::OpenScenario;
   using openscenario_interpreter::ParameterValueDistribution;

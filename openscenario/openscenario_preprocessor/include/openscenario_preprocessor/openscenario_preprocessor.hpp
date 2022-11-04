@@ -26,12 +26,11 @@
 
 namespace openscenario_preprocessor
 {
-// TODO : rename
-struct ScenarioInfo
+struct ScenarioSet
 {
-  ScenarioInfo() = default;
+  ScenarioSet() = default;
 
-  explicit ScenarioInfo(openscenario_preprocessor_msgs::srv::Load::Request & load_request)
+  explicit ScenarioSet(openscenario_preprocessor_msgs::srv::Load::Request & load_request)
   {
     path = load_request.path;
     expect = load_request.expect;
@@ -57,11 +56,10 @@ struct ScenarioInfo
 class Preprocessor : public rclcpp::Node
 {
 public:
-  //  OPENSCENARIO_INTERPRETER_PUBLIC
   explicit Preprocessor(const rclcpp::NodeOptions &);
 
 private:
-  void preprocessScenario(ScenarioInfo &);
+  void preprocessScenario(ScenarioSet &);
 
   [[nodiscard]] bool validateXOSC(const boost::filesystem::path &, bool);
 
@@ -72,7 +70,7 @@ private:
   rclcpp::Service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>::SharedPtr
     check_server;
 
-  std::deque<ScenarioInfo> preprocessed_scenarios;
+  std::deque<ScenarioSet> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
 };
