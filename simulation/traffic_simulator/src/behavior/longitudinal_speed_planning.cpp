@@ -36,6 +36,19 @@ double LongitudinalSpeedPlanner::getAccelerationDuration(
          getLinearAccelerationDuration(target_speed, constraints, current_twist, current_accel);
 }
 
+void LongitudinalSpeedPlanner::updateConstraintsFromJerkAndTimeConstraint(
+  double target_speed, const geometry_msgs::msg::Twist & current_twist,
+  const geometry_msgs::msg::Accel & current_accel, double linear_jerk, double acceleration_duration,
+  traffic_simulator_msgs::msg::DynamicConstraints & constraints)
+{
+  constraints.max_acceleration_rate = linear_jerk;
+  constraints.max_deceleration_rate = linear_jerk;
+  double t1 =
+    getQuadraticAccelerationDuration(target_speed, constraints, current_twist, current_accel);
+  if (t1 <= acceleration_duration) {
+  }
+}
+
 std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
 LongitudinalSpeedPlanner::getDynamicStates(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,

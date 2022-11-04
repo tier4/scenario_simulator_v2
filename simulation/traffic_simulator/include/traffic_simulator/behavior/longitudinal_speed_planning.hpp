@@ -35,6 +35,10 @@ public:
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;
+  void updateConstraintsFromJerkAndTimeConstraint(
+    double target_speed, const geometry_msgs::msg::Twist & current_twist,
+    const geometry_msgs::msg::Accel & current_accel, double linear_jerk,
+    double acceleration_duration, traffic_simulator_msgs::msg::DynamicConstraints & constraints);
   const double step_time;
   const std::string entity;
 
