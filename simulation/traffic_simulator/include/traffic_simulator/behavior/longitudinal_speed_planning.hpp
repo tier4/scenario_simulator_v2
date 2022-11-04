@@ -31,6 +31,10 @@ public:
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;
+  double getAccelerationDuration(
+    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
+    const geometry_msgs::msg::Twist & current_twist,
+    const geometry_msgs::msg::Accel & current_accel) const;
   const double step_time;
   const std::string entity;
 
@@ -52,14 +56,11 @@ private:
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;
-  double getLinearAccelerationDurationToBound(
-    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
-    const geometry_msgs::msg::Twist & current_twist) const;
-  double getQuadraticAccelerationDurationToBound(
+  double getLinearAccelerationDuration(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;
-  double getLinearAccelerationDurationToBound(
+  double getQuadraticAccelerationDurationToBound(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;

@@ -27,6 +27,15 @@ LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(double step_time, const std::
 {
 }
 
+double LongitudinalSpeedPlanner::getAccelerationDuration(
+  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
+  const geometry_msgs::msg::Twist & current_twist,
+  const geometry_msgs::msg::Accel & current_accel) const
+{
+  return getQuadraticAccelerationDuration(target_speed, constraints, current_twist, current_accel) +
+         getLinearAccelerationDuration(target_speed, constraints, current_twist, current_accel);
+}
+
 std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
 LongitudinalSpeedPlanner::getDynamicStates(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
@@ -66,17 +75,6 @@ double LongitudinalSpeedPlanner::getVelocityWithConstantJerk(
 {
   return current_twist.linear.x + 0.5 * linear_jerk * duration * duration +
          current_accel.linear.x * duration;
-}
-
-double LongitudinalSpeedPlanner::getLinearAccelerationDurationToBound(
-  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
-  const geometry_msgs::msg::Twist & current_twist) const
-{
-  if (isAccelerating(target_speed, current_twist)) {
-    return (target_speed - current_twist.linear.x) / constraints.max_acceleration;
-  } else {
-    return (current_twist.linear.x - target_speed) / constraints.max_deceleration;
-  }
 }
 
 double LongitudinalSpeedPlanner::getQuadraticAccelerationDurationToBound(
@@ -129,7 +127,7 @@ double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
   }
 }
 
-double LongitudinalSpeedPlanner::getLinearAccelerationDurationToBound(
+double LongitudinalSpeedPlanner::getLinearAccelerationDuration(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist,
   const geometry_msgs::msg::Accel & current_accel) const
@@ -143,7 +141,11 @@ double LongitudinalSpeedPlanner::getLinearAccelerationDurationToBound(
     geometry_msgs::msg::Twist twist = current_twist;
     twist.linear.x = getVelocityWithConstantJerk(
       target_speed, current_twist, current_accel, constraints, quad_duration);
-    return getLinearAccelerationDurationToBound(target_speed, constraints, twist);
+    if (isAccelerating(target_speed, current_twist)) {
+      return (target_speed - twist.linear.x) / constraints.max_acceleration;
+    } else {
+      return (twist.linear.x - target_speed) / constraints.max_deceleration;
+    }
   }
 }
 
