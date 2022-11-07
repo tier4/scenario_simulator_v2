@@ -111,10 +111,14 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::MOTORCYCLE));
+              object.kinematics.orientation_availability =
+                autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
               break;
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
               object.classification.push_back(makeObjectClassification(
                 autoware_auto_perception_msgs::msg::ObjectClassification::BICYCLE));
+              object.kinematics.orientation_availability =
+                autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
               break;
             case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
               object.classification.push_back(makeObjectClassification(
