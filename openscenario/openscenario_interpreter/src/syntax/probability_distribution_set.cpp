@@ -28,5 +28,9 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
     adaptor.probabilities.end())
 {
 }
+[[nodiscard]] auto ProbabilityDistributionSet::evaluate() -> Object
+{
+  return make<String>(adaptor.values.at(distribution.generate()));
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

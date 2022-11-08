@@ -49,6 +49,8 @@ struct NormalDistribution : public ComplexType
   StochasticDistributionClass<std::normal_distribution<Double::value_type>> distribution;
 
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

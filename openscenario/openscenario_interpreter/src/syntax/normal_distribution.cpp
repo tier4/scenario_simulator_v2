@@ -29,5 +29,9 @@ NormalDistribution::NormalDistribution(
     static_cast<double>(variance.data))
 {
 }
+[[nodiscard]] auto NormalDistribution::evaluate() -> Object
+{
+  return make<Double>(range.evaluate(distribution.generate()));
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
