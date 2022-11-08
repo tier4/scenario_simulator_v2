@@ -38,8 +38,7 @@ struct DistributionRange : private Scope, public ComplexType
 
   explicit DistributionRange(const pugi::xml_node &, Scope &);
 
-  // TODO: implement evaluate()
-  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

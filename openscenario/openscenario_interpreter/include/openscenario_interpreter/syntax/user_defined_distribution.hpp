@@ -41,8 +41,7 @@ struct UserDefinedDistribution : private Scope, public ComplexType
 
   explicit UserDefinedDistribution(const pugi::xml_node &, const Scope &);
 
-  // TODO: implement evaluate()`
-  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

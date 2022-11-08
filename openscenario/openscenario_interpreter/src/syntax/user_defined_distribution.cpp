@@ -26,5 +26,10 @@ UserDefinedDistribution::UserDefinedDistribution(const pugi::xml_node & node, co
   content(readContent<String>(node, local()))
 {
 }
+
+auto UserDefinedDistribution::evaluate() -> Object
+{
+  throw common::Error("UserDefinedDistribution is not implemented yet");
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

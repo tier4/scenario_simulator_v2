@@ -25,5 +25,10 @@ ValueSetDistribution::ValueSetDistribution(
   parameter_value_sets(readElements<ParameterValueSet, 1>("ParameterValueSet", node, scope))
 {
 }
+
+auto ValueSetDistribution::evaluate() -> Object
+{
+  throw common::Error("ValueSetDistribution is not implemented yet");
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

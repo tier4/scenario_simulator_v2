@@ -23,5 +23,10 @@ DistributionSet::DistributionSet(const pugi::xml_node & node, Scope & scope)
 : Scope(scope), elements(readElements<DistributionSetElement, 1>("Element", node, local()))
 {
 }
+
+auto DistributionSet::evaluate() -> Object
+{
+  throw common::Error("DistributionSet is not implemented yet");
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

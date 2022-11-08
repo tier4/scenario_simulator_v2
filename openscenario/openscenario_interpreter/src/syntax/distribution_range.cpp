@@ -24,5 +24,10 @@ DistributionRange::DistributionRange(const pugi::xml_node & node, Scope & scope)
 {
 }
 
+auto DistributionRange::evaluate() -> Object
+{
+  throw common::Error("DistributionRange is not implemented yet");
+}
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -25,5 +25,10 @@ ParameterValueSet::ParameterValueSet(
   parameter_assignments(readElements<ParameterAssignment, 1>("ParameterAssignment", node, local()))
 {
 }
+
+auto ParameterValueSet::evaluate() -> Object
+{
+  throw common::Error("ParameterValueSet is not implemented yet");
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
