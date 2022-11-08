@@ -16,7 +16,6 @@
 #define TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 
 #include <boost/optional.hpp>
-#include <limits>
 #include <memory>
 #include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
@@ -75,8 +74,7 @@ public:
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteLanelets(double horizon = std::numeric_limits<double>::infinity())
-    -> std::vector<std::int64_t> override;
+  auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 

@@ -27,7 +27,6 @@
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 #include <tf2/LinearMath/Matrix3x3.h>
-
 #ifdef USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #else
@@ -45,7 +44,6 @@
 #include <lanelet2_extension/utility/message_conversion.hpp>
 #include <lanelet2_extension/utility/query.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
-#include <limits>
 #include <map>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -117,13 +115,11 @@ public:
   double getSpeedLimit(std::vector<std::int64_t> lanelet_ids);
   bool isInRoute(std::int64_t lanelet_id, std::vector<std::int64_t> route) const;
   std::vector<std::int64_t> getFollowingLanelets(
-    std::int64_t lanelet_id, double distance = std::numeric_limits<double>::infinity(),
-    bool include_self = true);
+    std::int64_t lanelet_id, double distance = 100, bool include_self = true);
   std::vector<std::int64_t> getFollowingLanelets(
-    std::int64_t lanelet_id, std::vector<std::int64_t> candidate_lanelet_ids,
-    double distance = std::numeric_limits<double>::infinity(), bool include_self = true);
-  std::vector<std::int64_t> getPreviousLanelets(
-    std::int64_t lanelet_id, double distance = std::numeric_limits<double>::infinity());
+    std::int64_t lanelet_id, std::vector<std::int64_t> candidate_lanelet_ids, double distance = 100,
+    bool include_self = true);
+  std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::vector<std::int64_t> lanelet_ids);
   std::shared_ptr<math::geometry::CatmullRomSpline> getCenterPointsSpline(std::int64_t lanelet_id);

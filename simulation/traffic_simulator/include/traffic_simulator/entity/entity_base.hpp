@@ -19,7 +19,6 @@
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <boost/optional.hpp>
 #include <concealer/autoware.hpp>
-#include <limits>
 #include <memory>
 #include <queue>
 #include <string>
@@ -97,8 +96,7 @@ public:
 
   virtual auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
-  virtual auto getRouteLanelets(const double horizon = std::numeric_limits<double>::infinity())
-    -> std::vector<std::int64_t> = 0;
+  virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
 
   /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
 

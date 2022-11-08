@@ -16,7 +16,6 @@
 #define TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 
 #include <boost/optional.hpp>
-#include <limits>
 #include <memory>
 #include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
@@ -112,8 +111,7 @@ public:
     return behavior_plugin_ptr_->getCurrentAction();
   }
 
-  std::vector<std::int64_t> getRouteLanelets(
-    double horizon = std::numeric_limits<double>::infinity()) override
+  std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
     if (status_.lanelet_pose_valid) {
       return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);

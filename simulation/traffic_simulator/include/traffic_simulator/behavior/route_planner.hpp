@@ -16,7 +16,6 @@
 #define BEHAVIOR_TREE_PLUGIN__ROUTE_PLANNER_HPP_
 
 #include <deque>
-#include <limits>
 #include <memory>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
@@ -30,17 +29,14 @@ public:
 
   std::vector<std::int64_t> getRouteLanelets(
     const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints,
-    double horizon = std::numeric_limits<double>::infinity());
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon = 100);
+
+  std::vector<std::int64_t> getRouteLanelets(
+    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon = 100);
 
   std::vector<std::int64_t> getRouteLanelets(
     const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    double horizon = std::numeric_limits<double>::infinity());
-
-  std::vector<std::int64_t> getRouteLanelets(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose,
-    double horizon = std::numeric_limits<double>::infinity());
+    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon = 100);
 
   void cancelGoal();
   std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses();
