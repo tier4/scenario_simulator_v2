@@ -36,7 +36,8 @@ inline namespace syntax
 struct Histogram : public ComplexType
 {
   /**
-   * Note: HistogramBin must be stored in continuous range and ascending order, to `bins`
+   * Note: HistogramBin must be stored in continuous range and ascending order to `bins`
+   *       due to restriction of `BinAdapter`
    */
   const std::list<HistogramBin> bins;
 

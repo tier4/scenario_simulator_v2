@@ -40,8 +40,6 @@ struct UniformDistribution : public ComplexType
 
   explicit UniformDistribution(const pugi::xml_node &, Scope & scope);
 
-  // TODO: implement evaluate()
-  // Use std::uniform_real_distribution from <random>
   auto evaluate() -> Object;
 };
 }  // namespace syntax

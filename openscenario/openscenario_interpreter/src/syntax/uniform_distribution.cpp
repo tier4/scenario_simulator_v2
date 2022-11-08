@@ -27,10 +27,11 @@ UniformDistribution::UniformDistribution(
     range.upper_limit.data)
 {
 }
+
 [[nodiscard]] auto UniformDistribution::evaluate() -> Object
 {
   // Return a value without filtering by this->range here
-  // because it is embedded in distribution
+  // because it is embedded in StochasticDistributionClass
   return make<Double>(distribution.generate());
 }
 }  // namespace syntax
