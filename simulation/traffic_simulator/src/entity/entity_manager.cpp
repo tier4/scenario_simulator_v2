@@ -167,23 +167,15 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
   return hdmap_utils_ptr_;
 }
 
-auto EntityManager::getLongitudinalDistance(
-  const LaneletPose & from, const LaneletPose & to, const double max_distance)
+auto EntityManager::getLongitudinalDistance(const LaneletPose & from, const LaneletPose & to)
   -> boost::optional<double>
 {
   auto forward_distance =
     hdmap_utils_ptr_->getLongitudinalDistance(from.lanelet_id, from.s, to.lanelet_id, to.s);
 
-  if (forward_distance and forward_distance.get() > max_distance) {
-    forward_distance = boost::none;
-  }
-
   auto backward_distance =
     hdmap_utils_ptr_->getLongitudinalDistance(to.lanelet_id, to.s, from.lanelet_id, from.s);
 
-  if (backward_distance and backward_distance.get() > max_distance) {
-    backward_distance = boost::none;
-  }
   if (forward_distance && backward_distance) {
     if (forward_distance.get() > backward_distance.get()) {
       return -backward_distance.get();
@@ -194,38 +186,37 @@ auto EntityManager::getLongitudinalDistance(
     return forward_distance.get();
   } else if (backward_distance) {
     return -backward_distance.get();
+  } else {
+    return boost::none;
   }
-  return boost::none;
 }
 
-auto EntityManager::getLongitudinalDistance(
-  const LaneletPose & from, const std::string & to, const double max_distance)
+auto EntityManager::getLongitudinalDistance(const LaneletPose & from, const std::string & to)
   -> boost::optional<double>
 {
   if (!laneMatchingSucceed(to)) {
     return boost::none;
   } else {
-    return getLongitudinalDistance(from, getEntityStatus(to).lanelet_pose, max_distance);
+    return getLongitudinalDistance(from, getEntityStatus(to).lanelet_pose);
   }
 }
 
-auto EntityManager::getLongitudinalDistance(
-  const std::string & from, const LaneletPose & to, const double max_distance)
+auto EntityManager::getLongitudinalDistance(const std::string & from, const LaneletPose & to)
   -> boost::optional<double>
 {
   if (!laneMatchingSucceed(from)) {
     return boost::none;
   } else {
-    return getLongitudinalDistance(getEntityStatus(from).lanelet_pose, to, max_distance);
+    return getLongitudinalDistance(getEntityStatus(from).lanelet_pose, to);
   }
 }
 
-auto EntityManager::getLongitudinalDistance(
-  const std::string & from, const std::string & to, const double max_distance)
+auto EntityManager::getLongitudinalDistance(const std::string & from, const std::string & to)
   -> boost::optional<double>
 {
   if (laneMatchingSucceed(from) and laneMatchingSucceed(to)) {
-    return getLongitudinalDistance(getEntityStatus(from).lanelet_pose, to, max_distance);
+    return getLongitudinalDistance(
+      getEntityStatus(from).lanelet_pose, getEntityStatus(to).lanelet_pose);
   } else {
     return boost::none;
   }
