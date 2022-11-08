@@ -22,6 +22,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -59,6 +60,10 @@ public:
 
   virtual auto getCurrentAction() const -> std::string = 0;
 
+  /*   */ auto getCurrentAccel() const -> geometry_msgs::msg::Accel;
+
+  /*   */ auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
+
   /*   */ auto getDistanceToLaneBound() -> double;
 
   /*   */ auto getDistanceToLaneBound(std::int64_t lanelet_id) const -> double;
@@ -78,6 +83,9 @@ public:
   /*   */ auto getDistanceToRightLaneBound(const std::vector<std::int64_t> &) const -> double;
 
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
+
+  virtual auto getDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints;
 
   virtual auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
@@ -155,6 +163,8 @@ public:
 
   virtual void setDecelerationRateLimit(double deceleration_rate) = 0;
 
+  /*   */ void setDynamicConstraints(const traffic_simulator_msgs::msg::DynamicConstraints &);
+
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
 
   /*   */ void setEntityTypeList(
@@ -205,6 +215,9 @@ protected:
 
   boost::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
+
+  std::unique_ptr<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>
+    speed_planner_;
 
 private:
   virtual void requestSpeedChangeWithConstantAcceleration(

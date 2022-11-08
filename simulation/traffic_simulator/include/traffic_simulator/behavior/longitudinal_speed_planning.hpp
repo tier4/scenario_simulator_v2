@@ -35,10 +35,13 @@ public:
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel) const;
-  void updateConstraintsFromJerkAndTimeConstraint(
+  auto planConstraintsFromJerkAndTimeConstraint(
     double target_speed, const geometry_msgs::msg::Twist & current_twist,
-    const geometry_msgs::msg::Accel & current_accel, double linear_jerk,
-    double acceleration_duration, traffic_simulator_msgs::msg::DynamicConstraints & constraints);
+    const geometry_msgs::msg::Accel & current_accel, double acceleration_duration,
+    const traffic_simulator_msgs::msg::DynamicConstraints & constraints)
+    -> traffic_simulator_msgs::msg::DynamicConstraints;
+  bool isAccelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
+  bool isDecelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
   const double step_time;
   const std::string entity;
 
@@ -55,7 +58,6 @@ private:
   double getVelocityWithConstantJerk(
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel, double linear_jerk, double duration) const;
-  bool isAccelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
   double getQuadraticAccelerationDuration(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,

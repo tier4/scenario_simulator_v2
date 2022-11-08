@@ -77,7 +77,7 @@ private:
       getVehicleParameters());
     api_.setLinearVelocity("front", 10);
     api_.requestSpeedChange(
-      "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      "front", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 4.0),
       true);

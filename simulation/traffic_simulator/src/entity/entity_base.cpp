@@ -99,6 +99,16 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
   return math::geometry::get2DConvexHull(points_bbox);
 }
 
+auto EntityBase::getCurrentAccel() const -> geometry_msgs::msg::Accel
+{
+  return getStatus().action_status.accel;
+}
+
+auto EntityBase::getCurrentTwist() const -> geometry_msgs::msg::Twist
+{
+  return getStatus().action_status.twist;
+}
+
 auto EntityBase::getDistanceToLaneBound() -> double
 {
   return std::min(getDistanceToLeftLaneBound(), getDistanceToRightLaneBound());
@@ -177,6 +187,12 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
   return *std::min_element(distances.begin(), distances.end());
 }
 
+auto EntityBase::getDynamicConstraints() const
+  -> const traffic_simulator_msgs::msg::DynamicConstraints
+{
+  return getBehaviorParameter().dynamic_constraints;
+}
+
 auto EntityBase::getEntityStatusBeforeUpdate() const
   -> const traffic_simulator_msgs::msg::EntityStatus &
 {
@@ -222,15 +238,14 @@ void EntityBase::onUpdate(double /*current_time*/, double step_time)
 {
   job_list_.update(step_time);
   status_before_update_ = status_;
+  speed_planner_ =
+    std::make_unique<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>(
+      step_time, name);
 }
 
 void EntityBase::resetDynamicConstraints()
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
-  auto behavior_parameter = getBehaviorParameter();
-  behavior_parameter.dynamic_constraints = getDefaultDynamicConstraints();
-  setBehaviorParameter(behavior_parameter);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  setDynamicConstraints(getDefaultDynamicConstraints());
 }
 
 void EntityBase::requestLaneChange(
@@ -285,7 +300,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
-      if (getStatus().action_status.twist.linear.x < target_speed) {
+      if (speed_planner_->isAccelerating(target_speed, getCurrentTwist())) {
         setAccelerationLimit(std::abs(acceleration));
         job_list_.append(
           /**
@@ -298,7 +313,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
            * @brief Resets acceleration limit.
            */
           [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
-      } else if (getStatus().action_status.twist.linear.x > target_speed) {
+      } else if (speed_planner_->isDecelerating(target_speed, getCurrentTwist())) {
         setDecelerationLimit(std::abs(acceleration));
         job_list_.append(
           /**
@@ -326,9 +341,31 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 void EntityBase::requestSpeedChangeWithTimeConstraint(
   const double target_speed, const speed_change::Transition transition, double acceleration_time)
 {
-  requestSpeedChangeWithConstantAcceleration(
-    target_speed, transition,
-    (target_speed - getStatus().action_status.twist.linear.x) / acceleration_time, false);
+  switch (transition) {
+    case speed_change::Transition::LINEAR: {
+      setDynamicConstraints(speed_planner_->planConstraintsFromJerkAndTimeConstraint(
+        target_speed, getCurrentTwist(), getCurrentAccel(), acceleration_time,
+        getDynamicConstraints()));
+      job_list_.append(
+        /**
+           * @brief Checking if the entity reaches target speed.
+           */
+        [this, target_speed](double) {
+          return std::abs(getCurrentTwist().linear.x - target_speed) < 0.01;
+        },
+        /**
+           * @brief Resets deceleration limit.
+           */
+        [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
+      requestSpeedChange(target_speed, true);
+      break;
+    }
+    case speed_change::Transition::STEP: {
+      requestSpeedChange(target_speed, true);
+      setLinearVelocity(target_speed);
+      break;
+    }
+  }
 }
 
 void EntityBase::requestSpeedChange(
@@ -530,6 +567,14 @@ void EntityBase::requestSpeedChange(
 void EntityBase::requestWalkStraight()
 {
   THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
+}
+
+void EntityBase::setDynamicConstraints(
+  const traffic_simulator_msgs::msg::DynamicConstraints & constraints)
+{
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.dynamic_constraints = constraints;
+  setBehaviorParameter(behavior_parameter);
 }
 
 void EntityBase::setEntityTypeList(

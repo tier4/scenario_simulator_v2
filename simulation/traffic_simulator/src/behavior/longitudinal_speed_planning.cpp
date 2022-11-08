@@ -15,6 +15,7 @@
 #include <boost/algorithm/clamp.hpp>
 #include <geometry/linear_algebra.hpp>
 #include <iostream>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 
@@ -36,22 +37,31 @@ double LongitudinalSpeedPlanner::getAccelerationDuration(
          getLinearAccelerationDuration(target_speed, constraints, current_twist, current_accel);
 }
 
-void LongitudinalSpeedPlanner::updateConstraintsFromJerkAndTimeConstraint(
+auto LongitudinalSpeedPlanner::planConstraintsFromJerkAndTimeConstraint(
   double target_speed, const geometry_msgs::msg::Twist & current_twist,
-  const geometry_msgs::msg::Accel & current_accel, double linear_jerk, double acceleration_duration,
-  traffic_simulator_msgs::msg::DynamicConstraints & constraints)
+  const geometry_msgs::msg::Accel & current_accel, double acceleration_duration,
+  const traffic_simulator_msgs::msg::DynamicConstraints & constraints)
+  -> traffic_simulator_msgs::msg::DynamicConstraints
 {
-  constraints.max_acceleration_rate = linear_jerk;
-  constraints.max_deceleration_rate = linear_jerk;
+  traffic_simulator_msgs::msg::DynamicConstraints ret = constraints;
   const double t1 =
     getQuadraticAccelerationDuration(target_speed, constraints, current_twist, current_accel);
-  if (t1 <= acceleration_duration) {
+  if (t1 >= acceleration_duration) {
     // In this case, acceleration profile was uniquely determined, so you cannot reach target speed in target duration.
-    return;
+    return ret;
   }
   geometry_msgs::msg::Twist v1 = current_twist;
   v1.linear.x =
     getVelocityWithConstantJerk(target_speed, current_twist, current_accel, constraints, t1);
+  if (isAccelerating(target_speed, v1)) {
+    ret.max_acceleration = (target_speed - v1.linear.x) / (acceleration_duration - t1);
+    ret.max_deceleration = (target_speed - v1.linear.x) / (acceleration_duration - t1);
+  } else {
+    ret.max_acceleration = (v1.linear.x - target_speed) / (acceleration_duration - t1);
+    ret.max_deceleration = (v1.linear.x - target_speed) / (acceleration_duration - t1);
+  }
+  RCLCPP_WARN_STREAM(rclcpp::get_logger("test"), rosidl_generator_traits::to_yaml(ret));
+  return ret;
 }
 
 std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
@@ -70,6 +80,11 @@ LongitudinalSpeedPlanner::getDynamicStates(
   auto twist = forward(accel, current_twist, constraints);
   accel = timeDerivative(current_twist, twist);
   linear_jerk = timeDerivative(current_accel, accel);
+  /*
+  RCLCPP_WARN_STREAM(
+    rclcpp::get_logger("test"),
+    entity << "'s jerk : " << linear_jerk << " accel: " << accel.linear.x);
+*/
   return std::make_tuple(twist, accel, linear_jerk);
 }
 
@@ -126,7 +141,7 @@ double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
     double v = getVelocityWithConstantJerk(
       current_twist, current_accel, constraints.max_acceleration_rate, duration);
     // While quadratic acceleration, the entity does not reqched the target speed.
-    if (target_speed <= std::abs(v)) {
+    if (std::abs(v - target_speed) >= 0.01) {
       return duration;
     }
     // While quadratic acceleration, the entity reqched the target speed.
@@ -140,7 +155,7 @@ double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
     double v = getVelocityWithConstantJerk(
       current_twist, current_accel, -constraints.max_deceleration_rate, duration);
     // While quadratic acceleration, the entity does not reqched the target speed.
-    if (target_speed <= std::abs(v)) {
+    if (std::abs(v - target_speed) >= 0.01) {
       return duration;
     }
     // While quadratic acceleration, the entity reqched the target speed.
@@ -192,6 +207,15 @@ bool LongitudinalSpeedPlanner::isAccelerating(
   double target_speed, const geometry_msgs::msg::Twist & current_twist) const
 {
   if (current_twist.linear.x > target_speed) {
+    return false;
+  }
+  return true;
+}
+
+bool LongitudinalSpeedPlanner::isDecelerating(
+  double target_speed, const geometry_msgs::msg::Twist & current_twist) const
+{
+  if (current_twist.linear.x < target_speed) {
     return false;
   }
   return true;
