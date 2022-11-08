@@ -24,5 +24,6 @@ Range::Range(const pugi::xml_node & node, Scope & scope)
   upper_limit(readAttribute<Double>("upperLimit", node, scope))
 {
 }
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter

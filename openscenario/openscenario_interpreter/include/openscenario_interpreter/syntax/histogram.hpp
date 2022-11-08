@@ -58,6 +58,8 @@ struct Histogram : public ComplexType
     distribution;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
+
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
