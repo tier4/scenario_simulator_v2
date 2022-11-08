@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- PoissonDistribution ----------------------------------------------------
+/* ---- PoissonDistribution 1.2 ------------------------------------------------
  *
  *  <xsd:complexType name="PoissonDistribution">
  *    <xsd:sequence>
@@ -43,8 +43,6 @@ struct PoissonDistribution : public ComplexType
   StochasticDistributionClass<std::poisson_distribution<>> distribution;
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
-
-  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

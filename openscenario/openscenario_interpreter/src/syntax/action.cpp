@@ -38,6 +38,7 @@ auto Action::endsImmediately() const -> bool
 {
   return apply<bool>([](const auto & action) { return action.endsImmediately(); }, *this);
 }
+
 auto Action::run() -> void
 {
   return apply<void>([](auto && action) { return action.run(); }, *this);

@@ -51,7 +51,7 @@ auto toString(const VehicleModelType datum) -> std::string
   THROW_SIMULATION_ERROR("Unsupported vehicle model type, failed to convert to string");
 }
 
-auto getVehicleModelType()
+auto EgoEntity::getVehicleModelType() -> VehicleModelType
 {
   const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
@@ -76,9 +76,8 @@ auto getVehicleModelType()
   }
 }
 
-auto makeSimulationModel(
-  const VehicleModelType vehicle_model_type,
-  const double step_time,  //
+auto EgoEntity::makeSimulationModel(
+  const VehicleModelType vehicle_model_type, const double step_time,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
   -> const std::shared_ptr<SimModelInterface>
 {
@@ -127,7 +126,8 @@ auto makeSimulationModel(
   }
 }
 
-auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
+auto EgoEntity::makeAutoware(const Configuration & configuration)
+  -> std::unique_ptr<concealer::Autoware>
 {
   if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
       architecture_type == "awf/universe") {
@@ -153,11 +153,10 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
 }
 
 EgoEntity::EgoEntity(
-  const std::string & name,             //
-  const Configuration & configuration,  //
-  const double step_time,               //
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
-: VehicleEntity(name, parameters),
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+  const Configuration & configuration, const double step_time)
+: VehicleEntity(name, entity_status, parameters),
   autoware(makeAutoware(configuration)),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
@@ -176,16 +175,16 @@ auto EgoEntity::getCurrentAction() const -> std::string
   return state.empty() ? "Launching" : state;
 }
 
-auto EgoEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel
+auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
-  traffic_simulator_msgs::msg::DriverModel model;
+  traffic_simulator_msgs::msg::BehaviorParameter parameter;
   /**
    * @brief TODO, Input values get from autoware.
    */
-  model.see_around = true;
-  model.acceleration = 0;
-  model.deceleration = 0;
-  return model;
+  parameter.see_around = true;
+  parameter.acceleration = 0;
+  parameter.deceleration = 0;
+  return parameter;
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
@@ -194,8 +193,8 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   traffic_simulator_msgs::msg::EntityStatus status;
   {
     status.time = time;
-    status.type = getEntityType();
-    status.bounding_box = getBoundingBox();
+    status.type = getStatus().type;
+    status.bounding_box = getStatus().bounding_box;
     status.pose = getCurrentPose();
     status.action_status.twist = getCurrentTwist();
     status.action_status.accel = [&]() {
@@ -213,11 +212,13 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
     if (route_lanelets.empty()) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
+      lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
     } else {
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, route_lanelets, 1.0);
       if (!lanelet_pose) {
-        lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
+        lanelet_pose =
+          hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
       }
     }
 
@@ -236,17 +237,6 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   }
 
   return status;
-}
-
-auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static const auto entity_type = []() {
-    traffic_simulator_msgs::msg::EntityType entity_type;
-    entity_type.type = traffic_simulator_msgs::msg::EntityType::EGO;
-    return entity_type;
-  }();
-
-  return entity_type;
 }
 
 auto EgoEntity::getEntityTypename() const -> const std::string &
@@ -441,13 +431,13 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
-auto EgoEntity::setDriverModel(const traffic_simulator_msgs::msg::DriverModel &) -> void  //
+auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) -> void
 {
 }
 
-bool EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
+auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
-  const bool success = VehicleEntity::setStatus(status);  // NOTE: setStatus always succeeds.
+  VehicleEntity::setStatus(status);
 
   const auto current_pose = getStatus().pose;
 
@@ -466,8 +456,6 @@ bool EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
   if (not initial_pose_) {
     initial_pose_ = current_pose;
   }
-
-  return success;
 }
 
 void EgoEntity::requestSpeedChange(double value, bool)

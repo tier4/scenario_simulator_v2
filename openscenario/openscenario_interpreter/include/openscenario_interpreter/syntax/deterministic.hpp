@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Deterministic ----------------------------------------------------------
+/* ---- Deterministic 1.2 ------------------------------------------------------
  *
  *  <xsd:complexType name="Deterministic">
  *    <xsd:sequence>

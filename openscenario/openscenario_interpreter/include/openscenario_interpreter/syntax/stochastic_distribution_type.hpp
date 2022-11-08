@@ -28,7 +28,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- StochasticDistributionType ---------------------------------------------
+/* ---- StochasticDistributionType 1.2 -----------------------------------------
  *
  *  <xsd:group name="StochasticDistributionType">
  *    <xsd:sequence>

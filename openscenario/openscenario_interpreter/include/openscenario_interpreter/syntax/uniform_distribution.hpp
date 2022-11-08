@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- UniformDistribution ----------------------------------------------------
+/* ---- UniformDistribution 1.2 ------------------------------------------------
  *
  *  <xsd:complexType name="UniformDistribution">
  *    <xsd:sequence>
@@ -42,7 +42,6 @@ struct UniformDistribution : public ComplexType
 
   // TODO: implement evaluate()
   // Use std::uniform_real_distribution from <random>
-  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

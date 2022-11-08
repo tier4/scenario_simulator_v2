@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ValueSetDistribution ---------------------------------------------------
+/* ---- ValueSetDistribution 1.2 -----------------------------------------------
  *
  *  <xsd:complexType name="ValueSetDistribution">
  *    <xsd:sequence>
@@ -38,7 +38,6 @@ struct ValueSetDistribution : public Scope, public ComplexType
   explicit ValueSetDistribution(const pugi::xml_node &, Scope & scope);
 
   // TODO: implement evaluate()
-  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

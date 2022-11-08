@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ProbabilityDistributionSet ---------------------------------------------
+/* ---- ProbabilityDistributionSet 1.2 -----------------------------------------
  *
  *  <xsd:complexType name="ProbabilityDistributionSet">
  *    <xsd:sequence>
@@ -54,7 +54,6 @@ struct ProbabilityDistributionSet : public ComplexType
 
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
   // TODO: implement evaluate()
   // Use std::discrete_distribution from <random>
 };

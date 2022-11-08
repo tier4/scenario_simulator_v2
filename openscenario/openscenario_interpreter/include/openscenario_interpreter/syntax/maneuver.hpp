@@ -41,9 +41,13 @@ struct Maneuver : public Scope, public StoryboardElement
   const ParameterDeclarations parameter_declarations;
 
   explicit Maneuver(const pugi::xml_node &, Scope &);
-};
 
-auto operator<<(nlohmann::json &, const Maneuver &) -> nlohmann::json &;
+  auto overrideEvents() -> void;
+
+  auto running_events_count() const -> std::size_t;
+
+  friend auto operator<<(nlohmann::json &, const Maneuver &) -> nlohmann::json &;
+};
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

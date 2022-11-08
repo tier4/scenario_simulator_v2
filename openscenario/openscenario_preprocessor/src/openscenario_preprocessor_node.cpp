@@ -16,7 +16,6 @@
 
 #include <cstdlib>
 #include <memory>
-
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
 
 int main(const int argc, char const * const * const argv)

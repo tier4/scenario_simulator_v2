@@ -16,13 +16,14 @@
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
 
 #include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/static_transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.h>
+
 #ifdef USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #else
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #endif
-#include <tf2_ros/static_transform_broadcaster.h>
-#include <tf2_ros/transform_broadcaster.h>
 
 #include <boost/optional.hpp>
 #include <memory>
@@ -43,8 +44,8 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <type_traits>
@@ -207,7 +208,7 @@ public:
   FORWARD_TO_ENTITY(asAutoware, const);
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(get2DPolygon, const);
-  FORWARD_TO_ENTITY(getBoundingBox, const);
+  FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getDistanceToLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
@@ -215,22 +216,20 @@ public:
   FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, const);
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
-  FORWARD_TO_ENTITY(getDriverModel, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
-  FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
+  FORWARD_TO_ENTITY(setBehaviorParameter, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
-  FORWARD_TO_ENTITY(setDriverModel, );
+  FORWARD_TO_ENTITY(setLinearVelocity, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_ENTITY
@@ -271,9 +270,6 @@ public:
 
   bool laneMatchingSucceed(const std::string & name);
 
-  // TODO (yamacir-kit) Rename to 'hasEntityStatus'
-  bool entityStatusSet(const std::string & name) const;
-
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> boost::optional<double>;
 
@@ -287,8 +283,7 @@ public:
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
-  auto getEntityStatus(const std::string & name) const
-    -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>;
+  auto getEntityStatus(const std::string & name) const -> traffic_simulator_msgs::msg::EntityStatus;
 
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
@@ -322,10 +317,28 @@ public:
 
   auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
 
-  void getGoalPoses(
-    const std::string & name, std::vector<traffic_simulator_msgs::msg::LaneletPose> & goals);
-
-  void getGoalPoses(const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals);
+  template <typename T>
+  auto getGoalPoses(const std::string & name) -> std::vector<T>
+  {
+    if constexpr (std::is_same_v<std::decay_t<T>, traffic_simulator_msgs::msg::LaneletPose>) {
+      if (not npc_logic_started_) {
+        return {};
+      } else {
+        return entities_.at(name)->getGoalPoses();
+      }
+    } else {
+      if (not npc_logic_started_) {
+        return {};
+      } else {
+        std::vector<geometry_msgs::msg::Pose> poses;
+        for (const auto & lanelet_pose :
+             getGoalPoses<traffic_simulator_msgs::msg::LaneletPose>(name)) {
+          poses.push_back(toMapPose(lanelet_pose));
+        }
+        return poses;
+      }
+    }
+  }
 
   bool isEgo(const std::string & name) const;
 
@@ -349,24 +362,76 @@ public:
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
-  bool setEntityStatus(const std::string & name, traffic_simulator_msgs::msg::EntityStatus status);
+  auto setEntityStatus(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &)
+    -> void;
 
   void setVerbose(const bool verbose);
 
-  template <typename Entity, typename... Ts>
-  auto spawnEntity(const std::string & name, Ts &&... xs)
+  template <typename Entity, typename Pose, typename Parameters, typename... Ts>
+  auto spawnEntity(
+    const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
   {
-    const auto result =
-      entities_.emplace(name, std::make_unique<Entity>(name, std::forward<decltype(xs)>(xs)...));
-    if (result.second) {
-      result.first->second->setHdMapUtils(hdmap_utils_ptr_);
-      result.first->second->setTrafficLightManager(traffic_light_manager_ptr_);
-      if (npc_logic_started_ && !isEgo(name)) {
-        result.first->second->startNpcLogic();
+    auto makeEntityStatus = [&]() {
+      traffic_simulator_msgs::msg::EntityStatus entity_status;
+
+      if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
+        if (auto iter = std::find_if(
+              std::begin(entities_), std::end(entities_),
+              [this](auto && each) { return isEgo(each.first); });
+            iter != std::end(entities_)) {
+          THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
+        } else {
+          entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+        }
+      } else if constexpr (std::is_same_v<std::decay_t<Entity>, VehicleEntity>) {
+        entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+      } else if constexpr (std::is_same_v<std::decay_t<Entity>, PedestrianEntity>) {
+        entity_status.type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+      } else {
+        entity_status.type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
       }
-      return result.second;
+
+      entity_status.subtype = parameters.subtype;
+
+      entity_status.time = getCurrentTime();
+
+      entity_status.name = parameters.name;
+
+      entity_status.bounding_box = parameters.bounding_box;
+
+      entity_status.action_status = traffic_simulator_msgs::msg::ActionStatus();
+
+      if constexpr (std::is_same_v<std::decay_t<Pose>, traffic_simulator_msgs::msg::LaneletPose>) {
+        entity_status.pose = toMapPose(pose);
+        entity_status.lanelet_pose = pose;
+        entity_status.lanelet_pose_valid = true;
+      } else {
+        entity_status.pose = pose;
+
+        if (const auto lanelet_pose = toLaneletPose(pose, parameters.bounding_box, false);
+            lanelet_pose) {
+          entity_status.lanelet_pose = *lanelet_pose;
+          entity_status.lanelet_pose_valid = true;
+        } else {
+          entity_status.lanelet_pose_valid = false;
+        }
+      }
+
+      return entity_status;
+    };
+
+    if (const auto [iter, success] = entities_.emplace(
+          name, std::make_unique<Entity>(
+                  name, makeEntityStatus(), parameters, std::forward<decltype(xs)>(xs)...));
+        success) {
+      iter->second->setHdMapUtils(hdmap_utils_ptr_);
+      iter->second->setTrafficLightManager(traffic_light_manager_ptr_);
+      if (npc_logic_started_ && not isEgo(name)) {
+        iter->second->startNpcLogic();
+      }
+      return success;
     } else {
-      THROW_SEMANTIC_ERROR("entity : ", name, " is already exists.");
+      THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");
     }
   }
 

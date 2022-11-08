@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionDefinition -------------------------------------------------
+/* ---- DistributionDefinition 1.2 ---------------------------------------------
  *
  *  <xsd:group name="DistributionDefinition">
  *    <xsd:choice>

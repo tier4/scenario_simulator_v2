@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- NormalDistribution -----------------------------------------------------
+/* ---- NormalDistribution 1.2 -------------------------------------------------
  *
  *  <xsd:complexType name="NormalDistribution">
  *    <xsd:sequence>
@@ -49,8 +49,6 @@ struct NormalDistribution : public ComplexType
   StochasticDistributionClass<std::normal_distribution<Double::value_type>> distribution;
 
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
-
-  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

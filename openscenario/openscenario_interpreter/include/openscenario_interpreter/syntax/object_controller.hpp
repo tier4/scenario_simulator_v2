@@ -17,7 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 namespace openscenario_interpreter
 {

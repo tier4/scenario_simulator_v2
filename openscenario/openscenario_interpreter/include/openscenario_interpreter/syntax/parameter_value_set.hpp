@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ParameterValueSet ---------------------------------------------------
+/* ---- ParameterValueSet 1.2 --------------------------------------------------
  *
  *  <xsd:complexType name="ParameterValueSet">
  *    <xsd:sequence>
@@ -35,9 +35,6 @@ struct ParameterValueSet : private Scope, public ComplexType
   const std::list<ParameterAssignment> parameter_assignments;
 
   explicit ParameterValueSet(const pugi::xml_node &, Scope & scope);
-
-  // TODO: implement evaluate()
-  auto evaluate() -> Object { throw common::Error(__func__, "is not implemented yet"); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

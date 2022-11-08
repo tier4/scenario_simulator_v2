@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- OpenScenarioCategory ---------------------------------------------------
+/* ---- OpenScenarioCategory 1.2 -----------------------------------------------
  *
  *  <xsd:group name="OpenScenarioCategory">
  *    <xsd:choice>
