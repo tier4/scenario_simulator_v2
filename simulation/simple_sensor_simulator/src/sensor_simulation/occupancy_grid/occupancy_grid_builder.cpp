@@ -102,7 +102,7 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
   const auto real_width = width * resolution / 2;
   const auto real_height = height * resolution / 2;
 
-  const auto corners = PolygonType{
+  auto corners = PolygonType{
     makePoint(-real_width, -real_height),  // bottom left
     makePoint(+real_width, -real_height),  // bottom right
     makePoint(+real_width, +real_height),  // top right
@@ -136,12 +136,12 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
   {
     auto angle = [](const PointType & p) { return std::atan2(p.y, p.x); };
 
-    auto minmaxp = std::minmax_element(
+    auto min_max_p = std::minmax_element(
       occupied_polygon.begin(), occupied_polygon.end(),
       [&](const PointType & p, const PointType & q) { return angle(p) < angle(q); });
 
-    if (auto [minp, maxp] = minmaxp; angle(*maxp) - angle(*minp) > M_PI) {
-      minmaxp = std::minmax_element(
+    if (auto [min_p, max_p] = min_max_p; angle(*max_p) - angle(*min_p) > M_PI) {
+      min_max_p = std::minmax_element(
         occupied_polygon.begin(), occupied_polygon.end(),
         [&](const PointType & p, const PointType & q) {
           auto adjust = [](double theta) { return theta < 0 ? theta + 2 * M_PI : theta; };
@@ -149,22 +149,22 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
         });
     }
 
-    auto [minp, maxp] = minmaxp;
-    double minang = angle(*minp);
-    double maxang = angle(*maxp);
+    auto [min_p, max_p] = min_max_p;
+    double minang = angle(*min_p);
+    double maxang = angle(*max_p);
     if (minang > maxang) maxang += 2 * M_PI;
 
     size_t i = 0;
     for (; angle(corners[i % 4]) + 2 * M_PI * (i / 4) <= minang; ++i) {
     }
-    res.emplace_back(*minp);
-    res.emplace_back(projection(*minp, i));
+    res.emplace_back(*min_p);
+    res.emplace_back(projection(*min_p, i));
 
     for (; angle(corners[i % 4]) + 2 * M_PI * (i / 4) < maxang; ++i) {
       res.emplace_back(corners[i % 4]);
     }
-    res.emplace_back(projection(*maxp, i));
-    res.emplace_back(*maxp);
+    res.emplace_back(projection(*max_p, i));
+    res.emplace_back(*max_p);
   }
   return res;
 }
