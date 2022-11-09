@@ -42,8 +42,10 @@ private:
   void onUpdate() override
   {
     // RCLCPP_ERROR_STREAM(get_logger(), rosidl_generator_traits::to_yaml(api_.getBehaviorParameter("ego")));
-    std::cout << api_.getCurrentTime() << ","
-              << api_.getEntityStatus("ego").action_status.twist.linear.x << std::endl;
+    std::cout << api_.getCurrentTime()
+              << ",twist:" << api_.getEntityStatus("ego").action_status.twist.linear.x
+              << ",accel:" << api_.getEntityStatus("ego").action_status.accel.linear.x
+              << ",jerk:" << api_.getEntityStatus("ego").action_status.linear_jerk << std::endl;
     if (
       api_.getCurrentTime() <= 3.9 &&
       api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {

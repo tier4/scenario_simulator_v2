@@ -44,23 +44,25 @@ auto LongitudinalSpeedPlanner::planConstraintsFromJerkAndTimeConstraint(
   -> traffic_simulator_msgs::msg::DynamicConstraints
 {
   traffic_simulator_msgs::msg::DynamicConstraints ret = constraints;
-  const double t1 =
-    getQuadraticAccelerationDuration(target_speed, constraints, current_twist, current_accel);
-  if (t1 >= acceleration_duration) {
-    // In this case, acceleration profile was uniquely determined, so you cannot reach target speed in target duration.
-    return ret;
-  }
-  geometry_msgs::msg::Twist v1 = current_twist;
-  v1.linear.x =
-    getVelocityWithConstantJerk(target_speed, current_twist, current_accel, constraints, t1);
-  if (isAccelerating(target_speed, v1)) {
-    ret.max_acceleration = (target_speed - v1.linear.x) / (acceleration_duration - t1);
-    ret.max_deceleration = (target_speed - v1.linear.x) / (acceleration_duration - t1);
+  if (isAccelerating(target_speed, current_twist)) {
+    ret.max_acceleration = constraints.max_acceleration_rate * acceleration_duration -
+                           std::sqrt(
+                             (constraints.max_acceleration_rate * acceleration_duration *
+                              constraints.max_acceleration_rate * acceleration_duration) +
+                             2 * constraints.max_acceleration_rate *
+                               (current_twist.linear.x +
+                                current_accel.linear.x * acceleration_duration - target_speed)) +
+                           current_accel.linear.x;
   } else {
-    ret.max_acceleration = (v1.linear.x - target_speed) / (acceleration_duration - t1);
-    ret.max_deceleration = (v1.linear.x - target_speed) / (acceleration_duration - t1);
+    ret.max_deceleration = -constraints.max_deceleration_rate * acceleration_duration +
+                           std::sqrt(
+                             (constraints.max_deceleration_rate * acceleration_duration *
+                              constraints.max_deceleration_rate * acceleration_duration) -
+                             2 * constraints.max_deceleration_rate *
+                               (current_twist.linear.x -
+                                current_accel.linear.x * acceleration_duration - target_speed)) +
+                           current_accel.linear.x;
   }
-  RCLCPP_WARN_STREAM(rclcpp::get_logger("test"), rosidl_generator_traits::to_yaml(ret));
   return ret;
 }
 
@@ -138,6 +140,9 @@ double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
   if (isAccelerating(target_speed, current_twist)) {
     double duration =
       (constraints.max_acceleration - current_accel.linear.x) / constraints.max_acceleration_rate;
+    RCLCPP_ERROR_STREAM(
+      rclcpp::get_logger("hi"), constraints.max_acceleration << "," << current_accel.linear.x << ","
+                                                             << constraints.max_acceleration_rate);
     double v = getVelocityWithConstantJerk(
       current_twist, current_accel, constraints.max_acceleration_rate, duration);
     // While quadratic acceleration, the entity does not reqched the target speed.
