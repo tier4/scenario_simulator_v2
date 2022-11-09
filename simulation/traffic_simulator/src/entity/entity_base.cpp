@@ -199,7 +199,7 @@ auto EntityBase::getEntityStatusBeforeUpdate() const
   return status_before_update_;
 }
 
-auto EntityBase::getLinearJerk() const -> boost::optional<double> { return linear_jerk_; }
+auto EntityBase::getLinearJerk() const -> double { return getStatus().action_status.linear_jerk; }
 
 auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
 {

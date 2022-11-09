@@ -155,9 +155,6 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    linear_jerk_ =
-      (status_updated.action_status.accel.linear.x - status_.action_status.accel.linear.x) /
-      step_time;
     setStatus(status_updated);
     updateStandStillDuration(step_time);
   } else {

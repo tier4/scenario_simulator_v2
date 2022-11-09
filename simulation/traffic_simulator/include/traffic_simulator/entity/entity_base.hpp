@@ -97,7 +97,7 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
 
-  /*   */ auto getLinearJerk() const -> boost::optional<double>;
+  /*   */ auto getLinearJerk() const -> double;
 
   /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
@@ -208,8 +208,6 @@ protected:
 
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
-
-  boost::optional<double> linear_jerk_;
 
   double stand_still_duration_ = 0.0;
 
