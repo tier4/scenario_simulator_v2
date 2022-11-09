@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <algorithm>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -134,6 +136,14 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
           simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
           geometry_msgs::msg::Pose pose;
           simulation_interface::toMsg(s.pose(), pose);
+          auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
+          geometry_msgs::msg::Point center_point;
+          simulation_interface::toMsg(s.bounding_box().center(), center_point);
+          Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
+          center = rotation * center;
+          pose.position.x = pose.position.x + center.x();
+          pose.position.y = pose.position.y + center.y();
+          pose.position.z = pose.position.z + center.z();
           object.kinematics.pose_with_covariance.pose = pose;
           object.kinematics.pose_with_covariance.covariance = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
                                                                0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
