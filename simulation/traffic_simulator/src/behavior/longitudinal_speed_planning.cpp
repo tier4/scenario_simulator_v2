@@ -50,6 +50,9 @@ auto LongitudinalSpeedPlanner::planConstraintsFromJerkAndTimeConstraint(
     ret.max_acceleration_rate =
       2 * (target_speed - current_twist.linear.x - current_accel.linear.x * acceleration_duration) /
       (acceleration_duration * acceleration_duration);
+    ret.max_deceleration_rate =
+      2 * (target_speed - current_twist.linear.x - current_accel.linear.x * acceleration_duration) /
+      (acceleration_duration * acceleration_duration);
   } else {
     if (isAccelerating(target_speed, current_twist)) {
       ret.max_acceleration = constraints.max_acceleration_rate * acceleration_duration -
