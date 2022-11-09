@@ -293,10 +293,10 @@ public:
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   // clang-format off
-  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &, const double = 100) -> boost::optional<double>;
-  auto getLongitudinalDistance(const LaneletPose &, const std::string &, const double = 100) -> boost::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const LaneletPose &, const double = 100) -> boost::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const std::string &, const double = 100) -> boost::optional<double>;
+  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &) -> boost::optional<double>;
+  auto getLongitudinalDistance(const LaneletPose &, const std::string &) -> boost::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const LaneletPose &) -> boost::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const std::string &) -> boost::optional<double>;
   // clang-format on
 
   auto getNumberOfEgo() const -> std::size_t;

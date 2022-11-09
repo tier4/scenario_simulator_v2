@@ -25,8 +25,28 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
   parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
   traverse<1, unbounded>(node, "Event", [&](auto && node) {
-    return elements.push_back(readStoryboardElement<Event>(node, local()));
+    return elements.push_back(readStoryboardElement<Event>(node, local(), *this));
   });
+}
+
+auto Maneuver::overrideEvents() -> void
+{
+  for (auto && element : elements) {
+    assert(element.is<Event>());
+    element.as<Event>().override();
+  }
+}
+
+auto Maneuver::running_events_count() const -> std::size_t
+{
+  std::size_t ret = 0;
+  for (auto && element : elements) {
+    assert(element.is<Event>());
+    if (element.as<Event>().is<StoryboardElementState::runningState>()) {
+      ++ret;
+    }
+  }
+  return ret;
 }
 
 auto operator<<(nlohmann::json & json, const Maneuver & maneuver) -> nlohmann::json &
