@@ -445,29 +445,15 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
 traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdatedInWorldFrame(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
-  double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
-  if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = target_accel - step_time * constraints.max_deceleration_rate;
-    target_accel = boost::algorithm::clamp(target_accel, constraints.max_deceleration * -1, 0);
-  } else {
-    target_accel = target_accel + step_time * constraints.max_acceleration_rate;
-    target_accel = boost::algorithm::clamp(target_accel, 0, constraints.max_acceleration);
-  }
-  geometry_msgs::msg::Accel accel_new;
-  accel_new = entity_status.action_status.accel;
-  accel_new.linear.x = target_accel;
-
-  geometry_msgs::msg::Twist twist_new;
-  twist_new.linear.x = entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time;
-  twist_new.linear.y = entity_status.action_status.twist.linear.y + accel_new.linear.y * step_time;
-  twist_new.linear.z = entity_status.action_status.twist.linear.z + accel_new.linear.z * step_time;
-  twist_new.angular.x =
-    entity_status.action_status.twist.angular.x + accel_new.angular.x * step_time;
-  twist_new.angular.y =
-    entity_status.action_status.twist.angular.y + accel_new.angular.y * step_time;
-  twist_new.angular.z =
-    entity_status.action_status.twist.angular.z + accel_new.angular.z * step_time;
-
+  const auto speed_planner =
+    traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
+      step_time, entity_status.name);
+  const auto dynamics = speed_planner.getDynamicStates(
+    target_speed, constraints, entity_status.action_status.twist,
+    entity_status.action_status.accel);
+  double linear_jerk_new = std::get<2>(dynamics);
+  geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
+  geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
   geometry_msgs::msg::Pose pose_new;
   geometry_msgs::msg::Vector3 angular_trans_vec;
   angular_trans_vec.z = twist_new.angular.z * step_time;
@@ -489,6 +475,7 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
   entity_status_updated.pose = pose_new;
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;
+  entity_status_updated.action_status.linear_jerk = linear_jerk_new;
   entity_status_updated.lanelet_pose_valid = false;
   return entity_status_updated;
 }
