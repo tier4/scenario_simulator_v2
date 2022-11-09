@@ -129,6 +129,7 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
           }
         }
         if (not is_ego) {
+          simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
           geometry_msgs::msg::Pose pose;
           simulation_interface::toMsg(s.pose(), pose);
           auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
