@@ -34,6 +34,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct DistributionRange : private Scope, public ComplexType
 {
+  const Double step_width;
+
   const Range range;
 
   explicit DistributionRange(const pugi::xml_node &, Scope &);

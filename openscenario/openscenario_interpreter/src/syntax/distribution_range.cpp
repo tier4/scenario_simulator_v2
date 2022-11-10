@@ -20,7 +20,9 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 DistributionRange::DistributionRange(const pugi::xml_node & node, Scope & scope)
-: Scope(scope), range(readElement<Range>("Range", node, local()))
+: Scope(scope),
+  step_width(readAttribute<Double>("stepWidth", node, local())),
+  range(readElement<Range>("Range", node, local()))
 {
 }
 
