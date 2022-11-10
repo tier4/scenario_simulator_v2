@@ -394,6 +394,9 @@ void EntityBase::requestSpeedChange(
     case speed_change::Constraint::Type::TIME:
       requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
       break;
+    case speed_change::Constraint::Type::NONE:
+      requestSpeedChange(target_speed, continuous);
+      break;
   }
 }
 
@@ -514,6 +517,9 @@ void EntityBase::requestSpeedChange(
         THROW_SEMANTIC_ERROR("continuous = true is not allowed with time constraint.");
       }
       requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
+      break;
+    case speed_change::Constraint::Type::NONE:
+      requestSpeedChange(target_speed, continuous);
       break;
   }
 }

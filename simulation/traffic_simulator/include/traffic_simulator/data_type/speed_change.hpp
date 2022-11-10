@@ -37,7 +37,7 @@ struct Constraint
     // @todo DISTANCE,
     LONGITUDINAL_ACCELERATION,
     TIME,
-    //NONE
+    NONE
   };
   explicit constexpr Constraint(const Constraint::Type type, const double value)
   : type(type), value(value)
