@@ -28,7 +28,7 @@ enum class Transition {
   LINEAR,
   // @todo SINUSOIDAL,
   STEP,
-  //AUTO
+  AUTO
 };
 
 struct Constraint

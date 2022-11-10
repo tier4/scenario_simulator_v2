@@ -300,6 +300,13 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
+      requestSpeedChange(target_speed, continuous);
+      setLinearAcceleration(acceleration);
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed, speed_change::Transition::AUTO, acceleration, continuous);
+      break;
+    }
+    case speed_change::Transition::AUTO: {
       if (speed_planner_->isAccelerating(target_speed, getCurrentTwist())) {
         setAccelerationLimit(std::abs(acceleration));
         job_list_.append(
@@ -343,6 +350,13 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
+      requestSpeedChange(target_speed, false);
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed, transition, target_speed - getCurrentTwist().linear.x / acceleration_time,
+        false);
+      break;
+    }
+    case speed_change::Transition::AUTO: {
       setDynamicConstraints(speed_planner_->planConstraintsFromJerkAndTimeConstraint(
         target_speed, getCurrentTwist(), getCurrentAccel(), acceleration_time,
         getDynamicConstraints()));
@@ -357,11 +371,11 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
            * @brief Resets deceleration limit.
            */
         [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
-      requestSpeedChange(target_speed, true);
+      requestSpeedChange(target_speed, false);
       break;
     }
     case speed_change::Transition::STEP: {
-      requestSpeedChange(target_speed, true);
+      requestSpeedChange(target_speed, false);
       setLinearVelocity(target_speed);
       break;
     }
@@ -389,6 +403,12 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
+      setLinearAcceleration(acceleration);
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed, speed_change::Transition::AUTO, acceleration, continuous);
+      break;
+    }
+    case speed_change::Transition::AUTO: {
       job_list_.append(
         /**
          * @brief Checking if the entity reaches target speed.
@@ -433,6 +453,14 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
+      requestSpeedChangeWithConstantAcceleration(
+        target_speed.getAbsoluteValue(other_status_), transition,
+        target_speed.getAbsoluteValue(other_status_) -
+          getStatus().action_status.twist.linear.x / time,
+        false);
+      break;
+    }
+    case speed_change::Transition::AUTO: {
       job_list_.append(
         /**
          * @brief Checking if the entity reaches target speed.
@@ -511,7 +539,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
        * @brief If the target entity reaches the target speed, return true.
        */
       [this, target_speed](double) {
-        if (getStatus().action_status.twist.linear.x >= target_speed) {
+        if (speed_planner_->isTargetSpeedReached(target_speed, getCurrentTwist())) {
           return true;
         }
         target_speed_ = target_speed;
@@ -635,6 +663,13 @@ auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
   auto status = getStatus();
   status.action_status.twist.linear.x = linear_velocity;
+  setStatus(status);
+}
+
+auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
+{
+  auto status = getStatus();
+  status.action_status.accel.linear.x = linear_acceleration;
   setStatus(status);
 }
 

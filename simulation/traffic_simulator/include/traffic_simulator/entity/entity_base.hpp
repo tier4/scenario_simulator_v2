@@ -177,6 +177,8 @@ public:
 
   virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> void;
 
+  virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
+
   virtual auto setLinearVelocity(const double linear_velocity) -> void;
 
   virtual void setTrafficLightManager(

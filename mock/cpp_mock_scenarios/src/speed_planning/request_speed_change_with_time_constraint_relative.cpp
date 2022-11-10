@@ -66,7 +66,7 @@ private:
       "ego",
       traffic_simulator::speed_change::RelativeTargetSpeed(
         "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
-      traffic_simulator::speed_change::Transition::LINEAR,
+      traffic_simulator::speed_change::Transition::AUTO,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
       false);

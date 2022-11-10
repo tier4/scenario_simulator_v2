@@ -63,7 +63,7 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
     api_.setLinearVelocity("ego", 0);
     api_.requestSpeedChange(
-      "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      "ego", 10.0, traffic_simulator::speed_change::Transition::AUTO,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
       false);

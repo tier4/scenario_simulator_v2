@@ -42,6 +42,9 @@ public:
     -> traffic_simulator_msgs::msg::DynamicConstraints;
   bool isAccelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
   bool isDecelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
+  bool isTargetSpeedReached(
+    double target_speed, const geometry_msgs::msg::Twist & current_twist,
+    double torelance = 0.01) const;
   const double step_time;
   const std::string entity;
 

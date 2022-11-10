@@ -96,6 +96,15 @@ LongitudinalSpeedPlanner::getDynamicStates(
   return std::make_tuple(twist, accel, linear_jerk);
 }
 
+bool LongitudinalSpeedPlanner::isTargetSpeedReached(
+  double target_speed, const geometry_msgs::msg::Twist & current_twist, double torelance) const
+{
+  if (std::abs(target_speed - current_twist.linear.x) <= torelance) {
+    return true;
+  }
+  return false;
+}
+
 double LongitudinalSpeedPlanner::getVelocityWithConstantJerk(
   double target_speed, const geometry_msgs::msg::Twist & current_twist,
   const geometry_msgs::msg::Accel & current_accel,
