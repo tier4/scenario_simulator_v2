@@ -238,6 +238,7 @@ void toProto(
   proto.set_current_action(s.current_action);
   toProto(s.twist, *proto.mutable_twist());
   toProto(s.accel, *proto.mutable_accel());
+  proto.set_linear_jerk(s.linear_jerk);
 }
 
 void toMsg(
@@ -246,6 +247,7 @@ void toMsg(
   s.current_action = proto.current_action();
   toMsg(proto.twist(), s.twist);
   toMsg(proto.accel(), s.accel);
+  s.linear_jerk = proto.linear_jerk();
 }
 
 void toProto(

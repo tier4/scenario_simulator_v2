@@ -13,6 +13,7 @@ message ActionStatus {
   string current_action = 1;     // Current action of the entity.
   geometry_msgs.Twist twist = 2; // Velocity of the entity.
   geometry_msgs.Accel accel = 3; // Acceleration of the entity.
+  double linear_jerk = 4;        // Linear jerk of the entity.
 }
 
 /**

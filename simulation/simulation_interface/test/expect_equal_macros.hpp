@@ -126,7 +126,8 @@
 #define EXPECT_ACTION_STATUS_EQ(MSG, PROTO)                                 \
   EXPECT_STREQ(MSG.current_action.c_str(), PROTO.current_action().c_str()); \
   EXPECT_TWIST_EQ(MSG.twist, PROTO.twist());                                \
-  EXPECT_ACCEL_EQ(MSG.accel, PROTO.accel());
+  EXPECT_ACCEL_EQ(MSG.accel, PROTO.accel());                                \
+  EXPECT_DOUBLE_EQ(MSG.linear_jerk, PROTO.linear_jerk());
 
 #define EXPECT_LANELET_POSE_EQ(MSG, PROTO)       \
   EXPECT_EQ(MSG.lanelet_id, PROTO.lanelet_id()); \
