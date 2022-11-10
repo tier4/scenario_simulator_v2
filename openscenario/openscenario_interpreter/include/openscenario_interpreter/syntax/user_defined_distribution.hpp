@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_DISTRIBUTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
@@ -22,22 +22,28 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- OpenScenarioCategory 1.2 -----------------------------------------------
+/* ---- UserDefinedDistribution 1.2 --------------------------------------------
  *
- *  <xsd:group name="OpenScenarioCategory">
- *    <xsd:choice>
- *      <xsd:group ref="ScenarioDefinition"/>
- *      <xsd:group ref="CatalogDefinition"/>
- *      <xsd:group ref="ParameterValueDistributionDefinition"/>
- *    </xsd:choice>
- *  </xsd:group>
+ *  <xsd:complexType name="UserDefinedDistribution">
+ *    <xsd:simpleContent>
+ *      <xsd:extension base="xsd:string">
+ *        <xsd:attribute name="type" type="String" use="required"/>
+ *      </xsd:extension>
+ *    </xsd:simpleContent>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct OpenScenarioCategory : public Group
+struct UserDefinedDistribution : private Scope, public ComplexType
 {
-  explicit OpenScenarioCategory(const pugi::xml_node &, Scope &);
+  const String type;
+
+  const String content;
+
+  explicit UserDefinedDistribution(const pugi::xml_node &, const Scope &);
+
+  // TODO: implement evaluate()?`
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_DISTRIBUTION_HPP_

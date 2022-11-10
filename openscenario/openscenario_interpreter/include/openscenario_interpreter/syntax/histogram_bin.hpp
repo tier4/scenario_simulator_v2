@@ -12,32 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__HISTOGRAM_BIN_HPP_
+#define OPENSCENARIO_INTERPRETER__HISTOGRAM_BIN_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
-#include <pugixml.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/range.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- OpenScenarioCategory 1.2 -----------------------------------------------
+/* ---- HistogramBin 1.2 -------------------------------------------------------
  *
- *  <xsd:group name="OpenScenarioCategory">
- *    <xsd:choice>
- *      <xsd:group ref="ScenarioDefinition"/>
- *      <xsd:group ref="CatalogDefinition"/>
- *      <xsd:group ref="ParameterValueDistributionDefinition"/>
- *    </xsd:choice>
- *  </xsd:group>
+ *  <xsd:complexType name="HistogramBin">
+ *    <xsd:sequence>
+ *      <xsd:element name="Range" type="Range"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="weight" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct OpenScenarioCategory : public Group
+struct HistogramBin : public ComplexType
 {
-  explicit OpenScenarioCategory(const pugi::xml_node &, Scope &);
+  const Range range;
+
+  const Double weight;
+
+  explicit HistogramBin(const pugi::xml_node &, Scope & scope);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__HISTOGRAM_BIN_HPP_

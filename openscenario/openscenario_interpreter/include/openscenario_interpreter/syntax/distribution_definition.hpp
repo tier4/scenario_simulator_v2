@@ -12,32 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
+#define OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/deterministic.hpp>
+#include <openscenario_interpreter/syntax/stochastic.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- OpenScenarioCategory 1.2 -----------------------------------------------
+/* ---- DistributionDefinition 1.2 ---------------------------------------------
  *
- *  <xsd:group name="OpenScenarioCategory">
+ *  <xsd:group name="DistributionDefinition">
  *    <xsd:choice>
- *      <xsd:group ref="ScenarioDefinition"/>
- *      <xsd:group ref="CatalogDefinition"/>
- *      <xsd:group ref="ParameterValueDistributionDefinition"/>
+ *      <xsd:element name="Deterministic" type="Deterministic"/>
+ *      <xsd:element name="Stochastic" type="Stochastic"/>
  *    </xsd:choice>
  *  </xsd:group>
  *
  * -------------------------------------------------------------------------- */
-struct OpenScenarioCategory : public Group
+struct DistributionDefinition : public Group
 {
-  explicit OpenScenarioCategory(const pugi::xml_node &, Scope &);
+  explicit DistributionDefinition(const pugi::xml_node &, Scope & scope);
 };
+
+DEFINE_LAZY_VISITOR(
+  DistributionDefinition,  //
+  CASE(Deterministic),     //
+  CASE(Stochastic),        //
+);
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_

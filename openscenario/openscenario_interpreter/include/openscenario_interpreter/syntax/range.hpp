@@ -12,32 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RANGE_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__RANGE_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- OpenScenarioCategory 1.2 -----------------------------------------------
+/* ---- Range 1.2 --------------------------------------------------------------
  *
- *  <xsd:group name="OpenScenarioCategory">
- *    <xsd:choice>
- *      <xsd:group ref="ScenarioDefinition"/>
- *      <xsd:group ref="CatalogDefinition"/>
- *      <xsd:group ref="ParameterValueDistributionDefinition"/>
- *    </xsd:choice>
- *  </xsd:group>
+ *  <xsd:complexType name="Range">
+ *    <xsd:attribute name="lowerLimit" type="Double" use="required"/>
+ *    <xsd:attribute name="upperLimit" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
- * -------------------------------------------------------------------------- */
-struct OpenScenarioCategory : public Group
+ * ------------------------------------------------------------------------ */
+struct Range
 {
-  explicit OpenScenarioCategory(const pugi::xml_node &, Scope &);
+  const Double lower_limit = Double::infinity();
+
+  const Double upper_limit = -Double::infinity();
+
+  Range() = default;
+
+  explicit Range(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RANGE_HPP_
