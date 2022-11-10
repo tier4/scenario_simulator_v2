@@ -104,10 +104,7 @@ auto EntityBase::getCurrentAccel() const -> geometry_msgs::msg::Accel
   return getStatus().action_status.accel;
 }
 
-auto EntityBase::getCurrentTwist() const -> geometry_msgs::msg::Twist
-{
-  return getStatus().action_status.twist;
-}
+auto EntityBase::getCurrentTwist() const -> geometry_msgs::msg::Twist { return getCurrentTwist(); }
 
 auto EntityBase::getDistanceToLaneBound() -> double
 {
@@ -313,9 +310,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           /**
            * @brief Checking if the entity reaches target speed.
            */
-          [this, target_speed](double) {
-            return getStatus().action_status.twist.linear.x >= target_speed;
-          },
+          [this, target_speed](double) { return getCurrentTwist().linear.x >= target_speed; },
           /**
            * @brief Resets acceleration limit.
            */
@@ -326,9 +321,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           /**
            * @brief Checking if the entity reaches target speed.
            */
-          [this, target_speed](double) {
-            return getStatus().action_status.twist.linear.x <= target_speed;
-          },
+          [this, target_speed](double) { return getCurrentTwist().linear.x <= target_speed; },
           /**
            * @brief Resets deceleration limit.
            */
@@ -417,8 +410,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
          * @brief Checking if the entity reaches target speed.
          */
         [this, target_speed, acceleration](double) {
-          double diff =
-            target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
+          double diff = target_speed.getAbsoluteValue(other_status_) - getCurrentTwist().linear.x;
           /**
            * @brief Hard coded parameter, threashold for difference
            */
@@ -458,9 +450,7 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithConstantAcceleration(
         target_speed.getAbsoluteValue(other_status_), transition,
-        target_speed.getAbsoluteValue(other_status_) -
-          getStatus().action_status.twist.linear.x / time,
-        false);
+        target_speed.getAbsoluteValue(other_status_) - getCurrentTwist().linear.x / time, false);
       break;
     }
     case speed_change::Transition::AUTO: {
@@ -469,8 +459,7 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
          * @brief Checking if the entity reaches target speed.
          */
         [this, target_speed, time](double job_duration) {
-          double diff =
-            target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
+          double diff = target_speed.getAbsoluteValue(other_status_) - getCurrentTwist().linear.x;
           double acceleration = diff / time;
           /**
            * @brief Hard coded parameter, threashold for difference
@@ -583,9 +572,7 @@ void EntityBase::requestSpeedChange(
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
           return true;
         }
-        if (
-          getStatus().action_status.twist.linear.x >=
-          target_speed.getAbsoluteValue(other_status_)) {
+        if (getCurrentTwist().linear.x >= target_speed.getAbsoluteValue(other_status_)) {
           target_speed_ = target_speed.getAbsoluteValue(other_status_);
           return true;
         }
