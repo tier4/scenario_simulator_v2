@@ -26,9 +26,14 @@ DistributionRange::DistributionRange(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto DistributionRange::evaluate() -> Object
+auto DistributionRange::evaluate() -> SingleParameterList
 {
-  throw common::Error("DistributionRange is not implemented yet");
+  SingleParameterList list;
+  for (double parameter = range.lower_limit; parameter <= range.upper_limit;
+       parameter += step_width) {
+    list.emplace_back(make<Double>(parameter));
+  }
+  return list;
 }
 
 }  // namespace syntax

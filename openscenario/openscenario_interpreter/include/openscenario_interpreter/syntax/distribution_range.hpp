@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
+#include <openscenario_interpreter/utility/distribution.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -40,7 +41,7 @@ struct DistributionRange : private Scope, public ComplexType
 
   explicit DistributionRange(const pugi::xml_node &, Scope &);
 
-  auto evaluate() -> Object;
+  auto evaluate() -> SingleParameterList;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
