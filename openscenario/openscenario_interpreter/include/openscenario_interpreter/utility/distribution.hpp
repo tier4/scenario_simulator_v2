@@ -39,6 +39,14 @@ struct StochasticDistributionClass
 
   auto generate() { return distribution(random_engine); }
 };
+
+struct SingleParameterList : public std::vector<Object> {};
+//using UnnamedParameterSet = std::vector<Object>;
+//using UnnamedParameterList = std::vector<UnnamedParameterSet>;
+
+//using ParameterSet = std::unordered_map<std::string,Object>;
+//using ParameterList = std::vector<ParameterSet>;
+
 }  // namespace utility
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__DISTRIBUTION_HPP_

@@ -24,9 +24,14 @@ DistributionSet::DistributionSet(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto DistributionSet::evaluate() -> Object
+auto DistributionSet::evaluate() -> SingleParameterList
 {
-  throw common::Error("DistributionSet is not implemented yet");
+  SingleParameterList list;
+  for (const auto & element : elements) {
+    list.emplace_back(make<String>(element.value));
+  }
+  return list;
 }
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter

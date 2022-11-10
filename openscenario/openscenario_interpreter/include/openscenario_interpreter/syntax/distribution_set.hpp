@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__DISTRIBUTION_SET_HPP_
 
 #include <openscenario_interpreter/syntax/distribution_set_element.hpp>
-
+#include <openscenario_interpreter/utility/distribution.hpp>
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -36,7 +36,7 @@ struct DistributionSet : private Scope, public ComplexType
 
   explicit DistributionSet(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
+  auto evaluate() -> SingleParameterList;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
