@@ -12,32 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_ELEMENT_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_ELEMENT_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- OpenScenarioCategory 1.2 -----------------------------------------------
+/* ---- DistributionSetElement 1.2 ---------------------------------------------
  *
- *  <xsd:group name="OpenScenarioCategory">
- *    <xsd:choice>
- *      <xsd:group ref="ScenarioDefinition"/>
- *      <xsd:group ref="CatalogDefinition"/>
- *      <xsd:group ref="ParameterValueDistributionDefinition"/>
- *    </xsd:choice>
- *  </xsd:group>
+ *  <xsd:complexType name="DistributionSetElement">
+ *    <xsd:attribute name="value" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * -------------------------------------------------------------------------- */
-struct OpenScenarioCategory : public Group
+ * ------------------------------------------------------------------------ */
+struct DistributionSetElement
 {
-  explicit OpenScenarioCategory(const pugi::xml_node &, Scope &);
+  const String value;
+
+  DistributionSetElement() = default;
+
+  explicit DistributionSetElement(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_ELEMENT_HPP_
