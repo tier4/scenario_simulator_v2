@@ -118,7 +118,9 @@ void toProto(
   traffic_simulator_msgs::Performance & proto)
 {
   proto.set_max_acceleration(performance.max_acceleration);
+  proto.set_max_acceleration_rate(performance.max_acceleration_rate);
   proto.set_max_deceleration(performance.max_deceleration);
+  proto.set_max_deceleration_rate(performance.max_deceleration_rate);
   proto.set_max_speed(performance.max_speed);
 }
 
@@ -127,7 +129,9 @@ void toMsg(
   traffic_simulator_msgs::msg::Performance & performance)
 {
   performance.max_acceleration = proto.max_acceleration();
+  performance.max_acceleration_rate = proto.max_acceleration_rate();
   performance.max_deceleration = proto.max_deceleration();
+  performance.max_deceleration_rate = proto.max_deceleration_rate();
   performance.max_speed = proto.max_speed();
 }
 
