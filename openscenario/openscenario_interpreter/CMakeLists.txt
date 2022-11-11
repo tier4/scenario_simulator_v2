@@ -44,6 +44,12 @@ endif()
 rclcpp_components_register_nodes(${PROJECT_NAME} "openscenario_interpreter::Interpreter")
 
 # ------------------------------------------------------------------------------
+#  heartbeat_checker_node
+# ------------------------------------------------------------------------------
+
+ament_auto_add_executable(heartbeat_checker_node src/${PROJECT_NAME}_heartbeat_checker_node.cpp)
+
+# ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
 # ------------------------------------------------------------------------------
 

@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
+#include <openscenario_interpreter/heartbeat_server.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
@@ -35,6 +36,7 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
+  heartbeat_server(*this),
   intended_result("success"),
   local_frame_rate(30),
   local_real_time_factor(1.0),
@@ -192,6 +194,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           SimulatorCore::update();
 
           publishCurrentContext();
+          heartbeat_server.update();
         });
       });
   };
