@@ -104,7 +104,10 @@ auto EntityBase::getCurrentAccel() const -> geometry_msgs::msg::Accel
   return getStatus().action_status.accel;
 }
 
-auto EntityBase::getCurrentTwist() const -> geometry_msgs::msg::Twist { return getCurrentTwist(); }
+auto EntityBase::getCurrentTwist() const -> geometry_msgs::msg::Twist
+{
+  return getStatus().action_status.twist;
+}
 
 auto EntityBase::getDistanceToLaneBound() -> double
 {
