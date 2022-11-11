@@ -39,7 +39,7 @@ int main(const int argc, char const * const * const argv)
   auto heartbeat_client = node->create_client<std_srvs::srv::Empty>("/simulation/heartbeat");
 
   using namespace std::chrono_literals;
-  if (heartbeat_client->wait_for_service(1s)) {
+  if (not heartbeat_client->wait_for_service(1s)) {
     return static_cast<int>(Return::CONNECT_SERVER_TIMEOUT);
   }
   auto request = std::make_shared<std_srvs::srv::Empty::Request>();
