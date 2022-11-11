@@ -12,30 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <glog/logging.h>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/distribution_set_element.hpp>
 
-#include <cstdlib>
-#include <memory>
-#include <openscenario_interpreter/openscenario_preprocessor.hpp>
-
-int main(const int argc, char const * const * const argv)
+namespace openscenario_interpreter
 {
-  google::InitGoogleLogging(argv[0]);
-  google::InstallFailureSignalHandler();
-
-  rclcpp::init(argc, argv);
-
-  rclcpp::executors::SingleThreadedExecutor executor{};
-
-  rclcpp::NodeOptions options{};
-
-  auto node = std::make_shared<openscenario_interpreter::Preprocessor>(options);
-
-  executor.add_node((*node).get_node_base_interface());
-
-  executor.spin();
-
-  rclcpp::shutdown();
-
-  return 0;
+inline namespace syntax
+{
+DistributionSetElement::DistributionSetElement(const pugi::xml_node & node, Scope & scope)
+: value(readAttribute<String>("value", node, scope))
+{
 }
+}  // namespace syntax
+}  // namespace openscenario_interpreter

@@ -26,13 +26,12 @@ from typing import List
 import os
 
 import rclpy
-from openscenario_interpreter_msgs.srv import (
-    PreprocessorCheckDerivativeRemained,
-    PreprocessorDerive,
-    PreprocessorLoad
+from openscenario_preprocessor_msgs.srv import (
+    CheckDerivativeRemained,
+    Derive,
+    Load
 )
 from openscenario_utility.conversion import convert
-from openscenario_utility.validation import XOSCValidator
 from scenario_test_runner.lifecycle_controller import LifecycleController
 from scenario_test_runner.workflow import (
     Expect,
@@ -76,8 +75,7 @@ class ScenarioTestRunner(LifecycleController):
         global_frame_rate: float,
         global_real_time_factor: float,
         global_timeout: int,  # [sec]
-        output_directory: Path,
-        verbose_debug: bool
+        output_directory: Path
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -103,7 +101,6 @@ class ScenarioTestRunner(LifecycleController):
         self.global_frame_rate = global_frame_rate
         self.global_real_time_factor = global_real_time_factor
         self.global_timeout = global_timeout
-        self.verbose_debug = verbose_debug
 
         self.output_directory = substitute_ros_package(output_directory)
 
@@ -119,17 +116,17 @@ class ScenarioTestRunner(LifecycleController):
 
         self.current_workflow = None
 
-        self.check_preprocessor_client = self.create_client(PreprocessorCheckDerivativeRemained,
+        self.check_preprocessor_client = self.create_client(CheckDerivativeRemained,
                                                             '/simulation/openscenario_preprocessor/check')
         while not self.check_preprocessor_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warn('/simulation/openscenario_preprocessor/check service not available, waiting again...')
 
-        self.derive_preprocessor_client = self.create_client(PreprocessorDerive,
+        self.derive_preprocessor_client = self.create_client(Derive,
                                                              '/simulation/openscenario_preprocessor/derive')
         while not self.derive_preprocessor_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warn('/simulation/openscenario_preprocessor/derive service not available, waiting again...')
 
-        self.load_preprocessor_client = self.create_client(PreprocessorLoad,
+        self.load_preprocessor_client = self.create_client(Load,
                                                            '/simulation/openscenario_preprocessor/load')
         while not self.load_preprocessor_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warn('/simulation/openscenario_preprocessor/load service not available, waiting again...')
@@ -189,7 +186,7 @@ class ScenarioTestRunner(LifecycleController):
             if self.post_scenario_to_preprocessor(xosc_scenario):
                 preprocessed_scenarios = []
                 while self.derivative_remained_on_preprocessor():
-                    future = self.derive_preprocessor_client.call_async(PreprocessorDerive.Request())
+                    future = self.derive_preprocessor_client.call_async(Derive.Request())
                     rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
 
                     if future.result() is not None:
@@ -206,7 +203,7 @@ class ScenarioTestRunner(LifecycleController):
                 self.print_debug('finish derivation')
 
                 for preprocessed_scenario in preprocessed_scenarios:
-                    self.print_debug(preprocessed_scenario.path)
+                    self.print_debug(str(preprocessed_scenario.path))
 
                 self.run_preprocessed_scenarios(preprocessed_scenarios)
                 self.print_debug('finish execution')
@@ -271,7 +268,7 @@ class ScenarioTestRunner(LifecycleController):
 
     def post_scenario_to_preprocessor(self, scenario: Scenario):
 
-        request = PreprocessorLoad.Request()
+        request = Load.Request()
         request.path = str(scenario.path.absolute())
         request.expect = scenario.expect
         request.frame_rate = scenario.frame_rate
@@ -289,7 +286,7 @@ class ScenarioTestRunner(LifecycleController):
 
     def derivative_remained_on_preprocessor(self):
 
-        future = self.check_preprocessor_client.call_async(PreprocessorCheckDerivativeRemained.Request())
+        future = self.check_preprocessor_client.call_async(CheckDerivativeRemained.Request())
         rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
         if future.result() is not None:
             self.print_debug('Result of /simulation/openscenario_preprocessor/check: '
@@ -300,9 +297,8 @@ class ScenarioTestRunner(LifecycleController):
                              + str(future.exception()))
             exit(1)
 
-    def print_debug(self, message):
-        if self.verbose_debug:
-            self.get_logger().info(message)
+    def print_debug(self, message: str):
+        self.get_logger().info(message)
 
 
 def main(args=None):
@@ -331,8 +327,6 @@ def main(args=None):
     parser.add_argument("--ros-args", nargs="*")  # XXX DIRTY HACK
     parser.add_argument("-r", nargs="*")  # XXX DIRTY HACK
 
-    parser.add_argument("-v", "--verbose-debug", default=False, type=bool)
-
     args = parser.parse_args()
 
     test_runner = ScenarioTestRunner(
@@ -340,7 +334,6 @@ def main(args=None):
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
         output_directory=args.output_directory / "scenario_test_runner",
-        verbose_debug=args.verbose_debug
     )
 
     if args.scenario != Path("/dev/null"):

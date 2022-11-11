@@ -12,32 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/deterministic_multi_parameter_distribution_type.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- OpenScenarioCategory 1.2 -----------------------------------------------
+/* ---- DeterministicMultiParameterDistribution 1.2 ----------------------------
  *
- *  <xsd:group name="OpenScenarioCategory">
- *    <xsd:choice>
- *      <xsd:group ref="ScenarioDefinition"/>
- *      <xsd:group ref="CatalogDefinition"/>
- *      <xsd:group ref="ParameterValueDistributionDefinition"/>
- *    </xsd:choice>
- *  </xsd:group>
+ *  <xsd:complexType name="DeterministicMultiParameterDistribution">
+ *    <xsd:sequence>
+ *      <xsd:group ref="DeterministicMultiParameterDistributionType"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct OpenScenarioCategory : public Group
+struct DeterministicMultiParameterDistribution : public DeterministicMultiParameterDistributionType
 {
-  explicit OpenScenarioCategory(const pugi::xml_node &, Scope &);
+  explicit DeterministicMultiParameterDistribution(const pugi::xml_node &, Scope & scope);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_CATEGORY_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_HPP_
