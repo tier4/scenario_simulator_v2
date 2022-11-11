@@ -17,6 +17,8 @@
 
 #include <iostream>
 
+// cspell: ignore euclidian
+
 namespace openscenario_interpreter
 {
 inline namespace syntax

@@ -18,6 +18,8 @@
 #include <string>
 #include <type_traits>
 
+// cspell: ignore euclidian
+
 namespace openscenario_interpreter
 {
 inline namespace syntax

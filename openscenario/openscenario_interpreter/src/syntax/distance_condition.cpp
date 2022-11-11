@@ -23,6 +23,8 @@
 #include <openscenario_interpreter/utility/print.hpp>
 #include <sstream>
 
+// cspell: ignore euclidian
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
