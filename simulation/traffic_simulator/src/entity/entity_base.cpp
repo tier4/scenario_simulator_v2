@@ -468,7 +468,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
         return false;
       },
       /**
-       * @brief Cansel speed change request.
+       * @brief Cancel speed change request.
        */
       [this]() {}, job::Type::LINEAR_VELOCITY, true);
   } else {
@@ -484,7 +484,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
         return false;
       },
       /**
-       * @brief Cansel speed change request.
+       * @brief Cancel speed change request.
        */
       [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
@@ -524,7 +524,7 @@ void EntityBase::requestSpeedChange(
         return false;
       },
       /**
-       * @brief Cansel speed change request.
+       * @brief Cancel speed change request.
        */
       [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
