@@ -65,6 +65,8 @@ struct Parameter
 
   Shape shape;
 
+  Parameter() = default;
+
   explicit Parameter(
     const double initial_distance_offset, const bool dynamic_constraints_ignorable,
     const bool closed, const Shape & shape)

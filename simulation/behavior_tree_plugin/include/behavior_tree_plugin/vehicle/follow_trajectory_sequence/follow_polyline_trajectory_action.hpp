@@ -23,12 +23,18 @@ namespace vehicle
 {
 struct FollowPolylineTrajectoryAction : public VehicleActionNode
 {
+  using Parameter = traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Polyline>;
+
+  Parameter parameter;
+
   using VehicleActionNode::VehicleActionNode;
 
   auto calculateWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
     -> const boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
+
+  static auto providedPorts() -> BT::PortsList;
 
   auto tick() -> BT::NodeStatus override;
 };

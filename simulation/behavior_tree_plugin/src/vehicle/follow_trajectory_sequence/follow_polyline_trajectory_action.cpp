@@ -39,19 +39,58 @@ auto FollowPolylineTrajectoryAction::calculateObstacle(
   return boost::none;
 }
 
+auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
+{
+  auto && ports = VehicleActionNode::providedPorts();
+  ports.emplace(BT::InputPort<Parameter>("polyline_trajectory_parameter"));
+  return std::forward<decltype(ports)>(ports);
+}
+
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
   getBlackBoardValues();
 
-  if (request == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
-    auto updated_status = entity_status;
+  switch (request)
+  {
+  case traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY:
+    LINE();
 
-    setOutput("updated_status", updated_status);
-    setOutput("waypoints", calculateWaypoints());
-    setOutput("obstacle", calculateObstacle(calculateWaypoints()));
+    if (getInput<Parameter>("polyline_trajectory_parameter", parameter))
+    {
+      LINE();
 
-    return BT::NodeStatus::RUNNING;
-  } else {
+      PRINT(parameter.initial_distance_offset);
+      PRINT(parameter.dynamic_constraints_ignorable);
+      PRINT(parameter.closed);
+
+      for (std::size_t i = 0; i < parameter.shape.vertices.size(); ++i)
+      {
+        if (parameter.shape.vertices[i].time)
+        {
+          PRINT(*parameter.shape.vertices[i].time);
+        }
+
+        PRINT(parameter.shape.vertices[i].position.position.x);
+        PRINT(parameter.shape.vertices[i].position.position.y);
+        PRINT(parameter.shape.vertices[i].position.position.z);
+
+        PRINT(parameter.shape.vertices[i].position.orientation.x);
+        PRINT(parameter.shape.vertices[i].position.orientation.y);
+        PRINT(parameter.shape.vertices[i].position.orientation.z);
+        PRINT(parameter.shape.vertices[i].position.orientation.w);
+      }
+
+      setOutput("updated_status", entity_status);
+      setOutput("waypoints", calculateWaypoints());
+      setOutput("obstacle", calculateObstacle(calculateWaypoints()));
+
+      return BT::NodeStatus::RUNNING;
+    }
+    LINE();
+
+    [[fallthrough]];
+
+  default:
     return BT::NodeStatus::FAILURE;
   }
 }

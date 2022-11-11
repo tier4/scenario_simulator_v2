@@ -36,7 +36,7 @@ auto FollowTrajectoryAction::accomplished() noexcept -> bool { return false; }
 
 auto FollowTrajectoryAction::endsImmediately() noexcept -> bool { return false; }
 
-auto FollowTrajectoryAction::run() -> void { LINE(); }
+auto FollowTrajectoryAction::run() -> void {}
 
 auto FollowTrajectoryAction::start() -> void
 {
