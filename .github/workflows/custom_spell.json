@@ -1,7 +1,8 @@
 {
   "ignorePaths": [
     "external/lanelet2_matching/**",
-    "*/**/CHANGELOG.rst"
+    "*/**/CHANGELOG.rst",
+    "openscenario/openscenario_utility/openscenario_utility/resources/OpenSCENARIO-1.2.xsd"
   ],
   "words": [
     "parametersetaction",
