@@ -46,7 +46,7 @@ int main(const int argc, char const * const * const argv)
 
   auto response_future = heartbeat_client->async_send_request(request);
 
-  auto return_code = rclcpp::spin_until_future_complete(node, response_future);
+  auto return_code = rclcpp::spin_until_future_complete(node, response_future, 1s);
   rclcpp::shutdown();
 
   switch (return_code) {
