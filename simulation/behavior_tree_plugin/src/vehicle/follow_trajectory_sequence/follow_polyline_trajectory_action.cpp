@@ -43,13 +43,17 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
   getBlackBoardValues();
 
-  auto updated_status = entity_status;
+  if (request == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
+    auto updated_status = entity_status;
 
-  setOutput("updated_status", updated_status);
-  setOutput("waypoints", calculateWaypoints());
-  setOutput("obstacle", calculateObstacle(calculateWaypoints()));
+    setOutput("updated_status", updated_status);
+    setOutput("waypoints", calculateWaypoints());
+    setOutput("obstacle", calculateObstacle(calculateWaypoints()));
 
-  return BT::NodeStatus::RUNNING;
+    return BT::NodeStatus::RUNNING;
+  } else {
+    return BT::NodeStatus::FAILURE;
+  }
 }
 }  // namespace vehicle
 }  // namespace entity_behavior
