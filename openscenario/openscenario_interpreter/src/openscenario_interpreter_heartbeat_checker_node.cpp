@@ -17,14 +17,13 @@
 #include <chrono>
 #include <rclcpp/rclcpp.hpp>
 #include <std_srvs/srv/empty.hpp>
-//#include <openscenario_interpreter/openscenario_interpreter.hpp>
 
 enum class Return {
-  SUCCESS = 0,
-  CONNECT_SERVER_TIMEOUT = 1,
-  REQUEST_TIMEOUT = 2,
-  REQUEST_INTERRUPTED = 3,
-  UNKNOWN = 4,
+  success = 0,
+  connect_server_timeout = 1,
+  request_timeout = 2,
+  request_interrupted = 3,
+  unknown = 4,
 };
 
 int main(const int argc, char const * const * const argv)
@@ -40,26 +39,28 @@ int main(const int argc, char const * const * const argv)
 
   using namespace std::chrono_literals;
   if (not heartbeat_client->wait_for_service(1s)) {
-    return static_cast<int>(Return::CONNECT_SERVER_TIMEOUT);
+    return static_cast<int>(Return::connect_server_timeout);
   }
+
   auto request = std::make_shared<std_srvs::srv::Empty::Request>();
 
   auto response_future = heartbeat_client->async_send_request(request);
 
   auto return_code = rclcpp::spin_until_future_complete(node, response_future, 1s);
+
   rclcpp::shutdown();
 
   switch (return_code) {
     case rclcpp::FutureReturnCode::SUCCESS:
-      return static_cast<int>(Return::SUCCESS);
+      return static_cast<int>(Return::success);
       break;
     case rclcpp::FutureReturnCode::INTERRUPTED:
-      return static_cast<int>(Return::REQUEST_INTERRUPTED);
+      return static_cast<int>(Return::request_interrupted);
       break;
     case rclcpp::FutureReturnCode::TIMEOUT:
-      return static_cast<int>(Return::REQUEST_TIMEOUT);
+      return static_cast<int>(Return::request_timeout);
       break;
     default:
-      return static_cast<int>(Return::UNKNOWN);
+      return static_cast<int>(Return::unknown);
   }
 }
