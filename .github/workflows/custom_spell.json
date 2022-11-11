@@ -1,6 +1,7 @@
 {
   "ignorePaths": [
-    "external/lanelet2_matching/**"
+    "external/lanelet2_matching/**",
+    "*/**/CHANGELOG.rst"
   ],
   "words": [
     "parametersetaction",
