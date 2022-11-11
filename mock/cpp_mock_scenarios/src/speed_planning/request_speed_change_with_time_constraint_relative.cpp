@@ -41,7 +41,7 @@ public:
 private:
   void onUpdate() override
   {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    std::cout << api_.getCurrentTime() << "," << api_.getCurrentTwist("ego").linear.x << std::endl;
     if (
       api_.getCurrentTime() <= 3.9 &&
       api_.getEntityStatus("ego").action_status.twist.linear.x >= 10.0) {
@@ -62,11 +62,11 @@ private:
   {
     api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
-    api_.setLinearVelocity("ego", 0);
+    api_.setLinearVelocity("ego", 1.0);
     api_.requestSpeedChange(
       "ego",
       traffic_simulator::speed_change::RelativeTargetSpeed(
-        "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
+        "front", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
       traffic_simulator::speed_change::Transition::AUTO,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),

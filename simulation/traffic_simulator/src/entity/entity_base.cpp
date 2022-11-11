@@ -413,7 +413,8 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
          * @brief Checking if the entity reaches target speed.
          */
         [this, target_speed, acceleration](double) {
-          double diff = target_speed.getAbsoluteValue(other_status_) - getCurrentTwist().linear.x;
+          double diff =
+            target_speed.getAbsoluteValue(getStatus(), other_status_) - getCurrentTwist().linear.x;
           /**
            * @brief Hard coded parameter, threashold for difference
            */
@@ -439,7 +440,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
     }
     case speed_change::Transition::STEP: {
       requestSpeedChange(target_speed, continuous);
-      setLinearVelocity(target_speed.getAbsoluteValue(other_status_));
+      setLinearVelocity(target_speed.getAbsoluteValue(getStatus(), other_status_));
       break;
     }
   }
@@ -452,8 +453,10 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithConstantAcceleration(
-        target_speed.getAbsoluteValue(other_status_), transition,
-        target_speed.getAbsoluteValue(other_status_) - getCurrentTwist().linear.x / time, false);
+        target_speed.getAbsoluteValue(getStatus(), other_status_), transition,
+        target_speed.getAbsoluteValue(getStatus(), other_status_) -
+          getCurrentTwist().linear.x / time,
+        false);
       break;
     }
     case speed_change::Transition::AUTO: {
@@ -462,7 +465,8 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
          * @brief Checking if the entity reaches target speed.
          */
         [this, target_speed, time](double job_duration) {
-          double diff = target_speed.getAbsoluteValue(other_status_) - getCurrentTwist().linear.x;
+          double diff =
+            target_speed.getAbsoluteValue(getStatus(), other_status_) - getCurrentTwist().linear.x;
           double acceleration = diff / time;
           /**
            * @brief Hard coded parameter, threashold for difference
@@ -489,7 +493,7 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
     }
     case speed_change::Transition::STEP: {
       requestSpeedChange(target_speed, false);
-      setLinearVelocity(target_speed.getAbsoluteValue(other_status_));
+      setLinearVelocity(target_speed.getAbsoluteValue(getStatus(), other_status_));
       break;
     }
   }
@@ -562,7 +566,7 @@ void EntityBase::requestSpeedChange(
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
           return true;
         }
-        target_speed_ = target_speed.getAbsoluteValue(other_status_);
+        target_speed_ = target_speed.getAbsoluteValue(getStatus(), other_status_);
         return false;
       },
       [this]() {}, job::Type::LINEAR_VELOCITY, true);
@@ -575,8 +579,9 @@ void EntityBase::requestSpeedChange(
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
           return true;
         }
-        if (getCurrentTwist().linear.x >= target_speed.getAbsoluteValue(other_status_)) {
-          target_speed_ = target_speed.getAbsoluteValue(other_status_);
+        if (
+          getCurrentTwist().linear.x >= target_speed.getAbsoluteValue(getStatus(), other_status_)) {
+          target_speed_ = target_speed.getAbsoluteValue(getStatus(), other_status_);
           return true;
         }
         return false;

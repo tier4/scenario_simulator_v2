@@ -60,6 +60,7 @@ struct RelativeTargetSpeed
   {
   }
   double getAbsoluteValue(
+    const traffic_simulator_msgs::msg::EntityStatus & status,
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
     const;
   std::string reference_entity_name;
