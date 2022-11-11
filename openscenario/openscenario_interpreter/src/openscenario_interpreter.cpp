@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
+#include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -112,11 +113,15 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
 
-      if (script = std::make_shared<OpenScenario>(osc_path);
-          script->category.is<ScenarioDefinition>()) {
+      script = std::make_shared<OpenScenario>(osc_path);
+
+      if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
+      } else if (script->category.is<ParameterValueDistribution>()) {
+        throw Error("ParameterValueDistribution is not supported");
       } else {
-        throw SyntaxError("ParameterValueDistributionDefinition is not yet supported.");
+        throw SyntaxError(
+          "Unsupported member of OpenSCENARIOCategory group is defined in the scenario file");
       }
 
       return Interpreter::Result::SUCCESS;  // => Inactive
