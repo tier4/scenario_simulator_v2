@@ -209,7 +209,9 @@ public:
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
+  FORWARD_TO_ENTITY(getCurrentAccel, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
+  FORWARD_TO_ENTITY(getCurrentTwist, const);
   FORWARD_TO_ENTITY(getDistanceToLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
   FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );

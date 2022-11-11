@@ -268,7 +268,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
+  FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
+  FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
   FORWARD_TO_ENTITY_MANAGER(getDistanceToLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getDistanceToLeftLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getDistanceToRightLaneBound);

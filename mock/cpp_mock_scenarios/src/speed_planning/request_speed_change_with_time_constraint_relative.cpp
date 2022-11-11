@@ -47,7 +47,7 @@ private:
       api_.getEntityStatus("ego").action_status.twist.linear.x >= 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (api_.getCurrentTime() >= 4.0) {
+    if (api_.getCurrentTime() >= 3.9999) {
       if (
         api_.getEntityStatus("ego").action_status.twist.linear.x <= 10.0 &&
         api_.getEntityStatus("ego").action_status.twist.linear.x >= 9.9) {
