@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ros_ping_with_service)
+project(ros_ping)
 
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
@@ -13,7 +13,7 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_executable(single_ping_node src/single_ping_node.cpp)
+ament_auto_add_executable(ping src/ping.cpp)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

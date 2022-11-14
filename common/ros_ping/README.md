@@ -1,4 +1,4 @@
-# ros_ping_with_service
+# ros_ping
 
 This package can be used anywhere as long as the queried node implements a ping server with `std_srvs::srv::Empty`
 
@@ -6,7 +6,7 @@ This package can be used anywhere as long as the queried node implements a ping 
 
 1. Execute
 ```bash
-ros2 run ros_ping_with_service single_ping_node
+ros2 run ros_ping ping
 ```
 
 2. Show Result
@@ -34,6 +34,6 @@ The meaning of the return codes is shown in the table below.
 
 You can set parameters like below
 ```bash
-ros2 run ros_ping_with_service single_ping_node --ros-args -p connection_timeout_ms:=500
+ros2 run ros_ping ping --ros-args -p connection_timeout_ms:=500
 
 ```
