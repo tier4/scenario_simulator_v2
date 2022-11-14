@@ -97,9 +97,9 @@ LongitudinalSpeedPlanner::getDynamicStates(
 }
 
 bool LongitudinalSpeedPlanner::isTargetSpeedReached(
-  double target_speed, const geometry_msgs::msg::Twist & current_twist, double torelance) const
+  double target_speed, const geometry_msgs::msg::Twist & current_twist, double tolerance) const
 {
-  if (std::abs(target_speed - current_twist.linear.x) <= torelance) {
+  if (std::abs(target_speed - current_twist.linear.x) <= tolerance) {
     return true;
   }
   return false;
@@ -157,11 +157,11 @@ double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
       (constraints.max_acceleration - current_accel.linear.x) / constraints.max_acceleration_rate;
     double v = getVelocityWithConstantJerk(
       current_twist, current_accel, constraints.max_acceleration_rate, duration);
-    // While quadratic acceleration, the entity does not reqched the target speed.
+    // While quadratic acceleration, the entity does not reached the target speed.
     if (std::abs(v - target_speed) >= 0.01) {
       return duration;
     }
-    // While quadratic acceleration, the entity reqched the target speed.
+    // While quadratic acceleration, the entity reached the target speed.
     else {
       return getQuadraticAccelerationDurationWithConstantJerk(
         target_speed, constraints, current_twist, current_accel);
@@ -171,11 +171,11 @@ double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
       (current_accel.linear.x - constraints.max_deceleration) / constraints.max_deceleration_rate;
     double v = getVelocityWithConstantJerk(
       current_twist, current_accel, -constraints.max_deceleration_rate, duration);
-    // While quadratic acceleration, the entity does not reqched the target speed.
+    // While quadratic acceleration, the entity does not reached the target speed.
     if (std::abs(v - target_speed) >= 0.01) {
       return duration;
     }
-    // While quadratic acceleration, the entity reqched the target speed.
+    // While quadratic acceleration, the entity reached the target speed.
     else {
       return getQuadraticAccelerationDurationWithConstantJerk(
         target_speed, constraints, current_twist, current_accel);
@@ -208,13 +208,13 @@ double LongitudinalSpeedPlanner::getLinearAccelerationDuration(
 bool LongitudinalSpeedPlanner::isReachedToTargetSpeedWithConstantJerk(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist, const geometry_msgs::msg::Accel & current_accel,
-  double duration, double torelance) const
+  double duration, double tolerance) const
 {
   if (
     std::abs(
       getVelocityWithConstantJerk(
         target_speed, current_twist, current_accel, constraints, duration) -
-      target_speed) <= std::abs(torelance)) {
+      target_speed) <= std::abs(tolerance)) {
     return true;
   }
   return false;

@@ -44,7 +44,7 @@ public:
   bool isDecelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
   bool isTargetSpeedReached(
     double target_speed, const geometry_msgs::msg::Twist & current_twist,
-    double torelance = 0.01) const;
+    double tolerance = 0.01) const;
   const double step_time;
   const std::string entity;
 
@@ -53,7 +53,7 @@ private:
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel, double duration,
-    double torelance = 0.01) const;
+    double tolerance = 0.01) const;
   double getVelocityWithConstantJerk(
     double target_speed, const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel,
