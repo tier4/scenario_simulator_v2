@@ -16,7 +16,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_srvs/srv/empty.hpp>
 
-enum class Return {
+enum class ReturnCode {
   success = 0,
   connect_server_timeout = 1,
   request_timeout = 2,
@@ -46,7 +46,7 @@ int main(int argc, char * argv[])
 
   using namespace std::chrono_literals;
   if (not ping_client->wait_for_service(1ms * connection_timeout_ms)) {
-    return static_cast<int>(Return::connect_server_timeout);
+    return static_cast<int>(ReturnCode::connect_server_timeout);
   }
 
   auto request = std::make_shared<std_srvs::srv::Empty::Request>();
@@ -59,15 +59,12 @@ int main(int argc, char * argv[])
 
   switch (return_code) {
     case rclcpp::FutureReturnCode::SUCCESS:
-      return static_cast<int>(Return::success);
-      break;
+      return static_cast<int>(ReturnCode::success);
     case rclcpp::FutureReturnCode::INTERRUPTED:
-      return static_cast<int>(Return::request_interrupted);
-      break;
+      return static_cast<int>(ReturnCode::request_interrupted);
     case rclcpp::FutureReturnCode::TIMEOUT:
-      return static_cast<int>(Return::request_timeout);
-      break;
+      return static_cast<int>(ReturnCode::request_timeout);
     default:
-      return static_cast<int>(Return::unknown);
+      return static_cast<int>(ReturnCode::unknown);
   }
 }
