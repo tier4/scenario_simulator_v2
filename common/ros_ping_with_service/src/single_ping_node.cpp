@@ -33,9 +33,9 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::init(argc, argv);
 
-  auto node = rclcpp::Node::make_shared("heartbeat_checker");
+  auto node = rclcpp::Node::make_shared("single_ping_node");
 
-  auto heartbeat_client = node->create_client<std_srvs::srv::Empty>("/simulation/heartbeat");
+  auto heartbeat_client = node->create_client<std_srvs::srv::Empty>("/simulation/ping");
 
   using namespace std::chrono_literals;
   if (not heartbeat_client->wait_for_service(1s)) {
