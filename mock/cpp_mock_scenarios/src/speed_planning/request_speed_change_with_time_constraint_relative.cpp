@@ -41,16 +41,15 @@ public:
 private:
   void onUpdate() override
   {
-    std::cout << api_.getCurrentTime() << "," << api_.getCurrentTwist("ego").linear.x << std::endl;
     if (
       api_.getCurrentTime() <= 3.9 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x >= 10.0) {
+      api_.getEntityStatus("ego").action_status.twist.linear.x >= 3.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.getCurrentTime() >= 3.9999) {
       if (
-        api_.getEntityStatus("ego").action_status.twist.linear.x <= 10.0 &&
-        api_.getEntityStatus("ego").action_status.twist.linear.x >= 9.9) {
+        api_.getEntityStatus("ego").action_status.twist.linear.x <= 3.1 &&
+        api_.getEntityStatus("ego").action_status.twist.linear.x >= 2.9) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
@@ -66,7 +65,7 @@ private:
     api_.requestSpeedChange(
       "ego",
       traffic_simulator::speed_change::RelativeTargetSpeed(
-        "front", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
+        "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
       traffic_simulator::speed_change::Transition::AUTO,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),

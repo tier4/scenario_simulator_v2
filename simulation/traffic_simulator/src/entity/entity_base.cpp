@@ -452,43 +452,13 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
-      requestSpeedChangeWithConstantAcceleration(
-        target_speed.getAbsoluteValue(getStatus(), other_status_), transition,
-        target_speed.getAbsoluteValue(getStatus(), other_status_) -
-          getCurrentTwist().linear.x / time,
-        false);
+      requestSpeedChangeWithTimeConstraint(
+        target_speed.getAbsoluteValue(getStatus(), other_status_), transition, time);
       break;
     }
     case speed_change::Transition::AUTO: {
-      job_list_.append(
-        /**
-         * @brief Checking if the entity reaches target speed.
-         */
-        [this, target_speed, time](double job_duration) {
-          double diff =
-            target_speed.getAbsoluteValue(getStatus(), other_status_) - getCurrentTwist().linear.x;
-          double acceleration = diff / time;
-          /**
-           * @brief Hard coded parameter, threshold for difference
-           */
-          if (job_duration >= time) {
-            return true;
-          }
-          if (diff > 0) {
-            setAccelerationLimit(std::abs(acceleration));
-            return false;
-          }
-          if (diff < 0) {
-            setDecelerationLimit(std::abs(acceleration));
-            return false;
-          }
-          return false;
-        },
-        /**
-           * @brief Resets acceleration limit.
-           */
-        [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
-      requestSpeedChange(target_speed, false);
+      requestSpeedChangeWithTimeConstraint(
+        target_speed.getAbsoluteValue(getStatus(), other_status_), transition, time);
       break;
     }
     case speed_change::Transition::STEP: {
