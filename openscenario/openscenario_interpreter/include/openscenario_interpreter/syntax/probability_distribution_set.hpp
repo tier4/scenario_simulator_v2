@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
 
 #include <openscenario_interpreter/syntax/probability_distribution_set_element.hpp>
-#include <openscenario_interpreter/utility/distribution.hpp>
+#include <openscenario_interpreter/random/distribution.hpp>
 
 namespace openscenario_interpreter
 {

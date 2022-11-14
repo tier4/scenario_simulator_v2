@@ -17,7 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/histogram_bin.hpp>
-#include <openscenario_interpreter/utility/distribution.hpp>
+#include <openscenario_interpreter/random/distribution.hpp>
 
 namespace openscenario_interpreter
 {
