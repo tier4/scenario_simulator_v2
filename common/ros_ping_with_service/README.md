@@ -37,4 +37,3 @@ You can set parameters like below
 ros2 run ros_ping_with_service single_ping_node --ros-args -p connection_timeout_ms:=500
 
 ```
-
