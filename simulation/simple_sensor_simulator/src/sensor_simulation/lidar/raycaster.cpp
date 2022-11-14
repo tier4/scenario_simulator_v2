@@ -102,7 +102,7 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   }
 
   // Run as many threads as physical cores (which is usually /2 virtual threads)
-  // In heavy loads virtual threads (hyperthreading) add little to the overall performance
+  // In heavy loads virtual threads (hyper-threading) add little to the overall performance
   // This also minimizes cost of creating a thread (roughly 10us on Intel/Linux)
   int thread_count = std::thread::hardware_concurrency() / 2;
   // Per thread data structures:

@@ -171,7 +171,7 @@ BT::NodeStatus LaneChangeAction::tick()
     double target_accel = 0;
     switch (lane_change_parameters_->constraint.policy) {
       /**
-       * @brief Force changing speed in order to fullfill constraint.
+       * @brief Force changing speed in order to fulfill constraint.
        */
       case traffic_simulator::lane_change::Constraint::Policy::FORCE:
         entity_status.action_status.twist = geometry_msgs::msg::Twist();
@@ -180,7 +180,7 @@ BT::NodeStatus LaneChangeAction::tick()
         current_s_ = current_s_ + entity_status.action_status.twist.linear.x * step_time;
         break;
       /**
-       * @brief Changing linear speed and try to fullfill constraint.
+       * @brief Changing linear speed and try to fulfill constraint.
        */
       case traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT:
         target_accel =
