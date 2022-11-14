@@ -25,9 +25,9 @@ class PingService
 private:
   std::shared_ptr<std::promise<void>> update_notifier = nullptr;
 
-  rclcpp::CallbackGroup::SharedPtr service_callback_group;
+  const rclcpp::CallbackGroup::SharedPtr service_callback_group;
 
-  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr service;
+  const rclcpp::Service<std_srvs::srv::Empty>::SharedPtr service;
 
 public:
   explicit PingService(rclcpp_lifecycle::LifecycleNode & node)
@@ -38,14 +38,14 @@ public:
       [this](
         const std_srvs::srv::Empty::Request::SharedPtr,
         std_srvs::srv::Empty::Response::SharedPtr) -> void {
-        if (update_notifier == nullptr) {
+        if (not update_notifier) {
           update_notifier = std::make_shared<std::promise<void>>();
           auto future = update_notifier->get_future();
           future.get();
-          update_notifier = nullptr;
+          update_notifier.reset();
         } else {
           throw std::runtime_error(
-            "Multiple ping requests are accumulated. main loop in openscenario_interpreter "
+            "Multiple ping requests are accumulated. The loop that ping service is watching "
             "may not be responding");
         }
       },
@@ -53,7 +53,7 @@ public:
   {
   }
 
-  void notifyAlive()
+  void notifyAlive() const
   {
     if (update_notifier) {
       update_notifier->set_value();
