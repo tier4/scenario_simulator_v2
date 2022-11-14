@@ -174,7 +174,7 @@ def launch_setup(context, *args, **kwargs):
             # on_exit=Shutdown(),
         ),
         Node(
-            package="openscenario_interpreter",
+            package="openscenario_preprocessor",
             executable="openscenario_preprocessor_node",
             namespace="simulation",
             name="openscenario_preprocessor",

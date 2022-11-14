@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(openscenario_interpreter_msgs)
+project(openscenario_preprocessor_msgs)
 
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
@@ -15,7 +15,9 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  msg/Context.msg
+  srv/CheckDerivativeRemained.srv
+  srv/Derive.srv
+  srv/Load.srv
   DEPENDENCIES builtin_interfaces)
 
 ament_auto_package()
