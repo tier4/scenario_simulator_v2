@@ -23,7 +23,7 @@
   <depend>scenario_simulator_exception</depend>
   <depend>simple_junit</depend>
   <depend>std_msgs</depend>
-  <depend>ros_ping_with_service</depend>
+  <depend>ros_ping</depend>
   <depend>tier4_simulation_msgs</depend>
   <depend>traffic_simulator</depend>
   <depend>traffic_simulator_msgs</depend>

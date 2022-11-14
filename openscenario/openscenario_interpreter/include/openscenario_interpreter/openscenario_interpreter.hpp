@@ -52,7 +52,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
 
-  PingService ping_service;
+  ros_ping::PingService ping_service;
 
   String intended_result;
 
