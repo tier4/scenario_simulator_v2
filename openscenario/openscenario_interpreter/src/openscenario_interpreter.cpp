@@ -18,7 +18,6 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
-#include <openscenario_interpreter/ros_ping_service.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>

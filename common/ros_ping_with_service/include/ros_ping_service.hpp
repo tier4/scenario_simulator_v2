@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__HEARTBEAT_SERVER_HPP_
-#define OPENSCENARIO_INTERPRETER__HEARTBEAT_SERVER_HPP_
+#ifndef ROS_PING__PING_SERVER_HPP_
+#define ROS_PING__PING_SERVER_HPP_
 
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <std_srvs/srv/empty.hpp>
 
-namespace openscenario_interpreter
+namespace ros_ping
 {
 class PingService
 {
@@ -60,6 +60,6 @@ public:
     }
   }
 };
-}  // namespace openscenario_interpreter
+}  // namespace ros_ping
 
-#endif  // OPENSCENARIO_INTERPRETER__HEARTBEAT_SERVER_HPP_
+#endif  // ROS_PING__PING_SERVER_HPP_

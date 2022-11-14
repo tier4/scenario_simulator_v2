@@ -21,7 +21,6 @@
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
-#include <openscenario_interpreter/ros_ping_service.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
@@ -31,6 +30,7 @@
 #include <openscenario_interpreter_msgs/msg/context.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
+#include <ros_ping_with_service/include/ros_ping_service.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_junit/junit5.hpp>
 #include <utility>
