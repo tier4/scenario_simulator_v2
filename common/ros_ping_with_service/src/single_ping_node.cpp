@@ -24,24 +24,36 @@ enum class Return {
   unknown = 4,
 };
 
-int main(const int argc, char const * const * const argv)
+int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
   auto node = rclcpp::Node::make_shared("single_ping_node");
 
-  auto heartbeat_client = node->create_client<std_srvs::srv::Empty>("/simulation/ping");
+  node->declare_parameter<std::string>("service_name", "/simulation/ping");
+  std::string service_name;
+  node->get_parameter<std::string>("service_name", service_name);
+
+  node->declare_parameter<int>("connection_timeout_ms", 1000);
+  int connection_timeout_ms;
+  node->get_parameter<int>("connection_timeout_ms", connection_timeout_ms);
+
+  node->declare_parameter<int>("request_timeout_ms", 1000);
+  int request_timeout_ms;
+  node->get_parameter<int>("request_timeout_ms", request_timeout_ms);
+
+  auto ping_client = node->create_client<std_srvs::srv::Empty>(service_name);
 
   using namespace std::chrono_literals;
-  if (not heartbeat_client->wait_for_service(1s)) {
+  if (not ping_client->wait_for_service(1ms * connection_timeout_ms)) {
     return static_cast<int>(Return::connect_server_timeout);
   }
 
   auto request = std::make_shared<std_srvs::srv::Empty::Request>();
 
-  auto response_future = heartbeat_client->async_send_request(request);
+  auto response_future = ping_client->async_send_request(request);
 
-  auto return_code = rclcpp::spin_until_future_complete(node, response_future, 1s);
+  auto return_code = rclcpp::spin_until_future_complete(node, response_future, 1ms * request_timeout_ms);
 
   rclcpp::shutdown();
 
