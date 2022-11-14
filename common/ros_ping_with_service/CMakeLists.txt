@@ -13,7 +13,7 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_executable(${PROJECT_NAME} src/single_ping_node.cpp)
+ament_auto_add_executable(single_ping_node src/single_ping_node.cpp)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

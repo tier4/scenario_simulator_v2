@@ -21,7 +21,7 @@
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
-#include <openscenario_interpreter/heartbeat_server.hpp>
+#include <openscenario_interpreter/ros_ping_service.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
@@ -52,7 +52,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
 
-  HeartbeatServer heartbeat_server;
+  PingService ping_service;
 
   String intended_result;
 
