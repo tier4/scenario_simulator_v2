@@ -171,7 +171,7 @@ class Scope
      time, but the status quo will be maintained for the time being due to its
      wide impact. If you want to access global resources via `Scope`, we
      recommend that you go through the data member `open_scenario` instead of
-     `Scope::ScenarioDefintiion` whenever possible.
+     `Scope::ScenarioDefinition` whenever possible.
   */
 
   struct ScenarioDefinition
