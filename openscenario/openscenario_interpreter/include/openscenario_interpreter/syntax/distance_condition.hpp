@@ -96,8 +96,10 @@ struct DistanceCondition : private Scope, private SimulatorCore::CoordinateSyste
   auto evaluate() -> Object;
 };
 
-// clang-format off
+//ignore spell miss due to OpenSCENARIO standard
 // cspell: ignore euclidian
+
+// clang-format off
 template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) const -> double;
 template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const EntityRef &) const -> double;
 template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;

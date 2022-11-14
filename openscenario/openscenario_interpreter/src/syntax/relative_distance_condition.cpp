@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
+//ignore spell miss due to OpenSCENARIO standard
 // cspell: ignore euclidian
 
 namespace openscenario_interpreter
