@@ -35,7 +35,7 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
-  ping_service<rclcpp_lifecycle::LifecycleNode>(*this),
+  ping_service(*this),
   intended_result("success"),
   local_frame_rate(30),
   local_real_time_factor(1.0),
