@@ -60,8 +60,8 @@ private:
   {
     api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34606, 20.0), getVehicleParameters());
-    api_.setLinearVelocity("ego", 5);
-    api_.requestSpeedChange("ego", 5, true);
+    api_.setLinearVelocity("ego", 7);
+    api_.requestSpeedChange("ego", 7, true);
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop", "ego", -10, 10, 120635,
       metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE, 30, 1, 0.05);
