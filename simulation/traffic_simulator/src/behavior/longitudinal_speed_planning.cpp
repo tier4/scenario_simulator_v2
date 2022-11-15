@@ -28,10 +28,10 @@ LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(double step_time, const std::
 {
 }
 
-double LongitudinalSpeedPlanner::getAccelerationDuration(
+auto LongitudinalSpeedPlanner::getAccelerationDuration(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist,
-  const geometry_msgs::msg::Accel & current_accel) const
+  const geometry_msgs::msg::Accel & current_accel) const -> double
 {
   return getQuadraticAccelerationDuration(target_speed, constraints, current_twist, current_accel) +
          getLinearAccelerationDuration(target_speed, constraints, current_twist, current_accel);
@@ -77,11 +77,11 @@ auto LongitudinalSpeedPlanner::planConstraintsFromJerkAndTimeConstraint(
   return ret;
 }
 
-std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
-LongitudinalSpeedPlanner::getDynamicStates(
+auto LongitudinalSpeedPlanner::getDynamicStates(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist,
   const geometry_msgs::msg::Accel & current_accel) const
+  -> std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
 {
   if (std::fabs(target_speed) > constraints.max_speed) {
     THROW_SEMANTIC_ERROR(
@@ -96,8 +96,31 @@ LongitudinalSpeedPlanner::getDynamicStates(
   return std::make_tuple(twist, accel, linear_jerk);
 }
 
-bool LongitudinalSpeedPlanner::isTargetSpeedReached(
+auto LongitudinalSpeedPlanner::getRunningDistance(
+  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
+  const geometry_msgs::msg::Twist & current_twist, const geometry_msgs::msg::Accel & current_accel,
+  double current_linear_jerk) const -> double
+{
+  constexpr double twist_torelance = 0.01;
+  if (!isTargetSpeedReached(target_speed, current_twist, twist_torelance)) {
+    return 0;
+  }
+  double ret = 0;
+  std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double> next_state =
+    std::make_tuple(current_twist, current_accel, current_linear_jerk);
+  do {
+    next_state =
+      getDynamicStates(target_speed, constraints, std::get<0>(next_state), std::get<1>(next_state));
+    ret = ret + std::get<0>(next_state).linear.x * step_time +
+          std::get<1>(next_state).linear.x * step_time * step_time / 2.0 +
+          std::get<2>(next_state) * step_time * step_time * step_time / 6.0;
+  } while (!isTargetSpeedReached(target_speed, std::get<0>(next_state), twist_torelance));
+  return ret;
+}
+
+auto LongitudinalSpeedPlanner::isTargetSpeedReached(
   double target_speed, const geometry_msgs::msg::Twist & current_twist, double tolerance) const
+  -> bool
 {
   if (std::abs(target_speed - current_twist.linear.x) <= tolerance) {
     return true;
@@ -105,10 +128,11 @@ bool LongitudinalSpeedPlanner::isTargetSpeedReached(
   return false;
 }
 
-double LongitudinalSpeedPlanner::getVelocityWithConstantJerk(
+auto LongitudinalSpeedPlanner::getVelocityWithConstantJerk(
   double target_speed, const geometry_msgs::msg::Twist & current_twist,
   const geometry_msgs::msg::Accel & current_accel,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints, double duration) const
+  -> double
 {
   if (isAccelerating(target_speed, current_twist)) {
     return getVelocityWithConstantJerk(
@@ -119,18 +143,18 @@ double LongitudinalSpeedPlanner::getVelocityWithConstantJerk(
   }
 }
 
-double LongitudinalSpeedPlanner::getVelocityWithConstantJerk(
+auto LongitudinalSpeedPlanner::getVelocityWithConstantJerk(
   const geometry_msgs::msg::Twist & current_twist, const geometry_msgs::msg::Accel & current_accel,
-  double linear_jerk, double duration) const
+  double linear_jerk, double duration) const -> double
 {
   return current_twist.linear.x + 0.5 * linear_jerk * duration * duration +
          current_accel.linear.x * duration;
 }
 
-double LongitudinalSpeedPlanner::getQuadraticAccelerationDurationWithConstantJerk(
+auto LongitudinalSpeedPlanner::getQuadraticAccelerationDurationWithConstantJerk(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist,
-  const geometry_msgs::msg::Accel & current_accel) const
+  const geometry_msgs::msg::Accel & current_accel) const -> double
 {
   if (isAccelerating(target_speed, current_twist)) {
     return (-current_accel.linear.x + std::sqrt(
@@ -147,10 +171,10 @@ double LongitudinalSpeedPlanner::getQuadraticAccelerationDurationWithConstantJer
   }
 }
 
-double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
+auto LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist,
-  const geometry_msgs::msg::Accel & current_accel) const
+  const geometry_msgs::msg::Accel & current_accel) const -> double
 {
   if (isAccelerating(target_speed, current_twist)) {
     double duration =
@@ -183,10 +207,10 @@ double LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
   }
 }
 
-double LongitudinalSpeedPlanner::getLinearAccelerationDuration(
+auto LongitudinalSpeedPlanner::getLinearAccelerationDuration(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist,
-  const geometry_msgs::msg::Accel & current_accel) const
+  const geometry_msgs::msg::Accel & current_accel) const -> double
 {
   const double quad_duration =
     getQuadraticAccelerationDuration(target_speed, constraints, current_twist, current_accel);
@@ -205,10 +229,10 @@ double LongitudinalSpeedPlanner::getLinearAccelerationDuration(
   }
 }
 
-bool LongitudinalSpeedPlanner::isReachedToTargetSpeedWithConstantJerk(
+auto LongitudinalSpeedPlanner::isReachedToTargetSpeedWithConstantJerk(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist, const geometry_msgs::msg::Accel & current_accel,
-  double duration, double tolerance) const
+  double duration, double tolerance) const -> bool
 {
   if (
     std::abs(
@@ -220,8 +244,8 @@ bool LongitudinalSpeedPlanner::isReachedToTargetSpeedWithConstantJerk(
   return false;
 }
 
-bool LongitudinalSpeedPlanner::isAccelerating(
-  double target_speed, const geometry_msgs::msg::Twist & current_twist) const
+auto LongitudinalSpeedPlanner::isAccelerating(
+  double target_speed, const geometry_msgs::msg::Twist & current_twist) const -> bool
 {
   if (current_twist.linear.x > target_speed) {
     return false;
@@ -229,8 +253,8 @@ bool LongitudinalSpeedPlanner::isAccelerating(
   return true;
 }
 
-bool LongitudinalSpeedPlanner::isDecelerating(
-  double target_speed, const geometry_msgs::msg::Twist & current_twist) const
+auto LongitudinalSpeedPlanner::isDecelerating(
+  double target_speed, const geometry_msgs::msg::Twist & current_twist) const -> bool
 {
   if (current_twist.linear.x < target_speed) {
     return false;
@@ -238,10 +262,10 @@ bool LongitudinalSpeedPlanner::isDecelerating(
   return true;
 }
 
-double LongitudinalSpeedPlanner::planLinearJerk(
+auto LongitudinalSpeedPlanner::planLinearJerk(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints,
   const geometry_msgs::msg::Twist & current_twist,
-  const geometry_msgs::msg::Accel & current_accel) const
+  const geometry_msgs::msg::Accel & current_accel) const -> double
 {
   double accel_x_new = 0;
   if (isAccelerating(target_speed, current_twist)) {
@@ -250,7 +274,7 @@ double LongitudinalSpeedPlanner::planLinearJerk(
       std::min(constraints.max_acceleration, (target_speed - current_twist.linear.x) / step_time));
   } else {
     accel_x_new = boost::algorithm::clamp(
-      current_twist.linear.x - step_time * constraints.max_deceleration_rate,
+      current_accel.linear.x - step_time * constraints.max_deceleration_rate,
       std::max(
         constraints.max_deceleration * -1, (target_speed - current_twist.linear.x) / step_time),
       0);
@@ -258,9 +282,10 @@ double LongitudinalSpeedPlanner::planLinearJerk(
   return (accel_x_new - current_accel.linear.x) / step_time;
 }
 
-geometry_msgs::msg::Accel LongitudinalSpeedPlanner::forward(
+auto LongitudinalSpeedPlanner::forward(
   double linear_jerk, const geometry_msgs::msg::Accel & accel,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
+  -> geometry_msgs::msg::Accel
 {
   geometry_msgs::msg::Accel ret = accel;
   ret.linear.x = accel.linear.x + step_time * linear_jerk;
@@ -269,9 +294,10 @@ geometry_msgs::msg::Accel LongitudinalSpeedPlanner::forward(
   return ret;
 }
 
-geometry_msgs::msg::Twist LongitudinalSpeedPlanner::forward(
+auto LongitudinalSpeedPlanner::forward(
   const geometry_msgs::msg::Accel & accel, const geometry_msgs::msg::Twist & twist,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
+  -> geometry_msgs::msg::Twist
 {
   geometry_msgs::msg::Twist ret = twist;
   ret.linear = ret.linear + accel.linear * step_time;
@@ -281,8 +307,9 @@ geometry_msgs::msg::Twist LongitudinalSpeedPlanner::forward(
   return ret;
 }
 
-geometry_msgs::msg::Accel LongitudinalSpeedPlanner::timeDerivative(
+auto LongitudinalSpeedPlanner::timeDerivative(
   const geometry_msgs::msg::Twist & before, const geometry_msgs::msg::Twist & after) const
+  -> geometry_msgs::msg::Accel
 {
   geometry_msgs::msg::Accel ret;
   ret.linear = (after.linear - before.linear) / step_time;
@@ -290,8 +317,8 @@ geometry_msgs::msg::Accel LongitudinalSpeedPlanner::timeDerivative(
   return ret;
 }
 
-double LongitudinalSpeedPlanner::timeDerivative(
-  const geometry_msgs::msg::Accel & before, const geometry_msgs::msg::Accel & after) const
+auto LongitudinalSpeedPlanner::timeDerivative(
+  const geometry_msgs::msg::Accel & before, const geometry_msgs::msg::Accel & after) const -> double
 {
   return (after.linear.x - before.linear.x) / step_time;
 }

@@ -120,7 +120,7 @@ BT::NodeStatus FollowLaneAction::tick()
     if (distance_to_conflicting_entity) {
       if (
         distance_to_conflicting_entity.get() <
-        (vehicle_parameters.bounding_box.dimensions.x +
+        (vehicle_parameters.bounding_box.dimensions.x + 3 +
          calculateStopDistance(behavior_parameter.dynamic_constraints))) {
         return BT::NodeStatus::FAILURE;
       }

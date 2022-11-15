@@ -77,7 +77,7 @@ void ActionNode::getBlackBoardValues()
 
 double ActionNode::getHorizon() const
 {
-  return boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+  return boost::algorithm::clamp(getCurrentTwist().linear.x * 5, 20, 50);
 }
 
 traffic_simulator_msgs::msg::EntityStatus ActionNode::stopAtEndOfRoad() const
@@ -372,18 +372,16 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, entity_status.name);
-  const auto dynamics = speed_planner.getDynamicStates(
-    target_speed, constraints, entity_status.action_status.twist,
-    entity_status.action_status.accel);
+  const auto dynamics =
+    speed_planner.getDynamicStates(target_speed, constraints, getCurrentTwist(), getCurrentAccel());
 
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
 
   std::int64_t new_lanelet_id = entity_status.lanelet_pose.lanelet_id;
-  double new_s =
-    entity_status.lanelet_pose.s +
-    (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 * step_time;
+  double new_s = entity_status.lanelet_pose.s +
+                 (twist_new.linear.x + getCurrentTwist().linear.x) / 2.0 * step_time;
   if (new_s < 0) {
     auto previous_lanelet_ids =
       hdmap_utils->getPreviousLaneletIds(entity_status.lanelet_pose.lanelet_id);
@@ -448,9 +446,8 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, entity_status.name);
-  const auto dynamics = speed_planner.getDynamicStates(
-    target_speed, constraints, entity_status.action_status.twist,
-    entity_status.action_status.accel);
+  const auto dynamics =
+    speed_planner.getDynamicStates(target_speed, constraints, getCurrentTwist(), getCurrentAccel());
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
@@ -483,34 +480,25 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
 double ActionNode::calculateStopDistance(
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
 {
-  double v = entity_status.action_status.twist.linear.x;
-  /**
-   * @brief When the entity moving forward.
-   */
-  if (v >= 0) {
-    double t = std::sqrt(2 * v) / constraints.max_deceleration_rate;
-    if (t * constraints.max_deceleration_rate <= constraints.max_deceleration) {
-      return (t * t * t) / 6.0 * constraints.max_deceleration_rate;
-    } else {
-      double t1 = constraints.max_deceleration / constraints.max_deceleration_rate;
-      double v1 = v - t1 * constraints.max_deceleration_rate;
-      return (t1 * t1 * t1) / 6.0 * constraints.max_deceleration_rate +
-             (v1 * v1) / (2 * std::fabs(constraints.max_deceleration));
-    }
-  }
-  /**
-   * @brief When the entity moving backward.
-   */
-  else {
-    double t = std::sqrt(2 * v) / constraints.max_acceleration_rate;
-    if (t * constraints.max_acceleration_rate <= constraints.max_acceleration) {
-      return (t * t * t) / 6.0 * constraints.max_acceleration_rate;
-    } else {
-      double t1 = constraints.max_acceleration / constraints.max_acceleration_rate;
-      double v1 = v - t1 * constraints.max_acceleration_rate;
-      return (t1 * t1 * t1) / 6.0 * constraints.max_acceleration_rate +
-             (v1 * v1) / (2 * std::fabs(constraints.max_acceleration));
-    }
-  }
+  const auto speed_planner =
+    traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
+      step_time, entity_status.name);
+  return speed_planner.getRunningDistance(
+    0, constraints, getCurrentTwist(), getCurrentAccel(), getCurrentLinearJerk());
+}
+
+auto ActionNode::getCurrentTwist() const -> geometry_msgs::msg::Twist
+{
+  return entity_status.action_status.twist;
+}
+
+auto ActionNode::getCurrentAccel() const -> geometry_msgs::msg::Accel
+{
+  return entity_status.action_status.accel;
+}
+
+auto ActionNode::getCurrentLinearJerk() const -> double
+{
+  return entity_status.action_status.linear_jerk;
 }
 }  // namespace entity_behavior

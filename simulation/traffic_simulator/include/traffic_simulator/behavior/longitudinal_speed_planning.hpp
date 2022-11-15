@@ -27,66 +27,76 @@ class LongitudinalSpeedPlanner
 {
 public:
   explicit LongitudinalSpeedPlanner(double step_time, const std::string & entity);
-  std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double> getDynamicStates(
+  auto getDynamicStates(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
-    const geometry_msgs::msg::Accel & current_accel) const;
-  double getAccelerationDuration(
+    const geometry_msgs::msg::Accel & current_accel) const
+    -> std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>;
+  auto getAccelerationDuration(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
-    const geometry_msgs::msg::Accel & current_accel) const;
+    const geometry_msgs::msg::Accel & current_accel) const -> double;
   auto planConstraintsFromJerkAndTimeConstraint(
     double target_speed, const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel, double acceleration_duration,
     const traffic_simulator_msgs::msg::DynamicConstraints & constraints)
     -> traffic_simulator_msgs::msg::DynamicConstraints;
-  bool isAccelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
-  bool isDecelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const;
-  bool isTargetSpeedReached(
+  auto getRunningDistance(
+    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
+    const geometry_msgs::msg::Twist & current_twist,
+    const geometry_msgs::msg::Accel & current_accel, double current_linear_jerk) const -> double;
+  auto isAccelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const
+    -> bool;
+  auto isDecelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const
+    -> bool;
+  auto isTargetSpeedReached(
     double target_speed, const geometry_msgs::msg::Twist & current_twist,
-    double tolerance = 0.01) const;
+    double tolerance = 0.01) const -> bool;
   const double step_time;
   const std::string entity;
 
 private:
-  bool isReachedToTargetSpeedWithConstantJerk(
+  auto isReachedToTargetSpeedWithConstantJerk(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
-    const geometry_msgs::msg::Accel & current_accel, double duration,
-    double tolerance = 0.01) const;
-  double getVelocityWithConstantJerk(
+    const geometry_msgs::msg::Accel & current_accel, double duration, double tolerance = 0.01) const
+    -> bool;
+  auto getVelocityWithConstantJerk(
     double target_speed, const geometry_msgs::msg::Twist & current_twist,
     const geometry_msgs::msg::Accel & current_accel,
-    const traffic_simulator_msgs::msg::DynamicConstraints &, double duration) const;
-  double getVelocityWithConstantJerk(
+    const traffic_simulator_msgs::msg::DynamicConstraints &, double duration) const -> double;
+  auto getVelocityWithConstantJerk(
     const geometry_msgs::msg::Twist & current_twist,
-    const geometry_msgs::msg::Accel & current_accel, double linear_jerk, double duration) const;
-  double getQuadraticAccelerationDuration(
+    const geometry_msgs::msg::Accel & current_accel, double linear_jerk, double duration) const
+    -> double;
+  auto getQuadraticAccelerationDuration(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
-    const geometry_msgs::msg::Accel & current_accel) const;
-  double getLinearAccelerationDuration(
+    const geometry_msgs::msg::Accel & current_accel) const -> double;
+  auto getLinearAccelerationDuration(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
-    const geometry_msgs::msg::Accel & current_accel) const;
-  double getQuadraticAccelerationDurationWithConstantJerk(
+    const geometry_msgs::msg::Accel & current_accel) const -> double;
+  auto getQuadraticAccelerationDurationWithConstantJerk(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
-    const geometry_msgs::msg::Accel & current_accel) const;
-  double planLinearJerk(
+    const geometry_msgs::msg::Accel & current_accel) const -> double;
+  auto planLinearJerk(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
-    const geometry_msgs::msg::Accel & current_accel) const;
-  geometry_msgs::msg::Accel forward(
+    const geometry_msgs::msg::Accel & current_accel) const -> double;
+  auto forward(
     double linear_jerk, const geometry_msgs::msg::Accel &,
-    const traffic_simulator_msgs::msg::DynamicConstraints &) const;
-  geometry_msgs::msg::Twist forward(
+    const traffic_simulator_msgs::msg::DynamicConstraints &) const -> geometry_msgs::msg::Accel;
+  auto forward(
     const geometry_msgs::msg::Accel &, const geometry_msgs::msg::Twist &,
-    const traffic_simulator_msgs::msg::DynamicConstraints &) const;
-  geometry_msgs::msg::Accel timeDerivative(
-    const geometry_msgs::msg::Twist & before, const geometry_msgs::msg::Twist & after) const;
-  double timeDerivative(
-    const geometry_msgs::msg::Accel & before, const geometry_msgs::msg::Accel & after) const;
+    const traffic_simulator_msgs::msg::DynamicConstraints &) const -> geometry_msgs::msg::Twist;
+  auto timeDerivative(
+    const geometry_msgs::msg::Twist & before, const geometry_msgs::msg::Twist & after) const
+    -> geometry_msgs::msg::Accel;
+  auto timeDerivative(
+    const geometry_msgs::msg::Accel & before, const geometry_msgs::msg::Accel & after) const
+    -> double;
 };
 
 }  // namespace longitudinal_speed_planning

@@ -62,6 +62,9 @@ public:
     std::int64_t lanelet_id);
   traffic_simulator_msgs::msg::EntityStatus stopAtEndOfRoad() const;
   double getHorizon() const;
+  auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
+  auto getCurrentAccel() const -> geometry_msgs::msg::Accel;
+  auto getCurrentLinearJerk() const -> double;
 
   /// throws if the derived class return RUNNING.
   BT::NodeStatus executeTick() override;

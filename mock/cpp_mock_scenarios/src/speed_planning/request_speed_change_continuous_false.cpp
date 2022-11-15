@@ -47,31 +47,25 @@ private:
      */
     if (
       api_.getCurrentTime() != 0.0 && api_.getCurrentTime() <= 1.0 &&
-      api_.getEntityStatus("ego").action_status.accel.linear.x != 10.0) {
+      api_.getCurrentAccel("ego").linear.x != 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (
-      api_.getCurrentTime() >= 1.05 &&
-      api_.getEntityStatus("ego").action_status.accel.linear.x > 3.0) {
+    if (api_.getCurrentTime() >= 1.05 && api_.getCurrentAccel("ego").linear.x > 3.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
 
     /**
      * @brief checking linear speed
      */
-    if (
-      api_.getCurrentTime() <= 0.9 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {
+    if (api_.getCurrentTime() <= 0.9 && api_.getCurrentTwist("ego").linear.x > 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (
-      api_.getCurrentTime() >= 1.0 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x <= 10.0) {
+    if (api_.getCurrentTime() >= 1.0 && api_.getCurrentTwist("ego").linear.x <= 10.0) {
       speed_reached = true;
     }
     if (
       speed_reached && api_.getCurrentTime() >= 1.5 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x >= 13.88) {
+      api_.getCurrentTwist("ego").linear.x >= 13.88) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
