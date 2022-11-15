@@ -49,11 +49,10 @@ public:
     }
     return ports;
   }
-  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
-  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(
-    double target_speed, const std::vector<std::int64_t> & following_lanelets);
-  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
-    double target_speed);
+  auto calculateEntityStatusUpdated(double target_speed) const
+    -> traffic_simulator_msgs::msg::EntityStatus;
+  auto calculateEntityStatusUpdatedInWorldFrame(double target_speed) const
+    -> traffic_simulator_msgs::msg::EntityStatus;
   virtual const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() = 0;
   virtual const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) = 0;
