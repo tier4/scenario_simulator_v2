@@ -101,8 +101,8 @@ auto LongitudinalSpeedPlanner::getRunningDistance(
   const geometry_msgs::msg::Twist & current_twist, const geometry_msgs::msg::Accel & current_accel,
   double current_linear_jerk) const -> double
 {
-  constexpr double twist_torelance = 0.01;
-  if (isTargetSpeedReached(target_speed, current_twist, twist_torelance)) {
+  constexpr double twist_tolerance = 0.01;
+  if (isTargetSpeedReached(target_speed, current_twist, twist_tolerance)) {
     return 0;
   }
   double ret = 0;
@@ -114,7 +114,7 @@ auto LongitudinalSpeedPlanner::getRunningDistance(
     ret = ret + std::get<0>(next_state).linear.x * step_time +
           std::get<1>(next_state).linear.x * step_time * step_time / 2.0 +
           std::get<2>(next_state) * step_time * step_time * step_time / 6.0;
-  } while (!isTargetSpeedReached(target_speed, std::get<0>(next_state), twist_torelance));
+  } while (!isTargetSpeedReached(target_speed, std::get<0>(next_state), twist_tolerance));
   return ret;
 }
 
