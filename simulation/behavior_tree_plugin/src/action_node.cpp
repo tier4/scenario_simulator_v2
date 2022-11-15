@@ -36,7 +36,7 @@ ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & c
 
 BT::NodeStatus ActionNode::executeTick() { return BT::ActionNodeBase::executeTick(); }
 
-void ActionNode::getBlackBoardValues()
+auto ActionNode::getBlackBoardValues() -> void
 {
   if (!getInput<traffic_simulator::behavior::Request>("request", request)) {
     THROW_SIMULATION_ERROR("failed to get input request in ActionNode");
@@ -189,15 +189,15 @@ boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
   return *collision_points.begin();
 }
 
-boost::optional<double> ActionNode::getDistanceToStopLine(
+auto ActionNode::getDistanceToStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const std::vector<geometry_msgs::msg::Point> & waypoints)
+  const std::vector<geometry_msgs::msg::Point> & waypoints) const -> boost::optional<double>
 {
   return hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints);
 }
 
-boost::optional<double> ActionNode::getDistanceToFrontEntity(
-  const math::geometry::CatmullRomSplineInterface & spline)
+auto ActionNode::getDistanceToFrontEntity(
+  const math::geometry::CatmullRomSplineInterface & spline) const -> boost::optional<double>
 {
   auto name = getFrontEntityName(spline);
   if (!name) {
@@ -206,8 +206,8 @@ boost::optional<double> ActionNode::getDistanceToFrontEntity(
   return getDistanceToTargetEntityPolygon(spline, name.get());
 }
 
-boost::optional<std::string> ActionNode::getFrontEntityName(
-  const math::geometry::CatmullRomSplineInterface & spline)
+auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
+  -> boost::optional<std::string>
 {
   std::vector<double> distances;
   std::vector<std::string> entities;
@@ -238,9 +238,9 @@ boost::optional<std::string> ActionNode::getFrontEntityName(
   return entities[index];
 }
 
-boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
+auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
   const math::geometry::CatmullRomSplineInterface & spline,
-  const traffic_simulator_msgs::msg::EntityStatus & status)
+  const traffic_simulator_msgs::msg::EntityStatus & status) const -> boost::optional<double>
 {
   if (status.lanelet_pose_valid) {
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
@@ -249,8 +249,8 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
   return boost::none;
 }
 
-traffic_simulator_msgs::msg::EntityStatus ActionNode::getEntityStatus(
-  const std::string target_name) const
+auto ActionNode::getEntityStatus(const std::string target_name) const
+  -> traffic_simulator_msgs::msg::EntityStatus
 {
   if (other_entity_status.find(target_name) != other_entity_status.end()) {
     return other_entity_status.at(target_name);
@@ -258,10 +258,10 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::getEntityStatus(
   THROW_SIMULATION_ERROR("other entity : ", target_name, " does not exist.");
 }
 
-boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
+auto ActionNode::getDistanceToTargetEntityPolygon(
   const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
   double width_extension_right, double width_extension_left, double length_extension_front,
-  double length_extension_rear)
+  double length_extension_rear) const -> boost::optional<double>
 {
   const auto status = getEntityStatus(target_name);
   if (status.lanelet_pose_valid == true) {
@@ -272,10 +272,11 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
   return boost::none;
 }
 
-boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
+auto ActionNode::getDistanceToTargetEntityPolygon(
   const math::geometry::CatmullRomSplineInterface & spline,
   const traffic_simulator_msgs::msg::EntityStatus & status, double width_extension_right,
-  double width_extension_left, double length_extension_front, double length_extension_rear)
+  double width_extension_left, double length_extension_front, double length_extension_rear) const
+  -> boost::optional<double>
 {
   if (status.lanelet_pose_valid) {
     const auto polygon = math::geometry::transformPoints(
@@ -287,9 +288,9 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
   return boost::none;
 }
 
-boost::optional<double> ActionNode::getDistanceToConflictingEntity(
+auto ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & route_lanelets,
-  const math::geometry::CatmullRomSplineInterface & spline)
+  const math::geometry::CatmullRomSplineInterface & spline) -> boost::optional<double>
 {
   auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets);
   auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets);
@@ -312,9 +313,9 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   return *distances.begin();
 }
 
-std::vector<traffic_simulator_msgs::msg::EntityStatus>
-ActionNode::getConflictingEntityStatusOnCrossWalk(
+auto ActionNode::getConflictingEntityStatusOnCrossWalk(
   const std::vector<std::int64_t> & route_lanelets) const
+  -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
 {
   std::vector<traffic_simulator_msgs::msg::EntityStatus> conflicting_entity_status;
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(route_lanelets);
@@ -329,8 +330,8 @@ ActionNode::getConflictingEntityStatusOnCrossWalk(
   return conflicting_entity_status;
 }
 
-std::vector<traffic_simulator_msgs::msg::EntityStatus> ActionNode::getConflictingEntityStatusOnLane(
-  const std::vector<std::int64_t> & route_lanelets) const
+auto ActionNode::getConflictingEntityStatusOnLane(const std::vector<std::int64_t> & route_lanelets)
+  const -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
 {
   std::vector<traffic_simulator_msgs::msg::EntityStatus> conflicting_entity_status;
   auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(route_lanelets);
@@ -366,8 +367,9 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   return false;
 }
 
-traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
+auto ActionNode::calculateEntityStatusUpdated(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
+  -> traffic_simulator_msgs::msg::EntityStatus
 {
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
@@ -440,8 +442,9 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdat
   THROW_SIMULATION_ERROR("failed to calculate next status calculateEntityStatusUpdated function");
 }
 
-traffic_simulator_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdatedInWorldFrame(
+auto ActionNode::calculateEntityStatusUpdatedInWorldFrame(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
+  -> traffic_simulator_msgs::msg::EntityStatus
 {
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
