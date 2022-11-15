@@ -102,7 +102,7 @@ auto LongitudinalSpeedPlanner::getRunningDistance(
   double current_linear_jerk) const -> double
 {
   constexpr double twist_torelance = 0.01;
-  if (!isTargetSpeedReached(target_speed, current_twist, twist_torelance)) {
+  if (isTargetSpeedReached(target_speed, current_twist, twist_torelance)) {
     return 0;
   }
   double ret = 0;

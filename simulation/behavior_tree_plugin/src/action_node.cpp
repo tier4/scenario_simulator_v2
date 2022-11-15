@@ -483,8 +483,9 @@ double ActionNode::calculateStopDistance(
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, entity_status.name);
-  return speed_planner.getRunningDistance(
+  const auto ret = speed_planner.getRunningDistance(
     0, constraints, getCurrentTwist(), getCurrentAccel(), getCurrentLinearJerk());
+  return ret;
 }
 
 auto ActionNode::getCurrentTwist() const -> geometry_msgs::msg::Twist

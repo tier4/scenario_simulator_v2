@@ -45,29 +45,28 @@ private:
     if (api_.entityExists("bob") && api_.checkCollision("ego", "bob")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    /*
     if (t <= 1.0) {
       const auto vel = api_.getEntityStatus("bob").action_status.twist.linear.x;
       if (t != vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
-    if (t >= 6.15) {
-      if (7.3 >= t) {
+    if (t >= 6.6) {
+      if (7.5 >= t) {
         const auto vel = api_.getCurrentTwist("ego").linear.x;
-        if (std::fabs(0.01) <= vel) {
+        if (std::fabs(0.1) <= vel) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }
       } else {
         const auto vel = api_.getCurrentTwist("ego").linear.x;
+        std::cout << vel << std::endl;
         if (0.1 >= vel) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }
       }
     }
-    */
     // LCOV_EXCL_STOP
-    if (t >= 20) {
+    if (t >= 10) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
