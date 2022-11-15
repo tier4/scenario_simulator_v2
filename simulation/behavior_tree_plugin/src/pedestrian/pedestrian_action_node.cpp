@@ -39,10 +39,17 @@ void PedestrianActionNode::getBlackBoardValues()
   }
 }
 
-traffic_simulator_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatusUpdated(
-  double target_speed)
+auto PedestrianActionNode::calculateEntityStatusUpdated(double target_speed) const
+  -> traffic_simulator_msgs::msg::EntityStatus
 {
   return ActionNode::calculateEntityStatusUpdated(
+    target_speed, behavior_parameter.dynamic_constraints);
+}
+
+auto PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_speed) const
+  -> traffic_simulator_msgs::msg::EntityStatus
+{
+  return ActionNode::calculateEntityStatusUpdatedInWorldFrame(
     target_speed, behavior_parameter.dynamic_constraints);
 }
 }  // namespace entity_behavior
