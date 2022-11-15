@@ -30,7 +30,7 @@ int main(int argc, char * argv[])
 
   auto node = rclcpp::Node::make_shared("ping");
 
-  node->declare_parameter<std::string>("service_name", "/simulation/ping");
+  node->declare_parameter<std::string>("service_name", "/ping");
   std::string service_name;
   node->get_parameter<std::string>("service_name", service_name);
 

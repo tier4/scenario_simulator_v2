@@ -28,7 +28,7 @@ The meaning of the return codes is shown in the table below.
 
 | parameter name        | description                                                            | default value    |
 |-----------------------|------------------------------------------------------------------------|------------------|
-| service_name          | the name of the service to call                                        | /simulation/ping |
+| service_name          | the name of the service to call                                        | /ping |
 | connection_timeout_ms | timeout for establishing connection with service (unit : milliseconds) | 1000             |
 | request_timeout_ms    | timeout for waiting for service response (unit : milliseconds)         | 1000             | 
 
