@@ -27,14 +27,14 @@ private:
 
   const rclcpp::CallbackGroup::SharedPtr service_callback_group;
 
-  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr service;
+  const rclcpp::Service<std_srvs::srv::Empty>::SharedPtr service;
 
 public:
   template <typename NodeT>
   explicit PingService(NodeT & node)
   : service_callback_group(
       node.create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive)),
-    service(node.create_service<std_srvs::srv::Empty>(
+    service(node.template create_service<std_srvs::srv::Empty>(
       "ping",
       [this](
         const std_srvs::srv::Empty::Request::SharedPtr,
