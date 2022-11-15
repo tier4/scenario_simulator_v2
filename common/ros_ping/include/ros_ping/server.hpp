@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ROS_PING__PING_SERVER_HPP_
-#define ROS_PING__PING_SERVER_HPP_
+#ifndef ROS_PING__SERVER_HPP_
+#define ROS_PING__SERVER_HPP_
 
-#include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <std_srvs/srv/empty.hpp>
 
 namespace ros_ping
 {
-class PingService
+class PingServer
 {
 private:
   std::shared_ptr<std::promise<void>> update_notifier = nullptr;
@@ -31,7 +30,7 @@ private:
 
 public:
   template <typename NodeT>
-  explicit PingService(NodeT & node)
+  explicit PingServer(NodeT & node)
   : service_callback_group(
       node.create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive)),
     service(node.template create_service<std_srvs::srv::Empty>(
@@ -63,4 +62,4 @@ public:
 };
 }  // namespace ros_ping
 
-#endif  // ROS_PING__PING_SERVER_HPP_
+#endif  // ROS_PING__SERVER_HPP_

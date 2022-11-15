@@ -30,7 +30,7 @@
 #include <openscenario_interpreter_msgs/msg/context.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
-#include <ros_ping/service.hpp>
+#include <ros_ping/server.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_junit/junit5.hpp>
 #include <utility>
@@ -52,7 +52,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
 
-  ros_ping::PingService ping_service;
+  ros_ping::Server ping_service;
 
   String intended_result;
 
