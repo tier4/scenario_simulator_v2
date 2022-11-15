@@ -41,8 +41,10 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() <= 1.9 && api_.getCurrentTwist("front").linear.x > 5.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+    if (api_.getCurrentTime() <= 1.9) {
+      if (!equals(api_.getCurrentTime() + 3.0, api_.getCurrentTwist("front").linear.x, 0.01)) {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
     }
     if (
       api_.getCurrentTime() >= 2.0 && api_.getCurrentTwist("front").linear.x <= 5.05 &&
