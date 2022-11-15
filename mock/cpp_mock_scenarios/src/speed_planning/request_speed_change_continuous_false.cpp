@@ -43,22 +43,12 @@ private:
   void onUpdate() override
   {
     /**
-     * @brief checking linear acceleration
-     */
-    if (
-      api_.getCurrentTime() != 0.0 && api_.getCurrentTime() <= 1.0 &&
-      api_.getCurrentAccel("ego").linear.x != 10.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    if (api_.getCurrentTime() >= 1.05 && api_.getCurrentAccel("ego").linear.x > 3.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-
-    /**
      * @brief checking linear speed
      */
-    if (api_.getCurrentTime() <= 0.9 && api_.getCurrentTwist("ego").linear.x > 10.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+    if (api_.getCurrentTime() <= 0.95) {
+      if (!equals(api_.getCurrentTime() * 10.0, api_.getCurrentTwist("ego").linear.x, 0.01)) {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
     }
     if (api_.getCurrentTime() >= 1.0 && api_.getCurrentTwist("ego").linear.x <= 10.0) {
       speed_reached = true;
