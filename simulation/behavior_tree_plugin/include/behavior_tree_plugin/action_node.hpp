@@ -38,13 +38,14 @@ class ActionNode : public BT::ActionNodeBase
 public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNode() override = default;
-  bool foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const;
+  auto foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const -> bool;
   auto getDistanceToConflictingEntity(
     const std::vector<std::int64_t> & route_lanelets,
-    const math::geometry::CatmullRomSplineInterface & spline) -> boost::optional<double>;
+    const math::geometry::CatmullRomSplineInterface & spline) const -> boost::optional<double>;
   auto getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
     -> boost::optional<std::string>;
-  double calculateStopDistance(const traffic_simulator_msgs::msg::DynamicConstraints &) const;
+  auto calculateStopDistance(const traffic_simulator_msgs::msg::DynamicConstraints &) const
+    -> double;
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> boost::optional<double>;
   auto getDistanceToStopLine(
@@ -52,22 +53,22 @@ public:
     const std::vector<geometry_msgs::msg::Point> & waypoints) const -> boost::optional<double>;
   auto getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
-    const math::geometry::CatmullRomSplineInterface & spline) -> boost::optional<double>;
-  auto getRightOfWayEntities() -> std::vector<traffic_simulator_msgs::msg::EntityStatus>;
-  auto getRightOfWayEntities(const std::vector<std::int64_t> & following_lanelets)
+    const math::geometry::CatmullRomSplineInterface & spline) const -> boost::optional<double>;
+  auto getRightOfWayEntities() const -> std::vector<traffic_simulator_msgs::msg::EntityStatus>;
+  auto getRightOfWayEntities(const std::vector<std::int64_t> & following_lanelets) const
     -> std::vector<traffic_simulator_msgs::msg::EntityStatus>;
-  auto getYieldStopDistance(const std::vector<std::int64_t> & following_lanelets)
+  auto getYieldStopDistance(const std::vector<std::int64_t> & following_lanelets) const
     -> boost::optional<double>;
-  auto getOtherEntityStatus(std::int64_t lanelet_id)
+  auto getOtherEntityStatus(std::int64_t lanelet_id) const
     -> std::vector<traffic_simulator_msgs::msg::EntityStatus>;
   auto stopAtEndOfRoad() const -> traffic_simulator_msgs::msg::EntityStatus;
-  double getHorizon() const;
+  auto getHorizon() const -> double;
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
   auto getCurrentAccel() const -> geometry_msgs::msg::Accel;
   auto getCurrentLinearJerk() const -> double;
 
   /// throws if the derived class return RUNNING.
-  BT::NodeStatus executeTick() override;
+  auto executeTick() -> BT::NodeStatus override;
 
   void halt() override final { setStatus(BT::NodeStatus::IDLE); }
 

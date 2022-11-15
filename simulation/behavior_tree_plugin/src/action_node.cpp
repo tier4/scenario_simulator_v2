@@ -34,7 +34,7 @@ ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & c
 {
 }
 
-BT::NodeStatus ActionNode::executeTick() { return BT::ActionNodeBase::executeTick(); }
+auto ActionNode::executeTick() -> BT::NodeStatus { return BT::ActionNodeBase::executeTick(); }
 
 auto ActionNode::getBlackBoardValues() -> void
 {
@@ -75,12 +75,12 @@ auto ActionNode::getBlackBoardValues() -> void
   }
 }
 
-double ActionNode::getHorizon() const
+auto ActionNode::getHorizon() const -> double
 {
   return boost::algorithm::clamp(getCurrentTwist().linear.x * 5, 20, 50);
 }
 
-traffic_simulator_msgs::msg::EntityStatus ActionNode::stopAtEndOfRoad() const
+auto ActionNode::stopAtEndOfRoad() const -> traffic_simulator_msgs::msg::EntityStatus
 {
   traffic_simulator_msgs::msg::EntityStatus entity_status_updated = entity_status;
   entity_status_updated.time = current_time + step_time;
@@ -89,8 +89,8 @@ traffic_simulator_msgs::msg::EntityStatus ActionNode::stopAtEndOfRoad() const
   return entity_status_updated;
 }
 
-std::vector<traffic_simulator_msgs::msg::EntityStatus> ActionNode::getOtherEntityStatus(
-  std::int64_t lanelet_id)
+auto ActionNode::getOtherEntityStatus(std::int64_t lanelet_id) const
+  -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
 {
   std::vector<traffic_simulator_msgs::msg::EntityStatus> ret;
   for (const auto & status : other_entity_status) {
@@ -103,8 +103,8 @@ std::vector<traffic_simulator_msgs::msg::EntityStatus> ActionNode::getOtherEntit
   return ret;
 }
 
-boost::optional<double> ActionNode::getYieldStopDistance(
-  const std::vector<std::int64_t> & following_lanelets)
+auto ActionNode::getYieldStopDistance(const std::vector<std::int64_t> & following_lanelets) const
+  -> boost::optional<double>
 {
   std::set<double> distances;
   for (const auto & lanelet : following_lanelets) {
@@ -126,8 +126,8 @@ boost::optional<double> ActionNode::getYieldStopDistance(
   return boost::none;
 }
 
-std::vector<traffic_simulator_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntities(
-  const std::vector<std::int64_t> & following_lanelets)
+auto ActionNode::getRightOfWayEntities(const std::vector<std::int64_t> & following_lanelets) const
+  -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
 {
   std::vector<traffic_simulator_msgs::msg::EntityStatus> ret;
   const auto lanelet_ids_list = hdmap_utils->getRightOfWayLaneletIds(following_lanelets);
@@ -143,7 +143,8 @@ std::vector<traffic_simulator_msgs::msg::EntityStatus> ActionNode::getRightOfWay
   return ret;
 }
 
-std::vector<traffic_simulator_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntities()
+auto ActionNode::getRightOfWayEntities() const
+  -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
 {
   std::vector<traffic_simulator_msgs::msg::EntityStatus> ret;
   const auto lanelet_ids =
@@ -161,9 +162,9 @@ std::vector<traffic_simulator_msgs::msg::EntityStatus> ActionNode::getRightOfWay
   return ret;
 }
 
-boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
+auto ActionNode::getDistanceToTrafficLightStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const math::geometry::CatmullRomSplineInterface & spline)
+  const math::geometry::CatmullRomSplineInterface & spline) const -> boost::optional<double>
 {
   const auto traffic_light_ids = hdmap_utils->getTrafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.empty()) {
@@ -290,7 +291,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
 
 auto ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & route_lanelets,
-  const math::geometry::CatmullRomSplineInterface & spline) -> boost::optional<double>
+  const math::geometry::CatmullRomSplineInterface & spline) const -> boost::optional<double>
 {
   auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets);
   auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets);
@@ -346,7 +347,8 @@ auto ActionNode::getConflictingEntityStatusOnLane(const std::vector<std::int64_t
   return conflicting_entity_status;
 }
 
-bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const
+auto ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const
+  -> bool
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(following_lanelets);
@@ -480,8 +482,8 @@ auto ActionNode::calculateEntityStatusUpdatedInWorldFrame(
   return entity_status_updated;
 }
 
-double ActionNode::calculateStopDistance(
-  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
+auto ActionNode::calculateStopDistance(
+  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const -> double
 {
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
