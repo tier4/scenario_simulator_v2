@@ -73,7 +73,7 @@ public:
 };
 
 /**
- * @brief occupancy grid sensor implemtation
+ * @brief occupancy grid sensor implementation
  */
 template <typename T>
 class OccupancyGridSensor : public OccupancyGridSensorBase
