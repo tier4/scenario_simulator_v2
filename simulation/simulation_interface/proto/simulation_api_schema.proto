@@ -34,6 +34,7 @@ message DetectionSensorConfiguration {
   double range = 3;             // Sensor detection range. (unit : meter)
   string architecture_type = 4; // Autoware architecture type.
   bool filter_by_range = 5;     // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
+  double pos_noise_stddev = 6;  // standard deviation of position noise.
 }
 
 /**

@@ -15,11 +15,14 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
+
+#include <simulation_api_schema.pb.h>
+
 #include <memory>
-#include <rclcpp/rclcpp.hpp>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -44,6 +47,9 @@ protected:
 
   geometry_msgs::Pose getSensorPose(
     const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+
+  void applyNoise(
+    autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const;
 
 public:
   virtual ~DetectionSensorBase() = default;

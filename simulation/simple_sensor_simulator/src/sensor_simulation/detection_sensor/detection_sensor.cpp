@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <algorithm>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <memory>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
+
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -54,6 +56,22 @@ geometry_msgs::Pose DetectionSensorBase::getSensorPose(
     }
   }
   throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
+}
+
+void DetectionSensorBase::applyNoise(
+  autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const
+{
+  std::random_device seed;
+  std::shared_ptr<std::mt19937> rand_engine = std::make_shared<std::mt19937>(seed());
+  [[maybe_unused]]double pos_noise_stddev = configuration_.pos_noise_stddev();
+  std::shared_ptr<std::normal_distribution<>> pos_noise_dist =
+    std::make_shared<std::normal_distribution<>>(0.0, pos_noise_stddev);
+  autoware_auto_perception_msgs::msg::DetectedObject detected_object_with_noise;
+  detected_object_with_noise.kinematics.pose_with_covariance.pose.position.x +=
+    (*pos_noise_dist)(*rand_engine);
+  detected_object_with_noise.kinematics.pose_with_covariance.pose.position.y +=
+    (*pos_noise_dist)(*rand_engine);
+  detected_object = detected_object_with_noise;
 }
 
 template <>
@@ -151,6 +169,7 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
           simulation_interface::toMsg(
             s.action_status().twist(), object.kinematics.twist_with_covariance.twist);
           object.shape.type = object.shape.BOUNDING_BOX;
+          applyNoise(object);
           msg.objects.emplace_back(object);
         }
       }
