@@ -145,13 +145,13 @@ BT::NodeStatus StopAtStopLineAction::tick()
     }
     if (!distance_to_stopline_) {
       stopped_ = false;
-      setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+      setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
       const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
       setOutput("obstacle", obstacle);
       return BT::NodeStatus::SUCCESS;
     }
-    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
@@ -169,7 +169,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   } else {
     target_speed = target_linear_speed.get();
   }
-  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
   stopped_ = false;
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);

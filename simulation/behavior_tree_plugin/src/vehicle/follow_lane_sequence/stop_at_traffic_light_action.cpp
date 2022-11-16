@@ -128,7 +128,7 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!distance_to_stop_target_) {
-    setOutput("updated_status", calculateEntityStatusUpdated(0));
+    setOutput("updated_status", calculateUpdatedEntityStatus(0));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
@@ -141,7 +141,7 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   } else {
     target_speed = target_linear_speed.get();
   }
-  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

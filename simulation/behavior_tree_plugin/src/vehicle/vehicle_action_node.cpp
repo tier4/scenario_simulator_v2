@@ -43,14 +43,14 @@ void VehicleActionNode::getBlackBoardValues()
   }
 }
 
-auto VehicleActionNode::calculateEntityStatusUpdated(double target_speed) const
+auto VehicleActionNode::calculateUpdatedEntityStatus(double target_speed) const
   -> traffic_simulator_msgs::msg::EntityStatus
 {
-  return ActionNode::calculateEntityStatusUpdated(
+  return ActionNode::calculateUpdatedEntityStatus(
     target_speed, behavior_parameter.dynamic_constraints);
 }
 
-auto VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_speed) const
+auto VehicleActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
   -> traffic_simulator_msgs::msg::EntityStatus
 {
   if (target_speed > vehicle_parameters.performance.max_speed) {
@@ -58,7 +58,7 @@ auto VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(double target_s
   } else {
     target_speed = entity_status.action_status.twist.linear.x;
   }
-  return ActionNode::calculateEntityStatusUpdatedInWorldFrame(
+  return ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     target_speed, behavior_parameter.dynamic_constraints);
 }
 }  // namespace entity_behavior

@@ -116,7 +116,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   if (target_speed.get() <= front_entity_status.action_status.twist.linear.x) {
-    auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get());
+    auto entity_status_updated = calculateUpdatedEntityStatus(target_speed.get());
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
@@ -128,7 +128,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     (calculateStopDistance(behavior_parameter.dynamic_constraints) +
      vehicle_parameters.bounding_box.dimensions.x + 5)) {
     auto entity_status_updated =
-      calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x + 2);
+      calculateUpdatedEntityStatus(front_entity_status.action_status.twist.linear.x + 2);
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
@@ -138,7 +138,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     distance_to_front_entity_.get() <=
     calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     auto entity_status_updated =
-      calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x - 2);
+      calculateUpdatedEntityStatus(front_entity_status.action_status.twist.linear.x - 2);
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
@@ -146,7 +146,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::RUNNING;
   } else {
     auto entity_status_updated =
-      calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x);
+      calculateUpdatedEntityStatus(front_entity_status.action_status.twist.linear.x);
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);

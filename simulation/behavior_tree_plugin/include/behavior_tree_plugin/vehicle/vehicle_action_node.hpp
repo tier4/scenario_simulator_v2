@@ -49,9 +49,9 @@ public:
     }
     return ports;
   }
-  auto calculateEntityStatusUpdated(double target_speed) const
+  auto calculateUpdatedEntityStatus(double target_speed) const
     -> traffic_simulator_msgs::msg::EntityStatus;
-  auto calculateEntityStatusUpdatedInWorldFrame(double target_speed) const
+  auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
     -> traffic_simulator_msgs::msg::EntityStatus;
   virtual const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() = 0;
   virtual const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(

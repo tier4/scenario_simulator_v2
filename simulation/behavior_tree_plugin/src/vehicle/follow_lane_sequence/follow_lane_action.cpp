@@ -129,7 +129,7 @@ BT::NodeStatus FollowLaneAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  auto updated_status = calculateEntityStatusUpdated(target_speed.get());
+  auto updated_status = calculateUpdatedEntityStatus(target_speed.get());
   setOutput("updated_status", updated_status);
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);

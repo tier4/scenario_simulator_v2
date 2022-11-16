@@ -101,10 +101,10 @@ public:
     double width_extension_right = 0.0, double width_extension_left = 0.0,
     double length_extension_front = 0.0, double length_extension_rear = 0.0) const
     -> boost::optional<double>;
-  auto calculateEntityStatusUpdated(
+  auto calculateUpdatedEntityStatus(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
     -> traffic_simulator_msgs::msg::EntityStatus;
-  auto calculateEntityStatusUpdatedInWorldFrame(
+  auto calculateUpdatedEntityStatusInWorldFrame(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
     -> traffic_simulator_msgs::msg::EntityStatus;
 

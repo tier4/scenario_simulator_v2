@@ -108,7 +108,7 @@ BT::NodeStatus YieldAction::tick()
     if (!target_speed) {
       target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
     }
-    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
     const auto waypoints = calculateWaypoints();
     if (waypoints.waypoints.empty()) {
       return BT::NodeStatus::FAILURE;
@@ -123,7 +123,7 @@ BT::NodeStatus YieldAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;

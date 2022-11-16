@@ -369,7 +369,7 @@ auto ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   return false;
 }
 
-auto ActionNode::calculateEntityStatusUpdated(
+auto ActionNode::calculateUpdatedEntityStatus(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator_msgs::msg::EntityStatus
 {
@@ -427,7 +427,7 @@ auto ActionNode::calculateEntityStatusUpdated(
     }
     if (!calculation_success) {
       THROW_SIMULATION_ERROR(
-        "failed to calculate next status calculateEntityStatusUpdated function");
+        "failed to calculate next status calculateUpdatedEntityStatus function");
     }
     traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;
@@ -441,10 +441,10 @@ auto ActionNode::calculateEntityStatusUpdated(
     entity_status_updated.action_status.linear_jerk = linear_jerk_new;
     return entity_status_updated;
   }
-  THROW_SIMULATION_ERROR("failed to calculate next status calculateEntityStatusUpdated function");
+  THROW_SIMULATION_ERROR("failed to calculate next status calculateUpdatedEntityStatus function");
 }
 
-auto ActionNode::calculateEntityStatusUpdatedInWorldFrame(
+auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator_msgs::msg::EntityStatus
 {

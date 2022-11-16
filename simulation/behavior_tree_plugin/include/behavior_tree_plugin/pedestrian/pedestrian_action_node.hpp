@@ -41,9 +41,9 @@ public:
     return ports;
   }
   traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
-  auto calculateEntityStatusUpdatedInWorldFrame(double target_speed) const
+  auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
     -> traffic_simulator_msgs::msg::EntityStatus;
-  auto calculateEntityStatusUpdated(double target_speed) const
+  auto calculateUpdatedEntityStatus(double target_speed) const
     -> traffic_simulator_msgs::msg::EntityStatus;
 
 protected:
