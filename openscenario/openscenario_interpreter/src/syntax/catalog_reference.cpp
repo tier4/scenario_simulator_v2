@@ -30,7 +30,7 @@ inline namespace syntax
 #define UNSUPPORTED_CATALOG_REFERENCE_SPECIFIED(ELEMENT)       \
   SyntaxError(                                                 \
     "Given class ", ELEMENT,                                   \
-    " is valid OpenSCENARIO element of class CatalogRefenrece" \
+    " is valid OpenSCENARIO element of class CatalogReference" \
     ", but is not supported yet")
 
 template <typename... Ts>

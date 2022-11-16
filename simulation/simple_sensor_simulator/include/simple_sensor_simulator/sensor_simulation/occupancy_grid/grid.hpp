@@ -120,19 +120,19 @@ private:
   size_t getIndex(size_t row, size_t col) const;
 
   /**
-   * @brief Convert point in grid coordinate to point in world cooridnate
+   * @brief Convert point in grid coordinate to point in world coordinate
    * @return Point in world coordinate
    */
   geometry_msgs::msg::Point transformToWorld(const geometry_msgs::msg::Point & grid_point) const;
 
   /**
-   * @brief Convert point in world coordinate to point in grid cooridnate
+   * @brief Convert point in world coordinate to point in grid coordinate
    * @return Point in grid coordinate
    */
   geometry_msgs::msg::Point transformToGrid(const geometry_msgs::msg::Point & world_point) const;
 
   /**
-   * @brief Convert line segment in world coordinate to line segment in grid cooridnate
+   * @brief Convert line segment in world coordinate to line segment in grid coordinate
    * @return Line segment in grid coordinate
    */
   math::geometry::LineSegment transformToGrid(const math::geometry::LineSegment & line) const;

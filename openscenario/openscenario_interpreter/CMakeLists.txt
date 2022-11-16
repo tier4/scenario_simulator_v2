@@ -34,11 +34,6 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
 
-ament_auto_add_library(openscenario_preprocessor SHARED
-  src/openscenario_preprocessor.cpp)
-
-target_link_libraries(openscenario_preprocessor ${PROJECT_NAME})
-
 # workaround to allow deprecated header to build on both galactic and humble
 if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
   target_compile_definitions(${PROJECT_NAME} PUBLIC
@@ -47,7 +42,6 @@ if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
 endif()
 
 rclcpp_components_register_nodes(${PROJECT_NAME} "openscenario_interpreter::Interpreter")
-rclcpp_components_register_nodes(openscenario_preprocessor "openscenario_interpreter::Preprocessor")
 
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
@@ -55,10 +49,6 @@ rclcpp_components_register_nodes(openscenario_preprocessor "openscenario_interpr
 
 ament_auto_add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
-
-ament_auto_add_executable(openscenario_preprocessor_node src/openscenario_preprocessor_node.cpp)
-target_link_libraries(openscenario_preprocessor_node openscenario_preprocessor)
-
 
 # ------------------------------------------------------------------------------
 #  test

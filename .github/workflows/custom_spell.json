@@ -1,6 +1,9 @@
 {
   "ignorePaths": [
-    "external/lanelet2_matching/**"
+    "external/lanelet2_matching/**",
+    "*/**/CHANGELOG.rst",
+    "openscenario/openscenario_utility/openscenario_utility/resources/*.xsd",
+    "*.drawio"
   ],
   "words": [
     "parametersetaction",
@@ -74,6 +77,10 @@
     "Khanh",
     "approvable",
     "customcommandaction",
-    "prepending"
+    "prepending",
+    "kotaro",
+    "yoshimoto",
+    "engageable",
+    "travelling"
   ]
 }
