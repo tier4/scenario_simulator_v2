@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__DATA_TYPE__FOLLOW_TRAJECTORY_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <type_traits>
 

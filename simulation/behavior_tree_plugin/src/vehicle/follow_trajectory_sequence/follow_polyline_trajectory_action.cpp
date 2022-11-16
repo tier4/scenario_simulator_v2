@@ -56,22 +56,38 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
   return std::forward<decltype(ports)>(ports);
 }
 
-#define DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(OPERATOR)                       \
-  auto operator OPERATOR(                                                         \
-    const geometry_msgs::msg::Vector3 & a, const geometry_msgs::msg::Vector3 & b) \
-  {                                                                               \
-    geometry_msgs::msg::Vector3 v;                                                \
-    v.x = a.x OPERATOR b.x;                                                       \
-    v.y = a.y OPERATOR b.y;                                                       \
-    v.z = a.z OPERATOR b.z;                                                       \
-    return v;                                                                     \
-  }                                                                               \
+#define DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(OPERATOR) \
+  template <typename T, typename U>                         \
+  auto operator OPERATOR(const T & a, const U & b)          \
+  {                                                         \
+    geometry_msgs::msg::Vector3 v;                          \
+    v.x = a.x OPERATOR b.x;                                 \
+    v.y = a.y OPERATOR b.y;                                 \
+    v.z = a.z OPERATOR b.z;                                 \
+    return v;                                               \
+  }                                                         \
   static_assert(true)
 
 DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(+);
 DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(-);
 DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(*);
 DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(/);
+
+#define DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(OPERATOR) \
+  template <typename T, typename U>                                      \
+  auto operator OPERATOR(T & a, const U & b)->decltype(auto)             \
+  {                                                                      \
+    a.x OPERATOR b.x;                                                    \
+    a.y OPERATOR b.y;                                                    \
+    a.z OPERATOR b.z;                                                    \
+    return a;                                                            \
+  }                                                                      \
+  static_assert(true)
+
+DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(+=);
+DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(-=);
+DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(*=);
+DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(/=);
 
 #define DEFINE_VECTOR3_VS_DOUBLE_BINARY_OPERATOR(OPERATOR)                \
   auto operator OPERATOR(const geometry_msgs::msg::Vector3 & a, double b) \
@@ -89,43 +105,29 @@ DEFINE_VECTOR3_VS_DOUBLE_BINARY_OPERATOR(-);
 DEFINE_VECTOR3_VS_DOUBLE_BINARY_OPERATOR(*);
 DEFINE_VECTOR3_VS_DOUBLE_BINARY_OPERATOR(/);
 
-auto vector3(const geometry_msgs::msg::Point & point)
+template <typename T, typename U>
+auto distance(const T & from, const U & to)
+{
+  return std::hypot(to.x - from.x, to.y - from.y, to.z - from.z);
+}
+
+auto norm(const geometry_msgs::msg::Vector3 & v) { return std::hypot(v.x, v.y, v.z); }
+
+auto normalize(const geometry_msgs::msg::Vector3 & v) { return v / norm(v); }
+
+template <typename T, typename U>
+auto truncate(const T & a, const U & b)
 {
   geometry_msgs::msg::Vector3 v;
-  v.x = point.x;
-  v.y = point.y;
-  v.z = point.z;
+  v.x = std::min(a.x, b);
+  v.y = std::min(a.y, b);
+  v.z = std::min(a.z, b);
   return v;
 }
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
   getBlackBoardValues();
-
-  auto distance = [](const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) {
-    return std::hypot(
-      to.position.x - from.position.x, to.position.y - from.position.y,
-      to.position.z - from.position.z);
-  };
-
-  auto norm = [](const geometry_msgs::msg::Vector3 & v) { return std::hypot(v.x, v.y, v.z); };
-
-  auto normalize = [&](const geometry_msgs::msg::Vector3 & v) { return v / norm(v); };
-
-  auto speed = [&]() { return behavior_parameter.dynamic_constraints.max_speed / 10; };
-
-  auto make_steering =
-    [&](const auto & position, const auto & target, const auto & current_velocity) {
-      return normalize(vector3(target) - vector3(position)) * speed() - current_velocity;  // [m/s]
-    };
-
-  auto truncate = [](const geometry_msgs::msg::Vector3 & steering, double max_force) {
-    geometry_msgs::msg::Vector3 v;
-    v.x = std::min(steering.x, max_force);
-    v.y = std::min(steering.y, max_force);
-    v.z = std::min(steering.z, max_force);
-    return v;
-  };
 
   switch (request) {
     case traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY:
@@ -136,42 +138,36 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         // PRINT(parameter.dynamic_constraints_ignorable);
         // PRINT(parameter.closed);
 
+        auto speed = [&]() { return behavior_parameter.dynamic_constraints.max_speed / 10; };
+
+        auto steering = [&](auto && current_position, auto && target, auto && current_velocity) {
+          return normalize(target - current_position) * speed() - current_velocity;  // [m/s]
+        };
+
         auto updated_status = entity_status;
 
-        if (parameter.shape.vertices.front().time) {
-          // TODO
-        } else {
-          auto steering = make_steering(
-            entity_status.pose.position,
-            parameter.shape.vertices.at(current_waypoint_index).position.position,
-            entity_status.action_status.twist.linear);  // [m/s]
-
-          updated_status.action_status.twist.linear.x += steering.x;  // [m/s]
-          updated_status.action_status.twist.linear.y += steering.y;
-          updated_status.action_status.twist.linear.z += steering.z;
-
-          updated_status.action_status.twist.angular.x = 0;
-          updated_status.action_status.twist.angular.y = 0;
-          updated_status.action_status.twist.angular.z = std::atan2(
-            updated_status.action_status.twist.linear.y,
-            updated_status.action_status.twist.linear.x);
-
-          updated_status.pose.position.x +=
-            updated_status.action_status.twist.linear.x * step_time;  // [m/s] * [s] = [m]
-          updated_status.pose.position.y += updated_status.action_status.twist.linear.y * step_time;
-          updated_status.pose.position.z += updated_status.action_status.twist.linear.z * step_time;
-
-          updated_status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
-            updated_status.action_status.twist.angular);
-        }
+        updated_status.action_status.twist.linear += steering(
+          entity_status.pose.position,
+          parameter.shape.vertices.at(current_waypoint_index).position.position,
+          entity_status.action_status.twist.linear);
+        updated_status.action_status.twist.angular.x = 0;
+        updated_status.action_status.twist.angular.y = 0;
+        updated_status.action_status.twist.angular.z = std::atan2(
+          updated_status.action_status.twist.linear.y, updated_status.action_status.twist.linear.x);
+        updated_status.pose.position += updated_status.action_status.twist.linear * step_time;
+        updated_status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+          updated_status.action_status.twist.angular);
+        updated_status.time = entity_status.time + step_time;
+        updated_status.lanelet_pose_valid = false;
 
         setOutput("updated_status", updated_status);
         setOutput("waypoints", calculateWaypoints());
         setOutput("obstacle", calculateObstacle(calculateWaypoints()));
 
         if (auto d = distance(
-              updated_status.pose, parameter.shape.vertices.at(current_waypoint_index).position);
-            d < 1) {
+              updated_status.pose.position,
+              parameter.shape.vertices.at(current_waypoint_index).position.position);
+            d < parameter.initial_distance_offset) {
           ++current_waypoint_index;
         }
 
