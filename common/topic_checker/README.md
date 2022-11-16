@@ -1,4 +1,4 @@
-# ros_ping
+# topic_checker
 
 the node receiving any types of topic and return whether the node received it.
 
@@ -6,7 +6,7 @@ the node receiving any types of topic and return whether the node received it.
 
 1. Execute
 ```bash
-ros2 run ros_ping ping --ros-args -p topic_name:=<topic name>
+ros2 run topic_checker topic_checker --ros-args -p topic_name:=<topic name>
 ```
 
 2. Show Result

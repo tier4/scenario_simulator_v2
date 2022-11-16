@@ -27,7 +27,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
-  auto node = rclcpp::Node::make_shared("ping");
+  auto node = rclcpp::Node::make_shared("topic_checker");
 
   node->declare_parameter<std::string>("topic_name", "/ping");
   std::string topic_name;
