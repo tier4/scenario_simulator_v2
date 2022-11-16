@@ -27,7 +27,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
-  auto node = rclcpp::Node::make_shared("topic_checker");
+  auto node = rclcpp::Node::make_shared("topic_status_checker");
 
   node->declare_parameter<std::string>("topic_name", "");
   std::string topic_name;
