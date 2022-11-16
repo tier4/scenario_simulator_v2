@@ -44,10 +44,7 @@ public:
 
   ~MiscObjectEntity() override = default;
 
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override
-  {
-    return {};
-  }  //return {}?
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override { return {}; }
 
   boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
@@ -103,6 +100,10 @@ public:
   void setDecelerationLimit(double) override {}
 
   void setDecelerationRateLimit(double) override {}
+
+private:
+  auto estimateLaneletPose() const
+    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose> override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

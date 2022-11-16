@@ -99,19 +99,22 @@ public:
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
-  std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override;
+  auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
 
-  boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override;
+  auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override;
+  auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> override;
 
-  const traffic_simulator_msgs::msg::WaypointsArray getWaypoints() override;
+  auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   const std::string plugin_name;
 
 private:
+  auto estimateLaneletPose() const
+    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose> override;
+
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
-  std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
+  const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };
 }  // namespace entity

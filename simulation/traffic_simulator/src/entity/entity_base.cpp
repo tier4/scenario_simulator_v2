@@ -205,11 +205,8 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
 {
   if (status_.lanelet_pose_valid) {
     return status_.lanelet_pose;
-  } else if (status_.type.type == traffic_simulator_msgs::msg::EntityType::VEHICLE) {
-    return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, false);
-  } else {
-    return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, true);
   }
+  return boost::none;
 }
 
 auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
@@ -241,6 +238,18 @@ void EntityBase::onUpdate(double /*current_time*/, double step_time)
   speed_planner_ =
     std::make_unique<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>(
       step_time, name);
+}
+
+void EntityBase::onPostUpdate()
+{
+  const auto lanelet_pose = estimateLaneletPose();
+  if (lanelet_pose) {
+    status_.lanelet_pose_valid = true;
+    status_.lanelet_pose = lanelet_pose.get();
+  } else {
+    status_.lanelet_pose_valid = false;
+    status_.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+  }
 }
 
 void EntityBase::resetDynamicConstraints()

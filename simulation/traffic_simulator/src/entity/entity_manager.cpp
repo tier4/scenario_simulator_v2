@@ -497,6 +497,7 @@ traffic_simulator_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
   }
   entities_[name]->setEntityTypeList(type_list);
   entities_[name]->onUpdate(current_time_, step_time_);
+  entities_[name]->onPostUpdate();
   return entities_[name]->getStatus();
 }
 

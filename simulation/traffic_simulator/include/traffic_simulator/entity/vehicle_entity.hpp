@@ -111,6 +111,9 @@ public:
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
 
 private:
+  auto estimateLaneletPose() const
+    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose> override;
+
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
 
   const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;

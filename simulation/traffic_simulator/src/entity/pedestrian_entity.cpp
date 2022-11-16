@@ -98,12 +98,28 @@ std::vector<std::int64_t> PedestrianEntity::getRouteLanelets(double horizon)
   }
 }
 
-boost::optional<traffic_simulator_msgs::msg::Obstacle> PedestrianEntity::getObstacle()
+auto PedestrianEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return boost::none;
 }
 
-std::vector<traffic_simulator_msgs::msg::LaneletPose> PedestrianEntity::getGoalPoses()
+auto PedestrianEntity::estimateLaneletPose() const
+  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  if (status_.lanelet_pose_valid) {
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.lanelet_pose.lanelet_id, 1.0);
+  } else {
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, true);
+  }
+  if (!lanelet_pose) {
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status_.pose, true, 2.0);
+  }
+  return lanelet_pose;
+}
+
+auto PedestrianEntity::getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
   return route_planner_ptr_->getGoalPoses();
 }
