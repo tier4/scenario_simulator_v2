@@ -16,11 +16,11 @@
 #include <rclcpp/rclcpp.hpp>
 
 enum class ReturnCode {
-  success = 0,
-  timeout = 1,
-  no_publishers = 2,
-  interrupted = 3,
-  unknown = 4,
+  success,
+  timeout,
+  no_publishers,
+  interrupted,
+  unknown,
 };
 
 int main(int argc, char * argv[])
@@ -50,8 +50,9 @@ int main(int argc, char * argv[])
   using namespace std::chrono_literals;
   rclcpp::sleep_for(1ms * topic_discovery_time_ms);
 
-  auto topic_dict = node->get_topic_names_and_types();
-  if (auto topic_info = topic_dict.find(topic_name); topic_info != topic_dict.end()) {
+  auto topic_names_and_types = node->get_topic_names_and_types();
+  if (auto topic_info = topic_names_and_types.find(topic_name);
+      topic_info != topic_names_and_types.end()) {
     if (verbose) {
       RCLCPP_INFO_STREAM(node->get_logger(), "The topic `" << topic_name << "` is found!");
     }
