@@ -48,8 +48,7 @@ protected:
   geometry_msgs::Pose getSensorPose(
     const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
 
-  void applyNoise(
-    autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const;
+  void applyNoise(autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const;
 
 public:
   virtual ~DetectionSensorBase() = default;
