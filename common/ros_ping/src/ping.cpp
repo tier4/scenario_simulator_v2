@@ -52,7 +52,9 @@ int main(int argc, char * argv[])
 
   auto topic_dict = node->get_topic_names_and_types();
   if (auto topic_info = topic_dict.find(topic_name); topic_info != topic_dict.end()) {
-
+    if (verbose) {
+      RCLCPP_INFO_STREAM(node->get_logger(), "The topic `" << topic_name << "` is found!");
+    }
     std::promise<void> topic_notifier;
     auto topic_monitor = topic_notifier.get_future();
 
@@ -70,18 +72,40 @@ int main(int argc, char * argv[])
         options));
     }
 
-    using namespace std::chrono_literals;
-    switch(rclcpp::spin_until_future_complete(node, topic_monitor, 1ms * timeout_ms)){
+    switch (rclcpp::spin_until_future_complete(node, topic_monitor, 1ms * timeout_ms)) {
       case rclcpp::FutureReturnCode::SUCCESS:
+        if (verbose) {
+          RCLCPP_INFO_STREAM(
+            node->get_logger(), "Receive a message from `" << topic_name << "` topic!");
+        }
         return static_cast<int>(ReturnCode::success);
       case rclcpp::FutureReturnCode::TIMEOUT:
+        if (verbose) {
+          RCLCPP_INFO_STREAM(
+            node->get_logger(),
+            "Timeout for receiving a message from `" << topic_name << "` topic...");
+          RCLCPP_INFO_STREAM(node->get_logger(), "Timeout duration : " << timeout_ms);
+        }
         return static_cast<int>(ReturnCode::timeout);
       case rclcpp::FutureReturnCode::INTERRUPTED:
+        if (verbose) {
+          RCLCPP_INFO_STREAM(
+            node->get_logger(),
+            "Interrupted to receive a message from `" << topic_name << "` topic...");
+        }
         return static_cast<int>(ReturnCode::interrupted);
       default:
+        if (verbose) {
+          RCLCPP_INFO_STREAM(
+            node->get_logger(), "Unknown error is occurred during receiving a message from `"
+                                  << topic_name << "` topic...");
+        }
         return static_cast<int>(ReturnCode::unknown);
     }
   } else {
+    if (verbose) {
+      RCLCPP_INFO_STREAM(node->get_logger(), "The topic `" << topic_name << "` is not found!");
+    }
     return static_cast<int>(ReturnCode::no_publishers);
   }
 }
