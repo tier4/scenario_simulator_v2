@@ -73,7 +73,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
     }
   }
 
-  // find ego from `status` and get its pose with northside up
+  // find ego from `status` and get its pose with north side up
   auto ego_pose_north_up = geometry_msgs::msg::Pose();
   {
     auto is_ego = [&](const auto & s) { return configuration_.entity() == s.name(); };
