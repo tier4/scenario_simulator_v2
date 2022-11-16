@@ -37,6 +37,19 @@ int main(int argc, char * argv[])
   int timeout_ms;
   node->get_parameter<int>("timeout_ms", timeout_ms);
 
+  int topic_discovery_time_ms;
+  node->declare_parameter<int>("topic_discovery_time_ms", 500);
+  node->get_parameter<int>("topic_discovery_time_ms", topic_discovery_time_ms);
+
+  bool verbose;
+  node->declare_parameter<bool>("verbose", false);
+  node->get_parameter<bool>("verbose", verbose);
+
+  // wait for topic discovery
+  // ref : https://github.com/ros2/ros2/issues/1057
+  using namespace std::chrono_literals;
+  rclcpp::sleep_for(1ms * topic_discovery_time_ms);
+
   auto topic_dict = node->get_topic_names_and_types();
   if (auto topic_info = topic_dict.find(topic_name); topic_info != topic_dict.end()) {
 
