@@ -297,8 +297,6 @@ auto Interpreter::reset() -> void
     publisher_of_context->on_deactivate();
   }
 
-//  ping_service = nullptr;
-
   SimulatorCore::deactivate();
 
   scenarios.pop_front();
