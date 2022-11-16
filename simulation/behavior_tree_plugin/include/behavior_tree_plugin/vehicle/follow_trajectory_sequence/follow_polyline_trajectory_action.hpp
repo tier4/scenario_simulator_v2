@@ -23,9 +23,12 @@ namespace vehicle
 {
 struct FollowPolylineTrajectoryAction : public VehicleActionNode
 {
-  using Parameter = traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Polyline>;
+  using Parameter =
+    traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Polyline>;
 
   Parameter parameter;
+
+  std::size_t current_waypoint_index = 0;
 
   using VehicleActionNode::VehicleActionNode;
 

@@ -149,7 +149,7 @@ OpenSCENARIO:
                         Shape:
                           Polyline:
                             Vertex:
-                              - time: 0
+                              - time: 3
                                 Position:
                                   LanePosition:
                                     roadId: ''
@@ -166,7 +166,7 @@ OpenSCENARIO:
                                   LanePosition:
                                     roadId: ''
                                     laneId: '34462'
-                                    s: 22
+                                    s: 20
                                     offset: 0
                                     Orientation:
                                       type: relative
@@ -190,7 +190,19 @@ OpenSCENARIO:
                                   LanePosition:
                                     roadId: ''
                                     laneId: '34462'
-                                    s: 42
+                                    s: 40
+                                    offset: 0
+                                    Orientation:
+                                      type: relative
+                                      h: 0
+                                      p: 0
+                                      r: 0
+                              - time: 0
+                                Position:
+                                  LanePosition:
+                                    roadId: ''
+                                    laneId: '34513'
+                                    s: 50
                                     offset: 0
                                     Orientation:
                                       type: relative

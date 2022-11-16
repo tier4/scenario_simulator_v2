@@ -65,7 +65,7 @@ auto FollowTrajectoryAction::start() -> void
             absolute(vertex.time), static_cast<geometry_msgs::msg::Pose>(vertex.position)));
         }
 
-        return polyline;
+        return std::forward<decltype(polyline)>(polyline);
       };
 
       applyFollowTrajectoryAction(
