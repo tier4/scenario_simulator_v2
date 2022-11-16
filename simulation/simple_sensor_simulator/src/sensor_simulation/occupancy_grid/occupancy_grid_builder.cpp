@@ -34,8 +34,8 @@ OccupancyGridBuilder::OccupancyGridBuilder(
   invisible_grid_(height * width),
   values_(height * width),
 
-  mincols_(height),
-  maxcols_(height)
+  min_cols_(height),
+  max_cols_(height)
 {
 }
 
@@ -150,17 +150,17 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
     }
 
     auto [min_p, max_p] = min_max_p;
-    double minang = angle(*min_p);
-    double maxang = angle(*max_p);
-    if (minang > maxang) maxang += 2 * M_PI;
+    double min_ang = angle(*min_p);
+    double max_ang = angle(*max_p);
+    if (min_ang > max_ang) max_ang += 2 * M_PI;
 
     size_t i = 0;
-    for (; angle(corners[i % 4]) + 2 * M_PI * (i / 4) <= minang; ++i) {
+    for (; angle(corners[i % 4]) + 2 * M_PI * (i / 4) <= min_ang; ++i) {
     }
     res.emplace_back(*min_p);
     res.emplace_back(projection(*min_p, i));
 
-    for (; angle(corners[i % 4]) + 2 * M_PI * (i / 4) < maxang; ++i) {
+    for (; angle(corners[i % 4]) + 2 * M_PI * (i / 4) < max_ang; ++i) {
       res.emplace_back(corners[i % 4]);
     }
     res.emplace_back(projection(*max_p, i));
@@ -172,34 +172,34 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
 auto OccupancyGridBuilder::addPolygon(MarkerGridType & grid, const PolygonType & convex_hull)
   -> void
 {
-  mincols_.assign(mincols_.size(), width);
-  maxcols_.assign(maxcols_.size(), -1);
+  min_cols_.assign(min_cols_.size(), width);
+  max_cols_.assign(max_cols_.size(), -1);
 
   for (size_t i = 0; i < convex_hull.size(); ++i) {
     const auto p = transformToPixel(convex_hull[i]);
     const auto q = transformToPixel(convex_hull[(i + 1) % convex_hull.size()]);
     for (auto [col, row] : GridTraversal(p.x, p.y, q.x, q.y)) {
       if (row >= 0 && row < int32_t(height)) {
-        mincols_[row] = std::min(mincols_[row], col);
-        maxcols_[row] = std::max(maxcols_[row], col);
+        min_cols_[row] = std::min(min_cols_[row], col);
+        max_cols_[row] = std::max(max_cols_[row], col);
       }
     }
   }
 
   for (size_t row = 0; row < height; ++row) {
-    auto mincol = mincols_[row];
-    auto maxcol = maxcols_[row] + 1;
+    auto min_col = min_cols_[row];
+    auto max_col = max_cols_[row] + 1;
 
-    if (maxcol <= 0 || mincol >= int32_t(width)) {
+    if (max_col <= 0 || min_col >= int32_t(width)) {
       continue;
     }
-    if (mincol <= 0) {
+    if (min_col <= 0) {
       ++grid[width * row];
     } else {
-      ++grid[width * row + mincol];
+      ++grid[width * row + min_col];
     }
-    if (maxcol < int32_t(width)) {
-      --grid[width * row + maxcol];
+    if (max_col < int32_t(width)) {
+      --grid[width * row + max_col];
     }
   }
 }
@@ -227,7 +227,6 @@ auto OccupancyGridBuilder::add(const PrimitiveType & primitive) -> void
 
 auto OccupancyGridBuilder::build() -> void
 {
-  // Imos Method
   // https://imoz.jp/algorithms/imos_method.html (Japanese)
 
   for (size_t row = 0; row < height; ++row) {

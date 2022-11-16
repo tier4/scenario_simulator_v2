@@ -102,7 +102,7 @@ private:
    * @brief Vectors to hold min or max column of rasterized polygon
    * @note These vectors are declared as members to reuse allocated memory
    */
-  std::vector<int32_t> mincols_, maxcols_;
+  std::vector<int32_t> min_cols_, max_cols_;
 
   /**
    * @brief Mark grid area of convex hull
@@ -112,7 +112,7 @@ private:
   inline auto addPolygon(MarkerGridType & grid, const PolygonType & convex_hull) -> void;
 
   /**
-   * @brief Convert point in world coordinate to point in grid cooridnate
+   * @brief Convert point in world coordinate to point in grid coordinate
    * @param world_point
    * @return Point in grid coordinate
    */
