@@ -51,7 +51,7 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
-    if (t >= 6.15 && 7.25 >= t) {
+    if (t >= 6.65 && 7.25 >= t) {
       const auto vel = api_.getCurrentTwist("ego").linear.x;
       if (std::fabs(0.01) <= vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
