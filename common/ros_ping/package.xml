@@ -3,14 +3,13 @@
 <package format="3">
   <name>ros_ping</name>
   <version>0.6.6</version>
-  <description>ping with ros2 service</description>
+  <description>ping</description>
   <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>std_srvs</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>

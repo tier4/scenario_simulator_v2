@@ -25,7 +25,7 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::init(argc, argv);
 
-  rclcpp::executors::MultiThreadedExecutor executor{};
+  rclcpp::executors::SingleThreadedExecutor executor{};
 
   rclcpp::NodeOptions options{};
 

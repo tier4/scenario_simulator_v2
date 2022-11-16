@@ -14,13 +14,12 @@
 
 #include <chrono>
 #include <rclcpp/rclcpp.hpp>
-#include <std_srvs/srv/empty.hpp>
 
 enum class ReturnCode {
   success = 0,
-  connect_server_timeout = 1,
-  request_timeout = 2,
-  request_interrupted = 3,
+  timeout = 1,
+  no_publishers = 2,
+  interrupted = 3,
   unknown = 4,
 };
 
@@ -30,41 +29,46 @@ int main(int argc, char * argv[])
 
   auto node = rclcpp::Node::make_shared("ping");
 
-  node->declare_parameter<std::string>("service_name", "/ping");
-  std::string service_name;
-  node->get_parameter<std::string>("service_name", service_name);
+  node->declare_parameter<std::string>("topic_name", "/ping");
+  std::string topic_name;
+  node->get_parameter<std::string>("topic_name", topic_name);
 
-  node->declare_parameter<int>("connection_timeout_ms", 1000);
-  int connection_timeout_ms;
-  node->get_parameter<int>("connection_timeout_ms", connection_timeout_ms);
+  node->declare_parameter<int>("timeout_ms", 1000);
+  int timeout_ms;
+  node->get_parameter<int>("timeout_ms", timeout_ms);
 
-  node->declare_parameter<int>("request_timeout_ms", 1000);
-  int request_timeout_ms;
-  node->get_parameter<int>("request_timeout_ms", request_timeout_ms);
+  auto topic_dict = node->get_topic_names_and_types();
+  if (auto topic_info = topic_dict.find(topic_name); topic_info != topic_dict.end()) {
 
-  auto ping_client = node->create_client<std_srvs::srv::Empty>(service_name);
+    std::promise<void> topic_notifier;
+    auto topic_monitor = topic_notifier.get_future();
 
-  using namespace std::chrono_literals;
-  if (not ping_client->wait_for_service(1ms * connection_timeout_ms)) {
-    return static_cast<int>(ReturnCode::connect_server_timeout);
-  }
+    auto callback_group = node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
+    options.callback_group = callback_group;
 
-  auto request = std::make_shared<std_srvs::srv::Empty::Request>();
+    std::vector<std::shared_ptr<rclcpp::GenericSubscription>> subscriptions;
+    for (auto topic_type_string : topic_info->second) {
+      subscriptions.push_back(node->create_generic_subscription(
+        topic_name, topic_type_string, rclcpp::QoS(10),
+        [&topic_notifier](std::shared_ptr<rclcpp::SerializedMessage>) {
+          topic_notifier.set_value();
+        },
+        options));
+    }
 
-  auto response_future = ping_client->async_send_request(request);
-
-  auto return_code = rclcpp::spin_until_future_complete(node, response_future, 1ms * request_timeout_ms);
-
-  rclcpp::shutdown();
-
-  switch (return_code) {
-    case rclcpp::FutureReturnCode::SUCCESS:
-      return static_cast<int>(ReturnCode::success);
-    case rclcpp::FutureReturnCode::INTERRUPTED:
-      return static_cast<int>(ReturnCode::request_interrupted);
-    case rclcpp::FutureReturnCode::TIMEOUT:
-      return static_cast<int>(ReturnCode::request_timeout);
-    default:
-      return static_cast<int>(ReturnCode::unknown);
+    using namespace std::chrono_literals;
+    switch(rclcpp::spin_until_future_complete(node, topic_monitor, 1ms * timeout_ms)){
+      case rclcpp::FutureReturnCode::SUCCESS:
+        return static_cast<int>(ReturnCode::success);
+      case rclcpp::FutureReturnCode::TIMEOUT:
+        return static_cast<int>(ReturnCode::timeout);
+      case rclcpp::FutureReturnCode::INTERRUPTED:
+        return static_cast<int>(ReturnCode::interrupted);
+      default:
+        return static_cast<int>(ReturnCode::unknown);
+    }
+  } else {
+    return static_cast<int>(ReturnCode::no_publishers);
   }
 }

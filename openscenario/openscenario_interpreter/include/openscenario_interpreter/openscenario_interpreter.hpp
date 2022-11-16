@@ -52,8 +52,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
 
-  ros_ping::Server ping_service;
-
   String intended_result;
 
   double local_frame_rate;

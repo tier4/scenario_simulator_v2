@@ -35,7 +35,6 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
-  ping_service(*this),
   intended_result("success"),
   local_frame_rate(30),
   local_real_time_factor(1.0),
@@ -193,7 +192,6 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           SimulatorCore::update();
 
           publishCurrentContext();
-          ping_service.notifyAlive();
         });
       });
   };
@@ -298,6 +296,8 @@ auto Interpreter::reset() -> void
   if (publisher_of_context->is_activated()) {
     publisher_of_context->on_deactivate();
   }
+
+//  ping_service = nullptr;
 
   SimulatorCore::deactivate();
 
