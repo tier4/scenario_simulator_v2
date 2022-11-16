@@ -119,8 +119,6 @@ public:
 
   virtual void onUpdate(double current_time, double step_time);
 
-  virtual void onPostUpdate();
-
   /*   */ void resetDynamicConstraints();
 
   virtual void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) = 0;
@@ -222,8 +220,6 @@ protected:
     speed_planner_;
 
 private:
-  virtual auto estimateLaneletPose() const
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose> = 0;
   virtual void requestSpeedChangeWithConstantAcceleration(
     const double target_speed, const speed_change::Transition, double acceleration,
     const bool continuous);

@@ -48,6 +48,10 @@ public:
 
 protected:
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+
+private:
+  auto estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
+    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 };
 }  // namespace entity_behavior
 

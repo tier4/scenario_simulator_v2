@@ -89,12 +89,6 @@ auto VehicleEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg
   return behavior_plugin_ptr_->getObstacle();
 }
 
-auto VehicleEntity::estimateLaneletPose() const
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
-{
-  return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, false);
-}
-
 auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t>
 {
   if (status_.lanelet_pose_valid) {

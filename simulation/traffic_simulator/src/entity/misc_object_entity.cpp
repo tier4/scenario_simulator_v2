@@ -42,12 +42,6 @@ auto MiscObjectEntity::getCurrentAction() const -> std::string
   }
 }
 
-auto MiscObjectEntity::estimateLaneletPose() const
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
-{
-  return hdmap_utils_ptr_->toLaneletPose(status_.pose, status_.bounding_box, true);
-}
-
 auto MiscObjectEntity::getBehaviorParameter() const
   -> traffic_simulator_msgs::msg::BehaviorParameter
 {

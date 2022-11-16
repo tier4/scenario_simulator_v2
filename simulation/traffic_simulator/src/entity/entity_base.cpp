@@ -240,18 +240,6 @@ void EntityBase::onUpdate(double /*current_time*/, double step_time)
       step_time, name);
 }
 
-void EntityBase::onPostUpdate()
-{
-  const auto lanelet_pose = estimateLaneletPose();
-  if (lanelet_pose) {
-    status_.lanelet_pose_valid = true;
-    status_.lanelet_pose = lanelet_pose.get();
-  } else {
-    status_.lanelet_pose_valid = false;
-    status_.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-  }
-}
-
 void EntityBase::resetDynamicConstraints()
 {
   setDynamicConstraints(getDefaultDynamicConstraints());

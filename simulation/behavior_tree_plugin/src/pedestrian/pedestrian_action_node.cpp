@@ -49,7 +49,31 @@ auto PedestrianActionNode::calculateUpdatedEntityStatus(double target_speed) con
 auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
   -> traffic_simulator_msgs::msg::EntityStatus
 {
-  return ActionNode::calculateUpdatedEntityStatusInWorldFrame(
+  auto updated_status = ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     target_speed, behavior_parameter.dynamic_constraints);
+  const auto lanelet_pose = estimateLaneletPose(updated_status.pose);
+  if (lanelet_pose) {
+    updated_status.lanelet_pose_valid = true;
+    updated_status.lanelet_pose = lanelet_pose.get();
+  } else {
+    updated_status.lanelet_pose_valid = false;
+    updated_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+  }
+  return updated_status;
+}
+
+auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
+  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  if (entity_status.lanelet_pose_valid) {
+    lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status.lanelet_pose.lanelet_id, 1.0);
+  } else {
+    lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status.bounding_box, true);
+  }
+  if (!lanelet_pose) {
+    lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);
+  }
+  return lanelet_pose;
 }
 }  // namespace entity_behavior

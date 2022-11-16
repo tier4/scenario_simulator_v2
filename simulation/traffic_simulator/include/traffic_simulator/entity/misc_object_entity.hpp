@@ -100,10 +100,6 @@ public:
   void setDecelerationLimit(double) override {}
 
   void setDecelerationRateLimit(double) override {}
-
-private:
-  auto estimateLaneletPose() const
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose> override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
