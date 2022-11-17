@@ -154,7 +154,7 @@ struct LaneletPartForRouting
   ~LaneletPartForRouting() = default;
 
   lanelet::ConstLanelet lanelet;
-  double start_s = -1.0;  // -1 means from the begining
+  double start_s = -1.0;  // -1 means from the beginning
   double end_s = -1.0;    // -1 means to the end
 
   double min_distance_remaining;
