@@ -357,7 +357,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           double diff =
             target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
           /**
-           * @brief Hard coded parameter, threashold for difference
+           * @brief Hard coded parameter, threshold for difference
            */
           if (std::abs(diff) <= 0.1) {
             return true;
@@ -405,7 +405,7 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
             target_speed.getAbsoluteValue(other_status_) - getStatus().action_status.twist.linear.x;
           double acceleration = diff / time;
           /**
-           * @brief Hard coded parameter, threashold for difference
+           * @brief Hard coded parameter, threshold for difference
            */
           if (job_duration >= time) {
             return true;
@@ -468,7 +468,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
         return false;
       },
       /**
-       * @brief Cansel speed change request.
+       * @brief Cancel speed change request.
        */
       [this]() {}, job::Type::LINEAR_VELOCITY, true);
   } else {
@@ -484,7 +484,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
         return false;
       },
       /**
-       * @brief Cansel speed change request.
+       * @brief Cancel speed change request.
        */
       [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
@@ -524,7 +524,7 @@ void EntityBase::requestSpeedChange(
         return false;
       },
       /**
-       * @brief Cansel speed change request.
+       * @brief Cancel speed change request.
        */
       [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
   }
