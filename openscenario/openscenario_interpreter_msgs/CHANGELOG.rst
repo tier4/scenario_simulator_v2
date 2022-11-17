@@ -2,6 +2,30 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#903 <https://github.com/tier4/scenario_simulator_v2/issues/903>`_ from tier4/feature/empty/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Divide srv files related to preprocessor into openscenario_preprocessor_msgs
+* Delete unused files
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/priority
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/parameter_value_distribution
+* Merge branch 'master' into feature/interpreter/follow-trajectory-action-3
+* Merge pull request `#890 <https://github.com/tier4/scenario_simulator_v2/issues/890>`_ from tier4/refactor/test_runner
+* Change PreprocessorCheckDerivativeRemained.srv
+* Add openscenario_interpreter_msgs/PreprocessorCheckDerivationCompleted.srv
+* Delete openscenario_interpreter_msgs/Scenario.msg
+* Fix build error
+* Add openscenario_interpreter_msgs/Scenario.msg
+* Add message files related to openscenario_preprocessor
+* Add empty Preprocessor class
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Contributors: Kotaro Yoshimoto, MasayaKataoka, Piotr Zyskowski, Shota Minami, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.6 (2022-08-30)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion

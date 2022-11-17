@@ -2,6 +2,54 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* refactor(preprocessor): modify struct name
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge branch 'fix/interpreter/custom_command_action' into feature/interpreter/priority
+* Merge branch 'master' into fix/interpreter/custom_command_action
+* Merge branch 'master' into feature/bt_auto_ros_ports
+* Merge pull request `#848 <https://github.com/tier4/scenario_simulator_v2/issues/848>`_ from RobotecAI/fix/service-request-until-success
+* Add TODO comments
+* Merge remote-tracking branch 'origin/master' into feature/parameter_value_distribution
+* clang format
+* removed logs
+* log
+* single engage call
+* mode logs
+* test logs
+* debug log
+* Merge branch 'master' into feature/interpreter/priority
+* Revert "increased set velocity attempts count"
+* fix
+* increased set velocity attempts count
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* slight reformat; added exception when service does not succeed
+* Merge pull request `#875 <https://github.com/tier4/scenario_simulator_v2/issues/875>`_ from tier4/feature/concealer/acceleration
+* Merge remote-tracking branch 'origin/master' into feature/concealer/acceleration
+* Merge pull request `#823 <https://github.com/tier4/scenario_simulator_v2/issues/823>`_ from tier4/feature/start_npc_logic_api
+* review application
+* Update `AutowareUniverse` to publish current acceleration
+* Fix `AutowareUniverse::(engageable|engaged)` to check Autoware's exception
+* Lipsticks
+* Rename member function `Autoware::ready` to `Autoware::engaged`
+* license information added
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* code review suggestions application
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge branch 'master' into fix/simple_sensor_simulator/fast_occupancy_grid
+* Remove unused member function `AutowareUniverse::isReady`
+* Update `Interpreter` to set `Configuration::initialize_duration` to zero
+* templated service interface implemented; service request until success
+* Update `Interpreter` to start non-ego entities at Autoware reaches `DRIVING` state.
+* Merge remote-tracking branch 'origin/refactor/interpreter/scope' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Shota Minami, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.6 (2022-08-30)
 ------------------
 * Merge pull request `#794 <https://github.com/tier4/scenario_simulator_v2/issues/794>`_ from tier4/fix/interpreter/transition_assertion
