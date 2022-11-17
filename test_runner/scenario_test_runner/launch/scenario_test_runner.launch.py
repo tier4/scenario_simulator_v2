@@ -162,6 +162,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             name="simple_sensor_simulator",
             output="screen",
+            on_exit=Shutdown(),
             parameters=[{"port": port}],
         ),
         LifecycleNode(
