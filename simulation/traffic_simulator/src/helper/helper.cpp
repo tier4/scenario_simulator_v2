@@ -77,7 +77,7 @@ geometry_msgs::msg::Pose constructPose(
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
   const std::string & entity, const std::string & architecture_type, const double update_duration,
-  const double range, bool filter_by_range)
+  const double range, bool filter_by_range, const double pos_noise_stddev, const int random_seed)
 {
   simulation_api_schema::DetectionSensorConfiguration configuration;
   configuration.set_entity(entity);
@@ -85,6 +85,8 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
   configuration.set_update_duration(update_duration);
   configuration.set_range(range);
   configuration.set_filter_by_range(filter_by_range);
+  configuration.set_pos_noise_stddev(pos_noise_stddev);
+  configuration.set_random_seed(random_seed);
   return configuration;
 }
 

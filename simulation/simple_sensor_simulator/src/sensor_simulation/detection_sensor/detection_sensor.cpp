@@ -60,8 +60,8 @@ template <>
 void DetectionSensorBase::applyNoise<autoware_auto_perception_msgs::msg::DetectedObject>(
   autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const
 {
-  std::random_device seed;
-  std::shared_ptr<std::mt19937> rand_engine = std::make_shared<std::mt19937>(seed());
+  std::shared_ptr<std::mt19937> rand_engine =
+    std::make_shared<std::mt19937>(configuration_.random_seed());
   double pos_noise_stddev = configuration_.pos_noise_stddev();
   std::shared_ptr<std::normal_distribution<>> pos_noise_dist =
     std::make_shared<std::normal_distribution<>>(0.0, pos_noise_stddev);
