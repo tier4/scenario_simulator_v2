@@ -19,7 +19,7 @@ Minor Tweaks :oncoming_police_car:
 | ------- | ------------- | -------- | ------------ | ----------- |
 
 
-## Version 0.6.6
+## Version 0.6.7
 
 Major Changes :race_car: :red_car: :blue_car:
 
