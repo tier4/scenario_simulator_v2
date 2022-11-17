@@ -2,8 +2,8 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.7 (2022-11-17)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution
 * Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/behavior-parameter

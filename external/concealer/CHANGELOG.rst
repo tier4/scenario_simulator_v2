@@ -2,8 +2,8 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.7 (2022-11-17)
+------------------
 * refactor(preprocessor): modify struct name
 * Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution
 * Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box

@@ -2,8 +2,8 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.7 (2022-11-17)
+------------------
 * Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/priority
 * Merge remote-tracking branch 'origin/master' into fix/service-request-until-success

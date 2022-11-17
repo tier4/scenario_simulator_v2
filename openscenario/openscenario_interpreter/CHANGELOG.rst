@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.7 (2022-11-17)
+------------------
 * chore(interpreter): fix commit-leaked lines
 * fix(ping): fix compile error
 * fix!(ping): change the receiving target from server to topic

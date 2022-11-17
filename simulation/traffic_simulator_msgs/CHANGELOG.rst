@@ -2,8 +2,8 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.7 (2022-11-17)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution
 * Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
 * Merge pull request `#900 <https://github.com/tier4/scenario_simulator_v2/issues/900>`_ from tier4/feature/traffic_simulator/behavior-parameter
