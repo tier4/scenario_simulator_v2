@@ -63,13 +63,13 @@ void DetectionSensorBase::applyNoise<autoware_auto_perception_msgs::msg::Detecte
   std::shared_ptr<std::mt19937> rand_engine =
     std::make_shared<std::mt19937>(configuration_.random_seed());
   double pos_noise_stddev = configuration_.pos_noise_stddev();
-  std::shared_ptr<std::normal_distribution<>> pos_noise_dist =
+  std::shared_ptr<std::normal_distribution<>> position_noise_distribution =
     std::make_shared<std::normal_distribution<>>(0.0, pos_noise_stddev);
   autoware_auto_perception_msgs::msg::DetectedObject detected_object_with_noise;
   detected_object_with_noise.kinematics.pose_with_covariance.pose.position.x +=
-    (*pos_noise_dist)(*rand_engine);
+    (*position_noise_distribution)(*rand_engine);
   detected_object_with_noise.kinematics.pose_with_covariance.pose.position.y +=
-    (*pos_noise_dist)(*rand_engine);
+    (*position_noise_distribution)(*rand_engine);
   detected_object = detected_object_with_noise;
 }
 
