@@ -15,14 +15,12 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
 
-#include <rclcpp/rclcpp.hpp>
-
-#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
-
 #include <simulation_api_schema.pb.h>
 
+#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <memory>
 #include <random>
+#include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <vector>
 

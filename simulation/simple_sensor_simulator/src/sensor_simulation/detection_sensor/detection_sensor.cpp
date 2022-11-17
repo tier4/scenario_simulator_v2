@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simple_sensor_simulator/exception.hpp>
-#include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
-#include <simulation_interface/conversions.hpp>
-
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <memory>
+#include <simple_sensor_simulator/exception.hpp>
+#include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <string>
 #include <vector>
 
