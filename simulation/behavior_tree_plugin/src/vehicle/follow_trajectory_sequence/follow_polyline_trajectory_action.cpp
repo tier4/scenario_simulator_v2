@@ -53,6 +53,7 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 {
   auto && ports = VehicleActionNode::providedPorts();
   ports.emplace(BT::InputPort<Parameter>("polyline_trajectory_parameter"));
+  ports.emplace(BT::InputPort<decltype(target_speed)>("target_speed"));
   return std::forward<decltype(ports)>(ports);
 }
 
@@ -178,6 +179,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     case traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY:
       if (
         getInput<Parameter>("polyline_trajectory_parameter", parameter) and
+        getInput<decltype(target_speed)>("target_speed", target_speed) and
         not parameter.shape.vertices.empty()) {
         // PRINT(parameter.initial_distance_offset);
         // PRINT(parameter.dynamic_constraints_ignorable);
@@ -185,28 +187,31 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
         auto updated_status = entity_status;
 
-        auto steering = [&](auto && current_position, auto && current_target, auto && current_velocity) {
-          return normalize(current_target - current_position) *
-                   behavior_parameter.dynamic_constraints.max_speed -
-                 current_velocity;
-        };  // vector [m/s]
+        auto current_max_acceleration = [&]() {
+          return std::clamp(
+            entity_status.action_status.accel.linear.x +
+              behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time,
+            0.0, behavior_parameter.dynamic_constraints.max_acceleration);
+        };
 
         auto current_max_speed = [&]() {
           return std::clamp(
-            entity_status.action_status.twist.linear.x +
-              std::clamp(
-                entity_status.action_status.accel.linear.x +
-                  behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time,
-                0.0, behavior_parameter.dynamic_constraints.max_acceleration) *
-                step_time,
-            0.0, behavior_parameter.dynamic_constraints.max_speed);
+            entity_status.action_status.twist.linear.x + current_max_acceleration() * step_time,
+            0.0, target_speed ? *target_speed : behavior_parameter.dynamic_constraints.max_speed);
         };  // scalar [m/s]
+
+        auto steering =
+          [&](auto && current_position, auto && current_target, auto && current_velocity) {
+            // TODO: tuncate by current_max_acceleration() * step_time
+            return normalize(current_target - current_position) *
+                     behavior_parameter.dynamic_constraints.max_speed -
+                   current_velocity;
+          };  // vector [m/s]
 
         truncate(
           velocity += steering(
             entity_status.pose.position,
-            parameter.shape.vertices.at(current_waypoint_index).position.position,
-            velocity),
+            parameter.shape.vertices.at(current_waypoint_index).position.position, velocity),
           current_max_speed());
 
         auto previous_direction = direction;
@@ -221,13 +226,18 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
         updated_status.action_status.twist.angular.x = 0;
         updated_status.action_status.twist.angular.y = 0;
-        updated_status.action_status.twist.angular.z = (direction.z - previous_direction.z) / step_time;
+        updated_status.action_status.twist.angular.z =
+          (direction.z - previous_direction.z) / step_time;
 
-        updated_status.action_status.accel.linear = updated_status.action_status.twist.linear / step_time;
+        updated_status.action_status.accel.linear =
+          updated_status.action_status.twist.linear / step_time;
+        updated_status.action_status.accel.angular =
+          updated_status.action_status.twist.angular / step_time;
 
         updated_status.pose.position += velocity * step_time;
 
-        updated_status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(direction);
+        updated_status.pose.orientation =
+          quaternion_operation::convertEulerAngleToQuaternion(direction);
 
         updated_status.time = entity_status.time + step_time;
 
@@ -240,7 +250,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         if (auto d = distance(
               updated_status.pose.position,
               parameter.shape.vertices.at(current_waypoint_index).position.position);
-            d < parameter.initial_distance_offset) {
+            d < 1) {
           ++current_waypoint_index;
         }
 

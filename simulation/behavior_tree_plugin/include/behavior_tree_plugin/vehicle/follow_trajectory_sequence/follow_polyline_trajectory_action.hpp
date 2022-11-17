@@ -28,6 +28,8 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
 
   Parameter parameter;
 
+  boost::optional<double> target_speed;
+
   geometry_msgs::msg::Vector3 velocity;  // world coordinate
 
   geometry_msgs::msg::Vector3 direction;  // world coordinate
