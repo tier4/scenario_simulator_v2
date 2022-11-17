@@ -56,16 +56,30 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
   return std::forward<decltype(ports)>(ports);
 }
 
-#define DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(OPERATOR) \
-  template <typename T, typename U>                         \
-  auto operator OPERATOR(const T & a, const U & b)          \
-  {                                                         \
-    geometry_msgs::msg::Vector3 v;                          \
-    v.x = a.x OPERATOR b.x;                                 \
-    v.y = a.y OPERATOR b.y;                                 \
-    v.z = a.z OPERATOR b.z;                                 \
-    return v;                                               \
-  }                                                         \
+template <typename T, typename = void>
+struct is_vector3 : public std::false_type
+{
+};
+
+template <typename T>
+struct is_vector3<
+  T, std::void_t<decltype(std::declval<T>().x, std::declval<T>().y, std::declval<T>().z)>>
+: public std::true_type
+{
+};
+
+#define DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(OPERATOR)                      \
+  template <                                                                     \
+    typename T, typename U,                                                      \
+    std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, int> = 0> \
+  auto operator OPERATOR(const T & a, const U & b)                               \
+  {                                                                              \
+    geometry_msgs::msg::Vector3 v;                                               \
+    v.x = a.x OPERATOR b.x;                                                      \
+    v.y = a.y OPERATOR b.y;                                                      \
+    v.z = a.z OPERATOR b.z;                                                      \
+    return v;                                                                    \
+  }                                                                              \
   static_assert(true)
 
 DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(+);
@@ -73,15 +87,17 @@ DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(-);
 DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(*);
 DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(/);
 
-#define DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(OPERATOR) \
-  template <typename T, typename U>                                      \
-  auto operator OPERATOR(T & a, const U & b)->decltype(auto)             \
-  {                                                                      \
-    a.x OPERATOR b.x;                                                    \
-    a.y OPERATOR b.y;                                                    \
-    a.z OPERATOR b.z;                                                    \
-    return a;                                                            \
-  }                                                                      \
+#define DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(OPERATOR)         \
+  template <                                                                     \
+    typename T, typename U,                                                      \
+    std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, int> = 0> \
+  auto operator OPERATOR(T & a, const U & b)->decltype(auto)                     \
+  {                                                                              \
+    a.x OPERATOR b.x;                                                            \
+    a.y OPERATOR b.y;                                                            \
+    a.z OPERATOR b.z;                                                            \
+    return a;                                                                    \
+  }                                                                              \
   static_assert(true)
 
 DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(+=);
@@ -89,21 +105,42 @@ DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(-=);
 DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(*=);
 DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(/=);
 
-#define DEFINE_VECTOR3_VS_DOUBLE_BINARY_OPERATOR(OPERATOR)                \
-  auto operator OPERATOR(const geometry_msgs::msg::Vector3 & a, double b) \
-  {                                                                       \
-    geometry_msgs::msg::Vector3 v;                                        \
-    v.x = a.x OPERATOR b;                                                 \
-    v.y = a.y OPERATOR b;                                                 \
-    v.z = a.z OPERATOR b;                                                 \
-    return v;                                                             \
-  }                                                                       \
+#define DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(OPERATOR)                           \
+  template <                                                                         \
+    typename T, typename U,                                                          \
+    std::enable_if_t<std::conjunction_v<is_vector3<T>, std::is_scalar<U>>, int> = 0> \
+  auto operator OPERATOR(const T & a, const U & b)                                   \
+  {                                                                                  \
+    geometry_msgs::msg::Vector3 v;                                                   \
+    v.x = a.x OPERATOR b;                                                            \
+    v.y = a.y OPERATOR b;                                                            \
+    v.z = a.z OPERATOR b;                                                            \
+    return v;                                                                        \
+  }                                                                                  \
   static_assert(true)
 
-DEFINE_VECTOR3_VS_DOUBLE_BINARY_OPERATOR(+);
-DEFINE_VECTOR3_VS_DOUBLE_BINARY_OPERATOR(-);
-DEFINE_VECTOR3_VS_DOUBLE_BINARY_OPERATOR(*);
-DEFINE_VECTOR3_VS_DOUBLE_BINARY_OPERATOR(/);
+DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(+);
+DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(-);
+DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(*);
+DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(/);
+
+#define DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(OPERATOR)              \
+  template <                                                                         \
+    typename T, typename U,                                                          \
+    std::enable_if_t<std::conjunction_v<is_vector3<T>, std::is_scalar<U>>, int> = 0> \
+  auto operator OPERATOR(T & a, const U & b)                                         \
+  {                                                                                  \
+    a.x OPERATOR b;                                                                  \
+    a.y OPERATOR b;                                                                  \
+    a.z OPERATOR b;                                                                  \
+    return a;                                                                        \
+  }                                                                                  \
+  static_assert(true)
+
+DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(+=);
+DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(-=);
+DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(*=);
+DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(/=);
 
 template <typename T, typename U>
 auto distance(const T & from, const U & to)
@@ -116,13 +153,21 @@ auto norm(const geometry_msgs::msg::Vector3 & v) { return std::hypot(v.x, v.y, v
 auto normalize(const geometry_msgs::msg::Vector3 & v) { return v / norm(v); }
 
 template <typename T, typename U>
-auto truncate(const T & a, const U & b)
+auto truncate(const T & v, const U & max)
 {
-  geometry_msgs::msg::Vector3 v;
-  v.x = std::min(a.x, b);
-  v.y = std::min(a.y, b);
-  v.z = std::min(a.z, b);
-  return v;
+  if (auto x = norm(v); max < x) {
+    return v * (max / x);
+  } else {
+    return v;
+  }
+}
+
+template <typename T, typename U>
+auto truncate(T & v, const U & max)
+{
+  if (auto x = norm(v); max < x) {
+    v *= (max / x);
+  }
 }
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
@@ -138,26 +183,54 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         // PRINT(parameter.dynamic_constraints_ignorable);
         // PRINT(parameter.closed);
 
-        auto speed = [&]() { return behavior_parameter.dynamic_constraints.max_speed / 10; };
-
-        auto steering = [&](auto && current_position, auto && target, auto && current_velocity) {
-          return normalize(target - current_position) * speed() - current_velocity;  // [m/s]
-        };
-
         auto updated_status = entity_status;
 
-        updated_status.action_status.twist.linear += steering(
-          entity_status.pose.position,
-          parameter.shape.vertices.at(current_waypoint_index).position.position,
-          entity_status.action_status.twist.linear);
+        auto steering = [&](auto && current_position, auto && current_target, auto && current_velocity) {
+          return normalize(current_target - current_position) *
+                   behavior_parameter.dynamic_constraints.max_speed -
+                 current_velocity;
+        };  // vector [m/s]
+
+        auto current_max_speed = [&]() {
+          return std::clamp(
+            entity_status.action_status.twist.linear.x +
+              std::clamp(
+                entity_status.action_status.accel.linear.x +
+                  behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time,
+                0.0, behavior_parameter.dynamic_constraints.max_acceleration) *
+                step_time,
+            0.0, behavior_parameter.dynamic_constraints.max_speed);
+        };  // scalar [m/s]
+
+        truncate(
+          velocity += steering(
+            entity_status.pose.position,
+            parameter.shape.vertices.at(current_waypoint_index).position.position,
+            velocity),
+          current_max_speed());
+
+        auto previous_direction = direction;
+
+        direction.x = 0;
+        direction.y = 0;
+        direction.z = std::atan2(velocity.y, velocity.x);
+
+        updated_status.action_status.twist.linear.x = norm(velocity);
+        updated_status.action_status.twist.linear.y = 0;
+        updated_status.action_status.twist.linear.z = 0;
+
         updated_status.action_status.twist.angular.x = 0;
         updated_status.action_status.twist.angular.y = 0;
-        updated_status.action_status.twist.angular.z = std::atan2(
-          updated_status.action_status.twist.linear.y, updated_status.action_status.twist.linear.x);
-        updated_status.pose.position += updated_status.action_status.twist.linear * step_time;
-        updated_status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
-          updated_status.action_status.twist.angular);
+        updated_status.action_status.twist.angular.z = (direction.z - previous_direction.z) / step_time;
+
+        updated_status.action_status.accel.linear = updated_status.action_status.twist.linear / step_time;
+
+        updated_status.pose.position += velocity * step_time;
+
+        updated_status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(direction);
+
         updated_status.time = entity_status.time + step_time;
+
         updated_status.lanelet_pose_valid = false;
 
         setOutput("updated_status", updated_status);

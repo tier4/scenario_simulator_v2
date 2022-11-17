@@ -28,6 +28,10 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
 
   Parameter parameter;
 
+  geometry_msgs::msg::Vector3 velocity;  // world coordinate
+
+  geometry_msgs::msg::Vector3 direction;  // world coordinate
+
   std::size_t current_waypoint_index = 0;
 
   using VehicleActionNode::VehicleActionNode;
