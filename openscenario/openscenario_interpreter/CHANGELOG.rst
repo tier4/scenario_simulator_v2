@@ -2,6 +2,213 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.7 (2022-11-17)
+------------------
+* chore(interpreter): fix commit-leaked lines
+* fix(ping): fix compile error
+* fix!(ping): change the receiving target from server to topic
+* refactor(ping): change class name from `Service` to `Server`
+* fix(interpreter): fix compile error
+* chore(ping): fix some errors
+* refactor(ping): rename package from `ros_ping_with_service` to `ros_ping`
+* refactor(ping): move service class to `common` directory
+* refactor(ping): add `const` keyword
+* refactor(ping): change name
+* Merge remote-tracking branch 'origin/master' into feat/heat_beat
+* chore: fix compile errors
+* Merge pull request `#913 <https://github.com/tier4/scenario_simulator_v2/issues/913>`_ from tier4/use/autoware_github_actions
+* doc(spell-check): give reasons for ignoring misspellings in comment
+* chore(spell-check): ignore error from "euclidian"
+* fix(typo): defintiion => definition
+* fix(typo): refenrece => reference
+* refactor(heartbeat): fix enum class to snake_case
+* fix(heartbeat): fix deadlock
+* fix(heartbeat):
+* feature(heartbeat): add timeout to heartbeat_checker_node
+* feat(interpreter): add heartbeat_checker_node
+* Merge pull request `#903 <https://github.com/tier4/scenario_simulator_v2/issues/903>`_ from tier4/feature/empty/parameter_value_distribution
+* doc(interpreter): add OpenSCENARIO version to xsd descriptions
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution
+* Fix scenario loading error
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Fix scenario loading path
+* Merge pull request `#883 <https://github.com/tier4/scenario_simulator_v2/issues/883>`_ from tier4/feature/interpreter/priority
+* Rename member function `Maneuver::override_events` to `overrideEvents`
+* Update `CustomCommand::start` to return `void` instead of `int`
+* Lipsticks
+* Rename `ICustomCommand` to `CustomCommand`
+* Lipsticks
+* Merge pull request `#900 <https://github.com/tier4/scenario_simulator_v2/issues/900>`_ from tier4/feature/traffic_simulator/behavior-parameter
+* add a part for checking priority features to all-in-one.yaml
+* add DummyLongRunningAction and support skip priority
+* Add new message type `traffic_simulator_msgs::msg::DynamicConstraints`
+* Merge branch 'fix/interpreter/custom_command_action' into feature/interpreter/priority
+* Merge branch 'master' into fix/interpreter/custom_command_action
+* rename base -> entity
+* fix CustomCommand
+* Update syntax `SpeedProfileAction` to call `API::setBehaviorParameter`
+* Add some max constraints to `msg::BehaviorParameter`
+* Update `Performance::operator traffic_simulator_msgs::msg::Performance`
+* Update syntax `Performance` to version 1.2
+* Merge branch 'master' into feature/bt_auto_ros_ports
+* Merge pull request `#898 <https://github.com/tier4/scenario_simulator_v2/issues/898>`_ from tier4/feature/interpreter/speed-profile-action
+* Add test scenario `LongitudinalAction.SpeedProfileAction`
+* Rename `DriverModel` to `BehaviorParameter`
+* Delete distribution evaluation implementation
+* Clanup member function `SpeedProfileAction::apply`
+* Lipsticks
+* Delete distribution evaluation implementation
+* Add new member function `SpeedProfileAction::apply`
+* Update 'SpeedProfileAction' to respect attribute 'entityRef'
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* add CustomCommandActionBase class
+* Update syntax `SpeedProfileAction` to request speed change sequentially as given `SpeedProfileEntry`
+* Fix cardinality of element `SpeedProfileEntry` of syntax `SpeedProfileEntry`
+* Add new syntax `SpeedProfileEntry`
+* Add new syntax `DynamicConstraints`
+* Add new syntax `SpeedProfileAction`
+* Update syntax `LongitudinalAction` to version 1.2
+* Merge pull request `#896 <https://github.com/tier4/scenario_simulator_v2/issues/896>`_ from tier4/refactor/traffic_simulator/spawn
+* Update openscenario_interpreter description
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/priority
+* fix override
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Extract openscenario_preprocessor
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/spawn
+* Update API::spawn (VehicleEntity) to receive position
+* Refactor
+* Add TODO comments
+* Update `API::spawn` (PedestrianEntity) to receive position
+* Merge remote-tracking branch 'origin/master' into feature/parameter_value_distribution
+* Update `API::spawn` (MiscObjectEntity) to receive position
+* Merge pull request `#893 <https://github.com/tier4/scenario_simulator_v2/issues/893>`_ from tier4/feature/interpreter/follow-trajectory-action-3
+* Merge branch 'master' into feature/interpreter/follow-trajectory-action-3
+* Merge pull request `#890 <https://github.com/tier4/scenario_simulator_v2/issues/890>`_ from tier4/refactor/test_runner
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Update data member `EntityBase::stand_still_duration\_` to not to be optional
+* Remove unused argument from member function `CatalogReference::make`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into refactor/test_runner
+* Merge pull request `#892 <https://github.com/tier4/scenario_simulator_v2/issues/892>`_ from tier4/feature/interpreter/follow-trajectory-action-2
+* Apply ament_clang_format
+* Fix bug in preprocessor/derive server
+* Integrate preprocessor into scenario_test_runner.py
+* Add openscenario_preprocessor to launch file
+* Confirm operation check for preprocessor
+* Add annotations to avoid compiler warnings
+* Add new test scenario `RoutingAction.FollowTrajectoryAction.yaml`
+* Add new syntax class `Vertex`
+* Add new syntax class `Polyline`
+* Add new syntax class `Shape`
+* Add new syntax class `Trajectory`
+* Add new syntax class `TrajectoryRef`
+* Implement minimal interface of Preprocessor
+* Add new syntax class `FollowingMode`
+* Add new syntax class `TrajectoryFollowingMode`
+* Add new syntax class `Timing`
+* Add new syntax class `None`
+* Add new syntax class `TimeReference`
+* Add new syntax class `FollowTrajectoryAction`
+* Merge pull request `#891 <https://github.com/tier4/scenario_simulator_v2/issues/891>`_ from tier4/feature/interpreter/follow-trajectory-action
+* Merge pull request `#877 <https://github.com/tier4/scenario_simulator_v2/issues/877>`_ from tier4/feature/interpreter/printParameter
+* Move Preprocessor class implementation to cpp file
+* Add openscenario_preprocessor_node
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Move namespace `lane_change` into new header `data_type/lane_change.hpp`
+* Add openscenario_preprocessor.hpp
+* Move namespace `speed_change` into new header `data_type/speed_change.hpp`
+* Lipsticks
+* Cleanup struct `Constraint` and `RelativeTargetSpeed`
+* Lipsticks
+* Add empty Preprocessor class
+* Apply ament_clang_format
+* Implement ProbabilityDistributionSet
+* Add nodiscard annotation
+* Apply ament_clang_format
+* Implement Histogram
+* Implement PoissonDistribution
+* Implement UniformDistribution
+* Move StochasticDistributionClass to distribution.hpp
+* Implement normal_distribution
+* accept all priority values
+* Merge branch 'master' into feature/interpreter/priority
+* Merge pull request `#881 <https://github.com/tier4/scenario_simulator_v2/issues/881>`_ from tier4/fix/interpreter/on-activate
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Add new member function `Interpreter::reset`
+* Fix build errors
+* Fix exception handler of phase `on_activate` to return `FAILURE`
+* Add implementation hints to stochastic distributions
+* Cleanup
+* Fix XSD annotations
+* Apply ament_clang_format
+* Fix build errors
+* Add readGroups function
+* Splice `initialize_storyboard` to its caller
+* Fix build errors
+* Implement Stochastic::Stochastic
+* Add missing attribute to StochasticDistribution
+* Add PoissonDistribution
+* Add UniformDistribution
+* Add NormalDistribution
+* Add HistogramBin
+* Add Histogram
+* Fix Class name
+* Add ProbabilityDistributionSetElement
+* Add ProbabilityDistribution
+* Add StochasticDistributionType
+* Add StochasticDistribution
+* Add UserDefinedDistribution
+* Add DistributionSetElement
+* Add DistributionSet
+* Add Range
+* Add DistributionRange
+* Add ParameterValueSet
+* Add ValueSetDistribution
+* Add DeterministicSingleParameterDistributionType
+* Add DeterministicMultiParameterDistributionType
+* Fix Deterministic
+* Fix xsd annotation
+* Add DeterministicSingleParameterDistribution
+* Add DeterministicMultiParameterDistribution
+* Add DeterministicParameterDistribution
+* Add Deterministic
+* Fix implementation of DistributionDefinition
+* Merge remote-tracking branch 'origin/master' into feature/concealer/acceleration
+* Merge pull request `#823 <https://github.com/tier4/scenario_simulator_v2/issues/823>`_ from tier4/feature/start_npc_logic_api
+* Fix implementation of ParameterValueDistribution
+* fix function decl/impl order
+* ament_clang_format
+* add a new custom command (printParameter)
+* Add Stochastic
+* Add Deterministic
+* Add DistributionDefinition
+* Add ParameterValueDistribution
+* Update OpenScenarioCategory to OSC 1.2
+* ament_clang_format
+* add member functions for priority to Maneuver
+* add std::flush to test command
+* move some StoryboardElement's members from public to protected
+* Lipsticks
+* Rename member function `Autoware::ready` to `Autoware::engaged`
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Remove member function `Storyboard::start() -> void`
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge branch 'master' into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge remote-tracking branch 'origin/fix/ci_error' into feature/start_npc_logic_api
+* Merge branch 'master' into feature/occupancy_grid_docs
+* Remove unused member function `AutowareUniverse::isReady`
+* Update `Interpreter` to set `Configuration::initialize_duration` to zero
+* Lipsticks
+* Update `Interpreter` to start non-ego entities at Autoware reaches `DRIVING` state.
+* Merge remote-tracking branch 'origin/refactor/interpreter/scope' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Shota Minami, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.6 (2022-08-30)
 ------------------
 * Merge pull request `#852 <https://github.com/tier4/scenario_simulator_v2/issues/852>`_ from tier4/refactor/catalog

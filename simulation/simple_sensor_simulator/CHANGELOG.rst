@@ -2,6 +2,61 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.7 (2022-11-17)
+------------------
+* Merge remote-tracking branch 'origin/master' into feat/heat_beat
+* Merge pull request `#913 <https://github.com/tier4/scenario_simulator_v2/issues/913>`_ from tier4/use/autoware_github_actions
+* fix(typo): cooridnate => coordinate
+* fix(typo): implemtation => implementation
+* chore(spell-check): fix cspell error
+* chore(spell-check):  fix cspell error
+* Merge pull request `#888 <https://github.com/tier4/scenario_simulator_v2/issues/888>`_ from tier4/fix/shifted_bounding_box
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Copy dimension info
+* Merge remote-tracking branch 'origin/master' into fix/traffic_simulator/horizon
+* Merge pull request `#905 <https://github.com/tier4/scenario_simulator_v2/issues/905>`_ from tier4/fix/update-orientation-availability
+* fix: orientation availability
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/priority
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into refactor/test_runner
+* Merge pull request `#886 <https://github.com/tier4/scenario_simulator_v2/issues/886>`_ from RobotecAI/mkielczykowski/profile_embree
+* review applied
+* humble build fix
+* Code cleanup: delete Todo
+* Code cleanup: clang format
+* Fix bounding box shifting
+* Code cleanup: organise the raycaster code
+* Code cleanup: delete time measurement
+* Revert "WIP: Intermediate dynamic_scene optimization"
+* Fix compilation
+* MT patches
+* WIP: Implement (para)lellization and add scenarios
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge pull request `#866 <https://github.com/tier4/scenario_simulator_v2/issues/866>`_ from tier4/fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Fix wrong comment
+* Format
+* Remove unnecessary declaration
+* Merge branch 'feature/occupancy_grid_docs' into fix/simple_sensor_simulator/fast_occupancy_grid
+* Refacor `occupancy_grid_sensor` and improve performance
+* Remove redundant code and simplify
+* Reformat
+* WIP: Intermediate dynamic_scene optimization
+* Simplify grid cell data structure to improve performance
+* Fix typo
+* Merge remote-tracking branch 'origin/fix/ci_error' into feature/start_npc_logic_api
+* Merge branch 'master' into feature/occupancy_grid_docs
+* Update doxygen comments
+* Add doxygen comment
+* WIP: embree optimizations
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Michał Kiełczykowski, Piotr Rybicki, Piotr Zyskowski, Shota Minami, kyabe2718, satoshi-ota, yamacir-kit
+
 0.6.6 (2022-08-30)
 ------------------
 * Merge remote-tracking branch 'origin/master' into refactor/catalog
