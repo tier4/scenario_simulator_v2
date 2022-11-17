@@ -56,7 +56,8 @@ geometry_msgs::Pose DetectionSensorBase::getSensorPose(
   throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
 }
 
-void DetectionSensorBase::applyNoise(
+template <>
+void DetectionSensorBase::applyNoise<autoware_auto_perception_msgs::msg::DetectedObject>(
   autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const
 {
   std::random_device seed;
