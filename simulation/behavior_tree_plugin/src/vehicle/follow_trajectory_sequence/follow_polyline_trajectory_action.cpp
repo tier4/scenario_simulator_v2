@@ -202,7 +202,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
         auto steering =
           [&](auto && current_position, auto && current_target, auto && current_velocity) {
-            // TODO: tuncate by current_max_acceleration() * step_time
+            // TODO: truncate by current_max_acceleration() * step_time
             return normalize(current_target - current_position) *
                      behavior_parameter.dynamic_constraints.max_speed -
                    current_velocity;
