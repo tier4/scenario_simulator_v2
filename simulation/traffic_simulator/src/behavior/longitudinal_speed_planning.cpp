@@ -237,14 +237,11 @@ auto LongitudinalSpeedPlanner::isReachedToTargetSpeedWithConstantJerk(
   const geometry_msgs::msg::Twist & current_twist, const geometry_msgs::msg::Accel & current_accel,
   double duration, double tolerance) const -> bool
 {
-  if (
+  return (
     std::abs(
       getVelocityWithConstantJerk(
         target_speed, current_twist, current_accel, constraints, duration) -
-      target_speed) <= std::abs(tolerance)) {
-    return true;
-  }
-  return false;
+      target_speed) <= std::abs(tolerance));
 }
 
 auto LongitudinalSpeedPlanner::isAccelerating(
