@@ -427,7 +427,8 @@ auto ActionNode::calculateUpdatedEntityStatus(
     }
     if (!calculation_success) {
       THROW_SIMULATION_ERROR(
-        "Failed to calculate next status calculateUpdatedEntityStatus function, the estimated S value "
+        "Failed to calculate next status calculateUpdatedEntityStatus function, the estimated S "
+        "value "
         "is invalid in the target lanelet and adjacent lanelet");
     }
     traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
@@ -442,7 +443,6 @@ auto ActionNode::calculateUpdatedEntityStatus(
     entity_status_updated.action_status.linear_jerk = linear_jerk_new;
     return entity_status_updated;
   }
-  THROW_SIMULATION_ERROR("failed to calculate next status calculateUpdatedEntityStatus function");
 }
 
 auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
