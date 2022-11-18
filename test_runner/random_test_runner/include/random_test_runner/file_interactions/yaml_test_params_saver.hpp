@@ -132,7 +132,7 @@ public:
         "suites (currently only one is supported)");
     }
 
-    TestSuiteParameters test_suite_paramters = yaml_.begin()->second.as<TestSuiteParameters>();
+    TestSuiteParameters test_suite_parameters = yaml_.begin()->second.as<TestSuiteParameters>();
     std::vector<TestCaseParameters> test_cases_parameters;
     auto test_cases_yaml = yaml_.begin()->second["test_cases"];
     for (YAML::iterator test_case_it = test_cases_yaml.begin();
@@ -140,7 +140,7 @@ public:
       test_cases_parameters.emplace_back(test_case_it->as<TestCaseParameters>());
     }
 
-    return {test_suite_paramters, std::move(test_cases_parameters)};
+    return {test_suite_parameters, std::move(test_cases_parameters)};
   }
 
 private:

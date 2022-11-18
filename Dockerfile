@@ -6,6 +6,7 @@ ENV DEBCONF_NOWARNINGS=yes
 ARG ROS_DISTRO
 
 RUN sudo apt-get update && sudo apt-get -y install python3-pip python3-rospkg python3-rosdep software-properties-common
+# cspell: ignore kisak
 RUN add-apt-repository ppa:kisak/kisak-mesa -y
 RUN apt-get update && apt-get install libegl-mesa0 -y
 

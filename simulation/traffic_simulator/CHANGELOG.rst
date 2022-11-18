@@ -2,6 +2,150 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.7 (2022-11-17)
+------------------
+* Merge remote-tracking branch 'origin/master' into feat/heat_beat
+* Merge pull request `#913 <https://github.com/tier4/scenario_simulator_v2/issues/913>`_ from tier4/use/autoware_github_actions
+* fix(typo): threashold => threshold
+* fix(typo): cansel => cancel
+* Merge pull request `#908 <https://github.com/tier4/scenario_simulator_v2/issues/908>`_ from tier4/fix/traffic_simulator/horizon
+* Remove parameter `max_distance` from `EntityManager::getLongitudinalDistance`
+* Revert "Fix `traffic_simulator` distance measurement not working beyond 100m"
+* Fix `traffic_simulator` distance measurement not working beyond 100m
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge pull request `#900 <https://github.com/tier4/scenario_simulator_v2/issues/900>`_ from tier4/feature/traffic_simulator/behavior-parameter
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/behavior-parameter
+* Merge pull request `#901 <https://github.com/tier4/scenario_simulator_v2/issues/901>`_ from tier4/feature/speed_action_with_time
+* add test scenario for relative
+* add test scenario for time constraint
+* Add new message type `traffic_simulator_msgs::msg::DynamicConstraints`
+* Merge branch 'fix/interpreter/custom_command_action' into feature/interpreter/priority
+* fix compile errors
+* enable calculate active duration
+* Merge branch 'master' into fix/interpreter/custom_command_action
+* add argument for step time
+* enable speed change with time constraint
+* remove unused argument
+* update functions
+* add time constraint type
+* enable run requestTargetSpeed with absolute target speed and time constraint
+* add private function
+* Merge branch 'master' into feature/bt_auto_ros_ports
+* Merge pull request `#898 <https://github.com/tier4/scenario_simulator_v2/issues/898>`_ from tier4/feature/interpreter/speed-profile-action
+* Add test scenario `LongitudinalAction.SpeedProfileAction`
+* Rename `DriverModel` to `BehaviorParameter`
+* Update 'SpeedProfileAction' to respect attribute 'entityRef'
+* Update `EntityManager::getGoalPoses` to not to receive non-const reference
+* Cleanup `EntityManager::update`
+* Update `EntityManager::spawnEntity` to check the number of `EgoEntity` <= 1
+* Revert some changes
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Change `EntityBase::setOtherStatus` to not filter by distance
+* Merge pull request `#897 <https://github.com/tier4/scenario_simulator_v2/issues/897>`_ from tier4/update/vehicle_model
+* Merge pull request `#896 <https://github.com/tier4/scenario_simulator_v2/issues/896>`_ from tier4/refactor/traffic_simulator/spawn
+* Delete sim_model_util.hpp
+* Update vehicle model
+* Delete sim_model_time_delay.hpp
+* Update `EntityBase::setStatus` to return nothing
+* Move entity type constructor implementations into `.cpp`
+* Remove unused data member `*Entity::parameters`
+* Remove virtual function `EntityBase::getVehicleParameters`
+* Remove member function `EntityBase::getEntityType`
+* Remove member function `EntityBase::getBoundingBox`
+* Update `EntityBase::setStatus` to restore some possible missing data
+* Revert some changes
+* Remove data member `EntityBase::subtype`
+* Update `EntityBase::getStatus` to return data member reference
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/priority
+* Update `EntityBase::getEntityStatusBeforeUpdate` to return non-optional reference
+* Lipsticks
+* Update `EntityManager::getEntityStatus` to return non-optional value
+* Remove member function `EntityManager::entityStatusSet`
+* Remove member function `EntityBase::statusSet`
+* Make `EntityBase::status\_` non-optional
+* Update entity type constructors to receive `EntityStatus`
+* Change `EgoEntity` constructor argument order
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Update `EntityBase` to receive `Pose` as constructor argument
+* Update `VehicleEntity` and `EgoEntity` to receive `Pose` as constructor argument
+* Update `PedestrianEntity` to receive `Pose` as constructor argument
+* Update `MiscObjectEntity` to receive `Pose` as constructor argument
+* Merge remote-tracking branch 'origin/master' into refactor/traffic_simulator/spawn
+* Lipsticks
+* Update API::spawn (VehicleEntity) to receive position
+* Update `API::spawn` (PedestrianEntity) to receive position
+* Merge remote-tracking branch 'origin/master' into feature/parameter_value_distribution
+* Update `API::spawn` (MiscObjectEntity) to receive position
+* Merge pull request `#893 <https://github.com/tier4/scenario_simulator_v2/issues/893>`_ from tier4/feature/interpreter/follow-trajectory-action-3
+* Update `RoutePlanner` to store waypoints in deque instead of queue
+* Update `RoutePlanner` member functions to not to copy arguments
+* Remove unused data member `VehicleEntity::plugin_name`
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Update data member `EntityBase::stand_still_duration\_` to not to be optional
+* Remove unused data member `EntityBase::waypoints\_
+* Update member function `EntityBase::getEntityType` to be virtual
+* Remove unused data member `EntityBase::type`
+* Move data member `EntityBase::spline\_` into class `VehicleEntity`
+* Remove unused data member `visibility\_`
+* Merge remote-tracking branch 'origin/master' into refactor/test_runner
+* Remove member function `EntityBase::setVerbose`
+* Remove some copying
+* Update `EntityBase::getCurrentAction` to not to non-const value
+* Cleanup member function `EntityBase::EntityBase`
+* Move some function implenentations into `.cpp`
+* Move some function implementations into `.cpp`
+* Merge pull request `#891 <https://github.com/tier4/scenario_simulator_v2/issues/891>`_ from tier4/feature/interpreter/follow-trajectory-action
+* Move static assertions into .cpp
+* Move namespace `lane_change` into new header `data_type/lane_change.hpp`
+* Move namespace `speed_change` into new header `data_type/speed_change.hpp`
+* Move namespace `behavior` into new header `data_types/behavior.hpp`
+* Move data_types constructors into `.hpp`
+* Lipsticks
+* Cleanup struct `Constraint` and `RelativeTargetSpeed`
+* Merge branch 'master' into feature/interpreter/priority
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge pull request `#875 <https://github.com/tier4/scenario_simulator_v2/issues/875>`_ from tier4/feature/concealer/acceleration
+* Merge remote-tracking branch 'origin/master' into feature/concealer/acceleration
+* Merge pull request `#823 <https://github.com/tier4/scenario_simulator_v2/issues/823>`_ from tier4/feature/start_npc_logic_api
+* Delete commented out code
+* Lipsticks
+* Add new member function `getCurrentPose`
+* Add new member function `EgoEntity::getCurrentTwist`
+* Update `AutowareUniverse` to publish current acceleration
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge pull request `#863 <https://github.com/tier4/scenario_simulator_v2/issues/863>`_ from tier4/fix/ci_catch_rosdep_error
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge branch 'master' into fix/simple_sensor_simulator/fast_occupancy_grid
+* Replace lanelet2_extension_psim with lanelet2_extension
+* Merge remote-tracking branch 'origin/fix/ci_error' into feature/start_npc_logic_api
+* fix Ego dynamics calculation
+* Merge branch 'master' into feature/occupancy_grid_docs
+* apply reformat
+* does not update stand still duration while npc logic was not started
+* Update `Interpreter` to set `Configuration::initialize_duration` to zero
+* remove boost::optional value
+* return scenario time
+* remove early return
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* fix compile errors
+* initalize with NAN
+* use boost optional
+* use boost::optional type
+* remove passing current time to plugin
+* modify constructo for stop watch class
+* skip update npc status before starting npc logics
+* add isNpcLogicStarted function
+* fix compile errors
+* add startNpcLogic API
+* add startNpcLogic function
+* add new member value
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Shota Minami, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.6 (2022-08-30)
 ------------------
 * Merge pull request `#854 <https://github.com/tier4/scenario_simulator_v2/issues/854>`_ from tier4/feature/remove_simple_metrics

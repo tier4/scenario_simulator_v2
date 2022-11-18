@@ -1,26 +1,19 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-
 <package format="3">
-  <name>openscenario_interpreter_example</name>
+  <name>topic_status_checker</name>
   <version>0.6.7</version>
-  <description>Examples for some TIER IV OpenSCENARIO Interpreter's features</description>
-  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
+  <description>simple topic checking tool</description>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>autoware_auto_system_msgs</depend>
-  <depend>boost</depend>
-  <depend>libboost-dev</depend>
   <depend>rclcpp</depend>
-  <depend>scenario_simulator_v2_msgs</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>
-  <test_depend>ament_cmake_gtest</test_depend>
-  <test_depend>ament_cmake_pep257</test_depend>
-  <test_depend>ament_cmake_xmllint</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
   <test_depend>ament_lint_auto</test_depend>
 
   <export>
