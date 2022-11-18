@@ -353,14 +353,14 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
         getDynamicConstraints()));
       job_list_.append(
         /**
-           * @brief Checking if the entity reaches target speed.
-           */
+         * @brief Checking if the entity reaches target speed.
+         */
         [this, target_speed](double) {
           return std::abs(getCurrentTwist().linear.x - target_speed) < 0.01;
         },
         /**
-           * @brief Resets deceleration limit.
-           */
+         * @brief Resets deceleration/acceleration limit.
+         */
         [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
       requestSpeedChange(target_speed, false);
       break;
