@@ -354,9 +354,11 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
       job_list_.append(
         /**
          * @brief Checking if the entity reaches target speed.
-         * 0.01 is a hard corded tolerance for checking reached target speed.
          */
         [this, target_speed](double) {
+          /**
+           * @brief 0.01 is a hard corded tolerance for checking reached target speed.
+           */
           return std::abs(getCurrentTwist().linear.x - target_speed) < 0.01;
         },
         /**
