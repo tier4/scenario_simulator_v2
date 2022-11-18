@@ -125,10 +125,7 @@ auto LongitudinalSpeedPlanner::isTargetSpeedReached(
   double target_speed, const geometry_msgs::msg::Twist & current_twist, double tolerance) const
   -> bool
 {
-  if (std::abs(target_speed - current_twist.linear.x) <= tolerance) {
-    return true;
-  }
-  return false;
+  return std::abs(target_speed - current_twist.linear.x) <= tolerance;
 }
 
 auto LongitudinalSpeedPlanner::getVelocityWithConstantJerk(
