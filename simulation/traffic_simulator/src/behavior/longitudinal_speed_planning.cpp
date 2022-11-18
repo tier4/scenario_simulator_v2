@@ -250,19 +250,13 @@ auto LongitudinalSpeedPlanner::isReachedToTargetSpeedWithConstantJerk(
 auto LongitudinalSpeedPlanner::isAccelerating(
   double target_speed, const geometry_msgs::msg::Twist & current_twist) const -> bool
 {
-  if (current_twist.linear.x > target_speed) {
-    return false;
-  }
-  return true;
+  return (current_twist.linear.x >= target_speed);
 }
 
 auto LongitudinalSpeedPlanner::isDecelerating(
   double target_speed, const geometry_msgs::msg::Twist & current_twist) const -> bool
 {
-  if (current_twist.linear.x < target_speed) {
-    return false;
-  }
-  return true;
+  return (current_twist.linear.x <= target_speed);
 }
 
 auto LongitudinalSpeedPlanner::planLinearJerk(
@@ -273,12 +267,11 @@ auto LongitudinalSpeedPlanner::planLinearJerk(
   double accel_x_new = 0;
   if (isAccelerating(target_speed, current_twist)) {
     accel_x_new = std::clamp(
-      static_cast<double>(current_accel.linear.x + step_time * constraints.max_acceleration_rate),
-      0.0,
+      current_accel.linear.x + step_time * constraints.max_acceleration_rate, 0.0,
       std::min(constraints.max_acceleration, (target_speed - current_twist.linear.x) / step_time));
   } else {
     accel_x_new = std::clamp(
-      static_cast<double>(current_accel.linear.x - step_time * constraints.max_deceleration_rate),
+      current_accel.linear.x - step_time * constraints.max_deceleration_rate,
       std::max(
         constraints.max_deceleration * -1, (target_speed - current_twist.linear.x) / step_time),
       0.0);
