@@ -357,7 +357,7 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
          */
         [this, target_speed](double) {
           /**
-           * @brief 0.01 is a hard corded tolerance for checking reached target speed.
+           * @brief Hard coded parameter, 0.01 is a hard corded tolerance for checking reached target speed.
            */
           return std::abs(getCurrentTwist().linear.x - target_speed) < 0.01;
         },

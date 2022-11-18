@@ -427,7 +427,8 @@ auto ActionNode::calculateUpdatedEntityStatus(
     }
     if (!calculation_success) {
       THROW_SIMULATION_ERROR(
-        "failed to calculate next status calculateUpdatedEntityStatus function");
+        "Failed to calculate next status calculateUpdatedEntityStatus function, the estimated S value "
+        "is invalid in the target lanelet and adjacent lanelet");
     }
     traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;
