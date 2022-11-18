@@ -273,14 +273,15 @@ auto LongitudinalSpeedPlanner::planLinearJerk(
   double accel_x_new = 0;
   if (isAccelerating(target_speed, current_twist)) {
     accel_x_new = std::clamp(
-      current_accel.linear.x + step_time * constraints.max_acceleration_rate, 0,
+      static_cast<double>(current_accel.linear.x + step_time * constraints.max_acceleration_rate),
+      0.0,
       std::min(constraints.max_acceleration, (target_speed - current_twist.linear.x) / step_time));
   } else {
     accel_x_new = std::clamp(
-      current_accel.linear.x - step_time * constraints.max_deceleration_rate,
+      static_cast<double>(current_accel.linear.x - step_time * constraints.max_deceleration_rate),
       std::max(
         constraints.max_deceleration * -1, (target_speed - current_twist.linear.x) / step_time),
-      0);
+      0.0);
   }
   return (accel_x_new - current_accel.linear.x) / step_time;
 }
