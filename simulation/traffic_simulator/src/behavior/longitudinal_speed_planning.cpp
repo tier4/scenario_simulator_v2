@@ -101,6 +101,9 @@ auto LongitudinalSpeedPlanner::getRunningDistance(
   const geometry_msgs::msg::Twist & current_twist, const geometry_msgs::msg::Accel & current_accel,
   double current_linear_jerk) const -> double
 {
+  /**
+   * @brief Hard coded parameter, 0.01 is a hard corded tolerance for checking reached target speed.
+   */
   constexpr double twist_tolerance = 0.01;
   if (isTargetSpeedReached(target_speed, current_twist, twist_tolerance)) {
     return 0;
