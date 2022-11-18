@@ -182,6 +182,10 @@ public:
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along);
   std::vector<geometry_msgs::msg::Point> getLeftBound(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getRightBound(std::int64_t lanelet_id) const;
+  auto getLeftLaneIds(std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type) const
+    -> std::vector<std::int64_t>;
+  auto getRightLaneIds(std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type) const
+    -> std::vector<std::int64_t>;
 
   using LaneletId = std::int64_t;
 

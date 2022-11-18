@@ -170,6 +170,7 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
 auto EntityManager::getLongitudinalDistance(const LaneletPose & from, const LaneletPose & to)
   -> boost::optional<double>
 {
+  RCLCPP_WARN_STREAM(rclcpp::get_logger("logger"), __FILE__ << "," << __LINE__);
   auto forward_distance =
     hdmap_utils_ptr_->getLongitudinalDistance(from.lanelet_id, from.s, to.lanelet_id, to.s);
 
@@ -178,15 +179,20 @@ auto EntityManager::getLongitudinalDistance(const LaneletPose & from, const Lane
 
   if (forward_distance && backward_distance) {
     if (forward_distance.get() > backward_distance.get()) {
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("backward"), -backward_distance.get());
       return -backward_distance.get();
     } else {
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("forward"), forward_distance.get());
       return forward_distance.get();
     }
   } else if (forward_distance) {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("forward"), forward_distance.get());
     return forward_distance.get();
   } else if (backward_distance) {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("backward"), -backward_distance.get());
     return -backward_distance.get();
   } else {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("forward, backward"), "None");
     return boost::none;
   }
 }
@@ -214,6 +220,8 @@ auto EntityManager::getLongitudinalDistance(const std::string & from, const Lane
 auto EntityManager::getLongitudinalDistance(const std::string & from, const std::string & to)
   -> boost::optional<double>
 {
+  RCLCPP_WARN_STREAM(rclcpp::get_logger("logger"), __FILE__ << "," << __LINE__);
+  RCLCPP_WARN_STREAM(rclcpp::get_logger("logger"), from << "," << to);
   if (laneMatchingSucceed(from) and laneMatchingSucceed(to)) {
     return getLongitudinalDistance(
       getEntityStatus(from).lanelet_pose, getEntityStatus(to).lanelet_pose);

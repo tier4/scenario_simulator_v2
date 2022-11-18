@@ -929,6 +929,66 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getRightBound(std::int64_t la
   return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).rightBound());
 }
 
+auto HdMapUtils::getLeftLaneIds(
+  std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type) const
+  -> std::vector<std::int64_t>
+{
+  std::vector<std::int64_t> ret = {};
+  switch (type.type) {
+    case traffic_simulator_msgs::msg::EntityType::EGO:
+      for (const auto & lanelet :
+           vehicle_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
+        ret.emplace_back(lanelet.id());
+      }
+      break;
+    case traffic_simulator_msgs::msg::EntityType::VEHICLE:
+      for (const auto & lanelet :
+           vehicle_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
+        ret.emplace_back(lanelet.id());
+      }
+      break;
+    case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
+      for (const auto & lanelet :
+           pedestrian_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
+        ret.emplace_back(lanelet.id());
+      }
+      break;
+    case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
+      break;
+  }
+  return ret;
+}
+
+auto HdMapUtils::getRightLaneIds(
+  std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type) const
+  -> std::vector<std::int64_t>
+{
+  std::vector<std::int64_t> ret = {};
+  switch (type.type) {
+    case traffic_simulator_msgs::msg::EntityType::EGO:
+      for (const auto & lanelet :
+           vehicle_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
+        ret.emplace_back(lanelet.id());
+      }
+      break;
+    case traffic_simulator_msgs::msg::EntityType::VEHICLE:
+      for (const auto & lanelet :
+           vehicle_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
+        ret.emplace_back(lanelet.id());
+      }
+      break;
+    case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
+      for (const auto & lanelet :
+           pedestrian_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
+        ret.emplace_back(lanelet.id());
+      }
+      break;
+    case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
+      break;
+  }
+  return ret;
+}
+
 boost::optional<std::pair<math::geometry::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
