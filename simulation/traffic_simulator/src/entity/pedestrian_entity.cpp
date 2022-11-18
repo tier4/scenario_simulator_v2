@@ -14,7 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <boost/algorithm/clamp.hpp>
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>

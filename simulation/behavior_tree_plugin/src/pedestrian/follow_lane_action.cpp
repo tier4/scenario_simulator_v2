@@ -14,8 +14,8 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <algorithm>
 #include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
-#include <boost/algorithm/clamp.hpp>
 #include <iostream>
 #include <memory>
 #include <string>

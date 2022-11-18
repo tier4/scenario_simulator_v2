@@ -77,7 +77,7 @@ auto ActionNode::getBlackBoardValues() -> void
 
 auto ActionNode::getHorizon() const -> double
 {
-  return boost::algorithm::clamp(getCurrentTwist().linear.x * 5, 20, 50);
+  return std::clamp(getCurrentTwist().linear.x * 5, 20, 50);
 }
 
 auto ActionNode::stopAtEndOfRoad() const -> traffic_simulator_msgs::msg::EntityStatus

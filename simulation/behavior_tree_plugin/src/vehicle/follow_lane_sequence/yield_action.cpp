@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
-#include <boost/algorithm/clamp.hpp>
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -56,8 +56,7 @@ const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoint
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    double horizon =
-      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+    double horizon = std::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/algorithm/clamp.hpp>
+#include <algorithm>
 #include <geometry/linear_algebra.hpp>
 #include <iostream>
 #include <rclcpp/rclcpp.hpp>
@@ -272,11 +272,11 @@ auto LongitudinalSpeedPlanner::planLinearJerk(
 {
   double accel_x_new = 0;
   if (isAccelerating(target_speed, current_twist)) {
-    accel_x_new = boost::algorithm::clamp(
+    accel_x_new = std::clamp(
       current_accel.linear.x + step_time * constraints.max_acceleration_rate, 0,
       std::min(constraints.max_acceleration, (target_speed - current_twist.linear.x) / step_time));
   } else {
-    accel_x_new = boost::algorithm::clamp(
+    accel_x_new = std::clamp(
       current_accel.linear.x - step_time * constraints.max_deceleration_rate,
       std::max(
         constraints.max_deceleration * -1, (target_speed - current_twist.linear.x) / step_time),
@@ -292,8 +292,8 @@ auto LongitudinalSpeedPlanner::forward(
 {
   geometry_msgs::msg::Accel ret = accel;
   ret.linear.x = accel.linear.x + step_time * linear_jerk;
-  ret.linear.x = boost::algorithm::clamp(
-    ret.linear.x, constraints.max_deceleration * -1, constraints.max_acceleration);
+  ret.linear.x =
+    std::clamp(ret.linear.x, constraints.max_deceleration * -1, constraints.max_acceleration);
   return ret;
 }
 
@@ -304,8 +304,7 @@ auto LongitudinalSpeedPlanner::forward(
 {
   geometry_msgs::msg::Twist ret = twist;
   ret.linear = ret.linear + accel.linear * step_time;
-  ret.linear.x =
-    boost::algorithm::clamp(ret.linear.x, -1 * constraints.max_speed, constraints.max_speed);
+  ret.linear.x = std::clamp(ret.linear.x, -1 * constraints.max_speed, constraints.max_speed);
   ret.angular = ret.angular + accel.angular * step_time;
   return ret;
 }

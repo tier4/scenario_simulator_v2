@@ -17,7 +17,7 @@
 
 #include <behaviortree_cpp_v3/action_node.h>
 
-#include <boost/algorithm/clamp.hpp>
+#include <algorithm>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <memory>
 #include <string>
