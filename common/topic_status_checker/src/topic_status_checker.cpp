@@ -33,7 +33,7 @@ int main(int argc, char * argv[])
   std::string topic_name;
   node->get_parameter<std::string>("topic_name", topic_name);
 
-  node->declare_parameter<int>("timeout_ms", 1000);
+  node->declare_parameter<int>("timeout_ms", 2000);
   int timeout_ms;
   node->get_parameter<int>("timeout_ms", timeout_ms);
 

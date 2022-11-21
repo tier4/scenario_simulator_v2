@@ -29,6 +29,6 @@ The meaning of the return codes is shown in the table below.
 | parameter name          | description                                                    | default value |
 |-------------------------|----------------------------------------------------------------|---------------|
 | topic_name              | name of the topic                                              | ""            |
-| timeout_ms              | timeout for waiting to receive the topic (unit : milliseconds) | 1000          |
+| timeout_ms              | timeout for waiting to receive the topic (unit : milliseconds) | 2000          |
 | topic_discovery_time_ms | discovery time for the topic (unit : milliseconds)             | 500           |
 | verbose                 | whether to give verbose output                                 | false         |
