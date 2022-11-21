@@ -244,13 +244,13 @@ auto LongitudinalSpeedPlanner::isReachedToTargetSpeedWithConstantJerk(
 auto LongitudinalSpeedPlanner::isAccelerating(
   double target_speed, const geometry_msgs::msg::Twist & current_twist) const -> bool
 {
-  return (current_twist.linear.x >= target_speed);
+  return (current_twist.linear.x <= target_speed);
 }
 
 auto LongitudinalSpeedPlanner::isDecelerating(
   double target_speed, const geometry_msgs::msg::Twist & current_twist) const -> bool
 {
-  return (current_twist.linear.x <= target_speed);
+  return (current_twist.linear.x >= target_speed);
 }
 
 auto LongitudinalSpeedPlanner::planLinearJerk(
