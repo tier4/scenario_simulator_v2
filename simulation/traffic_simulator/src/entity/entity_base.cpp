@@ -297,7 +297,6 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
-      requestSpeedChange(target_speed, continuous);
       setLinearAcceleration(acceleration);
       requestSpeedChangeWithConstantAcceleration(
         target_speed, speed_change::Transition::AUTO, acceleration, continuous);
@@ -343,7 +342,6 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
 {
   switch (transition) {
     case speed_change::Transition::LINEAR: {
-      requestSpeedChange(target_speed, false);
       requestSpeedChangeWithConstantAcceleration(
         target_speed, transition, target_speed - getCurrentTwist().linear.x / acceleration_time,
         false);
