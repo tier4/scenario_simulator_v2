@@ -38,7 +38,7 @@ int main(int argc, char * argv[])
   node->get_parameter<int>("timeout_ms", timeout_ms);
 
   int topic_discovery_time_ms;
-  node->declare_parameter<int>("topic_discovery_time_ms", 500);
+  node->declare_parameter<int>("topic_discovery_time_ms", 1000);
   node->get_parameter<int>("topic_discovery_time_ms", topic_discovery_time_ms);
 
   bool verbose;
