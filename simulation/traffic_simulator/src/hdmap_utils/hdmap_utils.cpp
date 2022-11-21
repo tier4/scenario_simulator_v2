@@ -82,7 +82,7 @@ HdMapUtils::HdMapUtils(
   all_graphs.push_back(pedestrian_routing_graph_ptr_);
 }
 
-const std::vector<std::int64_t> HdMapUtils::getLaneletIds()
+const std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
 {
   std::vector<std::int64_t> ret;
   for (const auto & lanelet : lanelet_map_ptr_->laneletLayer) {
@@ -355,7 +355,7 @@ lanelet::BasicPoint2d HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & po
 
 boost::optional<std::int64_t> HdMapUtils::matchToLane(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  bool include_crosswalk, double reduction_ratio)
+  bool include_crosswalk, double reduction_ratio) const
 {
   boost::optional<std::int64_t> id;
   lanelet::matching::Object2d obj;
@@ -403,7 +403,7 @@ boost::optional<std::int64_t> HdMapUtils::matchToLane(
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, bool include_crosswalk, double matching_distance)
+  geometry_msgs::msg::Pose pose, bool include_crosswalk, double matching_distance) const
 {
   const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
   if (lanelet_ids.empty()) {
@@ -419,7 +419,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance)
+  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance) const
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
   const auto s = spline->getSValue(pose, matching_distance);
@@ -451,7 +451,8 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 }
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, std::vector<std::int64_t> lanelet_ids, double matching_distance)
+  geometry_msgs::msg::Pose pose, std::vector<std::int64_t> lanelet_ids,
+  double matching_distance) const
 {
   for (const auto id : lanelet_ids) {
     const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
@@ -464,7 +465,7 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
 
 boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  bool include_crosswalk, double matching_distance)
+  bool include_crosswalk, double matching_distance) const
 {
   const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
   if (!lanelet_id) {
@@ -489,6 +490,25 @@ boost::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletP
     }
   }
   return toLaneletPose(pose, include_crosswalk);
+}
+
+std::vector<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPoses(
+  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance,
+  bool include_opposite_direction) const
+{
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> ret;
+  traffic_simulator_msgs::msg::EntityType type;
+  type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+  std::vector<int64_t> lanelet_ids = concat(
+    getLeftLaneletIds(lanelet_id, type, include_opposite_direction),
+    getRightLaneletIds(lanelet_id, type, include_opposite_direction));
+  for (const auto & id : lanelet_ids) {
+    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
+    if (lanelet_pose) {
+      ret.emplace_back(lanelet_pose.get());
+    }
+  }
+  return ret;
 }
 
 boost::optional<std::int64_t> HdMapUtils::getClosestLaneletId(
@@ -713,14 +733,14 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
 }
 
 std::shared_ptr<math::geometry::CatmullRomSpline> HdMapUtils::getCenterPointsSpline(
-  std::int64_t lanelet_id)
+  std::int64_t lanelet_id) const
 {
   getCenterPoints(lanelet_id);
   return center_points_cache_.getCenterPointsSpline(lanelet_id);
 }
 
 std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
-  std::vector<std::int64_t> lanelet_ids)
+  std::vector<std::int64_t> lanelet_ids) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
   if (lanelet_ids.empty()) {
@@ -734,7 +754,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
   return ret;
 }
 
-std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t lanelet_id)
+std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t lanelet_id) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
   if (!lanelet_map_ptr_) {
@@ -929,28 +949,37 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getRightBound(std::int64_t la
   return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).rightBound());
 }
 
-auto HdMapUtils::getLeftLaneIds(
-  std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type) const
-  -> std::vector<std::int64_t>
+auto HdMapUtils::getLeftLaneletIds(
+  std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type,
+  bool include_opposite_direction) const -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ret = {};
   switch (type.type) {
     case traffic_simulator_msgs::msg::EntityType::EGO:
-      for (const auto & lanelet :
-           vehicle_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
-        ret.emplace_back(lanelet.id());
+      if (include_opposite_direction) {
+        ret = getLaneletIds(
+          vehicle_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+      } else {
+        ret = getLaneletIds(vehicle_routing_graph_ptr_->adjacentLefts(
+          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
       }
       break;
     case traffic_simulator_msgs::msg::EntityType::VEHICLE:
-      for (const auto & lanelet :
-           vehicle_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
-        ret.emplace_back(lanelet.id());
+      if (include_opposite_direction) {
+        ret = getLaneletIds(
+          vehicle_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+      } else {
+        ret = getLaneletIds(vehicle_routing_graph_ptr_->adjacentLefts(
+          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
       }
       break;
     case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
-      for (const auto & lanelet :
-           pedestrian_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
-        ret.emplace_back(lanelet.id());
+      if (include_opposite_direction) {
+        ret = getLaneletIds(
+          pedestrian_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+      } else {
+        ret = getLaneletIds(pedestrian_routing_graph_ptr_->adjacentLefts(
+          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
       }
       break;
     case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
@@ -959,28 +988,37 @@ auto HdMapUtils::getLeftLaneIds(
   return ret;
 }
 
-auto HdMapUtils::getRightLaneIds(
-  std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type) const
-  -> std::vector<std::int64_t>
+auto HdMapUtils::getRightLaneletIds(
+  std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type,
+  bool include_opposite_direction) const -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ret = {};
   switch (type.type) {
     case traffic_simulator_msgs::msg::EntityType::EGO:
-      for (const auto & lanelet :
-           vehicle_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
-        ret.emplace_back(lanelet.id());
+      if (include_opposite_direction) {
+        ret = getLaneletIds(
+          vehicle_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+      } else {
+        ret = getLaneletIds(vehicle_routing_graph_ptr_->adjacentRights(
+          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
       }
       break;
     case traffic_simulator_msgs::msg::EntityType::VEHICLE:
-      for (const auto & lanelet :
-           vehicle_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
-        ret.emplace_back(lanelet.id());
+      if (include_opposite_direction) {
+        ret = getLaneletIds(
+          vehicle_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+      } else {
+        ret = getLaneletIds(vehicle_routing_graph_ptr_->adjacentRights(
+          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
       }
       break;
     case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
-      for (const auto & lanelet :
-           pedestrian_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id))) {
-        ret.emplace_back(lanelet.id());
+      if (include_opposite_direction) {
+        ret = getLaneletIds(
+          pedestrian_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+      } else {
+        ret = getLaneletIds(pedestrian_routing_graph_ptr_->adjacentRights(
+          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
       }
       break;
     case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
@@ -1766,16 +1804,6 @@ std::vector<lanelet::Lanelet> HdMapUtils::getLanelets(
     lanelets.emplace_back(lanelet_map_ptr_->laneletLayer.get(id));
   }
   return lanelets;
-}
-
-std::vector<std::int64_t> HdMapUtils::getLaneletIds(
-  const std::vector<lanelet::Lanelet> & lanelets) const
-{
-  std::vector<std::int64_t> ids;
-  for (const auto & lanelet : lanelets) {
-    ids.emplace_back(lanelet.id());
-  }
-  return ids;
 }
 
 auto HdMapUtils::isTrafficLight(const LaneletId lanelet_id) const -> bool
