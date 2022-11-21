@@ -42,7 +42,7 @@ int main(int argc, char * argv[])
   node->get_parameter<int>("topic_discovery_time_ms", topic_discovery_time_ms);
 
   bool verbose;
-  node->declare_parameter<bool>("verbose", false);
+  node->declare_parameter<bool>("verbose", true);
   node->get_parameter<bool>("verbose", verbose);
 
   // wait for topic discovery
