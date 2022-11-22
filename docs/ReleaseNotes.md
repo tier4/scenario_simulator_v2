@@ -14,8 +14,9 @@ Bug Fixes:bug:
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
+| Feature                       | Brief summary                         | Category | Pull request                                                    | Contributor                             |
+|-------------------------------|---------------------------------------|----------|-----------------------------------------------------------------|-----------------------------------------|
+| Revert `topic_status_checker` | Delete `topic_status_checker` package | `common` | [#921](https://github.com/tier4/scenario_simulator_v2/pull/921) | [HansRobo](https://github.com/HansRobo) |
 
 
 ## Version 0.6.7
