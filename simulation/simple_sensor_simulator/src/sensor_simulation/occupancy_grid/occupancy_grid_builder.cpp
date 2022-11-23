@@ -90,8 +90,10 @@ auto OccupancyGridBuilder::makeOccupiedArea(const PrimitiveType & primitive) con
   bg::intersection(primitive_ring, grid_ring, intersection_polygon);
 
   auto result = PolygonType();
-  for (auto & p : intersection_polygon.front()) {
-    result.emplace_back(makePoint(p.x(), p.y()));
+  if (not intersection_polygon.empty()) {
+    for (auto & p : intersection_polygon.front()) {
+      result.emplace_back(makePoint(p.x(), p.y()));
+    }
   }
   return result;
 }
@@ -99,6 +101,10 @@ auto OccupancyGridBuilder::makeOccupiedArea(const PrimitiveType & primitive) con
 auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygon) const
   -> PolygonType
 {
+  if (occupied_polygon.empty()) {
+    return {};
+  }
+
   const auto real_width = width * resolution / 2;
   const auto real_height = height * resolution / 2;
 
