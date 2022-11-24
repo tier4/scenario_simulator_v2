@@ -56,11 +56,16 @@ void MiscObjectEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::B
 auto MiscObjectEntity::getDefaultDynamicConstraints() const
   -> const traffic_simulator_msgs::msg::DynamicConstraints &
 {
-  static auto default_dynamic_constraints = traffic_simulator_msgs::msg::DynamicConstraints();
-  default_dynamic_constraints.max_acceleration = 0.0;
-  default_dynamic_constraints.max_acceleration_rate = 0.0;
-  default_dynamic_constraints.max_deceleration = 0.0;
-  default_dynamic_constraints.max_deceleration_rate = 0.0;
+  static const auto default_dynamic_constraints = []() {
+    auto dynamic_constraints = traffic_simulator_msgs::msg::DynamicConstraints();
+    dynamic_constraints.max_speed = 0.0;
+    dynamic_constraints.max_acceleration = 0.0;
+    dynamic_constraints.max_acceleration_rate = 0.0;
+    dynamic_constraints.max_deceleration = 0.0;
+    dynamic_constraints.max_deceleration_rate = 0.0;
+    return dynamic_constraints;
+  }();
+
   return default_dynamic_constraints;
 }
 
