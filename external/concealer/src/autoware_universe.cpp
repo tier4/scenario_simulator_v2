@@ -284,9 +284,9 @@ namespace autoware_adapi_v1_msgs::msg
 {
 auto operator<<(std::ostream & out, const MrmState & message) -> std::ostream &
 {
-#define CASE(IDENTIFIER)           \
+#define CASE(IDENTIFIER)     \
   case MrmState::IDENTIFIER: \
-    out << #IDENTIFIER;            \
+    out << #IDENTIFIER;      \
     break
 
   switch (message.state) {
@@ -297,8 +297,7 @@ auto operator<<(std::ostream & out, const MrmState & message) -> std::ostream &
     CASE(UNKNOWN);
 
     default:
-      throw common::Error(
-        "Unsupported MrmState, state number : ", static_cast<int>(message.state));
+      throw common::Error("Unsupported MrmState, state number : ", static_cast<int>(message.state));
   }
 
 #undef CASE
@@ -311,8 +310,7 @@ auto operator>>(std::istream & is, MrmState & message) -> std::istream &
 #define STATE(IDENTIFIER) {#IDENTIFIER, MrmState::IDENTIFIER}
 
   std::unordered_map<std::string, std::uint8_t> state_dictionary{
-    STATE(MRM_FAILED), STATE(MRM_OPERATING),       STATE(MRM_SUCCEEDED),
-    STATE(NORMAL),     STATE(UNKNOWN),
+    STATE(MRM_FAILED), STATE(MRM_OPERATING), STATE(MRM_SUCCEEDED), STATE(NORMAL), STATE(UNKNOWN),
   };
 
 #undef STATE
@@ -328,7 +326,7 @@ auto operator>>(std::istream & is, MrmState & message) -> std::istream &
 
   return is;
 }
-}  // namespace autoware_auto_system_msgs::msg
+}  // namespace autoware_adapi_v1_msgs::msg
 
 namespace autoware_auto_vehicle_msgs::msg
 {
