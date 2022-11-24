@@ -83,8 +83,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
       std::make_pair(
         "currentEmergencyState",
         [result]() {
-          return make<String>(
-            boost::lexical_cast<String>(asAutoware(result.str(1)).getEmergencyState()));
+          return make<String>(boost::lexical_cast<String>(asAutoware(result.str(1)).getMrmState()));
         }),
       std::make_pair(
         "currentTurnIndicatorsState",
