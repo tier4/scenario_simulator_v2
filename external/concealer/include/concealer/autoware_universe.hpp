@@ -74,7 +74,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
-  using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
+  using MrmState = autoware_adapi_v1_msgs::msg::MrmState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
@@ -83,7 +83,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
   CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
-  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
+  CONCEALER_DEFINE_SUBSCRIPTION(MrmState, override);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
@@ -144,7 +144,7 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
     CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
-    CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
+    CONCEALER_INIT_SUBSCRIPTION(MrmState, "/system/fail_safe/mrm_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
@@ -204,12 +204,13 @@ public:
 }  // namespace concealer
 
 // for boost::lexical_cast
-namespace autoware_auto_system_msgs::msg
+namespace autoware_adapi_v1_msgs::msg
 {
-auto operator<<(std::ostream &, const EmergencyState &) -> std::ostream &;
+// DIRTY HACK!!!  these stream operators ignore MrmState::behavior
+auto operator<<(std::ostream &, const MrmState &) -> std::ostream &;
 
-auto operator>>(std::istream &, EmergencyState &) -> std::istream &;
-}  // namespace autoware_auto_system_msgs::msg
+auto operator>>(std::istream &, MrmState &) -> std::istream &;
+}  // namespace autoware_adapi_v1_msgs::msg
 
 namespace autoware_auto_vehicle_msgs::msg
 {

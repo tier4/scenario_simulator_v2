@@ -280,12 +280,12 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 }
 }  // namespace concealer
 
-namespace autoware_auto_system_msgs::msg
+namespace autoware_adapi_v1_msgs::msg
 {
-auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostream &
+auto operator<<(std::ostream & out, const MrmState & message) -> std::ostream &
 {
 #define CASE(IDENTIFIER)           \
-  case EmergencyState::IDENTIFIER: \
+  case MrmState::IDENTIFIER: \
     out << #IDENTIFIER;            \
     break
 
@@ -294,11 +294,11 @@ auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostr
     CASE(MRM_OPERATING);
     CASE(MRM_SUCCEEDED);
     CASE(NORMAL);
-    CASE(OVERRIDE_REQUESTING);
+    CASE(UNKNOWN);
 
     default:
       throw common::Error(
-        "Unsupported EmergencyState, state number : ", static_cast<int>(message.state));
+        "Unsupported MrmState, state number : ", static_cast<int>(message.state));
   }
 
 #undef CASE
@@ -306,13 +306,13 @@ auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostr
   return out;
 }
 
-auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
+auto operator>>(std::istream & is, MrmState & message) -> std::istream &
 {
-#define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
+#define STATE(IDENTIFIER) {#IDENTIFIER, MrmState::IDENTIFIER}
 
   std::unordered_map<std::string, std::uint8_t> state_dictionary{
     STATE(MRM_FAILED), STATE(MRM_OPERATING),       STATE(MRM_SUCCEEDED),
-    STATE(NORMAL),     STATE(OVERRIDE_REQUESTING),
+    STATE(NORMAL),     STATE(UNKNOWN),
   };
 
 #undef STATE
@@ -323,7 +323,7 @@ auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
   if (auto iter = state_dictionary.find(state_string); iter != state_dictionary.end()) {
     message.set__state(iter->second);
   } else {
-    throw common::Error("Unsupported EmergencyState::state : ", state_string.c_str());
+    throw common::Error("Unsupported MrmState::state : ", state_string.c_str());
   }
 
   return is;
