@@ -52,7 +52,8 @@ public:
     std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
     double max_distance = 100, double min_distance = 0);
   const std::vector<std::string> & getDetectedObject() const;
-  void setDirection(const simulation_api_schema::LidarConfiguration & configuration,
+  void setDirection(
+    const simulation_api_schema::LidarConfiguration & configuration,
     double horizontal_angle_start = 0, double horizontal_angle_end = 2 * M_PI);
 
 private:
@@ -77,8 +78,8 @@ private:
     int thread_id, int thread_count, RTCScene scene,
     pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud, RTCIntersectContext context,
     geometry_msgs::msg::Pose origin,
-    std::reference_wrapper<std::set<unsigned int>> ref_thread_detected_ids,
-    double max_distance, double min_distance,
+    std::reference_wrapper<std::set<unsigned int>> ref_thread_detected_ids, double max_distance,
+    double min_distance,
     std::reference_wrapper<const std::vector<Eigen::Matrix3d>> ref_rotation_matrices)
   {
     auto & rotation_matrices = ref_rotation_matrices.get();

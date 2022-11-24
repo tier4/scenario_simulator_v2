@@ -47,18 +47,20 @@ Raycaster::~Raycaster()
   rtcReleaseDevice(device_);
 }
 
-void Raycaster::setDirection(const simulation_api_schema::LidarConfiguration & configuration, double
-  horizontal_angle_start, double horizontal_angle_end){
-
+void Raycaster::setDirection(
+  const simulation_api_schema::LidarConfiguration & configuration, double horizontal_angle_start,
+  double horizontal_angle_end)
+{
   std::vector<double> vertical_angles;
   for (const auto v : configuration.vertical_angles()) {
     vertical_angles.emplace_back(v);
   }
 
   auto quat_directions = getDirections(
-  vertical_angles, horizontal_angle_start, horizontal_angle_end, configuration.horizontal_resolution());
+    vertical_angles, horizontal_angle_start, horizontal_angle_end,
+    configuration.horizontal_resolution());
   rotation_matrices_.clear();
-  for(const auto & q : quat_directions){
+  for (const auto & q : quat_directions) {
     rotation_matrices_.push_back(quaternion_operation::getRotationMatrix(q));
   }
 }
@@ -122,8 +124,7 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     thread_cloud[i] = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>());
     threads[i] = std::thread(
       intersect, i, thread_count, scene_, thread_cloud[i], context, origin,
-      std::ref(thread_detected_ids[i]), max_distance, min_distance,
-      std::ref(rotation_matrices_));
+      std::ref(thread_detected_ids[i]), max_distance, min_distance, std::ref(rotation_matrices_));
   }
   for (unsigned int i = 0; i < threads.size(); ++i) {
     threads[i].join();
