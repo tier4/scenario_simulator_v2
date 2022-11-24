@@ -357,7 +357,9 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
          */
         [this, target_speed](double) {
           /**
-           * @brief Hard coded parameter, 0.01 is a hard corded tolerance for checking reached target speed.
+           * @brief A value of 0.01 is the allowable range for determination of
+           * target speed attainment. This value was determined heuristically
+           * rather than for technical reasons.
            */
           return std::abs(getCurrentTwist().linear.x - target_speed) < 0.01;
         },
@@ -430,8 +432,8 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           return false;
         },
         /**
-           * @brief Resets acceleration limit.
-           */
+         * @brief Resets acceleration limit.
+         */
         [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
       requestSpeedChange(target_speed, continuous);
       break;

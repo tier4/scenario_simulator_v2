@@ -102,7 +102,9 @@ auto LongitudinalSpeedPlanner::getRunningDistance(
   double current_linear_jerk) const -> double
 {
   /**
-   * @brief Hard coded parameter, 0.01 is a tolerance for checking reached target speed.
+   * @brief A value of 0.01 is the allowable range for determination of target
+   * speed attainment. This value was determined heuristically rather than for
+   * technical reasons.
    */
   constexpr double twist_tolerance = 0.01;
   if (isTargetSpeedReached(target_speed, current_twist, twist_tolerance)) {
