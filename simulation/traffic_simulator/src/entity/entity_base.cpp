@@ -233,16 +233,16 @@ auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; 
 
 void EntityBase::onUpdate(double /*current_time*/, double step_time)
 {
-  job_list_.update(step_time);
+  job_list_.update(step_time, job::Event::PRE_UPDATE);
   status_before_update_ = status_;
   speed_planner_ =
     std::make_unique<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>(
       step_time, name);
 }
 
-virtual void onPostUpdate(double /*current_time*/, double step_time)
+void EntityBase::onPostUpdate(double /*current_time*/, double step_time)
 {
-  job_list_.update(step_time);
+  job_list_.update(step_time, job::Event::POST_UPDATE);
 }
 
 void EntityBase::resetDynamicConstraints()

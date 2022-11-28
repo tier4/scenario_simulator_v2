@@ -159,6 +159,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   } else {
     updateEntityStatusTimestamp(current_time);
   }
+  EntityBase::onPostUpdate(current_time, step_time);
 }
 
 void VehicleEntity::requestAcquirePosition(

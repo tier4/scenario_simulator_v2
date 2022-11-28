@@ -27,8 +27,9 @@ class JobList
 public:
   void append(
     const std::function<bool(const double)> & func_on_update,
-    const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive);
-  void update(const double step_time);
+    const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive,
+    const job::Event event = Event::POST_UPDATE);
+  void update(const double step_time, const job::Event event);
 
 private:
   std::vector<Job> list_;
