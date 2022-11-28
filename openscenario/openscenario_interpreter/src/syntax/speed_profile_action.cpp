@@ -91,7 +91,7 @@ auto SpeedProfileAction::endsImmediately() const -> bool { return false; }
 
 auto SpeedProfileAction::run() -> void
 {
-  auto compare = [this](const auto & actor, const auto & speed_profile_entry) {
+  auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
     if (entity_ref.empty()) {
       return equal_to<double>()(evaluateSpeed(actor), speed_profile_entry.speed);
     } else {
@@ -102,7 +102,7 @@ auto SpeedProfileAction::run() -> void
 
   for (auto && [actor, iter] : accomplishments) {
     if (
-      iter != std::end(speed_profile_entry) and compare(actor, *iter) and
+      iter != std::end(speed_profile_entry) and accomplished(actor, *iter) and
       ++iter != std::end(speed_profile_entry)) {
       apply(actor, *iter);
     }
