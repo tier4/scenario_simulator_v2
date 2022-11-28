@@ -500,11 +500,12 @@ std::vector<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPoses
   traffic_simulator_msgs::msg::EntityType type;
   type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
   std::vector<int64_t> lanelet_ids = concat(
-    getLeftLaneletIds(lanelet_id, type, include_opposite_direction),
-    getRightLaneletIds(lanelet_id, type, include_opposite_direction));
+    {lanelet_id}, concat(
+                    getLeftLaneletIds(lanelet_id, type, include_opposite_direction),
+                    getRightLaneletIds(lanelet_id, type, include_opposite_direction)));
   for (const auto & id : lanelet_ids) {
-    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
-    if (lanelet_pose) {
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("candiate"), static_cast<int>(id));
+    if (const auto lanelet_pose = toLaneletPose(pose, id, matching_distance)) {
       ret.emplace_back(lanelet_pose.get());
     }
   }
@@ -1192,7 +1193,8 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::toMapPoints(
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
-  std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat)
+  std::int64_t lanelet_id, double s, double offset,
+  const geometry_msgs::msg::Quaternion & quat) const
 {
   geometry_msgs::msg::PoseStamped ret;
   ret.header.frame_id = "map";
@@ -1211,7 +1213,7 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
-  traffic_simulator_msgs::msg::LaneletPose lanelet_pose)
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
 {
   return toMapPose(
     lanelet_pose.lanelet_id, lanelet_pose.s, lanelet_pose.offset,
@@ -1219,7 +1221,7 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
-  std::int64_t lanelet_id, double s, double offset)
+  std::int64_t lanelet_id, double s, double offset) const
 {
   traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
