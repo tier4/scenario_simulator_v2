@@ -534,6 +534,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
     return;
   }
   if (continuous) {
+    target_speed_ = target_speed;
     job_list_.append(
       /**
        * @brief If the target entity reaches the target speed, return true.
@@ -547,6 +548,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
        */
       [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Event::POST_UPDATE);
   } else {
+    target_speed_ = target_speed;
     job_list_.append(
       /**
        * @brief If the target entity reaches the target speed, return true.

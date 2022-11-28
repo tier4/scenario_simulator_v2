@@ -40,7 +40,6 @@ public:
 private:
   void onUpdate() override
   {
-    std::cout << api_.getCurrentTime() << "," << api_.getCurrentTwist("ego").linear.x << std::endl;
     if (api_.getCurrentTime() >= 5 && api_.metricExists("ego_out_of_range")) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
