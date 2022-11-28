@@ -24,7 +24,7 @@ void JobList::append(
   job::Type type, bool exclusive, const job::Event event)
 {
   for (auto & job : list_) {
-    if (job.type == type && job.exclusive == exclusive) {
+    if (job.type == type && job.exclusive == exclusive && job.getStatus() == job::Status::ACTIVE) {
       job.inactivate();
     }
   }

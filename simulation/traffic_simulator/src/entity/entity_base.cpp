@@ -259,6 +259,7 @@ void EntityBase::onPostUpdate(double /*current_time*/, double step_time)
 void EntityBase::resetDynamicConstraints()
 {
   std::cout << "RESET!!! " << getStatus().name << std::endl;
+  RCLCPP_ERROR_STREAM(rclcpp::get_logger("RESET!!!"), getStatus().name);
   setDynamicConstraints(getDefaultDynamicConstraints());
 }
 
@@ -323,6 +324,9 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
       break;
     }
     case speed_change::Transition::AUTO: {
+      RCLCPP_WARN_STREAM(
+        rclcpp::get_logger("requestSpeedChangeWithConstantAcceleration"),
+        __FILE__ << "," << __LINE__);
       if (speed_planner_->isAccelerating(target_speed, getCurrentTwist())) {
         setAccelerationLimit(std::abs(acceleration));
         job_list_.append(

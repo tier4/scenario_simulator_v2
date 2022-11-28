@@ -506,7 +506,7 @@ void EntityManager::update(const double current_time, const double step_time)
     "EntityManager::update", configuration.verbose);
   step_time_ = step_time;
   current_time_ = current_time;
-  setVerbose(configuration.verbose);
+  setVerbose(true);
   if (npc_logic_started_) {
     traffic_light_manager_ptr_->update(step_time_);
   }

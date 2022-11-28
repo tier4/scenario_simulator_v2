@@ -37,6 +37,8 @@ void Job::inactivate()
   func_on_cleanup_();
 }
 
+Status Job::getStatus() const { return status_; }
+
 void Job::onUpdate(const double step_time)
 {
   switch (status_) {

@@ -54,21 +54,25 @@ auto SpeedProfileAction::apply(
     }
   };
 
+  /*
   std::cout << "BEFORE APPLY PROFILE!!!" << std::endl;
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_speed);
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_acceleration);
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_acceleration_rate);
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_deceleration);
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_deceleration_rate);
+*/
 
   applyProfileAction(actor, dynamic_constraints);
 
+  /*
   std::cout << "AFTER APPLY PROFILE!!!" << std::endl;
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_speed);
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_acceleration);
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_acceleration_rate);
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_deceleration);
   PRINT(getBehaviorParameter(actor).dynamic_constraints.max_deceleration_rate);
+*/
 
   if (entity_ref.empty()) {
     applySpeedAction(
@@ -161,6 +165,7 @@ auto SpeedProfileAction::run() -> void
     previous.at(actor).acceleration = current_acceleration;
     previous.at(actor).acceleration_rate = current_acceleration_rate;
 
+    /*
     // clang-format off
     std::cout << "actor " << std::quoted(actor) << "\n"
               << "  speed_profile_entry[" << std::distance(std::begin(speed_profile_entry), iter) << "/" << speed_profile_entry.size() - 1 << "]\n"
@@ -176,6 +181,7 @@ auto SpeedProfileAction::run() -> void
               << "                        .max_deceleration_rate = " << getBehaviorParameter(actor).dynamic_constraints.max_deceleration_rate << "\n"
               << std::flush;
     // clang-format on
+*/
   }
 }
 
