@@ -44,36 +44,32 @@ auto SpeedProfileAction::apply(
   };
 
   auto constraint = [&]() {
-    if (std::isnan(speed_profile_entry.time)) {
+    if (std::isnan(speed_profile_entry.time) or following_mode.value == FollowingMode::position) {
       return traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
         traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
     } else {
-      // TODO
-      // return traffic_simulator::speed_change::Constraint(
-      //   traffic_simulator::speed_change::Constraint::Type::TIME, speed_profile_entry.time);
       return traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
-        traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
+        traffic_simulator::speed_change::Constraint::Type::TIME, speed_profile_entry.time);
     }
   };
 
+  applyProfileAction(actor, dynamic_constraints);
+
   if (entity_ref.empty()) {
-    applySpeedProfileAction(
+    applySpeedAction(
       actor,
-      dynamic_constraints,      //
       absolute_target_speed(),  //
-      traffic_simulator::speed_change::Transition::LINEAR,
+      traffic_simulator::speed_change::Transition::AUTO,
       constraint(),  //
-      true);
+      std::isnan(speed_profile_entry.time));
   } else {
-    applySpeedProfileAction(
+    applySpeedAction(
       actor,
-      dynamic_constraints,      //
       relative_target_speed(),  //
-      traffic_simulator::speed_change::Transition::LINEAR,
+      traffic_simulator::speed_change::Transition::AUTO,
       constraint(),  //
-      true);
+      std::isnan(speed_profile_entry.time));
   }
 }
 
