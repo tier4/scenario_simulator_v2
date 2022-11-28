@@ -54,7 +54,21 @@ auto SpeedProfileAction::apply(
     }
   };
 
+  std::cout << "BEFORE APPLY PROFILE!!!" << std::endl;
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_speed);
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_acceleration);
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_acceleration_rate);
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_deceleration);
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_deceleration_rate);
+
   applyProfileAction(actor, dynamic_constraints);
+
+  std::cout << "AFTER APPLY PROFILE!!!" << std::endl;
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_speed);
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_acceleration);
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_acceleration_rate);
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_deceleration);
+  PRINT(getBehaviorParameter(actor).dynamic_constraints.max_deceleration_rate);
 
   if (entity_ref.empty()) {
     applySpeedAction(
@@ -115,11 +129,51 @@ auto SpeedProfileAction::run() -> void
       }
     };
 
+    auto time = [&]() -> double {
+      if (iter == std::end(speed_profile_entry)) {
+        return Double::nan();
+      } else {
+        return iter->time;
+      }
+    };
+
+    auto previous_time = previous.at(actor).time;
+    auto previous_speed = previous.at(actor).speed;
+    auto previous_acceleration = previous.at(actor).acceleration;
+    auto previous_acceleration_rate = previous.at(actor).acceleration_rate;
+    // PRINT(previous_time);
+    // PRINT(previous_speed);
+    // PRINT(previous_acceleration);
+    // PRINT(previous_acceleration_rate);
+
+    auto current_time = evaluateSimulationTime();
+    auto current_speed = evaluateSpeed(actor);
+    auto current_acceleration = (current_speed - previous_speed) / (current_time - previous_time);
+    auto current_acceleration_rate =
+      (current_acceleration - previous_acceleration) / (current_time - previous_time);
+    // PRINT(current_time);
+    // PRINT(current_speed);
+    // PRINT(current_acceleration);
+    // PRINT(current_acceleration_rate);
+
+    previous.at(actor).time = current_time;
+    previous.at(actor).speed = current_speed;
+    previous.at(actor).acceleration = current_acceleration;
+    previous.at(actor).acceleration_rate = current_acceleration_rate;
+
     // clang-format off
     std::cout << "actor " << std::quoted(actor) << "\n"
-              << "  current speed = " << evaluateSpeed(actor) << "\n"
+              << "  speed_profile_entry[" << std::distance(std::begin(speed_profile_entry), iter) << "/" << speed_profile_entry.size() - 1 << "]\n"
+              << "  current speed = " << current_speed << "\n"
+              << "  current acceleration = " << current_acceleration << "\n"
+              << "  current acceleration rate = " << current_acceleration_rate << "\n"
               << "  target speed = " << target_speed() << "\n"
-              << "  entry = " << std::distance(std::begin(speed_profile_entry), iter) << "/" << speed_profile_entry.size() << "\n"
+              << "  time = " << time() << "\n"
+              << "  getBehaviorParameter().max_speed             = " << getBehaviorParameter(actor).dynamic_constraints.max_speed             << "\n"
+              << "                        .max_acceleration      = " << getBehaviorParameter(actor).dynamic_constraints.max_acceleration      << "\n"
+              << "                        .max_acceleration_rate = " << getBehaviorParameter(actor).dynamic_constraints.max_acceleration_rate << "\n"
+              << "                        .max_deceleration      = " << getBehaviorParameter(actor).dynamic_constraints.max_deceleration      << "\n"
+              << "                        .max_deceleration_rate = " << getBehaviorParameter(actor).dynamic_constraints.max_deceleration_rate << "\n"
               << std::flush;
     // clang-format on
   }
@@ -129,10 +183,13 @@ auto SpeedProfileAction::start() -> void
 {
   accomplishments.clear();
 
+  previous.clear();
+
   assert(not speed_profile_entry.empty());
 
   for (const auto & actor : actors) {
     accomplishments.emplace(actor, std::begin(speed_profile_entry));
+    previous.emplace(actor, dynamics());
     apply(actor, *accomplishments[actor]);
   }
 }
