@@ -46,9 +46,6 @@ EntityBase::EntityBase(
       status_.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
     }
   }
-
-  RCLCPP_WARN_STREAM(
-    rclcpp::get_logger("spawn:" + name), rosidl_generator_traits::to_yaml(status_.lanelet_pose));
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -607,6 +604,16 @@ auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   new_status.action_status.current_action = getCurrentAction();
 
   status_ = new_status;
+
+  if (entity_status.lanelet_pose_valid) {
+    if (const auto lanelet_pose = clampLaneletPose(entity_status.lanelet_pose)) {
+      status_.lanelet_pose_valid = true;
+      status_.lanelet_pose = lanelet_pose.get();
+    } else {
+      status_.lanelet_pose_valid = false;
+      status_.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    }
+  }
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
