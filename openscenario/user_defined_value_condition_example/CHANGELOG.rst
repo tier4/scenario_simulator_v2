@@ -2,6 +2,16 @@
 Changelog for package user_defined_value_condition_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.7 (2022-11-17)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge remote-tracking branch 'origin/fix/ci_error' into feature/start_npc_logic_api
+* Merge branch 'master' into feature/occupancy_grid_docs
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Shota Minami, yamacir-kit
+
 0.6.6 (2022-08-30)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
