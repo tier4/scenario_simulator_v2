@@ -37,6 +37,16 @@ EntityBase::EntityBase(
   npc_logic_started_(false)
 {
   setHdMapUtils(hdmap_utils_ptr);
+  if (entity_status.lanelet_pose_valid) {
+    if (const auto lanelet_pose = clampLaneletPose(entity_status.lanelet_pose)) {
+      status_.lanelet_pose_valid = true;
+      status_.lanelet_pose = lanelet_pose.get();
+    } else {
+      status_.lanelet_pose_valid = false;
+      status_.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    }
+  }
+
   RCLCPP_WARN_STREAM(
     rclcpp::get_logger("spawn:" + name), rosidl_generator_traits::to_yaml(status_.lanelet_pose));
 }
@@ -52,6 +62,12 @@ auto EntityBase::asAutoware() const -> concealer::Autoware &
 }
 
 void EntityBase::cancelRequest() {}
+
+auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
+  const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  return hdmap_utils_ptr_->clampLaneletPose(lanelet_pose);
+}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {

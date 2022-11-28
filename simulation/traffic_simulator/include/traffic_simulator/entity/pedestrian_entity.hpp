@@ -132,12 +132,7 @@ public:
   const std::string plugin_name;
 
 protected:
-  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
-  {
-    EntityBase::setHdMapUtils(ptr);
-    route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
-    behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
-  }
+  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;

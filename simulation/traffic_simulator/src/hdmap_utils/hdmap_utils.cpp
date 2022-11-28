@@ -82,6 +82,44 @@ HdMapUtils::HdMapUtils(
   all_graphs.push_back(pedestrian_routing_graph_ptr_);
 }
 
+auto HdMapUtils::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
+  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  if (0 <= lanelet_pose.s && lanelet_pose.s <= getLaneletLength(lanelet_pose.lanelet_id)) {
+    return lanelet_pose;
+  }
+  double rest_s = lanelet_pose.s;
+  std::int64_t lanelet_id = lanelet_pose.lanelet_id;
+  if (lanelet_pose.s < 0) {
+    while (rest_s < 0) {
+      const auto ids = getPreviousLaneletIds(lanelet_id);
+      if (ids.empty()) {
+        return boost::none;
+      }
+      rest_s = rest_s + getLaneletLength(ids[0]);
+      lanelet_id = ids[0];
+    }
+    traffic_simulator_msgs::msg::LaneletPose ret;
+    ret.lanelet_id = lanelet_id;
+    ret.s = rest_s;
+    return ret;
+  } else {
+    while (rest_s > getLaneletLength(lanelet_pose.lanelet_id)) {
+      const auto ids = getNextLaneletIds(lanelet_id);
+      if (ids.empty()) {
+        return boost::none;
+      }
+      rest_s = rest_s - getLaneletLength(ids[0]);
+      lanelet_id = ids[0];
+    }
+    traffic_simulator_msgs::msg::LaneletPose ret;
+    ret.lanelet_id = lanelet_id;
+    ret.s = rest_s;
+    return ret;
+  }
+  return boost::none;
+}
+
 const std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
 {
   std::vector<std::int64_t> ret;
