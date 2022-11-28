@@ -37,15 +37,7 @@ EntityBase::EntityBase(
   npc_logic_started_(false)
 {
   setHdMapUtils(hdmap_utils_ptr);
-  if (entity_status.lanelet_pose_valid) {
-    if (const auto lanelet_pose = clampLaneletPose(entity_status.lanelet_pose)) {
-      status_.lanelet_pose_valid = true;
-      status_.lanelet_pose = lanelet_pose.get();
-    } else {
-      status_.lanelet_pose_valid = false;
-      status_.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-    }
-  }
+  clampLaneletPose(status_);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -64,6 +56,19 @@ auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose
   const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   return hdmap_utils_ptr_->clampLaneletPose(lanelet_pose);
+}
+
+auto EntityBase::clampLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+{
+  if (status.lanelet_pose_valid) {
+    if (const auto lanelet_pose = clampLaneletPose(status.lanelet_pose)) {
+      status.lanelet_pose_valid = true;
+      status.lanelet_pose = lanelet_pose.get();
+    } else {
+      status.lanelet_pose_valid = false;
+      status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    }
+  }
 }
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
@@ -604,16 +609,7 @@ auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   new_status.action_status.current_action = getCurrentAction();
 
   status_ = new_status;
-
-  if (entity_status.lanelet_pose_valid) {
-    if (const auto lanelet_pose = clampLaneletPose(entity_status.lanelet_pose)) {
-      status_.lanelet_pose_valid = true;
-      status_.lanelet_pose = lanelet_pose.get();
-    } else {
-      status_.lanelet_pose_valid = false;
-      status_.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-    }
-  }
+  clampLaneletPose(status_);
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void

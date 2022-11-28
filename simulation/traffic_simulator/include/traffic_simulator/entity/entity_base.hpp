@@ -60,6 +60,8 @@ public:
   /*   */ auto clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
     -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
+  /*   */ auto clampLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
+
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 
   virtual auto getCurrentAction() const -> std::string = 0;
