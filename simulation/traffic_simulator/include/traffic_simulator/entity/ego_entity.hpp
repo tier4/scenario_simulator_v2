@@ -78,6 +78,7 @@ public:
 
   explicit EgoEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
     const double step_time);
 

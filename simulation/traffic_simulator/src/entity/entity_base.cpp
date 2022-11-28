@@ -28,13 +28,17 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
   status_(entity_status),
   status_before_update_(status_),
   npc_logic_started_(false)
 {
+  setHdMapUtils(hdmap_utils_ptr);
+  RCLCPP_WARN_STREAM(
+    rclcpp::get_logger("spawn:" + name), rosidl_generator_traits::to_yaml(status_.lanelet_pose));
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}

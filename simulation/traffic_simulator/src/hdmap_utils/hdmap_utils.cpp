@@ -503,8 +503,9 @@ std::vector<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPoses
     {lanelet_id}, concat(
                     getLeftLaneletIds(lanelet_id, type, include_opposite_direction),
                     getRightLaneletIds(lanelet_id, type, include_opposite_direction)));
+  lanelet_ids = sortAndUnique(concat(
+    lanelet_ids, concat(getPreviousLaneletIds(lanelet_ids), getNextLaneletIds(lanelet_ids))));
   for (const auto & id : lanelet_ids) {
-    RCLCPP_WARN_STREAM(rclcpp::get_logger("candiate"), static_cast<int>(id));
     if (const auto lanelet_pose = toLaneletPose(pose, id, matching_distance)) {
       ret.emplace_back(lanelet_pose.get());
     }
@@ -815,7 +816,18 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet
 }
 
 std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(
-  std::int64_t lanelet_id, std::string turn_direction)
+  const std::vector<std::int64_t> & lanelet_ids) const
+{
+  std::vector<std::int64_t> ret;
+  for (const auto & id : lanelet_ids) {
+    ret = concat(ret, getNextLaneletIds(id));
+  }
+  sortAndUnique(ret);
+  return ret;
+}
+
+std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(
+  std::int64_t lanelet_id, const std::string & turn_direction) const
 {
   std::vector<std::int64_t> ret;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -826,6 +838,17 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(
       ret.push_back(llt.id());
     }
   }
+  return ret;
+}
+
+std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(
+  const std::vector<std::int64_t> & lanelet_ids, const std::string & turn_direction) const
+{
+  std::vector<std::int64_t> ret;
+  for (const auto & id : lanelet_ids) {
+    ret = concat(ret, getNextLaneletIds(id, turn_direction));
+  }
+  sortAndUnique(ret);
   return ret;
 }
 
@@ -841,7 +864,18 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(std::int64_t lanelet_id)
 }
 
 std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
-  std::int64_t lanelet_id, std::string turn_direction)
+  const std::vector<std::int64_t> & lanelet_ids) const
+{
+  std::vector<std::int64_t> ret;
+  for (const auto & id : lanelet_ids) {
+    ret = concat(ret, getNextLaneletIds(id));
+  }
+  sortAndUnique(ret);
+  return ret;
+}
+
+std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
+  std::int64_t lanelet_id, const std::string & turn_direction) const
 {
   std::vector<std::int64_t> ret;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -851,6 +885,16 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
     if (turn_direction_llt == turn_direction) {
       ret.push_back(llt.id());
     }
+  }
+  return ret;
+}
+
+std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
+  const std::vector<std::int64_t> & lanelet_ids, const std::string & turn_direction) const
+{
+  std::vector<std::int64_t> ret;
+  for (const auto & id : lanelet_ids) {
+    ret = concat(ret, getNextLaneletIds(id, turn_direction));
   }
   return ret;
 }

@@ -96,11 +96,19 @@ public:
   geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset) const;
   double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
   const std::vector<std::int64_t> getLaneletIds() const;
-  std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
+  std::vector<std::int64_t> getNextLaneletIds(
+    std::int64_t lanelet_id, const std::string & turn_direction) const;
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
+  std::vector<std::int64_t> getNextLaneletIds(
+    const std::vector<std::int64_t> & lanelet_id, const std::string & turn_direction) const;
+  std::vector<std::int64_t> getNextLaneletIds(const std::vector<std::int64_t> & lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(
-    std::int64_t lanelet_id, std::string turn_direction);
+    std::int64_t lanelet_id, const std::string & turn_direction) const;
   std::vector<std::int64_t> getPreviousLaneletIds(std::int64_t lanelet_id) const;
+  std::vector<std::int64_t> getPreviousLaneletIds(
+    const std::vector<std::int64_t> & lanelet_ids, const std::string & turn_direction) const;
+  std::vector<std::int64_t> getPreviousLaneletIds(
+    const std::vector<std::int64_t> & lanelet_ids) const;
   boost::optional<int64_t> getLaneChangeableLaneletId(
     std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction);
   boost::optional<int64_t> getLaneChangeableLaneletId(
@@ -225,6 +233,14 @@ private:
   {
     std::vector<T> ret = v0;
     ret.insert(ret.end(), v1.begin(), v1.end());
+    return ret;
+  }
+  template <typename T>
+  std::vector<T> sortAndUnique(const std::vector<T> & data) const
+  {
+    std::vector<T> ret = data;
+    std::sort(ret.begin(), ret.end());
+    ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
     return ret;
   }
   std::vector<lanelet::AutowareTrafficLightConstPtr> getTrafficLights(

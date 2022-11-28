@@ -45,7 +45,9 @@ namespace entity
 class EntityBase
 {
 public:
-  explicit EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &);
+  explicit EntityBase(
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   virtual ~EntityBase() = default;
 
@@ -151,8 +153,6 @@ public:
   /*   */ void setEntityTypeList(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);
 
-  virtual void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
-
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &);
 
@@ -178,6 +178,8 @@ public:
   bool verbose;
 
 protected:
+  virtual void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+
   traffic_simulator_msgs::msg::EntityStatus status_;
 
   traffic_simulator_msgs::msg::EntityStatus status_before_update_;

@@ -27,6 +27,7 @@ class MiscObjectEntity : public EntityBase
 public:
   explicit MiscObjectEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
   void onUpdate(double, double) override;

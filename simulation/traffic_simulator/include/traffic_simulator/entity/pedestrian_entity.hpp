@@ -52,6 +52,7 @@ public:
 
   explicit PedestrianEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::PedestrianParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 
@@ -75,13 +76,6 @@ public:
   void requestWalkStraight() override;
 
   void cancelRequest() override;
-
-  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
-  {
-    EntityBase::setHdMapUtils(ptr);
-    route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
-    behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
-  }
 
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr) override
@@ -136,6 +130,14 @@ public:
   };
 
   const std::string plugin_name;
+
+protected:
+  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
+  {
+    EntityBase::setHdMapUtils(ptr);
+    route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
+    behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
+  }
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;

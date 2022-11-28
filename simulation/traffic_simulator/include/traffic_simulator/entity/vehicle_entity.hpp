@@ -55,6 +55,7 @@ public:
 
   explicit VehicleEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 
@@ -98,10 +99,11 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
-  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &) override;
-
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
+
+protected:
+  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &) override;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;

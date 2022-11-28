@@ -211,6 +211,7 @@ auto EntityManager::getLongitudinalDistance(
       }
     }
   }
+  RCLCPP_WARN_STREAM(rclcpp::get_logger("to_pose"), rosidl_generator_traits::to_yaml(to));
   if (distances.empty()) {
     RCLCPP_ERROR_STREAM(
       rclcpp::get_logger("getLongitudinalDistance"),
@@ -252,6 +253,7 @@ auto EntityManager::getLongitudinalDistance(
   const std::string & from, const std::string & to, bool include_adjacent_lanelet,
   bool include_opposite_direction) -> boost::optional<double>
 {
+  RCLCPP_WARN_STREAM(rclcpp::get_logger("getLongitudinalDistance"), from << "," << to);
   if (laneMatchingSucceed(from) and laneMatchingSucceed(to)) {
     return getLongitudinalDistance(
       getEntityStatus(from).lanelet_pose, getEntityStatus(to).lanelet_pose,
