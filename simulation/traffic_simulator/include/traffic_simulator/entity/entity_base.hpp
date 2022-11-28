@@ -119,6 +119,8 @@ public:
 
   virtual void onUpdate(double current_time, double step_time);
 
+  virtual void onPostUpdate(double current_time, double step_time);
+
   /*   */ void resetDynamicConstraints();
 
   virtual void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) = 0;

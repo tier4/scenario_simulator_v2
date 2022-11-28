@@ -240,6 +240,11 @@ void EntityBase::onUpdate(double /*current_time*/, double step_time)
       step_time, name);
 }
 
+virtual void onPostUpdate(double /*current_time*/, double step_time)
+{
+  job_list_.update(step_time);
+}
+
 void EntityBase::resetDynamicConstraints()
 {
   setDynamicConstraints(getDefaultDynamicConstraints());
