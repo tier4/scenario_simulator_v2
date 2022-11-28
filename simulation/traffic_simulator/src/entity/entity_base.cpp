@@ -231,6 +231,17 @@ auto EntityBase::getStandStillDuration() const -> double { return stand_still_du
 
 auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 
+auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
+{
+  return speed_planner_->isTargetSpeedReached(target_speed, getCurrentTwist());
+}
+
+auto EntityBase::isTargetSpeedReached(const speed_change::RelativeTargetSpeed & target_speed) const
+  -> bool
+{
+  return isTargetSpeedReached(target_speed.getAbsoluteValue(getStatus(), other_status_));
+}
+
 void EntityBase::onUpdate(double /*current_time*/, double step_time)
 {
   job_list_.update(step_time, job::Event::PRE_UPDATE);
@@ -300,6 +311,9 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
   const double target_speed, const speed_change::Transition transition, double acceleration,
   const bool continuous)
 {
+  if (!continuous && isTargetSpeedReached(target_speed)) {
+    return;
+  }
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       setLinearAcceleration(acceleration);
@@ -318,7 +332,8 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           /**
            * @brief Resets acceleration limit.
            */
-          [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
+          [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true,
+          job::Event::POST_UPDATE);
       } else if (speed_planner_->isDecelerating(target_speed, getCurrentTwist())) {
         setDecelerationLimit(std::abs(acceleration));
         job_list_.append(
@@ -329,7 +344,8 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           /**
            * @brief Resets deceleration limit.
            */
-          [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
+          [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true,
+          job::Event::POST_UPDATE);
       }
       requestSpeedChange(target_speed, continuous);
       break;
@@ -345,6 +361,9 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 void EntityBase::requestSpeedChangeWithTimeConstraint(
   const double target_speed, const speed_change::Transition transition, double acceleration_time)
 {
+  if (isTargetSpeedReached(target_speed)) {
+    return;
+  }
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithConstantAcceleration(
@@ -371,7 +390,8 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
         /**
          * @brief Resets deceleration/acceleration limit.
          */
-        [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
+        [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true,
+        job::Event::POST_UPDATE);
       requestSpeedChange(target_speed, false);
       break;
     }
@@ -387,6 +407,9 @@ void EntityBase::requestSpeedChange(
   const double target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
 {
+  if (!continuous && isTargetSpeedReached(target_speed)) {
+    return;
+  }
   switch (constraint.type) {
     case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
       requestSpeedChangeWithConstantAcceleration(
@@ -405,6 +428,9 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
   const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
   double acceleration, const bool continuous)
 {
+  if (!continuous && isTargetSpeedReached(target_speed)) {
+    return;
+  }
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       setLinearAcceleration(acceleration);
@@ -439,7 +465,8 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
         /**
          * @brief Resets acceleration limit.
          */
-        [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true);
+        [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true,
+        job::Event::POST_UPDATE);
       requestSpeedChange(target_speed, continuous);
       break;
     }
@@ -455,6 +482,9 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
   const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
   double time)
 {
+  if (isTargetSpeedReached(target_speed)) {
+    return;
+  }
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithTimeConstraint(
@@ -478,6 +508,9 @@ void EntityBase::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
 {
+  if (!continuous && isTargetSpeedReached(target_speed)) {
+    return;
+  }
   switch (constraint.type) {
     case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
       requestSpeedChangeWithConstantAcceleration(
@@ -497,6 +530,9 @@ void EntityBase::requestSpeedChange(
 
 void EntityBase::requestSpeedChange(double target_speed, bool continuous)
 {
+  if (!continuous && isTargetSpeedReached(target_speed)) {
+    return;
+  }
   if (continuous) {
     job_list_.append(
       /**
@@ -509,14 +545,14 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cancel speed change request.
        */
-      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+      [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Event::POST_UPDATE);
   } else {
     job_list_.append(
       /**
        * @brief If the target entity reaches the target speed, return true.
        */
       [this, target_speed](double) {
-        if (speed_planner_->isTargetSpeedReached(target_speed, getCurrentTwist())) {
+        if (isTargetSpeedReached(target_speed)) {
           return true;
         }
         target_speed_ = target_speed;
@@ -525,13 +561,17 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cancel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      job::Event::POST_UPDATE);
   }
 }
 
 void EntityBase::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
+  if (!continuous && isTargetSpeedReached(target_speed)) {
+    return;
+  }
   if (continuous) {
     job_list_.append(
       /**
@@ -544,7 +584,7 @@ void EntityBase::requestSpeedChange(
         target_speed_ = target_speed.getAbsoluteValue(getStatus(), other_status_);
         return false;
       },
-      [this]() {}, job::Type::LINEAR_VELOCITY, true);
+      [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Event::POST_UPDATE);
   } else {
     job_list_.append(
       /**
@@ -554,8 +594,7 @@ void EntityBase::requestSpeedChange(
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
           return true;
         }
-        if (
-          getCurrentTwist().linear.x >= target_speed.getAbsoluteValue(getStatus(), other_status_)) {
+        if (isTargetSpeedReached(target_speed)) {
           target_speed_ = target_speed.getAbsoluteValue(getStatus(), other_status_);
           return true;
         }
@@ -564,7 +603,8 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief Cancel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true);
+      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      job::Event::POST_UPDATE);
   }
 }
 

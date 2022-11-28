@@ -222,17 +222,20 @@ protected:
     speed_planner_;
 
 private:
-  virtual void requestSpeedChangeWithConstantAcceleration(
+  virtual auto requestSpeedChangeWithConstantAcceleration(
     const double target_speed, const speed_change::Transition, double acceleration,
-    const bool continuous);
-  virtual void requestSpeedChangeWithConstantAcceleration(
+    const bool continuous) -> void;
+  virtual auto requestSpeedChangeWithConstantAcceleration(
     const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, double acceleration, const bool continuous);
-  virtual void requestSpeedChangeWithTimeConstraint(
-    const double target_speed, const speed_change::Transition, double acceleration_time);
-  virtual void requestSpeedChangeWithTimeConstraint(
+    const speed_change::Transition transition, double acceleration, const bool continuous) -> void;
+  virtual auto requestSpeedChangeWithTimeConstraint(
+    const double target_speed, const speed_change::Transition, double acceleration_time) -> void;
+  virtual auto requestSpeedChangeWithTimeConstraint(
     const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, double time);
+    const speed_change::Transition transition, double time) -> void;
+  /*   */ auto isTargetSpeedReached(double target_speed) const -> bool;
+  /*   */ auto isTargetSpeedReached(const speed_change::RelativeTargetSpeed & target_speed) const
+    -> bool;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
