@@ -72,7 +72,8 @@ struct SpeedProfileAction : private Scope,  // NOTE: Required for access to acto
 
   struct [[deprecated]] dynamics
   {
-    double speed = 0, acceleration = 0, acceleration_rate = 0, time = 0;
+    double speed = 0, acceleration = 0, acceleration_rate = 0, time = 0,
+           remain_time = std::numeric_limits<double>::infinity();
   };
 
   [[deprecated]] std::unordered_map<std::string, dynamics> previous;
