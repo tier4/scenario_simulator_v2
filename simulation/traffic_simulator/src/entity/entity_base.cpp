@@ -367,7 +367,7 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithConstantAcceleration(
-        target_speed, transition, target_speed - getCurrentTwist().linear.x / acceleration_time,
+        target_speed, transition, (target_speed - getCurrentTwist().linear.x) / acceleration_time,
         false);
       break;
     }
