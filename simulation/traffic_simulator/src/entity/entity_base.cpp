@@ -365,10 +365,17 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
   if (isTargetSpeedReached(target_speed)) {
     return;
   }
+  if (
+    std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon() &&
+    transition != speed_change::Transition::STEP) {
+    requestSpeedChangeWithTimeConstraint(
+      target_speed, speed_change::Transition::STEP, acceleration_time);
+    return;
+  }
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithConstantAcceleration(
-        target_speed, transition, target_speed - getCurrentTwist().linear.x / acceleration_time,
+        target_speed, transition, (target_speed - getCurrentTwist().linear.x) / acceleration_time,
         false);
       break;
     }
@@ -481,20 +488,27 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 
 void EntityBase::requestSpeedChangeWithTimeConstraint(
   const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
-  double time)
+  double acceleration_time)
 {
   if (isTargetSpeedReached(target_speed)) {
+    return;
+  }
+  if (
+    std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon() &&
+    transition != speed_change::Transition::STEP) {
+    requestSpeedChangeWithTimeConstraint(
+      target_speed, speed_change::Transition::STEP, acceleration_time);
     return;
   }
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithTimeConstraint(
-        target_speed.getAbsoluteValue(getStatus(), other_status_), transition, time);
+        target_speed.getAbsoluteValue(getStatus(), other_status_), transition, acceleration_time);
       break;
     }
     case speed_change::Transition::AUTO: {
       requestSpeedChangeWithTimeConstraint(
-        target_speed.getAbsoluteValue(getStatus(), other_status_), transition, time);
+        target_speed.getAbsoluteValue(getStatus(), other_status_), transition, acceleration_time);
       break;
     }
     case speed_change::Transition::STEP: {
