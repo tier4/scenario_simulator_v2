@@ -44,13 +44,30 @@ auto SpeedProfileAction::apply(
   };
 
   auto constraint = [&]() {
-    if (std::isnan(speed_profile_entry.time) or following_mode.value == FollowingMode::position) {
-      return traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
-        traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
+    if (std::isnan(speed_profile_entry.time)) {
+      switch (following_mode) {
+        case FollowingMode::position:
+          return traffic_simulator::speed_change::Constraint(
+            traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
+            traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
+        default:
+        case FollowingMode::follow:
+          return traffic_simulator::speed_change::Constraint(
+            traffic_simulator::speed_change::Constraint::Type::NONE, 0);
+      }
     } else {
       return traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, speed_profile_entry.time);
+    }
+  };
+
+  auto transition = [&]() {
+    switch (following_mode) {
+      case FollowingMode::position:
+        return traffic_simulator::speed_change::Transition::LINEAR;
+      default:
+      case FollowingMode::follow:
+        return traffic_simulator::speed_change::Transition::AUTO;
     }
   };
 
@@ -72,17 +89,11 @@ auto SpeedProfileAction::apply(
 
   if (entity_ref.empty()) {
     applySpeedAction(
-      actor,
-      absolute_target_speed(),  //
-      traffic_simulator::speed_change::Transition::AUTO,
-      constraint(),  //
+      actor, absolute_target_speed(), transition(), constraint(),
       std::isnan(speed_profile_entry.time));
   } else {
     applySpeedAction(
-      actor,
-      relative_target_speed(),  //
-      traffic_simulator::speed_change::Transition::AUTO,
-      constraint(),  //
+      actor, relative_target_speed(), transition(), constraint(),
       std::isnan(speed_profile_entry.time));
   }
 }
@@ -90,7 +101,6 @@ auto SpeedProfileAction::apply(
 auto SpeedProfileAction::accomplished() -> bool
 {
   // NOTE: Action ends on reaching the target speed of the last SpeedProfileEntry.
-
   return std::all_of(
     std::begin(accomplishments), std::end(accomplishments), [this](auto && actor_and_iter) {
       return std::get<1>(actor_and_iter) == std::end(speed_profile_entry);

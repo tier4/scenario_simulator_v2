@@ -95,15 +95,15 @@ OpenSCENARIO:
                     DynamicConstraints:
                       maxSpeed: 30
                       maxAcceleration: 1
-                      maxAccelerationRate: 0.01
+                      maxAccelerationRate: 0.1
                       maxDeceleration: 1
-                      maxDecelerationRate: 0.01
+                      maxDecelerationRate: 0.1
                     SpeedProfileEntry:
-                      - speed:  1
-                      - speed: -1
-                      - speed:  2
-                      - speed: -2
-                      - speed:  3
+                      - speed:  10
+                      - speed: -10
+                      - speed:  20
+                      - speed: -20
+                      - speed:  30
           - entityRef: npc2
             PrivateAction:
               - TeleportAction:
@@ -117,11 +117,14 @@ OpenSCENARIO:
               - LongitudinalAction:
                   SpeedProfileAction:
                     followingMode: position
-                    DynamicConstraints:
+                    DynamicConstraints: # NOTE: if `position` specified, DynamicConstraints will be ignored.
                       maxAcceleration: 0
                       maxAccelerationRate: 0
                     SpeedProfileEntry:
                       - speed: 30
+                      - speed: -30
+                        time: 10
+                      - speed: 10
     Story:
       - name: ''
         Act:
