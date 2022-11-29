@@ -491,8 +491,8 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
     return;
   }
   if (std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon()) {
-    requestSpeedChange(target_speed, false);
-    setLinearVelocity(target_speed.getAbsoluteValue(getStatus(), other_status_));
+    requestSpeedChangeWithTimeConstraint(
+      target_speed, speed_change::Transition::STEP, acceleration_time);
     return;
   }
   switch (transition) {
