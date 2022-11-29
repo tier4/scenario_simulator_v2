@@ -66,7 +66,7 @@ class HdMapUtils
 public:
   explicit HdMapUtils(const boost::filesystem::path &, const geographic_msgs::msg::GeoPoint &);
 
-  auto clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanalet_pose)
+  auto clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
     -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   const autoware_auto_mapping_msgs::msg::HADMapBin toMapBin();
