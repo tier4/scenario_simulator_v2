@@ -364,7 +364,9 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
   if (isTargetSpeedReached(target_speed)) {
     return;
   }
-  if (std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon()) {
+  if (
+    std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon() &&
+    transition != speed_change::Transition::STEP) {
     requestSpeedChangeWithTimeConstraint(
       target_speed, speed_change::Transition::STEP, acceleration_time);
     return;
@@ -490,7 +492,9 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
   if (isTargetSpeedReached(target_speed)) {
     return;
   }
-  if (std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon()) {
+  if (
+    std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon() &&
+    transition != speed_change::Transition::STEP) {
     requestSpeedChangeWithTimeConstraint(
       target_speed, speed_change::Transition::STEP, acceleration_time);
     return;
