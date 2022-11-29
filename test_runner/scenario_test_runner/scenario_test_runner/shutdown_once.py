@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Modifications Copyright 2015 TIER IV, Inc.
+# Modifications Copyright 2022 TIER IV, Inc.
 
 """Module for the Shutdown action."""
 
@@ -47,7 +47,6 @@ class ShutdownOnce(EmitEvent):
 
     def execute(self, context: LaunchContext):
         """Execute the action."""
-
         if ShutdownOnce.shutdown_called:
             return
         else:
