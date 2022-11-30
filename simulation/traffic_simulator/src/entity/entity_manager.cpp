@@ -191,33 +191,36 @@ auto EntityManager::getLongitudinalDistance(
     } else {
       return boost::none;
     }
-  }
-  const auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
-    hdmap_utils_ptr_->toMapPose(from).pose, from.lanelet_id, 5.0, include_opposite_direction);
-  const auto to_poses = hdmap_utils_ptr_->toLaneletPoses(
-    hdmap_utils_ptr_->toMapPose(to).pose, to.lanelet_id, 5.0, include_opposite_direction);
-  std::vector<double> distances = {};
-  for (const auto & from_pose : from_poses) {
-    for (const auto & to_pose : to_poses) {
-      const auto distance_from_to =
-        getLongitudinalDistance(from_pose, to_pose, false, include_opposite_direction);
-      if (distance_from_to) {
-        distances.emplace_back(distance_from_to.get());
-      }
-      const auto distance_to_from =
-        getLongitudinalDistance(to_pose, from_pose, false, include_opposite_direction);
-      if (distance_to_from) {
-        distances.emplace_back(distance_to_from.get());
+  } else {
+    auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
+      hdmap_utils_ptr_->toMapPose(from).pose, from.lanelet_id, 5.0, include_opposite_direction);
+    from_poses.emplace_back(from);
+    auto to_poses = hdmap_utils_ptr_->toLaneletPoses(
+      hdmap_utils_ptr_->toMapPose(to).pose, to.lanelet_id, 5.0, include_opposite_direction);
+    to_poses.emplace_back(to);
+    std::vector<double> distances = {};
+    for (const auto & from_pose : from_poses) {
+      for (const auto & to_pose : to_poses) {
+        const auto distance_from_to =
+          getLongitudinalDistance(from_pose, to_pose, false, include_opposite_direction);
+        if (distance_from_to) {
+          distances.emplace_back(distance_from_to.get());
+        }
+        const auto distance_to_from =
+          getLongitudinalDistance(to_pose, from_pose, false, include_opposite_direction);
+        if (distance_to_from) {
+          distances.emplace_back(distance_to_from.get());
+        }
       }
     }
+    if (distances.empty()) {
+      return boost::none;
+    }
+    std::sort(distances.begin(), distances.end(), [](double a, double b) {
+      return std::abs(a) < std::abs(b);
+    });
+    return *distances.begin();
   }
-  if (distances.empty()) {
-    return boost::none;
-  }
-  std::sort(distances.begin(), distances.end(), [](double a, double b) {
-    return std::abs(a) < std::abs(b);
-  });
-  return *distances.begin();
 }
 
 auto EntityManager::getLongitudinalDistance(
