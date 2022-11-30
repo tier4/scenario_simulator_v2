@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
 #define OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
 
+#include <openscenario_interpreter/random/stochastic_distribution_sampler.hpp>
 #include <openscenario_interpreter/syntax/probability_distribution_set_element.hpp>
-#include <openscenario_interpreter/random/distribution.hpp>
 
 namespace openscenario_interpreter
 {
@@ -50,7 +50,7 @@ struct ProbabilityDistributionSet : public ComplexType
     std::vector<String> values;
   } adaptor;
 
-  StochasticDistributionClass<std::discrete_distribution<std::size_t>> distribution;
+  StochasticDistributionSampler<std::discrete_distribution<std::size_t>> distribution_sampler;
 
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 

@@ -15,9 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
 #define OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
 
+#include <openscenario_interpreter/random/stochastic_distribution_sampler.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/histogram_bin.hpp>
-#include <openscenario_interpreter/random/distribution.hpp>
 
 namespace openscenario_interpreter
 {
@@ -54,8 +54,8 @@ struct Histogram : public ComplexType
     std::vector<double> intervals, densities;
   } bin_adaptor;
 
-  StochasticDistributionClass<std::piecewise_constant_distribution<Double::value_type>>
-    distribution;
+  StochasticDistributionSampler<std::piecewise_constant_distribution<Double::value_type>>
+    distribution_sampler;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
 };

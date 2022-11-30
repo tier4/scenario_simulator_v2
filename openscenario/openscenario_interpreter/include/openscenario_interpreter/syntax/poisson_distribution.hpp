@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__POISSON_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__POISSON_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/random/stochastic_distribution_sampler.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
-#include <openscenario_interpreter/random/distribution.hpp>
 
 namespace openscenario_interpreter
 {
@@ -40,7 +40,7 @@ struct PoissonDistribution : public ComplexType
 
   const Double expected_value;
 
-  StochasticDistributionClass<std::poisson_distribution<>> distribution;
+  StochasticDistributionSampler<std::poisson_distribution<>> distribution_sampler;
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
 };

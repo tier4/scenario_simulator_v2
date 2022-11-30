@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_SAMPLER_HPP_
+#define OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_SAMPLER_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -21,14 +21,13 @@
 
 namespace openscenario_interpreter
 {
-inline namespace utility
+inline namespace random
 {
-// TODO : rename class name
 template <typename DistributionT>
-struct StochasticDistributionClass
+struct StochasticDistributionSampler
 {
   template <typename... Ts>
-  StochasticDistributionClass(double random_seed, Ts... xs)
+  StochasticDistributionSampler(double random_seed, Ts... xs)
   : random_engine(random_seed), distribution(xs...)
   {
   }
@@ -37,8 +36,8 @@ struct StochasticDistributionClass
 
   DistributionT distribution;
 
-  auto generate() { return distribution(random_engine); }
+  auto operator()() { return distribution(random_engine); }
 };
-}  // namespace utility
+}  // namespace random
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_SAMPLER_HPP_
