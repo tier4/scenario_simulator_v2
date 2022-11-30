@@ -199,8 +199,8 @@ auto OccupancyGridBuilder::addPolygon(MarkerGridType & grid, const PolygonType &
   // of the polygon. This makes performance of an occupancy grid generation
   // tolerant of an increasing number of primitives.
 
-  min_cols_.assign(min_cols_.size(), width); // Leftmost marked cells of each rows
-  max_cols_.assign(max_cols_.size(), -1);    // Rightmost marked cells of each rows
+  min_cols_.assign(min_cols_.size(), width);  // Leftmost marked cells of each rows
+  max_cols_.assign(max_cols_.size(), -1);     // Rightmost marked cells of each rows
 
   // Traverse each polygon edges on grid coordinate and update `min_cols_` and `max_cols_`
   for (size_t i = 0; i < convex_hull.size(); ++i) {
