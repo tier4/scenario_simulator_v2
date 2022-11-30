@@ -38,7 +38,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct NormalDistribution : public ComplexType
+struct NormalDistribution : public ComplexType, private Scope
 {
   const Range range;
 
@@ -49,6 +49,8 @@ struct NormalDistribution : public ComplexType
   StochasticDistributionSampler<std::normal_distribution<Double::value_type>> distribution_sampler;
 
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

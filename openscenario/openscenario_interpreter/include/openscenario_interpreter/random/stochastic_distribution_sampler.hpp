@@ -27,16 +27,13 @@ template <typename DistributionT>
 struct StochasticDistributionSampler
 {
   template <typename... Ts>
-  StochasticDistributionSampler(double random_seed, Ts... xs)
-  : random_engine(random_seed), distribution(xs...)
+  StochasticDistributionSampler(Ts... xs) : distribution(xs...)
   {
   }
 
-  std::mt19937 random_engine;
-
   DistributionT distribution;
 
-  auto operator()() { return distribution(random_engine); }
+  auto operator()(std::mt19937 random_engine) { return distribution(random_engine); }
 };
 }  // namespace random
 }  // namespace openscenario_interpreter

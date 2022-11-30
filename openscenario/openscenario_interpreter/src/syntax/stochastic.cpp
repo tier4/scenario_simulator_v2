@@ -20,11 +20,13 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Stochastic::Stochastic(const pugi::xml_node & node, Scope & scope)
-: stochastic_distribution(
-    readElement<StochasticDistribution>("StochasticDistribution", node, scope)),
-  number_of_test_runs(readAttribute<UnsignedInt>("numberOfTestRuns", node, scope)),
-  random_seed(readAttribute<Double>("randomSeed", node, scope))
+: number_of_test_runs(readAttribute<UnsignedInt>("numberOfTestRuns", node, scope)),
+  random_seed(readAttribute<Double>("randomSeed", node, scope)),
+  stochastic_distribution(
+    readElement<StochasticDistribution>("StochasticDistribution", node, scope))
 {
+  // "randomEngine" is not included in OSC standard.
+  scope.insert("randomEngine", make<std::mt19937>(random_seed.data));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

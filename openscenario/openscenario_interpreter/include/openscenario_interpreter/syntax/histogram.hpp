@@ -33,7 +33,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct Histogram : public ComplexType
+struct Histogram : public ComplexType, private Scope
 {
   /**
    * Note: HistogramBin must be stored in continuous range and ascending order, to `bins`
@@ -58,6 +58,8 @@ struct Histogram : public ComplexType
     distribution_sampler;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
+
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

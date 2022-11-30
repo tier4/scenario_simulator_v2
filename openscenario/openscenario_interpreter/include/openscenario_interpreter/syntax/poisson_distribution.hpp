@@ -34,7 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct PoissonDistribution : public ComplexType
+struct PoissonDistribution : public ComplexType, private Scope
 {
   const Range range;
 
@@ -43,6 +43,8 @@ struct PoissonDistribution : public ComplexType
   StochasticDistributionSampler<std::poisson_distribution<>> distribution_sampler;
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

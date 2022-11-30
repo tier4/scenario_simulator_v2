@@ -23,9 +23,7 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : elements(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope)),
   adaptor(elements),
-  distribution(
-    scope.ref<Double>(std::string("randomSeed")).data, adaptor.probabilities.begin(),
-    adaptor.probabilities.end())
+  distribution_sampler(adaptor.probabilities.begin(), adaptor.probabilities.end())
 {
 }
 }  // namespace syntax
