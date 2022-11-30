@@ -70,6 +70,7 @@ auto OccupancyGridBuilder::makeOccupiedArea(const PrimitiveType & primitive) con
   using Point = bg::model::d2::point_xy<double>;
   using Ring = bg::model::ring<Point>;
 
+  // Generate a polygon of given primitive
   auto primitive_ring = Ring();
   for (auto & e : primitive.get2DConvexHull()) {
     auto p = transformToGrid(e);
@@ -86,11 +87,14 @@ auto OccupancyGridBuilder::makeOccupiedArea(const PrimitiveType & primitive) con
     {-real_width, +real_height},  // top left
   };
 
+  // Clip a polygon to fit into grid area
   auto intersection_polygon = std::vector<Ring>();
   bg::intersection(primitive_ring, grid_ring, intersection_polygon);
 
   auto result = PolygonType();
   if (not intersection_polygon.empty()) {
+    // If a polygon intersects the occupancy grid area, `intersection_polygon` will have
+    // just one `Ring` so accessing a polygon via `front()` should be sufficient
     for (auto & p : intersection_polygon.front()) {
       result.emplace_back(makePoint(p.x(), p.y()));
     }
@@ -116,6 +120,8 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
   };
 
   {
+    // Treat the entire occupancy grid area as invisible if `occupied_polygon`
+    // covers the origin of the grid
     bool overlap_origin = true;
     for (size_t i = 0; i < occupied_polygon.size(); ++i) {
       const auto & p = occupied_polygon[i];
@@ -125,6 +131,8 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
     if (overlap_origin) return corners;
   }
 
+  // Culculate an intersection point between grid edges and a line
+  // pass through the origin and a given point
   const auto projection = [&](const PointType & p, size_t i) -> PointType {
     switch (i % 4) {
       default:
@@ -142,10 +150,13 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
   {
     auto angle = [](const PointType & p) { return std::atan2(p.y, p.x); };
 
+    // Find a minimum and a maximum point in polygons by comparing angles with range [-\pi, \pi].
     auto min_max_p = std::minmax_element(
       occupied_polygon.begin(), occupied_polygon.end(),
       [&](const PointType & p, const PointType & q) { return angle(p) < angle(q); });
 
+    // If a polygon overlaps a line \theta = \pi, change angle range to [0, 2\pi]
+    // and find those points again.
     if (auto [min_p, max_p] = min_max_p; angle(*max_p) - angle(*min_p) > M_PI) {
       min_max_p = std::minmax_element(
         occupied_polygon.begin(), occupied_polygon.end(),
@@ -160,15 +171,21 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
     double max_ang = angle(*max_p);
     if (min_ang > max_ang) max_ang += 2 * M_PI;
 
+    // Construct a polygon of invisible area
+    // Note that lines below are order-sensitive so be careful when you try to modify
     size_t i = 0;
     for (; angle(corners[i % 4]) + 2 * M_PI * (i / 4) <= min_ang; ++i) {
     }
+    // First, add minimum angle point and its projection point.
     res.emplace_back(*min_p);
     res.emplace_back(projection(*min_p, i));
 
+    // Next, add grid corners between a minimum and a maximum angle point.
     for (; angle(corners[i % 4]) + 2 * M_PI * (i / 4) < max_ang; ++i) {
       res.emplace_back(corners[i % 4]);
     }
+
+    // Finally, add a projection point of maximum angle point and itself.
     res.emplace_back(projection(*max_p, i));
     res.emplace_back(*max_p);
   }
@@ -178,9 +195,14 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
 auto OccupancyGridBuilder::addPolygon(MarkerGridType & grid, const PolygonType & convex_hull)
   -> void
 {
-  min_cols_.assign(min_cols_.size(), width);
-  max_cols_.assign(max_cols_.size(), -1);
+  // This function assumes a given polygon is a convex hull and marks only edges
+  // of the polygon. This makes performance of an occupancy grid generation
+  // tolerant of an increasing number of primitives.
 
+  min_cols_.assign(min_cols_.size(), width); // Leftmost marked cells of each rows
+  max_cols_.assign(max_cols_.size(), -1);    // Rightmost marked cells of each rows
+
+  // Traverse each polygon edges on grid coordinate and update `min_cols_` and `max_cols_`
   for (size_t i = 0; i < convex_hull.size(); ++i) {
     const auto p = transformToPixel(convex_hull[i]);
     const auto q = transformToPixel(convex_hull[(i + 1) % convex_hull.size()]);
@@ -192,22 +214,44 @@ auto OccupancyGridBuilder::addPolygon(MarkerGridType & grid, const PolygonType &
     }
   }
 
+  // Put marked cells on the occupancy grid
   for (size_t row = 0; row < height; ++row) {
     auto min_col = min_cols_[row];
     auto max_col = max_cols_[row] + 1;
 
+    // do not care the outside of the occupancy grid
     if (max_col <= 0 || min_col >= int32_t(width)) {
       continue;
     }
+
+    // Increment the leftmost grid cell values
     if (min_col <= 0) {
       ++grid[width * row];
     } else {
       ++grid[width * row + min_col];
     }
+
+    // Decrement the leftmost grid cell values
     if (max_col < int32_t(width)) {
       --grid[width * row + max_col];
     }
   }
+
+  // At this stage, we have marked grid cells like
+  //
+  //  0  0  0  0  0  0  0  0
+  //  0  0  0  1  0 -1  0  0
+  //  0  1  0  0  0  0 -1  0
+  //  0  0  0  1  0  0  0 -1
+  //  0  0  0  0  0  0  0  0
+  //
+  // Later we calculate prefix sum for each rows of the grid
+  // and get a complete occupancy grid like
+  //  0  0  0  0  0  0  0  0
+  //  0  0  0  1  1  0  0  0
+  //  0  1  1  1  1  1  0  0
+  //  0  0  0  1  1  1  1  0
+  //  0  0  0  0  0  0  0  0
 }
 
 auto OccupancyGridBuilder::add(const PrimitiveType & primitive) -> void
@@ -235,6 +279,10 @@ auto OccupancyGridBuilder::build() -> void
 {
   // https://imoz.jp/algorithms/imos_method.html (Japanese)
 
+  // We can make prefix sum culculation faster by unrolling for loop and
+  // tweaking compiler options, but, as far as I run this code locally,
+  // it takes about 200us for 400x400 grids and I think it is sufficient,
+  // so I leave this naive implementation.
   for (size_t row = 0; row < height; ++row) {
     for (size_t col = 0; col + 1 < width; ++col) {
       invisible_grid_[row * width + col + 1] += invisible_grid_[row * width + col];
