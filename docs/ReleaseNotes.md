@@ -4,6 +4,25 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature                       | Brief summary                         | Category | Pull request                                                    | Contributor                             |
+|-------------------------------|---------------------------------------|----------|-----------------------------------------------------------------|-----------------------------------------|
+| Revert `topic_status_checker` | Delete `topic_status_checker` package | `common` | [#921](https://github.com/tier4/scenario_simulator_v2/pull/921) | [HansRobo](https://github.com/HansRobo) |
+
+
+## Version 0.6.7
+
+Major Changes :race_car: :red_car: :blue_car:
+
 |                    Feature                     |                                                                           Brief summary                                                                           |                           Category                           |                          Pull request                           |                                         Contributor                                          |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Engagement                                     | Changed time management to send engage as soon as autoware state transitions to `WAITING_FOR_ENGAGE` and start simulation as soon as it transitions to `DRIVING`. | `traffic_simulator`, `concealer`, `openscenario_interpreter` | [#823](https://github.com/tier4/scenario_simulator_v2/pull/823) | [hakuturu583](https://github.com/hakuturu583), [yamacir-kit](https://github.com/yamacir-kit) |
