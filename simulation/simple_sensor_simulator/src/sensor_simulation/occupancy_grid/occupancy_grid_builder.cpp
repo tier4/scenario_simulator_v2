@@ -131,7 +131,7 @@ auto OccupancyGridBuilder::makeInvisibleArea(const PolygonType & occupied_polygo
     if (overlap_origin) return corners;
   }
 
-  // Culculate an intersection point between grid edges and a line
+  // Calculate an intersection point between grid edges and a line
   // pass through the origin and a given point
   const auto projection = [&](const PointType & p, size_t i) -> PointType {
     switch (i % 4) {
@@ -238,7 +238,6 @@ auto OccupancyGridBuilder::addPolygon(MarkerGridType & grid, const PolygonType &
   }
 
   // At this stage, we have marked grid cells like
-  //
   //  0  0  0  0  0  0  0  0
   //  0  0  0  1  0 -1  0  0
   //  0  1  0  0  0  0 -1  0
@@ -279,7 +278,7 @@ auto OccupancyGridBuilder::build() -> void
 {
   // https://imoz.jp/algorithms/imos_method.html (Japanese)
 
-  // We can make prefix sum culculation faster by unrolling for loop and
+  // We can make prefix sum calculation faster by unrolling for loop and
   // tweaking compiler options, but, as far as I run this code locally,
   // it takes about 200us for 400x400 grids and I think it is sufficient,
   // so I leave this naive implementation.
