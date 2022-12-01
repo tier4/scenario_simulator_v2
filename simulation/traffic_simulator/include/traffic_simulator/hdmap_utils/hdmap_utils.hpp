@@ -66,7 +66,7 @@ class HdMapUtils
 public:
   explicit HdMapUtils(const boost::filesystem::path &, const geographic_msgs::msg::GeoPoint &);
 
-  auto clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
+  auto clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
     -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   const autoware_auto_mapping_msgs::msg::HADMapBin toMapBin();
@@ -92,11 +92,7 @@ public:
     const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
     bool include_crosswalk, double reduction_ratio = 0.8) const;
   geometry_msgs::msg::PoseStamped toMapPose(
-    std::int64_t lanelet_id, double s, double offset,
-    const geometry_msgs::msg::Quaternion & quat) const;
-  geometry_msgs::msg::PoseStamped toMapPose(
     const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const;
-  geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset) const;
   double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
   const std::vector<std::int64_t> getLaneletIds() const;
   std::vector<std::int64_t> getNextLaneletIds(
@@ -122,7 +118,7 @@ public:
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline);
-  double getLaneletLength(std::int64_t lanelet_id);
+  double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
     traffic_simulator_msgs::msg::LaneletPose from, traffic_simulator_msgs::msg::LaneletPose to);
@@ -281,6 +277,10 @@ private:
     const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const;
   std::vector<geometry_msgs::msg::Point> toPolygon(
     const lanelet::ConstLineString3d & line_string) const;
+  geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset) const;
+  geometry_msgs::msg::PoseStamped toMapPose(
+    std::int64_t lanelet_id, double s, double offset,
+    const geometry_msgs::msg::Quaternion & quat) const;
 };
 }  // namespace hdmap_utils
 

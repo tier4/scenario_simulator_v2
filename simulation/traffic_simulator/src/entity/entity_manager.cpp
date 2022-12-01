@@ -354,13 +354,13 @@ auto EntityManager::getRelativePose(
 auto EntityManager::getRelativePose(const std::string & from, const LaneletPose & to) const
   -> geometry_msgs::msg::Pose
 {
-  return getRelativePose(getEntityStatus(from).pose, to);
+  return getRelativePose(getEntityStatus(from).pose, toMapPose(to));
 }
 
 auto EntityManager::getRelativePose(const LaneletPose & from, const std::string & to) const
   -> geometry_msgs::msg::Pose
 {
-  return getRelativePose(from, getEntityStatus(to).pose);
+  return getRelativePose(toMapPose(from), getEntityStatus(to).pose);
 }
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }

@@ -164,7 +164,13 @@ void VehicleEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   if (status_.lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, lanelet_pose);
+    if (const auto pose = hdmap_utils_ptr_->clampLaneletPose(lanelet_pose)) {
+      route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, pose.get());
+    } else {
+      THROW_SEMANTIC_ERROR(
+        "Lanelet pose\n", rosidl_generator_traits::to_yaml(lanelet_pose),
+        "\nis invalid, please check lanelet length and connection.");
+    }
   }
 }
 

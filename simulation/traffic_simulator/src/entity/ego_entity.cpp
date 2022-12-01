@@ -356,7 +356,13 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 void EgoEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
-  requestAssignRoute({lanelet_pose});
+  if (const auto pose = hdmap_utils_ptr_->clampLaneletPose(lanelet_pose)) {
+    requestAssignRoute({pose.get()});
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Lanelet pose\n", rosidl_generator_traits::to_yaml(lanelet_pose),
+      "\nis invalid, please check lanelet length and connection.");
+  }
 }
 
 void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)

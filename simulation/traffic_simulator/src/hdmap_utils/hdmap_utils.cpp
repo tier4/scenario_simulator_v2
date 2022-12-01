@@ -83,7 +83,7 @@ HdMapUtils::HdMapUtils(
 }
 
 auto HdMapUtils::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+  const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   if (0 <= lanelet_pose.s && lanelet_pose.s <= getLaneletLength(lanelet_pose.lanelet_id)) {
     return lanelet_pose;
@@ -832,7 +832,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
   return ret;
 }
 
-double HdMapUtils::getLaneletLength(std::int64_t lanelet_id)
+double HdMapUtils::getLaneletLength(std::int64_t lanelet_id) const
 {
   if (lanelet_length_cache_.exists(lanelet_id)) {
     return lanelet_length_cache_.getLength(lanelet_id);
@@ -1297,9 +1297,15 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
 {
-  return toMapPose(
-    lanelet_pose.lanelet_id, lanelet_pose.s, lanelet_pose.offset,
-    quaternion_operation::convertEulerAngleToQuaternion(lanelet_pose.rpy));
+  if (const auto pose = clampLaneletPose(lanelet_pose)) {
+    return toMapPose(
+      pose->lanelet_id, pose->s, pose->offset,
+      quaternion_operation::convertEulerAngleToQuaternion(pose->rpy));
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Lanelet pose\n", rosidl_generator_traits::to_yaml(lanelet_pose),
+      "\nis invalid, please check lanelet length and connection.");
+  }
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(

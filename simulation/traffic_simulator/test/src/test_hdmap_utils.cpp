@@ -44,12 +44,16 @@ TEST(HdMapUtils, MatchToLane)
   bbox.dimensions.x = 1.0;
   bbox.dimensions.y = 1.0;
   {
-    const auto id = hdmap_utils.matchToLane(hdmap_utils.toMapPose(120659, 1, 0).pose, bbox, false);
+    const auto id = hdmap_utils.matchToLane(
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(120659, 1, 0)).pose,
+      bbox, false);
     EXPECT_TRUE(id);
     EXPECT_EQ(id.get(), 120659);
   }
   {
-    const auto id = hdmap_utils.matchToLane(hdmap_utils.toMapPose(34411, 1, 0).pose, bbox, false);
+    const auto id = hdmap_utils.matchToLane(
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34411, 1, 0)).pose,
+      bbox, false);
     EXPECT_TRUE(id);
     EXPECT_EQ(id.get(), 34411);
   }
