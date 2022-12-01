@@ -78,9 +78,9 @@ boost::optional<double> StopAtTrafficLightAction::calculateTargetSpeed(double cu
    */
   double rest_distance =
     distance_to_stop_target_.get() - vehicle_parameters.bounding_box.dimensions.x * 0.5 - 1.0;
-  if (rest_distance < calculateStopDistance(behavior_parameter.deceleration)) {
+  if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     if (rest_distance > 0) {
-      return std::sqrt(2 * behavior_parameter.deceleration * rest_distance);
+      return std::sqrt(2 * behavior_parameter.dynamic_constraints.max_deceleration * rest_distance);
     } else {
       return 0;
     }
@@ -128,7 +128,7 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!distance_to_stop_target_) {
-    setOutput("updated_status", calculateEntityStatusUpdated(0));
+    setOutput("updated_status", calculateUpdatedEntityStatus(0));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
@@ -141,7 +141,7 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   } else {
     target_speed = target_linear_speed.get();
   }
-  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

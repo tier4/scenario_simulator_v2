@@ -127,7 +127,7 @@ TEST(Conversion, Performance)
   EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
   EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
   performance = traffic_simulator_msgs::msg::Performance();
-  EXPECT_DOUBLE_EQ(performance.max_speed, 0);
+  EXPECT_DOUBLE_EQ(performance.max_speed, 30.0);
   simulation_interface::toMsg(proto, performance);
   EXPECT_PERFORMANCE_EQ(performance, proto);
 }

@@ -93,8 +93,9 @@ BT::NodeStatus FollowLaneAction::tick()
     auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
     if (distance_to_front_entity) {
       if (
-        distance_to_front_entity.get() <= calculateStopDistance(behavior_parameter.deceleration) +
-                                            vehicle_parameters.bounding_box.dimensions.x + 5) {
+        distance_to_front_entity.get() <=
+        calculateStopDistance(behavior_parameter.dynamic_constraints) +
+          vehicle_parameters.bounding_box.dimensions.x + 5) {
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -110,16 +111,17 @@ BT::NodeStatus FollowLaneAction::tick()
       getDistanceToConflictingEntity(route_lanelets, *trajectory);
     if (distance_to_stopline) {
       if (
-        distance_to_stopline.get() <= calculateStopDistance(behavior_parameter.deceleration) +
-                                        vehicle_parameters.bounding_box.dimensions.x * 0.5 + 5) {
+        distance_to_stopline.get() <=
+        calculateStopDistance(behavior_parameter.dynamic_constraints) +
+          vehicle_parameters.bounding_box.dimensions.x * 0.5 + 5) {
         return BT::NodeStatus::FAILURE;
       }
     }
     if (distance_to_conflicting_entity) {
       if (
         distance_to_conflicting_entity.get() <
-        (vehicle_parameters.bounding_box.dimensions.x +
-         calculateStopDistance(behavior_parameter.deceleration))) {
+        (vehicle_parameters.bounding_box.dimensions.x + 3 +
+         calculateStopDistance(behavior_parameter.dynamic_constraints))) {
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -127,7 +129,7 @@ BT::NodeStatus FollowLaneAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  auto updated_status = calculateEntityStatusUpdated(target_speed.get());
+  auto updated_status = calculateUpdatedEntityStatus(target_speed.get());
   setOutput("updated_status", updated_status);
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);

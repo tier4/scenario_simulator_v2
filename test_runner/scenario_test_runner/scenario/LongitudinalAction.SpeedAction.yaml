@@ -114,7 +114,7 @@ OpenSCENARIO:
                                     dynamicsShape: linear
                                   SpeedActionTarget:
                                     AbsoluteTargetSpeed:
-                                      value: 100
+                                      value: 50
             StartTrigger:
               ConditionGroup:
                 - Condition:
@@ -154,7 +154,7 @@ OpenSCENARIO:
                                     EntityCondition:
                                       SpeedCondition:
                                         rule: equalTo
-                                        value: 100
+                                        value: 50
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none
