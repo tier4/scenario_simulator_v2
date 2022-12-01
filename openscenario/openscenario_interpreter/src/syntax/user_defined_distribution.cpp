@@ -22,8 +22,7 @@ inline namespace syntax
 {
 UserDefinedDistribution::UserDefinedDistribution(const pugi::xml_node & node, const Scope & scope)
 : Scope(scope),
-  type(readAttribute<String>("type", node, local())),
-  content(readContent<String>(node, local()))
+  type(readAttribute<String>("type", node, local()))
 {
 }
 }  // namespace syntax
