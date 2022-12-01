@@ -50,7 +50,7 @@ struct ProbabilityDistributionSet : public ComplexType, private Scope
     std::vector<String> values;
   } adaptor;
 
-  StochasticDistributionSampler<std::discrete_distribution<std::size_t>> distribution_sampler;
+  StochasticDistributionSampler<std::discrete_distribution<std::size_t>> samplerDistribution;
 
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 

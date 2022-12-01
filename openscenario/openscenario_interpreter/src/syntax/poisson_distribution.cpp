@@ -24,13 +24,13 @@ PoissonDistribution::PoissonDistribution(
 : Scope(scope),
   range(readElement<Range>("range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
-  distribution_sampler(expected_value.data)
+  samplerDistribution(expected_value.data)
 {
 }
 
 auto PoissonDistribution::evaluate() -> Object
 {
-  return make<Double>(distribution_sampler(this->ref<std::mt19937>(std::string("randomEngine"))));
+  return make<Double>(samplerDistribution(this->ref<std::mt19937>(std::string("randomEngine"))));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -46,7 +46,7 @@ struct NormalDistribution : public ComplexType, private Scope
 
   const Double variance;
 
-  StochasticDistributionSampler<std::normal_distribution<Double::value_type>> distribution_sampler;
+  StochasticDistributionSampler<std::normal_distribution<Double::value_type>> samplerDistribution;
 
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
 

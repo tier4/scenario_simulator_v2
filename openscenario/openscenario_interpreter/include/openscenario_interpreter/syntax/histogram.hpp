@@ -55,7 +55,7 @@ struct Histogram : public ComplexType, private Scope
   } bin_adaptor;
 
   StochasticDistributionSampler<std::piecewise_constant_distribution<Double::value_type>>
-    distribution_sampler;
+    samplerDistribution;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
 

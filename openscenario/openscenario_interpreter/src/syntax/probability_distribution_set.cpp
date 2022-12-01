@@ -31,13 +31,13 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
   elements(
     generateVector(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
   adaptor(elements),
-  distribution_sampler(adaptor.probabilities.begin(), adaptor.probabilities.end())
+  samplerDistribution(adaptor.probabilities.begin(), adaptor.probabilities.end())
 {
 }
 
 auto ProbabilityDistributionSet::evaluate() -> Object
 {
-  size_t index = distribution_sampler(this->ref<std::mt19937>(std::string("randomEngine")));
+  size_t index = samplerDistribution(this->ref<std::mt19937>(std::string("randomEngine")));
   return make<String>(elements.at(index));
 }
 }  // namespace syntax
