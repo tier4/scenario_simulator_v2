@@ -31,7 +31,7 @@ NormalDistribution::NormalDistribution(
 
 auto NormalDistribution::evaluate() -> Object
 {
-  return make<Double>(samplerDistribution(this->ref<std::mt19937>(std::string("randomEngine"))));
+  return make<Double>(samplerDistribution(ref<std::mt19937>(std::string("randomEngine"))));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
