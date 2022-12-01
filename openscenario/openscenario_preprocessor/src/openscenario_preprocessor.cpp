@@ -20,13 +20,15 @@
 
 namespace openscenario_preprocessor
 {
+using openscenario_preprocessor_msgs::srv::CheckDerivativeRemained;
+using openscenario_preprocessor_msgs::srv::Derive;
+using openscenario_preprocessor_msgs::srv::Load;
+
 Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
 : rclcpp::Node("preprocessor", options),
-  load_server(create_service<openscenario_preprocessor_msgs::srv::Load>(
+  load_server(create_service<Load>(
     "~/load",
-    [this](
-      const openscenario_preprocessor_msgs::srv::Load::Request::SharedPtr request,
-      openscenario_preprocessor_msgs::srv::Load::Response::SharedPtr response) -> void {
+    [this](const Load::Request::SharedPtr request, Load::Response::SharedPtr response) -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       try {
         auto s = ScenarioSet(*request);
@@ -39,11 +41,9 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
         preprocessed_scenarios.clear();
       }
     })),
-  derive_server(create_service<openscenario_preprocessor_msgs::srv::Derive>(
+  derive_server(create_service<Derive>(
     "~/derive",
-    [this](
-      const openscenario_preprocessor_msgs::srv::Derive::Request::SharedPtr,
-      openscenario_preprocessor_msgs::srv::Derive::Response::SharedPtr response) -> void {
+    [this](const Derive::Request::SharedPtr, Derive::Response::SharedPtr response) -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       if (preprocessed_scenarios.empty()) {
         response->path = "no output";
@@ -52,12 +52,11 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
         preprocessed_scenarios.pop_front();
       }
     })),
-  check_server(create_service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>(
+  check_server(create_service<CheckDerivativeRemained>(
     "~/check",
     [this](
-      const openscenario_preprocessor_msgs::srv::CheckDerivativeRemained::Request::SharedPtr,
-      openscenario_preprocessor_msgs::srv::CheckDerivativeRemained::Response::SharedPtr response)
-      -> void {
+      const CheckDerivativeRemained::Request::SharedPtr,
+      CheckDerivativeRemained::Response::SharedPtr response) -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       response->derivative_remained = not preprocessed_scenarios.empty();
     }))
