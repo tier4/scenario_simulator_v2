@@ -19,10 +19,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+template <typename T>
+auto generateVector(const std::list<T> & list) -> std::vector<T>
+{
+  return std::vector<T>(list.begin(), list.end());
+}
+
 ProbabilityDistributionSet::ProbabilityDistributionSet(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
-  elements(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope)),
+  elements(
+    generateVector(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
   adaptor(elements),
   distribution_sampler(adaptor.probabilities.begin(), adaptor.probabilities.end())
 {
@@ -30,7 +37,8 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
 
 auto ProbabilityDistributionSet::evaluate() -> Object
 {
-  return make<Double>(distribution_sampler(this->ref<std::mt19937>(std::string("randomEngine"))));
+  size_t index = distribution_sampler(this->ref<std::mt19937>(std::string("randomEngine")));
+  return make<String>(elements.at(index));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

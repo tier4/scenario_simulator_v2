@@ -34,12 +34,12 @@ inline namespace syntax
 
 struct ProbabilityDistributionSet : public ComplexType, private Scope
 {
-  const std::list<ProbabilityDistributionSetElement> elements;
+  const std::vector<ProbabilityDistributionSetElement> elements;
 
   struct ProbabilityDistributionSetAdaptor
   {
     explicit ProbabilityDistributionSetAdaptor(
-      const std::list<ProbabilityDistributionSetElement> & elements)
+      const std::vector<ProbabilityDistributionSetElement> & elements)
     {
       for (const auto & element : elements) {
         probabilities.emplace_back(element.weight);
