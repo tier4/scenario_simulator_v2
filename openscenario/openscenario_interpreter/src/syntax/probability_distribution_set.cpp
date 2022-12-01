@@ -21,10 +21,16 @@ inline namespace syntax
 {
 ProbabilityDistributionSet::ProbabilityDistributionSet(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: elements(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope)),
+: Scope(scope),
+  elements(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope)),
   adaptor(elements),
   distribution_sampler(adaptor.probabilities.begin(), adaptor.probabilities.end())
 {
+}
+
+auto ProbabilityDistributionSet::evaluate() -> Object
+{
+  return make<Double>(distribution_sampler(this->ref<std::mt19937>(std::string("randomEngine"))));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

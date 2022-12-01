@@ -32,7 +32,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct ProbabilityDistributionSet : public ComplexType
+struct ProbabilityDistributionSet : public ComplexType, private Scope
 {
   const std::list<ProbabilityDistributionSetElement> elements;
 
@@ -54,8 +54,7 @@ struct ProbabilityDistributionSet : public ComplexType
 
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 
-  // TODO: implement evaluate()
-  // Use std::discrete_distribution from <random>
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
