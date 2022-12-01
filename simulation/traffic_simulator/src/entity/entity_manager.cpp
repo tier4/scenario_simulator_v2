@@ -171,12 +171,24 @@ auto EntityManager::getLongitudinalDistance(
   const LaneletPose & from, const LaneletPose & to, bool include_adjacent_lanelet,
   bool include_opposite_direction) -> boost::optional<double>
 {
+  LaneletPose from_pose;
+  if (const auto lanelet_pose = hdmap_utils_ptr_->clampLaneletPose(from)) {
+    from_pose = lanelet_pose.get();
+  } else {
+    return boost::none;
+  }
+  LaneletPose to_pose;
+  if (const auto lanelet_pose = hdmap_utils_ptr_->clampLaneletPose(from)) {
+    to_pose = lanelet_pose.get();
+  } else {
+    return boost::none;
+  }
   if (!include_adjacent_lanelet) {
-    auto forward_distance =
-      hdmap_utils_ptr_->getLongitudinalDistance(from.lanelet_id, from.s, to.lanelet_id, to.s);
+    auto forward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
+      from_pose.lanelet_id, from_pose.s, to_pose.lanelet_id, to_pose.s);
 
-    auto backward_distance =
-      hdmap_utils_ptr_->getLongitudinalDistance(to.lanelet_id, to.s, from.lanelet_id, from.s);
+    auto backward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
+      to_pose.lanelet_id, to_pose.s, from_pose.lanelet_id, from_pose.s);
 
     if (forward_distance && backward_distance) {
       if (forward_distance.get() > backward_distance.get()) {
@@ -193,10 +205,11 @@ auto EntityManager::getLongitudinalDistance(
     }
   } else {
     auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
-      hdmap_utils_ptr_->toMapPose(from).pose, from.lanelet_id, 5.0, include_opposite_direction);
+      hdmap_utils_ptr_->toMapPose(from).pose, from_pose.lanelet_id, 5.0,
+      include_opposite_direction);
     from_poses.emplace_back(from);
     auto to_poses = hdmap_utils_ptr_->toLaneletPoses(
-      hdmap_utils_ptr_->toMapPose(to).pose, to.lanelet_id, 5.0, include_opposite_direction);
+      hdmap_utils_ptr_->toMapPose(to).pose, to_pose.lanelet_id, 5.0, include_opposite_direction);
     to_poses.emplace_back(to);
     std::vector<double> distances = {};
     for (const auto & from_pose : from_poses) {
