@@ -52,7 +52,7 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
       return;
     }
-    if (distance_to_front.get() >= 5.1 || 4.9 >= distance_to_front.get()) {
+    if (!equals(distance_to_front.get(), 5.0, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
       return;
     }
@@ -60,7 +60,7 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
       return;
     }
-    if (distance_to_behind.get() >= -4.9 || -5.1 >= distance_to_behind.get()) {
+    if (!equals(distance_to_behind.get(), -5.0, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
       return;
     }

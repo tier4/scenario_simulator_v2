@@ -178,7 +178,7 @@ auto EntityManager::getLongitudinalDistance(
     return boost::none;
   }
   LaneletPose to_pose;
-  if (const auto lanelet_pose = hdmap_utils_ptr_->clampLaneletPose(from)) {
+  if (const auto lanelet_pose = hdmap_utils_ptr_->clampLaneletPose(to)) {
     to_pose = lanelet_pose.get();
   } else {
     return boost::none;
