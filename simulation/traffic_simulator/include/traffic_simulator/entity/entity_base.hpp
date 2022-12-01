@@ -58,9 +58,13 @@ public:
   virtual void cancelRequest();
 
   /*   */ auto clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    -> traffic_simulator_msgs::msg::LaneletPose;
 
   /*   */ auto clampLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
+
+  /*   */ auto clampLaneletPoses(
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_poses) const
+    -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 

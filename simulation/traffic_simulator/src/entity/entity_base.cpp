@@ -53,15 +53,21 @@ auto EntityBase::asAutoware() const -> concealer::Autoware &
 void EntityBase::cancelRequest() {}
 
 auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
-  const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+  const -> traffic_simulator_msgs::msg::LaneletPose
 {
-  return hdmap_utils_ptr_->clampLaneletPose(lanelet_pose);
+  if (const auto ret = hdmap_utils_ptr_->clampLaneletPose(lanelet_pose)) {
+    return ret.get();
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Lanelet pose\n", rosidl_generator_traits::to_yaml(lanelet_pose),
+      "\nis invalid, please check lanelet length and connection.");
+  }
 }
 
 auto EntityBase::clampLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void
 {
   if (status.lanelet_pose_valid) {
-    if (const auto lanelet_pose = clampLaneletPose(status.lanelet_pose)) {
+    if (const auto lanelet_pose = hdmap_utils_ptr_->clampLaneletPose(status.lanelet_pose)) {
       status.lanelet_pose_valid = true;
       status.lanelet_pose = lanelet_pose.get();
     } else {
@@ -69,6 +75,19 @@ auto EntityBase::clampLaneletPose(traffic_simulator_msgs::msg::EntityStatus & st
       status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
     }
   }
+}
+
+auto EntityBase::clampLaneletPoses(
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_poses) const
+  -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
+{
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> ret;
+  std::transform(
+    lanelet_poses.begin(), lanelet_poses.end(), std::back_inserter(ret),
+    [this](const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) {
+      return clampLaneletPose(lanelet_pose);
+    });
+  return ret;
 }
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>

@@ -53,7 +53,7 @@ void PedestrianEntity::requestAssignRoute(
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_.lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints);
+    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, clampLaneletPoses(waypoints));
   }
 }
 
@@ -82,13 +82,7 @@ void PedestrianEntity::requestAcquirePosition(
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_.lanelet_pose_valid) {
-    if (const auto pose = hdmap_utils_ptr_->clampLaneletPose(lanelet_pose)) {
-      route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, pose.get());
-    } else {
-      THROW_SEMANTIC_ERROR(
-        "Lanelet pose\n", rosidl_generator_traits::to_yaml(lanelet_pose),
-        "\nis invalid, please check lanelet length and connection.");
-    }
+    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, clampLaneletPose(lanelet_pose));
   }
 }
 
