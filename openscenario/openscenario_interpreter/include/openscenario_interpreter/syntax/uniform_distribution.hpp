@@ -36,8 +36,7 @@ struct UniformDistribution : public ComplexType, private Scope
 {
   const Range range;
 
-  StochasticDistributionSampler<std::uniform_real_distribution<Double::value_type>>
-    samplerDistribution;
+  StochasticDistributionSampler<std::uniform_real_distribution<Double::value_type>> sample;
 
   explicit UniformDistribution(const pugi::xml_node &, Scope & scope);
 

@@ -23,13 +23,13 @@ UniformDistribution::UniformDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
   range(readElement<Range>("range", node, scope)),
-  samplerDistribution(range.lower_limit.data, range.upper_limit.data)
+  sample(range.lower_limit.data, range.upper_limit.data)
 {
 }
 
 auto UniformDistribution::evaluate() -> Object
 {
-  return make<Double>(samplerDistribution(this->ref<std::mt19937>(std::string("randomEngine"))));
+  return make<Double>(sample(this->ref<std::mt19937>(std::string("randomEngine"))));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

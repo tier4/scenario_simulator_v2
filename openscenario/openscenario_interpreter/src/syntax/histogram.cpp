@@ -23,14 +23,13 @@ Histogram::Histogram(const pugi::xml_node & node, openscenario_interpreter::Scop
 : Scope(scope),
   bins(readElements<HistogramBin, 1>("Bin", node, scope)),
   bin_adaptor(bins),
-  samplerDistribution(
-    bin_adaptor.intervals.begin(), bin_adaptor.intervals.end(), bin_adaptor.densities.begin())
+  sample(bin_adaptor.intervals.begin(), bin_adaptor.intervals.end(), bin_adaptor.densities.begin())
 {
 }
 
 auto Histogram::evaluate() -> Object
 {
-  return make<Double>(samplerDistribution(this->ref<std::mt19937>(std::string("randomEngine"))));
+  return make<Double>(sample(this->ref<std::mt19937>(std::string("randomEngine"))));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

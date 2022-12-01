@@ -40,7 +40,7 @@ struct PoissonDistribution : public ComplexType, private Scope
 
   const Double expected_value;
 
-  StochasticDistributionSampler<std::poisson_distribution<>> samplerDistribution;
+  StochasticDistributionSampler<std::poisson_distribution<>> sample;
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
 

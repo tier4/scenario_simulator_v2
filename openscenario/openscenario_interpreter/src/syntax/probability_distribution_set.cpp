@@ -19,6 +19,8 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+
+// DIRTY HACK?
 template <typename T>
 auto generateVector(const std::list<T> & list) -> std::vector<T>
 {
@@ -31,14 +33,14 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
   elements(
     generateVector(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
   adaptor(elements),
-  samplerDistribution(adaptor.probabilities.begin(), adaptor.probabilities.end())
+  sample(adaptor.probabilities.begin(), adaptor.probabilities.end())
 {
 }
 
 auto ProbabilityDistributionSet::evaluate() -> Object
 {
-  size_t index = samplerDistribution(this->ref<std::mt19937>(std::string("randomEngine")));
-  return make<String>(elements.at(index));
+  size_t index = sample(ref<std::mt19937>(std::string("randomEngine")));
+  return elements.at(index);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
