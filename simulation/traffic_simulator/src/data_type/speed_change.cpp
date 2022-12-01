@@ -31,14 +31,26 @@ static_assert(std::is_copy_assignable_v<RelativeTargetSpeed>);
 static_assert(std::is_move_assignable_v<RelativeTargetSpeed>);
 
 double RelativeTargetSpeed::getAbsoluteValue(
+  const traffic_simulator_msgs::msg::EntityStatus & status,
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
   const
 {
   if (const auto iter = other_status.find(reference_entity_name); iter == other_status.end()) {
-    THROW_SEMANTIC_ERROR(
-      "Reference entity name ", std::quoted(reference_entity_name),
-      " is invalid. Please check entity ", std::quoted(reference_entity_name),
-      " exists and not a same entity you want to request changing target speed.");
+    if (status.name == reference_entity_name) {
+      switch (type) {
+        default:
+        case Type::DELTA:
+          return status.action_status.twist.linear.x + value;
+        case Type::FACTOR:
+          return status.action_status.twist.linear.x * value;
+      }
+    } else {
+      THROW_SEMANTIC_ERROR(
+        "Reference entity name ", std::quoted(reference_entity_name),
+        " is invalid. Please check entity ", std::quoted(reference_entity_name),
+        " exists and not a same entity you want to request changing target speed.");
+    }
+
   } else {
     switch (type) {
       default:

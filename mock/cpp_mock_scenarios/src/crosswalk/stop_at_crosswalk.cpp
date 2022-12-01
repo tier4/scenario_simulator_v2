@@ -51,14 +51,15 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
-    if (t >= 6.15) {
-      if (7.3 >= t) {
-        const auto vel = api_.getEntityStatus("ego").action_status.twist.linear.x;
-        if (std::fabs(0.01) <= vel) {
+    if (t >= 6.6) {
+      if (7.5 >= t) {
+        const auto vel = api_.getCurrentTwist("ego").linear.x;
+        if (std::fabs(0.1) <= vel) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }
       } else {
-        const auto vel = api_.getEntityStatus("ego").action_status.twist.linear.x;
+        const auto vel = api_.getCurrentTwist("ego").linear.x;
+        std::cout << vel << std::endl;
         if (0.1 >= vel) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }

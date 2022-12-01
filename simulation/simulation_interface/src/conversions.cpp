@@ -118,7 +118,9 @@ void toProto(
   traffic_simulator_msgs::Performance & proto)
 {
   proto.set_max_acceleration(performance.max_acceleration);
+  proto.set_max_acceleration_rate(performance.max_acceleration_rate);
   proto.set_max_deceleration(performance.max_deceleration);
+  proto.set_max_deceleration_rate(performance.max_deceleration_rate);
   proto.set_max_speed(performance.max_speed);
 }
 
@@ -127,7 +129,9 @@ void toMsg(
   traffic_simulator_msgs::msg::Performance & performance)
 {
   performance.max_acceleration = proto.max_acceleration();
+  performance.max_acceleration_rate = proto.max_acceleration_rate();
   performance.max_deceleration = proto.max_deceleration();
+  performance.max_deceleration_rate = proto.max_deceleration_rate();
   performance.max_speed = proto.max_speed();
 }
 
@@ -238,6 +242,7 @@ void toProto(
   proto.set_current_action(s.current_action);
   toProto(s.twist, *proto.mutable_twist());
   toProto(s.accel, *proto.mutable_accel());
+  proto.set_linear_jerk(s.linear_jerk);
 }
 
 void toMsg(
@@ -246,6 +251,7 @@ void toMsg(
   s.current_action = proto.current_action();
   toMsg(proto.twist(), s.twist);
   toMsg(proto.accel(), s.accel);
+  s.linear_jerk = proto.linear_jerk();
 }
 
 void toProto(

@@ -89,10 +89,12 @@
  * @brief Expect equal macros for traffic_simulator_msgs.
  */
 
-#define EXPECT_PERFORMANCE_EQ(MSG, PROTO)                           \
-  EXPECT_DOUBLE_EQ(MSG.max_speed, PROTO.max_speed());               \
-  EXPECT_DOUBLE_EQ(MSG.max_acceleration, PROTO.max_acceleration()); \
-  EXPECT_DOUBLE_EQ(MSG.max_deceleration, PROTO.max_deceleration());
+#define EXPECT_PERFORMANCE_EQ(MSG, PROTO)                                     \
+  EXPECT_DOUBLE_EQ(MSG.max_speed, PROTO.max_speed());                         \
+  EXPECT_DOUBLE_EQ(MSG.max_acceleration, PROTO.max_acceleration());           \
+  EXPECT_DOUBLE_EQ(MSG.max_acceleration_rate, PROTO.max_acceleration_rate()); \
+  EXPECT_DOUBLE_EQ(MSG.max_deceleration, PROTO.max_deceleration());           \
+  EXPECT_DOUBLE_EQ(MSG.max_deceleration_rate, PROTO.max_deceleration_rate());
 
 #define EXPECT_AXLE_EQ(MSG, PROTO)                              \
   EXPECT_DOUBLE_EQ(MSG.max_steering, PROTO.max_steering());     \
@@ -126,7 +128,8 @@
 #define EXPECT_ACTION_STATUS_EQ(MSG, PROTO)                                 \
   EXPECT_STREQ(MSG.current_action.c_str(), PROTO.current_action().c_str()); \
   EXPECT_TWIST_EQ(MSG.twist, PROTO.twist());                                \
-  EXPECT_ACCEL_EQ(MSG.accel, PROTO.accel());
+  EXPECT_ACCEL_EQ(MSG.accel, PROTO.accel());                                \
+  EXPECT_DOUBLE_EQ(MSG.linear_jerk, PROTO.linear_jerk());
 
 #define EXPECT_LANELET_POSE_EQ(MSG, PROTO)       \
   EXPECT_EQ(MSG.lanelet_id, PROTO.lanelet_id()); \
