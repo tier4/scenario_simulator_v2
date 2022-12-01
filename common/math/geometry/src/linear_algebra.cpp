@@ -67,6 +67,15 @@ geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec)
 }  // namespace geometry
 }  // namespace math
 
+geometry_msgs::msg::Vector3 operator/(const geometry_msgs::msg::Vector3 & vec, double value)
+{
+  geometry_msgs::msg::Vector3 ret;
+  ret.x = vec.x / value;
+  ret.y = vec.y / value;
+  ret.z = vec.z / value;
+  return ret;
+}
+
 geometry_msgs::msg::Vector3 operator*(const geometry_msgs::msg::Vector3 & vec, double value)
 {
   geometry_msgs::msg::Vector3 ret;

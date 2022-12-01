@@ -2,6 +2,29 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.7 (2022-11-17)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge pull request `#900 <https://github.com/tier4/scenario_simulator_v2/issues/900>`_ from tier4/feature/traffic_simulator/behavior-parameter
+* Increase the default maximum acceleration of `DynamicConstraints`
+* Updates `setBehaviorParameter` to clamp the given value with maximum performance
+* Add new message type `traffic_simulator_msgs::msg::DynamicConstraints`
+* Merge branch 'fix/interpreter/custom_command_action' into feature/interpreter/priority
+* Merge branch 'master' into fix/interpreter/custom_command_action
+* Add some max constraints to `msg::BehaviorParameter`
+* Add `max\_(acceleration|deceleration)_rate` to `traffic_simulator_msgs::msg::Performance`
+* Merge branch 'master' into feature/bt_auto_ros_ports
+* Merge pull request `#898 <https://github.com/tier4/scenario_simulator_v2/issues/898>`_ from tier4/feature/interpreter/speed-profile-action
+* Add test scenario `LongitudinalAction.SpeedProfileAction`
+* Rename `DriverModel` to `BehaviorParameter`
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Shota Minami, kyabe2718, yamacir-kit
+
 0.6.6 (2022-08-30)
 ------------------
 * Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference

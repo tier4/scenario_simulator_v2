@@ -45,7 +45,7 @@ auto AutowareUniverse::approve(const CooperateStatusArray & cooperate_status_arr
   }
 
   if (not request->commands.empty()) {
-    requestCooperateCommands(request);
+    task_queue.delay([this, request]() { requestCooperateCommands(request); });
   }
 }
 
@@ -114,8 +114,34 @@ auto AutowareUniverse::engage() -> void
   });
 }
 
+auto AutowareUniverse::engageable() const -> bool
+{
+  rethrow();
+  return task_queue.exhausted() and isWaitingForEngage();
+}
+
+auto AutowareUniverse::engaged() const -> bool
+{
+  rethrow();
+  return task_queue.exhausted() and isDriving();
+}
+
 auto AutowareUniverse::update() -> void
 {
+  setAcceleration([this]() {
+    Acceleration message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "/base_link";
+    message.accel.accel = current_acceleration;
+    message.accel.covariance.at(6 * 0 + 0) = 0.001;  // linear x
+    message.accel.covariance.at(6 * 1 + 1) = 0.001;  // linear y
+    message.accel.covariance.at(6 * 2 + 2) = 0.001;  // linear z
+    message.accel.covariance.at(6 * 3 + 3) = 0.001;  // angular x
+    message.accel.covariance.at(6 * 4 + 4) = 0.001;  // angular y
+    message.accel.covariance.at(6 * 5 + 5) = 0.001;  // angular z
+    return message;
+  }());
+
   setControlModeReport([this]() {
     ControlModeReport message;
     message.mode = ControlModeReport::AUTONOMOUS;
@@ -238,14 +264,12 @@ auto AutowareUniverse::sendSIGINT() -> void  //
 
 auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
 {
-  auto request = std::make_shared<SetVelocityLimit::Request>();
-  request->velocity = velocity_limit;
-  requestSetVelocityLimit(request);
-}
-
-auto AutowareUniverse::isReady() noexcept -> bool
-{
-  return is_ready or (is_ready = isWaitingForRoute());
+  task_queue.delay([this, velocity_limit]() {
+    auto request = std::make_shared<SetVelocityLimit::Request>();
+    request->velocity = velocity_limit;
+    // We attempt to resend the service up to 30 times, but this number of times was determined by heuristics, not for any technical reason
+    requestSetVelocityLimit(request, 30);
+  });
 }
 
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
@@ -277,8 +301,9 @@ auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostr
         "Unsupported EmergencyState, state number : ", static_cast<int>(message.state));
   }
 
-  return out;
 #undef CASE
+
+  return out;
 }
 
 auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
@@ -325,9 +350,11 @@ auto operator<<(std::ostream & out, const TurnIndicatorsCommand & message) -> st
         "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
   }
 
-  return out;
 #undef CASE
+
+  return out;
 }
+
 auto operator>>(std::istream & is, TurnIndicatorsCommand & message) -> std::istream &
 {
 #define STATE(IDENTIFIER) {#IDENTIFIER, TurnIndicatorsCommand::IDENTIFIER}

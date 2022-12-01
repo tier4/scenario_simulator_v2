@@ -18,7 +18,6 @@
 #include <memory>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <simple_sensor_simulator/exception.hpp>
-#include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_generator.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
@@ -42,17 +41,17 @@ geometry_msgs::Pose OccupancyGridSensorBase::getSensorPose(
 const std::vector<std::string> OccupancyGridSensorBase::getDetectedObjects(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
 {
-  std::vector<std::string> detected_objects;
+  std::vector<std::string> detected_entities;
   const auto pose = getSensorPose(status);
   for (const auto & s : status) {
     double distance = std::hypot(
       s.pose().position().x() - pose.position().x(), s.pose().position().y() - pose.position().y(),
       s.pose().position().z() - pose.position().z());
     if (s.name() != configuration_.entity() && distance <= configuration_.range()) {
-      detected_objects.emplace_back(s.name());
+      detected_entities.emplace_back(s.name());
     }
   }
-  return detected_objects;
+  return detected_entities;
 }
 
 template <>
@@ -60,28 +59,48 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp,
   const std::vector<std::string> & lidar_detected_entity) -> nav_msgs::msg::OccupancyGrid
 {
-  std::vector<std::string> detected_objects;
-  if (configuration_.filter_by_range()) {
-    detected_objects = getDetectedObjects(status);
-  } else {
-    detected_objects = lidar_detected_entity;
-  }
-  boost::optional<geometry_msgs::msg::Pose> ego_pose_north_up;
-  OccupancyGridGenerator generator(configuration_);
-  for (const auto & s : status) {
-    if (configuration_.entity() == s.name()) {
-      geometry_msgs::msg::Pose pose;
-      simulation_interface::toMsg(s.pose(), pose);
-      pose.orientation = geometry_msgs::msg::Quaternion();
-      ego_pose_north_up = pose;
+  // check if entities in `status` have unique names
+  {
+    auto unique_entities = std::set<std::string>();
+    for (const auto & s : status) {
+      if (configuration_.entity() != s.name()) {
+        if (unique_entities.count(s.name()) != 0) {
+          throw std::runtime_error(
+            "status contains primitives with the same name: `" + s.name() + "`");
+        }
+        unique_entities.insert(s.name());
+      }
     }
   }
+
+  // find ego from `status` and get its pose with north side up
+  auto ego_pose_north_up = geometry_msgs::msg::Pose();
+  {
+    auto is_ego = [&](const auto & s) { return configuration_.entity() == s.name(); };
+    auto ego = std::find_if(status.begin(), status.end(), is_ego);
+    if (ego == status.end()) {
+      throw SimulationRuntimeError("Failed to calculate ego pose with north up.");
+    }
+    simulation_interface::toMsg(ego->pose(), ego_pose_north_up);
+    ego_pose_north_up.orientation = geometry_msgs::msg::Quaternion();
+  }
+
+  // construct a `set` of detected object names to look up entities later
+  auto detected_entities = std::set<std::string>();
+  {
+    auto v = configuration_.filter_by_range() ? getDetectedObjects(status) : lidar_detected_entity;
+    detected_entities.insert(v.begin(), v.end());
+  }
+
+  // enumerate all primitive shapes of entities
+  auto primitives = std::vector<std::unique_ptr<primitives::Primitive>>();
   for (const auto & s : status) {
     if (configuration_.entity() != s.name()) {
-      auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
-      if (result == detected_objects.end()) {
+      // skip if entity is not actually detected
+      if (detected_entities.count(s.name()) == 0) {
         continue;
       }
+
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(s.pose(), pose);
       auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
@@ -92,15 +111,33 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
       pose.position.x = pose.position.x + center.x();
       pose.position.y = pose.position.y + center.y();
       pose.position.z = pose.position.z + center.z();
-      generator.addPrimitive<simple_sensor_simulator::primitives::Box>(
-        s.name(), s.bounding_box().dimensions().x(), s.bounding_box().dimensions().y(),
-        s.bounding_box().dimensions().z(), pose);
+
+      primitives.push_back(std::make_unique<primitives::Box>(
+        s.bounding_box().dimensions().x(), s.bounding_box().dimensions().y(),
+        s.bounding_box().dimensions().z(), pose));
     }
   }
-  if (ego_pose_north_up) {
-    return generator.generate(ego_pose_north_up.get(), stamp);
-  } else {
-    throw SimulationRuntimeError("Failed to calculate ego pose with north up.");
+
+  // reset `Grid` and draw all primitive shapes on `Grid`
+  grid_.reset(ego_pose_north_up);
+  for (const auto & primitive : primitives) {
+    grid_.addPrimitive(primitive);
   }
+
+  // construct `OccupancyGrid`
+  nav_msgs::msg::OccupancyGrid occupancy_grid;
+  occupancy_grid.header.stamp = stamp;
+  occupancy_grid.header.frame_id = "map";
+  occupancy_grid.data = grid_.getData();
+  occupancy_grid.info.height = configuration_.height();
+  occupancy_grid.info.width = configuration_.width();
+  occupancy_grid.info.map_load_time = stamp;
+  occupancy_grid.info.resolution = configuration_.resolution();
+  occupancy_grid.info.origin = ego_pose_north_up;
+  occupancy_grid.info.origin.position.x -=
+    0.5 * configuration_.height() * configuration_.resolution();
+  occupancy_grid.info.origin.position.y -=
+    0.5 * configuration_.width() * configuration_.resolution();
+  return occupancy_grid;
 }
 }  // namespace simple_sensor_simulator

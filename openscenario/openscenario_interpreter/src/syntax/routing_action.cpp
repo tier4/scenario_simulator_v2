@@ -24,7 +24,7 @@ RoutingAction::RoutingAction(const pugi::xml_node & node, Scope & scope)
 : ComplexType(
     choice(node,
       std::make_pair(     "AssignRouteAction", [&](const auto & node) { return make<     AssignRouteAction>(node, scope); }),
-      std::make_pair("FollowTrajectoryAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair("FollowTrajectoryAction", [&](const auto & node) { return make<FollowTrajectoryAction>(node, scope); }),
       std::make_pair( "AcquirePositionAction", [&](const auto & node) { return make< AcquirePositionAction>(node, scope); })))
 // clang-format on
 {

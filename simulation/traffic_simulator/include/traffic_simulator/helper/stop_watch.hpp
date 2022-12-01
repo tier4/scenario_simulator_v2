@@ -18,6 +18,7 @@
 #include <boost/optional.hpp>
 #include <chrono>
 #include <iostream>
+#include <rclcpp/rclcpp.hpp>
 #include <string>
 
 namespace traffic_simulator
@@ -28,7 +29,14 @@ template <typename T>
 class StopWatch
 {
 public:
-  explicit StopWatch(const std::string & name) : name(name) {}
+  explicit StopWatch(const std::string & name, bool verbose = false, bool autostart = true)
+  : name(name), verbose(verbose)
+  {
+    if (autostart) {
+      start();
+    }
+  }
+
   void start()
   {
     end_time = boost::none;
@@ -37,25 +45,39 @@ public:
   void stop() { end_time = std::chrono::system_clock::now(); }
   void print()
   {
-    if (start_time && end_time) {
-      double elapsed = std::chrono::duration_cast<T>(end_time.get() - start_time.get()).count();
-      if (typeid(T) == typeid(std::chrono::microseconds)) {
-        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " microseconds"
-                  << std::endl;
+    if (verbose) {
+      if (start_time && end_time) {
+        double elapsed = std::chrono::duration_cast<T>(end_time.get() - start_time.get()).count();
+        if (typeid(T) == typeid(std::chrono::microseconds)) {
+          std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " microseconds"
+                    << std::endl;
+        }
+        if (typeid(T) == typeid(std::chrono::milliseconds)) {
+          std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " milliseconds"
+                    << std::endl;
+        }
+        if (typeid(T) == typeid(std::chrono::seconds)) {
+          std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " seconds"
+                    << std::endl;
+        }
       }
-      if (typeid(T) == typeid(std::chrono::milliseconds)) {
-        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " milliseconds"
-                  << std::endl;
+    } else {
+      if (start_time) {
+        RCLCPP_ERROR_STREAM(
+          rclcpp::get_logger(name), "Stop watch : " << name << " did not started.");
       }
-      if (typeid(T) == typeid(std::chrono::seconds)) {
-        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " seconds"
-                  << std::endl;
+      if (end_time) {
+        RCLCPP_ERROR_STREAM(
+          rclcpp::get_logger(name), "Stop watch : " << name << " did not stopped.");
       }
     }
   }
 
-private:
+public:
   const std::string name;
+  const bool verbose;
+
+private:
   boost::optional<std::chrono::system_clock::time_point> start_time, end_time;
 };
 }  // namespace helper

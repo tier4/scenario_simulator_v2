@@ -26,17 +26,19 @@ pid_t process_id = 0;
 
 auto stop() -> void
 {
-  int status = 0;
+  if (int status = 0; process_id) {
+    /*
+       NOTE: If the interval between running `record::start(...)` and
+       `record::stop()` is too short, the bag file will not be saved
+       successfully. In such cases, the ros2 bag record command is not
+       recording, but before it, that is, booting. So SIGINT doesn't end the
+       record, it just kills the Python interpreter.
+    */
+    std::this_thread::sleep_for(std::chrono::seconds(3));  // DIRTY HACK!!!
 
-  // NOTE: If the interval between running `record::start(...)` and
-  // `record::stop()` is too short, the bag file will not be saved
-  // successfully. In such cases, the ros2 bag record command is not recording,
-  // but before it, that is, booting. So SIGINT doesn't end the record, it just
-  // kills the Python interpreter.
-  std::this_thread::sleep_for(std::chrono::seconds(3));  // DIRTY HACK!!!
-
-  if (::kill(process_id, SIGINT) or waitpid(process_id, &status, 0) < 0) {
-    std::exit(EXIT_FAILURE);
+    if (::kill(process_id, SIGINT) or waitpid(process_id, &status, 0) < 0) {
+      std::exit(EXIT_FAILURE);
+    }
   }
 }
 }  // namespace record

@@ -17,6 +17,7 @@
 #include <behavior_tree_plugin/pedestrian/behavior_tree.hpp>
 #include <iostream>
 #include <memory>
+#include <pugixml.hpp>
 #include <string>
 #include <utility>
 
@@ -24,17 +25,55 @@ namespace entity_behavior
 {
 void PedestrianBehaviorTree::configure(const rclcpp::Logger & logger)
 {
-  std::string path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin") +
-                     "/config/pedestrian_entity_behavior.xml";
-  factory_.registerNodeType<entity_behavior::pedestrian::FollowLaneAction>("FollowLane");
-  factory_.registerNodeType<entity_behavior::pedestrian::WalkStraightAction>("WalkStraightAction");
-  tree_ = factory_.createTreeFromFile(path);
+  namespace pedestrian = entity_behavior::pedestrian;
+  factory_.registerNodeType<pedestrian::FollowLaneAction>("FollowLane");
+  factory_.registerNodeType<pedestrian::WalkStraightAction>("WalkStraightAction");
+
+  auto base_path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin");
+  auto format_path = base_path + "/config/pedestrian_entity_behavior.xml";
+  tree_ = createBehaviorTree(format_path);
   logging_event_ptr_ =
     std::make_unique<behavior_tree_plugin::LoggingEvent>(tree_.rootNode(), logger);
   reset_request_event_ptr_ = std::make_unique<behavior_tree_plugin::ResetRequestEvent>(
     tree_.rootNode(), [&]() { return getRequest(); },
     [&]() { setRequest(traffic_simulator::behavior::Request::NONE); });
   setRequest(traffic_simulator::behavior::Request::NONE);
+}
+
+auto PedestrianBehaviorTree::createBehaviorTree(const std::string & format_path) -> BT::Tree
+{
+  auto xml_doc = pugi::xml_document();
+  xml_doc.load_file(format_path.c_str());
+
+  class XMLTreeWalker : public pugi::xml_tree_walker
+  {
+  public:
+    explicit XMLTreeWalker(const BT::TreeNodeManifest & manifest) : manifest_(manifest) {}
+
+  private:
+    bool for_each(pugi::xml_node & node) final
+    {
+      if (node.name() == manifest_.registration_ID) {
+        for (const auto & [port, info] : manifest_.ports) {
+          node.append_attribute(port.c_str()) = std::string("{" + port + "}").c_str();
+        }
+      }
+      return true;
+    }
+
+    const BT::TreeNodeManifest & manifest_;
+  };
+
+  for (const auto & [id, manifest] : factory_.manifests()) {
+    if (factory_.builtinNodes().count(id) == 0) {
+      auto walker = XMLTreeWalker(manifest);
+      xml_doc.traverse(walker);
+    }
+  }
+
+  auto xml_str = std::stringstream();
+  xml_doc.save(xml_str);
+  return factory_.createTreeFromText(xml_str.str());
 }
 
 const std::string & PedestrianBehaviorTree::getCurrentAction() const

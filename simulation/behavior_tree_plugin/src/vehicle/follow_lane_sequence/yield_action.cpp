@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
-#include <boost/algorithm/clamp.hpp>
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -56,8 +56,7 @@ const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoint
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    double horizon =
-      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+    double horizon = getHorizon();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
@@ -79,9 +78,9 @@ boost::optional<double> YieldAction::calculateTargetSpeed()
    */
   double rest_distance =
     distance_to_stop_target_.get() - vehicle_parameters.bounding_box.dimensions.x * 0.5 - 1.0;
-  if (rest_distance < calculateStopDistance(driver_model.deceleration)) {
+  if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     if (rest_distance > 0) {
-      return std::sqrt(2 * driver_model.deceleration * rest_distance);
+      return std::sqrt(2 * behavior_parameter.dynamic_constraints.max_deceleration * rest_distance);
     } else {
       return 0;
     }
@@ -97,7 +96,7 @@ BT::NodeStatus YieldAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!driver_model.see_around) {
+  if (!behavior_parameter.see_around) {
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {
@@ -108,7 +107,7 @@ BT::NodeStatus YieldAction::tick()
     if (!target_speed) {
       target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
     }
-    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
     const auto waypoints = calculateWaypoints();
     if (waypoints.waypoints.empty()) {
       return BT::NodeStatus::FAILURE;
@@ -123,7 +122,7 @@ BT::NodeStatus YieldAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;

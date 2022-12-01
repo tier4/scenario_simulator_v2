@@ -175,7 +175,7 @@ def convert(input: Path, output: Path, verbose: bool = True):
         output.mkdir(parents=True, exist_ok=True)
 
     schema = xmlschema.XMLSchema(
-        resource_string(__name__, "resources/OpenSCENARIO-1.1.xsd").decode("utf-8")
+        resource_string(__name__, "resources/OpenSCENARIO-1.2.xsd").decode("utf-8")
     )
 
     yaml = load_yaml(input)

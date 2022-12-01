@@ -24,7 +24,7 @@ LoggingEvent::LoggingEvent(BT::TreeNode * root_node, const rclcpp::Logger & logg
 }
 
 void LoggingEvent::callback(
-  BT::Duration /*timestamp*/, const BT::TreeNode & node, BT::NodeStatus prev_status,
+  BT::Duration /*timestamp*/, const BT::TreeNode & node, BT::NodeStatus /*prev_status*/,
   BT::NodeStatus status)
 {
   // RCLCPP_INFO_STREAM(

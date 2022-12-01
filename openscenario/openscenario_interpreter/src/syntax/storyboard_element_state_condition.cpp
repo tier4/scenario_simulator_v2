@@ -45,8 +45,7 @@ StoryboardElementStateCondition::StoryboardElementStateCondition(
   auto register_callback = [this]() {
     local()
       .ref<StoryboardElement>(storyboard_element_ref)
-      .callbacks[state]
-      .emplace_back([this](auto && storyboard_element) {
+      .addTransitionCallback(state, [this](auto && storyboard_element) {
         current_state = storyboard_element.state().template as<StoryboardElementState>();
       });
   };

@@ -35,9 +35,10 @@ float64_t SimModelIdealSteerAccGeared::getSteer() { return input_(IDX_U::STEER_D
 void SimModelIdealSteerAccGeared::update(const float64_t & dt)
 {
   const auto prev_state = state_;
-
   updateRungeKutta(dt, input_);
 
+  // consider gear
+  // update position and velocity first, and then acceleration is calculated naturally
   updateStateWithGear(state_, prev_state, gear_, dt);
 }
 
@@ -59,8 +60,7 @@ Eigen::VectorXd SimModelIdealSteerAccGeared::calcModel(
 }
 
 void SimModelIdealSteerAccGeared::updateStateWithGear(
-  Eigen::VectorXd & state, const Eigen::VectorXd & prev_state, const uint8_t gear,
-  const double /*dt*/)
+  Eigen::VectorXd & state, const Eigen::VectorXd & prev_state, const uint8_t gear, const double dt)
 {
   using autoware_auto_vehicle_msgs::msg::GearCommand;
   if (
@@ -97,5 +97,5 @@ void SimModelIdealSteerAccGeared::updateStateWithGear(
     state(IDX::YAW) = prev_state(IDX::YAW);
   }
 
-  // state(IDX::ACCX) = (state(IDX::VX) - prev_state(IDX::VX)) / std::max(dt, 1.0e-5);
+  current_acc_ = (state(IDX::VX) - prev_state(IDX::VX)) / std::max(dt, 1.0e-5);
 }

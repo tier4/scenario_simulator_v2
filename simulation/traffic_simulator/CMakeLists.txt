@@ -27,8 +27,11 @@ ament_auto_find_build_dependencies()
 ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
   src/behavior/route_planner.cpp
+  src/behavior/longitudinal_speed_planning.cpp
   src/color_utils/color_utils.cpp
-  src/data_type/data_types.cpp
+  src/data_type/behavior.cpp
+  src/data_type/lane_change.cpp
+  src/data_type/speed_change.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
   src/entity/entity_manager.cpp
@@ -37,8 +40,8 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/vehicle_entity.cpp
   src/hdmap_utils/hdmap_utils.cpp
   src/helper/helper.cpp
-  src/job/job_list.cpp
   src/job/job.cpp
+  src/job/job_list.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp
   src/metrics/momentary_stop_metric.cpp
@@ -46,19 +49,17 @@ ament_auto_add_library(traffic_simulator SHARED
   src/metrics/reaction_time_metric.cpp
   src/metrics/traveled_distance_metric.cpp
   src/simulation_clock/simulation_clock.cpp
-  src/traffic_lights/traffic_light_manager.cpp
-  src/traffic_lights/traffic_light.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
-  src/vehicle_model/sim_model_delay_steer_acc_geared.cpp
+  src/traffic_lights/traffic_light.cpp
+  src/traffic_lights/traffic_light_manager.cpp
   src/vehicle_model/sim_model_delay_steer_acc.cpp
+  src/vehicle_model/sim_model_delay_steer_acc_geared.cpp
   src/vehicle_model/sim_model_delay_steer_vel.cpp
-  src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
   src/vehicle_model/sim_model_ideal_steer_acc.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
   src/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_model/sim_model_interface.cpp
-  src/vehicle_model/sim_model_time_delay.cpp
-  src/vehicle_model/sim_model_util.cpp
 )
 
 target_link_libraries(traffic_simulator

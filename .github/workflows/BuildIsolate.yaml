@@ -12,7 +12,7 @@ jobs:
   build_isolate:
     name: build_isolate
     runs-on: ubuntu-20.04
-    timeout-minutes: 90
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -23,7 +23,6 @@ jobs:
             concealer,
             cpp_mock_scenarios,
             kashiwanoha_map,
-            lanelet2_extension_psim,
             lanelet2_matching,
             openscenario_interpreter,
             openscenario_interpreter_example,
