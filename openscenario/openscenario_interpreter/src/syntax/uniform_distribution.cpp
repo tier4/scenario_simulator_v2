@@ -29,7 +29,7 @@ UniformDistribution::UniformDistribution(
 
 auto UniformDistribution::evaluate() -> Object
 {
-  return make(distribution_sampler(this->ref<std::mt19937>(std::string("randomEngine"))));
+  return make<Double>(distribution_sampler(this->ref<std::mt19937>(std::string("randomEngine"))));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
