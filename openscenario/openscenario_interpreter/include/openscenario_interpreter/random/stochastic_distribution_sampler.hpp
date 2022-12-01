@@ -27,7 +27,7 @@ template <typename DistributionT>
 struct StochasticDistributionSampler
 {
   template <typename... Ts>
-  StochasticDistributionSampler(Ts... xs) : distribution(xs...)
+  explicit StochasticDistributionSampler(Ts... xs) : distribution(xs...)
   {
   }
 
