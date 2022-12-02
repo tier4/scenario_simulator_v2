@@ -97,33 +97,21 @@ auto SpeedProfileAction::endsImmediately() const -> bool { return false; }
 
 auto SpeedProfileAction::run() -> void
 {
-  auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-    if (entity_ref.empty()) {
-      return equal_to<double>()(evaluateSpeed(actor), speed_profile_entry.speed);
-    } else {
-      return equal_to<double>()(
-        evaluateSpeed(actor), speed_profile_entry.speed + evaluateSpeed(entity_ref));
-    }
-  };
-
   for (auto && [actor, iter] : accomplishments) {
+    auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
+      if (entity_ref.empty()) {
+        return equal_to<double>()(evaluateSpeed(actor), speed_profile_entry.speed);
+      } else {
+        return equal_to<double>()(
+          evaluateSpeed(actor), speed_profile_entry.speed + evaluateSpeed(entity_ref));
+      }
+    };
+
     if (
       iter != std::end(speed_profile_entry) and accomplished(actor, *iter) and
       ++iter != std::end(speed_profile_entry)) {
       apply(actor, *iter);
     }
-  }
-
-  for (auto && [actor, iter] : accomplishments) {
-    auto target_speed = [&]() -> double {
-      if (iter == std::end(speed_profile_entry)) {
-        return Double::nan();
-      } else if (entity_ref.empty()) {
-        return iter->speed;
-      } else {
-        return evaluateSpeed(entity_ref) + iter->speed;
-      }
-    };
   }
 }
 

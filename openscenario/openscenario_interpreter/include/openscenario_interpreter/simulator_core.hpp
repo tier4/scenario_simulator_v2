@@ -184,11 +184,11 @@ public:
       return core->spawn(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename EntityRef>
-    [[deprecated]] static auto getBehaviorParameter(const EntityRef & entity_ref)
-    {
-      return core->getBehaviorParameter(entity_ref);
-    }
+    // template <typename EntityRef>
+    // [[deprecated]] static auto getBehaviorParameter(const EntityRef & entity_ref)
+    // {
+    //   return core->getBehaviorParameter(entity_ref);
+    // }
 
     template <typename EntityRef, typename DynamicConstraints>
     static auto applyProfileAction(
