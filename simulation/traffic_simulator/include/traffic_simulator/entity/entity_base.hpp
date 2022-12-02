@@ -22,6 +22,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
@@ -60,6 +61,10 @@ public:
 
   virtual auto getCurrentAction() const -> std::string = 0;
 
+  /*   */ auto getCurrentAccel() const -> geometry_msgs::msg::Accel;
+
+  /*   */ auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
+
   /*   */ auto getDistanceToLaneBound() -> double;
 
   /*   */ auto getDistanceToLaneBound(std::int64_t lanelet_id) const -> double;
@@ -80,6 +85,12 @@ public:
 
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
+  virtual auto getDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints;
+
+  virtual auto getDefaultDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
+
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const traffic_simulator_msgs::msg::EntityStatus &;
 
@@ -87,7 +98,7 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
 
-  /*   */ auto getLinearJerk() const -> boost::optional<double>;
+  /*   */ auto getLinearJerk() const -> double;
 
   /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
@@ -108,6 +119,10 @@ public:
   /*   */ auto isNpcLogicStarted() const -> bool;
 
   virtual void onUpdate(double current_time, double step_time);
+
+  virtual void onPostUpdate(double current_time, double step_time);
+
+  /*   */ void resetDynamicConstraints();
 
   virtual void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) = 0;
 
@@ -148,7 +163,13 @@ public:
 
   virtual void setAccelerationLimit(double acceleration) = 0;
 
+  virtual void setAccelerationRateLimit(double acceleration_rate) = 0;
+
   virtual void setDecelerationLimit(double deceleration) = 0;
+
+  virtual void setDecelerationRateLimit(double deceleration_rate) = 0;
+
+  /*   */ void setDynamicConstraints(const traffic_simulator_msgs::msg::DynamicConstraints &);
 
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
 
@@ -161,6 +182,8 @@ public:
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &);
 
   virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> void;
+
+  virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 
   virtual auto setLinearVelocity(const double linear_velocity) -> void;
 
@@ -194,25 +217,29 @@ protected:
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
-  boost::optional<double> linear_jerk_;
-
   double stand_still_duration_ = 0.0;
 
   boost::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
 
+  std::unique_ptr<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>
+    speed_planner_;
+
 private:
-  virtual void requestSpeedChangeWithConstantAcceleration(
+  virtual auto requestSpeedChangeWithConstantAcceleration(
     const double target_speed, const speed_change::Transition, double acceleration,
-    const bool continuous);
-  virtual void requestSpeedChangeWithConstantAcceleration(
+    const bool continuous) -> void;
+  virtual auto requestSpeedChangeWithConstantAcceleration(
     const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, double acceleration, const bool continuous);
-  virtual void requestSpeedChangeWithTimeConstraint(
-    const double target_speed, const speed_change::Transition, double acceleration_time);
-  virtual void requestSpeedChangeWithTimeConstraint(
+    const speed_change::Transition transition, double acceleration, const bool continuous) -> void;
+  virtual auto requestSpeedChangeWithTimeConstraint(
+    const double target_speed, const speed_change::Transition, double acceleration_time) -> void;
+  virtual auto requestSpeedChangeWithTimeConstraint(
     const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, double time);
+    const speed_change::Transition transition, double time) -> void;
+  /*   */ auto isTargetSpeedReached(double target_speed) const -> bool;
+  /*   */ auto isTargetSpeedReached(const speed_change::RelativeTargetSpeed & target_speed) const
+    -> bool;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -59,11 +59,7 @@ public:
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
 
-  auto getEntityTypename() const -> const std::string & override
-  {
-    static const std::string result = "PedestrianEntity";
-    return result;
-  }
+  auto getEntityTypename() const -> const std::string & override;
 
   void onUpdate(double current_time, double step_time) override;
 
@@ -76,19 +72,10 @@ public:
 
   void cancelRequest() override;
 
-  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
-  {
-    EntityBase::setHdMapUtils(ptr);
-    route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
-    behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
-  }
+  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override;
 
   void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr) override
-  {
-    EntityBase::setTrafficLightManager(ptr);
-    behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
-  }
+    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr) override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
 
@@ -96,50 +83,34 @@ public:
 
   void setAccelerationLimit(double acceleration) override;
 
+  void setAccelerationRateLimit(double acceleration_rate) override;
+
   void setDecelerationLimit(double deceleration) override;
+
+  void setDecelerationRateLimit(double deceleration) override;
 
   void requestAssignRoute(
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
-  std::string getCurrentAction() const override
-  {
-    if (!npc_logic_started_) {
-      return "waiting";
-    }
-    return behavior_plugin_ptr_->getCurrentAction();
-  }
+  std::string getCurrentAction() const override;
 
-  std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
-  {
-    if (status_.lanelet_pose_valid) {
-      return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
-    } else {
-      return {};
-    }
-  }
+  auto getDefaultDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
-  boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
-  {
-    return boost::none;
-  }
+  auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
 
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override
-  {
-    return route_planner_ptr_->getGoalPoses();
-  }
+  auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  const traffic_simulator_msgs::msg::WaypointsArray getWaypoints() override
-  {
-    return traffic_simulator_msgs::msg::WaypointsArray();
-  };
+  auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> override;
+
+  auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   const std::string plugin_name;
 
-private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
-  std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
+  const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };
 }  // namespace entity

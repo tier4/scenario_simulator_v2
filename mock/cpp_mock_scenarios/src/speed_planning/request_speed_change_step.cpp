@@ -19,18 +19,20 @@
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 // headers in STL
 #include <memory>
 #include <string>
 #include <vector>
 
-class MomentaryStopScenario : public cpp_mock_scenarios::CppScenarioNode
+class RequestSpeedChangeScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit MomentaryStopScenario(const rclcpp::NodeOptions & option)
+  explicit RequestSpeedChangeScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "momentary_stop", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "request_speed_change_step",
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option)
   {
     start();
@@ -39,19 +41,12 @@ public:
 private:
   void onUpdate() override
   {
-    // LCOV_EXCL_START
-    if (!api_.metricExists("ego_momentary_stop")) {
+    if (
+      api_.getCurrentTime() <= 0.999 && !equals(api_.getCurrentTwist("ego").linear.x, 10.0, 0.01) &&
+      !equals(api_.getCurrentTwist("front").linear.x, 10.0, 0.01)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (
-      api_.metricExists("ego_momentary_stop") &&
-      api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::FAILURE) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    // LCOV_EXCL_STOP
-    if (
-      api_.metricExists("ego_momentary_stop") &&
-      api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::SUCCESS) {
+    if (api_.getCurrentTime() >= 1.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -59,12 +54,23 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34606, 20.0), getVehicleParameters());
-    api_.setLinearVelocity("ego", 7);
-    api_.requestSpeedChange("ego", 7, true);
-    api_.addMetric<metrics::MomentaryStopMetric>(
-      "ego_momentary_stop", "ego", -10, 10, 120635,
-      metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE, 30, 1, 0.05);
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
+    api_.setLinearVelocity("ego", 0);
+    api_.requestSpeedChange(
+      "ego", 10.0, traffic_simulator::speed_change::Transition::STEP,
+      traffic_simulator::speed_change::Constraint(
+        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
+      true);
+
+    api_.spawn(
+      "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
+      getVehicleParameters());
+    api_.setLinearVelocity("front", 0);
+    api_.requestSpeedChange(
+      "front", 10.0, traffic_simulator::speed_change::Transition::STEP,
+      traffic_simulator::speed_change::Constraint(
+        traffic_simulator::speed_change::Constraint::Type::TIME, 0.0),
+      true);
   }
 };
 
@@ -72,7 +78,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<MomentaryStopScenario>(options);
+  auto component = std::make_shared<RequestSpeedChangeScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

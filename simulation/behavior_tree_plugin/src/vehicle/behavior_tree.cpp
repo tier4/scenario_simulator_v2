@@ -134,13 +134,6 @@ auto VehicleBehaviorTree::setBehaviorParameter(
 
     result.dynamic_constraints.max_speed = std::clamp(
       result.dynamic_constraints.max_speed, 0.0, vehicle_parameters.performance.max_speed);
-
-    result.acceleration =
-      std::clamp(result.acceleration, 0.0, result.dynamic_constraints.max_acceleration);
-
-    result.deceleration =
-      std::clamp(result.deceleration, 0.0, result.dynamic_constraints.max_deceleration);
-
     return result;
   };
 
