@@ -19,7 +19,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 // DIRTY HACK?
 template <typename T>
 auto generateVector(const std::list<T> & list) -> std::vector<T>

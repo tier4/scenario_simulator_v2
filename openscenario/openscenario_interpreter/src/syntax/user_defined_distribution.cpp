@@ -21,8 +21,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 UserDefinedDistribution::UserDefinedDistribution(const pugi::xml_node & node, const Scope & scope)
-: Scope(scope),
-  type(readAttribute<String>("type", node, local()))
+: Scope(scope), type(readAttribute<String>("type", node, local()))
 {
 }
 }  // namespace syntax
