@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace random
 {
-template <typename DistributionT>
+template <typename DistributorT>
 struct StochasticDistributionSampler
 {
   template <typename... Ts>
@@ -31,7 +31,7 @@ struct StochasticDistributionSampler
   {
   }
 
-  DistributionT distribute;
+  DistributorT distribute;
 
   auto operator()(std::mt19937 & random_engine) { return distribute(random_engine); }
 };
