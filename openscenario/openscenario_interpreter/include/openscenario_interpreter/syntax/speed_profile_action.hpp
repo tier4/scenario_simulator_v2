@@ -70,14 +70,6 @@ struct SpeedProfileAction : private Scope,  // NOTE: Required for access to acto
 
   std::unordered_map<String, std::list<SpeedProfileEntry>::const_iterator> accomplishments;
 
-  struct [[deprecated]] dynamics
-  {
-    double speed = 0, acceleration = 0, acceleration_rate = 0, time = 0,
-           remain_time = std::numeric_limits<double>::infinity();
-  };
-
-  [[deprecated]] std::unordered_map<std::string, dynamics> previous;
-
   explicit SpeedProfileAction(const pugi::xml_node &, Scope &);
 
   auto accomplished() -> bool;

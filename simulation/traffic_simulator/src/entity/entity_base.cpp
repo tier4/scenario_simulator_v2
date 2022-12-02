@@ -258,7 +258,6 @@ void EntityBase::onPostUpdate(double /*current_time*/, double step_time)
 
 void EntityBase::resetDynamicConstraints()
 {
-  std::cout << "RESET!!! " << getStatus().name << std::endl;
   setDynamicConstraints(getDefaultDynamicConstraints());
 }
 
