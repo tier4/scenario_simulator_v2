@@ -4,8 +4,9 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
+|                    Feature                    |                                              Brief summary                                              |      Category       |                          Pull request                           |                  Contributor                  |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Start supporting jerk simulation and planning | Start supporting jerk simulation and enable limit jerk while effecting API::requestSpeedChange function | `traffic_simulator` | [#909](https://github.com/tier4/scenario_simulator_v2/pull/909) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
 
@@ -16,6 +17,7 @@ Minor Tweaks :oncoming_police_car:
 
 | Feature                                  | Brief summary                                                                                                                         | Category                   | Pull request                                                    | Contributor                                   |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Revert `topic_status_checker`            | Delete `topic_status_checker` package.                                                                                                | `common`                   | [#921](https://github.com/tier4/scenario_simulator_v2/pull/921) | [HansRobo](https://github.com/HansRobo)       |
 | OpenSCENARIO `UserDefinedValueCondition` | Remove the message type package `openscenario_msgs` and moved its contents to a new external repository `scenario_simulator_v2_msgs`. | `openscenario_interpreter` | [#874](https://github.com/tier4/scenario_simulator_v2/pull/874) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.7

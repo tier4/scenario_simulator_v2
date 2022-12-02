@@ -27,7 +27,8 @@ enum class Transition {
   // @todo CUBIC,
   LINEAR,
   // @todo SINUSOIDAL,
-  STEP
+  STEP,
+  AUTO
 };
 
 struct Constraint
@@ -35,7 +36,8 @@ struct Constraint
   enum class Type {
     // @todo DISTANCE,
     LONGITUDINAL_ACCELERATION,
-    TIME
+    TIME,
+    NONE
   };
   explicit constexpr Constraint(const Constraint::Type type, const double value)
   : type(type), value(value)
@@ -58,6 +60,7 @@ struct RelativeTargetSpeed
   {
   }
   double getAbsoluteValue(
+    const traffic_simulator_msgs::msg::EntityStatus & status,
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
     const;
   std::string reference_entity_name;

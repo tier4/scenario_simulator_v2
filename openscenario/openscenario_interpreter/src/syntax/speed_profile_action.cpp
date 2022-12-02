@@ -47,14 +47,14 @@ auto SpeedProfileAction::apply(
     if (std::isnan(speed_profile_entry.time)) {
       return traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
-        traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
+        traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
     } else {
       // TODO
       // return traffic_simulator::speed_change::Constraint(
       //   traffic_simulator::speed_change::Constraint::Type::TIME, speed_profile_entry.time);
       return traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
-        traffic_simulator_msgs::msg::BehaviorParameter().acceleration);
+        traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
     }
   };
 
