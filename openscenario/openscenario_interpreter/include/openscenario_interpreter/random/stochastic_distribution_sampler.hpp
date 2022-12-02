@@ -27,7 +27,8 @@ template <typename DistributorT>
 struct StochasticDistributionSampler
 {
   template <typename... Ts>
-  explicit StochasticDistributionSampler(Ts... xs) : distribute(xs...)
+  explicit StochasticDistributionSampler(Ts &&... xs)
+  : distribute(std::forward<decltype(xs)>(xs)...)
   {
   }
 
