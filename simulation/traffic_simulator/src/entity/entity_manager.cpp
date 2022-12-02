@@ -191,7 +191,7 @@ auto EntityManager::getLongitudinalDistance(
       to_pose.lanelet_id, to_pose.s, from_pose.lanelet_id, from_pose.s);
 
     if (forward_distance && backward_distance) {
-      if (forward_distance.get() > backward_distance.get()) {
+      if (forward_distance.get() >= backward_distance.get()) {
         return -backward_distance.get();
       } else {
         return forward_distance.get();
@@ -214,15 +214,10 @@ auto EntityManager::getLongitudinalDistance(
     std::vector<double> distances = {};
     for (const auto & from_pose : from_poses) {
       for (const auto & to_pose : to_poses) {
-        const auto distance_from_to =
-          getLongitudinalDistance(from_pose, to_pose, false, include_opposite_direction);
-        if (distance_from_to) {
-          distances.emplace_back(distance_from_to.get());
-        }
-        const auto distance_to_from =
-          getLongitudinalDistance(to_pose, from_pose, false, include_opposite_direction);
-        if (distance_to_from) {
-          distances.emplace_back(distance_to_from.get());
+        if (
+          const auto distance =
+            getLongitudinalDistance(from_pose, to_pose, false, include_opposite_direction)) {
+          distances.emplace_back(distance.get());
         }
       }
     }

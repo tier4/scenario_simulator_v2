@@ -252,12 +252,5 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   }
   EntityBase::onPostUpdate(current_time, step_time);
 }
-
-void PedestrianEntity::setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
-{
-  EntityBase::setHdMapUtils(ptr);
-  route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
-  behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
-}
 }  // namespace entity
 }  // namespace traffic_simulator
