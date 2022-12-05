@@ -44,14 +44,12 @@ private:
     if (api_.getEntityStatus("front").action_status.twist.linear.x < 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (
-      api_.getCurrentTime() <= 0.9 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {
+    if (api_.getCurrentTime() <= 0.9 && api_.getCurrentTwist("ego").linear.x > 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
-      api_.getCurrentTime() >= 1.0 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x <= 10.0) {
+      api_.getCurrentTime() >= 1.0 && api_.getCurrentTwist("ego").linear.x <= 10.0 &&
+      api_.getCurrentTwist("ego").linear.x >= 9.9) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }

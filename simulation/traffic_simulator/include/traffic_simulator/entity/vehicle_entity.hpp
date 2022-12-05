@@ -66,6 +66,9 @@ public:
 
   auto getCurrentAction() const -> std::string override;
 
+  auto getDefaultDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
+
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityTypename() const -> const std::string & override;
@@ -94,7 +97,11 @@ public:
 
   void setAccelerationLimit(double acceleration) override;
 
+  void setAccelerationRateLimit(double acceleration_rate) override;
+
   void setDecelerationLimit(double deceleration) override;
+
+  void setDecelerationRateLimit(double deceleration_rate) override;
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 

@@ -57,8 +57,7 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculat
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    double horizon =
-      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+    double horizon = getHorizon();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
@@ -79,10 +78,10 @@ boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(double curren
    * @brief hard coded parameter!! 1.0 is a stop margin
    */
   double rest_distance =
-    distance_to_stopline_.get() - vehicle_parameters.bounding_box.dimensions.x * 0.5 - 1.0;
-  if (rest_distance < calculateStopDistance(behavior_parameter.deceleration)) {
+    distance_to_stopline_.get() - (vehicle_parameters.bounding_box.dimensions.x + 3.0);
+  if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     if (rest_distance > 0) {
-      return std::sqrt(2 * behavior_parameter.deceleration * rest_distance);
+      return std::sqrt(2 * behavior_parameter.dynamic_constraints.max_deceleration * rest_distance);
     } else {
       return 0;
     }
@@ -145,13 +144,13 @@ BT::NodeStatus StopAtStopLineAction::tick()
     }
     if (!distance_to_stopline_) {
       stopped_ = false;
-      setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+      setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
       const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
       setOutput("obstacle", obstacle);
       return BT::NodeStatus::SUCCESS;
     }
-    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
@@ -169,7 +168,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   } else {
     target_speed = target_linear_speed.get();
   }
-  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
   stopped_ = false;
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);

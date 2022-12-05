@@ -33,6 +33,11 @@ enum class Status {
   INACTIVE = 1,
 };
 
+enum class Event {
+  PRE_UPDATE = 0,
+  POST_UPDATE = 1,
+};
+
 class Job
 {
 public:
@@ -46,9 +51,10 @@ public:
    */
   Job(
     const std::function<bool(double)> & func_on_update,
-    const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive);
+    const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive, Event event);
   void onUpdate(const double step_time);
   void inactivate();
+  Status getStatus() const;
 
 private:
   std::function<bool(double)> func_on_update_;
@@ -59,6 +65,7 @@ private:
 public:
   const job::Type type;
   const bool exclusive;
+  const Event event;
 };
 }  // namespace job
 }  // namespace traffic_simulator

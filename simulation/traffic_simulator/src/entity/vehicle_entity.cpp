@@ -14,7 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <boost/algorithm/clamp.hpp>
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
@@ -59,6 +59,13 @@ auto VehicleEntity::getCurrentAction() const -> std::string
   } else {
     return behavior_plugin_ptr_->getCurrentAction();
   }
+}
+
+auto VehicleEntity::getDefaultDynamicConstraints() const
+  -> const traffic_simulator_msgs::msg::DynamicConstraints &
+{
+  static auto default_dynamic_constraints = traffic_simulator_msgs::msg::DynamicConstraints();
+  return default_dynamic_constraints;
 }
 
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
@@ -136,7 +143,6 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
       }
     }
     behavior_plugin_ptr_->setReferenceTrajectory(spline_);
-
     behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (status_updated.lanelet_pose_valid) {
@@ -148,14 +154,12 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    linear_jerk_ =
-      (status_updated.action_status.accel.linear.x - status_.action_status.accel.linear.x) /
-      step_time;
     setStatus(status_updated);
     updateStandStillDuration(step_time);
   } else {
     updateEntityStatusTimestamp(current_time);
   }
+  EntityBase::onPostUpdate(current_time, step_time);
 }
 
 void VehicleEntity::requestAcquirePosition(
@@ -222,20 +226,40 @@ void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Para
 void VehicleEntity::setAccelerationLimit(double acceleration)
 {
   if (acceleration <= 0.0) {
-    THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
+    THROW_SEMANTIC_ERROR("Acceleration limit must be greater than or equal to zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
-  behavior_parameter.acceleration = acceleration;
+  behavior_parameter.dynamic_constraints.max_acceleration = acceleration;
+  setBehaviorParameter(behavior_parameter);
+}
+
+void VehicleEntity::setAccelerationRateLimit(double acceleration_rate)
+{
+  if (acceleration_rate <= 0.0) {
+    THROW_SEMANTIC_ERROR("Acceleration rate limit must be greater than or equal to zero.");
+  }
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.dynamic_constraints.max_acceleration_rate = acceleration_rate;
   setBehaviorParameter(behavior_parameter);
 }
 
 void VehicleEntity::setDecelerationLimit(double deceleration)
 {
   if (deceleration <= 0.0) {
-    THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
+    THROW_SEMANTIC_ERROR("Deceleration limit must be greater than or equal to zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
-  behavior_parameter.deceleration = deceleration;
+  behavior_parameter.dynamic_constraints.max_deceleration = deceleration;
+  setBehaviorParameter(behavior_parameter);
+}
+
+void VehicleEntity::setDecelerationRateLimit(double deceleration_rate)
+{
+  if (deceleration_rate <= 0.0) {
+    THROW_SEMANTIC_ERROR("Deceleration rate limit must be greater than or equal to zero.");
+  }
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.dynamic_constraints.max_deceleration_rate = deceleration_rate;
   setBehaviorParameter(behavior_parameter);
 }
 
