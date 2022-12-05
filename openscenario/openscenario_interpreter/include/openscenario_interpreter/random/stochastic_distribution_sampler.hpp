@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_SAMPLER_HPP_
+#define OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_SAMPLER_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -21,32 +21,21 @@
 
 namespace openscenario_interpreter
 {
-inline namespace utility
+inline namespace random
 {
-// TODO : rename class name
-template <typename DistributionT>
-struct StochasticDistributionClass
+template <typename DistributorT>
+struct StochasticDistributionSampler
 {
   template <typename... Ts>
-  StochasticDistributionClass(double random_seed, Ts... xs)
-  : random_engine(random_seed), distribution(xs...)
+  explicit StochasticDistributionSampler(Ts &&... xs)
+  : distribute(std::forward<decltype(xs)>(xs)...)
   {
   }
 
-  std::mt19937 random_engine;
+  DistributorT distribute;
 
-  DistributionT distribution;
-
-  auto generate() { return distribution(random_engine); }
+  auto operator()(std::mt19937 & random_engine) { return distribute(random_engine); }
 };
-
-struct SingleParameterList : public std::vector<Object> {};
-//using UnnamedParameterSet = std::vector<Object>;
-//using UnnamedParameterList = std::vector<UnnamedParameterSet>;
-
-//using ParameterSet = std::unordered_map<std::string,Object>;
-//using ParameterList = std::vector<ParameterSet>;
-
-}  // namespace utility
+}  // namespace random
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_SAMPLER_HPP_

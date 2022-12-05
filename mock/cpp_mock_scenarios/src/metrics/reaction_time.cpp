@@ -40,8 +40,8 @@ public:
 private:
   void onUpdate() override
   {
-    double ego_accel = api_.getEntityStatus("ego").action_status.accel.linear.x;
-    double ego_twist = api_.getEntityStatus("ego").action_status.twist.linear.x;
+    double ego_accel = api_.getCurrentAccel("ego").linear.x;
+    double ego_twist = api_.getCurrentTwist("ego").linear.x;
     // double npc_accel = api_.getEntityStatus("npc").action_status.accel.linear.x;
     double npc_twist = api_.getEntityStatus("npc").action_status.twist.linear.x;
     // LCOV_EXCL_START

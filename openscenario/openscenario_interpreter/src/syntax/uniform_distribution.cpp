@@ -21,18 +21,15 @@ inline namespace syntax
 {
 UniformDistribution::UniformDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: range(readElement<Range>("range", node, scope)),
-  distribution(
-    scope.ref<Double>(std::string("randomSeed")).data, range.lower_limit.data,
-    range.upper_limit.data)
+: Scope(scope),
+  range(readElement<Range>("range", node, scope)),
+  sample(range.lower_limit.data, range.upper_limit.data)
 {
 }
 
-[[nodiscard]] auto UniformDistribution::evaluate() -> Object
+auto UniformDistribution::evaluate() -> Object
 {
-  // Return a value without filtering by this->range here
-  // because it is embedded in StochasticDistributionClass
-  return make<Double>(distribution.generate());
+  return make<Double>(sample(ref<std::mt19937>(std::string("randomEngine"))));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

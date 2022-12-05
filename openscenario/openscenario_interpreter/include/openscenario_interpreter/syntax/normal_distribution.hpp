@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__NORMAL_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__NORMAL_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/random/stochastic_distribution_sampler.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
-#include <openscenario_interpreter/utility/distribution.hpp>
 #include <random>
 #include <string>
 
@@ -38,7 +38,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct NormalDistribution : public ComplexType
+struct NormalDistribution : public ComplexType, private Scope
 {
   const Range range;
 
@@ -46,7 +46,7 @@ struct NormalDistribution : public ComplexType
 
   const Double variance;
 
-  StochasticDistributionClass<std::normal_distribution<Double::value_type>> distribution;
+  StochasticDistributionSampler<std::normal_distribution<Double::value_type>> sample;
 
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
 

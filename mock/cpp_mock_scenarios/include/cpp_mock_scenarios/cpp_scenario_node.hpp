@@ -20,6 +20,7 @@
 #include <traffic_simulator/api/api.hpp>
 
 // headers in STL
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -39,6 +40,15 @@ public:
   void stop(Result result, const std::string & description = "");
   void expectThrow() { exception_expect_ = true; }
   void expectNoThrow() { exception_expect_ = false; }
+  template <typename T>
+  auto equals(const T v1, const T v2, const T tolerance = std::numeric_limits<T>::epsilon()) const
+    -> bool
+  {
+    if (std::abs(v2 - v1) <= tolerance) {
+      return true;
+    }
+    return false;
+  }
 
 protected:
   traffic_simulator::API api_;

@@ -2,6 +2,30 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.7 (2022-11-17)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/priority
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/parameter_value_distribution
+* Merge branch 'master' into feature/interpreter/follow-trajectory-action-3
+* Merge pull request `#890 <https://github.com/tier4/scenario_simulator_v2/issues/890>`_ from tier4/refactor/test_runner
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Fix version of OpenSCENARIO xsd
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into refactor/test_runner
+* Merge pull request `#892 <https://github.com/tier4/scenario_simulator_v2/issues/892>`_ from tier4/feature/interpreter/follow-trajectory-action-2
+* Add python packages to openscenario_utility/package.xml
+* Update dependencies of openscenario_utility
+* Add new schema file `OpenSCENARIO-1.2.xsd`
+* Use OSC 1.1
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Contributors: Kotaro Yoshimoto, MasayaKataoka, Piotr Zyskowski, Shota Minami, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.6 (2022-08-30)
 ------------------
 * Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference

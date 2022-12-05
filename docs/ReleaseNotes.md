@@ -4,6 +4,26 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
+|                    Feature                    |                                              Brief summary                                              |      Category       |                          Pull request                           |                  Contributor                  |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Start supporting jerk simulation and planning | Start supporting jerk simulation and enable limit jerk while effecting API::requestSpeedChange function | `traffic_simulator` | [#909](https://github.com/tier4/scenario_simulator_v2/pull/909) | [hakuturu583](https://github.com/hakuturu583) |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature                       | Brief summary                         | Category | Pull request                                                    | Contributor                             |
+|-------------------------------|---------------------------------------|----------|-----------------------------------------------------------------|-----------------------------------------|
+| Revert `topic_status_checker` | Delete `topic_status_checker` package | `common` | [#921](https://github.com/tier4/scenario_simulator_v2/pull/921) | [HansRobo](https://github.com/HansRobo) |
+
+
+## Version 0.6.7
+
+Major Changes :race_car: :red_car: :blue_car:
+
 |                    Feature                     |                                                                           Brief summary                                                                           |                           Category                           |                          Pull request                           |                                         Contributor                                          |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Engagement                                     | Changed time management to send engage as soon as autoware state transitions to `WAITING_FOR_ENGAGE` and start simulation as soon as it transitions to `DRIVING`. | `traffic_simulator`, `concealer`, `openscenario_interpreter` | [#823](https://github.com/tier4/scenario_simulator_v2/pull/823) | [hakuturu583](https://github.com/hakuturu583), [yamacir-kit](https://github.com/yamacir-kit) |
@@ -14,17 +34,20 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature                      | Brief summary                                                                                                          | Category                   | Pull request                                                    | Contributor                                   |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
-| Interpreter state transition | Fixed a problem with error handling and state transition when an error occurred in the activation phase of simulation. | `openscenario_interpreter` | [#881](https://github.com/tier4/scenario_simulator_v2/pull/881) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Feature                       | Brief summary                                                                                                          | Category                   | Pull request                                                    | Contributor                                   |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Interpreter state transition  | Fixed a problem with error handling and state transition when an error occurred in the activation phase of simulation. | `openscenario_interpreter` | [#881](https://github.com/tier4/scenario_simulator_v2/pull/881) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Correct bounding box position | Fixed bounding box shifting on Rviz                                                                                    | `simple_sensor_simulator`  | [#888](https://github.com/tier4/scenario_simulator_v2/pull/888) | [shouth](https://github.com/shouth)           |
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature                           | Brief summary                                                                                              | Category                  | Pull request                                                    | Contributor                                   |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
-| `lanelet2_extension_psim`         | Remove `external/lanelet2_extension_psim` and add dependency to `lanelet2_extension` in `autoware_common`. | `external`                | [#863](https://github.com/tier4/scenario_simulator_v2/pull/863) | [HansRobo](https://github.com/HansRobo)       |
-| Improve `OccupancyGridSensor`     | Improve performance of occupancy grid generation by changing internal data structure.                      | `simple_sensor_simulator` | [#866](https://github.com/tier4/scenario_simulator_v2/pull/866) | [shouth](https://github.com/shouth)           |
-| `traffic_simulator`'s API `spawn` | Changed the `spawn` API to require the initial coordinates of the entity.                                  | `traffic_simulator`       | [#896](https://github.com/tier4/scenario_simulator_v2/pull/896) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Feature                                    | Brief summary                                                                                              | Category                  | Pull request                                                    | Contributor                                   |
+|--------------------------------------------|------------------------------------------------------------------------------------------------------------|---------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| `lanelet2_extension_psim`                  | Remove `external/lanelet2_extension_psim` and add dependency to `lanelet2_extension` in `autoware_common`. | `external`                | [#863](https://github.com/tier4/scenario_simulator_v2/pull/863) | [HansRobo](https://github.com/HansRobo)       |
+| Improve `OccupancyGridSensor`              | Improve performance of occupancy grid generation by changing internal data structure.                      | `simple_sensor_simulator` | [#866](https://github.com/tier4/scenario_simulator_v2/pull/866) | [shouth](https://github.com/shouth)           |
+| `traffic_simulator`'s API `spawn`          | Changed the `spawn` API to require the initial coordinates of the entity.                                  | `traffic_simulator`       | [#896](https://github.com/tier4/scenario_simulator_v2/pull/896) | [yamacir-kit](https://github.com/yamacir-kit) |
+| `traffic_simulator`'s distance calculation | Update the `traffic_simulator` distance measurement API to remove the default range limit of 100m maximum. | `traffic_simulator`       | [#908](https://github.com/tier4/scenario_simulator_v2/pull/908) | [yamacir-kit](https://github.com/yamacir-kit) |
+| `topic_status_checker`                     | Add `topic_status_checker` package to check node state from outside via topic status                       | `common`                  | [#912](https://github.com/tier4/scenario_simulator_v2/pull/912) | [HansRobo](https://github.com/HansRobo)       |
 
 ## Version 0.6.6
 

@@ -30,7 +30,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ParameterValueSet : private Scope, public ComplexType
+struct ParameterValueSet : private Scope
 {
   const std::list<ParameterAssignment> parameter_assignments;
 

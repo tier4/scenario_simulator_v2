@@ -15,9 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__UNIFORM_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__UNIFORM_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/random/stochastic_distribution_sampler.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
-#include <openscenario_interpreter/utility/distribution.hpp>
 
 namespace openscenario_interpreter
 {
@@ -32,11 +32,11 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct UniformDistribution : public ComplexType
+struct UniformDistribution : public ComplexType, private Scope
 {
   const Range range;
 
-  StochasticDistributionClass<std::uniform_real_distribution<Double::value_type>> distribution;
+  StochasticDistributionSampler<std::uniform_real_distribution<Double::value_type>> sample;
 
   explicit UniformDistribution(const pugi::xml_node &, Scope & scope);
 

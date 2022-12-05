@@ -15,7 +15,6 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
-#include <boost/algorithm/clamp.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/transform.hpp>
 #include <memory>
@@ -48,8 +47,7 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    double horizon =
-      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+    double horizon = getHorizon();
     auto following_lanelets =
       hdmap_utils->getFollowingLanelets(lane_change_parameters_->target.lanelet_id, 0);
     double l = curve_->getLength();
@@ -171,7 +169,7 @@ BT::NodeStatus LaneChangeAction::tick()
     double target_accel = 0;
     switch (lane_change_parameters_->constraint.policy) {
       /**
-       * @brief Force changing speed in order to fullfill constraint.
+       * @brief Force changing speed in order to fulfill constraint.
        */
       case traffic_simulator::lane_change::Constraint::Policy::FORCE:
         entity_status.action_status.twist = geometry_msgs::msg::Twist();
@@ -180,22 +178,23 @@ BT::NodeStatus LaneChangeAction::tick()
         current_s_ = current_s_ + entity_status.action_status.twist.linear.x * step_time;
         break;
       /**
-       * @brief Changing linear speed and try to fullfill constraint.
+       * @brief Changing linear speed and try to fulfill constraint.
        */
       case traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT:
         target_accel =
           (lane_change_velocity_ - entity_status.action_status.twist.linear.x) / step_time;
         if (entity_status.action_status.twist.linear.x > target_speed) {
-          target_accel =
-            boost::algorithm::clamp(target_accel, behavior_parameter.deceleration * -1, 0);
+          target_accel = std::clamp(
+            target_accel, behavior_parameter.dynamic_constraints.max_deceleration * -1.0, 0.0);
         } else {
-          target_accel = boost::algorithm::clamp(target_accel, 0, behavior_parameter.acceleration);
+          target_accel =
+            std::clamp(target_accel, 0.0, behavior_parameter.dynamic_constraints.max_acceleration);
         }
         geometry_msgs::msg::Accel accel_new;
         accel_new.linear.x = target_accel;
         geometry_msgs::msg::Twist twist_new;
-        twist_new.linear.x = boost::algorithm::clamp(
-          entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10,
+        twist_new.linear.x = std::clamp(
+          entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10.0,
           vehicle_parameters.performance.max_speed);
         twist_new.linear.y = 0.0;
         twist_new.linear.z = 0.0;
