@@ -204,6 +204,11 @@ auto EntityManager::getLongitudinalDistance(
       return boost::none;
     }
   } else {
+    /*
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("debug"), __FILE__ << "," << __LINE__);
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("from"), from_pose.lanelet_id << "," << from_pose.s);
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("to"), to_pose.lanelet_id << "," << to_pose.s);
+    */
     auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
       hdmap_utils_ptr_->toMapPose(from).pose, from_pose.lanelet_id, 5.0,
       include_opposite_direction);
@@ -227,6 +232,12 @@ auto EntityManager::getLongitudinalDistance(
     std::sort(distances.begin(), distances.end(), [](double a, double b) {
       return std::abs(a) < std::abs(b);
     });
+    /*
+    for(const auto distance : distances) {
+      RCLCPP_WARN_STREAM(rclcpp::get_logger("candidate"), distance);
+    }
+    */
+    // RCLCPP_ERROR_STREAM(rclcpp::get_logger("debug"), __FILE__ << "," << __LINE__);
     return *distances.begin();
   }
 }
