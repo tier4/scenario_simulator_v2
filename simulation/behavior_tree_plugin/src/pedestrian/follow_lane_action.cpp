@@ -14,8 +14,8 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <algorithm>
 #include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
-#include <boost/algorithm/clamp.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -49,7 +49,7 @@ BT::NodeStatus FollowLaneAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
-  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian

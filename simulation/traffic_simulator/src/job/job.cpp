@@ -20,12 +20,13 @@ namespace job
 {
 Job::Job(
   const std::function<bool(const double)> & func_on_update,
-  const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive)
+  const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive, job::Event event)
 : func_on_update_(func_on_update),
   func_on_cleanup_(func_on_cleanup),
   job_duration_(0.0),
   type(type),
-  exclusive(exclusive)
+  exclusive(exclusive),
+  event(event)
 {
   status_ = Status::ACTIVE;
 }
@@ -35,6 +36,8 @@ void Job::inactivate()
   status_ = Status::INACTIVE;
   func_on_cleanup_();
 }
+
+Status Job::getStatus() const { return status_; }
 
 void Job::onUpdate(const double step_time)
 {
