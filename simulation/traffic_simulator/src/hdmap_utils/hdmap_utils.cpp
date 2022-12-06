@@ -104,7 +104,7 @@ auto HdMapUtils::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose
     ret.s = rest_s;
     return ret;
   } else {
-    while (rest_s > getLaneletLength(lanelet_pose.lanelet_id)) {
+    while (rest_s > getLaneletLength(lanelet_id)) {
       const auto ids = getNextLaneletIds(lanelet_id);
       if (ids.empty()) {
         return boost::none;
