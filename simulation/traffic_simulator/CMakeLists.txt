@@ -13,6 +13,16 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
+# Set ROS_DISTRO macros
+set(ROS_DISTRO $ENV{ROS_DISTRO})
+if(${ROS_DISTRO} STREQUAL "rolling")
+  add_compile_definitions(ROS_DISTRO_ROLLING)
+elseif(${ROS_DISTRO} STREQUAL "galactic")
+  add_compile_definitions(ROS_DISTRO_GALACTIC)
+elseif(${ROS_DISTRO} STREQUAL "humble")
+  add_compile_definitions(ROS_DISTRO_HUMBLE)
+endif()
+
 find_package(ament_cmake_auto REQUIRED)
 find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
