@@ -231,7 +231,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
       std::vector<std::int64_t> empty = {};
       behavior_plugin_ptr_->setRouteLanelets(empty);
     }
-    behavior_plugin_ptr_->update(current_time_, step_time_);
+    behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (status_updated.lanelet_pose_valid) {
       auto following_lanelets =
@@ -245,6 +245,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
 
     setStatus(status_updated);
     updateStandStillDuration(step_time);
+    updateTraveledDistance(step_time);
   } else {
     updateEntityStatusTimestamp(current_time);
   }

@@ -224,6 +224,7 @@ public:
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
+  FORWARD_TO_ENTITY(getTraveledDistance, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
@@ -344,8 +345,6 @@ public:
     }
   }
 
-  double getTraveledDistance(const std::string & target_entity) const;
-
   bool isEgo(const std::string & name) const;
 
   bool isEgoSpawned() const;
@@ -460,8 +459,6 @@ public:
   void update(const double current_time, const double step_time);
 
   void updateHdmapMarker();
-
-  void updateAllJobs();
 
   void startNpcLogic();
 

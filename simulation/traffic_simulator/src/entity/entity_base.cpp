@@ -29,11 +29,7 @@ namespace entity
 {
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
-: name(name),
-  verbose(true),
-  status_(entity_status),
-  status_before_update_(status_),
-  npc_logic_started_(false)
+: name(name), verbose(true), status_(entity_status), status_before_update_(status_)
 {
 }
 
@@ -736,6 +732,14 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
   } else {
     return stand_still_duration_ = 0.0;
   }
+}
+
+auto EntityBase::updateTraveledDistance(const double step_time) -> double
+{
+  if (npc_logic_started_) {
+    traveled_distance_ += getCurrentTwist().linear.x * step_time;
+  }
+  return traveled_distance_;
 }
 
 auto EntityBase::getTraveledDistance() const -> double { return traveled_distance_; }
