@@ -36,6 +36,14 @@ struct StochasticDistributionSampler
 
   auto operator()(std::mt19937 & random_engine) { return distribute(random_engine); }
 };
+
+struct SingleParameterList : public std::vector<Object> {};
+//using UnnamedParameterSet = std::vector<Object>;
+//using UnnamedParameterList = std::vector<UnnamedParameterSet>;
+
+//using ParameterSet = std::unordered_map<std::string,Object>;
+//using ParameterList = std::vector<ParameterSet>;
+
 }  // namespace random
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_SAMPLER_HPP_
