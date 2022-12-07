@@ -1,4 +1,8 @@
 repositories:
+  autoware_msgs: # for tier4_autoware_msgs
+    type: git
+    url: https://github.com/autowarefoundation/autoware_msgs.git
+    version: main
   autoware_auto_msgs:
     type: git
     url: https://github.com/tier4/autoware_auto_msgs.git
@@ -11,3 +15,7 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/color_names.git
     version: master
+  autoware_common:
+    type: git
+    url: https://github.com/autowarefoundation/autoware_common.git
+    version: main

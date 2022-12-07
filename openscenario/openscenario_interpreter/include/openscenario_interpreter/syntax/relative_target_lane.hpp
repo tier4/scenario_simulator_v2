@@ -17,7 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator/data_type/data_types.hpp>
+#include <traffic_simulator/data_type/lane_change.hpp>
 
 namespace openscenario_interpreter
 {

@@ -157,21 +157,22 @@ void Autoware::shutdownAutoware()
 
 void Autoware::rethrow() const
 {
+  task_queue.rethrow();
+
   if (is_thrown.load(std::memory_order_acquire)) {
     std::rethrow_exception(thrown);
   }
 }
 
-bool Autoware::ready() const
-{
-  task_queue.rethrow();
-  rethrow();
-  return task_queue.exhausted();
-}
-
 void Autoware::resetTimerCallback()
 {
   updater = create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });
+}
+
+auto Autoware::set(const geometry_msgs::msg::Accel & acceleration)
+  -> const geometry_msgs::msg::Accel &
+{
+  return current_acceleration = acceleration;
 }
 
 auto Autoware::set(const geometry_msgs::msg::Pose & pose) -> const geometry_msgs::msg::Pose &

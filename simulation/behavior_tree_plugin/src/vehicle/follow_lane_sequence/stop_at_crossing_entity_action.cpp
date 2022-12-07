@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <utility>
@@ -76,9 +77,9 @@ boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double 
   }
   double rest_distance =
     distance_to_stop_target_.get() - (vehicle_parameters.bounding_box.dimensions.x + 3);
-  if (rest_distance < calculateStopDistance(driver_model.deceleration)) {
+  if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     if (rest_distance > 0) {
-      return std::sqrt(2 * driver_model.deceleration * rest_distance);
+      return std::sqrt(2 * behavior_parameter.dynamic_constraints.max_deceleration * rest_distance);
     } else {
       return 0;
     }
@@ -99,7 +100,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if (!driver_model.see_around) {
+  if (!behavior_parameter.see_around) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
@@ -140,7 +141,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     target_linear_speed = boost::none;
   }
   if (!distance_to_stop_target_) {
-    setOutput("updated_status", calculateEntityStatusUpdated(0));
+    setOutput("updated_status", calculateUpdatedEntityStatus(0));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
@@ -154,7 +155,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   } else {
     target_speed = target_linear_speed.get();
   }
-  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

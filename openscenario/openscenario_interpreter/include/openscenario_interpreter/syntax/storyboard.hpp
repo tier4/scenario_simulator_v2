@@ -52,10 +52,8 @@ struct Storyboard : public Scope,
 
   auto run() -> void override;
 
-  auto start() -> void override;
+  friend auto operator<<(nlohmann::json &, const Storyboard &) -> nlohmann::json &;
 };
-
-auto operator<<(nlohmann::json &, const Storyboard &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

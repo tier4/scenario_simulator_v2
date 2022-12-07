@@ -58,9 +58,9 @@ struct InitActions : public StoryboardElement
   Elements global_actions;
   Elements user_defined_actions;
   Elements privates;
-};
 
-auto operator<<(nlohmann::json &, const InitActions &) -> nlohmann::json &;
+  friend auto operator<<(nlohmann::json &, const InitActions &) -> nlohmann::json &;
+};
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -55,7 +55,7 @@ jobs:
           apt-get update
           apt install -y python3-pip
           rosdep update
-          rosdep install -iry --from-paths src --rosdistro ${{ matrix.rosdistro }}
+          rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
         shell: bash
 
       - name: Build packages

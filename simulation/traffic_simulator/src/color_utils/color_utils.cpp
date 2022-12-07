@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/algorithm/clamp.hpp>
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>

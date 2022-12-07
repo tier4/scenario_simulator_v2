@@ -23,7 +23,7 @@
 
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/linear_algebra.hpp>
-#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
+#include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
 LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
@@ -154,7 +154,7 @@ struct LaneletPartForRouting
   ~LaneletPartForRouting() = default;
 
   lanelet::ConstLanelet lanelet;
-  double start_s = -1.0;  // -1 means from the begining
+  double start_s = -1.0;  // -1 means from the beginning
   double end_s = -1.0;    // -1 means to the end
 
   double min_distance_remaining;
