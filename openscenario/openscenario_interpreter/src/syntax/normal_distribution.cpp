@@ -25,13 +25,11 @@ NormalDistribution::NormalDistribution(
   range(readElement<Range>("range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   variance(readAttribute<Double>("variance", node, scope)),
-  sample(static_cast<double>(expected_value.data), static_cast<double>(variance.data))
+  distribute(static_cast<double>(expected_value.data), static_cast<double>(variance.data)),
+  random_engine(scope.seed)
 {
 }
 
-auto NormalDistribution::evaluate() -> Object
-{
-  return make<Double>(sample(ref<std::mt19937>(std::string("randomEngine"))));
-}
+auto NormalDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

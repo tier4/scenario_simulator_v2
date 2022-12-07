@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__NORMAL_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__NORMAL_DISTRIBUTION_HPP_
 
-#include <openscenario_interpreter/random/stochastic_distribution_sampler.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
@@ -46,7 +45,9 @@ struct NormalDistribution : public ComplexType, private Scope
 
   const Double variance;
 
-  StochasticDistributionSampler<std::normal_distribution<Double::value_type>> sample;
+  std::normal_distribution<Double::value_type> distribute;
+
+  std::mt19937 random_engine;
 
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
 
