@@ -45,42 +45,48 @@ auto SpeedProfileAction::apply(
 
   auto constraint = [&]() {
     if (std::isnan(speed_profile_entry.time)) {
-      return traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
-        traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
+      switch (following_mode) {
+        case FollowingMode::position:
+          return traffic_simulator::speed_change::Constraint(
+            traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
+            traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
+        default:
+        case FollowingMode::follow:
+          return traffic_simulator::speed_change::Constraint(
+            traffic_simulator::speed_change::Constraint::Type::NONE, 0);
+      }
     } else {
-      // TODO
-      // return traffic_simulator::speed_change::Constraint(
-      //   traffic_simulator::speed_change::Constraint::Type::TIME, speed_profile_entry.time);
       return traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
-        traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
+        traffic_simulator::speed_change::Constraint::Type::TIME, speed_profile_entry.time);
     }
   };
 
+  auto transition = [&]() {
+    switch (following_mode) {
+      case FollowingMode::position:
+        return traffic_simulator::speed_change::Transition::LINEAR;
+      default:
+      case FollowingMode::follow:
+        return traffic_simulator::speed_change::Transition::AUTO;
+    }
+  };
+
+  applyProfileAction(actor, dynamic_constraints);
+
   if (entity_ref.empty()) {
-    applySpeedProfileAction(
-      actor,
-      dynamic_constraints,      //
-      absolute_target_speed(),  //
-      traffic_simulator::speed_change::Transition::LINEAR,
-      constraint(),  //
-      true);
+    applySpeedAction(
+      actor, absolute_target_speed(), transition(), constraint(),
+      std::isnan(speed_profile_entry.time));
   } else {
-    applySpeedProfileAction(
-      actor,
-      dynamic_constraints,      //
-      relative_target_speed(),  //
-      traffic_simulator::speed_change::Transition::LINEAR,
-      constraint(),  //
-      true);
+    applySpeedAction(
+      actor, relative_target_speed(), transition(), constraint(),
+      std::isnan(speed_profile_entry.time));
   }
 }
 
 auto SpeedProfileAction::accomplished() -> bool
 {
   // NOTE: Action ends on reaching the target speed of the last SpeedProfileEntry.
-
   return std::all_of(
     std::begin(accomplishments), std::end(accomplishments), [this](auto && actor_and_iter) {
       return std::get<1>(actor_and_iter) == std::end(speed_profile_entry);
@@ -91,41 +97,21 @@ auto SpeedProfileAction::endsImmediately() const -> bool { return false; }
 
 auto SpeedProfileAction::run() -> void
 {
-  auto compare = [this](const auto & actor, const auto & speed_profile_entry) {
-    if (entity_ref.empty()) {
-      return equal_to<double>()(evaluateSpeed(actor), speed_profile_entry.speed);
-    } else {
-      return equal_to<double>()(
-        evaluateSpeed(actor), speed_profile_entry.speed + evaluateSpeed(entity_ref));
-    }
-  };
-
   for (auto && [actor, iter] : accomplishments) {
-    if (
-      iter != std::end(speed_profile_entry) and compare(actor, *iter) and
-      ++iter != std::end(speed_profile_entry)) {
-      apply(actor, *iter);
-    }
-  }
-
-  for (auto && [actor, iter] : accomplishments) {
-    auto target_speed = [&]() -> double {
-      if (iter == std::end(speed_profile_entry)) {
-        return Double::nan();
-      } else if (entity_ref.empty()) {
-        return iter->speed;
+    auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
+      if (entity_ref.empty()) {
+        return equal_to<double>()(evaluateSpeed(actor), speed_profile_entry.speed);
       } else {
-        return evaluateSpeed(entity_ref) + iter->speed;
+        return equal_to<double>()(
+          evaluateSpeed(actor), speed_profile_entry.speed + evaluateSpeed(entity_ref));
       }
     };
 
-    // clang-format off
-    std::cout << "actor " << std::quoted(actor) << "\n"
-              << "  current speed = " << evaluateSpeed(actor) << "\n"
-              << "  target speed = " << target_speed() << "\n"
-              << "  entry = " << std::distance(std::begin(speed_profile_entry), iter) << "/" << speed_profile_entry.size() << "\n"
-              << std::flush;
-    // clang-format on
+    if (
+      iter != std::end(speed_profile_entry) and accomplished(actor, *iter) and
+      ++iter != std::end(speed_profile_entry)) {
+      apply(actor, *iter);
+    }
   }
 }
 
