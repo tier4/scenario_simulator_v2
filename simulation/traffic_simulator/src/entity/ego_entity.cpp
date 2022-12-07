@@ -207,7 +207,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
       return accel;
     }();
 
-    const auto route_lanelets = getRouteLanelets();
+    const auto route_lanelets = getRouteUniqueLanelets();
 
     boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
@@ -250,16 +250,17 @@ auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Ob
   return boost::none;
 }
 
-auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
+auto EgoEntity::getRouteUniqueLanelets() const -> std::vector<std::int64_t>
 {
-  std::vector<std::int64_t> ids{};
+  std::unordered_set<std::int64_t> unique_ids{};
 
   if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get()); universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
-      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+        std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::inserter(unique_ids, unique_ids.end()));
     }
-    ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
   }
+
+  std::vector<std::int64_t> ids{unique_ids.begin(), unique_ids.end()};
 
   return ids;
 }

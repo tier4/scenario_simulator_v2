@@ -111,7 +111,7 @@ public:
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+  auto getRouteUniqueLanelets() const -> std::vector<std::int64_t>;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
