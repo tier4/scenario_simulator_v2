@@ -23,7 +23,7 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
@@ -40,7 +40,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
-      BT::InputPort<traffic_simulator_msgs::msg::DriverModel>("driver_model"),
+      BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
       BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters"),
       BT::InputPort<std::shared_ptr<math::geometry::CatmullRomSpline>>("reference_trajectory")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
@@ -49,17 +49,16 @@ public:
     }
     return ports;
   }
-  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
-  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(
-    double target_speed, const std::vector<std::int64_t> & following_lanelets);
-  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
-    double target_speed);
+  auto calculateUpdatedEntityStatus(double target_speed) const
+    -> traffic_simulator_msgs::msg::EntityStatus;
+  auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
+    -> traffic_simulator_msgs::msg::EntityStatus;
   virtual const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() = 0;
   virtual const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) = 0;
 
 protected:
-  traffic_simulator_msgs::msg::DriverModel driver_model;
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
   std::shared_ptr<math::geometry::CatmullRomSpline> reference_trajectory;
   std::unique_ptr<math::geometry::CatmullRomSubspline> trajectory;

@@ -19,7 +19,7 @@
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 // headers in STL
 #include <memory>
@@ -40,8 +40,8 @@ public:
 private:
   void onUpdate() override
   {
-    double ego_accel = api_.getEntityStatus("ego").action_status.accel.linear.x;
-    double ego_twist = api_.getEntityStatus("ego").action_status.twist.linear.x;
+    double ego_accel = api_.getCurrentAccel("ego").linear.x;
+    double ego_twist = api_.getCurrentTwist("ego").linear.x;
     // double npc_accel = api_.getEntityStatus("npc").action_status.accel.linear.x;
     double npc_twist = api_.getEntityStatus("npc").action_status.twist.linear.x;
     // LCOV_EXCL_START
@@ -68,14 +68,13 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn("ego", getVehicleParameters());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
-      traffic_simulator::helper::constructActionStatus(15));
-    api_.spawn("npc", getVehicleParameters());
-    api_.setEntityStatus(
-      "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
-      traffic_simulator::helper::constructActionStatus(10));
+    api_.spawn(
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
+    api_.setLinearVelocity("ego", 15);
+
+    api_.spawn(
+      "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0), getVehicleParameters());
+    api_.setLinearVelocity("npc", 10);
     api_.requestSpeedChange("npc", 10, true);
     api_.addMetric<metrics::ReactionTimeMetric>("ego_reaction_time", "ego", 1, -1, 1, true, true);
   }

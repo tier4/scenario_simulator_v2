@@ -87,14 +87,3 @@ Reaction time metric enables us to check the target entity follows the front ent
 
 Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1OutOfRangeMetric/).
 Out of range metric enables us to check the velocity, acceleration, jerk of a target entity are in the valid range or not.
-
-### Standstill
-
-Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1StandstillMetric/).
-Standstill metric enables us to check an entity is stacked or not.
-This metric checks the standstill duration of the target entity overs the allowed standstill duration.
-
-### Collision
-
-Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1CollisionMetric/).
-Collision metric checks the target entity is colliding with the other entity or not.

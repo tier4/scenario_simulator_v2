@@ -19,7 +19,7 @@
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 // headers in STL
 #include <memory>
@@ -44,33 +44,31 @@ private:
     if (api_.getEntityStatus("front").action_status.twist.linear.x < 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (
-      api_.getCurrentTime() <= 0.9 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {
+    if (api_.getCurrentTime() <= 0.9 && api_.getCurrentTwist("ego").linear.x > 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
-      api_.getCurrentTime() >= 1.0 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x <= 10.0) {
+      api_.getCurrentTime() >= 1.0 && api_.getCurrentTwist("ego").linear.x <= 10.0 &&
+      api_.getCurrentTwist("ego").linear.x >= 9.9) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
 
   void onInitialize() override
   {
-    api_.spawn("ego", getVehicleParameters());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
-      traffic_simulator::helper::constructActionStatus(0));
+    api_.spawn(
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
+    api_.setLinearVelocity("ego", 0);
     api_.requestSpeedChange(
       "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
-    api_.spawn("front", getVehicleParameters());
-    api_.setEntityStatus(
+
+    api_.spawn(
       "front", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
-      traffic_simulator::helper::constructActionStatus(0));
+      getVehicleParameters());
+    api_.setLinearVelocity("front", 0);
     api_.requestSpeedChange(
       "front", 10.0, traffic_simulator::speed_change::Transition::STEP,
       traffic_simulator::speed_change::Constraint(

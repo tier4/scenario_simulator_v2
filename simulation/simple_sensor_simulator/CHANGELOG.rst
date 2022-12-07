@@ -2,6 +2,108 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.7 (2022-11-17)
+------------------
+* Merge remote-tracking branch 'origin/master' into feat/heat_beat
+* Merge pull request `#913 <https://github.com/tier4/scenario_simulator_v2/issues/913>`_ from tier4/use/autoware_github_actions
+* fix(typo): cooridnate => coordinate
+* fix(typo): implemtation => implementation
+* chore(spell-check): fix cspell error
+* chore(spell-check):  fix cspell error
+* Merge pull request `#888 <https://github.com/tier4/scenario_simulator_v2/issues/888>`_ from tier4/fix/shifted_bounding_box
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Copy dimension info
+* Merge remote-tracking branch 'origin/master' into fix/traffic_simulator/horizon
+* Merge pull request `#905 <https://github.com/tier4/scenario_simulator_v2/issues/905>`_ from tier4/fix/update-orientation-availability
+* fix: orientation availability
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/priority
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into refactor/test_runner
+* Merge pull request `#886 <https://github.com/tier4/scenario_simulator_v2/issues/886>`_ from RobotecAI/mkielczykowski/profile_embree
+* review applied
+* humble build fix
+* Code cleanup: delete Todo
+* Code cleanup: clang format
+* Fix bounding box shifting
+* Code cleanup: organise the raycaster code
+* Code cleanup: delete time measurement
+* Revert "WIP: Intermediate dynamic_scene optimization"
+* Fix compilation
+* MT patches
+* WIP: Implement (para)lellization and add scenarios
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge pull request `#866 <https://github.com/tier4/scenario_simulator_v2/issues/866>`_ from tier4/fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Fix wrong comment
+* Format
+* Remove unnecessary declaration
+* Merge branch 'feature/occupancy_grid_docs' into fix/simple_sensor_simulator/fast_occupancy_grid
+* Refacor `occupancy_grid_sensor` and improve performance
+* Remove redundant code and simplify
+* Reformat
+* WIP: Intermediate dynamic_scene optimization
+* Simplify grid cell data structure to improve performance
+* Fix typo
+* Merge remote-tracking branch 'origin/fix/ci_error' into feature/start_npc_logic_api
+* Merge branch 'master' into feature/occupancy_grid_docs
+* Update doxygen comments
+* Add doxygen comment
+* WIP: embree optimizations
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Michał Kiełczykowski, Piotr Rybicki, Piotr Zyskowski, Shota Minami, kyabe2718, satoshi-ota, yamacir-kit
+
+0.6.6 (2022-08-30)
+------------------
+* Merge remote-tracking branch 'origin/master' into refactor/catalog
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge pull request `#849 <https://github.com/tier4/scenario_simulator_v2/issues/849>`_ from tier4/fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Change `Grid` to update partially
+* Reorder lines
+* Improve filling algorithm
+* Merge pull request `#847 <https://github.com/tier4/scenario_simulator_v2/issues/847>`_ from tier4/feature/value_constraint
+* Replace "Tier IV" with "TIER IV"
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* Merge remote-tracking branch 'origin/master' into doc/6th_improvement
+* Merge pull request `#835 <https://github.com/tier4/scenario_simulator_v2/issues/835>`_ from RobotecAI/fix/obstacle_detection_raycaster
+* Add zero-initialization of raycast and change default mask values
+* Set mask property to raycaster hit to enable intersecting with geometries in the scene
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Merge pull request `#816 <https://github.com/tier4/scenario_simulator_v2/issues/816>`_ from tier4/feature/geometry_lib
+* fix namespavce
+* modify namespace
+* move directory
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* apply reformat
+* Merge branch 'feature/geometry_lib' of https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* add contains to the collision directory
+* move to geometry math
+* move line segment class to the polygon directory
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* move directory
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* use geometry_math::getMinValue/getMaxValue function
+* add filterByAxis function
+* use std::transform
+* Merge branch 'feature/get_distance_to_lane_bound' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Michał Kiełczykowski, Piotr Zyskowski, Shota Minami, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble

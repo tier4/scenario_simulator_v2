@@ -48,6 +48,7 @@ public:
   template <typename F>
   decltype(auto) delay(F && f)
   {
+    rethrow();
     std::unique_lock lk(thunks_mutex);
     thunks.emplace(std::forward<F>(f));
   }

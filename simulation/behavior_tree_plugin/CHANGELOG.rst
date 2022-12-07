@@ -2,6 +2,77 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.7 (2022-11-17)
+------------------
+* Merge remote-tracking branch 'origin/master' into feat/heat_beat
+* Merge pull request `#913 <https://github.com/tier4/scenario_simulator_v2/issues/913>`_ from tier4/use/autoware_github_actions
+* fix(typo): fullfill => fulfill
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge pull request `#900 <https://github.com/tier4/scenario_simulator_v2/issues/900>`_ from tier4/feature/traffic_simulator/behavior-parameter
+* Lipsticks
+* Updates `setBehaviorParameter` to clamp the given value with maximum performance
+* Merge branch 'fix/interpreter/custom_command_action' into feature/interpreter/priority
+* Merge branch 'master' into fix/interpreter/custom_command_action
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/behavior-parameter
+* Merge pull request `#899 <https://github.com/tier4/scenario_simulator_v2/issues/899>`_ from tier4/feature/bt_auto_ros_ports
+* Merge branch 'master' into feature/bt_auto_ros_ports
+* Merge pull request `#898 <https://github.com/tier4/scenario_simulator_v2/issues/898>`_ from tier4/feature/interpreter/speed-profile-action
+* Rename `DriverModel` to `BehaviorParameter`
+* Configure behavior tree ports automatically
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/priority
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge remote-tracking branch 'origin/master' into refactor/test_runner
+* Merge pull request `#891 <https://github.com/tier4/scenario_simulator_v2/issues/891>`_ from tier4/feature/interpreter/follow-trajectory-action
+* Move namespace `behavior` into new header `data_types/behavior.hpp`
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* fix compile errors
+* remove getCurrentTime function
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* remove passing current time to plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Shota Minami, kyabe2718, yamacir-kit
+
+0.6.6 (2022-08-30)
+------------------
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge pull request `#822 <https://github.com/tier4/scenario_simulator_v2/issues/822>`_ from tier4/fix/stop_position
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Merge pull request `#821 <https://github.com/tier4/scenario_simulator_v2/issues/821>`_ from tier4/feature/linelint
+* Merge pull request `#816 <https://github.com/tier4/scenario_simulator_v2/issues/816>`_ from tier4/feature/geometry_lib
+* fix lint error
+* fix namespavce
+* modify namespace
+* move directory
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* update margin
+* add margin
+* add 1.0m margin
+* fix stop position
+* Merge branch 'feature/geometry_lib' of https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* split directory
+* change namespace
+* apply reformat
+* add geometry_math package
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge pull request `#793 <https://github.com/tier4/scenario_simulator_v2/issues/793>`_ from tier4/fix/build-error-humble

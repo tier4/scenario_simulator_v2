@@ -20,25 +20,38 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Event::Event(const pugi::xml_node & node, Scope & scope)
+Event::Event(const pugi::xml_node & node, Scope & scope, Maneuver & maneuver)
 : Scope(readAttribute<String>("name", node, scope), scope),
   StoryboardElement(
     readAttribute<UnsignedInt>("maximumExecutionCount", node, local(), UnsignedInt(1)),
     // If there is no "StartTrigger" in the "Event", the default StartTrigger that always returns true is used.
     readElement<Trigger>("StartTrigger", node, local(), Trigger({ConditionGroup()}))),
-  priority(readAttribute<Priority>("priority", node, local()))
+  priority(readAttribute<Priority>("priority", node, local())),
+  parent_maneuver(maneuver)
 {
   traverse<1, unbounded>(node, "Action", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Action>(node, local()));
   });
+
+  if (priority == Priority::skip) {
+    addTransitionCallback(StoryboardElementState::startTransition, [this](auto &&) {
+      if (parent_maneuver.running_events_count() > 0) {
+        transitionTo(standby_state);
+      }
+    });
+  }
 }
 
 auto Event::start() -> void
 {
+  if (priority == Priority::overwrite) {
+    parent_maneuver.overrideEvents();
+  }
+
   for (auto && element : elements) {
     assert(element.template is<Action>());
     assert(element.template is_also<StoryboardElement>());
-    element.template as<StoryboardElement>().current_state = start_transition;
+    element.template as<StoryboardElement>().transitionTo(start_transition);
   }
 }
 

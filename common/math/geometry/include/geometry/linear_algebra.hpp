@@ -35,6 +35,7 @@ double getInternalAngle(
 }  // namespace geometry
 }  // namespace math
 
+geometry_msgs::msg::Vector3 operator/(const geometry_msgs::msg::Vector3 & vec, double value);
 geometry_msgs::msg::Vector3 operator*(const geometry_msgs::msg::Vector3 & vec, double value);
 geometry_msgs::msg::Vector3 operator*(double value, const geometry_msgs::msg::Vector3 & vec);
 geometry_msgs::msg::Point operator+(

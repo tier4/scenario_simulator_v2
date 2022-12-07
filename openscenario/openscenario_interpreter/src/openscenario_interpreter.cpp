@@ -19,7 +19,9 @@
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
+#include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
@@ -72,10 +74,6 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
     logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
   {
     configuration.auto_sink = false;
-
-    configuration.initialize_duration =
-      ObjectController::ego_count > 0 ? getParameter<int>("initialize_duration") : 0;
-
     configuration.scenario_path = osc_path;
 
     // XXX DIRTY HACK!!!
@@ -119,51 +117,82 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
+      } else if (script->category.is<ParameterValueDistribution>()) {
+        throw Error("ParameterValueDistribution is not supported");
       } else {
-        throw SyntaxError("ParameterValueDistributionDefinition is not yet supported.");
+        throw SyntaxError(
+          "Unsupported member of OpenSCENARIOCategory group is defined in the scenario file");
       }
 
       return Interpreter::Result::SUCCESS;  // => Inactive
     });
 }
 
+auto Interpreter::engage() const -> void
+{
+  for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
+    if (
+      scenario_object.template as<ScenarioObject>().is_added and
+      scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
+      asAutoware(name).engage();
+    }
+  }
+}
+
+auto Interpreter::engageable() const -> bool
+{
+  return std::all_of(
+    std::cbegin(currentScenarioDefinition()->entities),
+    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
+      const auto & [name, scenario_object] = each;
+      return not scenario_object.template as<ScenarioObject>().is_added or
+             not scenario_object.template as<ScenarioObject>()
+                   .object_controller.isUserDefinedController() or
+             asAutoware(name).engageable();
+    });
+}
+
+auto Interpreter::engaged() const -> bool
+{
+  return std::all_of(
+    std::cbegin(currentScenarioDefinition()->entities),
+    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
+      const auto & [name, scenario_object] = each;
+      return not scenario_object.template as<ScenarioObject>().is_added or
+             not scenario_object.template as<ScenarioObject>()
+                   .object_controller.isUserDefinedController() or
+             asAutoware(name).engaged();
+    });
+}
+
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  auto initializeStoryboard = [this]() {
-    return withExceptionHandler(
-      [this](auto &&...) {
-        publishCurrentContext();
-        deactivate();
-      },
-      [this]() {
-        if (currentScenarioDefinition()) {
-          currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
-          SimulatorCore::update();
-        } else {
-          throw Error("No script evaluable.");
-        }
-      });
-  };
-
-  auto evaluateStoryboard = [&]() {
+  auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
         deactivate();
       },
       [this]() {
-        if (evaluateSimulationTime() < 0) {
-          SimulatorCore::update();
-          publishCurrentContext();
-        } else if (currentScenarioDefinition()) {
-          withTimeoutHandler(defaultTimeoutHandler(), [this]() {
+        withTimeoutHandler(defaultTimeoutHandler(), [this]() {
+          if (std::isnan(evaluateSimulationTime())) {
+            if (not waiting_for_engagement_to_be_completed and engageable()) {
+              engage();
+              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
+            } else if (engaged()) {
+              activateNonUserDefinedControllers();
+              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
+            }
+          } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
-            SimulatorCore::update();
-            publishCurrentContext();
-          });
-        } else {
-          throw Error("No script evaluable.");
-        }
+          } else {
+            throw Error("No script evaluable.");
+          }
+
+          SimulatorCore::update();
+
+          publishCurrentContext();
+        });
       });
   };
 
@@ -171,7 +200,11 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
     return Result::FAILURE;
   } else {
     return withExceptionHandler(
-      [this](auto &&...) { return Interpreter::Result::ERROR; },
+      [this](auto &&...) {
+        publishCurrentContext();
+        reset();
+        return Interpreter::Result::FAILURE;  // => Inactive
+      },
       [&]() {
         if (getParameter<bool>("record", true)) {
           // clang-format off
@@ -204,9 +237,13 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         assert(publisher_of_context->is_activated());
 
-        initializeStoryboard();
+        if (currentScenarioDefinition()) {
+          currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
+        } else {
+          throw Error("No script evaluable.");
+        }
 
-        timer = create_wall_timer(currentLocalFrameRate(), evaluateStoryboard);
+        timer = create_wall_timer(currentLocalFrameRate(), evaluate_storyboard);
 
         return Interpreter::Result::SUCCESS;  // => Active
       });
@@ -215,25 +252,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 {
-  timer.reset();  // Stop scenario evaluation
-
-  publisher_of_context->on_deactivate();
-
-  SimulatorCore::deactivate();
-
-  scenarios.pop_front();
-
-  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
-  boost::apply_visitor(
-    overload(
-      [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
-      [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
-      [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
-    result);
-
-  if (getParameter<bool>("record", true)) {
-    record::stop();
-  }
+  reset();
 
   return Interpreter::Result::SUCCESS;  // => Inactive
 }
@@ -245,7 +264,7 @@ auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
 {
-  deactivate();  // DIRTY HACK!!!
+  reset();
 
   return Interpreter::Result::SUCCESS;  // => Unconfigured
 }
@@ -268,6 +287,31 @@ auto Interpreter::publishCurrentContext() const -> void
   }
 
   publisher_of_context->publish(context);
+}
+
+auto Interpreter::reset() -> void
+{
+  timer.reset();  // Stop scenario evaluation
+
+  if (publisher_of_context->is_activated()) {
+    publisher_of_context->on_deactivate();
+  }
+
+  SimulatorCore::deactivate();
+
+  scenarios.pop_front();
+
+  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+  boost::apply_visitor(
+    overload(
+      [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
+      [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
+      [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
+    result);
+
+  if (getParameter<bool>("record", true)) {
+    record::stop();
+  }
 }
 }  // namespace openscenario_interpreter
 

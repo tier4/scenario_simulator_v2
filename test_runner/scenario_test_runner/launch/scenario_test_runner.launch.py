@@ -19,7 +19,7 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 
-from launch.actions import DeclareLaunchArgument, OpaqueFunction, Shutdown
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 
 from launch.conditions import IfCondition
 
@@ -28,6 +28,8 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, LifecycleNode
 
 from pathlib import Path
+
+from scenario_test_runner.shutdown_once import ShutdownOnce
 
 
 def architecture_types():
@@ -144,7 +146,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             name="scenario_test_runner",
             output="screen",
-            on_exit=Shutdown(),
+            on_exit=ShutdownOnce(),
             arguments=[
                 # fmt: off
                 "--global-frame-rate",       global_frame_rate,
@@ -162,6 +164,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             name="simple_sensor_simulator",
             output="screen",
+            on_exit=ShutdownOnce(),
             parameters=[{"port": port}],
         ),
         LifecycleNode(
@@ -171,7 +174,15 @@ def launch_setup(context, *args, **kwargs):
             name="openscenario_interpreter",
             output="screen",
             parameters=make_parameters(),
-            # on_exit=Shutdown(),
+            on_exit=ShutdownOnce(),
+        ),
+        Node(
+            package="openscenario_preprocessor",
+            executable="openscenario_preprocessor_node",
+            namespace="simulation",
+            name="openscenario_preprocessor",
+            output="screen",
+            on_exit=ShutdownOnce(),
         ),
         Node(
             package="openscenario_visualization",

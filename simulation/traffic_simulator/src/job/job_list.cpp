@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 
 namespace traffic_simulator
@@ -19,33 +20,22 @@ namespace traffic_simulator
 namespace job
 {
 void JobList::append(
-  const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
-  job::Type type, bool exclusive, job::Trigger trigger)
+  const std::function<bool(double)> & func_on_update, const std::function<void()> & func_on_cleanup,
+  job::Type type, bool exclusive, const job::Event event)
 {
   for (auto & job : list_) {
-    if (exclusive) {
-      if (job.type == type && job.exclusive) {
-        job.inactivate();
-      }
+    if (job.type == type && job.exclusive == exclusive && job.getStatus() == job::Status::ACTIVE) {
+      job.inactivate();
     }
   }
-  list_.emplace_back(Job(func_on_update, func_on_cleanup, type, exclusive, trigger));
+  list_.emplace_back(Job(func_on_update, func_on_cleanup, type, exclusive, event));
 }
 
-void JobList::update()
+void JobList::update(const double step_time, const job::Event event)
 {
   for (auto & job : list_) {
-    if (job.trigger == job::Trigger::ON_UPDATE) {
-      job.update();
-    }
-  }
-}
-
-void JobList::measure()
-{
-  for (auto & job : list_) {
-    if (job.trigger == job::Trigger::ON_MEASURE) {
-      job.update();
+    if (job.event == event) {
+      job.onUpdate(step_time);
     }
   }
 }

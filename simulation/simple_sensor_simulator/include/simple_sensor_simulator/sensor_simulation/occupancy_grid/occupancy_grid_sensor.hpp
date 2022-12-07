@@ -23,8 +23,13 @@
 #include <string>
 #include <vector>
 
+#include "simple_sensor_simulator/sensor_simulation/occupancy_grid/grid.hpp"
+
 namespace simple_sensor_simulator
 {
+/**
+ * @brief Base class of occupancy grid sensor simulator
+ */
 class OccupancyGridSensorBase
 {
 protected:
@@ -44,21 +49,42 @@ protected:
 public:
   virtual ~OccupancyGridSensorBase() = default;
 
+  /**
+   * @brief Update sensor status
+   */
   virtual void update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> & lidar_detected_entity) = 0;
 
+  /**
+   * @brief List all objects in range of sensor sight
+   * @return names of objects in range of sensor sight
+   */
   const std::vector<std::string> getDetectedObjects(
     const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+
+  /**
+   * @brief Extract sensor pose from entity statuses
+   * @return sensor pose
+   * @warning `status` must contain EGO object
+   * @exception SimulationRuntimeError if `status` does not contain EGO object
+   */
   geometry_msgs::Pose getSensorPose(
     const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
 };
 
+/**
+ * @brief occupancy grid sensor implementation
+ */
 template <typename T>
 class OccupancyGridSensor : public OccupancyGridSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
+  /**
+   * @brief construct occupancy grid from entity list
+   * @return occupancy grid of specified type
+   */
   auto getOccupancyGrid(
     const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> &) -> T;
@@ -68,7 +94,9 @@ public:
     const double current_time,
     const simulation_api_schema::OccupancyGridSensorConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
-  : OccupancyGridSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr)
+  : OccupancyGridSensorBase(current_time, configuration),
+    publisher_ptr_(publisher_ptr),
+    grid_(configuration.resolution(), configuration.height(), configuration.width())
   {
   }
 
@@ -84,6 +112,9 @@ public:
       detected_objects_ = {};
     }
   }
+
+private:
+  mutable Grid grid_;
 };
 
 template <>

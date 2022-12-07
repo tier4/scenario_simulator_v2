@@ -121,10 +121,11 @@ Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh` co
 
 #### Built-in commands
 
-| Name        | Effect                                               |
-|:------------|:-----------------------------------------------------|
-| exitSuccess | Immediately terminates the simulation as successful. |
-| exitFailure | Immediately terminates the simulation as a failure.  |
+| Name               | Effect                                                   |
+|:-------------------|:---------------------------------------------------------|
+| exitSuccess        | Immediately terminates the simulation as successful.     |
+| exitFailure        | Immediately terminates the simulation as a failure.      |
+| WalkStraightAction | Make a **pedestrian** NPC walk straight without a target |
 
 These built-in commands force the simulation to terminate.
 This termination ignores the StoryboardElement's lifecycle transition (that is, it means that `StoryboardElementStateCondition` cannot be used to prevent or detect the execution of this command).
@@ -154,16 +155,18 @@ In scenario_simulator_v2, we use `UserDefinedValueCondition` to control the prog
 ```
 #### Built-in conditions
 
-You can use Autoware related conditions via UserDefinedValueCondition.  
-Like "ego.currentState", you can specify the entity by name and refer to its status.  
+Like "currentState", the conditions start with "current" return Autoware-related conditions.  
+And like "ego.currentState", they can specify the entity reference by prepending the name of the entity
+
 The following built-in conditions return a string that represents the state.   
 See Reference for specific strings.  
 
-| Name                       | description                                         | Reference                                                                                                                   |
+| Name                       | description                                         | Reference /                                                                                                                 |
 |:---------------------------|:----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
 | currentState               | returns Autoware's state                            | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/AutowareState.idl)          |
 | currentEmergencyState      | return Autoware's emergency state.                  | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_system_msgs/msg/EmergencyState.idl)         |
 | currentTurnIndicatorsState | return turn indicators state controlled by Autoware | [URL](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/msg/TurnIndicatorsCommand.idl) |
+| RelativeHeadingCondition   | return the relative angle to the lane heading       | need to give the entity reference, lane id, and s coordinate                                                                |
 
 #### External ROS2 topic condition
 
@@ -221,7 +224,7 @@ OpenSCENARIO standards.
 | GlobalAction.TrafficAction.**TrafficStopAction**                                        |  Unsupported   |                                    |                      |
 | GlobalAction.VariableAction.**VariableSetAction**                                       |  Unsupported   |                                    | created in v1.2      |
 | GlobalAction.VariableAction.**VariableModifyAction**                                    |  Unsupported   |                                    | created in v1.2      |
-| UserDefinedAction.**CustomCommandAction**                                               |       ✔        | No                                 |                      |
+| UserDefinedAction.**CustomCommandAction**                                               |       ✔        | See [here](#customcommandaction)   |                      |
 | PrivateAction.AppearanceAction.**AnimationAction**                                      |  Unsupported   |                                    | created in v1.2      |
 | PrivateAction.AppearanceAction.**LightStateAction**                                     |  Unsupported   |                                    | created in v1.2      |
 | PrivateAction.LongitudinalAction.**SpeedAction**                                        |       ✔        | See [here](#speedaction)           |                      |
@@ -272,6 +275,12 @@ OpenSCENARIO standards.
 ### ParameterSetAction
 
 - Currently, ParameterSetAction cannot handle `dateTime` type parameters.
+
+### CustomCommandAction
+#### WalkStraightAction
+- This action is a temporary feature until `FollowTrajectoryAction` is implemented.
+- This action cannot be used in combination with `AcquirePositionAction` because `WalkStraightAction` just makes a pedestrian NPC go straight without a destination.
+
 
 ### SpeedAction
 

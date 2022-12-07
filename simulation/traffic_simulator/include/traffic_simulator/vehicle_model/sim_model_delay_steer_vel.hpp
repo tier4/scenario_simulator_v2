@@ -80,8 +80,8 @@ private:
   const float64_t vx_time_constant_;
   //!< @brief time constant for 1D model of velocity dynamics
   const float64_t steer_delay_;  //!< @brief time delay for angular-velocity command [s]
-  const float64_t steer_time_constant_;
-  //!< @brief time constant for 1D model of angular-velocity dynamics
+  const float64_t
+    steer_time_constant_;  //!< @brief time constant for 1D model of angular-velocity dynamics
 
   /**
    * @brief set queue buffer for input command

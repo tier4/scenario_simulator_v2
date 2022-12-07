@@ -1,7 +1,9 @@
 {
   "ignorePaths": [
-    "external/lanelet2_extension_psim/**",
-    "external/lanelet2_matching/**"
+    "external/lanelet2_matching/**",
+    "*/**/CHANGELOG.rst",
+    "openscenario/openscenario_utility/openscenario_utility/resources/*.xsd",
+    "*.drawio"
   ],
   "words": [
     "parametersetaction",
@@ -73,6 +75,14 @@
     "nosetests",
     "rosdoc",
     "Khanh",
-    "approvable"
+    "approvable",
+    "customcommandaction",
+    "prepending",
+    "kotaro",
+    "yoshimoto",
+    "engageable",
+    "travelling",
+    "libunwind",
+    "linelint"
   ]
 }

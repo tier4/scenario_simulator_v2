@@ -17,11 +17,14 @@
 
 #include <boost/filesystem.hpp>
 #include <openscenario_interpreter/functional/fold.hpp>
+#include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/directory.hpp>
+#include <openscenario_interpreter/syntax/parameter_assignments.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
+#include <optional>
 
 namespace openscenario_interpreter
 {
@@ -40,24 +43,21 @@ inline namespace syntax
 
 struct CatalogReference
 {
-  static auto make(const pugi::xml_node &, Scope &) -> Object;
+  CatalogReference(const pugi::xml_node &, Scope &);
 
-  template <typename... Ts>
-  static auto make(const pugi::xml_node & node, Scope & scope) -> Object
-  {
-    auto result = CatalogReference::make(node, scope);
+  auto make() -> const Object;
 
-    if (fold_right(std::logical_or<void>(), result.is_also<Ts>()...)) {
-      return result;
-    } else {
-      std::stringstream what;
-      what << "Required type of catalog element is one of the following type: ";
-      print_to(what, std::array<const char *, sizeof...(Ts)>{typeid(Ts).name()...});
-      what << ". But the type of this element is " << makeTypename(result.type()) << ".";
-      throw SyntaxError(what.str());
-    }
-  }
+  Scope scope;
+
+  const std::string catalog_name;
+
+  const std::string entry_name;
+
+  ParameterAssignments parameter_assignments;
+
+  pugi::xml_node catalog_node;
 };
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

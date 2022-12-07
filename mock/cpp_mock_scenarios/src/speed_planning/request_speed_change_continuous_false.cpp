@@ -19,7 +19,7 @@
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator_msgs/msg/driver_model.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 // headers in STL
 #include <memory>
@@ -43,35 +43,19 @@ private:
   void onUpdate() override
   {
     /**
-     * @brief checking linear acceleration
-     */
-    if (
-      api_.getCurrentTime() != 0.0 && api_.getCurrentTime() <= 1.0 &&
-      api_.getEntityStatus("ego").action_status.accel.linear.x != 10.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    if (
-      api_.getCurrentTime() >= 1.05 &&
-      api_.getEntityStatus("ego").action_status.accel.linear.x > 3.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-
-    /**
      * @brief checking linear speed
      */
-    if (
-      api_.getCurrentTime() <= 0.9 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+    if (api_.getCurrentTime() <= 0.95) {
+      if (!equals(api_.getCurrentTime() * 10.0, api_.getCurrentTwist("ego").linear.x, 0.01)) {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
     }
-    if (
-      api_.getCurrentTime() >= 1.0 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x <= 10.0) {
+    if (api_.getCurrentTime() >= 1.0 && api_.getCurrentTwist("ego").linear.x <= 10.0) {
       speed_reached = true;
     }
     if (
       speed_reached && api_.getCurrentTime() >= 1.5 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x >= 13.88) {
+      api_.getCurrentTwist("ego").linear.x >= 13.88) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -79,10 +63,9 @@ private:
   void onInitialize() override
   {
     speed_reached = false;
-    api_.spawn("ego", getVehicleParameters());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
-      traffic_simulator::helper::constructActionStatus(0));
+    api_.spawn(
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
+    api_.setLinearVelocity("ego", 0);
     api_.requestSpeedChange(
       "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(

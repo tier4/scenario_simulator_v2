@@ -17,18 +17,20 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
+#include <openscenario_interpreter/syntax/speed_profile_action.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- LongitudinalAction -----------------------------------------------------
+/* ---- LongitudinalAction 1.2 -------------------------------------------------
  *
  *  <xsd:complexType name="LongitudinalAction">
  *    <xsd:choice>
- *      <xsd:element name="SpeedAction" type="SpeedAction"/>
- *      <xsd:element name="LongitudinalDistanceAction" type="LongitudinalDistanceAction"/>
+ *      <xsd:element name="SpeedAction" type="SpeedAction" minOccurs="0"/>
+ *      <xsd:element name="LongitudinalDistanceAction" type="LongitudinalDistanceAction" minOccurs="0"/>
+ *      <xsd:element name="SpeedProfileAction" type="SpeedProfileAction" minOccurs="0"/>
  *    </xsd:choice>
  *  </xsd:complexType>
  *
@@ -47,14 +49,14 @@ struct LongitudinalAction : public ComplexType
 DEFINE_LAZY_VISITOR(
   LongitudinalAction,
   CASE(SpeedAction),  //
-  // CASE(LongitudinalDistanceAction),
-);
+  // CASE(LongitudinalDistanceAction),  //
+  CASE(SpeedProfileAction));
 
 DEFINE_LAZY_VISITOR(
   const LongitudinalAction,
   CASE(SpeedAction),  //
-  // CASE(LongitudinalDistanceAction),
-);
+  // CASE(LongitudinalDistanceAction),  //
+  CASE(SpeedProfileAction));
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

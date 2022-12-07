@@ -26,10 +26,10 @@ class JobList
 {
 public:
   void append(
-    const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
-    job::Type type, bool exclusive, job::Trigger trigger);
-  void update();
-  void measure();
+    const std::function<bool(const double)> & func_on_update,
+    const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive,
+    const job::Event event);
+  void update(const double step_time, const job::Event event);
 
 private:
   std::vector<Job> list_;

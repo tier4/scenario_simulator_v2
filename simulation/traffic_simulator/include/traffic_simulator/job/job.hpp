@@ -36,9 +36,9 @@ enum class Status {
   INACTIVE = 1,
 };
 
-enum class Trigger {
-  ON_UPDATE = 0,
-  ON_MEASURE = 1,
+enum class Event {
+  PRE_UPDATE = 0,
+  POST_UPDATE = 1,
 };
 
 class Job
@@ -53,20 +53,22 @@ public:
    * @param exclusive If true, the Job works exclusively by type.
    */
   Job(
-    const std::function<bool()> & func_on_update, const std::function<void()> & func_on_cleanup,
-    job::Type type, bool exclusive, job::Trigger trigger);
-  void update();
+    const std::function<bool(double)> & func_on_update,
+    const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive, Event event);
+  void onUpdate(const double step_time);
   void inactivate();
+  Status getStatus() const;
 
 private:
-  std::function<bool()> func_on_update_;
+  std::function<bool(double)> func_on_update_;
   std::function<void()> func_on_cleanup_;
   Status status_;
+  double job_duration_;
 
 public:
   const job::Type type;
   const bool exclusive;
-  const job::Trigger trigger;
+  const Event event;
 };
 }  // namespace job
 }  // namespace traffic_simulator

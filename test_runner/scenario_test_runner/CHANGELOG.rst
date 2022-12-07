@@ -2,6 +2,87 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.7 (2022-11-17)
+------------------
+* Merge pull request `#903 <https://github.com/tier4/scenario_simulator_v2/issues/903>`_ from tier4/feature/empty/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge pull request `#883 <https://github.com/tier4/scenario_simulator_v2/issues/883>`_ from tier4/feature/interpreter/priority
+* add a part for checking priority features to all-in-one.yaml
+* Merge branch 'fix/interpreter/custom_command_action' into feature/interpreter/priority
+* Merge branch 'master' into fix/interpreter/custom_command_action
+* Merge branch 'master' into feature/bt_auto_ros_ports
+* Merge pull request `#898 <https://github.com/tier4/scenario_simulator_v2/issues/898>`_ from tier4/feature/interpreter/speed-profile-action
+* Add test scenario `LongitudinalAction.SpeedProfileAction`
+* Replace msg names to new ones
+* Delete unused files
+* add a lane change scenario to all-in-one.yaml
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/priority
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Extract openscenario_preprocessor
+* Merge remote-tracking branch 'origin/master' into feature/parameter_value_distribution
+* Merge branch 'master' into feature/interpreter/follow-trajectory-action-3
+* Merge pull request `#890 <https://github.com/tier4/scenario_simulator_v2/issues/890>`_ from tier4/refactor/test_runner
+* Merge remote-tracking branch 'origin/master' into fix/shifted_bounding_box
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into refactor/test_runner
+* Merge pull request `#892 <https://github.com/tier4/scenario_simulator_v2/issues/892>`_ from tier4/feature/interpreter/follow-trajectory-action-2
+* Fix workflow execution
+* Fix bug in lifecycle operation
+* Integrate preprocessor into scenario_test_runner.py
+* Add openscenario_preprocessor to launch file
+* Format scenario_test_runner.py
+* Add new test scenario `RoutingAction.FollowTrajectoryAction.yaml`
+* Add empty implementation for new structure of test_runner
+* Rename / Add annotations to functions in scenario_test_runner.py
+* Code cleanup: delete yaml scenarios
+* WIP: Implement (para)lellization and add scenarios
+* Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/simple_sensor_simulator/fast_occupancy_grid
+* Merge remote-tracking branch 'origin/master' into fix/ci_catch_rosdep_error
+* Merge remote-tracking branch 'origin/fix/ci_error' into feature/start_npc_logic_api
+* Merge branch 'master' into feature/occupancy_grid_docs
+* Merge remote-tracking branch 'origin/master' into feature/start_npc_logic_api
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/start_npc_logic_api
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Michał Kiełczykowski, Piotr Zyskowski, Shota Minami, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
+0.6.6 (2022-08-30)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Revert change for scenario `sample.yaml`
+* Rename CMake targets to `lanelet2_extension_psim*` from `lanelet2_extension*`
+* Merge pull request `#847 <https://github.com/tier4/scenario_simulator_v2/issues/847>`_ from tier4/feature/value_constraint
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Fix sample.yaml
+* Add value constraint to sample scenario
+* Merge remote-tracking branch 'tier/master' into fix/concealer-dangling-reference
+* Merge remote-tracking branch 'origin/master' into doc/6th_improvement
+* Merge pull request `#837 <https://github.com/tier4/scenario_simulator_v2/issues/837>`_ from tier4/update/rviz_display
+* Fix runtime errors
+* Fix the way to import rviz config path
+* Format files
+* Format files
+* Format files
+* Merge remote-tracking branch 'tier/master' into fix/obstacle_detection_raycaster
+* Merge branch 'master' into fix/trajectory_offset
+* Add command line option to pass rviz_config
+* Merge pull request `#830 <https://github.com/tier4/scenario_simulator_v2/issues/830>`_ from tier4/feature/interpreter/relative-heading-condition
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/transition_assertion
+* Add new NonStandardOperation `evaluateRelativeHeading`
+* Update `UserDefinedValueCondition` to support function-style expression (EXPERIMENTAL)
+* Merge remote-tracking branch 'origin/master' into fix/stop_position
+* Merge remote-tracking branch 'origin/master' into feature/autoware/request-to-cooperate
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/geometry_lib
+* Merge remote-tracking branch 'origin/master' into doc/4th-improvement
+* Merge remote-tracking branch 'origin/master' into feature/openscenario/non_instantaneous_actions
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/geometry_lib
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/get_relative_pose_with_lane_pose
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Merge remote-tracking branch 'origin/master' into refactor/interpreter/simulator-core
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.6.5 (2022-06-16)
 ------------------
 * Merge branch 'master' into feature/change_engage_api_name
