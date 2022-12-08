@@ -30,7 +30,7 @@ jobs:
       matrix:
         rosdistro: [galactic]
     steps:
-      - name: supress warnings
+      - name: suppress warnings
         run: |
           git config --global --add safe.directory '*'
       - uses: actions/checkout@v2-beta
