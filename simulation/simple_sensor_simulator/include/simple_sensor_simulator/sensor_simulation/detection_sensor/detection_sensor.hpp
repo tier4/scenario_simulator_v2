@@ -33,10 +33,13 @@ protected:
 
   simulation_api_schema::DetectionSensorConfiguration configuration_;
 
+  std::shared_ptr<std::mt19937> rand_engine_;
+
   explicit DetectionSensorBase(
     const double last_update_stamp,
     const simulation_api_schema::DetectionSensorConfiguration & configuration)
-  : last_update_stamp_(last_update_stamp), configuration_(configuration)
+  : last_update_stamp_(last_update_stamp), configuration_(configuration),
+  rand_engine_(std::make_shared<std::mt19937>(configuration.random_seed()))
   {
   }
 
