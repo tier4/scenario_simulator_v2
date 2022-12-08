@@ -56,8 +56,6 @@ struct SpeedProfileAction : private Scope,  // NOTE: Required for access to acto
      Performance class of a Vehicle entity resulting in a smoother speed
      profile curve (mode=follow). For mode=follow the acceleration is zero at
      the start and end of the profile.
-
-     NOTE: Currently ignored.
   */
   const FollowingMode following_mode;
 

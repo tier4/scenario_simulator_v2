@@ -16,7 +16,7 @@ OpenSCENARIO:
       TrafficSignalController: []
   Entities:
     ScenarioObject:
-      - name: npc1
+      - name: ego
         Vehicle: &Vehicle
           name: ''
           vehicleCategory: car
@@ -55,79 +55,16 @@ OpenSCENARIO:
               Property:
                 - name: 'isBlind'
                   value: 'true'
+      - name: npc1
+        Vehicle: *Vehicle
+        ObjectController: *ObjectController
       - name: npc2
-        Vehicle: *Vehicle
-        ObjectController: *ObjectController
-      - name: npc3
-        Vehicle: *Vehicle
-        ObjectController: *ObjectController
-      - name: ego
         Vehicle: *Vehicle
         ObjectController: *ObjectController
   Storyboard:
     Init:
       Actions:
         Private:
-          - entityRef: npc1
-            PrivateAction:
-              - TeleportAction:
-                  Position:
-                    LanePosition:
-                      roadId: ''
-                      laneId: '34513'
-                      s: 0
-                      offset: 0
-                      Orientation: &Orientation
-                        type: relative
-                        h: 0
-                        p: 0
-                        r: 0
-              - LongitudinalAction:
-                  SpeedProfileAction:
-                    followingMode: follow
-                    SpeedProfileEntry:
-                      - speed: 20
-          - entityRef: npc2
-            PrivateAction:
-              - TeleportAction:
-                  Position:
-                    LanePosition:
-                      roadId: ''
-                      laneId: '34675'
-                      s: 0
-                      offset: 0
-                      Orientation: *Orientation
-              - LongitudinalAction:
-                  SpeedProfileAction:
-                    followingMode: follow
-                    SpeedProfileEntry:
-                      - speed:  5
-                      - speed: 10
-                      - speed: 15
-                      - speed: 20
-          - entityRef: npc3
-            PrivateAction:
-              - TeleportAction:
-                  Position:
-                    LanePosition:
-                      roadId: ''
-                      laneId: '34690'
-                      s: 0
-                      offset: 0
-                      Orientation: *Orientation
-              - LongitudinalAction:
-                  SpeedProfileAction:
-                    followingMode: follow
-                    SpeedProfileEntry:
-                      - speed:  1
-                      - speed:  2
-                      - speed:  3
-                      - speed:  5
-                      - speed:  8
-                      - speed: 13
-                      - speed: 21
-                      - speed: 34
-                      - speed: 55
           - entityRef: ego
             PrivateAction:
               - TeleportAction:
@@ -137,17 +74,57 @@ OpenSCENARIO:
                       laneId: '34615'
                       s: 0
                       offset: 0
+                      Orientation: &Orientation
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+          - entityRef: npc1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 0
+                      offset: 0
                       Orientation: *Orientation
-              # - LongitudinalAction:
-              #     SpeedProfileAction:
-              #       entityRef: npc3
-              #       followingMode: follow
-              #       SpeedProfileEntry:
-              #         - speed: 1
-              #         - speed: 2
-              #         - speed: 3
-              #         - speed: 4
-              #         - speed: 5
+              - LongitudinalAction:
+                  SpeedProfileAction:
+                    followingMode: follow
+                    DynamicConstraints:
+                      maxSpeed: 30
+                      maxAcceleration: 1
+                      maxAccelerationRate: 0.1
+                      maxDeceleration: 1
+                      maxDecelerationRate: 0.1
+                    SpeedProfileEntry:
+                      - speed:  10
+                      - speed: -10
+                      - speed:  20
+                      - speed: -20
+                      - speed:  30
+          - entityRef: npc2
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 0
+                      offset: 0
+                      Orientation: *Orientation
+              - LongitudinalAction:
+                  SpeedProfileAction:
+                    followingMode: position
+                    DynamicConstraints: # NOTE: if `position` specified, DynamicConstraints will be ignored.
+                      maxAcceleration: 0
+                      maxAccelerationRate: 0
+                    SpeedProfileEntry:
+                      - speed: 30
+                      - speed: -30
+                        time: 20
+                      - speed: 10
     Story:
       - name: ''
         Act:
@@ -169,14 +146,14 @@ OpenSCENARIO:
                             PrivateAction:
                               - LongitudinalAction:
                                   SpeedProfileAction:
-                                    entityRef: npc1
+                                    entityRef: npc2
                                     followingMode: follow
                                     SpeedProfileEntry:
-                                      - speed:   5
+                                      - speed:  10
                                       - speed: -10
-                                      - speed:  15
-                                      - speed: -20
-                                      - speed:  25
+                                      - speed:  10
+                                      - speed: -10
+                                      - speed:  10
                         StartTrigger: &StartTrigger
                           ConditionGroup:
                             - Condition:
