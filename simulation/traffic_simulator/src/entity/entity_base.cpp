@@ -58,9 +58,15 @@ auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose
   if (const auto ret = hdmap_utils_ptr_->clampLaneletPose(lanelet_pose)) {
     return ret.get();
   } else {
+#ifdef ROS_DISTRO_GALACTIC
     THROW_SEMANTIC_ERROR(
       "Lanelet pose\n", rosidl_generator_traits::to_yaml(lanelet_pose),
       "\nis invalid, please check lanelet length and connection.");
+#else
+    THROW_SEMANTIC_ERROR(
+      "Lanelet pose\n", traffic_simulator_msgs::msg::to_yaml(lanelet_pose),
+      "\nis invalid, please check lanelet length and connection.");
+#endif
   }
 }
 

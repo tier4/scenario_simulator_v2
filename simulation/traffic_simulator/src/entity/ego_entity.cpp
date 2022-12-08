@@ -362,9 +362,15 @@ void EgoEntity::requestAcquirePosition(
   if (const auto pose = hdmap_utils_ptr_->clampLaneletPose(lanelet_pose)) {
     requestAssignRoute({pose.get()});
   } else {
+#ifdef ROS_DISTRO_GALACTIC
     THROW_SEMANTIC_ERROR(
       "Lanelet pose\n", rosidl_generator_traits::to_yaml(lanelet_pose),
       "\nis invalid, please check lanelet length and connection.");
+#else
+    THROW_SEMANTIC_ERROR(
+      "Lanelet pose\n", traffic_simulator_msgs::msg::to_yaml(lanelet_pose),
+      "\nis invalid, please check lanelet length and connection.");
+#endif
   }
 }
 
