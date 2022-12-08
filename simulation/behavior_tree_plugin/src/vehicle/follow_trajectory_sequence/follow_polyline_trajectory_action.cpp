@@ -185,6 +185,28 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         // PRINT(parameter.dynamic_constraints_ignorable);
         // PRINT(parameter.closed);
 
+        auto remain_time = [&]() {
+          // TODO std::find_first_of => iter != std::end => return *iter, else infinity
+          if (parameter.shape.vertices.at(current_waypoint_index).time) {
+            return *parameter.shape.vertices.at(current_waypoint_index).time - entity_status.time;
+          } else {
+            return std::numeric_limits<double>::infinity();
+          }
+        };
+
+        if (remain_time() <= step_time) {
+          std::cout << "TIME OVER!!!" << std::endl;
+          if (parameter.dynamic_constraints_ignorable) {
+            std::cout << "TELEPORT!" << std::endl;
+            throw std::runtime_error("TELEPORT!");
+          } else {
+            std::cout << "DISCARD CURRENT WAYPOINT!" << std::endl;
+            if (current_waypoint_index + 1 < parameter.shape.vertices.size()) {
+              ++current_waypoint_index;
+            }
+          }
+        }
+
         auto updated_status = entity_status;
 
         auto current_max_acceleration = [&]() {
@@ -194,10 +216,54 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
             0.0, behavior_parameter.dynamic_constraints.max_acceleration);
         };
 
+        auto max_speed = [&]() {
+          return target_speed ? *target_speed : behavior_parameter.dynamic_constraints.max_speed;
+        };
+
+        auto adjust = [&](auto suggested_speed) {
+          std::cout << std::string(80, '-') << std::endl;
+
+          std::cout << "waypoint " << current_waypoint_index + 1 << "/"
+                    << parameter.shape.vertices.size() << std::endl;
+
+          if (parameter.shape.vertices.at(current_waypoint_index).time) {
+            PRINT(*parameter.shape.vertices.at(current_waypoint_index).time);
+
+            auto distance_to_next_waypoint = [&]() {
+              return distance(
+                entity_status.pose.position,
+                parameter.shape.vertices.at(current_waypoint_index).position.position);
+            };
+
+            auto expected_distance = suggested_speed * remain_time();
+
+            PRINT(remain_time());
+            PRINT(distance_to_next_waypoint());
+            PRINT(suggested_speed);
+            PRINT(expected_distance);
+
+            if (expected_distance < distance_to_next_waypoint()) {
+              std::cout << "TIME SHORTAGE" << std::endl;
+              return suggested_speed;
+            } else if (distance_to_next_waypoint() < expected_distance) {
+              std::cout << "TOO FAST => FIX" << std::endl;
+              auto fixed_speed =
+                distance_to_next_waypoint() / remain_time();  // TODO max_deceleration_rate
+              PRINT(fixed_speed);
+              return fixed_speed;
+            } else {
+              std::cout << "OK" << std::endl;
+              return suggested_speed;
+            }
+          } else {
+            return suggested_speed;
+          }
+        };
+
         auto current_max_speed = [&]() {
-          return std::clamp(
+          return adjust(std::clamp(
             entity_status.action_status.twist.linear.x + current_max_acceleration() * step_time,
-            0.0, target_speed ? *target_speed : behavior_parameter.dynamic_constraints.max_speed);
+            0.0, max_speed()));
         };  // scalar [m/s]
 
         auto steering =
@@ -250,7 +316,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         if (auto d = distance(
               updated_status.pose.position,
               parameter.shape.vertices.at(current_waypoint_index).position.position);
-            d < 1) {
+            std::abs(d) <= std::numeric_limits<double>::epsilon()) {
           ++current_waypoint_index;
         }
 

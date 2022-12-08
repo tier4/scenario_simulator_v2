@@ -73,7 +73,10 @@ OpenSCENARIO:
                   FollowTrajectoryAction:
                     initialDistanceOffset: 1
                     TimeReference:
-                      None:
+                      Timing:
+                        domainAbsoluteRelative: relative
+                        offset: 0
+                        scale: 1
                     TrajectoryFollowingMode:
                       followingMode: follow
                     TrajectoryRef:
@@ -95,7 +98,7 @@ OpenSCENARIO:
                                       h: 0
                                       p: 0
                                       r: 0
-                              - time: 0
+                              - time: 4
                                 Position:
                                   LanePosition:
                                     roadId: ''
@@ -107,7 +110,7 @@ OpenSCENARIO:
                                       h: 0
                                       p: 0
                                       r: 0
-                              - time: 0
+                              - time: 10
                                 Position:
                                   LanePosition:
                                     roadId: ''
@@ -119,7 +122,7 @@ OpenSCENARIO:
                                       h: 0
                                       p: 0
                                       r: 0
-                              - time: 0
+                              - time: 12
                                 Position:
                                   LanePosition:
                                     roadId: ''
@@ -131,7 +134,7 @@ OpenSCENARIO:
                                       h: 0
                                       p: 0
                                       r: 0
-                              - time: 0
+                              - time: 15
                                 Position: &ego_destination
                                   LanePosition:
                                     roadId: ''
