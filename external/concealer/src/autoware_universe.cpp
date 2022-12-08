@@ -65,7 +65,6 @@ auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       set(initial_pose);
-      waitForAutowareStateToBeInitializing();
       waitForAutowareStateToBeWaitingForRoute([&]() {
         InitialPose initial_pose;
         {
@@ -98,8 +97,7 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
       setCheckpoint(each);
     }
-    waitForAutowareStateToBePlanning();
-    waitForAutowareStateToBeWaitingForEngage();  // NOTE: Autoware.IV 0.11.1 waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
+    waitForAutowareStateToBeWaitingForEngage();
   });
 }
 
