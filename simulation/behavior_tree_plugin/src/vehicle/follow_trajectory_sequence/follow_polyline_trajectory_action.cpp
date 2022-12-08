@@ -180,12 +180,25 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   switch (request) {
     case traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY:
       if (
-        getInput<Parameter>("polyline_trajectory_parameter", parameter) and
+        getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) and
         getInput<decltype(target_speed)>("target_speed", target_speed) and
         not parameter.shape.vertices.empty()) {
         // PRINT(parameter.initial_distance_offset);
         // PRINT(parameter.dynamic_constraints_ignorable);
         // PRINT(parameter.closed);
+
+        auto exhausted = [&]() {
+          return current_waypoint_index == parameter.shape.vertices.size();
+        };
+
+        auto advance = [&]() {
+          ++current_waypoint_index;
+          if (exhausted() and parameter.closed) {
+            current_waypoint_index = 0;
+          }
+        };
+
+        auto discard = advance;
 
         auto remain_time = [&]() {
           // TODO std::find_first_of => iter != std::end => return *iter, else infinity
@@ -209,8 +222,6 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
           }
         }
 
-        auto updated_status = entity_status;
-
         auto current_max_acceleration = [&]() {
           return std::clamp(
             entity_status.action_status.accel.linear.x +
@@ -231,26 +242,23 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
           if (parameter.shape.vertices.at(current_waypoint_index).time) {
             PRINT(*parameter.shape.vertices.at(current_waypoint_index).time);
 
-            auto distance_to_next_waypoint = [&]() {
-              return distance(
-                entity_status.pose.position,
-                parameter.shape.vertices.at(current_waypoint_index).position.position);
-            };
+            const auto distance_to_next_waypoint = distance(
+              entity_status.pose.position,
+              parameter.shape.vertices.at(current_waypoint_index).position.position);
 
-            auto expected_distance = suggested_speed * remain_time();
+            const auto estimated_time_of_arrival = distance_to_next_waypoint / suggested_speed;
 
             PRINT(remain_time());
-            PRINT(distance_to_next_waypoint());
             PRINT(suggested_speed);
-            PRINT(expected_distance);
+            PRINT(estimated_time_of_arrival);
 
-            if (expected_distance < distance_to_next_waypoint()) {
+            if (remain_time() < estimated_time_of_arrival) {
               std::cout << "TIME SHORTAGE" << std::endl;
               return suggested_speed;
-            } else if (distance_to_next_waypoint() < expected_distance) {
+            } else if (estimated_time_of_arrival < remain_time()) {
               std::cout << "TOO FAST => FIX" << std::endl;
               auto fixed_speed =
-                distance_to_next_waypoint() / remain_time();  // TODO max_deceleration_rate
+                distance_to_next_waypoint / remain_time();  // TODO max_deceleration_rate
               PRINT(fixed_speed);
               return fixed_speed;
             } else {
@@ -288,30 +296,29 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         direction.y = 0;
         direction.z = std::atan2(velocity.y, velocity.x);
 
-        updated_status.action_status.twist.linear.x = norm(velocity);
-        updated_status.action_status.twist.linear.y = 0;
-        updated_status.action_status.twist.linear.z = 0;
+        auto seek = [&]() {
+          auto updated_status = entity_status;
 
-        updated_status.action_status.twist.angular.x = 0;
-        updated_status.action_status.twist.angular.y = 0;
-        updated_status.action_status.twist.angular.z =
-          (direction.z - previous_direction.z) / step_time;
+          // clang-format off
+          updated_status.action_status.twist.linear.x = norm(velocity);
+          updated_status.action_status.twist.linear.y = 0;
+          updated_status.action_status.twist.linear.z = 0;
+          updated_status.action_status.twist.angular.x = 0;
+          updated_status.action_status.twist.angular.y = 0;
+          updated_status.action_status.twist.angular.z = (direction.z - previous_direction.z) / step_time;
+          updated_status.action_status.accel.linear = updated_status.action_status.twist.linear / step_time;
+          updated_status.action_status.accel.angular = updated_status.action_status.twist.angular / step_time;
+          updated_status.pose.position += velocity * step_time;
+          updated_status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(direction);
+          updated_status.time = entity_status.time + step_time;
+          updated_status.lanelet_pose_valid = false;
+          // clang-format on
 
-        updated_status.action_status.accel.linear =
-          updated_status.action_status.twist.linear / step_time;
-        updated_status.action_status.accel.angular =
-          updated_status.action_status.twist.angular / step_time;
+          return updated_status;
+        };
 
-        updated_status.pose.position += velocity * step_time;
 
-        updated_status.pose.orientation =
-          quaternion_operation::convertEulerAngleToQuaternion(direction);
-
-        updated_status.time = entity_status.time + step_time;
-
-        updated_status.lanelet_pose_valid = false;
-
-        setOutput("updated_status", updated_status);
+        setOutput("updated_status", seek());
         setOutput("waypoints", calculateWaypoints());
         setOutput("obstacle", calculateObstacle(calculateWaypoints()));
 
@@ -319,11 +326,10 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
               updated_status.pose.position,
               parameter.shape.vertices.at(current_waypoint_index).position.position);
             std::abs(d) <= std::numeric_limits<double>::epsilon()) {
-          ++current_waypoint_index;
+          advance();
         }
 
-        return current_waypoint_index == parameter.shape.vertices.size() ? BT::NodeStatus::SUCCESS
-                                                                         : BT::NodeStatus::RUNNING;
+        return exhausted() ? BT::NodeStatus::SUCCESS : BT::NodeStatus::RUNNING;
       }
       [[fallthrough]];
 
