@@ -30,6 +30,10 @@ void OutOfRangeMetric::setEntityManager(
 
 void OutOfRangeMetric::update()
 {
+  if (!entity_manager_ptr_->entityExists(target_entity)) {
+    success();
+    return;
+  }
   const auto status = entity_manager_ptr_->getEntityStatus(target_entity);
 
   linear_velocity_ = status.action_status.twist.linear.x;
