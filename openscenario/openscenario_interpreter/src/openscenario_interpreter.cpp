@@ -23,7 +23,6 @@
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
-#include <rclcpp_components/register_node_macro.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
@@ -314,5 +313,3 @@ auto Interpreter::reset() -> void
   }
 }
 }  // namespace openscenario_interpreter
-
-RCLCPP_COMPONENTS_REGISTER_NODE(openscenario_interpreter::Interpreter)

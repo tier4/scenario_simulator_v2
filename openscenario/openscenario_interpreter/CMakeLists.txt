@@ -41,13 +41,12 @@ if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
   )
 endif()
 
-rclcpp_components_register_nodes(${PROJECT_NAME} "openscenario_interpreter::Interpreter")
-
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
 # ------------------------------------------------------------------------------
 
 ament_auto_add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
+
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 # ------------------------------------------------------------------------------
