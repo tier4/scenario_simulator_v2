@@ -187,18 +187,22 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         // PRINT(parameter.dynamic_constraints_ignorable);
         // PRINT(parameter.closed);
 
-        auto exhausted = [&]() {
-          return current_waypoint_index == parameter.shape.vertices.size();
+        auto waypoints_exhausted = [&]() {
+          return parameter.shape.vertices.size() <= current_waypoint_index;
         };
 
-        auto advance = [&]() {
+        auto pop_current_waypoint = [&]() {
           ++current_waypoint_index;
-          if (exhausted() and parameter.closed) {
+          if (waypoints_exhausted() and parameter.closed) {
             current_waypoint_index = 0;
           }
         };
 
-        auto discard = advance;
+        auto discard_current_waypoint = pop_current_waypoint;
+
+        auto current_waypoint = [&]() {
+          return parameter.shape.vertices.at(current_waypoint_index);
+        };
 
         auto remain_time = [&]() {
           // TODO std::find_first_of => iter != std::end => return *iter, else infinity
@@ -209,24 +213,20 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
           }
         };
 
-        if (remain_time() <= step_time) {
-          std::cout << "TIME OVER!!!" << std::endl;
-          if (parameter.dynamic_constraints_ignorable) {
-            std::cout << "TELEPORT!" << std::endl;
-            throw std::runtime_error("TELEPORT!");
-          } else {
-            std::cout << "DISCARD CURRENT WAYPOINT!" << std::endl;
-            if (current_waypoint_index + 1 < parameter.shape.vertices.size()) {
-              ++current_waypoint_index;
-            }
-          }
-        }
-
-        auto current_max_acceleration = [&]() {
+        auto maximum_acceleration_currently_available = [&]() {
           return std::clamp(
             entity_status.action_status.accel.linear.x +
               behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time,
-            0.0, behavior_parameter.dynamic_constraints.max_acceleration);
+            -behavior_parameter.dynamic_constraints.max_deceleration,
+            +behavior_parameter.dynamic_constraints.max_acceleration);
+        };
+
+        auto minimum_acceleration_currently_available = [&]() {
+          return std::clamp(
+            entity_status.action_status.accel.linear.x -
+              behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time,
+            -behavior_parameter.dynamic_constraints.max_deceleration,
+            +behavior_parameter.dynamic_constraints.max_acceleration);
         };
 
         auto max_speed = [&]() {
@@ -239,28 +239,42 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
           std::cout << "waypoint " << current_waypoint_index + 1 << "/"
                     << parameter.shape.vertices.size() << std::endl;
 
-          if (parameter.shape.vertices.at(current_waypoint_index).time) {
-            PRINT(*parameter.shape.vertices.at(current_waypoint_index).time);
-
-            const auto distance_to_next_waypoint = distance(
-              entity_status.pose.position,
-              parameter.shape.vertices.at(current_waypoint_index).position.position);
+          if (current_waypoint().time) {
+            const auto distance_to_next_waypoint =
+              distance(entity_status.pose.position, current_waypoint().position.position);
 
             const auto estimated_time_of_arrival = distance_to_next_waypoint / suggested_speed;
 
+            const auto desired_speed = distance_to_next_waypoint / remain_time();
+
             PRINT(remain_time());
-            PRINT(suggested_speed);
+            // PRINT(suggested_speed);
             PRINT(estimated_time_of_arrival);
+            // PRINT(desired_speed);
 
             if (remain_time() < estimated_time_of_arrival) {
-              std::cout << "TIME SHORTAGE" << std::endl;
-              return suggested_speed;
+              std::cout << "TIME SHORTAGE => ACCELERATE" << std::endl;
+              auto accelerated_speed = std::min(
+                suggested_speed + maximum_acceleration_currently_available() * step_time,
+                desired_speed);
+              // PRINT(suggested_speed);
+              // PRINT(maximum_acceleration_currently_available());
+              // PRINT(maximum_acceleration_currently_available() * step_time);
+              // PRINT(suggested_speed + maximum_acceleration_currently_available() * step_time);
+              // PRINT(accelerated_speed);
+              return accelerated_speed;
             } else if (estimated_time_of_arrival < remain_time()) {
-              std::cout << "TOO FAST => FIX" << std::endl;
-              auto fixed_speed =
-                distance_to_next_waypoint / remain_time();  // TODO max_deceleration_rate
-              PRINT(fixed_speed);
-              return fixed_speed;
+              std::cout << "TOO FAST => DECELERATE" << std::endl;
+              auto decelerated_speed = std::max(
+                suggested_speed + minimum_acceleration_currently_available() * step_time,
+                desired_speed);
+              // PRINT(suggested_speed);
+              // PRINT(minimum_acceleration_currently_available());
+              // PRINT(minimum_acceleration_currently_available() * step_time);
+              // PRINT(suggested_speed + minimum_acceleration_currently_available() * step_time);
+              // PRINT(desired_speed);
+              // PRINT(decelerated_speed);
+              return decelerated_speed;
             } else {
               std::cout << "OK" << std::endl;
               return suggested_speed;
@@ -270,25 +284,28 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
           }
         };
 
-        auto current_max_speed = [&]() {
-          return adjust(std::clamp(
-            entity_status.action_status.twist.linear.x + current_max_acceleration() * step_time,
-            0.0, max_speed()));
-        };  // scalar [m/s]
-
         auto steering =
           [&](auto && current_position, auto && current_target, auto && current_velocity) {
-            // TODO: truncate by current_max_acceleration() * step_time
+            // TODO: truncate by maximum_acceleration_currently_available() * step_time
             return normalize(current_target - current_position) *
                      behavior_parameter.dynamic_constraints.max_speed -
                    current_velocity;
           };  // vector [m/s]
 
-        truncate(
-          velocity += steering(
-            entity_status.pose.position,
-            parameter.shape.vertices.at(current_waypoint_index).position.position, velocity),
-          current_max_speed());
+        if (remain_time() <= step_time) {
+          std::cout << "TIME OVER!!!" << std::endl;
+          if (parameter.dynamic_constraints_ignorable) {
+            std::cout << "TELEPORT!" << std::endl;
+            throw std::runtime_error("TELEPORT!");
+          } else {
+            discard_current_waypoint();
+          }
+        }
+
+        velocity +=
+          steering(entity_status.pose.position, current_waypoint().position.position, velocity);
+
+        truncate(velocity, adjust(entity_status.action_status.twist.linear.x));
 
         auto previous_direction = direction;
 
@@ -296,40 +313,36 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         direction.y = 0;
         direction.z = std::atan2(velocity.y, velocity.x);
 
-        auto seek = [&]() {
-          auto updated_status = entity_status;
+        auto updated_status = entity_status;
 
-          // clang-format off
-          updated_status.action_status.twist.linear.x = norm(velocity);
-          updated_status.action_status.twist.linear.y = 0;
-          updated_status.action_status.twist.linear.z = 0;
-          updated_status.action_status.twist.angular.x = 0;
-          updated_status.action_status.twist.angular.y = 0;
-          updated_status.action_status.twist.angular.z = (direction.z - previous_direction.z) / step_time;
-          updated_status.action_status.accel.linear = updated_status.action_status.twist.linear / step_time;
-          updated_status.action_status.accel.angular = updated_status.action_status.twist.angular / step_time;
-          updated_status.pose.position += velocity * step_time;
-          updated_status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(direction);
-          updated_status.time = entity_status.time + step_time;
-          updated_status.lanelet_pose_valid = false;
-          // clang-format on
+        // clang-format off
+        updated_status.action_status.twist.linear.x = norm(velocity);
+        updated_status.action_status.twist.linear.y = 0;
+        updated_status.action_status.twist.linear.z = 0;
+        updated_status.action_status.twist.angular.x = 0;
+        updated_status.action_status.twist.angular.y = 0;
+        updated_status.action_status.twist.angular.z = (direction.z - previous_direction.z) / step_time;
+        updated_status.action_status.accel.linear = (updated_status.action_status.twist.linear - entity_status.action_status.twist.linear) / step_time;
+        updated_status.action_status.accel.angular = (updated_status.action_status.twist.angular - entity_status.action_status.twist.angular) / step_time;
+        updated_status.pose.position += velocity * step_time;
+        updated_status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(direction);
+        updated_status.time = entity_status.time + step_time;
+        updated_status.lanelet_pose_valid = false;
+        // clang-format on
 
-          return updated_status;
-        };
-
-
-        setOutput("updated_status", seek());
+        setOutput("updated_status", updated_status);
         setOutput("waypoints", calculateWaypoints());
         setOutput("obstacle", calculateObstacle(calculateWaypoints()));
 
-        if (auto d = distance(
-              updated_status.pose.position,
-              parameter.shape.vertices.at(current_waypoint_index).position.position);
+        if (auto d = distance(updated_status.pose.position, current_waypoint().position.position);
             std::abs(d) <= std::numeric_limits<double>::epsilon()) {
-          advance();
+          std::cout << "REACHED!!!" << std::endl;
+          pop_current_waypoint();
+        } else {
+          PRINT(d);
         }
 
-        return exhausted() ? BT::NodeStatus::SUCCESS : BT::NodeStatus::RUNNING;
+        return waypoints_exhausted() ? BT::NodeStatus::SUCCESS : BT::NodeStatus::RUNNING;
       }
       [[fallthrough]];
 
