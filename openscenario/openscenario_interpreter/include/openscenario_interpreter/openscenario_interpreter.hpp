@@ -43,7 +43,12 @@
 
 namespace openscenario_interpreter
 {
-class Interpreter : public rclcpp_lifecycle::LifecycleNode,
+class LifecycleNode : public rclcpp_lifecycle::LifecycleNode
+{
+  using rclcpp_lifecycle::LifecycleNode::LifecycleNode;
+};
+
+class Interpreter : public LifecycleNode,
                     private SimulatorCore::ConditionEvaluation,
                     private SimulatorCore::NonStandardOperation
 {

@@ -33,7 +33,7 @@
 namespace openscenario_interpreter
 {
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
-: rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
+: LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
   intended_result("success"),
   local_frame_rate(30),
