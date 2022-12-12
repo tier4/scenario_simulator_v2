@@ -21,13 +21,15 @@ inline namespace syntax
 {
 NormalDistribution::NormalDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: range(readElement<Range>("range", node, scope)),
+: Scope(scope),
+  range(readElement<Range>("range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   variance(readAttribute<Double>("variance", node, scope)),
-  distribution(
-    scope.ref<Double>(std::string("randomSeed")).data, static_cast<double>(expected_value.data),
-    static_cast<double>(variance.data))
+  distribute(static_cast<double>(expected_value.data), static_cast<double>(variance.data)),
+  random_engine(scope.seed)
 {
 }
+
+auto NormalDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

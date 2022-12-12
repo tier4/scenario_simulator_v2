@@ -14,7 +14,7 @@
 
 #include <openscenario_interpreter/syntax/catalog_definition.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
-#include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
+#include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
@@ -25,9 +25,9 @@ OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & 
 : Group(
     // clang-format off
     choice(tree,
-            std::make_pair("Storyboard",                [&](auto && node) { return make<ScenarioDefinition        >(tree, scope);         }),  // DIRTY HACK!!!
-            std::make_pair("Catalog",                   [&](auto && node) { return make<CatalogDefinition         >(tree, scope);          }),
-            std::make_pair("ParameterValueDistribution",[&](auto && node) { return make<ParameterValueDistribution>(node, scope); })))
+            std::make_pair("Storyboard",                [&](auto && node) { return make<ScenarioDefinition                  >(tree, scope);}),  // DIRTY HACK!!!
+            std::make_pair("Catalog",                   [&](auto && node) { return make<CatalogDefinition                   >(tree, scope);}),
+            std::make_pair("ParameterValueDistribution",[&](auto && node) { return make<ParameterValueDistributionDefinition>(node, scope);})))
 // clang-format on
 {
 }
