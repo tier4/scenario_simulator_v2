@@ -35,7 +35,12 @@ def run_bash_command(bash_commands, error_message):
 
 def get_output_path(package_name: str = "scenario_test_runner"):
     return os.path.join(
-        get_package_prefix(package_name), "..", "..", "build", package_name, "scenario_tests"
+        get_package_prefix(package_name),
+        "..",
+        "..",
+        "build",
+        package_name,
+        "scenario_tests",
     )
 
 
