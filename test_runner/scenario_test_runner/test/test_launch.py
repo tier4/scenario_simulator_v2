@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import subprocess
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory, get_package_prefix
+import os
+import shutil
 
 
 def run_bash_command(bash_commands, error_message):
@@ -31,7 +33,22 @@ def run_bash_command(bash_commands, error_message):
         assert result == 0, error_message
 
 
+def get_output_path(package_name: str = "scenario_test_runner"):
+    return os.path.join(
+        get_package_prefix(package_name), "..", "..", "build", package_name, "scenario_tests"
+    )
+
+
+def make_output_directory(directory: str):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    else:
+        shutil.rmtree(directory)
+        os.makedirs(directory)
+
+
 def test_launch():
+    make_output_directory(get_output_path())
     run_bash_command(
         [
             "ros2",
@@ -42,6 +59,7 @@ def test_launch():
             + get_package_share_directory("scenario_test_runner")
             + "/config/workflow_example.yaml",
             "global_frame_rate:=20",
+            "output_directory:=" + get_output_path(),
         ],
         "Something wrong while running scenarios, please check test result file in /tmp/scenario_test_runner/result.junit.xml",
     )
@@ -51,7 +69,7 @@ def test_launch():
             "run",
             "scenario_test_runner",
             "result_checker",
-            "/tmp/scenario_test_runner/result.junit.xml",
+            os.path.join(get_output_path, "/scenario_test_runner/result.junit.xml"),
         ],
-        "Some of the scenario was failed, please check test result file in /tmp/scenario_test_runner/result.junit.xml",
+        "Some of the scenarios were failed, please check test result file in /tmp/scenario_test_runner/result.junit.xml",
     )
