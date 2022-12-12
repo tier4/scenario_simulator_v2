@@ -74,7 +74,7 @@ def test_launch():
             "run",
             "scenario_test_runner",
             "result_checker",
-            os.path.join(get_output_path, "/scenario_test_runner/result.junit.xml"),
+            os.path.join(get_output_path(), "/scenario_test_runner/result.junit.xml"),
         ],
         "Some of the scenarios were failed, please check test result file in /tmp/scenario_test_runner/result.junit.xml",
     )
