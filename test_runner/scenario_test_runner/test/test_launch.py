@@ -43,7 +43,7 @@ def test_launch():
             + "/config/workflow_example.yaml",
             "global_frame_rate:=20",
         ],
-        "Somethig wrong while runnning scenarios, please check test result file in /tmp/scenario_test_runner/result.junit.xml",
+        "Something wrong while running scenarios, please check test result file in /tmp/scenario_test_runner/result.junit.xml",
     )
     run_bash_command(
         [
