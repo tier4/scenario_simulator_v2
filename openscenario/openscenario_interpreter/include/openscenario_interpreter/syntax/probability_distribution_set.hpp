@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
 
 #include <openscenario_interpreter/syntax/probability_distribution_set_element.hpp>
-#include <openscenario_interpreter/utility/distribution.hpp>
+#include <random>
 
 namespace openscenario_interpreter
 {
@@ -32,14 +32,14 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct ProbabilityDistributionSet : public ComplexType
+struct ProbabilityDistributionSet : public ComplexType, private Scope
 {
-  const std::list<ProbabilityDistributionSetElement> elements;
+  const std::vector<ProbabilityDistributionSetElement> elements;
 
   struct ProbabilityDistributionSetAdaptor
   {
     explicit ProbabilityDistributionSetAdaptor(
-      const std::list<ProbabilityDistributionSetElement> & elements)
+      const std::vector<ProbabilityDistributionSetElement> & elements)
     {
       for (const auto & element : elements) {
         probabilities.emplace_back(element.weight);
@@ -50,12 +50,13 @@ struct ProbabilityDistributionSet : public ComplexType
     std::vector<String> values;
   } adaptor;
 
-  StochasticDistributionClass<std::discrete_distribution<std::size_t>> distribution;
+  std::discrete_distribution<std::size_t> distribute;
+
+  std::mt19937 random_engine;
 
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 
-  // TODO: implement evaluate()
-  // Use std::discrete_distribution from <random>
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
