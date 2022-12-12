@@ -29,12 +29,15 @@ inline namespace syntax
  *    <xsd:sequence>
  *      <xsd:group ref="DeterministicSingleParameterDistributionType"/>
  *    </xsd:sequence>
+ *    <xsd:attribute name="parameterName" type="String" use="required"/>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct DeterministicSingleParameterDistribution
 : public DeterministicSingleParameterDistributionType
 {
+  const String parameter_name;
+
   explicit DeterministicSingleParameterDistribution(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
