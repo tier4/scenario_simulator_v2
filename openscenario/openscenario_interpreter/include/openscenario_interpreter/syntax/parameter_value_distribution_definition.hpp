@@ -12,36 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_VALUE_DISTRIBUTION_DEFINITION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_VALUE_DISTRIBUTION_DEFINITION_HPP_
 
-#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- UserDefinedDistribution 1.2 --------------------------------------------
+/* ---- ParameterValueDistributionDefinition 1.2 ------------------------------
  *
- *  <xsd:complexType name="UserDefinedDistribution">
- *    <xsd:simpleContent>
- *      <xsd:extension base="xsd:string">
- *        <xsd:attribute name="type" type="String" use="required"/>
- *      </xsd:extension>
- *    </xsd:simpleContent>
- *  </xsd:complexType>
+ * <xsd:group name="ParameterValueDistributionDefinition">
+ *   <xsd:sequence>
+ *     <xsd:element name="ParameterValueDistribution" type="ParameterValueDistribution"/>
+ *   </xsd:sequence>
+ * </xsd:group>
  *
  * -------------------------------------------------------------------------- */
-struct UserDefinedDistribution : private Scope, public ComplexType
+struct ParameterValueDistributionDefinition : public ParameterValueDistribution
 {
-  const String type;
-
-  explicit UserDefinedDistribution(const pugi::xml_node &, const Scope &);
-
-  // TODO: implement evaluate()?`
+  explicit ParameterValueDistributionDefinition(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_VALUE_DISTRIBUTION_DEFINITION_HPP_
