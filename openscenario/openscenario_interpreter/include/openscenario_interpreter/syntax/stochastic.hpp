@@ -37,13 +37,14 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+
 struct Stochastic : public ComplexType
 {
-  const StochasticDistribution stochastic_distribution;
-
   const UnsignedInt number_of_test_runs;
 
   const Double random_seed;
+
+  const StochasticDistribution stochastic_distribution;
 
   explicit Stochastic(const pugi::xml_node &, Scope & scope);
 };

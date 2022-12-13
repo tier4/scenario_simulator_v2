@@ -65,6 +65,7 @@ public:
     const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
   : LidarSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr)
   {
+    raycaster_.setDirection(configuration);
   }
 
   auto update(
@@ -78,6 +79,10 @@ public:
       detected_objects_ = {};
     }
   }
+
+private:
+  // Override
+  Raycaster raycaster_;
 };
 
 template <>

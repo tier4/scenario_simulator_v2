@@ -13,22 +13,17 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/poisson_distribution.hpp>
+#include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-PoissonDistribution::PoissonDistribution(
-  const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: Scope(scope),
-  range(readElement<Range>("range", node, scope)),
-  expected_value(readAttribute<Double>("expectedValue", node, scope)),
-  distribute(expected_value.data),
-  random_engine(scope.seed)
+ParameterValueDistributionDefinition::ParameterValueDistributionDefinition(
+  const pugi::xml_node & node, Scope & scope)
+: ParameterValueDistribution(
+    readElement<ParameterValueDistribution>("parameterValueDistribution", node, scope))
 {
 }
-
-auto PoissonDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

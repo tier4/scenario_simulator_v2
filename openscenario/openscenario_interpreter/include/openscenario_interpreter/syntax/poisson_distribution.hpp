@@ -18,7 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
-#include <openscenario_interpreter/utility/distribution.hpp>
+#include <random>
 
 namespace openscenario_interpreter
 {
@@ -34,15 +34,19 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct PoissonDistribution : public ComplexType
+struct PoissonDistribution : public ComplexType, private Scope
 {
   const Range range;
 
   const Double expected_value;
 
-  StochasticDistributionClass<std::poisson_distribution<>> distribution;
+  std::poisson_distribution<> distribute;
+
+  std::mt19937 random_engine;
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
