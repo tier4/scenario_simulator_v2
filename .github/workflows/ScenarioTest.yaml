@@ -54,8 +54,8 @@ jobs:
           cd ~/ros2_ws
           apt-get update
           apt install -y python3-pip
-          rosdep update
-          rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }} --include-eol-distros
+          rosdep update --include-eol-distros
+          rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
         shell: bash
 
       - name: Build packages
