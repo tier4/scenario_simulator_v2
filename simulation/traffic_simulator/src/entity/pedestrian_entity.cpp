@@ -52,17 +52,18 @@ void PedestrianEntity::requestAssignRoute(
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   lanelet::Ids route_ids;
   if (status_.lanelet_pose_valid) {
-    route_ids=route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints);
+    route_ids = route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints);
   }
-  const auto route_points=hdmap_utils_ptr_->getCenterPoints(route_ids);
+  const auto route_points = hdmap_utils_ptr_->getCenterPoints(route_ids);
   goal_poses_.clear();
-  for(const auto & point : route_points){
+  for (const auto & point : route_points) {
     geometry_msgs::msg::Pose pose;
-    pose.position=point;
-    if(const auto lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(pose, getStatus().bounding_box, true)){
-      const auto map_pose_stamped =
-      hdmap_utils_ptr_->toMapPose(lanelet_pose.get().lanelet_id, lanelet_pose.get().s, lanelet_pose.get().offset);
+    pose.position = point;
+    if (
+      const auto lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(pose, getStatus().bounding_box, true)) {
+      const auto map_pose_stamped = hdmap_utils_ptr_->toMapPose(
+        lanelet_pose.get().lanelet_id, lanelet_pose.get().s, lanelet_pose.get().offset);
       goal_poses_.emplace_back(map_pose_stamped.pose);
     }
   }
@@ -141,7 +142,7 @@ void PedestrianEntity::requestAcquirePosition(
   }
   const auto map_pose_stamped =
     hdmap_utils_ptr_->toMapPose(lanelet_pose.lanelet_id, lanelet_pose.s, lanelet_pose.offset);
-  goal_poses_={map_pose_stamped.pose};
+  goal_poses_ = {map_pose_stamped.pose};
   behavior_plugin_ptr_->setGoalPoses(goal_poses_);
 }
 
