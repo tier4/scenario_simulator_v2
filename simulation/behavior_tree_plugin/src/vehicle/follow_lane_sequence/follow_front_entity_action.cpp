@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
-#include <boost/algorithm/clamp.hpp>
-#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <vector>
+#include <optional>
 
 namespace entity_behavior
 {
@@ -57,8 +57,7 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    double horizon =
-      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+    double horizon = getHorizon();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
       entity_status.lanelet_pose.offset);
@@ -117,7 +116,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   if (target_speed.value() <= front_entity_status.action_status.twist.linear.x) {
-    auto entity_status_updated = calculateEntityStatusUpdated(target_speed.value());
+    auto entity_status_updated = calculateUpdatedEntityStatus(target_speed.value());
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
@@ -125,19 +124,21 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   if (
-    distance_to_front_entity_.value() >= (calculateStopDistance(behavior_parameter.deceleration) +
-                                          vehicle_parameters.bounding_box.dimensions.x + 5)) {
+    distance_to_front_entity_.value() >=
+    (calculateStopDistance(behavior_parameter.dynamic_constraints) +
+     vehicle_parameters.bounding_box.dimensions.x + 5)) {
     auto entity_status_updated =
-      calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x + 2);
+      calculateUpdatedEntityStatus(front_entity_status.action_status.twist.linear.x + 2);
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
   } else if (
-    distance_to_front_entity_.value() <= calculateStopDistance(behavior_parameter.deceleration)) {
+    distance_to_front_entity_.value() <=
+    calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     auto entity_status_updated =
-      calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x - 2);
+      calculateUpdatedEntityStatus(front_entity_status.action_status.twist.linear.x - 2);
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
@@ -145,7 +146,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::RUNNING;
   } else {
     auto entity_status_updated =
-      calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x);
+      calculateUpdatedEntityStatus(front_entity_status.action_status.twist.linear.x);
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);

@@ -183,8 +183,8 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
    * @brief TODO, Input values get from autoware.
    */
   parameter.see_around = true;
-  parameter.acceleration = 0;
-  parameter.deceleration = 0;
+  parameter.dynamic_constraints.max_acceleration = 0;
+  parameter.dynamic_constraints.max_deceleration = 0;
   return parameter;
 }
 
@@ -340,17 +340,20 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     vehicle_model_ptr_->update(step_time);
   }
 
-  setStatus(getEntityStatus(current_time + step_time, step_time));
-  updateStandStillDuration(step_time);
-
+  auto entity_status = getEntityStatus(current_time + step_time, step_time);
   if (previous_linear_velocity_) {
-    linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time;
+    entity_status.action_status.linear_jerk =
+      (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time;
   } else {
-    linear_jerk_ = 0;
+    entity_status.action_status.linear_jerk = 0;
   }
+  setStatus(entity_status);
+  updateStandStillDuration(step_time);
 
   previous_linear_velocity_ = vehicle_model_ptr_->getVx();
   previous_angular_velocity_ = vehicle_model_ptr_->getWz();
+
+  EntityBase::onPostUpdate(current_time, step_time);
 }
 
 void EgoEntity::requestAcquirePosition(
@@ -430,6 +433,12 @@ auto EgoEntity::requestSpeedChange(
   THROW_SEMANTIC_ERROR(
     "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
     "purposes only.");
+}
+
+auto EgoEntity::getDefaultDynamicConstraints() const
+  -> const traffic_simulator_msgs::msg::DynamicConstraints &
+{
+  THROW_SEMANTIC_ERROR("getDefaultDynamicConstraints function does not support EgoEntity");
 }
 
 auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) -> void

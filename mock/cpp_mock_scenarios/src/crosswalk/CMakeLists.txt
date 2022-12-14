@@ -10,5 +10,5 @@ install(TARGETS
 
 if(BUILD_TESTING)
   include(../../cmake/add_cpp_mock_scenario_test.cmake)
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "stop_at_crosswalk" "15.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "stop_at_crosswalk" "20.0")
 endif()

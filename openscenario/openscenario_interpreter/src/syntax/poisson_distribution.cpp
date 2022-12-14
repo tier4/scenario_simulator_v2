@@ -21,10 +21,14 @@ inline namespace syntax
 {
 PoissonDistribution::PoissonDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: range(readElement<Range>("range", node, scope)),
+: Scope(scope),
+  range(readElement<Range>("range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
-  distribution(scope.ref<Double>(std::string("randomSeed")).data, expected_value.data)
+  distribute(expected_value.data),
+  random_engine(scope.seed)
 {
 }
+
+auto PoissonDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

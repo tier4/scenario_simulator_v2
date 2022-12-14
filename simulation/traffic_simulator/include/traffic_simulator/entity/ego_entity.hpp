@@ -99,6 +99,9 @@ public:
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
+  auto getDefaultDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
+
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityStatus(const double, const double) const

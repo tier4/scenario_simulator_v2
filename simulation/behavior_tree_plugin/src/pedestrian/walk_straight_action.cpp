@@ -47,7 +47,7 @@ BT::NodeStatus WalkStraightAction::tick()
   if (!target_speed) {
     target_speed = 1.111;
   }
-  auto updated_status = calculateEntityStatusUpdatedInWorldFrame(target_speed.value());
+  auto updated_status = calculateUpdatedEntityStatusInWorldFrame(target_speed.value());
   setOutput("updated_status", updated_status);
   return BT::NodeStatus::RUNNING;
 }

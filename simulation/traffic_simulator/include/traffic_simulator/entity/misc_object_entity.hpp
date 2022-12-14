@@ -34,6 +34,9 @@ public:
 
   auto getCurrentAction() const -> std::string override;
 
+  auto getDefaultDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
+
   auto getEntityTypename() const -> const std::string & override
   {
     static const std::string result = "MiscObjectEntity";
@@ -42,10 +45,7 @@ public:
 
   ~MiscObjectEntity() override = default;
 
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override
-  {
-    return {};
-  }  //return {}?
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override { return {}; }
 
   std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
@@ -96,7 +96,11 @@ public:
 
   void setAccelerationLimit(double) override {}
 
+  void setAccelerationRateLimit(double) override {}
+
   void setDecelerationLimit(double) override {}
+
+  void setDecelerationRateLimit(double) override {}
 };
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -36,15 +36,12 @@ bool ReactionTimeMetric::activateTrigger() { return true; }
 void ReactionTimeMetric::update()
 {
   const auto jerk = entity_manager_ptr_->getLinearJerk(target_entity);
-  if (!jerk) {
-    THROW_SIMULATION_ERROR("failed to calculate linear jerk.");
-  }
-  current_linear_jerk_ = jerk.value();
-  if (check_lower_threshold && jerk_lower_threshold >= jerk.value()) {
+  current_linear_jerk_ = jerk;
+  if (check_lower_threshold && jerk_lower_threshold >= jerk) {
     success();
     return;
   }
-  if (check_upper_threshold && jerk_upper_threshold <= jerk.value()) {
+  if (check_upper_threshold && jerk_upper_threshold <= jerk) {
     success();
     return;
   }

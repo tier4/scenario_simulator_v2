@@ -41,13 +41,13 @@ public:
 private:
   void onUpdate() override
   {
-    if (
-      api_.getCurrentTime() <= 3.9 &&
-      api_.getEntityStatus("ego").action_status.twist.linear.x > 10.0) {
+    if (api_.getCurrentTime() <= 3.9 && api_.getCurrentTwist("ego").linear.x > 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (api_.getCurrentTime() >= 4.0) {
-      if (api_.getEntityStatus("ego").action_status.twist.linear.x <= 10.0) {
+    if (api_.getCurrentTime() >= 3.999) {
+      if (
+        api_.getCurrentTwist("ego").linear.x <= 10.0 &&
+        api_.getCurrentTwist("ego").linear.x >= 9.9) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
@@ -61,7 +61,7 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
     api_.setLinearVelocity("ego", 0);
     api_.requestSpeedChange(
-      "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      "ego", 10.0, traffic_simulator::speed_change::Transition::AUTO,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
       false);
@@ -71,7 +71,7 @@ private:
       getVehicleParameters());
     api_.setLinearVelocity("front", 10);
     api_.requestSpeedChange(
-      "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      "front", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 4.0),
       true);
