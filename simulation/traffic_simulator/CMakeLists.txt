@@ -38,6 +38,10 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/misc_object_entity.cpp
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
+  src/entity/monitor/crosswalk_momentary_stop_monitor.cpp
+  src/entity/monitor/out_of_range_monitor.cpp
+  src/entity/monitor/reaction_time_monitor.cpp
+  src/entity/monitor/stop_line_momentary_stop_monitor.cpp
   src/hdmap_utils/hdmap_utils.cpp
   src/helper/helper.cpp
   src/job/job.cpp

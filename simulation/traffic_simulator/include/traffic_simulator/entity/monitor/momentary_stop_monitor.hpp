@@ -1,0 +1,94 @@
+// Copyright 2015 TIER IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef TRAFFIC_SIMULATOR__MONITOR__MOMENTARY_STOP_MONITOR_HPP_
+#define TRAFFIC_SIMULATOR__MONITOR__MOMENTARY_STOP_MONITOR_HPP_
+
+#include <cstdint>
+#include <traffic_simulator/entity/entity_base.hpp>
+
+namespace traffic_simulator::entity
+{
+template <typename Derived>
+class MomentaryStopMonitor
+{
+public:
+  /**
+   * @brief Construct a new Momentary Stop Metric object
+   *
+   * @param entity Name of target entity which you want to check momentary stop.
+   * @param min_acceleration Minimum acceleration in stopping sequence.
+   * @param max_acceleration Maximum acceleration in stopping sequence.
+   * @param stop_target_lanelet_id Lanelet ID of the stop target.
+   * @param stop_target_lanelet_type Type of the stop target.
+   * @param stop_sequence_start_distance If the entity get closer to the stop target and the distance between target entity
+   *  and stop target under the stop_sequence_start_distance, this metrics becomes active state.
+   * @param stop_sequence_end_distance If the target entity and stop target under this value and the target entity does not stopped,
+   * this metrics becomes failure state.
+   * @param stop_duration If the metrics is in active state and stop longer than stop_duration, then the metric become success.
+   */
+  MomentaryStopMonitor(
+    EntityBase & entity, double min_acceleration, double max_acceleration,
+    std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
+    double stop_sequence_end_distance, double stop_duration)
+  : entity_(entity),
+    min_acceleration_(min_acceleration),
+    max_acceleration_(max_acceleration),
+    stop_target_lanelet_id_(stop_target_lanelet_id),
+    stop_sequence_start_distance_(stop_sequence_start_distance),
+    stop_sequence_end_distance_(stop_sequence_end_distance),
+    stop_duration_(stop_duration)
+  {
+  }
+
+  auto operator()(double) -> bool
+  {
+    auto & self = static_cast<Derived &>(*this);
+    std::optional<double> distance = self.getDistance();
+    if (!distance) {
+      THROW_SIMULATION_ERROR("failed to calculate distance to stop line.");
+    }
+
+    double linear_acceleration = entity_.getCurrentAccel().linear.x;
+    if (linear_acceleration < min_acceleration_ || linear_acceleration > max_acceleration_) {
+      throw SPECIFICATION_VIOLATION("acceleration is out of range");
+    }
+
+    double standstill_duration = entity_.getStandStillDuration();
+    double linear_twist = entity_.getCurrentTwist().linear.x;
+    if (
+      linear_twist < std::numeric_limits<double>::epsilon() &&
+      standstill_duration >= stop_duration_) {
+      return false;
+    }
+
+    if (distance.value() <= stop_sequence_end_distance_) {
+      throw SPECIFICATION_VIOLATION("overrun detected");
+    }
+
+    return true;
+  }
+
+protected:
+  EntityBase & entity_;
+  const double min_acceleration_;
+  const double max_acceleration_;
+  const std::int64_t stop_target_lanelet_id_;
+  const double stop_sequence_start_distance_;
+  const double stop_sequence_end_distance_;
+  const double stop_duration_;
+};
+}  // namespace traffic_simulator::entity
+
+#endif  // TRAFFIC_SIMULATOR__MONITOR__MOMENTARY_STOP_MONITOR_HPP_

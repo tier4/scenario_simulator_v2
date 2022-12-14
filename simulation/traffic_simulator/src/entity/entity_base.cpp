@@ -12,15 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <functional>
 #include <geometry/distance.hpp>
 #include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/entity/monitor/crosswalk_momentary_stop_monitor.hpp>
+#include <traffic_simulator/entity/monitor/out_of_range_monitor.hpp>
+#include <traffic_simulator/entity/monitor/reaction_time_monitor.hpp>
+#include <traffic_simulator/entity/monitor/stop_line_momentary_stop_monitor.hpp>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace traffic_simulator
@@ -737,5 +744,51 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
     return stand_still_duration_ = 0.0;
   }
 }
+
+auto EntityBase::monitorOutOfRange(
+  double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
+  double min_jerk, double max_jerk, std::optional<std::string> jerk_topic) -> void
+{
+  auto monitor = OutOfRangeMonitor(
+    *this, min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk,
+    std::move(jerk_topic));
+  job_list_.append(
+    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
+}
+
+auto EntityBase::monitorMomentaryStopAtStopLine(
+  double min_acceleration, double max_acceleration, std::int64_t stop_target_lanelet_id,
+  double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
+  -> void
+{
+  auto monitor = StopLineMomentaryStopMonitor(
+    *this, min_acceleration, max_acceleration, stop_target_lanelet_id, stop_sequence_start_distance,
+    stop_sequence_end_distance, stop_duration);
+  job_list_.append(
+    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
+}
+
+auto EntityBase::monitorMomentaryStopAtCrosswalk(
+  double min_acceleration, double max_acceleration, std::int64_t stop_target_lanelet_id,
+  double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
+  -> void
+{
+  auto monitor = CrosswalkMomentaryStopMonitor(
+    *this, min_acceleration, max_acceleration, stop_target_lanelet_id, stop_sequence_start_distance,
+    stop_sequence_end_distance, stop_duration);
+  job_list_.append(
+    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
+}
+
+auto EntityBase::monitorReactionTime(
+  double max_reaction_time, std::optional<double> upper_jerk_threshold = std::nullopt,
+  std::optional<double> lower_jerk_threshold = std::nullopt) -> void
+{
+  auto monitor =
+    ReactionTimeMonitor(*this, max_reaction_time, upper_jerk_threshold, lower_jerk_threshold);
+  job_list_.append(
+    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -20,6 +20,7 @@
 #include <boost/optional.hpp>
 #include <concealer/autoware.hpp>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
@@ -195,6 +196,24 @@ public:
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
   /*   */ auto updateStandStillDuration(const double step_time) -> double;
+
+  /*   */ auto monitorOutOfRange(
+    double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
+    double min_jerk, double max_jerk, std::optional<std::string> jerk_topic) -> void;
+
+  /*   */ auto monitorMomentaryStopAtStopLine(
+    double min_acceleration, double max_acceleration, std::int64_t stop_target_lanelet_id,
+    double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
+    -> void;
+
+  /*   */ auto monitorMomentaryStopAtCrosswalk(
+    double min_acceleration, double max_acceleration, std::int64_t stop_target_lanelet_id,
+    double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
+    -> void;
+
+  /*   */ auto monitorReactionTime(
+    double max_reaction_time, std::optional<double> upper_jerk_threshold,
+    std::optional<double> lower_jerk_threshold) -> void;
 
   const std::string name;
 
