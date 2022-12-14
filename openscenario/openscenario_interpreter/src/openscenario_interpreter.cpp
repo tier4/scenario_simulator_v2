@@ -32,7 +32,7 @@
 namespace openscenario_interpreter
 {
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
-: LifecycleNode("openscenario_interpreter", options),
+: rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
   intended_result("success"),
   local_frame_rate(30),
@@ -91,15 +91,13 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       return Interpreter::Result::FAILURE;  // => Unconfigured
     },
     [this]() {
-      /* ---- NOTE -------------------------------------------------------------
-       *
-       *  The scenario_test_runner that launched this node considers that "the
-       *  scenario is not expected to finish" or "an abnormality has occurred
-       *  that prevents the interpreter from terminating itself" after the
-       *  specified time (specified by --global-timeout), and deactivates this
-       *  node.
-       *
-       * -------------------------------------------------------------------- */
+      /*
+         The scenario_test_runner that launched this node considers that "the
+         scenario is not expected to finish" or "an abnormality has occurred
+         that prevents the interpreter from terminating itself" after the
+         specified time (specified by --global-timeout), and deactivates this
+         node.
+      */
       result = common::junit::Failure(
         "Timeout",
         "The simulation time has exceeded the time specified by the scenario_test_runner.");
