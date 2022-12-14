@@ -19,6 +19,7 @@
 
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <memory>
+#include <random>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <vector>
@@ -32,10 +33,14 @@ protected:
 
   simulation_api_schema::DetectionSensorConfiguration configuration_;
 
+  std::shared_ptr<std::mt19937> rand_engine_;
+
   explicit DetectionSensorBase(
     const double last_update_stamp,
     const simulation_api_schema::DetectionSensorConfiguration & configuration)
-  : last_update_stamp_(last_update_stamp), configuration_(configuration)
+  : last_update_stamp_(last_update_stamp),
+    configuration_(configuration),
+    rand_engine_(std::make_shared<std::mt19937>(configuration.random_seed()))
   {
   }
 
@@ -45,6 +50,9 @@ protected:
   geometry_msgs::Pose getSensorPose(
     const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
 
+  template <typename T>
+  void applyNoise(T & detected_object) const;
+
 public:
   virtual ~DetectionSensorBase() = default;
 
@@ -52,6 +60,10 @@ public:
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> & lidar_detected_entity) = 0;
 };
+
+template <>
+void DetectionSensorBase::applyNoise<autoware_auto_perception_msgs::msg::DetectedObject>(
+  autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const;
 
 template <typename T>
 class DetectionSensor : public DetectionSensorBase
