@@ -82,6 +82,7 @@
     "yoshimoto",
     "engageable",
     "travelling",
-    "libunwind"
+    "libunwind",
+    "linelint"
   ]
 }
