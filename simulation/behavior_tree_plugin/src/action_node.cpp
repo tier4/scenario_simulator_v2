@@ -260,7 +260,7 @@ auto ActionNode::getEntityStatus(const std::string target_name) const
   THROW_SIMULATION_ERROR("other entity : ", target_name, " does not exist.");
 }
 
-std::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
+auto ActionNode::getDistanceToTargetEntityPolygon(
   const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
   double width_extension_right, double width_extension_left, double length_extension_front,
   double length_extension_rear) const -> std::optional<double>

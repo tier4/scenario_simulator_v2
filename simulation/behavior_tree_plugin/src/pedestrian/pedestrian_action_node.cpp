@@ -55,7 +55,7 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
   const auto lanelet_pose = estimateLaneletPose(updated_status.pose);
   if (lanelet_pose) {
     updated_status.lanelet_pose_valid = true;
-    updated_status.lanelet_pose = lanelet_pose.get();
+    updated_status.lanelet_pose = lanelet_pose.value();
   } else {
     updated_status.lanelet_pose_valid = false;
     updated_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();

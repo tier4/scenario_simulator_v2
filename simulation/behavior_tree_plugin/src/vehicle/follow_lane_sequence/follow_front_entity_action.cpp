@@ -15,10 +15,10 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <vector>
-#include <optional>
 
 namespace entity_behavior
 {

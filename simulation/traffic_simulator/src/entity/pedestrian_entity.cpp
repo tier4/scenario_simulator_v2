@@ -98,9 +98,9 @@ std::vector<std::int64_t> PedestrianEntity::getRouteLanelets(double horizon)
   }
 }
 
-auto PedestrianEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
+auto PedestrianEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  return boost::none;
+  return std::nullopt;
 }
 
 auto PedestrianEntity::getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
