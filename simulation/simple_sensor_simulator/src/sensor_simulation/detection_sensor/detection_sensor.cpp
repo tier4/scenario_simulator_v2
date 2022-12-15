@@ -27,30 +27,32 @@
 
 namespace simple_sensor_simulator
 {
-const std::vector<std::string> DetectionSensorBase::getDetectedObjects(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
+auto DetectionSensorBase::getDetectedObjects(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
+  -> std::vector<std::string>
 {
   std::vector<std::string> detected_objects;
-  const auto pose = getSensorPose(status);
-  for (const auto & s : status) {
-    double distance = std::hypot(
-      s.pose().position().x() - pose.position().x(), s.pose().position().y() - pose.position().y(),
-      s.pose().position().z() - pose.position().z());
-    if (s.name() != configuration_.entity() && distance <= configuration_.range()) {
-      detected_objects.emplace_back(s.name());
+  const auto pose = getSensorPose(statuses);
+  for (const auto & status : statuses) {
+    if (double distance = std::hypot(
+          status.pose().position().x() - pose.position().x(),
+          status.pose().position().y() - pose.position().y(),
+          status.pose().position().z() - pose.position().z());
+        status.name() != configuration_.entity() && distance <= configuration_.range()) {
+      detected_objects.emplace_back(status.name());
     }
   }
   return detected_objects;
 }
 
 geometry_msgs::Pose DetectionSensorBase::getSensorPose(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
 {
-  for (const auto & s : status) {
+  for (const auto & status : statuses) {
     if (
-      s.type().type() == traffic_simulator_msgs::EntityType::EGO &&
-      s.name() == configuration_.entity()) {
-      return s.pose();
+      status.type().type() == traffic_simulator_msgs::EntityType::EGO &&
+      status.name() == configuration_.entity()) {
+      return status.pose();
     }
   }
   throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
@@ -58,16 +60,16 @@ geometry_msgs::Pose DetectionSensorBase::getSensorPose(
 
 template <>
 auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyNoise(
-  autoware_auto_perception_msgs::msg::DetectedObject & detected_object) -> void
+  autoware_auto_perception_msgs::msg::DetectedObject detected_object)
+  -> autoware_auto_perception_msgs::msg::DetectedObject
 {
-  double pos_noise_stddev = configuration_.pos_noise_stddev();
-  auto position_noise_distribution = std::normal_distribution<>(0.0, pos_noise_stddev);
-  autoware_auto_perception_msgs::msg::DetectedObject detected_object_with_noise = detected_object;
-  detected_object_with_noise.kinematics.pose_with_covariance.pose.position.x +=
+  auto position_noise_distribution =
+    std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
+  detected_object.kinematics.pose_with_covariance.pose.position.x +=
     position_noise_distribution(random_engine_);
-  detected_object_with_noise.kinematics.pose_with_covariance.pose.position.y +=
+  detected_object.kinematics.pose_with_covariance.pose.position.y +=
     position_noise_distribution(random_engine_);
-  detected_object = detected_object_with_noise;
+  return detected_object;
 }
 
 template <>
@@ -154,8 +156,7 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         simulation_interface::toMsg(
           status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
         object.shape.type = object.shape.BOUNDING_BOX;
-        applyNoise(object);
-        msg.objects.emplace_back(object);
+        msg.objects.push_back(applyNoise(object));
       }
     }
     publisher_ptr_->publish(msg);

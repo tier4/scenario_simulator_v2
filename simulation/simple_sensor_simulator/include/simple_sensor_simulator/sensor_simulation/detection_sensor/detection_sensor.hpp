@@ -44,8 +44,8 @@ protected:
   {
   }
 
-  const std::vector<std::string> getDetectedObjects(
-    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+  auto getDetectedObjects(const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
+    -> std::vector<std::string>;
 
   geometry_msgs::Pose getSensorPose(
     const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
@@ -72,7 +72,8 @@ public:
   {
   }
 
-  auto applyNoise(autoware_auto_perception_msgs::msg::DetectedObject &) -> void;
+  auto applyNoise(autoware_auto_perception_msgs::msg::DetectedObject)
+    -> autoware_auto_perception_msgs::msg::DetectedObject;
 
   auto update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
@@ -81,7 +82,8 @@ public:
 
 template <>
 auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyNoise(
-  autoware_auto_perception_msgs::msg::DetectedObject &) -> void;
+  autoware_auto_perception_msgs::msg::DetectedObject)
+  -> autoware_auto_perception_msgs::msg::DetectedObject;
 
 template <>
 void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
