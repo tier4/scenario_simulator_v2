@@ -58,15 +58,15 @@ geometry_msgs::Pose DetectionSensorBase::getSensorPose(
 
 template <>
 void DetectionSensorBase::applyNoise<autoware_auto_perception_msgs::msg::DetectedObject>(
-  autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const
+  autoware_auto_perception_msgs::msg::DetectedObject & detected_object)
 {
   double pos_noise_stddev = configuration_.pos_noise_stddev();
   auto position_noise_distribution = std::normal_distribution<>(0.0, pos_noise_stddev);
   autoware_auto_perception_msgs::msg::DetectedObject detected_object_with_noise = detected_object;
   detected_object_with_noise.kinematics.pose_with_covariance.pose.position.x +=
-    position_noise_distribution(*rand_engine_);
+    position_noise_distribution(random_engine_);
   detected_object_with_noise.kinematics.pose_with_covariance.pose.position.y +=
-    position_noise_distribution(*rand_engine_);
+    position_noise_distribution(random_engine_);
   detected_object = detected_object_with_noise;
 }
 

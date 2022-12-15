@@ -33,14 +33,14 @@ protected:
 
   simulation_api_schema::DetectionSensorConfiguration configuration_;
 
-  std::shared_ptr<std::mt19937> rand_engine_;
+  std::mt19937 random_engine_;
 
   explicit DetectionSensorBase(
     const double last_update_stamp,
     const simulation_api_schema::DetectionSensorConfiguration & configuration)
   : last_update_stamp_(last_update_stamp),
     configuration_(configuration),
-    rand_engine_(std::make_shared<std::mt19937>(configuration.random_seed()))
+    random_engine_(configuration.random_seed())
   {
   }
 
@@ -51,7 +51,7 @@ protected:
     const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
 
   template <typename T>
-  void applyNoise(T & detected_object) const;
+  void applyNoise(T & detected_object);
 
 public:
   virtual ~DetectionSensorBase() = default;
@@ -63,7 +63,7 @@ public:
 
 template <>
 void DetectionSensorBase::applyNoise<autoware_auto_perception_msgs::msg::DetectedObject>(
-  autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const;
+  autoware_auto_perception_msgs::msg::DetectedObject &);
 
 template <typename T>
 class DetectionSensor : public DetectionSensorBase
