@@ -57,8 +57,8 @@ geometry_msgs::Pose DetectionSensorBase::getSensorPose(
 }
 
 template <>
-void DetectionSensorBase::applyNoise<autoware_auto_perception_msgs::msg::DetectedObject>(
-  autoware_auto_perception_msgs::msg::DetectedObject & detected_object)
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyNoise(
+  autoware_auto_perception_msgs::msg::DetectedObject & detected_object) -> void
 {
   double pos_noise_stddev = configuration_.pos_noise_stddev();
   auto position_noise_distribution = std::normal_distribution<>(0.0, pos_noise_stddev);
@@ -77,11 +77,8 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 {
   auto makeObjectClassification = [](const auto & label) {
     autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
-    {
-      object_classification.label = label;
-      object_classification.probability = 1;
-    }
-
+    object_classification.label = label;
+    object_classification.probability = 1;
     return object_classification;
   };
   std::vector<std::string> detected_objects;

@@ -50,9 +50,6 @@ protected:
   geometry_msgs::Pose getSensorPose(
     const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
 
-  template <typename T>
-  void applyNoise(T & detected_object);
-
 public:
   virtual ~DetectionSensorBase() = default;
 
@@ -60,10 +57,6 @@ public:
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> & lidar_detected_entity) = 0;
 };
-
-template <>
-void DetectionSensorBase::applyNoise<autoware_auto_perception_msgs::msg::DetectedObject>(
-  autoware_auto_perception_msgs::msg::DetectedObject &);
 
 template <typename T>
 class DetectionSensor : public DetectionSensorBase
@@ -79,10 +72,16 @@ public:
   {
   }
 
+  auto applyNoise(autoware_auto_perception_msgs::msg::DetectedObject &) -> void;
+
   auto update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> & lidar_detected_entity) -> void override;
 };
+
+template <>
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyNoise(
+  autoware_auto_perception_msgs::msg::DetectedObject &) -> void;
 
 template <>
 void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
