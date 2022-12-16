@@ -11,11 +11,17 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          pwd && ls -a ../ && gh pr edit ${{ github.event.pull_request.number }} --add-label "interface breaking"
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Add label
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "interface breaking"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: |
+      - name: Add comment
+        run: |
           gh pr comment  "$PR_NUMBER" --edit-last --body "This PR breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364"
           || gh pr comment  "$PR_NUMBER" --body "This PR breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364"
         env:
