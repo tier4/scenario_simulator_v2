@@ -1,6 +1,5 @@
 name: InterfaceUpdateNotification
 on:
-  workflow_dispatch:
   pull_request:
     branches:
       - master
@@ -12,11 +11,14 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - run: gh pr edit ${{ github.event.pull_request.number }} --add-label "interface breaking"
+      - run: |
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "interface breaking"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: gh pr comment  ${{ github.event.pull_request.number }} --edit-last --body "This PR breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364" || \
-             gh pr comment  ${{ github.event.pull_request.number }} --body "This PR breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364"
+      - run: |
+          gh pr comment  "$PR_NUMBER" --edit-last --body "This PR breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364"
+          || gh pr comment  "$PR_NUMBER" --body "This PR breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
 
