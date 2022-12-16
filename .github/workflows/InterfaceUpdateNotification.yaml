@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          pwd && gh pr edit ${{ github.event.pull_request.number }} --add-label "interface breaking"
+          pwd && ls -a && gh pr edit ${{ github.event.pull_request.number }} --add-label "interface breaking"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: |
