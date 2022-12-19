@@ -57,6 +57,21 @@ geometry_msgs::Pose DetectionSensorBase::getSensorPose(
 }
 
 template <>
+void DetectionSensorBase::applyNoise<autoware_auto_perception_msgs::msg::DetectedObject>(
+  autoware_auto_perception_msgs::msg::DetectedObject & detected_object) const
+{
+  double pos_noise_stddev = configuration_.pos_noise_stddev();
+  std::shared_ptr<std::normal_distribution<>> position_noise_distribution =
+    std::make_shared<std::normal_distribution<>>(0.0, pos_noise_stddev);
+  autoware_auto_perception_msgs::msg::DetectedObject detected_object_with_noise = detected_object;
+  detected_object_with_noise.kinematics.pose_with_covariance.pose.position.x +=
+    (*position_noise_distribution)(*rand_engine_);
+  detected_object_with_noise.kinematics.pose_with_covariance.pose.position.y +=
+    (*position_noise_distribution)(*rand_engine_);
+  detected_object = detected_object_with_noise;
+}
+
+template <>
 void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity)
@@ -151,6 +166,7 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
           simulation_interface::toMsg(
             s.action_status().twist(), object.kinematics.twist_with_covariance.twist);
           object.shape.type = object.shape.BOUNDING_BOX;
+          applyNoise(object);
           msg.objects.emplace_back(object);
         }
       }

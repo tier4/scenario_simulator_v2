@@ -24,13 +24,11 @@ PoissonDistribution::PoissonDistribution(
 : Scope(scope),
   range(readElement<Range>("range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
-  sample(expected_value.data)
+  distribute(expected_value.data),
+  random_engine(scope.seed)
 {
 }
 
-auto PoissonDistribution::evaluate() -> Object
-{
-  return make<Double>(sample(ref<std::mt19937>(std::string("randomEngine"))));
-}
+auto PoissonDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

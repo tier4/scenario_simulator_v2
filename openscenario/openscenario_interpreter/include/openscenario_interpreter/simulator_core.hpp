@@ -184,19 +184,29 @@ public:
       return core->spawn(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename EntityRef, typename DynamicConstraints, typename... Ts>
-    static auto applySpeedProfileAction(
-      const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints, Ts &&... xs)
-      -> void
+    template <typename EntityRef, typename DynamicConstraints>
+    static auto applyProfileAction(
+      const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints) -> void
     {
-      core->setBehaviorParameter(entity_ref, [&]() {
+      return core->setBehaviorParameter(entity_ref, [&]() {
         auto behavior_parameter = core->getBehaviorParameter(entity_ref);
-        behavior_parameter.dynamic_constraints =
-          static_cast<traffic_simulator_msgs::msg::DynamicConstraints>(dynamic_constraints);
+
+#define UPDATE_IF_IS_NOT_INFINITY(DATA_MEMBER)                                            \
+  if (not std::isinf(dynamic_constraints.DATA_MEMBER)) {                                  \
+    behavior_parameter.dynamic_constraints.DATA_MEMBER = dynamic_constraints.DATA_MEMBER; \
+  }                                                                                       \
+  static_assert(true)
+
+        UPDATE_IF_IS_NOT_INFINITY(max_speed);
+        UPDATE_IF_IS_NOT_INFINITY(max_acceleration);
+        UPDATE_IF_IS_NOT_INFINITY(max_acceleration_rate);
+        UPDATE_IF_IS_NOT_INFINITY(max_deceleration);
+        UPDATE_IF_IS_NOT_INFINITY(max_deceleration_rate);
+
+#undef UPDATE_IF_IS_NOT_INFINITY
+
         return behavior_parameter;
       }());
-
-      applySpeedAction(entity_ref, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename Controller>

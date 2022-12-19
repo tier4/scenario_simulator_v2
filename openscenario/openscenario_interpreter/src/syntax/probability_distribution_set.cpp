@@ -32,13 +32,14 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
   elements(
     generateVector(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
   adaptor(elements),
-  sample(adaptor.probabilities.begin(), adaptor.probabilities.end())
+  distribute(adaptor.probabilities.begin(), adaptor.probabilities.end()),
+  random_engine(scope.seed)
 {
 }
 
 auto ProbabilityDistributionSet::evaluate() -> Object
 {
-  size_t index = sample(ref<std::mt19937>(std::string("randomEngine")));
+  size_t index = distribute(random_engine);
   return elements.at(index);
 }
 }  // namespace syntax
