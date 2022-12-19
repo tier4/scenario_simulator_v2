@@ -44,10 +44,6 @@ public:
     // TODO MUTEX LOCK
     statuses[id].last_access = std::chrono::high_resolution_clock::now();
   }
-
-  auto hoge() const
-  {
-  }
 } static status_monitor;
 }  // namespace common
 
