@@ -45,8 +45,8 @@ auto DetectionSensorBase::getDetectedObjects(
   return detected_objects;
 }
 
-geometry_msgs::Pose DetectionSensorBase::getSensorPose(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
+auto DetectionSensorBase::getSensorPose(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> geometry_msgs::Pose
 {
   for (const auto & status : statuses) {
     if (
@@ -73,9 +73,9 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::apply
 }
 
 template <>
-void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
-  const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity)
+  const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity) -> void
 {
   auto makeObjectClassification = [](const auto & label) {
     autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
@@ -83,9 +83,9 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     object_classification.probability = 1;
     return object_classification;
   };
-  const std::vector<std::string> detected_objects{
-    configuration_.filter_by_range() ? getDetectedObjects(statuses) : lidar_detected_entity};
   if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
+    const std::vector<std::string> detected_objects{
+      configuration_.filter_by_range() ? getDetectedObjects(statuses) : lidar_detected_entity};
     autoware_auto_perception_msgs::msg::DetectedObjects msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = "map";
