@@ -25,15 +25,19 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::init(argc, argv);
 
-  rclcpp::executors::SingleThreadedExecutor executor{};
+  rclcpp::executors::SingleThreadedExecutor executor;
 
-  rclcpp::NodeOptions options{};
+  rclcpp::NodeOptions options;
 
   auto node = std::make_shared<openscenario_interpreter::Interpreter>(options);
 
-  executor.add_node((*node).get_node_base_interface());
+  executor.add_node(node->get_node_base_interface());
 
-  executor.spin();
+  while (rclcpp::ok())
+  {
+    executor.spin_once();
+    common::status_monitor.touch(std::this_thread::get_id());
+  }
 
   rclcpp::shutdown();
 
