@@ -22,6 +22,7 @@
 #include <memory>
 #include <optional>
 #include <queue>
+#include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
@@ -197,9 +198,17 @@ public:
 
   /*   */ auto updateStandStillDuration(const double step_time) -> double;
 
-  /*   */ auto monitorOutOfRange(
-    double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
-    double min_jerk, double max_jerk, std::optional<std::string> jerk_topic) -> void;
+  /*   */ auto monitorVelocityOutOfRange(double min_velocity, double max_velocity) -> void;
+
+  /*   */ auto monitorAccelerationOutOfRange(double min_acceleration, double max_acceleration)
+    -> void;
+
+  /*   */ auto monitorJerkOutOfRange(double min_jerk, double max_jerk) -> void;
+
+  /*   */ auto monitorJerkOutOfRange(
+    double min_jerk, double max_jerk,
+    std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface_ptr,
+    const std::string & topic_name) -> void;
 
   /*   */ auto monitorMomentaryStopAtStopLine(
     double min_acceleration, double max_acceleration, std::int64_t stop_target_lanelet_id,

@@ -16,48 +16,52 @@
 #define TRAFFIC_SIMULATOR__ENTITY__MONITOR__OUT_OF_RANGE_MONITOR_HPP_
 
 #include <optional>
-#include <rclcpp/qos.hpp>
 #include <string>
-#include <tier4_debug_msgs/msg/float32_stamped.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 
 namespace traffic_simulator::entity
 {
-class OutOfRangeMonitor
+template <typename ValuePolicy>
+class OutOfRangeMonitor : private ValuePolicy
 {
-  using JerkMessageType = tier4_debug_msgs::msg::Float32Stamped;
-
 public:
   /**
    * @brief Construct a new Out Of Range Monitor object
-   * @param target_entity Name of target entity
-   * @param min_velocity If the velocity of the target entity go below this value, this metrics becomes failure state.
-   * @param max_velocity If the velocity of the target entity overs this value, this metrics becomes failure state.
-   * @param min_acceleration If the acceleration of the target entity go below this value, this metrics becomes failure state.
-   * @param max_acceleration If the acceleration of the target entity overs this value, this metrics becomes failure state.
-   * @param min_jerk If the jerk of the target entity go below this value, this metrics becomes failure state.
-   * @param max_jerk If the jerk of the target entity overs this value, this metrics becomes failure state.
+   * @param entity target entity
+   * @param min_value min range value
+   * @param max_value max range value
+   * @param name range name
+   * @note If return value of ValuePolicy::getValue() goes outside of this range, an exception is thrown.
    */
   OutOfRangeMonitor(
-    EntityBase & entity, double min_velocity, double max_velocity, double min_acceleration,
-    double max_acceleration, double min_jerk, double max_jerk,
-    std::optional<std::string> jerk_topic = std::nullopt);
+    EntityBase & entity, std::string name, std::optional<double> min_value,
+    std::optional<double> max_value, ValuePolicy policy = ValuePolicy())
+  : ValuePolicy(std::move(policy)),
+    min_value(min_value),
+    max_value(max_value),
+    name(std::move(name)),
+    entity_(entity)
+  {
+  }
 
-  auto operator()(double) -> bool;
+  auto operator()(double) -> bool
+  {
+    auto value = this->getValue(entity_);
+    if ((min_value && value < *min_value) || (max_value && value > *max_value)) {
+      auto min_string = min_value ? std::to_string(*min_value) : "(None)";
+      auto max_string = max_value ? std::to_string(*max_value) : "(None)";
+      throw SPECIFICATION_VIOLATION(
+        "current ", name, " (", value, ") is out of range ([", min_string, ", ", max_string, "])");
+    }
+    return false;
+  }
+
+  const std::optional<double> min_value;
+  const std::optional<double> max_value;
+  const std::string name;
 
 private:
-  const double min_velocity_;
-  const double max_velocity_;
-  const double min_acceleration_;
-  const double max_acceleration_;
-  const double min_jerk_;
-  const double max_jerk_;
-  const std::optional<std::string> jerk_topic_;
-
   EntityBase & entity_;
-  double linear_jerk_ = 0;
-
-  rclcpp::Subscription<JerkMessageType>::SharedPtr jerk_callback_ptr_;
 };
 }  // namespace traffic_simulator::entity
 

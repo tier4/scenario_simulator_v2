@@ -23,6 +23,10 @@
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/monitor/crosswalk_distance_policy.hpp>
+#include <traffic_simulator/entity/monitor/linear_acceleration_value_policy.hpp>
+#include <traffic_simulator/entity/monitor/linear_jerk_subscription_value_policy.hpp>
+#include <traffic_simulator/entity/monitor/linear_jerk_value_policy.hpp>
+#include <traffic_simulator/entity/monitor/linear_velocity_value_policy.hpp>
 #include <traffic_simulator/entity/monitor/momentary_stop_monitor.hpp>
 #include <traffic_simulator/entity/monitor/out_of_range_monitor.hpp>
 #include <traffic_simulator/entity/monitor/reaction_time_monitor.hpp>
@@ -746,13 +750,38 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
   }
 }
 
-auto EntityBase::monitorOutOfRange(
-  double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
-  double min_jerk, double max_jerk, std::optional<std::string> jerk_topic) -> void
+auto EntityBase::monitorVelocityOutOfRange(double min_velocity, double max_velocity) -> void
+{
+  auto monitor =
+    OutOfRangeMonitor(*this, "velocity", min_velocity, max_velocity, LinearVelocityValuePolicy());
+  job_list_.append(
+    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
+}
+
+auto EntityBase::monitorAccelerationOutOfRange(double min_acceleration, double max_acceleration)
+  -> void
 {
   auto monitor = OutOfRangeMonitor(
-    *this, min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk,
-    std::move(jerk_topic));
+    *this, "acceleration", min_acceleration, max_acceleration, LinearAccelerationValuePolicy());
+  job_list_.append(
+    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
+}
+
+auto EntityBase::monitorJerkOutOfRange(double min_jerk, double max_jerk) -> void
+{
+  auto monitor = OutOfRangeMonitor(*this, "jerk", min_jerk, max_jerk, LinearJerkValuePolicy());
+  job_list_.append(
+    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
+}
+
+auto EntityBase::monitorJerkOutOfRange(
+  double min_jerk, double max_jerk,
+  std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface_ptr,
+  const std::string & topic_name) -> void
+{
+  auto monitor = OutOfRangeMonitor(
+    *this, "jerk", min_jerk, max_jerk,
+    LinearJerkSubscriptionValuePolicy(std::move(node_topics_interface_ptr), topic_name));
   job_list_.append(
     monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
 }

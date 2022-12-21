@@ -15,7 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__MONITOR__CROSSWALK_DISTANCE_POLICY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__MONITOR__CROSSWALK_DISTANCE_POLICY_HPP_
 
-#include <cstdint>
 #include <optional>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>

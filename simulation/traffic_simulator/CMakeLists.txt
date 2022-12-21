@@ -39,7 +39,10 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
   src/entity/monitor/crosswalk_distance_policy.cpp
-  src/entity/monitor/out_of_range_monitor.cpp
+  src/entity/monitor/linear_acceleration_value_policy.cpp
+  src/entity/monitor/linear_jerk_value_policy.cpp
+  src/entity/monitor/linear_jerk_subscription_value_policy.cpp
+  src/entity/monitor/linear_velocity_value_policy.cpp
   src/entity/monitor/reaction_time_monitor.cpp
   src/entity/monitor/stop_line_distance_policy.cpp
   src/hdmap_utils/hdmap_utils.cpp

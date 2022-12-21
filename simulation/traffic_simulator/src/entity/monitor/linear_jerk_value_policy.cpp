@@ -12,28 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__ENTITY__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
-#define TRAFFIC_SIMULATOR__ENTITY__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
-
-#include <memory>
-#include <optional>
+#include <rclcpp/create_subscription.hpp>
+#include <rclcpp/qos.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/entity/monitor/linear_jerk_value_policy.hpp>
 
 namespace traffic_simulator::entity
 {
-class StopLineDistancePolicy
+auto LinearJerkValuePolicy::getValue(EntityBase & entity) const -> double
 {
-public:
-  using HdMapUtilsPtr = std::shared_ptr<hdmap_utils::HdMapUtils>;
-
-  explicit StopLineDistancePolicy(HdMapUtilsPtr hdmap_utils_ptr);
-
-  auto getDistance(EntityBase & entity, std::int64_t stop_line_id) -> std::optional<double>;
-
-private:
-  HdMapUtilsPtr hdmap_utils_ptr_;
-};
+  return entity.getLinearJerk();
+}
 }  // namespace traffic_simulator::entity
-
-#endif  // TRAFFIC_SIMULATOR__ENTITY__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
