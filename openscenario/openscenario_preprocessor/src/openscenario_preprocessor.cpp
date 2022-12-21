@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//#define OPENSCENARIO_INTERPRETER_NO_EXTENSION
-
 #include <algorithm>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
@@ -23,12 +21,12 @@
 namespace openscenario_preprocessor
 {
 Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
-: rclcpp::Node("preprocessor", options)
-{
-  using openscenario_preprocessor_msgs::srv::Load;
-  load_server = create_service<Load>(
+: rclcpp::Node("preprocessor", options),
+  load_server(create_service<openscenario_preprocessor_msgs::srv::Load>(
     "~/load",
-    [this](const Load::Request::SharedPtr request, Load::Response::SharedPtr response) -> void {
+    [this](
+      const openscenario_preprocessor_msgs::srv::Load::Request::SharedPtr request,
+      openscenario_preprocessor_msgs::srv::Load::Response::SharedPtr response) -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       try {
         auto s = ScenarioSet(*request);
@@ -40,12 +38,12 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
         response->message = e.what();
         preprocessed_scenarios.clear();
       }
-    });
-
-  using openscenario_preprocessor_msgs::srv::Derive;
-  derive_server = create_service<Derive>(
+    })),
+  derive_server(create_service<openscenario_preprocessor_msgs::srv::Derive>(
     "~/derive",
-    [this](const Derive::Request::SharedPtr, Derive::Response::SharedPtr response) -> void {
+    [this](
+      const openscenario_preprocessor_msgs::srv::Derive::Request::SharedPtr,
+      openscenario_preprocessor_msgs::srv::Derive::Response::SharedPtr response) -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       if (preprocessed_scenarios.empty()) {
         response->path = "no output";
@@ -53,17 +51,17 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
         *response = preprocessed_scenarios.front().getDeriveResponse();
         preprocessed_scenarios.pop_front();
       }
-    });
-
-  using openscenario_preprocessor_msgs::srv::CheckDerivativeRemained;
-  check_server = create_service<CheckDerivativeRemained>(
+    })),
+  check_server(create_service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>(
     "~/check",
     [this](
-      const CheckDerivativeRemained::Request::SharedPtr,
-      CheckDerivativeRemained::Response::SharedPtr response) -> void {
+      const openscenario_preprocessor_msgs::srv::CheckDerivativeRemained::Request::SharedPtr,
+      openscenario_preprocessor_msgs::srv::CheckDerivativeRemained::Response::SharedPtr response)
+      -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       response->derivative_remained = not preprocessed_scenarios.empty();
-    });
+    }))
+{
 }
 
 bool Preprocessor::validateXOSC(const boost::filesystem::path & file_name, bool verbose = false)

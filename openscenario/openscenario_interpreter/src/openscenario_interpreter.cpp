@@ -118,10 +118,12 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
       } else if (script->category.is<ParameterValueDistribution>()) {
-        throw Error("ParameterValueDistribution is not supported");
+        throw Error(
+          "ParameterValueDistribution cannot be processed by openscenario_interpreter alone. "
+          "Give a preprocessed scenario using openscenario_preprocessor together");
       } else {
         throw SyntaxError(
-          "Unsupported member of OpenSCENARIOCategory group is defined in the scenario file");
+          "Unsupported member of OpenScenarioCategory group is defined in the scenario file");
       }
 
       return Interpreter::Result::SUCCESS;  // => Inactive
