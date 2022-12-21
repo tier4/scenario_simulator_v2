@@ -469,7 +469,7 @@ public:
    * @param min_velocity lower limit of velocity
    * @param max_velocity upper limit of velocity
    * @throw SpecificationViolation if velocity goes out of range
-   * @note This functionality was originally implimented as a part of OutOfRangeMetric
+   * @note This functionality was originally implemented as a part of OutOfRangeMetric
    */
   /*   */ auto monitorVelocityOutOfRange(
     const std::string & name, std::optional<double> min_velocity,
@@ -481,7 +481,7 @@ public:
    * @param min_acceleration lower limit of acceleration
    * @param max_acceleration upper limit of acceleration
    * @throw SpecificationViolation if acceleration goes out of range
-   * @note This functionality was originally implimented as a part of OutOfRangeMetric
+   * @note This functionality was originally implemented as a part of OutOfRangeMetric
    */
   /*   */ auto monitorAccelerationOutOfRange(
     const std::string & name, std::optional<double> min_acceleration,
@@ -493,7 +493,7 @@ public:
    * @param min_jerk lower limit of jerk
    * @param max_jerk upper limit of jerk
    * @throw SpecificationViolation if acceleration goes out of range
-   * @note This functionality was originally implimented as a part of OutOfRangeMetric
+   * @note This functionality was originally implemented as a part of OutOfRangeMetric
    */
   /*   */ auto monitorJerkOutOfRange(
     const std::string & name, std::optional<double> min_jerk, std::optional<double> max_jerk)
@@ -506,7 +506,7 @@ public:
    * @param max_jerk upper limit of jerk
    * @param topic_name topic name to subscribe for jerk values
    * @throw SpecificationViolation if acceleration goes out of range
-   * @note This functionality was originally implimented as a part of OutOfRangeMetric
+   * @note This functionality was originally implemented as a part of OutOfRangeMetric
    * @note This function expect that the message type of topic is tier4_debug_msgs::msg::Float32Stamped
    */
   /*   */ auto monitorJerkOutOfRange(
@@ -522,7 +522,7 @@ public:
    * @param stop_sequence_start_distance distance between the entity and the target where the entity begins to stop
    * @param stop_sequence_end_distance least distance between the entity and the target where the entity should stop
    * @param stop_duration stop duration of the entity that the monitor discontinues watching
-   * @note This functionality was originally implimented as a part of MomentaryStopMetric
+   * @note This functionality was originally implemented as a part of MomentaryStopMetric
    */
   /*   */ auto monitorStopLineMomentaryStop(
     const std::string & name, double min_acceleration, double max_acceleration,
@@ -538,7 +538,7 @@ public:
    * @param stop_sequence_start_distance distance between the entity and the target where the entity begins to stop
    * @param stop_sequence_end_distance least distance between the entity and the target where the entity should stop
    * @param stop_duration stop duration of the entity that the monitor discontinues watching
-   * @note This functionality was originally implimented as a part of MomentaryStopMetric
+   * @note This functionality was originally implemented as a part of MomentaryStopMetric
    */
   /*   */ auto monitorCrosswalkMomentaryStop(
     const std::string & name, double min_acceleration, double max_acceleration,
@@ -551,7 +551,7 @@ public:
    * @param min_reaction_time lower limit of reaction time
    * @param upper_jerk_threshold upper limit of jerk
    * @param lower_jerk_threshold lower limit of jerk
-   * @note This functionality was originally implimented as a part of ReactionTimeMetric
+   * @note This functionality was originally implemented as a part of ReactionTimeMetric
    */
   /*   */ auto monitorReactionTime(
     const std::string & name, double max_reaction_time, std::optional<double> upper_jerk_threshold,
