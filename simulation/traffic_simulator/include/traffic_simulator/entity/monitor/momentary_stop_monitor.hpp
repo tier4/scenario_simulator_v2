@@ -21,7 +21,7 @@
 namespace traffic_simulator::entity
 {
 template <typename DistancePolicy>
-class MomentaryStopMonitor
+class MomentaryStopMonitor : private DistancePolicy
 {
 public:
   /**
@@ -41,8 +41,10 @@ public:
   MomentaryStopMonitor(
     EntityBase & entity, double min_acceleration, double max_acceleration,
     std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
-    double stop_sequence_end_distance, double stop_duration)
-  : entity_(entity),
+    double stop_sequence_end_distance, double stop_duration,
+    DistancePolicy policy = DistancePolicy())
+  : DistancePolicy(policy),
+    entity_(entity),
     min_acceleration_(min_acceleration),
     max_acceleration_(max_acceleration),
     stop_target_lanelet_id_(stop_target_lanelet_id),
@@ -54,7 +56,7 @@ public:
 
   auto operator()(double) -> bool
   {
-    auto distance = DistancePolicy::getDistance(entity_, stop_target_lanelet_id_);
+    auto distance = this->getDistance(entity_, stop_target_lanelet_id_);
     if (not distance) {
       if (is_target_in_range_) {
         THROW_SIMULATION_ERROR("failed to calculate distance to stop line.");

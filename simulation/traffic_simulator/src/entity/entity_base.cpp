@@ -762,9 +762,9 @@ auto EntityBase::monitorMomentaryStopAtStopLine(
   double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
   -> void
 {
-  auto monitor = MomentaryStopMonitor<StopLineDistancePolicy>(
+  auto monitor = MomentaryStopMonitor(
     *this, min_acceleration, max_acceleration, stop_target_lanelet_id, stop_sequence_start_distance,
-    stop_sequence_end_distance, stop_duration);
+    stop_sequence_end_distance, stop_duration, StopLineDistancePolicy(hdmap_utils_ptr_));
   job_list_.append(
     monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
 }
@@ -774,9 +774,9 @@ auto EntityBase::monitorMomentaryStopAtCrosswalk(
   double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
   -> void
 {
-  auto monitor = MomentaryStopMonitor<CrosswalkDistancePolicy>(
+  auto monitor = MomentaryStopMonitor(
     *this, min_acceleration, max_acceleration, stop_target_lanelet_id, stop_sequence_start_distance,
-    stop_sequence_end_distance, stop_duration);
+    stop_sequence_end_distance, stop_duration, CrosswalkDistancePolicy(hdmap_utils_ptr_));
   job_list_.append(
     monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
 }

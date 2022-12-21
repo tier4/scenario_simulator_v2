@@ -16,15 +16,24 @@
 #define TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
 
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
 namespace traffic_simulator::entity
 {
 class StopLineDistancePolicy
 {
 public:
-  static auto getDistance(EntityBase & entity, std::int64_t lanelet_id) -> std::optional<double>;
+  using HdMapUtilsPtr = std::shared_ptr<hdmap_utils::HdMapUtils>;
+
+  explicit StopLineDistancePolicy(HdMapUtilsPtr hdmap_utils_ptr);
+
+  auto getDistance(EntityBase & entity, std::int64_t stop_line_id) -> std::optional<double>;
+
+private:
+  HdMapUtilsPtr hdmap_utils_ptr_;
 };
 }  // namespace traffic_simulator::entity
 

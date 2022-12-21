@@ -21,10 +21,22 @@
 
 namespace traffic_simulator::entity
 {
-auto CrosswalkDistancePolicy::getDistance(EntityBase &, std::int64_t) -> std::optional<double>
+CrosswalkDistancePolicy::CrosswalkDistancePolicy(HdMapUtilsPtr hdmap_utils_ptr)
+: hdmap_utils_ptr_(std::move(hdmap_utils_ptr))
 {
-  // TODO: implement
-  return {};
+}
+
+auto CrosswalkDistancePolicy::getDistance(EntityBase & entity, std::int64_t crosswalk_id)
+  -> std::optional<double>
+{
+  auto waypoints = entity.getWaypoints().waypoints;
+  if (waypoints.empty()) {
+    return std::nullopt;
+  }
+
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+  auto polygon = hdmap_utils_ptr_->getLaneletPolygon(crosswalk_id);
+  return spline.getCollisionPointIn2D(polygon).value();
 }
 
 }  // namespace traffic_simulator::entity

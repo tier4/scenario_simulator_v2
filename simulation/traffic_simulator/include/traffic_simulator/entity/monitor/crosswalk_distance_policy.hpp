@@ -18,13 +18,21 @@
 #include <cstdint>
 #include <optional>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
 namespace traffic_simulator::entity
 {
 class CrosswalkDistancePolicy
 {
 public:
-  static auto getDistance(EntityBase & entity, std::int64_t lanelet_id) -> std::optional<double>;
+  using HdMapUtilsPtr = std::shared_ptr<hdmap_utils::HdMapUtils>;
+
+  explicit CrosswalkDistancePolicy(HdMapUtilsPtr hdmap_utils_ptr);
+
+  auto getDistance(EntityBase & entity, std::int64_t crosswalk_id) -> std::optional<double>;
+
+private:
+  HdMapUtilsPtr hdmap_utils_ptr_;
 };
 }  // namespace traffic_simulator::entity
 

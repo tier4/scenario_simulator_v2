@@ -33,10 +33,8 @@ OutOfRangeMonitor::OutOfRangeMonitor(
 
 auto OutOfRangeMonitor::operator()(double) -> bool
 {
-  const auto status = entity_.getStatus();
-
-  auto linear_velocity = status.action_status.twist.linear.x;
-  auto linear_acceleration = status.action_status.accel.linear.x;
+  auto linear_velocity = entity_.getCurrentTwist().linear.x;
+  auto linear_acceleration = entity_.getCurrentAccel().linear.x;
 
   if (min_velocity_ > linear_velocity || linear_velocity > max_velocity_) {
     throw SPECIFICATION_VIOLATION(
