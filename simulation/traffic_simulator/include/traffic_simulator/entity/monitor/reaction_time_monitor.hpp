@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MONITOR__REACTION_TIME_MONITOR_HPP_
-#define TRAFFIC_SIMULATOR__MONITOR__REACTION_TIME_MONITOR_HPP_
+#ifndef TRAFFIC_SIMULATOR__ENTITY__MONITOR__REACTION_TIME_MONITOR_HPP_
+#define TRAFFIC_SIMULATOR__ENTITY__MONITOR__REACTION_TIME_MONITOR_HPP_
 
 #include <optional>
 #include <string>
@@ -48,4 +48,4 @@ private:
 };
 }  // namespace traffic_simulator::entity
 
-#endif  // TRAFFIC_SIMULATOR__MONITOR__REACTION_TIME_MONITOR_HPP_
+#endif  // TRAFFIC_SIMULATOR__ENTITY__MONITOR__REACTION_TIME_MONITOR_HPP_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
-#define TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
+#ifndef TRAFFIC_SIMULATOR__ENTITY__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
+#define TRAFFIC_SIMULATOR__ENTITY__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
 
 #include <cstdint>
 #include <memory>
@@ -37,4 +37,4 @@ private:
 };
 }  // namespace traffic_simulator::entity
 
-#endif  // TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
+#endif  // TRAFFIC_SIMULATOR__ENTITY__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
