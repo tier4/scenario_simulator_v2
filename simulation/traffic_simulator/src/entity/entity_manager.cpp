@@ -640,8 +640,7 @@ auto EntityManager::monitorMomentaryStopAtCrosswalk(
 }
 
 auto EntityManager::monitorReactionTime(
-  const std::string & name, double max_reaction_time,
-  std::optional<double> upper_jerk_threshold,
+  const std::string & name, double max_reaction_time, std::optional<double> upper_jerk_threshold,
   std::optional<double> lower_jerk_threshold) -> void
 {
   auto monitor = ReactionTimeMonitor(
