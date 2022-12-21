@@ -81,7 +81,7 @@ public:
     return entity_.getStandStillDuration() >= stop_duration_;
   }
 
-protected:
+private:
   EntityBase & entity_;
   const double min_acceleration_;
   const double max_acceleration_;
