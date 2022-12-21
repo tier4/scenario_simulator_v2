@@ -15,11 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__MONITOR__LINEAR_JERK_VALUE_POLICY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__MONITOR__LINEAR_JERK_VALUE_POLICY_HPP_
 
-#include <memory>
-#include <rclcpp/node_interfaces/node_topics_interface.hpp>
-#include <rclcpp/subscription.hpp>
-#include <string>
-#include <tier4_debug_msgs/msg/float32_stamped.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 
 namespace traffic_simulator::entity
