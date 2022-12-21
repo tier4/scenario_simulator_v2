@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MONITOR__CROSSWALK_MOMENTARY_STOP_MONITOR_HPP_
-#define TRAFFIC_SIMULATOR__MONITOR__CROSSWALK_MOMENTARY_STOP_MONITOR_HPP_
-
+#include <limits>
 #include <optional>
-#include <traffic_simulator/entity/monitor/momentary_stop_monitor.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+#include <string>
+#include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/entity/monitor/crosswalk_distance_policy.hpp>
 
 namespace traffic_simulator::entity
 {
-class CrosswalkMomentaryStopMonitor : public MomentaryStopMonitor<CrosswalkMomentaryStopMonitor>
+auto CrosswalkDistancePolicy::getDistance(EntityBase &, std::int64_t) -> std::optional<double>
 {
-  using Base = MomentaryStopMonitor<CrosswalkMomentaryStopMonitor>;
+  // TODO: implement
+  return {};
+}
 
-public:
-  using Base::Base;
-
-  auto getDistance() -> std::optional<double>;
-};
 }  // namespace traffic_simulator::entity
-
-#endif  // TRAFFIC_SIMULATOR__MONITOR__CROSSWALK_MOMENTARY_STOP_MONITOR_HPP_

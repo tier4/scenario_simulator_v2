@@ -33,16 +33,16 @@ auto ReactionTimeMonitor::operator()(double step_time) -> bool
 {
   const auto jerk = entity_.getLinearJerk();
   if (lower_jerk_threshold_ && *lower_jerk_threshold_ >= jerk) {
-    return false;
+    return true;
   }
   if (upper_jerk_threshold_ && *upper_jerk_threshold_ <= jerk) {
-    return false;
+    return true;
   }
   if (elapsed_duration_ > max_reaction_time_) {
-    throw SPECIFICATION_VIOLATION("maximum reaction time is expired.");
+    throw SPECIFICATION_VIOLATION("maximum reaction time exceeded.");
   }
   elapsed_duration_ = elapsed_duration_ + step_time;
-  return true;
+  return false;
 }
 
 }  // namespace traffic_simulator::entity

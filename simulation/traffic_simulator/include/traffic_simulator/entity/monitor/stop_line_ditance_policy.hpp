@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_MOMENTARY_STOP_MONITOR_HPP_
-#define TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_MOMENTARY_STOP_MONITOR_HPP_
+#ifndef TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
+#define TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_
 
+#include <cstdint>
 #include <optional>
-#include <traffic_simulator/entity/monitor/momentary_stop_monitor.hpp>
+#include <traffic_simulator/entity/entity_base.hpp>
 
 namespace traffic_simulator::entity
 {
-class StopLineMomentaryStopMonitor : public MomentaryStopMonitor<StopLineMomentaryStopMonitor>
+class StopLineDistancePolicy
 {
-  using Base = MomentaryStopMonitor<StopLineMomentaryStopMonitor>;
-
 public:
-  using Base::Base;
-
-  auto getDistance() -> std::optional<double>;
+  static auto getDistance(EntityBase & entity, std::int64_t lanelet_id) -> std::optional<double>;
 };
 }  // namespace traffic_simulator::entity
 
-#endif  // TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_MOMENTARY_STOP_MONITOR_HPP_
+#endif  // TRAFFIC_SIMULATOR__MONITOR__STOP_LINE_DISTANCE_POLICY_HPP_

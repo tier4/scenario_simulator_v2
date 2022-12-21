@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <limits>
+#ifndef TRAFFIC_SIMULATOR__MONITOR__CROSSWALK_DISTANCE_POLICY_HPP_
+#define TRAFFIC_SIMULATOR__MONITOR__CROSSWALK_DISTANCE_POLICY_HPP_
+
+#include <cstdint>
 #include <optional>
-#include <scenario_simulator_exception/exception.hpp>
-#include <string>
-#include <traffic_simulator/entity/monitor/stop_line_momentary_stop_monitor.hpp>
+#include <traffic_simulator/entity/entity_base.hpp>
 
 namespace traffic_simulator::entity
 {
-auto StopLineMomentaryStopMonitor::getDistance() -> std::optional<double>
+class CrosswalkDistancePolicy
 {
-  // TODO: implement
-  return {};
-}
-
+public:
+  static auto getDistance(EntityBase & entity, std::int64_t lanelet_id) -> std::optional<double>;
+};
 }  // namespace traffic_simulator::entity
+
+#endif  // TRAFFIC_SIMULATOR__MONITOR__CROSSWALK_DISTANCE_POLICY_HPP_

@@ -22,10 +22,11 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/monitor/crosswalk_momentary_stop_monitor.hpp>
+#include <traffic_simulator/entity/monitor/crosswalk_distance_policy.hpp>
+#include <traffic_simulator/entity/monitor/momentary_stop_monitor.hpp>
 #include <traffic_simulator/entity/monitor/out_of_range_monitor.hpp>
 #include <traffic_simulator/entity/monitor/reaction_time_monitor.hpp>
-#include <traffic_simulator/entity/monitor/stop_line_momentary_stop_monitor.hpp>
+#include <traffic_simulator/entity/monitor/stop_line_ditance_policy.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -761,7 +762,7 @@ auto EntityBase::monitorMomentaryStopAtStopLine(
   double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
   -> void
 {
-  auto monitor = StopLineMomentaryStopMonitor(
+  auto monitor = MomentaryStopMonitor<StopLineDistancePolicy>(
     *this, min_acceleration, max_acceleration, stop_target_lanelet_id, stop_sequence_start_distance,
     stop_sequence_end_distance, stop_duration);
   job_list_.append(
@@ -773,7 +774,7 @@ auto EntityBase::monitorMomentaryStopAtCrosswalk(
   double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
   -> void
 {
-  auto monitor = CrosswalkMomentaryStopMonitor(
+  auto monitor = MomentaryStopMonitor<CrosswalkDistancePolicy>(
     *this, min_acceleration, max_acceleration, stop_target_lanelet_id, stop_sequence_start_distance,
     stop_sequence_end_distance, stop_duration);
   job_list_.append(

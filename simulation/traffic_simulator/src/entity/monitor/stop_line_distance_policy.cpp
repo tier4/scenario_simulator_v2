@@ -16,11 +16,12 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/entity/monitor/crosswalk_momentary_stop_monitor.hpp>
+#include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/entity/monitor/stop_line_ditance_policy.hpp>
 
 namespace traffic_simulator::entity
 {
-auto CrosswalkMomentaryStopMonitor::getDistance() -> std::optional<double>
+auto StopLineDistancePolicy::getDistance(EntityBase &, std::int64_t) -> std::optional<double>
 {
   // TODO: implement
   return {};

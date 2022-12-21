@@ -19,8 +19,6 @@
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
 
-#include "traffic_simulator/entity/entity_base.hpp"
-
 namespace traffic_simulator::entity
 {
 class ReactionTimeMonitor
@@ -30,8 +28,8 @@ public:
    * @brief Construct a new Reaction Time Monitor object
    * @param entity name of the target entity
    * @param max_reaction_time maximum time
-   * @param jerk_upper_threshold If not std::nullopt and the jerk of target entity overs this value, the metric becomes failure state.
-   * @param jerk_lower_threshold If not std::nullopt and the jerk of target entity go below this value, the metric becomes failure state.
+   * @param jerk_upper_threshold If not std::nullopt and the jerk of target entity exceeds this value, the metric becomes failure state.
+   * @param jerk_lower_threshold If not std::nullopt and the jerk of target entity falls below this value, the metric becomes failure state.
    */
   explicit ReactionTimeMonitor(
     EntityBase & entity, double max_reaction_time,

@@ -20,7 +20,7 @@
 
 namespace traffic_simulator::entity
 {
-template <typename Derived>
+template <typename DistancePolicy>
 class MomentaryStopMonitor
 {
 public:
@@ -54,30 +54,29 @@ public:
 
   auto operator()(double) -> bool
   {
-    auto & self = static_cast<Derived &>(*this);
-    std::optional<double> distance = self.getDistance();
-    if (!distance) {
-      THROW_SIMULATION_ERROR("failed to calculate distance to stop line.");
+    auto distance = DistancePolicy::getDistance(entity_, stop_target_lanelet_id_);
+    if (not distance) {
+      if (is_target_in_range_) {
+        THROW_SIMULATION_ERROR("failed to calculate distance to stop line.");
+      }
+      return false;
+    }
+    if (not is_target_in_range_) {
+      if (distance.value() > stop_sequence_start_distance_) {
+        return false;
+      }
+      is_target_in_range_ = true;
     }
 
     double linear_acceleration = entity_.getCurrentAccel().linear.x;
     if (linear_acceleration < min_acceleration_ || linear_acceleration > max_acceleration_) {
       throw SPECIFICATION_VIOLATION("acceleration is out of range");
     }
-
-    double standstill_duration = entity_.getStandStillDuration();
-    double linear_twist = entity_.getCurrentTwist().linear.x;
-    if (
-      linear_twist < std::numeric_limits<double>::epsilon() &&
-      standstill_duration >= stop_duration_) {
-      return false;
-    }
-
     if (distance.value() <= stop_sequence_end_distance_) {
       throw SPECIFICATION_VIOLATION("overrun detected");
     }
 
-    return true;
+    return entity_.getStandStillDuration() >= stop_duration_;
   }
 
 protected:
@@ -88,6 +87,7 @@ protected:
   const double stop_sequence_start_distance_;
   const double stop_sequence_end_distance_;
   const double stop_duration_;
+  bool is_target_in_range_ = false;
 };
 }  // namespace traffic_simulator::entity
 
