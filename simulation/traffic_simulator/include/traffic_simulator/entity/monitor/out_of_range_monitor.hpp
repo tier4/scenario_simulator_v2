@@ -36,7 +36,7 @@ public:
   OutOfRangeMonitor(
     EntityBase & entity, std::string name, std::optional<double> min_value,
     std::optional<double> max_value, ValuePolicy policy = ValuePolicy())
-  : ValuePolicy(std::move(policy)),
+  : ValuePolicy(policy),
     min_value(min_value),
     max_value(max_value),
     name(std::move(name)),

@@ -43,7 +43,7 @@ public:
     std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
     double stop_sequence_end_distance, double stop_duration,
     DistancePolicy policy = DistancePolicy())
-  : DistancePolicy(std::move(policy)),
+  : DistancePolicy(policy),
     entity_(entity),
     min_acceleration_(min_acceleration),
     max_acceleration_(max_acceleration),
