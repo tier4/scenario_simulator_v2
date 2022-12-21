@@ -24,6 +24,15 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
+#include <traffic_simulator/entity/monitor/crosswalk_distance_policy.hpp>
+#include <traffic_simulator/entity/monitor/linear_acceleration_value_policy.hpp>
+#include <traffic_simulator/entity/monitor/linear_jerk_subscription_value_policy.hpp>
+#include <traffic_simulator/entity/monitor/linear_jerk_value_policy.hpp>
+#include <traffic_simulator/entity/monitor/linear_velocity_value_policy.hpp>
+#include <traffic_simulator/entity/monitor/momentary_stop_monitor.hpp>
+#include <traffic_simulator/entity/monitor/out_of_range_monitor.hpp>
+#include <traffic_simulator/entity/monitor/reaction_time_monitor.hpp>
+#include <traffic_simulator/entity/monitor/stop_line_ditance_policy.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <unordered_map>
@@ -569,5 +578,76 @@ void EntityManager::startNpcLogic()
     it->second->startNpcLogic();
   }
 }
+
+auto EntityManager::monitorVelocityOutOfRange(
+  const std::string & name, double min_velocity, double max_velocity) -> void
+{
+  auto monitor = OutOfRangeMonitor(
+    *entities_.at(name), "velocity", min_velocity, max_velocity, LinearVelocityValuePolicy());
+  addMonitor(name, monitor);
+}
+
+auto EntityManager::monitorAccelerationOutOfRange(
+  const std::string & name, double min_acceleration, double max_acceleration) -> void
+{
+  auto monitor = OutOfRangeMonitor(
+    *entities_.at(name), "acceleration", min_acceleration, max_acceleration,
+    LinearAccelerationValuePolicy());
+  addMonitor(name, monitor);
+}
+
+auto EntityManager::monitorJerkOutOfRange(
+  const std::string & name, double min_jerk, double max_jerk) -> void
+{
+  auto monitor =
+    OutOfRangeMonitor(*entities_.at(name), "jerk", min_jerk, max_jerk, LinearJerkValuePolicy());
+  addMonitor(name, monitor);
+}
+
+auto EntityManager::monitorJerkOutOfRange(
+  const std::string & name, double min_jerk, double max_jerk,
+  std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface_ptr,
+  const std::string & topic_name) -> void
+{
+  auto monitor = OutOfRangeMonitor(
+    *entities_.at(name), "jerk", min_jerk, max_jerk,
+    LinearJerkSubscriptionValuePolicy(std::move(node_topics_interface_ptr), topic_name));
+  addMonitor(name, monitor);
+}
+
+auto EntityManager::monitorMomentaryStopAtStopLine(
+  const std::string & name, double min_acceleration, double max_acceleration,
+  std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
+  double stop_sequence_end_distance, double stop_duration) -> void
+{
+  auto monitor = MomentaryStopMonitor(
+    *entities_.at(name), min_acceleration, max_acceleration, stop_target_lanelet_id,
+    stop_sequence_start_distance, stop_sequence_end_distance, stop_duration,
+    StopLineDistancePolicy(hdmap_utils_ptr_));
+  addMonitor(name, monitor);
+}
+
+auto EntityManager::monitorMomentaryStopAtCrosswalk(
+  const std::string & name, double min_acceleration, double max_acceleration,
+  std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
+  double stop_sequence_end_distance, double stop_duration) -> void
+{
+  auto monitor = MomentaryStopMonitor(
+    *entities_.at(name), min_acceleration, max_acceleration, stop_target_lanelet_id,
+    stop_sequence_start_distance, stop_sequence_end_distance, stop_duration,
+    CrosswalkDistancePolicy(hdmap_utils_ptr_));
+  addMonitor(name, monitor);
+}
+
+auto EntityManager::monitorReactionTime(
+  const std::string & name, double max_reaction_time,
+  std::optional<double> upper_jerk_threshold,
+  std::optional<double> lower_jerk_threshold) -> void
+{
+  auto monitor = ReactionTimeMonitor(
+    *entities_.at(name), max_reaction_time, upper_jerk_threshold, lower_jerk_threshold);
+  addMonitor(name, monitor);
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator

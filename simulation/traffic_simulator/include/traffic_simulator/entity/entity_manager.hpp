@@ -462,6 +462,40 @@ public:
   void startNpcLogic();
 
   auto isNpcLogicStarted() const { return npc_logic_started_; }
+
+  /*   */ auto monitorVelocityOutOfRange(
+    const std::string & name, double min_velocity, double max_velocity) -> void;
+
+  /*   */ auto monitorAccelerationOutOfRange(
+    const std::string & name, double min_acceleration, double max_acceleration) -> void;
+
+  /*   */ auto monitorJerkOutOfRange(const std::string & name, double min_jerk, double max_jerk)
+    -> void;
+
+  /*   */ auto monitorJerkOutOfRange(
+    const std::string & name, double min_jerk, double max_jerk,
+    std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface_ptr,
+    const std::string & topic_name) -> void;
+
+  /*   */ auto monitorMomentaryStopAtStopLine(
+    const std::string & name, double min_acceleration, double max_acceleration,
+    std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
+    double stop_sequence_end_distance, double stop_duration) -> void;
+
+  /*   */ auto monitorMomentaryStopAtCrosswalk(
+    const std::string & name, double min_acceleration, double max_acceleration,
+    std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
+    double stop_sequence_end_distance, double stop_duration) -> void;
+
+  /*   */ auto monitorReactionTime(
+    const std::string & name, double max_reaction_time, std::optional<double> upper_jerk_threshold,
+    std::optional<double> lower_jerk_threshold) -> void;
+
+  template <class Monitor>
+  auto addMonitor(const std::string & name, Monitor monitor)
+  {
+    entities_.at(name)->addMonitor(monitor);
+  }
 };
 }  // namespace entity
 }  // namespace traffic_simulator

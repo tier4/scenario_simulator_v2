@@ -22,15 +22,6 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/monitor/crosswalk_distance_policy.hpp>
-#include <traffic_simulator/entity/monitor/linear_acceleration_value_policy.hpp>
-#include <traffic_simulator/entity/monitor/linear_jerk_subscription_value_policy.hpp>
-#include <traffic_simulator/entity/monitor/linear_jerk_value_policy.hpp>
-#include <traffic_simulator/entity/monitor/linear_velocity_value_policy.hpp>
-#include <traffic_simulator/entity/monitor/momentary_stop_monitor.hpp>
-#include <traffic_simulator/entity/monitor/out_of_range_monitor.hpp>
-#include <traffic_simulator/entity/monitor/reaction_time_monitor.hpp>
-#include <traffic_simulator/entity/monitor/stop_line_ditance_policy.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -748,76 +739,6 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
   } else {
     return stand_still_duration_ = 0.0;
   }
-}
-
-auto EntityBase::monitorVelocityOutOfRange(double min_velocity, double max_velocity) -> void
-{
-  auto monitor =
-    OutOfRangeMonitor(*this, "velocity", min_velocity, max_velocity, LinearVelocityValuePolicy());
-  job_list_.append(
-    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
-}
-
-auto EntityBase::monitorAccelerationOutOfRange(double min_acceleration, double max_acceleration)
-  -> void
-{
-  auto monitor = OutOfRangeMonitor(
-    *this, "acceleration", min_acceleration, max_acceleration, LinearAccelerationValuePolicy());
-  job_list_.append(
-    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
-}
-
-auto EntityBase::monitorJerkOutOfRange(double min_jerk, double max_jerk) -> void
-{
-  auto monitor = OutOfRangeMonitor(*this, "jerk", min_jerk, max_jerk, LinearJerkValuePolicy());
-  job_list_.append(
-    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
-}
-
-auto EntityBase::monitorJerkOutOfRange(
-  double min_jerk, double max_jerk,
-  std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface_ptr,
-  const std::string & topic_name) -> void
-{
-  auto monitor = OutOfRangeMonitor(
-    *this, "jerk", min_jerk, max_jerk,
-    LinearJerkSubscriptionValuePolicy(std::move(node_topics_interface_ptr), topic_name));
-  job_list_.append(
-    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
-}
-
-auto EntityBase::monitorMomentaryStopAtStopLine(
-  double min_acceleration, double max_acceleration, std::int64_t stop_target_lanelet_id,
-  double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
-  -> void
-{
-  auto monitor = MomentaryStopMonitor(
-    *this, min_acceleration, max_acceleration, stop_target_lanelet_id, stop_sequence_start_distance,
-    stop_sequence_end_distance, stop_duration, StopLineDistancePolicy(hdmap_utils_ptr_));
-  job_list_.append(
-    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
-}
-
-auto EntityBase::monitorMomentaryStopAtCrosswalk(
-  double min_acceleration, double max_acceleration, std::int64_t stop_target_lanelet_id,
-  double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
-  -> void
-{
-  auto monitor = MomentaryStopMonitor(
-    *this, min_acceleration, max_acceleration, stop_target_lanelet_id, stop_sequence_start_distance,
-    stop_sequence_end_distance, stop_duration, CrosswalkDistancePolicy(hdmap_utils_ptr_));
-  job_list_.append(
-    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
-}
-
-auto EntityBase::monitorReactionTime(
-  double max_reaction_time, std::optional<double> upper_jerk_threshold = std::nullopt,
-  std::optional<double> lower_jerk_threshold = std::nullopt) -> void
-{
-  auto monitor =
-    ReactionTimeMonitor(*this, max_reaction_time, upper_jerk_threshold, lower_jerk_threshold);
-  job_list_.append(
-    monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
 }
 
 }  // namespace entity

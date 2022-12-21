@@ -28,6 +28,7 @@
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/job/job.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
@@ -198,31 +199,12 @@ public:
 
   /*   */ auto updateStandStillDuration(const double step_time) -> double;
 
-  /*   */ auto monitorVelocityOutOfRange(double min_velocity, double max_velocity) -> void;
-
-  /*   */ auto monitorAccelerationOutOfRange(double min_acceleration, double max_acceleration)
-    -> void;
-
-  /*   */ auto monitorJerkOutOfRange(double min_jerk, double max_jerk) -> void;
-
-  /*   */ auto monitorJerkOutOfRange(
-    double min_jerk, double max_jerk,
-    std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface_ptr,
-    const std::string & topic_name) -> void;
-
-  /*   */ auto monitorMomentaryStopAtStopLine(
-    double min_acceleration, double max_acceleration, std::int64_t stop_target_lanelet_id,
-    double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
-    -> void;
-
-  /*   */ auto monitorMomentaryStopAtCrosswalk(
-    double min_acceleration, double max_acceleration, std::int64_t stop_target_lanelet_id,
-    double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
-    -> void;
-
-  /*   */ auto monitorReactionTime(
-    double max_reaction_time, std::optional<double> upper_jerk_threshold,
-    std::optional<double> lower_jerk_threshold) -> void;
+  template <class Monitor>
+  /*   */ auto addMonitor(Monitor monitor) -> void
+  {
+    job_list_.append(
+      monitor, [] {}, job::Type::UNKOWN, false, job::Event::POST_UPDATE);
+  }
 
   const std::string name;
 
