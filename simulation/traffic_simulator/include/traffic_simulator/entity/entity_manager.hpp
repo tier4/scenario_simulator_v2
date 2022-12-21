@@ -463,39 +463,99 @@ public:
 
   auto isNpcLogicStarted() const { return npc_logic_started_; }
 
+  /**
+   * @brief Monitor whether velocity of an entity is out of range
+   * @param name entity name
+   * @param min_velocity lower limit of velocity
+   * @param max_velocity upper limit of velocity
+   * @throw SpecificationViolation if velocity goes out of range
+   * @note This functionality was originally implimented as a part of OutOfRangeMetric
+   */
   /*   */ auto monitorVelocityOutOfRange(
-    const std::string & name, double min_velocity, double max_velocity) -> void;
+    const std::string & name, std::optional<double> min_velocity,
+    std::optional<double> max_velocity) -> void;
 
+  /**
+   * @brief Monitor whether acceleration of an entity is out of range
+   * @param name entity name
+   * @param min_acceleration lower limit of acceleration
+   * @param max_acceleration upper limit of acceleration
+   * @throw SpecificationViolation if acceleration goes out of range
+   * @note This functionality was originally implimented as a part of OutOfRangeMetric
+   */
   /*   */ auto monitorAccelerationOutOfRange(
-    const std::string & name, double min_acceleration, double max_acceleration) -> void;
+    const std::string & name, std::optional<double> min_acceleration,
+    std::optional<double> max_acceleration) -> void;
 
-  /*   */ auto monitorJerkOutOfRange(const std::string & name, double min_jerk, double max_jerk)
+  /**
+   * @brief Monitor whether jerk of an entity is out of range using EntityBase::getLinearJerk()
+   * @param name entity name
+   * @param min_jerk lower limit of jerk
+   * @param max_jerk upper limit of jerk
+   * @throw SpecificationViolation if acceleration goes out of range
+   * @note This functionality was originally implimented as a part of OutOfRangeMetric
+   */
+  /*   */ auto monitorJerkOutOfRange(
+    const std::string & name, std::optional<double> min_jerk, std::optional<double> max_jerk)
     -> void;
 
+  /**
+   * @brief Monitor whether jerk of an entity is out of range using jerk topic subscription
+   * @param name entity name
+   * @param min_jerk lower limit of jerk
+   * @param max_jerk upper limit of jerk
+   * @param topic_name topic name to subscribe for jerk values
+   * @throw SpecificationViolation if acceleration goes out of range
+   * @note This functionality was originally implimented as a part of OutOfRangeMetric
+   * @note This function expect that the message type of topic is tier4_debug_msgs::msg::Float32Stamped
+   */
   /*   */ auto monitorJerkOutOfRange(
-    const std::string & name, double min_jerk, double max_jerk,
-    std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface_ptr,
+    const std::string & name, std::optional<double> min_jerk, std::optional<double> max_jerk,
     const std::string & topic_name) -> void;
 
-  /*   */ auto monitorMomentaryStopAtStopLine(
+  /**
+   * @brief Monitor momentary stop at stop line
+   * @param name entity name
+   * @param min_acceleration lower limit of acceleration on momentary stop
+   * @param max_acceleration upper limit of acceleration on momentary stop
+   * @param stop_target_lanelet_id target lanelet to stop for
+   * @param stop_sequence_start_distance distance between the entity and the target where the entity begins to stop
+   * @param stop_sequence_end_distance least distance between the entity and the target where the entity should stop
+   * @param stop_duration stop duration of the entity that the monitor discontinues watching
+   * @note This functionality was originally implimented as a part of MomentaryStopMetric
+   */
+  /*   */ auto monitorStopLineMomentaryStop(
     const std::string & name, double min_acceleration, double max_acceleration,
     std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
     double stop_sequence_end_distance, double stop_duration) -> void;
 
-  /*   */ auto monitorMomentaryStopAtCrosswalk(
+  /**
+   * @brief Monitor momentary stop at crosswalk
+   * @param name entity name
+   * @param min_acceleration lower limit of acceleration on momentary stop
+   * @param max_acceleration upper limit of acceleration on momentary stop
+   * @param stop_target_lanelet_id target lanelet to stop for
+   * @param stop_sequence_start_distance distance between the entity and the target where the entity begins to stop
+   * @param stop_sequence_end_distance least distance between the entity and the target where the entity should stop
+   * @param stop_duration stop duration of the entity that the monitor discontinues watching
+   * @note This functionality was originally implimented as a part of MomentaryStopMetric
+   */
+  /*   */ auto monitorCrosswalkMomentaryStop(
     const std::string & name, double min_acceleration, double max_acceleration,
     std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
     double stop_sequence_end_distance, double stop_duration) -> void;
 
+  /**
+   * @brief Monitor reaction time
+   * @param name entity name
+   * @param min_reaction_time lower limit of reaction time
+   * @param upper_jerk_threshold upper limit of jerk
+   * @param lower_jerk_threshold lower limit of jerk
+   * @note This functionality was originally implimented as a part of ReactionTimeMetric
+   */
   /*   */ auto monitorReactionTime(
     const std::string & name, double max_reaction_time, std::optional<double> upper_jerk_threshold,
     std::optional<double> lower_jerk_threshold) -> void;
-
-  template <class Monitor>
-  auto addMonitor(const std::string & name, Monitor monitor)
-  {
-    entities_.at(name)->addMonitor(monitor);
-  }
 };
 }  // namespace entity
 }  // namespace traffic_simulator

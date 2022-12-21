@@ -300,6 +300,12 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
+  FORWARD_TO_ENTITY_MANAGER(monitorVelocityOutOfRange);
+  FORWARD_TO_ENTITY_MANAGER(monitorAccelerationOutOfRange);
+  FORWARD_TO_ENTITY_MANAGER(monitorJerkOutOfRange);
+  FORWARD_TO_ENTITY_MANAGER(monitorStopLineMomentaryStop);
+  FORWARD_TO_ENTITY_MANAGER(monitorCrosswalkMomentaryStop);
+  FORWARD_TO_ENTITY_MANAGER(monitorReactionTime);
 
 #undef FORWARD_TO_ENTITY_MANAGER
 
