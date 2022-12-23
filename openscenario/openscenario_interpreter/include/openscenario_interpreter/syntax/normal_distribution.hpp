@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
-#include <openscenario_interpreter/utility/distribution.hpp>
 #include <random>
 #include <string>
 
@@ -38,7 +37,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct NormalDistribution : public ComplexType
+struct NormalDistribution : public ComplexType, private Scope
 {
   const Range range;
 
@@ -46,9 +45,13 @@ struct NormalDistribution : public ComplexType
 
   const Double variance;
 
-  StochasticDistributionClass<std::normal_distribution<Double::value_type>> distribution;
+  std::normal_distribution<Double::value_type> distribute;
+
+  std::mt19937 random_engine;
 
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

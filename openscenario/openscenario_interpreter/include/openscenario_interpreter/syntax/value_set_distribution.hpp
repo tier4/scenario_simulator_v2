@@ -31,7 +31,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ValueSetDistribution : public Scope, public ComplexType
+struct ValueSetDistribution : public Scope
 {
   const std::list<ParameterValueSet> parameter_value_sets;
 
