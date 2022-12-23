@@ -42,7 +42,7 @@ struct UniformDistribution : public ComplexType, private Scope
 
   explicit UniformDistribution(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
+  auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

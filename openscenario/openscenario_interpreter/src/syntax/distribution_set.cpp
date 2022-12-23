@@ -24,9 +24,9 @@ DistributionSet::DistributionSet(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto DistributionSet::evaluate() -> SingleParameterList
+auto DistributionSet::derive() -> std::vector<Object>
 {
-  SingleParameterList list;
+  std::vector<Object> list;
   for (const auto & element : elements) {
     list.emplace_back(make<String>(element.value));
   }

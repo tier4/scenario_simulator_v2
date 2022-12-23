@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__NORMAL_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__NORMAL_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
@@ -37,7 +38,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct NormalDistribution : public ComplexType, private Scope
+struct NormalDistribution : public ComplexType, private Scope, public StochasticDistributionBase
 {
   const Range range;
 
@@ -51,7 +52,7 @@ struct NormalDistribution : public ComplexType, private Scope
 
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
+  auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

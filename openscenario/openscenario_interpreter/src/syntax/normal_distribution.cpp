@@ -30,6 +30,9 @@ NormalDistribution::NormalDistribution(
 {
 }
 
-auto NormalDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
+auto NormalDistribution::derive() -> Object
+{
+  return make<Double>(distribute(random_engine));
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

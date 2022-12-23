@@ -37,7 +37,7 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
 {
 }
 
-auto ProbabilityDistributionSet::evaluate() -> Object
+auto ProbabilityDistributionSet::derive() -> Object
 {
   size_t index = distribute(random_engine);
   return elements.at(index);

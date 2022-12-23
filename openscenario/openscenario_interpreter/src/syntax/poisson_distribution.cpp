@@ -29,6 +29,6 @@ PoissonDistribution::PoissonDistribution(
 {
 }
 
-auto PoissonDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
+auto PoissonDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

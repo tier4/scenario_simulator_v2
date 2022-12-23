@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/stochastic_distribution_type.hpp>
 #include <pugixml.hpp>
+#include <openscenario_interpreter/parameter_distribution.hpp>
 
 namespace openscenario_interpreter
 {

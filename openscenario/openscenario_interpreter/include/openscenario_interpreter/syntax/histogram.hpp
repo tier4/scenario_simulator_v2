@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
 #define OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/histogram_bin.hpp>
 #include <random>
@@ -33,7 +34,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct Histogram : public ComplexType, private Scope
+struct Histogram : public ComplexType, private Scope, public StochasticDistributionBase
 {
   /**
    * Note: HistogramBin must be stored in continuous range and ascending order to `bins`
@@ -61,7 +62,7 @@ struct Histogram : public ComplexType, private Scope
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
+  auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

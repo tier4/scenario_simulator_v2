@@ -29,6 +29,6 @@ Histogram::Histogram(const pugi::xml_node & node, openscenario_interpreter::Scop
 {
 }
 
-auto Histogram::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
+auto Histogram::derive() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -26,9 +26,9 @@ DistributionRange::DistributionRange(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto DistributionRange::evaluate() -> SingleParameterList
+auto DistributionRange::derive() -> std::vector<Object>
 {
-  SingleParameterList list;
+  std::vector<Object> list;
   for (double parameter = range.lower_limit; parameter <= range.upper_limit;
        parameter += step_width) {
     list.emplace_back(make<Double>(parameter));

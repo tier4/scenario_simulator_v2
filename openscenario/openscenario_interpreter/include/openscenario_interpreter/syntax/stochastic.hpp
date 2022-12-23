@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__STOCHASTIC_HPP_
 #define OPENSCENARIO_INTERPRETER__STOCHASTIC_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/stochastic_distribution.hpp>
@@ -38,7 +39,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct Stochastic : public ComplexType
+struct Stochastic : public ComplexType, public ParameterDistributionBase
 {
   const UnsignedInt number_of_test_runs;
 
@@ -47,6 +48,15 @@ struct Stochastic : public ComplexType
   const StochasticDistribution stochastic_distribution;
 
   explicit Stochastic(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> std::vector<std::unordered_map<std::string, Object>> override
+  {
+    std::vector<std::unordered_map<std::string, Object>> parameters;
+    for(int i = 0; i < number_of_test_runs; i++){
+      parameters.emplace_back({{stochastic_distribution.parameter_name, stochastic_distribution.derive()}});
+    }
+    return stochastic_distribution.derive();
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
