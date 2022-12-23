@@ -16,6 +16,7 @@
 #include <boost/lexical_cast.hpp>
 #include <cstdint>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <sstream>
 #include <status_monitor/status_monitor.hpp>
 
@@ -37,21 +38,30 @@ StatusMonitor::StatusMonitor()
       while (not terminating.load(std::memory_order_acquire)) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        std::stringstream ss;
+        nlohmann::json json;
 
-        ss << "WATCHDOG[" << std::this_thread::get_id() << "]\n";
+        json["details"] = nlohmann::json::array();
 
         if (not statuses.empty()) {
           for (auto && [id, status] : statuses) {
-            // clang-format off
-            ss << "  thread-id[" << id << "]\n"
-               << "    elapsed: " << status.elapsed_time_since_last_access<std::chrono::milliseconds>().count() << " [ms]\n"
-               << "    status.ok(): " << std::boolalpha << status.ok() << "\n";
-            // clang-format on
+            nlohmann::json detail;
+
+            detail["id"] = boost::lexical_cast<std::string>(id);
+            detail["sinceLastAccessMilliseconds"] = boost::lexical_cast<std::string>(
+              status.elapsed_time_since_last_access<std::chrono::milliseconds>().count());
+            detail["good"] = status.good() ? "true" : "false";
+
+            json["details"].push_back(detail);
           }
         }
 
-        file << ss.str() << std::flush;
+        json["id"] = boost::lexical_cast<std::string>(std::this_thread::get_id());
+
+        json["overallStatus"] = std::all_of(
+          std::begin(statuses), std::end(statuses),
+          [](auto && id_and_status) { return std::get<1>(id_and_status).good(); });
+
+        file << json.dump() << std::endl;
       }
 
       std::cout << "WATCHDOG[" << std::this_thread::get_id() << "] TERMINATED" << std::endl;

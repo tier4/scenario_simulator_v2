@@ -39,9 +39,9 @@ class StatusMonitor
       }
     }
 
-    auto ok() const { return elapsed_time_since_last_access() < threshold; }
+    auto good() const { return elapsed_time_since_last_access() < threshold; }
 
-    explicit operator bool() const { return ok(); }
+    explicit operator bool() const { return good(); }
   };
 
   static inline std::ofstream file;
@@ -52,7 +52,7 @@ class StatusMonitor
 
   static inline std::atomic_bool terminating;
 
-  static inline std::chrono::milliseconds threshold = std::chrono::milliseconds(1);
+  static inline std::chrono::milliseconds threshold = std::chrono::milliseconds(1000);
 
 public:
   explicit StatusMonitor();
