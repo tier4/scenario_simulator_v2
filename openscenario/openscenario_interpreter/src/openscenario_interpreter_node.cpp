@@ -33,8 +33,7 @@ int main(const int argc, char const * const * const argv)
 
   executor.add_node(node->get_node_base_interface());
 
-  while (rclcpp::ok())
-  {
+  while (rclcpp::ok()) {
     executor.spin_once();
     common::status_monitor.touch(std::this_thread::get_id());
   }

@@ -20,7 +20,6 @@ OpenSCENARIO:
               value: 1.0
             - rule: greaterOrEqual
               value: -1.0
-
   CatalogLocations:
     CatalogLocation: []
   RoadNetwork:
