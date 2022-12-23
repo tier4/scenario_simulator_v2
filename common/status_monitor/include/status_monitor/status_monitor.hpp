@@ -15,7 +15,9 @@
 #ifndef STATUS_MONITOR__STATUS_MONITOR_HPP_
 #define STATUS_MONITOR__STATUS_MONITOR_HPP_
 
+#include <cerrno>
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <thread>
 #include <unordered_map>
@@ -28,6 +30,8 @@ class StatusMonitor
   {
     std::chrono::high_resolution_clock::time_point last_access;
 
+    bool exited = false;
+
     template <typename Duration = void>
     auto elapsed_time_since_last_access() const
     {
@@ -39,7 +43,7 @@ class StatusMonitor
       }
     }
 
-    auto good() const { return elapsed_time_since_last_access() < threshold; }
+    auto good() const { return exited or elapsed_time_since_last_access() < threshold; }
 
     explicit operator bool() const { return good(); }
   };
@@ -59,13 +63,34 @@ public:
 
   ~StatusMonitor();
 
+  auto good() const
+  {
+    return std::all_of(std::begin(statuses), std::end(statuses), [](auto && id_and_status) {
+      return std::get<1>(id_and_status).good();
+    });
+  }
+
+  static auto name() -> std::string
+  {
+#if _GNU_SOURCE
+    return std::filesystem::path(program_invocation_name).filename();
+#else
+    return boost::lexical_cast<std::string>(std::this_thread::get_id())
+#endif
+  }
+
   auto touch(std::thread::id id)
   {
     // TODO MUTEX LOCK
     statuses[id].last_access = std::chrono::high_resolution_clock::now();
   }
 
-  auto erase(std::thread::id id) { statuses.erase(id); }
+  auto mark_as_exited(std::thread::id id)
+  {
+    if (auto iter = statuses.find(id); iter != std::end(statuses)) {
+      std::get<1>(*iter).exited = true;
+    }
+  }
 } static status_monitor;
 }  // namespace common
 

@@ -30,8 +30,7 @@ StatusMonitor::StatusMonitor()
     statuses = {};
 
     watchdog = std::thread([this]() {
-      if (file.open("/tmp/monitor-" + boost::lexical_cast<std::string>(std::this_thread::get_id()));
-          not file.is_open()) {
+      if (file.open("/tmp/monitor-" + name()); not file.is_open()) {
         std::cout << "FILE OPEN FAILED!!!" << std::endl;
       }
 
@@ -49,17 +48,14 @@ StatusMonitor::StatusMonitor()
             detail["id"] = boost::lexical_cast<std::string>(id);
             detail["sinceLastAccessMilliseconds"] = boost::lexical_cast<std::string>(
               status.elapsed_time_since_last_access<std::chrono::milliseconds>().count());
-            detail["good"] = status.good() ? "true" : "false";
+            detail["good"] = status.good();
+            detail["exited"] = status.exited;
 
             json["details"].push_back(detail);
           }
         }
 
-        json["id"] = boost::lexical_cast<std::string>(std::this_thread::get_id());
-
-        json["overallStatus"] = std::all_of(
-          std::begin(statuses), std::end(statuses),
-          [](auto && id_and_status) { return std::get<1>(id_and_status).good(); });
+        json["overallStatus"] = good();
 
         file << json.dump() << std::endl;
       }
@@ -71,9 +67,7 @@ StatusMonitor::StatusMonitor()
 
 StatusMonitor::~StatusMonitor()
 {
-  if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
-    statuses.erase(iter);
-  }
+  mark_as_exited(std::this_thread::get_id());
 
   if (not --count) {
     terminating.store(true, std::memory_order_release);
