@@ -12,8 +12,9 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
+| Feature           | Brief summary                                                                          | Category            | Pull request                                                    | Contributor                             |
+|-------------------|----------------------------------------------------------------------------------------|---------------------|-----------------------------------------------------------------|-----------------------------------------|
+| Fix vehicle_model | Import bug fixes from simple_planning_simulator in autoware.universe for vehicle_model | `traffic_simulator` | [#936](https://github.com/tier4/scenario_simulator_v2/pull/936) | [HansRobo](https://github.com/HansRobo) |
 
 Minor Tweaks :oncoming_police_car:
 
