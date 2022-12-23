@@ -29,6 +29,12 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+struct SingleParameterList : public std::vector<Object> {};
+//using UnnamedParameterSet = std::vector<Object>;
+//using UnnamedParameterList = std::vector<UnnamedParameterSet>;
+
+//using ParameterSet = std::unordered_map<std::string,Object>;
+//using ParameterList = std::vector<ParameterSet>;
 struct DistributionSet : private Scope, public ComplexType
 {
   const std::list<DistributionSetElement> elements;
