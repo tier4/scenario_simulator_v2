@@ -43,20 +43,38 @@ StatusMonitor::StatusMonitor()
           for (auto && [id, status] : statuses) {
             nlohmann::json detail;
 
-            detail["id"] = boost::lexical_cast<std::string>(id);
-            detail["name"] = status.name;
-            detail["sinceLastAccessMilliseconds"] =
-              status.elapsed_time_since_last_access<std::chrono::milliseconds>().count();
-            detail["good"] = status.good();
             detail["exited"] = status.exited;
+
+            detail["good"] = status.good();
+
+            detail["maximum_access_interval"] =
+              std::chrono::duration_cast<std::chrono::milliseconds>(status.maximum_access_interval)
+                .count();
+
+            detail["minimum_access_interval"] =
+              std::chrono::duration_cast<std::chrono::milliseconds>(status.minimum_access_interval)
+                .count();
+
+            detail["thread_id"] = boost::lexical_cast<std::string>(id);
+
+            detail["name"] = status.name;
+
+            detail["since_last_access_ms"] =
+              status.elapsed_time_since_last_access<std::chrono::milliseconds>().count();
 
             json["details"].push_back(detail);
           }
         }
 
-        json["name"] = name();
-        json["overallStatus"] = good();
+        // TODO json["exited"]
 
+        json["name"] = name();
+
+        json["good"] = good();
+
+        json["unix_time"] = std::chrono::duration_cast<std::chrono::seconds>(
+                              std::chrono::high_resolution_clock::now().time_since_epoch())
+                              .count();
         file << json.dump() << std::endl;
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -69,7 +87,7 @@ StatusMonitor::StatusMonitor()
 
 StatusMonitor::~StatusMonitor()
 {
-  mark_as_exited(std::this_thread::get_id());
+  mark_as_exited();
 
   if (not --count) {
     terminating.store(true, std::memory_order_release);

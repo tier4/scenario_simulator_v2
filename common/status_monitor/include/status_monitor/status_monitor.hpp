@@ -33,12 +33,21 @@ class StatusMonitor
 
     std::chrono::high_resolution_clock::time_point last_access;
 
+    using duration =
+      decltype(std::chrono::high_resolution_clock::now() - std::chrono::high_resolution_clock::now());
+
+    duration minimum_access_interval;
+
+    duration maximum_access_interval;
+
     bool exited = false;
 
     template <typename Name>
     explicit Status(Name && name)
     : name(std::forward<decltype(name)>(name)),
-      last_access(std::chrono::high_resolution_clock::now())
+      last_access(std::chrono::high_resolution_clock::now()),
+      minimum_access_interval(duration::max()),
+      maximum_access_interval(duration::min())
     {
     }
 
@@ -98,18 +107,29 @@ public:
     // statuses[std::this_thread::get_id()].last_access = std::chrono::high_resolution_clock::now();
 
     if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
-      std::get<1>(*iter).last_access = std::chrono::high_resolution_clock::now();
+      [[maybe_unused]] auto && [id, status] = *iter;
+
+      const auto now = std::chrono::high_resolution_clock::now();
+
+      const auto this_access_interval = now - status.last_access;
+
+      status.minimum_access_interval =
+        std::min<std::decay_t<decltype(status.minimum_access_interval)>>(
+          status.minimum_access_interval, this_access_interval);
+
+      status.maximum_access_interval =
+        std::max<std::decay_t<decltype(status.maximum_access_interval)>>(
+          status.maximum_access_interval, this_access_interval);
+
+      status.last_access = now;
     } else {
-      statuses.emplace(
-        std::this_thread::get_id(),
-        std::forward<decltype(name)>(name)
-        );
+      statuses.emplace(std::this_thread::get_id(), std::forward<decltype(name)>(name));
     }
   }
 
-  auto mark_as_exited(std::thread::id id)
+  auto mark_as_exited()
   {
-    if (auto iter = statuses.find(id); iter != std::end(statuses)) {
+    if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
       std::get<1>(*iter).exited = true;
     }
   }
