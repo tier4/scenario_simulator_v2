@@ -21,6 +21,7 @@
 #include <fstream>
 #include <thread>
 #include <unordered_map>
+#include <utility>
 
 namespace common
 {
@@ -28,9 +29,18 @@ class StatusMonitor
 {
   struct Status
   {
+    const std::string name;
+
     std::chrono::high_resolution_clock::time_point last_access;
 
     bool exited = false;
+
+    template <typename Name>
+    explicit Status(Name && name)
+    : name(std::forward<decltype(name)>(name)),
+      last_access(std::chrono::high_resolution_clock::now())
+    {
+    }
 
     template <typename Duration = void>
     auto elapsed_time_since_last_access() const
@@ -70,21 +80,31 @@ public:
     });
   }
 
-  static auto name() -> const std::string &
+  static auto name() -> decltype(auto)
   {
-    static const auto name =
+    static const std::string name =
 #if _GNU_SOURCE
-      std::filesystem::path(program_invocation_name).filename().string() + "_status";
+      std::filesystem::path(program_invocation_name).filename();
 #else
-      "thread_" + boost::lexical_cast<std::string>(std::this_thread::get_id()) + "_status";
+      "thread_" + boost::lexical_cast<std::string>(std::this_thread::get_id());
 #endif
     return name;
   }
 
-  auto touch(std::thread::id id)
+  template <typename Name>
+  auto touch(Name && name)
   {
     // TODO MUTEX LOCK
-    statuses[id].last_access = std::chrono::high_resolution_clock::now();
+    // statuses[std::this_thread::get_id()].last_access = std::chrono::high_resolution_clock::now();
+
+    if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
+      std::get<1>(*iter).last_access = std::chrono::high_resolution_clock::now();
+    } else {
+      statuses.emplace(
+        std::this_thread::get_id(),
+        std::forward<decltype(name)>(name)
+        );
+    }
   }
 
   auto mark_as_exited(std::thread::id id)

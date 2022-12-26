@@ -30,13 +30,11 @@ StatusMonitor::StatusMonitor()
     statuses = {};
 
     watchdog = std::thread([this]() {
-      if (file.open("/tmp/" + name()); not file.is_open()) {
+      if (file.open("/tmp/" + name() + "_status"); not file.is_open()) {
         std::cout << "FILE OPEN FAILED!!!" << std::endl;
       }
 
       while (not terminating.load(std::memory_order_acquire)) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-
         nlohmann::json json;
 
         json["details"] = nlohmann::json::array();
@@ -46,8 +44,9 @@ StatusMonitor::StatusMonitor()
             nlohmann::json detail;
 
             detail["id"] = boost::lexical_cast<std::string>(id);
-            detail["sinceLastAccessMilliseconds"] = boost::lexical_cast<std::string>(
-              status.elapsed_time_since_last_access<std::chrono::milliseconds>().count());
+            detail["name"] = status.name;
+            detail["sinceLastAccessMilliseconds"] =
+              status.elapsed_time_since_last_access<std::chrono::milliseconds>().count();
             detail["good"] = status.good();
             detail["exited"] = status.exited;
 
@@ -55,9 +54,12 @@ StatusMonitor::StatusMonitor()
           }
         }
 
+        json["name"] = name();
         json["overallStatus"] = good();
 
         file << json.dump() << std::endl;
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
       }
 
       std::cout << "WATCHDOG[" << std::this_thread::get_id() << "] TERMINATED" << std::endl;

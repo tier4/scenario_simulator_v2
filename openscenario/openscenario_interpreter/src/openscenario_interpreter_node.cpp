@@ -35,7 +35,7 @@ int main(const int argc, char const * const * const argv)
 
   while (rclcpp::ok()) {
     executor.spin_once();
-    common::status_monitor.touch(std::this_thread::get_id());
+    common::status_monitor.touch(__func__);
   }
 
   rclcpp::shutdown();
