@@ -70,13 +70,15 @@ public:
     });
   }
 
-  static auto name() -> std::string
+  static auto name() -> const std::string &
   {
+    static const auto name =
 #if _GNU_SOURCE
-    return std::filesystem::path(program_invocation_name).filename();
+      std::filesystem::path(program_invocation_name).filename().string() + "_status";
 #else
-    return boost::lexical_cast<std::string>(std::this_thread::get_id())
+      "thread_" + boost::lexical_cast<std::string>(std::this_thread::get_id()) + "_status";
 #endif
+    return name;
   }
 
   auto touch(std::thread::id id)

@@ -30,7 +30,7 @@ StatusMonitor::StatusMonitor()
     statuses = {};
 
     watchdog = std::thread([this]() {
-      if (file.open("/tmp/monitor-" + name()); not file.is_open()) {
+      if (file.open("/tmp/" + name()); not file.is_open()) {
         std::cout << "FILE OPEN FAILED!!!" << std::endl;
       }
 
