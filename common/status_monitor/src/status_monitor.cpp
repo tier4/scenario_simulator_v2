@@ -39,7 +39,7 @@ StatusMonitor::StatusMonitor()
         std::this_thread::sleep_for(std::chrono::seconds(1));
       }
 
-      std::cout << "WATCHDOG " << std::this_thread::get_id() << " TERMINATED" << std::endl;
+      // std::cout << "WATCHDOG " << std::this_thread::get_id() << " TERMINATED" << std::endl;
     });
   }
 }
@@ -72,32 +72,36 @@ auto StatusMonitor::write() const -> void
 {
   nlohmann::json json;
 
-  json["details"] = nlohmann::json::array();
+  json["threads"] = nlohmann::json::array();
 
   if (not statuses.empty()) {
     for (auto && [id, status] : statuses) {
-      nlohmann::json detail;
+      nlohmann::json thread;
 
-      detail["exited"] = status.exited;
+      thread["exited"] = status.exited;
 
-      detail["good"] = status.good();
+      thread["good"] = status.good();
 
-      detail["maximum_access_interval_ms"] =
+      thread["maximum_access_interval_ms"] =
         std::chrono::duration_cast<std::chrono::milliseconds>(status.maximum_access_interval)
           .count();
 
-      detail["minimum_access_interval_ms"] =
+      thread["minimum_access_interval_ms"] =
         std::chrono::duration_cast<std::chrono::milliseconds>(status.minimum_access_interval)
           .count();
 
-      detail["thread_id"] = boost::lexical_cast<std::string>(id);
+      thread["thread_id"] = boost::lexical_cast<std::string>(id);
 
-      detail["name"] = status.name;
+      thread["name"] = status.name;
 
-      detail["since_last_access_ms"] =
+      thread["since_last_access_ms"] =
         std::chrono::duration_cast<std::chrono::milliseconds>(status.since_last_access()).count();
 
-      json["details"].push_back(detail);
+      json["threads"].push_back(thread);
+
+      if (not status.good()) {
+        std::cout << status.name << " of " << name() << " is probably unresponsive." << std::endl;
+      }
     }
   }
 

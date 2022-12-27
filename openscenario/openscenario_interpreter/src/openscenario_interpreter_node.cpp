@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <memory>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
+#include <status_monitor/status_monitor.hpp>
 
 int main(const int argc, char const * const * const argv)
 {
@@ -34,8 +35,8 @@ int main(const int argc, char const * const * const argv)
   executor.add_node(node->get_node_base_interface());
 
   while (rclcpp::ok()) {
-    executor.spin_once();
     common::status_monitor.touch(__func__);
+    executor.spin_once();
   }
 
   rclcpp::shutdown();

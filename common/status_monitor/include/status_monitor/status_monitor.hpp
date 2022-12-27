@@ -69,7 +69,7 @@ class StatusMonitor
 
   static inline std::atomic_bool terminating;
 
-  static inline std::chrono::seconds threshold = std::chrono::seconds(1);
+  static inline std::chrono::seconds threshold = std::chrono::seconds(10);
 
 public:
   explicit StatusMonitor();
