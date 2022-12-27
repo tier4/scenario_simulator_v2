@@ -35,49 +35,7 @@ StatusMonitor::StatusMonitor()
       }
 
       while (not terminating.load(std::memory_order_acquire)) {
-        nlohmann::json json;
-
-        json["details"] = nlohmann::json::array();
-
-        if (not statuses.empty()) {
-          for (auto && [id, status] : statuses) {
-            nlohmann::json detail;
-
-            detail["exited"] = status.exited;
-
-            detail["good"] = status.good();
-
-            detail["maximum_access_interval_ms"] =
-              std::chrono::duration_cast<std::chrono::milliseconds>(status.maximum_access_interval)
-                .count();
-
-            detail["minimum_access_interval_ms"] =
-              std::chrono::duration_cast<std::chrono::milliseconds>(status.minimum_access_interval)
-                .count();
-
-            detail["thread_id"] = boost::lexical_cast<std::string>(id);
-
-            detail["name"] = status.name;
-
-            detail["since_last_access_ms"] =
-              std::chrono::duration_cast<std::chrono::milliseconds>(status.since_last_access())
-                .count();
-
-            json["details"].push_back(detail);
-          }
-        }
-
-        // TODO json["exited"]
-
-        json["name"] = name();
-
-        json["good"] = good();
-
-        json["unix_time"] = std::chrono::duration_cast<std::chrono::seconds>(
-                              std::chrono::high_resolution_clock::now().time_since_epoch())
-                              .count();
-        file << json.dump() << std::endl;
-
+        write();
         std::this_thread::sleep_for(std::chrono::seconds(1));
       }
 
@@ -97,5 +55,60 @@ StatusMonitor::~StatusMonitor()
 
     file.close();
   }
+}
+
+auto StatusMonitor::name() const -> const std::string &
+{
+  static const std::string name =
+#if _GNU_SOURCE
+    std::filesystem::path(program_invocation_name).filename().string();
+#else
+    "thread_" + boost::lexical_cast<std::string>(std::this_thread::get_id());
+#endif
+  return name;
+}
+
+auto StatusMonitor::write() const -> void
+{
+  nlohmann::json json;
+
+  json["details"] = nlohmann::json::array();
+
+  if (not statuses.empty()) {
+    for (auto && [id, status] : statuses) {
+      nlohmann::json detail;
+
+      detail["exited"] = status.exited;
+
+      detail["good"] = status.good();
+
+      detail["maximum_access_interval_ms"] =
+        std::chrono::duration_cast<std::chrono::milliseconds>(status.maximum_access_interval)
+          .count();
+
+      detail["minimum_access_interval_ms"] =
+        std::chrono::duration_cast<std::chrono::milliseconds>(status.minimum_access_interval)
+          .count();
+
+      detail["thread_id"] = boost::lexical_cast<std::string>(id);
+
+      detail["name"] = status.name;
+
+      detail["since_last_access_ms"] =
+        std::chrono::duration_cast<std::chrono::milliseconds>(status.since_last_access()).count();
+
+      json["details"].push_back(detail);
+    }
+  }
+
+  json["name"] = name();
+
+  json["good"] = good();
+
+  json["unix_time"] = std::chrono::duration_cast<std::chrono::seconds>(
+                        std::chrono::high_resolution_clock::now().time_since_epoch())
+                        .count();
+
+  file << json.dump() << std::endl;
 }
 }  // namespace common

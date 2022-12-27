@@ -83,16 +83,14 @@ public:
     });
   }
 
-  static auto name() -> decltype(auto)
+  auto mark_as_exited()
   {
-    static const std::string name =
-#if _GNU_SOURCE
-      std::filesystem::path(program_invocation_name).filename();
-#else
-      "thread_" + boost::lexical_cast<std::string>(std::this_thread::get_id());
-#endif
-    return name;
+    if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
+      std::get<1>(*iter).exited = true;
+    }
   }
+
+  auto name() const -> const std::string &;
 
   template <typename Name>
   auto touch(Name && name)
@@ -119,12 +117,7 @@ public:
     }
   }
 
-  auto mark_as_exited()
-  {
-    if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
-      std::get<1>(*iter).exited = true;
-    }
-  }
+  auto write() const -> void;
 } static status_monitor;
 }  // namespace common
 
