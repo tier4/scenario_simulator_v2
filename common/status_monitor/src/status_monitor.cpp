@@ -47,11 +47,11 @@ StatusMonitor::StatusMonitor()
 
             detail["good"] = status.good();
 
-            detail["maximum_access_interval"] =
+            detail["maximum_access_interval_ms"] =
               std::chrono::duration_cast<std::chrono::milliseconds>(status.maximum_access_interval)
                 .count();
 
-            detail["minimum_access_interval"] =
+            detail["minimum_access_interval_ms"] =
               std::chrono::duration_cast<std::chrono::milliseconds>(status.minimum_access_interval)
                 .count();
 
@@ -60,7 +60,8 @@ StatusMonitor::StatusMonitor()
             detail["name"] = status.name;
 
             detail["since_last_access_ms"] =
-              status.elapsed_time_since_last_access<std::chrono::milliseconds>().count();
+              std::chrono::duration_cast<std::chrono::milliseconds>(status.since_last_access())
+                .count();
 
             json["details"].push_back(detail);
           }
@@ -80,7 +81,7 @@ StatusMonitor::StatusMonitor()
         std::this_thread::sleep_for(std::chrono::seconds(1));
       }
 
-      std::cout << "WATCHDOG[" << std::this_thread::get_id() << "] TERMINATED" << std::endl;
+      std::cout << "WATCHDOG " << std::this_thread::get_id() << " TERMINATED" << std::endl;
     });
   }
 }

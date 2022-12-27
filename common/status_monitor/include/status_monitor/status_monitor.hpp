@@ -51,18 +51,12 @@ class StatusMonitor
     {
     }
 
-    template <typename Duration = void>
-    auto elapsed_time_since_last_access() const
+    auto since_last_access() const
     {
-      if constexpr (std::is_void_v<Duration>) {
-        return std::chrono::high_resolution_clock::now() - last_access;
-      } else {
-        return std::chrono::duration_cast<Duration>(
-          std::chrono::high_resolution_clock::now() - last_access);
-      }
+      return std::chrono::high_resolution_clock::now() - last_access;
     }
 
-    auto good() const { return exited or elapsed_time_since_last_access() < threshold; }
+    auto good() const { return exited or since_last_access() < threshold; }
 
     explicit operator bool() const { return good(); }
   };
@@ -75,7 +69,7 @@ class StatusMonitor
 
   static inline std::atomic_bool terminating;
 
-  static inline std::chrono::milliseconds threshold = std::chrono::milliseconds(1000);
+  static inline std::chrono::seconds threshold = std::chrono::seconds(1);
 
 public:
   explicit StatusMonitor();
@@ -104,8 +98,6 @@ public:
   auto touch(Name && name)
   {
     // TODO MUTEX LOCK
-    // statuses[std::this_thread::get_id()].last_access = std::chrono::high_resolution_clock::now();
-
     if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
       [[maybe_unused]] auto && [id, status] = *iter;
 
