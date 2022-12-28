@@ -1150,7 +1150,7 @@ boost::optional<double> HdMapUtils::getLateralDistance(
   if (route.empty()) {
     return boost::none;
   }
-  return from.s - to.s;
+  return to.offset - from.offset;
 }
 
 boost::optional<double> HdMapUtils::getLongitudinalDistance(

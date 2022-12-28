@@ -170,7 +170,7 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
 auto EntityManager::getLateralDistance(const LaneletPose & from, const LaneletPose & to) const
   -> boost::optional<double>
 {
-  return hdmap_utils_ptr_->getLongitudinalDistance(from, to);
+  return hdmap_utils_ptr_->getLateralDistance(from, to);
 }
 
 auto EntityManager::getLateralDistance(const LaneletPose & from, const std::string & to) const

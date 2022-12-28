@@ -26,10 +26,10 @@
 #include <string>
 #include <vector>
 
-class GetLongitudinalDistanceScenario : public cpp_mock_scenarios::CppScenarioNode
+class GetDistanceInLaneCoordinateScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit GetLongitudinalDistanceScenario(const rclcpp::NodeOptions & option)
+  explicit GetDistanceInLaneCoordinateScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "get_longitudinal_distance",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
@@ -47,8 +47,20 @@ private:
     }
     const auto distance_to_front = api_.getLongitudinalDistance("ego", "front");
     const auto distance_to_behind = api_.getLongitudinalDistance("ego", "behind");
+    const auto lateral_to_front = api_.getLateralDistance("ego", "front");
+    const auto lateral_to_behind = api_.getLateralDistance("ego", "behind");
     // LCOV_EXCL_START
+    if (lateral_to_front && !equals(lateral_to_front.get(), 1.0)) {
+      return stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (lateral_to_behind && !equals(lateral_to_behind.get(), -1.0)) {
+      return stop(cpp_mock_scenarios::Result::FAILURE);
+    }
     if (!distance_to_front) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+      return;
+    }
+    if (!lateral_to_behind) {
       stop(cpp_mock_scenarios::Result::FAILURE);
       return;
     }
@@ -75,13 +87,13 @@ private:
     api_.requestSpeedChange("ego", 3, true);
 
     api_.spawn(
-      "front", traffic_simulator::helper::constructLaneletPose(34513, 10, 0, 0, 0, 0),
+      "front", traffic_simulator::helper::constructLaneletPose(34513, 10, 1, 0, 0, 0),
       getVehicleParameters());
     api_.setLinearVelocity("front", 10);
     api_.requestSpeedChange("front", 3, true);
 
     api_.spawn(
-      "behind", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
+      "behind", traffic_simulator::helper::constructLaneletPose(34513, 0, -1, 0, 0, 0),
       getVehicleParameters());
     api_.setLinearVelocity("behind", 10);
     api_.requestSpeedChange("behind", 3, true);
@@ -92,7 +104,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<GetLongitudinalDistanceScenario>(options);
+  auto component = std::make_shared<GetDistanceInLaneCoordinateScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
