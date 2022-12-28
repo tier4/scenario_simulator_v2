@@ -19,6 +19,7 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <mutex>
 #include <thread>
 #include <unordered_map>
 #include <utility>
@@ -71,31 +72,18 @@ class StatusMonitor
 
   static inline std::chrono::seconds threshold = std::chrono::seconds(10);
 
+  static inline std::mutex mutex;
+
 public:
   explicit StatusMonitor();
 
   ~StatusMonitor();
 
-  auto good() const
-  {
-    return std::all_of(std::begin(statuses), std::end(statuses), [](auto && id_and_status) {
-      return std::get<1>(id_and_status).good();
-    });
-  }
-
-  auto mark_as_exited()
-  {
-    if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
-      std::get<1>(*iter).exited = true;
-    }
-  }
-
-  auto name() const -> const std::string &;
-
   template <typename Name>
   auto touch(Name && name)
   {
-    // TODO MUTEX LOCK
+    auto lock = std::scoped_lock<std::mutex>(mutex);
+
     if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
       [[maybe_unused]] auto && [id, status] = *iter;
 

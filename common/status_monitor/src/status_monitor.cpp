@@ -22,6 +22,17 @@
 
 namespace common
 {
+static auto name() -> const std::string &
+{
+  static const std::string name =
+#if _GNU_SOURCE
+    std::filesystem::path(program_invocation_name).filename().string();
+#else
+    "thread_" + boost::lexical_cast<std::string>(std::this_thread::get_id());
+#endif
+  return name;
+}
+
 static std::size_t count = 0;
 
 StatusMonitor::StatusMonitor()
@@ -30,22 +41,31 @@ StatusMonitor::StatusMonitor()
     statuses = {};
 
     watchdog = std::thread([this]() {
-      if (file.open("/tmp/" + name() + "_status"); not file.is_open()) {
-        std::cout << "FILE OPEN FAILED!!!" << std::endl;
-      }
+      /*
+         When a file open fails, the system expects the upper-level system to
+         determine that the system is in an abnormal state because the file
+         that should have been output does not exist.
+      */
+      file.open("/tmp/" + name() + "_status");
 
       while (not terminating.load(std::memory_order_acquire)) {
         write();
         std::this_thread::sleep_for(std::chrono::seconds(1));
       }
-
-      // std::cout << "WATCHDOG " << std::this_thread::get_id() << " TERMINATED" << std::endl;
     });
   }
 }
 
 StatusMonitor::~StatusMonitor()
 {
+  auto lock = std::scoped_lock<std::mutex>(mutex);
+
+  auto mark_as_exited = [this]() {
+    if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
+      std::get<1>(*iter).exited = true;
+    }
+  };
+
   mark_as_exited();
 
   if (not --count) {
@@ -57,19 +77,16 @@ StatusMonitor::~StatusMonitor()
   }
 }
 
-auto StatusMonitor::name() const -> const std::string &
-{
-  static const std::string name =
-#if _GNU_SOURCE
-    std::filesystem::path(program_invocation_name).filename().string();
-#else
-    "thread_" + boost::lexical_cast<std::string>(std::this_thread::get_id());
-#endif
-  return name;
-}
-
 auto StatusMonitor::write() const -> void
 {
+  auto lock = std::scoped_lock<std::mutex>(mutex);
+
+  auto good = []() {
+    return std::all_of(std::begin(statuses), std::end(statuses), [](auto && id_and_status) {
+      return std::get<1>(id_and_status).good();
+    });
+  };
+
   nlohmann::json json;
 
   json["threads"] = nlohmann::json::array();
@@ -77,8 +94,6 @@ auto StatusMonitor::write() const -> void
   if (not statuses.empty()) {
     for (auto && [id, status] : statuses) {
       nlohmann::json thread;
-
-      thread["exited"] = status.exited;
 
       thread["good"] = status.good();
 
