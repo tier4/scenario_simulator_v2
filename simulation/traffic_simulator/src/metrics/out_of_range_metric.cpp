@@ -30,6 +30,10 @@ void OutOfRangeMetric::setEntityManager(
 
 void OutOfRangeMetric::update()
 {
+  if (!entity_manager_ptr_->entityExists(target_entity)) {
+    success();
+    return;
+  }
   const auto status = entity_manager_ptr_->getEntityStatus(target_entity);
 
   linear_velocity_ = status.action_status.twist.linear.x;
@@ -50,10 +54,7 @@ void OutOfRangeMetric::update()
   }
 
   if (!jerk_callback_ptr_) {
-    const auto jerk_opt = entity_manager_ptr_->getLinearJerk(target_entity);
-    if (jerk_opt) {
-      linear_jerk_ = jerk_opt.get();
-    }
+    linear_jerk_ = entity_manager_ptr_->getLinearJerk(target_entity);
   }
 
   if (!(min_jerk <= linear_jerk_ && linear_jerk_ <= max_jerk)) {

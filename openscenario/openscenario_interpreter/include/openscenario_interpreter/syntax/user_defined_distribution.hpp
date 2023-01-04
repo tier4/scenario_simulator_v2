@@ -37,8 +37,6 @@ struct UserDefinedDistribution : private Scope, public ComplexType
 {
   const String type;
 
-  const String content;
-
   explicit UserDefinedDistribution(const pugi::xml_node &, const Scope &);
 
   // TODO: implement evaluate()?`

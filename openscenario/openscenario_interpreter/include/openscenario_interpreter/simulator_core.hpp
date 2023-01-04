@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -184,19 +185,29 @@ public:
       return core->spawn(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename EntityRef, typename DynamicConstraints, typename... Ts>
-    static auto applySpeedProfileAction(
-      const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints, Ts &&... xs)
-      -> void
+    template <typename EntityRef, typename DynamicConstraints>
+    static auto applyProfileAction(
+      const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints) -> void
     {
-      core->setBehaviorParameter(entity_ref, [&]() {
+      return core->setBehaviorParameter(entity_ref, [&]() {
         auto behavior_parameter = core->getBehaviorParameter(entity_ref);
-        behavior_parameter.dynamic_constraints =
-          static_cast<traffic_simulator_msgs::msg::DynamicConstraints>(dynamic_constraints);
+
+#define UPDATE_IF_IS_NOT_INFINITY(DATA_MEMBER)                                            \
+  if (not std::isinf(dynamic_constraints.DATA_MEMBER)) {                                  \
+    behavior_parameter.dynamic_constraints.DATA_MEMBER = dynamic_constraints.DATA_MEMBER; \
+  }                                                                                       \
+  static_assert(true)
+
+        UPDATE_IF_IS_NOT_INFINITY(max_speed);
+        UPDATE_IF_IS_NOT_INFINITY(max_acceleration);
+        UPDATE_IF_IS_NOT_INFINITY(max_acceleration_rate);
+        UPDATE_IF_IS_NOT_INFINITY(max_deceleration);
+        UPDATE_IF_IS_NOT_INFINITY(max_deceleration_rate);
+
+#undef UPDATE_IF_IS_NOT_INFINITY
+
         return behavior_parameter;
       }());
-
-      applySpeedAction(entity_ref, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename Controller>
@@ -218,13 +229,15 @@ public:
 
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
+          // clang-format off
+          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
-          configuration.set_architecture_type(
-            getParameter<std::string>("architecture_type", "awf/universe"));
-          configuration.set_update_duration(0.1);
+          configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
+          configuration.set_pos_noise_stddev(controller.properties.template get<Double>("detectedObjectPositionStandardDeviation"));
+          configuration.set_random_seed(controller.properties.template get<UnsignedInteger>("randomSeed"));
           configuration.set_range(300);
-          configuration.set_filter_by_range(
-            controller.properties.template get<Boolean>("isClairvoyant"));
+          configuration.set_update_duration(0.1);
+          // clang-format on
           return configuration;
         }());
 

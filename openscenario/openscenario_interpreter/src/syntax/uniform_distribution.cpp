@@ -21,11 +21,13 @@ inline namespace syntax
 {
 UniformDistribution::UniformDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: range(readElement<Range>("range", node, scope)),
-  distribution(
-    scope.ref<Double>(std::string("randomSeed")).data, range.lower_limit.data,
-    range.upper_limit.data)
+: Scope(scope),
+  range(readElement<Range>("range", node, scope)),
+  distribute(range.lower_limit.data, range.upper_limit.data),
+  random_engine(scope.seed)
 {
 }
+
+auto UniformDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

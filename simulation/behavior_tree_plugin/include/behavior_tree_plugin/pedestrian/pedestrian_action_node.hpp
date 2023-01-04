@@ -41,12 +41,17 @@ public:
     return ports;
   }
   traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
-  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
-    double target_speed);
-  traffic_simulator_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
+  auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
+    -> traffic_simulator_msgs::msg::EntityStatus;
+  auto calculateUpdatedEntityStatus(double target_speed) const
+    -> traffic_simulator_msgs::msg::EntityStatus;
 
 protected:
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+
+private:
+  auto estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
+    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 };
 }  // namespace entity_behavior
 

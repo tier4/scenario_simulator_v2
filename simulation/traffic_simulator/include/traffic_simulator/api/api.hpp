@@ -223,7 +223,7 @@ public:
     const std::string &, const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
 
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
-  bool attachDetectionSensor(const std::string &);
+  bool attachDetectionSensor(const std::string &, double pos_noise_stddev, int random_seed = 0);
 
   bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
 
@@ -268,7 +268,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
+  FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
+  FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
   FORWARD_TO_ENTITY_MANAGER(getDistanceToLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getDistanceToLeftLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getDistanceToRightLaneBound);
@@ -290,8 +292,10 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
+  FORWARD_TO_ENTITY_MANAGER(setAccelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
+  FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
