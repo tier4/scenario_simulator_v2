@@ -80,11 +80,26 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     const std::unordered_map<std::string, std::function<Object()>> dispatch{
       std::make_pair(
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
+#ifdef USE_ADAPI_V1_MSGS
+      std::make_pair(
+        "currentMrmState",
+        [result]() {
+          return make<String>(boost::lexical_cast<String>(
+            autoware_adapi_v1_msgs::msg::StateType(asAutoware(result.str(1)).getMrmState())));
+        }),
+      std::make_pair(
+        "currentMrmBehavior",
+        [result]() {
+          return make<String>(boost::lexical_cast<String>(
+            autoware_adapi_v1_msgs::msg::BehaviorType(asAutoware(result.str(1)).getMrmState())));
+        }),
+#else
       std::make_pair(
         "currentEmergencyState",
         [result]() {
           return make<String>(boost::lexical_cast<String>(asAutoware(result.str(1)).getMrmState()));
         }),
+#endif
       std::make_pair(
         "currentTurnIndicatorsState",
         [result]() {
