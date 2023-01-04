@@ -74,7 +74,11 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
+#ifdef USE_ADAPI_V1_MSGS
   using MrmState = autoware_adapi_v1_msgs::msg::MrmState;
+#else
+  using MrmState = autoware_auto_system_msgs::msg::EmergencyState;
+#endif
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
@@ -204,13 +208,35 @@ public:
 }  // namespace concealer
 
 // for boost::lexical_cast
+#ifdef USE_ADAPI_V1_MSGS
 namespace autoware_adapi_v1_msgs::msg
 {
-// DIRTY HACK!!!  these stream operators ignore MrmState::behavior
-auto operator<<(std::ostream &, const MrmState &) -> std::ostream &;
+struct BehaviorType{
+  explicit BehaviorType(const MrmState & mrm_state) : data(mrm_state.behavior){}
+  MrmState::_behavior_type data;
+};
 
-auto operator>>(std::istream &, MrmState &) -> std::istream &;
+auto operator<<(std::ostream &, const BehaviorType &) -> std::ostream &;
+
+auto operator>>(std::istream &, BehaviorType &) -> std::istream &;
+
+struct StateType{
+  explicit StateType(const MrmState & mrm_state) : data(mrm_state.state) {}
+  MrmState::_state_type data;
+};
+
+auto operator<<(std::ostream &, const StateType &) -> std::ostream &;
+
+auto operator>>(std::istream &, StateType &) -> std::istream &;
 }  // namespace autoware_adapi_v1_msgs::msg
+#else
+namespace autoware_auto_system_msgs::msg
+{
+auto operator<<(std::ostream &, const EmergencyState &) -> std::ostream &;
+
+auto operator>>(std::istream &, EmergencyState &) -> std::istream &;
+}  // namespace autoware_auto_system_msgs::msg
+#endif
 
 namespace autoware_auto_vehicle_msgs::msg
 {
