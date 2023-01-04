@@ -217,7 +217,7 @@ auto EntityManager::getLateralDistance(
   -> boost::optional<double>
 {
   const auto to_pose = getLaneletPose(to, matching_distance);
-  if (std::abs(from.offset) <= matching_distance && to_pose) {
+  if (to_pose) {
     return getLateralDistance(from, to_pose.get(), matching_distance);
   }
   return boost::none;
@@ -228,7 +228,7 @@ auto EntityManager::getLateralDistance(
   -> boost::optional<double>
 {
   const auto from_pose = getLaneletPose(from, matching_distance);
-  if (from_pose && std::abs(to.offset) <= matching_distance) {
+  if (from_pose) {
     return getLateralDistance(from_pose.get(), to, matching_distance);
   }
   return boost::none;
@@ -240,6 +240,8 @@ auto EntityManager::getLateralDistance(
 {
   const auto from_pose = getLaneletPose(from, matching_distance);
   const auto to_pose = getLaneletPose(to, matching_distance);
+  // std::cout << rosidl_generator_traits::to_yaml(from_pose.get()) << std::endl;
+  // std::cout << rosidl_generator_traits::to_yaml(to_pose.get()) << std::endl;
   if (from_pose && to_pose) {
     return getLateralDistance(from_pose.get(), to_pose.get(), matching_distance);
   }

@@ -47,9 +47,20 @@ private:
     }
     const auto distance_to_front = api_.getLongitudinalDistance("ego", "front");
     const auto distance_to_behind = api_.getLongitudinalDistance("ego", "behind");
+    const auto lateral_none = api_.getLateralDistance("ego", "front", 0.1);
+    const auto lateral_about_one = api_.getLateralDistance("ego", "front", 1.5);
     const auto lateral_to_front = api_.getLateralDistance("ego", "front");
     const auto lateral_to_behind = api_.getLateralDistance("ego", "behind");
     // LCOV_EXCL_START
+    if (lateral_none) {
+      return stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (!lateral_about_one) {
+      return stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (lateral_about_one && !equals(lateral_about_one.get(), 1.0, 0.001)) {
+      return stop(cpp_mock_scenarios::Result::FAILURE);
+    }
     if (lateral_to_front && !equals(lateral_to_front.get(), 1.0)) {
       return stop(cpp_mock_scenarios::Result::FAILURE);
     }
