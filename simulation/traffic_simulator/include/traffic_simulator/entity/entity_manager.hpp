@@ -299,6 +299,10 @@ public:
   auto getLateralDistance(const LaneletPose &, const std::string &) const -> boost::optional<double>;
   auto getLateralDistance(const std::string &, const LaneletPose &) const -> boost::optional<double>;
   auto getLateralDistance(const std::string &, const std::string &) const -> boost::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const LaneletPose &, double matching_distance) const -> boost::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const std::string &, double matching_distance) const -> boost::optional<double>;
+  auto getLateralDistance(const std::string &, const LaneletPose &, double matching_distance) const -> boost::optional<double>;
+  auto getLateralDistance(const std::string &, const std::string &, double matching_distance) const -> boost::optional<double>;
   auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &) const -> boost::optional<double>;
   auto getLongitudinalDistance(const LaneletPose &, const std::string &) const -> boost::optional<double>;
   auto getLongitudinalDistance(const std::string &, const LaneletPose &) const -> boost::optional<double>;
