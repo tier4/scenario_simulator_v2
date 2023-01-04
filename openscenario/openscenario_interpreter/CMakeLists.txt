@@ -14,6 +14,20 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
+# for backward compatibility
+find_package(autoware_adapi_v1_msgs)
+if( autoware_adapi_v1_msgs_FOUND )
+  add_compile_options(-D USE_ADAPI_V1_MSGS)
+  list(APPEND ${PROJECT_NAME}_BUILD_DEPENDS autoware_adapi_v1_msgs)
+  list(APPEND ${PROJECT_NAME}_BUILD_EXPORT_DEPENDS autoware_adapi_v1_msgs)
+  list(APPEND ${PROJECT_NAME}_EXEC_DEPENDS autoware_adapi_v1_msgs)
+  list(APPEND ${PROJECT_NAME}_BUILD_DEPENDS autoware_adapi_v1_msgs)
+  list(APPEND ${PROJECT_NAME}_FOUND_BUILD_DEPENDS autoware_adapi_v1_msgs)
+  list(APPEND ${PROJECT_NAME}_FOUND_DEFINITIONS ${autoware_adapi_v1_msgs_DEFINITIONS})
+  list(APPEND ${PROJECT_NAME}_FOUND_INCLUDE_DIRS ${autoware_adapi_v1_msgs_INCLUDE_DIRS})
+  list(APPEND ${PROJECT_NAME}_FOUND_LIBRARIES ${autoware_adapi_v1_msgs_LIBRARIES})
+endif()
+
 # ------------------------------------------------------------------------------
 #  libopenscenario_interpreter
 # ------------------------------------------------------------------------------

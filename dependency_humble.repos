@@ -1,8 +1,8 @@
 repositories:
-  autoware_adapi_msgs:
-    type: git
-    url: https://github.com/autowarefoundation/autoware_adapi_msgs.git
-    version: main
+#  autoware_adapi_msgs:
+#    type: git
+#    url: https://github.com/autowarefoundation/autoware_adapi_msgs.git
+#    version: main
   autoware_msgs: # for tier4_autoware_msgs
     type: git
     url: https://github.com/autowarefoundation/autoware_msgs.git
