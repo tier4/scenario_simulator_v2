@@ -47,17 +47,33 @@ void Autoware::checkAutowareProcess()
   }
 }
 
+#ifdef USE_ADAPI_V1_MSGS
 auto Autoware::getMrmState() const -> autoware_adapi_v1_msgs::msg::MrmState
 {
   static auto mrm_state = []() {
-    autoware_adapi_v1_msgs::msg::MrmState mrm_state;
-    mrm_state.state = autoware_adapi_v1_msgs::msg::MrmState::NORMAL;
-    mrm_state.behavior = autoware_adapi_v1_msgs::msg::MrmState::NONE;
+    using autoware_adapi_v1_msgs::msg::MrmState;
+    MrmState mrm_state;
+    mrm_state.state = MrmState::NORMAL;
+    mrm_state.behavior = MrmState::NONE;
     return mrm_state;
   }();
   mrm_state.stamp = now();
   return mrm_state;
 }
+
+#else
+auto Autoware::getMrmState() const -> autoware_auto_system_msgs::msg::EmergencyState
+{
+  static auto mrm_state = []() {
+    using autoware_auto_system_msgs::msg::EmergencyState;
+    EmergencyState mrm_state;
+    mrm_state.state = EmergencyState::NORMAL;
+    return mrm_state;
+  }();
+  mrm_state.stamp = now();
+  return mrm_state;
+}
+#endif
 
 auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
 {

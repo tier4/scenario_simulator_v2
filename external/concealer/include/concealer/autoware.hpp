@@ -19,7 +19,12 @@
 
 #include <sys/wait.h>
 
+#ifdef USE_ADAPI_V1_MSGS
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#else
+#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
+#endif
+
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
@@ -170,7 +175,11 @@ public:
 
   virtual auto getAutowareStateName() const -> std::string = 0;
 
+#ifdef USE_ADAPI_V1_MSGS
   virtual auto getMrmState() const -> autoware_adapi_v1_msgs::msg::MrmState;
+#else
+  virtual auto getMrmState() const -> autoware_auto_system_msgs::msg::EmergencyState;
+#endif
 
   virtual auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand;
 
