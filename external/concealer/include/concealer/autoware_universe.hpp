@@ -211,8 +211,9 @@ public:
 #ifdef USE_ADAPI_V1_MSGS
 namespace autoware_adapi_v1_msgs::msg
 {
-struct BehaviorType{
-  explicit BehaviorType(const MrmState & mrm_state) : data(mrm_state.behavior){}
+struct BehaviorType
+{
+  explicit BehaviorType(const MrmState & mrm_state) : data(mrm_state.behavior) {}
   MrmState::_behavior_type data;
 };
 
@@ -220,7 +221,8 @@ auto operator<<(std::ostream &, const BehaviorType &) -> std::ostream &;
 
 auto operator>>(std::istream &, BehaviorType &) -> std::istream &;
 
-struct StateType{
+struct StateType
+{
   explicit StateType(const MrmState & mrm_state) : data(mrm_state.state) {}
   MrmState::_state_type data;
 };

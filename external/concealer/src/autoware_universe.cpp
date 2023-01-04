@@ -408,7 +408,7 @@ auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
 {
 #define STATE(IDENTIFIER)                   \
   {                                         \
-    #IDENTIFIER, EmergencyState::IDENTIFIER \
+#IDENTIFIER, EmergencyState::IDENTIFIER \
   }
 
   std::unordered_map<std::string, std::uint8_t> state_dictionary{
