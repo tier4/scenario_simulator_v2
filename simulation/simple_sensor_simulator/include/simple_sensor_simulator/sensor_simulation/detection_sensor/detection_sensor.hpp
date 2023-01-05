@@ -19,6 +19,7 @@
 
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <memory>
+#include <random>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <vector>
@@ -39,11 +40,11 @@ protected:
   {
   }
 
-  const std::vector<std::string> getDetectedObjects(
-    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+  auto getDetectedObjects(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
+    -> std::vector<std::string>;
 
-  geometry_msgs::Pose getSensorPose(
-    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+  auto getSensorPose(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
+    -> geometry_msgs::Pose;
 
 public:
   virtual ~DetectionSensorBase() = default;
@@ -58,14 +59,23 @@ class DetectionSensor : public DetectionSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
+  std::mt19937 random_engine_;
+
+  auto applyNoise(autoware_auto_perception_msgs::msg::DetectedObject)
+    -> autoware_auto_perception_msgs::msg::DetectedObject;
+
 public:
   explicit DetectionSensor(
     const double current_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher)
-  : DetectionSensorBase(current_time, configuration), publisher_ptr_(publisher)
+  : DetectionSensorBase(current_time, configuration),
+    publisher_ptr_(publisher),
+    random_engine_(configuration.random_seed())
   {
   }
+
+  ~DetectionSensor() override = default;
 
   auto update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
@@ -73,9 +83,14 @@ public:
 };
 
 template <>
-void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyNoise(
+  autoware_auto_perception_msgs::msg::DetectedObject)
+  -> autoware_auto_perception_msgs::msg::DetectedObject;
+
+template <>
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-  const std::vector<std::string> & lidar_detected_entity);
+  const std::vector<std::string> & lidar_detected_entity) -> void;
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
