@@ -162,19 +162,20 @@ class ScenarioTestRunner(LifecycleController):
     def spin(self):
         """Run scenario."""
         time.sleep(self.SLEEP_RATE)
-
+        # rate=self.create_rate(self.SLEEP_RATE)
         while self.activate_node():
             start = time.time()
-            while True:
+            while rclpy.ok():
                 if self.get_lifecycle_state() == "inactive":
                     break
-                elif ((time.time() - start) > self.global_timeout
+                if ((time.time() - start) > self.global_timeout
                         if self.global_timeout is not None else False):
                     self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
                     self.deactivate_node()
                     break
                 else:
                     time.sleep(self.SLEEP_RATE)
+                    # rate.sleep()
 
     def run_scenarios(self, scenarios: List[Scenario]):
 
@@ -211,6 +212,8 @@ class ScenarioTestRunner(LifecycleController):
                 exit(1)
 
         self.shutdown()
+        # rclpy.try_shutdown()
+        self.destroy_node()
 
     def run_preprocessed_scenarios(self, scenarios: List[Scenario]):
         """
@@ -258,6 +261,9 @@ class ScenarioTestRunner(LifecycleController):
 
         except KeyboardInterrupt:
             self.get_logger().warn("KeyboardInterrupt")
+            rclpy.try_shutdown()
+            self.destroy_node()
+            exit(0)
         except OSError as e:
             self.get_logger().warn("OSError: {}".format(e))
         except Exception as e:
