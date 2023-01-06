@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_set.hpp>
 
@@ -31,13 +32,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ValueSetDistribution : public Scope
+struct ValueSetDistribution : public Scope, public MultiParameterDistributionBase
 {
   const std::list<ParameterValueSet> parameter_value_sets;
 
   explicit ValueSetDistribution(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
+  auto derive() -> std::vector<std::unordered_map<std::string, Object>> override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -32,9 +32,12 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DeterministicMultiParameterDistribution : public DeterministicMultiParameterDistributionType
+struct DeterministicMultiParameterDistribution : public DeterministicMultiParameterDistributionType,
+                                                 public MultiParameterDistributionBase
 {
   explicit DeterministicMultiParameterDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> std::vector<std::unordered_map<std::string, Object>> override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

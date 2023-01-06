@@ -34,11 +34,13 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct DeterministicSingleParameterDistribution
-: public DeterministicSingleParameterDistributionType, public SingleParameterDistributionBase
+: public DeterministicSingleParameterDistributionType,
+  public SingleParameterDistributionBase
 {
   const String parameter_name;
 
   explicit DeterministicSingleParameterDistribution(const pugi::xml_node &, Scope &);
+
   auto derive() -> std::vector<Object> override;
 };
 }  // namespace syntax

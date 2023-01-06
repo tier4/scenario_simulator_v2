@@ -26,9 +26,13 @@ ValueSetDistribution::ValueSetDistribution(
 {
 }
 
-auto ValueSetDistribution::evaluate() -> Object
+auto ValueSetDistribution::derive() -> std::vector<std::unordered_map<std::string, Object>>
 {
-  throw common::Error("ValueSetDistribution is not implemented yet");
+  std::vector<std::unordered_map<std::string, Object>> parameters;
+  for (const auto & parameter_value_set : parameter_value_sets) {
+    parameters.emplace_back(parameter_value_set.evaluate());
+  }
+  return parameters;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

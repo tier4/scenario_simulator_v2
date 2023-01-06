@@ -24,5 +24,11 @@ DeterministicMultiParameterDistribution::DeterministicMultiParameterDistribution
 : DeterministicMultiParameterDistributionType(node, scope)
 {
 }
+
+std::vector<std::unordered_map<std::string, Object>>
+DeterministicMultiParameterDistribution::derive()
+{
+  return DeterministicMultiParameterDistributionType::derive();
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

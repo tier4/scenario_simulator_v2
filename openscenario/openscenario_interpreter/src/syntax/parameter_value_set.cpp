@@ -26,9 +26,13 @@ ParameterValueSet::ParameterValueSet(
 {
 }
 
-auto ParameterValueSet::evaluate() -> Object
+auto ParameterValueSet::evaluate() const -> std::unordered_map<std::string, Object>
 {
-  throw common::Error("ParameterValueSet is not implemented yet");
+  std::unordered_map<std::string, Object> parameters;
+  for (const auto & parameter : parameter_assignments) {
+    parameters[parameter.parameterRef] = make<String>(parameter.value);
+  }
+  return parameters;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

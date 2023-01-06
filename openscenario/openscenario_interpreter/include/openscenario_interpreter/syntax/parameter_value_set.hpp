@@ -36,8 +36,7 @@ struct ParameterValueSet : private Scope
 
   explicit ParameterValueSet(const pugi::xml_node &, Scope & scope);
 
-  // TODO: implement evaluate()
-  auto evaluate() -> Object;
+  auto evaluate() const -> std::unordered_map<std::string, Object>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
