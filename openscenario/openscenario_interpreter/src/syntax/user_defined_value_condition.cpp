@@ -82,7 +82,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
 #ifdef USE_ADAPI_V1_MSGS
       std::make_pair(
-        "currentMrmState",
+        "currentEmergencyState",
         [result]() {
           return make<String>(boost::lexical_cast<String>(
             autoware_adapi_v1_msgs::msg::StateType(asAutoware(result.str(1)).getMrmState())));
