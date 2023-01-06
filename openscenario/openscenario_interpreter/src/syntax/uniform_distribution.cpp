@@ -27,7 +27,9 @@ UniformDistribution::UniformDistribution(
   random_engine(scope.seed)
 {
 }
-
-auto UniformDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
+std::vector<Object> UniformDistribution::derive()
+{
+  return std::vector<Object>({make<Double>(distribute(random_engine))});
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

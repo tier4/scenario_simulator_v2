@@ -33,7 +33,9 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct ProbabilityDistributionSet : public ComplexType, private Scope
+struct ProbabilityDistributionSet : public ComplexType,
+                                    private Scope,
+                                    public SingleParameterDistributionBase
 {
   const std::vector<ProbabilityDistributionSetElement> elements;
 
@@ -57,7 +59,7 @@ struct ProbabilityDistributionSet : public ComplexType, private Scope
 
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 
-  auto derive() -> Object override;
+  auto derive() -> std::vector<Object> override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

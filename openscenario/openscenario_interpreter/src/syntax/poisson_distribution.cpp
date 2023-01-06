@@ -28,7 +28,9 @@ PoissonDistribution::PoissonDistribution(
   random_engine(scope.seed)
 {
 }
-
-auto PoissonDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
+std::vector<Object> PoissonDistribution::derive()
+{
+  return std::vector<Object>({make<Double>(distribute(random_engine))});
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

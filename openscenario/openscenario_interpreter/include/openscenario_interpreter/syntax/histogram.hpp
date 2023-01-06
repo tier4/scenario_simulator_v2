@@ -34,7 +34,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct Histogram : public ComplexType, private Scope, public StochasticDistributionBase
+struct Histogram : public ComplexType, private Scope, public SingleParameterDistributionBase
 {
   /**
    * Note: HistogramBin must be stored in continuous range and ascending order to `bins`
@@ -61,8 +61,7 @@ struct Histogram : public ComplexType, private Scope, public StochasticDistribut
   std::mt19937 random_engine;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
-
-  auto derive() -> Object override;
+  auto derive() -> std::vector<Object> override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -29,10 +29,9 @@ NormalDistribution::NormalDistribution(
   random_engine(scope.seed)
 {
 }
-
-auto NormalDistribution::derive() -> Object
+std::vector<Object> NormalDistribution::derive()
 {
-  return make<Double>(distribute(random_engine));
+  return std::vector<Object>({make<Double>(distribute(random_engine))});
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

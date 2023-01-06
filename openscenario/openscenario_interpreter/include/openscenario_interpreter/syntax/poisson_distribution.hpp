@@ -35,7 +35,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct PoissonDistribution : public ComplexType, private Scope, public StochasticDistributionBase
+struct PoissonDistribution : public ComplexType, private Scope, public SingleParameterDistributionBase
 {
   const Range range;
 
@@ -46,8 +46,7 @@ struct PoissonDistribution : public ComplexType, private Scope, public Stochasti
   std::mt19937 random_engine;
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
-
-  auto derive() -> Object override;
+  auto derive() -> std::vector<Object> override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
