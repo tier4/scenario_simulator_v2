@@ -54,7 +54,7 @@ DEFINE_LAZY_VISITOR(
   CASE(UniformDistribution),         //
   CASE(PoissonDistribution),         //
   CASE(Histogram),                   //
-  CASE(UserDefinedDistribution),     //
+//  CASE(UserDefinedDistribution),     //
 );
 }  // namespace syntax
 }  // namespace openscenario_interpreter
