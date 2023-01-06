@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/distribution_range.hpp>
 #include <openscenario_interpreter/syntax/distribution_set.hpp>
 #include <openscenario_interpreter/syntax/user_defined_distribution.hpp>
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -45,7 +46,7 @@ DEFINE_LAZY_VISITOR(
   DeterministicSingleParameterDistributionType,
   CASE(DistributionSet),          //
   CASE(DistributionRange),        //
-  CASE(UserDefinedDistribution),  //
+//  CASE(UserDefinedDistribution),  //
 );
 }  // namespace syntax
 }  // namespace openscenario_interpreter

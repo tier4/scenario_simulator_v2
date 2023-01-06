@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_RANGE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_RANGE_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
 #include <pugixml.hpp>
@@ -32,15 +33,15 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DistributionRange : private Scope, public ComplexType
+
+struct DistributionRange : private Scope, public ComplexType, public SingleParameterDistributionBase
 {
   const Double step_width;
 
   const Range range;
 
   explicit DistributionRange(const pugi::xml_node &, Scope &);
-
-  auto derive() -> std::vector<Object>;
+  auto derive() -> std::vector<Object> override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

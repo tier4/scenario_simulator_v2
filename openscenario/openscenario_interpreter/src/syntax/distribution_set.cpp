@@ -32,6 +32,5 @@ auto DistributionSet::derive() -> std::vector<Object>
   }
   return list;
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

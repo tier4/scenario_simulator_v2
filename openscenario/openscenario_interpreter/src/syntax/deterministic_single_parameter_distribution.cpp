@@ -25,5 +25,10 @@ DeterministicSingleParameterDistribution::DeterministicSingleParameterDistributi
   parameter_name(readAttribute<String>("parameterName", node, scope))
 {
 }
+std::vector<Object> DeterministicSingleParameterDistribution::derive()
+{
+  return apply<std::vector<Object>>(
+    [](auto & distribution) { return distribution.derive(); }, *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

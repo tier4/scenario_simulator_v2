@@ -53,11 +53,9 @@ struct Stochastic : public ComplexType, public SingleParameterDistributionBase
   {
     std::vector<Object> parameters;
     for (int i = 0; i < number_of_test_runs; i++) {
-      parameters.emplace_back(
-        apply<std::vector<Object>>(
-          [](auto & type) { return type.derive(); },
-          reinterpret_cast<StochasticDistributionType &>(stochastic_distribution))
-          .front());
+      parameters.emplace_back(apply<std::vector<Object>>(
+                                [](auto & type) { return type.derive(); }, stochastic_distribution)
+                                .front());
     }
     return parameters;
   }
