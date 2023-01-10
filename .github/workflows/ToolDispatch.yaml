@@ -1,7 +1,5 @@
-
-name: dispatch for sim_evaluation_tools
+name: ToolDispatch
 on:
-  workflow_dispatch:
   pull_request:
     types: [opened]
 
