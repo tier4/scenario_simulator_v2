@@ -225,6 +225,8 @@ auto EntityBase::getStatus() const -> const traffic_simulator_msgs::msg::EntityS
 
 auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
 
+auto EntityBase::getTraveledDistance() const -> double { return traveled_distance_; }
+
 auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
@@ -741,8 +743,6 @@ auto EntityBase::updateTraveledDistance(const double step_time) -> double
   }
   return traveled_distance_;
 }
-
-auto EntityBase::getTraveledDistance() const -> double { return traveled_distance_; }
 
 }  // namespace entity
 }  // namespace traffic_simulator
