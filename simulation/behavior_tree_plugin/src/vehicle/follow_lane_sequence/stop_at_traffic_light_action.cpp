@@ -78,13 +78,9 @@ std::optional<double> StopAtTrafficLightAction::calculateTargetSpeed(double curr
    * @brief hard coded parameter!! 1.0 is a stop margin
    */
   double rest_distance =
-    distance_to_stop_target_.value() - vehicle_parameters.bounding_box.dimensions.x * 0.5 - 1.0;
+    distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
   if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
-    if (rest_distance > 0) {
-      return std::sqrt(2 * behavior_parameter.dynamic_constraints.max_deceleration * rest_distance);
-    } else {
-      return 0;
-    }
+    return 0;
   }
   return current_velocity;
 }
@@ -111,11 +107,6 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (trajectory == nullptr) {
-    return BT::NodeStatus::FAILURE;
-  }
-  const auto distance_to_traffic_stop_line =
-    hdmap_utils->getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
-  if (!distance_to_traffic_stop_line) {
     return BT::NodeStatus::FAILURE;
   }
   distance_to_stop_target_ = getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
