@@ -6,7 +6,7 @@ on:
 jobs:
   make_dispatch_event:
     runs-on: ubuntu-latest
-    if: github.event.label.name == 'ready for regression test'
+    if: github.event.label.name == 'wait for regression test'
     steps:
     - name: trigger
       run: |
