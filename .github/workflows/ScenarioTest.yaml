@@ -5,15 +5,13 @@ on:
   schedule:
     - cron: 0 0 * * *
   pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "README.md"
-      - "workflows/Docker.yaml"
-      - "workflows/Documentation.yaml"
-      - "workflows/NotifyFailure.yaml"
-      - "workflows/Release.yaml"
-      - "workflows/SpellCheck.yaml"
+    paths:
+      - '**''
+      - '!docs/**'
+      - '!README.md'
+      - '!.github/**'
+      - '.github/workflows/ScenarioTest.yaml'
+      - '!mkdocs.yml'
   push:
     branches:
       - master
