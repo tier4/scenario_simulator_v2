@@ -21,7 +21,7 @@ jobs:
   job1:
     name: ScenarioTest
     runs-on: ubuntu-20.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     container: ros:${{ matrix.rosdistro }}
     env:
       DEBIAN_FRONTEND: noninteractive
