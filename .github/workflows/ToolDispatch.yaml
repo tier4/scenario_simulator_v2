@@ -1,11 +1,12 @@
 name: ToolDispatch
 on:
   pull_request:
-    types: [opened]
+    types: [labeled]
 
 jobs:
   make_dispatch_event:
     runs-on: ubuntu-latest
+    if: github.event.label.name == 'ready for regression test'
     steps:
     - name: trigger
       run: |
