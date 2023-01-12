@@ -12,6 +12,9 @@
 
 # external packages
 external/autoware_auto_msgs
+external/autoware_common
+external/autoware_msgs
+external/color_names
 external/tier4_msgs
 external/zmqpp_vendor
 

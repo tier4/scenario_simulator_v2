@@ -120,6 +120,8 @@ public:
     const math::geometry::CatmullRomSplineInterface & spline);
   double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s);
+  boost::optional<double> getLateralDistance(
+    traffic_simulator_msgs::msg::LaneletPose from, traffic_simulator_msgs::msg::LaneletPose to);
   boost::optional<double> getLongitudinalDistance(
     traffic_simulator_msgs::msg::LaneletPose from, traffic_simulator_msgs::msg::LaneletPose to);
   boost::optional<double> getLongitudinalDistance(
