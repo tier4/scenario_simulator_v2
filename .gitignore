@@ -14,6 +14,9 @@
 external/autoware_auto_msgs
 external/tier4_msgs
 external/zmqpp_vendor
+external/autoware_common/
+external/autoware_msgs/
+external/color_names/
 
 # auto-generated files
 html
