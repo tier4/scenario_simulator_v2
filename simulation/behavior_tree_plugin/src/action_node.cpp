@@ -486,12 +486,10 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
 auto ActionNode::calculateStopDistance(
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const -> double
 {
-  const auto speed_planner =
-    traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
-      step_time, entity_status.name);
-  const auto ret = speed_planner.getRunningDistance(
-    0, constraints, getCurrentTwist(), getCurrentAccel(), getCurrentLinearJerk());
-  return ret;
+  return traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
+           step_time, entity_status.name)
+    .getRunningDistance(
+      0, constraints, getCurrentTwist(), getCurrentAccel(), getCurrentLinearJerk());
 }
 
 auto ActionNode::getCurrentTwist() const -> geometry_msgs::msg::Twist

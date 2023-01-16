@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -228,13 +229,15 @@ public:
 
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
+          // clang-format off
+          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
-          configuration.set_architecture_type(
-            getParameter<std::string>("architecture_type", "awf/universe"));
-          configuration.set_update_duration(0.1);
+          configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
+          configuration.set_pos_noise_stddev(controller.properties.template get<Double>("detectedObjectPositionStandardDeviation"));
+          configuration.set_random_seed(controller.properties.template get<UnsignedInteger>("randomSeed"));
           configuration.set_range(300);
-          configuration.set_filter_by_range(
-            controller.properties.template get<Boolean>("isClairvoyant"));
+          configuration.set_update_duration(0.1);
+          // clang-format on
           return configuration;
         }());
 
