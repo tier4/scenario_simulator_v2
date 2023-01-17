@@ -43,6 +43,10 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
+#ifdef USE_ADAPI_V1_MSGS
+#include <autoware_adapi_msgs/msg/mrm_state.hpp>
+#endif
+
 namespace concealer
 {
 class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUniverse>
@@ -74,12 +78,11 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
+  using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
+  using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
 #ifdef USE_ADAPI_V1_MSGS
   using MrmState = autoware_adapi_v1_msgs::msg::MrmState;
-#else
-  using MrmState = autoware_auto_system_msgs::msg::EmergencyState;
 #endif
-  using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
@@ -87,8 +90,11 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
   CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
-  CONCEALER_DEFINE_SUBSCRIPTION(MrmState, override);
+  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
+#ifdef USE_ADAPI_V1_MSGS
+  CONCEALER_DEFINE_SUBSCRIPTION(MrmState);
+#endif
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
   CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
@@ -148,8 +154,11 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
     CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
-    CONCEALER_INIT_SUBSCRIPTION(MrmState, "/system/fail_safe/mrm_state"),
+    CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
+#ifdef USE_ADAPI_V1_MSGS
+    CONCEALER_INIT_SUBSCRIPTION(MrmState, "/api/fail_safe/mrm_state"),
+#endif
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
@@ -176,7 +185,11 @@ public:
 
   auto getAutowareStateName() const -> std::string override;
 
+  auto getEmergencyStateName() const -> std::string override;
+
   auto getGearSign() const -> double override;
+
+  auto getMinimumRiskManeuverStateName() const -> std::string override;
 
   auto getSteeringAngle() const -> double override;
 
@@ -231,14 +244,14 @@ auto operator<<(std::ostream &, const StateType &) -> std::ostream &;
 
 auto operator>>(std::istream &, StateType &) -> std::istream &;
 }  // namespace autoware_adapi_v1_msgs::msg
-#else
+#endif
+
 namespace autoware_auto_system_msgs::msg
 {
 auto operator<<(std::ostream &, const EmergencyState &) -> std::ostream &;
 
 auto operator>>(std::istream &, EmergencyState &) -> std::istream &;
 }  // namespace autoware_auto_system_msgs::msg
-#endif
 
 namespace autoware_auto_vehicle_msgs::msg
 {
