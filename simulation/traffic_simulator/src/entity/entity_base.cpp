@@ -751,7 +751,7 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
 auto EntityBase::updateTraveledDistance(const double step_time) -> double
 {
   if (npc_logic_started_) {
-    traveled_distance_ += getCurrentTwist().linear.x * step_time;
+    traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
   }
   return traveled_distance_;
 }
