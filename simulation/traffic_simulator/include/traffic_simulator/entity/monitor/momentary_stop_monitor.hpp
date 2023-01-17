@@ -36,7 +36,7 @@ public:
    *  and stop target under the stop_sequence_start_distance, this monitor begins
    * @param stop_sequence_end_distance If the target entity and stop target under this value and the target entity does not stopped,
    * this monitor throws SPECIFICATION_VIOLATION.
-   * @param stop_duration If entites stop longer than stop_duration, then this monitor ends successfully.
+   * @param stop_duration If entities stop longer than stop_duration, then this monitor ends successfully.
    */
   MomentaryStopMonitor(
     EntityBase & entity, double min_acceleration, double max_acceleration,
