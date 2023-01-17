@@ -210,7 +210,7 @@ auto EntityBase::getLaneletPose() const -> std::optional<traffic_simulator_msgs:
 }
 
 auto EntityBase::getLaneletPose(double matching_distance) const
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getStatus().type.type) {
     return hdmap_utils_ptr_->toLaneletPose(

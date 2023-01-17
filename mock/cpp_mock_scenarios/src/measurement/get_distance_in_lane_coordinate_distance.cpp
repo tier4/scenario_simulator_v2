@@ -58,13 +58,13 @@ private:
     if (!lateral_about_one) {
       return stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (lateral_about_one && !equals(lateral_about_one.get(), 1.0, 0.001)) {
+    if (lateral_about_one && !equals(lateral_about_one.value(), 1.0, 0.001)) {
       return stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (lateral_to_front && !equals(lateral_to_front.get(), 1.0)) {
+    if (lateral_to_front && !equals(lateral_to_front.value(), 1.0)) {
       return stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (lateral_to_behind && !equals(lateral_to_behind.get(), -1.0)) {
+    if (lateral_to_behind && !equals(lateral_to_behind.value(), -1.0)) {
       return stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (!distance_to_front) {

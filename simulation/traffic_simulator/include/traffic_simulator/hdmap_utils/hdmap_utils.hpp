@@ -115,7 +115,8 @@ public:
   double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s) const;
   std::optional<double> getLateralDistance(
-    const traffic_simulator_msgs::msg::LaneletPose & from, const traffic_simulator_msgs::msg::LaneletPose & to);
+    const traffic_simulator_msgs::msg::LaneletPose & from,
+    const traffic_simulator_msgs::msg::LaneletPose & to) const;
   std::optional<double> getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
     const traffic_simulator_msgs::msg::LaneletPose & to) const;
