@@ -272,7 +272,7 @@ public:
 
   bool entityExists(const std::string & name);
 
-  bool laneMatchingSucceed(const std::string & name);
+  bool laneMatchingSucceed(const std::string & name) const;
 
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> std::optional<double>;
@@ -295,10 +295,18 @@ public:
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   // clang-format off
-  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &) -> std::optional<double>;
-  auto getLongitudinalDistance(const LaneletPose &, const std::string &) -> std::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const LaneletPose &) -> std::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const std::string &) -> std::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const LaneletPose &) const -> std::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const std::string &) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &, const LaneletPose &) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &, const std::string &) const -> std::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const LaneletPose &, double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const std::string &, double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &, const LaneletPose &, double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &, const std::string &, double matching_distance) const -> std::optional<double>;
+  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &) const -> std::optional<double>;
+  auto getLongitudinalDistance(const LaneletPose &, const std::string &) const -> std::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const LaneletPose &) const -> std::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const std::string &) const -> std::optional<double>;
   // clang-format on
 
   auto getNumberOfEgo() const -> std::size_t;

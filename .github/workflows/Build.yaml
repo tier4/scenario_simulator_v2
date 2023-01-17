@@ -5,21 +5,19 @@ on:
   schedule:
     - cron: 0 0 * * *
   pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "README.md"
-      - "workflows/Docker.yaml"
-      - "workflows/Documentation.yaml"
-      - "workflows/NotifyFailure.yaml"
-      - "workflows/Release.yaml"
-      - "workflows/SpellCheck.yaml"
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!README.md'
+      - '!.github/**'
+      - '.github/workflows/Build.yaml'
+      - '!mkdocs.yml'
 
 jobs:
   build:
     name: build
     runs-on: ubuntu-20.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       max-parallel: 8

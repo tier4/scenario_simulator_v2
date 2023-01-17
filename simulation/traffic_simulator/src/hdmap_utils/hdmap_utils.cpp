@@ -1146,6 +1146,17 @@ bool HdMapUtils::canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lan
   return traffic_rules_vehicle_ptr_->canChangeLane(from_lanelet, to_lanelet);
 }
 
+std::optional<double> HdMapUtils::getLateralDistance(
+  const traffic_simulator_msgs::msg::LaneletPose & from,
+  const traffic_simulator_msgs::msg::LaneletPose & to) const
+{
+  const auto route = getRoute(from.lanelet_id, to.lanelet_id);
+  if (route.empty()) {
+    return std::nullopt;
+  }
+  return to.offset - from.offset;
+}
+
 std::optional<double> HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to) const
