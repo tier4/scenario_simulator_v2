@@ -303,9 +303,9 @@ struct MinimumRiskManeuverInfo
   template <typename T>
   auto extractStateName(T & msg) const -> std::string
   {
-#define CASE(IDENTIFIER)\
-  case T::IDENTIFIER:   \
-    return #IDENTIFIER; \
+#define CASE(IDENTIFIER) \
+  case T::IDENTIFIER:    \
+    return #IDENTIFIER;  \
     break
 
     if constexpr (std::is_same_v<T, autoware_auto_system_msgs::msg::EmergencyState>) {
@@ -343,9 +343,9 @@ struct MinimumRiskManeuverInfo
   template <typename T>
   auto extractBehaviorName(T & msg) const -> std::string
   {
-#define CASE(IDENTIFIER)\
-  case T::IDENTIFIER:   \
-    return #IDENTIFIER;\
+#define CASE(IDENTIFIER) \
+  case T::IDENTIFIER:    \
+    return #IDENTIFIER;  \
     break
 
     if constexpr (std::is_same_v<T, autoware_auto_system_msgs::msg::EmergencyState>) {
@@ -528,10 +528,7 @@ auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostr
 
 auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
 {
-#define STATE(IDENTIFIER)                   \
-  {                                         \
-#IDENTIFIER, EmergencyState::IDENTIFIER \
-  }
+#define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
 
   std::unordered_map<std::string, std::uint8_t> state_dictionary{
     STATE(MRM_FAILED), STATE(MRM_OPERATING),       STATE(MRM_SUCCEEDED),
