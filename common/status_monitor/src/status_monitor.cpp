@@ -46,7 +46,7 @@ StatusMonitor::StatusMonitor()
          determine that the system is in an abnormal state because the file
          that should have been output does not exist.
       */
-      file.open("/tmp/" + name() + "_status");
+      file.open("/tmp/" + name() + "_status.json");
 
       while (not terminating.load(std::memory_order_acquire)) {
         write();
