@@ -205,6 +205,18 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
   return boost::none;
 }
 
+auto EntityBase::getLaneletPose(double matching_distance) const
+  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getStatus().type.type) {
+    return hdmap_utils_ptr_->toLaneletPose(
+      getMapPose(), getStatus().bounding_box, true, matching_distance);
+  } else {
+    return hdmap_utils_ptr_->toLaneletPose(
+      getMapPose(), getStatus().bounding_box, false, matching_distance);
+  }
+}
+
 auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
 
 auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)

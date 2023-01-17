@@ -103,6 +103,9 @@ public:
 
   /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
+  /*   */ auto getLaneletPose(double matching_distance) const
+    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
   /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 
   /*   */ auto getMapPose(const geometry_msgs::msg::Pose &) -> geometry_msgs::msg::Pose;
