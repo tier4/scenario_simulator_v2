@@ -364,19 +364,25 @@ public:
       const std::string & entity_ref, const Performance & performance,
       const Properties & properties)
     {
-      core->addMetric<metrics::OutOfRangeMetric>(entity_ref + "-out-of-range", [&]() {
-        metrics::OutOfRangeMetric::Config configuration;
-        configuration.target_entity = entity_ref;
-        configuration.min_velocity = -performance.max_speed;
-        configuration.max_velocity = +performance.max_speed;
-        configuration.min_acceleration = -performance.max_deceleration;
-        configuration.max_acceleration = +performance.max_acceleration;
-        configuration.min_jerk = properties.template get<Double>("minJerk", Double::lowest());
-        configuration.max_jerk = properties.template get<Double>("maxJerk", Double::max());
-        configuration.jerk_topic =
-          "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
-        return configuration;
-      }());
+      {
+        auto min = -performance.max_speed;
+        auto max = +performance.max_speed;
+        core->monitorVelocityOutOfRange(entity_ref, min, max);
+      }
+
+      {
+        auto min = -performance.max_deceleration;
+        auto max = +performance.max_deceleration;
+        core->monitorAccelerationOutOfRange(entity_ref, min, max);
+      }
+
+      {
+        auto min = properties.template get<Double>("minJerk", Double::lowest());
+        auto max = properties.template get<Double>("maxJerk", Double::max());
+        auto topic =
+          std::string("/planning/scenario_planning/motion_velocity_optimizer/closest_jerk");
+        core->monitorJerkOutOfRange(entity_ref, min, max, topic);
+      }
     }
 
     template <typename... Ts>

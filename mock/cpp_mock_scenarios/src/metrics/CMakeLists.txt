@@ -1,8 +1,3 @@
-ament_auto_add_executable(traveled_distance
-  traveled_distance.cpp
-)
-target_link_libraries(traveled_distance cpp_scenario_node)
-
 ament_auto_add_executable(momentary_stop
   momentary_stop.cpp
 )
@@ -19,7 +14,6 @@ ament_auto_add_executable(out_of_range
 target_link_libraries(out_of_range cpp_scenario_node)
 
 install(TARGETS
-  traveled_distance
   momentary_stop
   reaction_time
   out_of_range
@@ -28,7 +22,6 @@ install(TARGETS
 
 if(BUILD_TESTING)
   include(../../cmake/add_cpp_mock_scenario_test.cmake)
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "traveled_distance" "15.0")
   add_cpp_mock_scenario_test(${PROJECT_NAME} "momentary_stop" "20.0")
   add_cpp_mock_scenario_test(${PROJECT_NAME} "reaction_time" "10.0")
   add_cpp_mock_scenario_test(${PROJECT_NAME} "out_of_range" "7.0")

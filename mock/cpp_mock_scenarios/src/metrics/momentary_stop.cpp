@@ -39,19 +39,7 @@ public:
 private:
   void onUpdate() override
   {
-    // LCOV_EXCL_START
-    if (!api_.metricExists("ego_momentary_stop")) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    if (
-      api_.metricExists("ego_momentary_stop") &&
-      api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::FAILURE) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    // LCOV_EXCL_STOP
-    if (
-      api_.metricExists("ego_momentary_stop") &&
-      api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::SUCCESS) {
+    if (api_.getCurrentTime() >= 12) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -62,9 +50,7 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34606, 20.0), getVehicleParameters());
     api_.setLinearVelocity("ego", 7);
     api_.requestSpeedChange("ego", 7, true);
-    api_.addMetric<metrics::MomentaryStopMetric>(
-      "ego_momentary_stop", "ego", -10, 10, 120635,
-      metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE, 30, 1, 0.05);
+    api_.monitorStopLineMomentaryStop("ego", -10, 10, 120635, 30, 1, 0.05);
   }
 };
 

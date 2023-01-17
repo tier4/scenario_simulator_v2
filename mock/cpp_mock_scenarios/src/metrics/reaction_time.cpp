@@ -51,18 +51,8 @@ private:
     if (api_.checkCollision("ego", "npc")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (!api_.metricExists("ego_reaction_time")) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    if (
-      api_.metricExists("ego_reaction_time") &&
-      api_.getMetricLifecycle("ego_reaction_time") == metrics::MetricLifecycle::FAILURE) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    }
     // LCOV_EXCL_STOP
-    if (
-      api_.metricExists("ego_reaction_time") &&
-      api_.getMetricLifecycle("ego_reaction_time") == metrics::MetricLifecycle::SUCCESS) {
+    if (api_.getCurrentTime() >= 12) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -76,7 +66,7 @@ private:
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0), getVehicleParameters());
     api_.setLinearVelocity("npc", 10);
     api_.requestSpeedChange("npc", 10, true);
-    api_.addMetric<metrics::ReactionTimeMetric>("ego_reaction_time", "ego", 1, -1, 1, true, true);
+    api_.monitorReactionTime("ego", 1, 1, -1);
   }
 };
 

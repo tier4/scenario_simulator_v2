@@ -47,7 +47,7 @@ DEFINE_ERROR_CATEGORY(SemanticError);
 // A problem occurred that interfered with the continuation of the simulation.
 DEFINE_ERROR_CATEGORY(SimulationError);
 
-// Metric module detects specification violation in simulation.
+// Monitor module detects specification violation in simulation.
 DEFINE_ERROR_CATEGORY(SpecificationViolation);
 
 // There is a syntactic error in the description of the scenario. Or you are

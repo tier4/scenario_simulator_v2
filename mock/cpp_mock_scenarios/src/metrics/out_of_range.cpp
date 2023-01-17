@@ -40,7 +40,7 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() >= 5 && api_.metricExists("ego_out_of_range")) {
+    if (api_.getCurrentTime() >= 5) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -51,13 +51,8 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
     api_.setLinearVelocity("ego", 3);
     api_.requestSpeedChange("ego", 3, true);
-    metrics::OutOfRangeMetric::Config config;
-    config.target_entity = "ego";
-    config.min_velocity = 2.95;
-    config.max_velocity = 3.05;
-    config.min_acceleration = -0.1;
-    config.max_acceleration = 0.1;
-    api_.addMetric<metrics::OutOfRangeMetric>("ego_out_of_range", config);
+    api_.monitorVelocityOutOfRange("ego", 2.95, 3.05);
+    api_.monitorAccelerationOutOfRange("ego", -0.1, 0.1);
   }
 };
 

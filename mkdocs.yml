@@ -81,7 +81,6 @@ nav:
       - developer_guide/SystemArchitecture.md
       - developer_guide/TrafficSimulator.md
       - developer_guide/ZeroMQ.md
-      - developer_guide/Metrics.md
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
       - developer_guide/TIERIVScenarioFormatVersion2.md
