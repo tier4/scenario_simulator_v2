@@ -1,7 +1,13 @@
 from glob import glob
 import os
+from warnings import simplefilter
+from pkg_resources import PkgResourcesDeprecationWarning
+from setuptools import SetuptoolsDeprecationWarning
 
 from setuptools import setup
+
+simplefilter("ignore", category=SetuptoolsDeprecationWarning)
+simplefilter("ignore", category=PkgResourcesDeprecationWarning)
 
 package_name = "scenario_test_runner"
 
@@ -12,12 +18,20 @@ setup(
     data_files=[
         ("share/" + package_name + "/config", glob("config/*")),
         ("share/" + package_name + "/launch", glob("launch/*.launch.*")),
-        ("share/" + package_name + "/scenario", list(filter(lambda p : os.path.isfile(p), glob("scenario/*")))),
+        (
+            "share/" + package_name + "/scenario",
+            list(filter(lambda p: os.path.isfile(p), glob("scenario/*"))),
+        ),
         ("share/" + package_name, ["package.xml"]),
         ("share/ament_index/resource_index/packages", glob("resource/*")),
-    ] + [
-        ("share/" + package_name + "/" + catalog_dir, [fname for fname in glob(catalog_dir + "/*") if os.path.isfile(fname)])
-        for catalog_dir in glob("scenario/catalog/*") if os.path.isdir(catalog_dir)
+    ]
+    + [
+        (
+            "share/" + package_name + "/" + catalog_dir,
+            [fname for fname in glob(catalog_dir + "/*") if os.path.isfile(fname)],
+        )
+        for catalog_dir in glob("scenario/catalog/*")
+        if os.path.isdir(catalog_dir)
     ],
     install_requires=["setuptools"],
     zip_safe=True,

@@ -4,6 +4,12 @@
 from glob import glob
 from pathlib import Path
 from setuptools import setup, find_packages
+from warnings import simplefilter
+from pkg_resources import PkgResourcesDeprecationWarning
+from setuptools import SetuptoolsDeprecationWarning
+
+simplefilter("ignore", category=SetuptoolsDeprecationWarning)
+simplefilter("ignore", category=PkgResourcesDeprecationWarning)
 
 
 package_name = "openscenario_utility"
