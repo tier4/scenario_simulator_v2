@@ -26,6 +26,8 @@ enum class Type {
   UNKOWN = 0,
   LINEAR_VELOCITY = 1,
   LINEAR_ACCELERATION = 2,
+  STAND_STILL_DURATION = 3,
+  TRAVELED_DISTANCE = 4,
 };
 
 enum class Status {
@@ -43,7 +45,7 @@ class Job
 public:
   /**
    * @brief Construct a new Job object
-   * 
+   *
    * @param func_on_update If func_on_update function returns true, runs func_on_update function.
    * @param func_on_cleanup If func_on_update function returns true, runs func_on_update function.
    * @param type Type of the Job
