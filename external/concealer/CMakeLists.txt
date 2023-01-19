@@ -32,6 +32,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/autoware_universe.cpp
   src/cooperator.cpp
   src/execute.cpp
+  src/minimum_risk_maneuver_merger.cpp
   src/task_queue.cpp)
 
 # workaround to allow deprecated header to build on both galactic and humble

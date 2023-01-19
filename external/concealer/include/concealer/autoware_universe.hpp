@@ -122,7 +122,10 @@ private:
   MinimumRiskManeuverMerger minimum_risk_maneuver_merger;
 
   template <typename T>
-  auto receiveMinimumRiskManeuverState(const T &) -> void;
+  auto receiveMinimumRiskManeuverState(const T & msg) -> void
+  {
+    minimum_risk_maneuver_merger.set(msg);
+  }
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \

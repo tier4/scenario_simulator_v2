@@ -60,11 +60,11 @@ auto AutowareUniverse::cooperate(const CooperateStatusArray & cooperate_status_a
   }
 }
 
-template <typename T>
-auto AutowareUniverse::receiveMinimumRiskManeuverState(const T & msg) -> void
-{
-  minimum_risk_maneuver_merger.set(msg);
-}
+//template auto
+//AutowareUniverse::receiveMinimumRiskManeuverState<autoware_auto_system_msgs::msg::EmergencyState>(
+//  const autoware_auto_system_msgs::msg::EmergencyState &) -> void;
+//template auto AutowareUniverse::receiveMinimumRiskManeuverState<
+//  autoware_adapi_v1_msgs::msg::MrmState>(const autoware_adapi_v1_msgs::msg::MrmState &) -> void;
 
 auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
