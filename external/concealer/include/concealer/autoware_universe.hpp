@@ -221,38 +221,6 @@ public:
 }  // namespace concealer
 
 // for boost::lexical_cast
-#ifdef USE_ADAPI_V1_MSGS
-namespace autoware_adapi_v1_msgs::msg
-{
-struct BehaviorType
-{
-  explicit BehaviorType(const MrmState & mrm_state) : data(mrm_state.behavior) {}
-  MrmState::_behavior_type data;
-};
-
-auto operator<<(std::ostream &, const BehaviorType &) -> std::ostream &;
-
-auto operator>>(std::istream &, BehaviorType &) -> std::istream &;
-
-struct StateType
-{
-  explicit StateType(const MrmState & mrm_state) : data(mrm_state.state) {}
-  MrmState::_state_type data;
-};
-
-auto operator<<(std::ostream &, const StateType &) -> std::ostream &;
-
-auto operator>>(std::istream &, StateType &) -> std::istream &;
-}  // namespace autoware_adapi_v1_msgs::msg
-#endif
-
-namespace autoware_auto_system_msgs::msg
-{
-auto operator<<(std::ostream &, const EmergencyState &) -> std::ostream &;
-
-auto operator>>(std::istream &, EmergencyState &) -> std::istream &;
-}  // namespace autoware_auto_system_msgs::msg
-
 namespace autoware_auto_vehicle_msgs::msg
 {
 auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
