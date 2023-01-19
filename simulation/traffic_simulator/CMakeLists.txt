@@ -22,6 +22,7 @@ elseif(${ROS_DISTRO} STREQUAL "galactic")
 elseif(${ROS_DISTRO} STREQUAL "humble")
   add_compile_definitions(ROS_DISTRO_HUMBLE)
 endif()
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 
 find_package(ament_cmake_auto REQUIRED)
 find_package(traffic_simulator_msgs REQUIRED)
@@ -57,7 +58,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/metrics/momentary_stop_metric.cpp
   src/metrics/out_of_range_metric.cpp
   src/metrics/reaction_time_metric.cpp
-  src/metrics/traveled_distance_metric.cpp
   src/simulation_clock/simulation_clock.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp

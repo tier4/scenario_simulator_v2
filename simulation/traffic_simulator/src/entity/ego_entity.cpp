@@ -349,6 +349,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   }
   setStatus(entity_status);
   updateStandStillDuration(step_time);
+  updateTraveledDistance(step_time);
 
   previous_linear_velocity_ = vehicle_model_ptr_->getVx();
   previous_angular_velocity_ = vehicle_model_ptr_->getWz();

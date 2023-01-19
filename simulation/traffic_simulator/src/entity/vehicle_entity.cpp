@@ -156,8 +156,10 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
+
     setStatus(status_updated);
     updateStandStillDuration(step_time);
+    updateTraveledDistance(step_time);
   } else {
     updateEntityStatusTimestamp(current_time);
   }
