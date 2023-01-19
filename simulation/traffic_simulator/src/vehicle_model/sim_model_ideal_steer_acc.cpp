@@ -1,4 +1,3 @@
-
 // Copyright 2021 The Autoware Foundation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
