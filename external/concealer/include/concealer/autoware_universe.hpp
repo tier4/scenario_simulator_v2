@@ -32,6 +32,7 @@
 #include <concealer/autoware.hpp>
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
+#include <concealer/minimum_risk_maneuver_merger.hpp>
 #include <concealer/task_queue.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
@@ -44,7 +45,7 @@
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
 #ifdef USE_ADAPI_V1_MSGS
-#include <autoware_adapi_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #endif
 
 namespace concealer
@@ -118,6 +119,11 @@ private:
 
   auto cooperate(const CooperateStatusArray &) -> void;
 
+  MinimumRiskManeuverMerger minimum_risk_maneuver_merger;
+
+  template <typename T>
+  auto receiveMinimumRiskManeuverState(const T &) -> void;
+
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
   auto is##NAME() const noexcept                             \
@@ -154,10 +160,10 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
     CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
-    CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(EmergencyState, "/system/emergency/emergency_state", receiveMinimumRiskManeuverState),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
 #ifdef USE_ADAPI_V1_MSGS
-    CONCEALER_INIT_SUBSCRIPTION(MrmState, "/api/fail_safe/mrm_state"),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(MrmState, "/api/fail_safe/mrm_state", receiveMinimumRiskManeuverState),
 #endif
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
@@ -188,6 +194,8 @@ public:
   auto getEmergencyStateName() const -> std::string override;
 
   auto getGearSign() const -> double override;
+
+  auto getMinimumRiskManeuverBehaviorName() const -> std::string override;
 
   auto getMinimumRiskManeuverStateName() const -> std::string override;
 

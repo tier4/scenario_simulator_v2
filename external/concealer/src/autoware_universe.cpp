@@ -60,6 +60,12 @@ auto AutowareUniverse::cooperate(const CooperateStatusArray & cooperate_status_a
   }
 }
 
+template <typename T>
+auto AutowareUniverse::receiveMinimumRiskManeuverState(const T & msg) -> void
+{
+  minimum_risk_maneuver_merger.set(msg);
+}
+
 auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
@@ -255,127 +261,20 @@ auto AutowareUniverse::getAutowareStateName() const -> std::string
 #undef CASE
 }
 
-//auto Autoware::getMinimumRiskManeuverStateName() const -> std::string
-//{
-//  using autoware_auto_system_msgs::msg::EmergencyState;
-//  EmergencyState mrm_state;
-//  mrm_state.state = EmergencyState::NORMAL;
-//  return boost::lexical_cast<std::string>(mrm_state);
-//}
-enum class MinimumRiskManeuverSource {
-  none,
-  autoware_auto_system_msgs,
-  autoware_adapi_v1_msgs,
-};
-struct MinimumRiskManeuverInfo
+auto AutowareUniverse::getEmergencyStateName() const -> std::string
 {
-  MinimumRiskManeuverSource source = MinimumRiskManeuverSource::none;
-  std::string state_name;
-  std::string behavior_name;
-  void set(autoware_auto_system_msgs::msg::EmergencyState & msg)
-  {
-    if (source == MinimumRiskManeuverSource::autoware_adapi_v1_msgs) {
-      std::cout
-        << "Multiple source of MinimumRiskManeuverState are exist. It must be the only."
-           "It is possible that the combination of Autoware-related repositories is incorrect."
-        << std::endl;
-    } else {
-      source = MinimumRiskManeuverSource::autoware_auto_system_msgs;
-      state_name = boost::lexical_cast<std::string>(msg);
-    }
-  }
-#ifdef USE_ADAPI_V1_MSGS
-  void set(autoware_adapi_v1_msgs::msg::MrmState & msg)
-  {
-    if (source == MinimumRiskManeuverSource::autoware_auto_system_msgs) {
-      std::cout
-        << "Multiple source of MinimumRiskManeuverState are exist. It must be the only."
-           " It is possible that the combination of Autoware-related repositories is incorrect."
-        << std::endl;
-    } else {
-      source = MinimumRiskManeuverSource::autoware_adapi_v1_msgs;
-      state_name = boost::lexical_cast<std::string>(msg);
-      behavior_name = boost::lexical_cast<std::string>(msg.behavior);
-    }
-  }
-#endif
+  return minimum_risk_maneuver_merger.getStateName();
+}
 
-  template <typename T>
-  auto extractStateName(T & msg) const -> std::string
-  {
-#define CASE(IDENTIFIER) \
-  case T::IDENTIFIER:    \
-    return #IDENTIFIER;  \
-    break
+auto AutowareUniverse::getMinimumRiskManeuverBehaviorName() const -> std::string
+{
+  return minimum_risk_maneuver_merger.getBehaviorName();
+}
 
-    if constexpr (std::is_same_v<T, autoware_auto_system_msgs::msg::EmergencyState>) {
-      switch (msg.data) {
-        CASE(MRM_FAILED);
-        CASE(MRM_OPERATING);
-        CASE(MRM_SUCCEEDED);
-        CASE(NORMAL);
-        CASE(UNKNOWN);
-
-        default:
-          throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.data));
-      }
-    }
-#ifdef USE_ADAPI_V1_MSG
-    else if constexpr (std::is_same_v<T, autoware_adapi_v1_msgs::msg::MrmState>) {
-      switch (msg.data) {
-        CASE(MRM_FAILED);
-        CASE(MRM_OPERATING);
-        CASE(MRM_SUCCEEDED);
-        CASE(NORMAL);
-        CASE(UNKNOWN);
-
-        default:
-          throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.data));
-      }
-    }
-#endif
-    else {
-      throw common::Error("Unsupported MrmState type : ", typeid(T).name());
-    }
-#undef CASE
-  }
-
-  template <typename T>
-  auto extractBehaviorName(T & msg) const -> std::string
-  {
-#define CASE(IDENTIFIER) \
-  case T::IDENTIFIER:    \
-    return #IDENTIFIER;  \
-    break
-
-    if constexpr (std::is_same_v<T, autoware_auto_system_msgs::msg::EmergencyState>) {
-      throw common::Error(
-        "autoware_auto_system_msgs::msg::EmergencyState has no behavior field for "
-        "MinimumRiskManeuver");
-    }
-#ifdef USE_ADAPI_V1_MSG
-    else if constexpr (std::is_same_v<T, autoware_adapi_msgs::msg::MrmState>) {
-      switch (msg.data) {
-        CASE(COMFORTABLE_STOP);
-        CASE(EMERGENCY_STOP);
-        CASE(NONE);
-        CASE(UNKNOWN);
-
-        default:
-          throw common::Error(
-            "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.data));
-      }
-    }
-#endif
-    else {
-      throw common::Error("Unsupported type of MrmState");
-    }
-  }
-};
-
-std::string AutowareUniverse::getEmergencyStateName() const { return std::string(); }
-
-std::string AutowareUniverse::getMinimumRiskManeuverStateName() const { return std::string(); }
+auto AutowareUniverse::getMinimumRiskManeuverStateName() const -> std::string
+{
+  return minimum_risk_maneuver_merger.getStateName();
+}
 
 auto AutowareUniverse::sendSIGINT() -> void  //
 {

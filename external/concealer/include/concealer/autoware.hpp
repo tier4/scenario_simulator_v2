@@ -175,9 +175,8 @@ public:
 
   virtual auto getAutowareStateName() const -> std::string = 0;
 
-#ifdef USE_ADAPI_V1_MSGS
   virtual auto getMinimumRiskManeuverBehaviorName() const -> std::string = 0;
-#endif
+
   virtual auto getMinimumRiskManeuverStateName() const -> std::string = 0;
 
   virtual auto getEmergencyStateName() const -> std::string = 0;
