@@ -61,24 +61,31 @@ MultiClient::MultiClient(
     protocol, hostname, simulation_interface::ports::attach_occupancy_grid_sensor));
   socket_update_traffic_lights_.connect(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::update_traffic_lights));
+}
 
-  rclcpp::on_shutdown([this] { is_running = false; });
+void MultiClient::closeConnection()
+{
+  if(is_running) 
+  {
+    is_running = false;
+    socket_initialize_.close();
+    socket_update_frame_.close();
+    socket_update_sensor_frame_.close();
+    socket_spawn_vehicle_entity_.close();
+    socket_spawn_pedestrian_entity_.close();
+    socket_spawn_misc_object_entity_.close();
+    socket_despawn_entity_.close();
+    socket_update_entity_status_.close();
+    socket_attach_lidar_sensor_.close();
+    socket_attach_detection_sensor_.close();
+    socket_attach_occupancy_grid_sensor_.close();
+    socket_update_traffic_lights_.close();
+  }
 }
 
 MultiClient::~MultiClient()
 {
-  socket_initialize_.close();
-  socket_update_frame_.close();
-  socket_update_sensor_frame_.close();
-  socket_spawn_vehicle_entity_.close();
-  socket_spawn_pedestrian_entity_.close();
-  socket_spawn_misc_object_entity_.close();
-  socket_despawn_entity_.close();
-  socket_update_entity_status_.close();
-  socket_attach_lidar_sensor_.close();
-  socket_attach_detection_sensor_.close();
-  socket_attach_occupancy_grid_sensor_.close();
-  socket_update_traffic_lights_.close();
+  closeConnection();
 }
 
 void MultiClient::call(
