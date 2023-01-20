@@ -24,7 +24,7 @@ setup(
     maintainer_email="tatsuya.yamasaki@tier4.jp",
     description="Utility tools for ASAM OpenSCENARIO 1.2.0",
     packages=find_packages(),
-    install_requires=["PyYAML", "numpy", "setuptools", "xmlschema"],
+    install_requires=["PyYAML", "numpy", "setuptools<66.0.0", "xmlschema"],
     include_package_data=True,
     package_data={"": ["resources/*.xsd"]},
     data_files=[
