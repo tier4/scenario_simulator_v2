@@ -16,7 +16,6 @@
 
 namespace concealer
 {
-
 auto MinimumRiskManeuverMerger::set(const autoware_auto_system_msgs::msg::EmergencyState & msg)
   -> void
 {
@@ -30,6 +29,7 @@ auto MinimumRiskManeuverMerger::set(const autoware_auto_system_msgs::msg::Emerge
     state_name = extractStateName<autoware_auto_system_msgs::msg::EmergencyState>(msg);
   }
 }
+
 #ifdef USE_ADAPI_V1_MSGS
 auto MinimumRiskManeuverMerger::set(const autoware_adapi_v1_msgs::msg::MrmState & msg) -> void
 {
@@ -49,20 +49,23 @@ auto MinimumRiskManeuverMerger::set(const autoware_adapi_v1_msgs::msg::MrmState 
 auto MinimumRiskManeuverMerger::getStateName() const -> std::string
 {
   if (source == MinimumRiskManeuverSource::none) {
-    throw common::Error(
-      "No source for MinimumRiskManeuverState exist."
-      "Please check source topic name and its existence");
+    std::cout << "No source for MinimumRiskManeuverState exist."
+                 "Please check source topic name and its existence"
+              << std::endl;
+    return "";
   } else {
     return state_name;
   }
 }
+
 auto MinimumRiskManeuverMerger::getBehaviorName() const -> std::string
 {
   switch (source) {
     case MinimumRiskManeuverSource::none:
-      throw common::Error(
-        "No source for MinimumRiskManeuverState exist."
-        "Please check source topic name and its existence");
+      std::cout << "No source for MinimumRiskManeuverState exist."
+                   "Please check source topic name and its existence"
+                << std::endl;
+      return "";
     case MinimumRiskManeuverSource::autoware_auto_system_msgs:
       throw common::Error(
         "the Autoware uses autoware_auto_system_msgs for EmergencyState, which doesn't support "
