@@ -81,9 +81,10 @@ class Workflow:
         self.path = path
 
         self.schema = yamale.make_schema(
-            Path(get_package_share_directory("scenario_test_runner")).parent.joinpath(
-                "ament_index", "resource_index", "packages", "workflow_schema.yaml"
-            )
+            # Path(get_package_share_directory("scenario_test_runner")).parent.parent.joinpath(
+            #     "lib", "scenario_test_runner", "resources", "workflow_schema.yaml"
+            # )
+            Path(__file__).parent / "resources/workflow_schema.yaml"
         )
 
         self.global_frame_rate = global_frame_rate
