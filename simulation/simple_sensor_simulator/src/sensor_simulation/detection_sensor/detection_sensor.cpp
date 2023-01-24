@@ -168,7 +168,6 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         if (recognizeWithProbability(random_engine_)) {
           msg.objects.push_back(applyPositionNoise(object));
         }
-        // std::cerr << recognition_lost_uniform_distribution(random_engine_) << std::endl;
       }
     }
     publisher_ptr_->publish(msg);
