@@ -16,6 +16,7 @@
     "collisioncondition",
     "customcommandaction",
     "DBOOST",
+    "DBUILD",
     "DEPENDEND",
     "Deps",
     "Disp",
