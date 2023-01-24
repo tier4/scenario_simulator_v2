@@ -14,9 +14,11 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-|      Feature      |             Brief summary              |                  Category                   |                          Pull request                           |                  Contributor                  |
-| ----------------- | -------------------------------------- | ------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
-| Fix stop behavior | Update NPC behavior and avoid overrun. | `traffic_simulator`, `behavior_tree_plugin` | [#946](https://github.com/tier4/scenario_simulator_v2/pull/946) | [hakuturu583](https://github.com/hakuturu583) |
+| Feature           | Brief summary                                                                          | Category                                    | Pull request                                                    | Contributor                                   |
+|-------------------|----------------------------------------------------------------------------------------|---------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| Fix stop behavior | Update NPC behavior and avoid overrun.                                                 | `traffic_simulator`, `behavior_tree_plugin` | [#946](https://github.com/tier4/scenario_simulator_v2/pull/946) | [hakuturu583](https://github.com/hakuturu583) |
+| Fix vehicle_model | Import bug fixes from simple_planning_simulator in autoware.universe for vehicle_model | `traffic_simulator`                         | [#936](https://github.com/tier4/scenario_simulator_v2/pull/936) | [HansRobo](https://github.com/HansRobo)       |
+
 
 Minor Tweaks :oncoming_police_car:
 
@@ -64,6 +66,8 @@ Major Changes :race_car: :red_car: :blue_car:
 | RTC (Request to Cooperate)                                        | Experimental support for automatic approval of requests to cooperate from Autoware.Universe.         | `concealer`                | [#818](https://github.com/tier4/scenario_simulator_v2/pull/818) | [yamacir-kit](https://github.com/yamacir-kit) |
 | Experimental UserDefinedValueCondition `RelativeHeadingCondition` | Update `UserDefinedValueCondition` to support new experimental condition `RelativeHeadingCondition`. | `openscenario_interpreter` | [#830](https://github.com/tier4/scenario_simulator_v2/pull/830) | [yamacir-kit](https://github.com/yamacir-kit) |
 | OpenSCENARIO `ValueConstraint`, `ValueConstraintGroup`            | Add support for `ValueConstraint` and `ValueConstraintGroup`.                                        | `openscenario_interpreter` | [#847](https://github.com/tier4/scenario_simulator_v2/pull/847) | [HansRobo](https://github.com/HansRobo)       |
+| Add `API::getTraveledDistance()`                                  | Add `API::getTraveledDistance()` to obtain how far an entity traveled, and remove `TraveledDistanceMetric`.                                | `traffic_simulator`        | [#858](https://github.com/tier4/scenario_simulator_v2/pull/858) | [hakuturu583](https://github.com/hakuturu583), [shouth](https://github.com/shouth)       |
+
 | Improve ego lane matching logic                                   | Retry matching to lanelet without using route information from Autoware.                             | `traffic_simulator`        | [#864](https://github.com/tier4/scenario_simulator_v2/pull/864) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
