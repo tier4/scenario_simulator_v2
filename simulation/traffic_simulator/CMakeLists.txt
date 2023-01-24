@@ -13,6 +13,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+
 find_package(ament_cmake_auto REQUIRED)
 find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
@@ -47,7 +49,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/metrics/momentary_stop_metric.cpp
   src/metrics/out_of_range_metric.cpp
   src/metrics/reaction_time_metric.cpp
-  src/metrics/traveled_distance_metric.cpp
   src/simulation_clock/simulation_clock.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
