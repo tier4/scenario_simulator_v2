@@ -22,6 +22,7 @@
     "pluggable",
     "randomizer",
     "randomizers",
+    "libunwind",
     "subspline",
     "TESTRANDOMIZER",
     "TIERIV",
