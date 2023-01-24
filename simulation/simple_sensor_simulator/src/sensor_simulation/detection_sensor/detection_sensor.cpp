@@ -59,7 +59,7 @@ auto DetectionSensorBase::getSensorPose(
 }
 
 template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyNoise(
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
   autoware_auto_perception_msgs::msg::DetectedObject detected_object)
   -> autoware_auto_perception_msgs::msg::DetectedObject
 {
@@ -161,7 +161,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         double probability = 10.0;  // recognition lost probability [%]
 
         if (recognition_lost_uniform_distribution(random_engine_) > probability) {
-          msg.objects.push_back(applyNoise(object));
+          msg.objects.push_back(applyPositionNoise(object));
         }
         std::cerr << recognition_lost_uniform_distribution(random_engine_) << std::endl;
       }
