@@ -32,6 +32,7 @@ jobs:
             rosdistro: humble
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
+      BUILD_CPP_MOCK_SCENARIOS: ON
     container:
       image: ${{ matrix.docker_image }}
     steps:
@@ -58,7 +59,7 @@ jobs:
           package-name: ${{ steps.list_packages.outputs.package_list }}
           target-ros2-distro: ${{ matrix.rosdistro }}
           vcs-repo-file-url: dependency_${{ matrix.rosdistro }}.repos
-          extra-cmake-args: -DWITH_INTEGRATION_TEST=ON
+          extra-cmake-args: -DWITH_INTEGRATION_TEST=ON -DBUILD_CPP_MOCK_SCENARIOS=ON
           colcon-defaults: |
             {
               "build": {
