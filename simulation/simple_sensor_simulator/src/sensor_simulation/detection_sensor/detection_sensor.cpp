@@ -14,10 +14,14 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <algorithm>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <memory>
+#include <simple_sensor_simulator/exception.hpp>
+#include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <string>
 #include <vector>
 
@@ -159,6 +163,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         if (recognition_lost_uniform_distribution(random_engine_) > probability) {
           msg.objects.push_back(applyNoise(object));
         }
+        std::cerr << recognition_lost_uniform_distribution(random_engine_) << std::endl;
       }
     }
     publisher_ptr_->publish(msg);
