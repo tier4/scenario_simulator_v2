@@ -32,7 +32,6 @@ jobs:
             rosdistro: humble
     env:
       ROS_DISTRO: ${{ matrix.rosdistro }}
-      BUILD_CPP_MOCK_SCENARIOS: ON
     container:
       image: ${{ matrix.docker_image }}
     steps:
