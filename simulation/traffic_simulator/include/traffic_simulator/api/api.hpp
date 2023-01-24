@@ -224,7 +224,7 @@ public:
 
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
   bool attachDetectionSensor(
-    const std::string &, double pos_noise_stddev, int random_seed = 0, double probability_of_lost);
+    const std::string &, double pos_noise_stddev, double probability_of_lost, int random_seed = 0);
 
   bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
 
