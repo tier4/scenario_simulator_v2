@@ -6,12 +6,6 @@ on:
     branches:
       - master
 
-env:
-  cspell-json-url: https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/.cspell.json
-  local-cspell-json: .github/workflows/custom_spell.json
-  dict-packages: |
-    https://github.com/tier4/cspell-dicts
-
 jobs:
   spell-check:
     runs-on: ubuntu-latest
@@ -21,7 +15,7 @@ jobs:
 
       - name: Install dict packages
         run: |
-          for package in $(IFS=" " echo "${{ dict-packages }}"); do
+          for package in $(IFS=" " echo "https://github.com/tier4/cspell-dicts"); do
             echo "Install $package."
             npm install $package
           done
@@ -29,14 +23,14 @@ jobs:
 
       - name: Retrieve remote dictionary
         run: |
-          curl -fsSL -o remote.cspell.json ${{ cspell-json-url }} \
+          curl -fsSL -o remote.cspell.json https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/.cspell.json \
             -H "Authorization: token ${{ github.token }}"
         shell: bash
 
       - name: Prepare local dictionary
         run: |
-          if [ -f "${{ local-cspell-json }}" ]; then
-            cp ${{ local-cspell-json }} local.cspell.json || true
+          if [ -f ".github/workflows/custom_spell.json" ]; then
+            cp .github/workflows/custom_spell.json local.cspell.json || true
           else
             echo "No local dictionary found."
             echo "{}" > local.cspell.json
