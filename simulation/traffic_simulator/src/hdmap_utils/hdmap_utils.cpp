@@ -782,6 +782,18 @@ double HdMapUtils::getLaneletLength(std::int64_t lanelet_id)
   return ret;
 }
 
+std::vector<std::int64_t> HdMapUtils::getPreviousRoadShoulderLanelet(std::int64_t lanelet_id) const
+{
+  std::vector<std::int64_t> ret;
+  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : shoulder_lanelets_) {
+    if (lanelet::geometry::follows(shoulder_lanelet, lanelet)) {
+      ret.emplace_back(shoulder_lanelet.id());
+    }
+  }
+  return ret;
+}
+
 std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet_id) const
 {
   std::vector<std::int64_t> ret;
@@ -804,6 +816,21 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(
     if (turn_direction_llt == turn_direction) {
       ret.push_back(llt.id());
     }
+  }
+  return ret;
+}
+
+std::vector<std::int64_t> HdMapUtils::getNextRoadShoulderLanelet(std::int64_t lanelet_id) const
+{
+  std::vector<std::int64_t> ret;
+  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : shoulder_lanelets_) {
+    if (lanelet::geometry::follows(lanelet, shoulder_lanelet)) {
+      ret.emplace_back(shoulder_lanelet.id());
+    }
+  }
+  for (const auto & id : getNextRoadShoulderLanelet(lanelet_id)) {
+    ret.push_back(id);
   }
   return ret;
 }

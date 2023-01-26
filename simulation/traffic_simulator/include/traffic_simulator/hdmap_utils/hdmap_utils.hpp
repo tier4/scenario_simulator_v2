@@ -236,6 +236,17 @@ private:
     const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const;
   std::vector<geometry_msgs::msg::Point> toPolygon(
     const lanelet::ConstLineString3d & line_string) const;
+  template <typename T>
+  std::vector<std::int64_t> getLaneletIds(const std::vector<T> & lanelets) const
+  {
+    std::vector<std::int64_t> ids;
+    for (const auto & lanelet : lanelets) {
+      ids.emplace_back(lanelet.id());
+    }
+    return ids;
+  }
+  std::vector<std::int64_t> getNextRoadShoulderLanelet(std::int64_t lanelet_id) const;
+  std::vector<std::int64_t> getPreviousRoadShoulderLanelet(std::int64_t lanelet_id) const;
 };
 }  // namespace hdmap_utils
 
