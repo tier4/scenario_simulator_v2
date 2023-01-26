@@ -150,6 +150,40 @@ OpenSCENARIO:
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_1
+                                        - entityRef: car_3
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: false # True: distance is measured between closest bounding box points. False: reference point distance is used.
+                                        relativeDistanceType: lateral
+                                        rule: equalTo
+                                        value: -1.5
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_2
+                                        - entityRef: car_4
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: false # True: distance is measured between closest bounding box points. False: reference point distance is used.
+                                        relativeDistanceType: lateral
+                                        rule: equalTo
+                                        value: 0.5
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
                                       value: 10

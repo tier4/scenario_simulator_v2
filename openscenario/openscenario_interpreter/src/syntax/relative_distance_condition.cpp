@@ -114,6 +114,29 @@ auto RelativeDistanceCondition::distance<
 
 template <>
 auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::lateral, false>(const EntityRef & triggering_entity)
+  -> double
+{
+  // std::cout << std::string(80, '-') << std::endl;
+  //
+  // PRINT(coordinate_system);
+  // PRINT(freespace);
+  // PRINT(relative_distance_type);
+
+  if (
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
+    // PRINT(triggering_entity);
+    // PRINT(entity_ref);
+    // PRINT(makeNativeRelativeLanePosition(triggering_entity, entity_ref).offset);
+    return makeNativeRelativeLanePosition(triggering_entity, entity_ref).offset;
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, false>(
   const EntityRef & triggering_entity) -> double
 {
