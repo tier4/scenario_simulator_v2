@@ -25,6 +25,7 @@ auto MinimumRiskManeuverMerger::set(const autoware_auto_system_msgs::msg::Emerge
          "It is possible that the combination of Autoware-related repositories is incorrect."
       << std::endl;
   } else {
+    std::cout << "Input from auto msg" << std::endl;
     source = MinimumRiskManeuverSource::autoware_auto_system_msgs;
     state_name = extractStateName<autoware_auto_system_msgs::msg::EmergencyState>(msg);
   }
@@ -54,6 +55,7 @@ auto MinimumRiskManeuverMerger::getStateName() const -> std::string
               << std::endl;
     return "";
   } else {
+    std::cout << "Output State : " << state_name << std::endl;
     return state_name;
   }
 }
