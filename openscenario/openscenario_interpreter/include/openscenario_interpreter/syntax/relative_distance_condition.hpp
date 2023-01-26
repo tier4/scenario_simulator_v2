@@ -46,22 +46,37 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct RelativeDistanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
-  // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity".
+  /*
+     Definition of the coordinate system to be used for calculations. If not
+     provided the value is interpreted as "entity".
+  */
   const CoordinateSystem coordinate_system;
 
-  // Reference entity.
+  /*
+     Reference entity.
+  */
   const String entity_ref;
 
-  // True: distance is measured between closest bounding box points. False: reference point distance is used.
+  /*
+     True: distance is measured between closest bounding box points.
+     False: reference point distance is used.
+  */
   const Boolean freespace;
 
-  // Definition of the coordinate system dimension(s) to be used for calculating distances.
+  /*
+     Definition of the coordinate system dimension(s) to be used for
+     calculating distances.
+  */
   const RelativeDistanceType relative_distance_type;
 
-  // The operator (less, greater, equal).
+  /*
+     The operator (less, greater, equal).
+  */
   const Rule rule;
 
-  // The distance value. Unit: m; Range: [0..inf[.
+  /*
+     The distance value. Unit: m; Range: [0..inf[.
+  */
   const Double value;
 
   const TriggeringEntities triggering_entities;
@@ -83,12 +98,12 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   auto evaluate() -> Object;
 };
 
-//ignore spell miss due to OpenSCENARIO standard
+// NOTE: Ignore spell miss due to OpenSCENARIO standard.
 // cspell: ignore euclidian
 
 // clang-format off
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const EntityRef &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const EntityRef &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const EntityRef &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const EntityRef &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const EntityRef &) -> double;
