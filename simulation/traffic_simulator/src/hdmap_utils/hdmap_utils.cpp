@@ -80,9 +80,11 @@ HdMapUtils::HdMapUtils(
   std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
   all_graphs.push_back(vehicle_routing_graph_ptr_);
   all_graphs.push_back(pedestrian_routing_graph_ptr_);
+  shoulder_lanelets_ =
+    lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
-const std::vector<std::int64_t> HdMapUtils::getLaneletIds()
+const std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
 {
   std::vector<std::int64_t> ret;
   for (const auto & lanelet : lanelet_map_ptr_->laneletLayer) {
