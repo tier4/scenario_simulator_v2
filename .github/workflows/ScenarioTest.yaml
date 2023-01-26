@@ -60,7 +60,7 @@ jobs:
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           cd ~/ros2_ws
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON
         shell: bash
 
       - name: Scenario test
