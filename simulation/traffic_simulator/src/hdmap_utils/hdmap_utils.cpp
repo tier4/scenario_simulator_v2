@@ -804,6 +804,9 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet
   for (const auto & llt : previous_lanelets) {
     ret.push_back(llt.id());
   }
+  for (const auto & id : getPreviousRoadShoulderLanelet(lanelet_id)) {
+    ret.emplace_back(id);
+  }
   return ret;
 }
 
@@ -831,9 +834,6 @@ std::vector<std::int64_t> HdMapUtils::getNextRoadShoulderLanelet(std::int64_t la
       ret.emplace_back(shoulder_lanelet.id());
     }
   }
-  for (const auto & id : getNextRoadShoulderLanelet(lanelet_id)) {
-    ret.push_back(id);
-  }
   return ret;
 }
 
@@ -844,6 +844,9 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(std::int64_t lanelet_id)
   const auto following_lanelets = vehicle_routing_graph_ptr_->following(lanelet);
   for (const auto & llt : following_lanelets) {
     ret.push_back(llt.id());
+  }
+  for (const auto & id : getNextRoadShoulderLanelet(lanelet_id)) {
+    ret.emplace_back(id);
   }
   return ret;
 }
