@@ -83,7 +83,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
   CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
-  CONCEALER_DEFINE_SUBSCRIPTION(MrmState, override);
+  CONCEALER_DEFINE_SUBSCRIPTION(MrmState);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
@@ -144,7 +144,7 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
     CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
-    CONCEALER_INIT_SUBSCRIPTION(MrmState, "/system/fail_safe/mrm_state"),
+    CONCEALER_INIT_SUBSCRIPTION(MrmState, "/api/fail_safe/mrm_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
@@ -200,18 +200,14 @@ public:
   auto setVelocityLimit(double) -> void override;
 
   auto update() -> void override;
+
+  auto getMrmBehaviorName() const -> std::string override;
+
+  auto getMrmStateName() const -> std::string override;
 };
 }  // namespace concealer
 
 // for boost::lexical_cast
-namespace autoware_adapi_v1_msgs::msg
-{
-// DIRTY HACK!!!  these stream operators ignore MrmState::behavior
-auto operator<<(std::ostream &, const MrmState &) -> std::ostream &;
-
-auto operator>>(std::istream &, MrmState &) -> std::istream &;
-}  // namespace autoware_adapi_v1_msgs::msg
-
 namespace autoware_auto_vehicle_msgs::msg
 {
 auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;

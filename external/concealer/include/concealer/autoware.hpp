@@ -170,7 +170,9 @@ public:
 
   virtual auto getAutowareStateName() const -> std::string = 0;
 
-  virtual auto getMrmState() const -> autoware_adapi_v1_msgs::msg::MrmState;
+  virtual auto getMrmBehaviorName() const -> std::string = 0;
+
+  virtual auto getMrmStateName() const -> std::string = 0;
 
   virtual auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand;
 
