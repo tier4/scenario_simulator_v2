@@ -13,32 +13,27 @@
 # limitations under the License.
 
 find_package(ament_cmake_test REQUIRED)
-
-option(WITH_INTEGRATION_TEST "If true, run integration test with colcon test command" OFF)
-
 #
 # Add a launch test
 #
 # :param scenario: name of the scenario you want to run
 function(add_cpp_mock_scenario_test package_name scenario timeout)
-  if(WITH_INTEGRATION_TEST)
-    set(cmd
-      "ros2"
-      "launch"
-      "cpp_mock_scenarios"
-      "mock_test.launch.py"
-      "package:=${package_name}"
-      "scenario:=${scenario}"
-      "timeout:=${timeout}"
-      "junit_path:=${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.xunit.xml"
-    )
+  set(cmd
+    "ros2"
+    "launch"
+    "cpp_mock_scenarios"
+    "mock_test.launch.py"
+    "package:=${package_name}"
+    "scenario:=${scenario}"
+    "timeout:=${timeout}"
+    "junit_path:=${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.xunit.xml"
+  )
 
-    ament_add_test(
-      "${package_name}_${scenario}"
-      COMMAND ${cmd}
-      OUTPUT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.output.txt"
-      RESULT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.xunit.xml"
-      TIMEOUT "30"
-    )
-  endif()
+  ament_add_test(
+    "${package_name}_${scenario}"
+    COMMAND ${cmd}
+    OUTPUT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.output.txt"
+    RESULT_FILE "${CMAKE_BINARY_DIR}/test_results/${package_name}/${package_name}_${scenario}.xunit.xml"
+    TIMEOUT "30"
+  )
 endfunction()
