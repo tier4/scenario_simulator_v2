@@ -15,6 +15,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 include(FindProtobuf REQUIRED)
@@ -43,17 +45,20 @@ ament_auto_add_executable(traffic_simulation_demo
 )
 target_link_libraries(traffic_simulation_demo cpp_scenario_node)
 
-add_subdirectory(src/collision)
-add_subdirectory(src/crosswalk)
-add_subdirectory(src/follow_front_entity)
-add_subdirectory(src/follow_lane)
-add_subdirectory(src/lane_change)
-add_subdirectory(src/measurement)
-add_subdirectory(src/merge)
-add_subdirectory(src/metrics)
-add_subdirectory(src/move_backward)
-add_subdirectory(src/pedestrian)
-add_subdirectory(src/speed_planning)
+option(BUILD_CPP_MOCK_SCENARIOS "Building the C++ scenarios" OFF)
+if(BUILD_CPP_MOCK_SCENARIOS)
+  add_subdirectory(src/collision)
+  add_subdirectory(src/crosswalk)
+  add_subdirectory(src/follow_front_entity)
+  add_subdirectory(src/follow_lane)
+  add_subdirectory(src/lane_change)
+  add_subdirectory(src/measurement)
+  add_subdirectory(src/merge)
+  add_subdirectory(src/metrics)
+  add_subdirectory(src/move_backward)
+  add_subdirectory(src/pedestrian)
+  add_subdirectory(src/speed_planning)
+endif()
 
 install(
   DIRECTORY launch rviz

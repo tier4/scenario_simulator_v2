@@ -32,8 +32,8 @@ from openscenario_preprocessor_msgs.srv import (
     Load
 )
 from openscenario_utility.conversion import convert
-from scenario_test_runner.lifecycle_controller import LifecycleController
-from scenario_test_runner.workflow import (
+from lifecycle_controller import LifecycleController
+from workflow import (
     Expect,
     Scenario,
     Workflow,

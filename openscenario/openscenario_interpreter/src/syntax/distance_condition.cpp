@@ -23,7 +23,7 @@
 #include <openscenario_interpreter/utility/print.hpp>
 #include <sstream>
 
-//ignore spell miss due to OpenSCENARIO standard
+// NOTE: Ignore spell miss due to OpenSCENARIO standard.
 // cspell: ignore euclidian
 
 namespace openscenario_interpreter
@@ -172,6 +172,43 @@ auto DistanceCondition::distance<
         return makeNativeRelativeWorldPosition(
                  triggering_entity, static_cast<NativeWorldPosition>(position))
           .position.x;
+      }),
+    position);
+}
+
+template <>
+auto DistanceCondition::distance<  //
+  CoordinateSystem::lane, RelativeDistanceType::lateral, false>(
+  const EntityRef & triggering_entity) const -> double
+{
+  return apply<double>(
+    overload(
+      [&](const WorldPosition & position) {
+        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+          return makeNativeRelativeLanePosition(
+                   triggering_entity, static_cast<NativeLanePosition>(position))
+            .offset;
+        } else {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+      },
+      [&](const RelativeWorldPosition & position) {
+        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+          return makeNativeRelativeLanePosition(
+                   triggering_entity, static_cast<NativeLanePosition>(position))
+            .offset;
+        } else {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+      },
+      [&](const LanePosition & position) {
+        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+          return makeNativeRelativeLanePosition(
+                   triggering_entity, static_cast<NativeLanePosition>(position))
+            .offset;
+        } else {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
       }),
     position);
 }

@@ -73,11 +73,6 @@ If you want to use the metrics class with C++ APIs, all you have to do is call t
 api_.addMetric<T>("name of metric", "arguments for metric you want to check" ...);
 ```
 
-### Traveled Distance
-
-Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1TraveledDistanceMetric/#public-functions).
-Traveled distance metric calculates the total traveled distance for a target entity.
-
 ### Momentary Stop
 
 Class documentation is [here](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classmetrics_1_1MomentaryStopMetric/).
