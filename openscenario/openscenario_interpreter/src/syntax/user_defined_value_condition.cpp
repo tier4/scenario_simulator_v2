@@ -83,7 +83,23 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
       std::make_pair(
         "currentEmergencyState",
         [result]() {
-          return make<String>(boost::lexical_cast<String>(asAutoware(result.str(1)).getMrmState()));
+          auto s = asAutoware(result.str(1)).getMrmStateName();
+          //          std::cout << "ego.currentEmergencyState : " << s << std::endl;
+          return make<String>(s);
+        }),
+      std::make_pair(
+        "currentMinimumRiskManeuverState.state",
+        [result]() {
+          auto s = asAutoware(result.str(1)).getMrmStateName();
+          //          std::cout << "ego.currentMinimumRiskManeuverState.state : " << s << std::endl;
+          return make<String>(s);
+        }),
+      std::make_pair(
+        "currentMinimumRiskManeuverState.behavior",
+        [result]() {
+          auto s = asAutoware(result.str(1)).getMrmBehaviorName();
+          //          std::cout << "ego.currentMinimumRiskManeuverState.behavior : " << s << std::endl;
+          return make<String>(s);
         }),
       std::make_pair(
         "currentTurnIndicatorsState",

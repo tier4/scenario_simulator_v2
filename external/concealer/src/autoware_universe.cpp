@@ -265,7 +265,8 @@ auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
-    // We attempt to resend the service up to 30 times, but this number of times was determined by heuristics, not for any technical reason
+    // We attempt to resend the service up to 30 times, but this number of times was determined by
+    // heuristics, not for any technical reason
     requestSetVelocityLimit(request, 30);
   });
 }
@@ -276,55 +277,44 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 {
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
-}  // namespace concealer
 
-namespace autoware_adapi_v1_msgs::msg
-{
-auto operator<<(std::ostream & out, const MrmState & message) -> std::ostream &
+std::string AutowareUniverse::getMrmBehaviorName() const
 {
 #define CASE(IDENTIFIER)     \
   case MrmState::IDENTIFIER: \
-    out << #IDENTIFIER;      \
-    break
+    return #IDENTIFIER;
 
-  switch (message.state) {
+  switch (getMrmState().behavior) {
+    CASE(COMFORTABLE_STOP);
+    CASE(EMERGENCY_STOP);
+    CASE(NONE);
+    CASE(UNKNOWN);
+    default:
+      throw common::Error(
+        "Unsupported MrmState, behavior number : ", static_cast<int>(getMrmState().behavior));
+  }
+#undef CASE
+}
+
+std::string AutowareUniverse::getMrmStateName() const
+{
+#define CASE(IDENTIFIER)     \
+  case MrmState::IDENTIFIER: \
+    return #IDENTIFIER;
+
+  switch (getMrmState().state) {
     CASE(MRM_FAILED);
     CASE(MRM_OPERATING);
     CASE(MRM_SUCCEEDED);
     CASE(NORMAL);
     CASE(UNKNOWN);
-
     default:
-      throw common::Error("Unsupported MrmState, state number : ", static_cast<int>(message.state));
+      throw common::Error(
+        "Unsupported MrmState, state number : ", static_cast<int>(getMrmState().state));
   }
-
 #undef CASE
-
-  return out;
 }
-
-auto operator>>(std::istream & is, MrmState & message) -> std::istream &
-{
-#define STATE(IDENTIFIER) {#IDENTIFIER, MrmState::IDENTIFIER}
-
-  std::unordered_map<std::string, std::uint8_t> state_dictionary{
-    STATE(MRM_FAILED), STATE(MRM_OPERATING), STATE(MRM_SUCCEEDED), STATE(NORMAL), STATE(UNKNOWN),
-  };
-
-#undef STATE
-
-  std::string state_string;
-  is >> state_string;
-
-  if (auto iter = state_dictionary.find(state_string); iter != state_dictionary.end()) {
-    message.set__state(iter->second);
-  } else {
-    throw common::Error("Unsupported MrmState::state : ", state_string.c_str());
-  }
-
-  return is;
-}
-}  // namespace autoware_adapi_v1_msgs::msg
+}  // namespace concealer
 
 namespace autoware_auto_vehicle_msgs::msg
 {
