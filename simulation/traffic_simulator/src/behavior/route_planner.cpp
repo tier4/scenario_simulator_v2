@@ -21,9 +21,10 @@ RoutePlanner::RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdma
 {
 }
 
-std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
+auto RoutePlanner::getRouteLanelets(
   const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon)
+  -> std::vector<std::int64_t>
 {
   waypoint_queue_.clear();
   if (waypoints.empty()) {
@@ -35,8 +36,9 @@ std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
   return getRouteLanelets(entity_lanelet_pose, waypoint_queue_.front(), horizon);
 }
 
-std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
+auto RoutePlanner::getRouteLanelets(
   const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon)
+  -> std::vector<std::int64_t>
 {
   if (!whole_route_) {
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);

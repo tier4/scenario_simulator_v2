@@ -27,16 +27,18 @@ class RoutePlanner
 public:
   explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
-  std::vector<std::int64_t> getRouteLanelets(
+  auto getRouteLanelets(
     const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon = 100);
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon = 100)
+    -> std::vector<std::int64_t>;
 
-  std::vector<std::int64_t> getRouteLanelets(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon = 100);
+  auto getRouteLanelets(
+    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon = 100)
+    -> std::vector<std::int64_t>;
 
-  std::vector<std::int64_t> getRouteLanelets(
+  auto getRouteLanelets(
     const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon = 100);
+    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon = 100) -> std::vector<std::int64_t>;
 
   void cancelGoal();
   std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses();
