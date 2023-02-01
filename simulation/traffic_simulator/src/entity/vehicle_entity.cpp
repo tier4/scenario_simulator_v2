@@ -127,10 +127,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setEntityStatus(status_);
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
 
-    std::vector<std::int64_t> route_lanelets = {};
-    if (status_.lanelet_pose_valid) {
-      route_lanelets = route_planner_ptr_->getRouteLanelets(status_.lanelet_pose);
-    }
+    std::vector<std::int64_t> route_lanelets = getRouteLanelets();
     behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
 
     // recalculate spline only when input data changes

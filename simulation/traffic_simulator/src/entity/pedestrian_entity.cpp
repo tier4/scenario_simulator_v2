@@ -226,13 +226,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(status_);
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
-    if (status_.lanelet_pose_valid) {
-      auto route = route_planner_ptr_->getRouteLanelets(status_.lanelet_pose);
-      behavior_plugin_ptr_->setRouteLanelets(route);
-    } else {
-      std::vector<std::int64_t> empty = {};
-      behavior_plugin_ptr_->setRouteLanelets(empty);
-    }
+    behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
     behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (status_updated.lanelet_pose_valid) {
