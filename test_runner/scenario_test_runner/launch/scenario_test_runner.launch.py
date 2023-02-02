@@ -142,7 +142,7 @@ def launch_setup(context, *args, **kwargs):
         # fmt: on
         Node(
             package="scenario_test_runner",
-            executable="scenario_test_runner",
+            executable="scenario_test_runner.py",
             namespace="simulation",
             name="scenario_test_runner",
             output="screen",
