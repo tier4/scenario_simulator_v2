@@ -1,0 +1,56 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: "1970-01-01T09:00:00+09:00"
+    description: ""
+    author: "Tatsuya Yamasaki"
+  Catalog:
+    name: sample_vehicle
+    Vehicle:
+      - name: sample_vehicle
+        vehicleCategory: car
+        ParameterDeclarations:
+          ParameterDeclaration:
+            # https://github.com/autowarefoundation/sample_vehicle_launch/blob/main/sample_vehicle_description/config/simulator_model.param.yaml
+            - { name: vel_lim,        parameterType: double, value: 50.0  }
+            - { name: vel_rate_lim,   parameterType: double, value:  7.0  }
+            - { name: steer_lim,      parameterType: double, value:  1.0  }
+            # https://github.com/autowarefoundation/sample_vehicle_launch/blob/main/sample_vehicle_description/config/vehicle_info.param.yaml
+            - { name: wheel_radius,   parameterType: double, value:  0.39 }
+            - { name: wheel_width,    parameterType: double, value:  0.42 }
+            - { name: wheel_base,     parameterType: double, value:  2.74 }
+            - { name: wheel_tread,    parameterType: double, value:  1.63 }
+            - { name: front_overhang, parameterType: double, value:  1.0  }
+            - { name: rear_overhang,  parameterType: double, value:  1.03 }
+            - { name: left_overhang,  parameterType: double, value:  0.1  }
+            - { name: right_overhang, parameterType: double, value:  0.1  }
+            - { name: vehicle_height, parameterType: double, value:  2.5  }
+        BoundingBox:
+          Center:
+            x: ${ ($front_overhang + $wheel_base + $rear_overhang) / 2 - $rear_overhang }
+            y: 0
+            z: ${ $vehicle_height / 2 }
+          Dimensions:
+            width: ${ $left_overhang + $wheel_tread + $right_overhang }
+            length: ${ $front_overhang + $wheel_base + $rear_overhang }
+            height: $vehicle_height
+        Performance:
+          maxSpeed: $vel_lim
+          maxAcceleration: $vel_rate_lim
+          maxDeceleration: $vel_rate_lim
+        Axles:
+          FrontAxle:
+            maxSteering: $steer_lim
+            wheelDiameter: ${ 2 * $wheel_radius }
+            trackWidth: $wheel_tread
+            positionX: $wheel_base
+            positionZ: $wheel_radius
+          RearAxle:
+            maxSteering: 0
+            wheelDiameter: ${ 2 * $wheel_radius }
+            trackWidth: $wheel_tread
+            positionX: 0
+            positionZ: $wheel_radius
+        Properties:
+          Property: []

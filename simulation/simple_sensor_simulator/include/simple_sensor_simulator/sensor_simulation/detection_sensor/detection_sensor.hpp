@@ -46,6 +46,8 @@ protected:
   auto getSensorPose(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
     -> geometry_msgs::Pose;
 
+  auto recognizeWithProbability(std::mt19937 &) const -> bool;
+
 public:
   virtual ~DetectionSensorBase() = default;
 
@@ -61,7 +63,7 @@ class DetectionSensor : public DetectionSensorBase
 
   std::mt19937 random_engine_;
 
-  auto applyNoise(autoware_auto_perception_msgs::msg::DetectedObject)
+  auto applyPositionNoise(autoware_auto_perception_msgs::msg::DetectedObject)
     -> autoware_auto_perception_msgs::msg::DetectedObject;
 
 public:
@@ -83,7 +85,7 @@ public:
 };
 
 template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyNoise(
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
   autoware_auto_perception_msgs::msg::DetectedObject)
   -> autoware_auto_perception_msgs::msg::DetectedObject;
 

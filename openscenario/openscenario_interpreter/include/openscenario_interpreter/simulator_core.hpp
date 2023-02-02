@@ -140,23 +140,33 @@ public:
       }
     }
 
-    template <typename... Ts>
-    static auto makeNativeRelativeLanePosition(Ts &&... xs)  // DUMMY IMPLEMENTATION!!!
+    template <typename From, typename To>
+    static auto makeNativeRelativeLanePosition(const From & from, const To & to)
     {
       auto s = [](auto &&... xs) {
         if (const auto result = core->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
             result) {
           return result.value();
         } else {
-          using value_type = typename std::decay<decltype(result)>::type::value_type;
-          return std::numeric_limits<value_type>::quiet_NaN();
+          return std::numeric_limits<
+            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
+        }
+      };
+
+      auto t = [](auto &&... xs) {
+        if (const auto result = core->getLateralDistance(std::forward<decltype(xs)>(xs)...);
+            result) {
+          return *result;
+        } else {
+          return std::numeric_limits<
+            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
         }
       };
 
       NativeRelativeLanePosition position;
       position.lanelet_id = std::numeric_limits<std::int64_t>::max();
-      position.s = s(std::forward<decltype(xs)>(xs)...);
-      position.offset = std::numeric_limits<double>::quiet_NaN();
+      position.s = s(from, to);
+      position.offset = t(from, to);
       position.rpy.x = std::numeric_limits<double>::quiet_NaN();
       position.rpy.y = std::numeric_limits<double>::quiet_NaN();
       position.rpy.z = std::numeric_limits<double>::quiet_NaN();
