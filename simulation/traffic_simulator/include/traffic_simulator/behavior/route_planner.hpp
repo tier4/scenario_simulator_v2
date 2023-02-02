@@ -38,7 +38,8 @@ public:
 
   auto getRouteLanelets(
     const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon = 100) -> std::vector<std::int64_t>;
+    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon = 100)
+    -> std::vector<std::int64_t>;
 
   void cancelGoal();
   std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses();
