@@ -20,7 +20,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${autoware_adapi_v1_msgs_CMAKE_MODULE
 find_package(autoware_adapi_v1_msgs)
 if( autoware_adapi_v1_msgs_FOUND )
   # DIRTY HACK! : ament_cmake_auto
-  add_compile_options(-D USE_ADAPI_V1_MSGS)
   list(APPEND ${PROJECT_NAME}_BUILD_DEPENDS autoware_adapi_v1_msgs)
   list(APPEND ${PROJECT_NAME}_BUILD_EXPORT_DEPENDS autoware_adapi_v1_msgs)
   list(APPEND ${PROJECT_NAME}_EXEC_DEPENDS autoware_adapi_v1_msgs)

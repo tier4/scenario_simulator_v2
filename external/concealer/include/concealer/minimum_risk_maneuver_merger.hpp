@@ -18,7 +18,7 @@
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
-#ifdef USE_ADAPI_V1_MSGS
+#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #endif
 
@@ -38,23 +38,24 @@ private:
   std::string behavior_name;
 
 public:
-  auto set(const autoware_auto_system_msgs::msg::EmergencyState & msg) -> void;
+  //  auto set(const autoware_auto_system_msgs::msg::EmergencyState & msg) -> void;
 
-#ifdef USE_ADAPI_V1_MSGS
-  auto set(const autoware_adapi_v1_msgs::msg::MrmState & msg) -> void;
+#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
+//  auto set(const autoware_adapi_v1_msgs::msg::MrmState & msg) -> void;
 #endif
 
-  auto getStateName() const -> std::string;
+  //  auto getStateName() const -> std::string;
 
-  auto getBehaviorName() const -> std::string;
+  //  auto getBehaviorName() const -> std::string;
 
 private:
-  template <typename T>
-  auto extractStateName(const T & msg) const -> std::string;
-
-  template <typename T>
-  auto extractBehaviorName(const T & msg) const -> std::string;
 };
+
+template <typename T>
+auto extractStateName(const T & msg) -> std::string;
+
+template <typename T>
+auto extractBehaviorName(const T & msg) -> std::string;
 
 }  // namespace concealer
 #endif  //CONCEALER__MINIMUM_RISK_MANEUVER_MERGER_HPP_

@@ -14,6 +14,9 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware_universe.hpp>
+#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#endif
 
 namespace concealer
 {
@@ -59,12 +62,6 @@ auto AutowareUniverse::cooperate(const CooperateStatusArray & cooperate_status_a
       return;
   }
 }
-
-//template auto
-//AutowareUniverse::receiveMinimumRiskManeuverState<autoware_auto_system_msgs::msg::EmergencyState>(
-//  const autoware_auto_system_msgs::msg::EmergencyState &) -> void;
-//template auto AutowareUniverse::receiveMinimumRiskManeuverState<
-//  autoware_adapi_v1_msgs::msg::MrmState>(const autoware_adapi_v1_msgs::msg::MrmState &) -> void;
 
 auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
@@ -263,17 +260,20 @@ auto AutowareUniverse::getAutowareStateName() const -> std::string
 
 auto AutowareUniverse::getEmergencyStateName() const -> std::string
 {
-  return minimum_risk_maneuver_merger.getStateName();
+  return minimum_risk_maneuver_state;
+  //  return minimum_risk_maneuver_merger.getStateName();
 }
 
 auto AutowareUniverse::getMinimumRiskManeuverBehaviorName() const -> std::string
 {
-  return minimum_risk_maneuver_merger.getBehaviorName();
+  return minimum_risk_maneuver_behavior;
+  //  return minimum_risk_maneuver_merger.getBehaviorName();
 }
 
 auto AutowareUniverse::getMinimumRiskManeuverStateName() const -> std::string
 {
-  return minimum_risk_maneuver_merger.getStateName();
+  return minimum_risk_maneuver_state;
+  //  return minimum_risk_maneuver_merger.getStateName();
 }
 
 auto AutowareUniverse::sendSIGINT() -> void  //
@@ -297,6 +297,62 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 {
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
+
+template <typename T>
+auto AutowareUniverse::receiveMinimumRiskManeuverState(const T & msg) -> void
+{
+#define CASE(IDENTIFIER, VARIABLE) \
+  case T::IDENTIFIER:              \
+    VARIABLE = #IDENTIFIER;        \
+    break
+
+  using RAW_T = std::decay_t<T>;
+  if constexpr (std::is_same_v<RAW_T, autoware_auto_system_msgs::msg::EmergencyState>) {
+    switch (msg.state) {
+      CASE(MRM_FAILED, minimum_risk_maneuver_state);
+      CASE(MRM_OPERATING, minimum_risk_maneuver_state);
+      CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
+      CASE(NORMAL, minimum_risk_maneuver_state);
+      CASE(OVERRIDE_REQUESTING, minimum_risk_maneuver_state);
+
+      default:
+        throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
+    }
+    minimum_risk_maneuver_behavior = "";
+  }
+#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
+  else if constexpr (std::is_same_v<RAW_T, autoware_adapi_v1_msgs::msg::MrmState>) {
+    switch (msg.state) {
+      CASE(MRM_FAILED, minimum_risk_maneuver_state);
+      CASE(MRM_OPERATING, minimum_risk_maneuver_state);
+      CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
+      CASE(NORMAL, minimum_risk_maneuver_state);
+      CASE(UNKNOWN, minimum_risk_maneuver_state);
+      default:
+        throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
+    }
+#endif
+
+    switch (msg.behavior) {
+      CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
+      CASE(EMERGENCY_STOP, minimum_risk_maneuver_behavior);
+      CASE(NONE, minimum_risk_maneuver_behavior);
+      CASE(UNKNOWN, minimum_risk_maneuver_behavior);
+      default:
+        throw common::Error(
+          "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.behavior));
+    }
+  }
+}
+
+template auto
+AutowareUniverse::receiveMinimumRiskManeuverState<autoware_auto_system_msgs::msg::EmergencyState>(
+  const autoware_auto_system_msgs::msg::EmergencyState &) -> void;
+#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
+template auto AutowareUniverse::receiveMinimumRiskManeuverState<
+  autoware_adapi_v1_msgs::msg::MrmState>(const autoware_adapi_v1_msgs::msg::MrmState &) -> void;
+#endif
+
 }  // namespace concealer
 
 namespace autoware_auto_vehicle_msgs::msg

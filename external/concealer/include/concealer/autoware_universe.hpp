@@ -44,7 +44,7 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
-#ifdef USE_ADAPI_V1_MSGS
+#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #endif
 
@@ -81,7 +81,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
-#ifdef USE_ADAPI_V1_MSGS
+#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
   using MrmState = autoware_adapi_v1_msgs::msg::MrmState;
 #endif
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
@@ -121,11 +121,12 @@ private:
 
   MinimumRiskManeuverMerger minimum_risk_maneuver_merger;
 
+  std::string minimum_risk_maneuver_state;
+
+  std::string minimum_risk_maneuver_behavior;
+
   template <typename T>
-  auto receiveMinimumRiskManeuverState(const T & msg) -> void
-  {
-    minimum_risk_maneuver_merger.set(msg);
-  }
+  auto receiveMinimumRiskManeuverState(const T & msg) -> void;
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
