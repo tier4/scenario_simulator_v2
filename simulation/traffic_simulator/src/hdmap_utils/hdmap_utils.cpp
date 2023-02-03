@@ -84,7 +84,7 @@ HdMapUtils::HdMapUtils(
     lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
-const std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
+std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
 {
   std::vector<std::int64_t> ret;
   for (const auto & lanelet : lanelet_map_ptr_->laneletLayer) {
