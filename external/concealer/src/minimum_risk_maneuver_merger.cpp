@@ -139,7 +139,7 @@ auto extractBehaviorName(const T & msg) -> std::string
       "MinimumRiskManeuver");
   }
 #if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
-  else if constexpr (std::is_same_v<T, autoware_adapi_msgs::msg::MrmState>) {
+  else if constexpr (std::is_same_v<T, autoware_adapi_v1_msgs::msg::MrmState>) {
     switch (msg.behavior) {
       CASE(COMFORTABLE_STOP);
       CASE(EMERGENCY_STOP);
