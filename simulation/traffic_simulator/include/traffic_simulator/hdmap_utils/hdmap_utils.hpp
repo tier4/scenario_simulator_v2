@@ -90,7 +90,7 @@ public:
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
   geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset);
   double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
-  const std::vector<std::int64_t> getLaneletIds();
+  std::vector<std::int64_t> getLaneletIds() const;
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(
@@ -236,6 +236,9 @@ private:
     const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const;
   std::vector<geometry_msgs::msg::Point> toPolygon(
     const lanelet::ConstLineString3d & line_string) const;
+  lanelet::ConstLanelets shoulder_lanelets_;
+  std::vector<std::int64_t> getNextRoadShoulderLanelet(std::int64_t lanelet_id) const;
+  std::vector<std::int64_t> getPreviousRoadShoulderLanelet(std::int64_t lanelet_id) const;
 };
 }  // namespace hdmap_utils
 
