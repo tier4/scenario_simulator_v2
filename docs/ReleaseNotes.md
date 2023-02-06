@@ -15,11 +15,12 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature                   | Brief summary                                                                          | Category                                    | Pull request                                                    | Contributor                                   |
-|---------------------------|----------------------------------------------------------------------------------------|---------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------|
-| Fix stop behavior         | Update NPC behavior and avoid overrun.                                                 | `traffic_simulator`, `behavior_tree_plugin` | [#946](https://github.com/tier4/scenario_simulator_v2/pull/946) | [hakuturu583](https://github.com/hakuturu583) |
-| Fix vehicle_model         | Import bug fixes from simple_planning_simulator in autoware.universe for vehicle_model | `traffic_simulator`                         | [#936](https://github.com/tier4/scenario_simulator_v2/pull/936) | [HansRobo](https://github.com/HansRobo)       |
-| Fix next/previous lanelet | Enable get next/previous lanelet with `road_shoulder` subtype.                         | `traffic_simulator`                         | [#963](https://github.com/tier4/scenario_simulator_v2/pull/963) | [hakuturu583](https://github.com/hakuturu583) |
+| Feature                                  | Brief summary                                                                                                  | Category                                    | Pull request                                                    | Contributor                                   |
+|------------------------------------------|----------------------------------------------------------------------------------------------------------------|---------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| Fix stop behavior                        | Update NPC behavior and avoid overrun.                                                                         | `traffic_simulator`, `behavior_tree_plugin` | [#946](https://github.com/tier4/scenario_simulator_v2/pull/946) | [hakuturu583](https://github.com/hakuturu583) |
+| Fix vehicle_model                        | Import bug fixes from simple_planning_simulator in autoware.universe for vehicle_model                         | `traffic_simulator`                         | [#936](https://github.com/tier4/scenario_simulator_v2/pull/936) | [HansRobo](https://github.com/HansRobo)       |
+| Fix next/previous lanelet                | Enable get next/previous lanelet with `road_shoulder` subtype.                                                 | `traffic_simulator`                         | [#963](https://github.com/tier4/scenario_simulator_v2/pull/963) | [hakuturu583](https://github.com/hakuturu583) |
+| Clamp lanelet while specify lanelet pose | Clamp lanelet pose and re-calculate s value when the s value in lanelet pose under 0 or over lanelet's length. | `traffic_simulator`                         | [#924](https://github.com/tier4/scenario_simulator_v2/pull/924) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 
