@@ -339,10 +339,11 @@ public:
     template <typename... Ts>
     static auto evaluateSimulationTime(Ts &&... xs) -> double
     {
-      if(SimulatorCore::active())
+      if (SimulatorCore::active()) {
         return core->getCurrentTime(std::forward<decltype(xs)>(xs)...);
-      else
+      } else {
         return std::numeric_limits<double>::quiet_NaN();
+      }
     }
 
     template <typename... Ts>

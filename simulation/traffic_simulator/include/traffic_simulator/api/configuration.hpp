@@ -87,8 +87,7 @@ struct Configuration
       throw common::SimulationError("The map_path must contain at least one *.osm file");
     } else if (not contains(map_path, ".pcd")) {
       throw common::SimulationError("The map_path must contain at least one *.pcd file");
-    }
-    else {
+    } else {
       return map_path;
     }
   }
