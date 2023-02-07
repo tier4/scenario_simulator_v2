@@ -96,7 +96,7 @@ public:
   double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
   std::vector<std::int64_t> getLaneletIds() const;
   std::vector<std::int64_t> getNextLaneletIds(
-    std::int64_t lanelet_id, const std::string & turn_direction);
+    std::int64_t lanelet_id, const std::string & turn_direction) const;
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getNextLaneletIds(
     const std::vector<std::int64_t> & lanelet_id, const std::string & turn_direction) const;
