@@ -65,8 +65,7 @@ MultiClient::MultiClient(
 
 void MultiClient::closeConnection()
 {
-  if(is_running) 
-  {
+  if (is_running) {
     is_running = false;
     socket_initialize_.close();
     socket_update_frame_.close();
@@ -83,10 +82,7 @@ void MultiClient::closeConnection()
   }
 }
 
-MultiClient::~MultiClient()
-{
-  closeConnection();
-}
+MultiClient::~MultiClient() { closeConnection(); }
 
 void MultiClient::call(
   const simulation_api_schema::InitializeRequest & req,

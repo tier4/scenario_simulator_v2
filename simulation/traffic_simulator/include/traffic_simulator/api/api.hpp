@@ -81,7 +81,7 @@ public:
     setVerbose(configuration.verbose);
   }
 
-  void closeZMQConnection(){zeromq_client_.closeConnection();}
+  void closeZMQConnection() { zeromq_client_.closeConnection(); }
 
   template <typename T, typename... Ts>
   void addMetric(const std::string & name, Ts &&... xs)

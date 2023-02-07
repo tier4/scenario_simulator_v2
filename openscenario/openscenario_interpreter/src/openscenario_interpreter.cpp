@@ -277,7 +277,7 @@ auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
 {
   timer.reset();
   scenarios.clear();
-  script.reset();  
+  script.reset();
   SimulatorCore::deactivate();
   return Interpreter::Result::SUCCESS;  // => Finalized
 }

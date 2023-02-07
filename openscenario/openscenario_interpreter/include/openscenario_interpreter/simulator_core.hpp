@@ -58,12 +58,11 @@ public:
 
   static auto active() { return static_cast<bool>(core); }
 
-  static auto deactivate() -> void 
-  { 
-    if(active())
-    {
+  static auto deactivate() -> void
+  {
+    if (active()) {
       core->closeZMQConnection();
-      core.reset(); 
+      core.reset();
     }
   }
 
