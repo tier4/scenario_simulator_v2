@@ -75,10 +75,9 @@ BT::NodeStatus MoveBackwardAction::tick()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  auto following_lanelets =
-    hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id);
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+    target_speed = hdmap_utils->getSpeedLimit(
+      hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id));
   }
   setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
   const auto obstacle = calculateObstacle(waypoints);
