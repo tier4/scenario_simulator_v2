@@ -86,10 +86,7 @@ void Autoware::shutdownAutoware()
 {
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
   {
-    if (spinner.joinable()) {
       stopRequest();
-      spinner.join();
-    }
   }
 
   if (process_id != 0 && not is_autoware_exited) {
@@ -159,7 +156,7 @@ void Autoware::rethrow() const
 {
   task_queue.rethrow();
 
-  if (is_thrown.load(std::memory_order_acquire)) {
+  if (is_thrown) {
     std::rethrow_exception(thrown);
   }
 }

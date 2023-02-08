@@ -60,13 +60,11 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
 
-  std::atomic<bool> is_stop_requested = false;
-
-  std::thread spinner;
+  bool is_stop_requested = false;
 
   rclcpp::TimerBase::SharedPtr updater;
 
-  std::atomic<bool> is_thrown = false;
+  bool is_thrown = false;
 
   std::exception_ptr thrown;
 
@@ -89,11 +87,11 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
-  void stopRequest() noexcept { return is_stop_requested.store(true, std::memory_order_release); }
+  void stopRequest() noexcept { is_stop_requested = true; }
 
   bool isStopRequested() const noexcept
   {
-    return is_stop_requested.load(std::memory_order_acquire);
+    return is_stop_requested;
   }
 
   virtual auto update() -> void = 0;
@@ -109,24 +107,27 @@ protected:
   void resetTimerCallback();
 
 public:
+    void spinSome() {
+        try {
+            if (rclcpp::ok() and not isStopRequested()) {
+                checkAutowareProcess();
+                rclcpp::spin_some(get_node_base_interface());
+            }
+        } catch (...) {
+            thrown = std::current_exception();
+            is_thrown= true;
+        }
+    }
+
+    // ====== Autoware =====
   CONCEALER_PUBLIC explicit Autoware(pid_t pid = 0)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    spinner([this]() {
-      try {
-        while (rclcpp::ok() and not isStopRequested()) {
-          checkAutowareProcess();
-          rclcpp::spin_some(get_node_base_interface());
-          std::this_thread::yield();
-        }
-      } catch (...) {
-        thrown = std::current_exception();
-        is_thrown.store(true, std::memory_order_release);
-      }
-    }),
     process_id(pid)
   {
   }
 
+
+    // ====== AutowareUser =====
   template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
   : Autoware(ros2_launch(std::forward<decltype(xs)>(xs)...))
@@ -135,6 +136,7 @@ public:
 
   ~Autoware() override = default;
 
+    // ====== AutowareUser =====
   /* ---- NOTE -------------------------------------------------------------------
    *
    *  Send an engagement request to Autoware. If Autoware does not have an
