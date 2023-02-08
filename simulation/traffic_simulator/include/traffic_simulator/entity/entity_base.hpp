@@ -222,8 +222,6 @@ protected:
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
-  double stand_still_duration_ = 0.0;
-
   std::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
 
