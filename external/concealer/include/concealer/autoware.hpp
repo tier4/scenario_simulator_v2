@@ -32,12 +32,9 @@
 #include <concealer/utility/autoware_stream.hpp>
 #include <concealer/utility/visibility.hpp>
 #include <exception>
-#include <future>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <limits>
-#include <mutex>
-#include <thread>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <utility>
 
