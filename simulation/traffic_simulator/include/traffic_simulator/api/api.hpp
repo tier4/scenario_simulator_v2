@@ -223,7 +223,8 @@ public:
     const std::string &, const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
 
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
-  bool attachDetectionSensor(const std::string &, double pos_noise_stddev, int random_seed = 0);
+  bool attachDetectionSensor(
+    const std::string &, double pos_noise_stddev, double probability_of_lost, int random_seed = 0);
 
   bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
 
