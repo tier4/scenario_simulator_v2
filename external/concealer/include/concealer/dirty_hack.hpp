@@ -19,11 +19,11 @@
 
 #define CONCEALER_DEFINE_SUBSCRIPTION(TYPE, ...)                                                   \
 private:                                                                                           \
-  TYPE::SharedPtr current_value_of_##TYPE = std::make_shared<TYPE>();                              \
+  TYPE::ConstSharedPtr current_value_of_##TYPE = std::make_shared<const TYPE>();                   \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;                                    \
                                                                                                    \
 public:                                                                                            \
-  auto get##TYPE() const->TYPE __VA_ARGS__ { return *std::atomic_load(&current_value_of_##TYPE); } \
+  auto get##TYPE() const->TYPE __VA_ARGS__ { return *current_value_of_##TYPE; }                    \
   static_assert(true, "")
 
 #define CONCEALER_DEFINE_PUBLISHER(TYPE)                  \
@@ -41,13 +41,13 @@ public:                                                   \
 #define CONCEALER_INIT_SUBSCRIPTION(TYPE, TOPIC)                                                \
   subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>(     \
     TOPIC, 1, [this](const TYPE::ConstSharedPtr message) {                                      \
-      std::atomic_store(&current_value_of_##TYPE, std::move(std::make_shared<TYPE>(*message))); \
+      current_value_of_##TYPE = message;                                                        \
     }))
 
 #define CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(TYPE, TOPIC, CALLBACK)                        \
   subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>(     \
     TOPIC, 1, [this](const TYPE::ConstSharedPtr message) {                                      \
-      std::atomic_store(&current_value_of_##TYPE, std::move(std::make_shared<TYPE>(*message))); \
+      current_value_of_##TYPE = message;                                                        \
       CALLBACK(*current_value_of_##TYPE);                                                       \
     }))
 
