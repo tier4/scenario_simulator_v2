@@ -28,7 +28,7 @@
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
-#include <concealer/autoware.hpp>
+#include <concealer/autoware_user.hpp>
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <concealer/task_queue.hpp>

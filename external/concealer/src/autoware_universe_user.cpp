@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <boost/range/adaptor/sliced.hpp>
-#include <concealer/autoware_universe.hpp>
+#include <concealer/autoware_universe_user.hpp>
 
 namespace concealer
 {

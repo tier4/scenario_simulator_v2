@@ -16,7 +16,7 @@
 #define CONCEALER__SERVICE_WITH_VALIDATION_HPP_
 
 #include <chrono>
-#include <concealer/autoware.hpp>
+#include <concealer/autoware_user.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 

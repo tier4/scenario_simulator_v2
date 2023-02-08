@@ -18,7 +18,7 @@
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <boost/optional.hpp>
-#include <concealer/autoware.hpp>
+#include <concealer/autoware_user.hpp>
 #include <memory>
 #include <queue>
 #include <string>
