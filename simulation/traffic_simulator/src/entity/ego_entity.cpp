@@ -12,19 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/entity/ego_entity.hpp>
-
-#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
-
-#include <boost/lexical_cast.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <boost/lexical_cast.hpp>
 #include <functional>
 #include <memory>
 #include <string>
 #include <system_error>
 #include <thread>
+#include <traffic_simulator/entity/ego_entity.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
 #include <utility>

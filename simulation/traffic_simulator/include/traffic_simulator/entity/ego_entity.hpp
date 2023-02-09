@@ -15,21 +15,18 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
+#include <algorithm>
+#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/optional.hpp>
 #include <concealer/autoware_universe.hpp>
+#include <memory>
+#include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
-
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
-
-#include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
-
-#include <algorithm>
-#include <memory>
-#include <string>
 #include <vector>
 
 template <typename T>
