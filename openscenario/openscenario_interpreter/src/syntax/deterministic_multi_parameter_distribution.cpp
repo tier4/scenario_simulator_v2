@@ -25,7 +25,7 @@ DeterministicMultiParameterDistribution::DeterministicMultiParameterDistribution
 {
 }
 
-std::vector<std::unordered_map<std::string, Object>>
+ParameterDistribution
 DeterministicMultiParameterDistribution::derive()
 {
   return DeterministicMultiParameterDistributionType::derive();

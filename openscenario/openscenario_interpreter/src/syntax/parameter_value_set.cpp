@@ -26,11 +26,11 @@ ParameterValueSet::ParameterValueSet(
 {
 }
 
-auto ParameterValueSet::evaluate() const -> std::unordered_map<std::string, Object>
+auto ParameterValueSet::evaluate() const -> std::shared_ptr<std::unordered_map<std::string, Object>>
 {
-  std::unordered_map<std::string, Object> parameters;
+  std::shared_ptr<std::unordered_map<std::string, Object>> parameters;
   for (const auto & parameter : parameter_assignments) {
-    parameters[parameter.parameterRef] = make<String>(parameter.value);
+    parameters->at(parameter.parameterRef) = make<String>(parameter.value);
   }
   return parameters;
 }

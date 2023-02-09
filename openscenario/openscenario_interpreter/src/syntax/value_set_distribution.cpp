@@ -26,9 +26,9 @@ ValueSetDistribution::ValueSetDistribution(
 {
 }
 
-auto ValueSetDistribution::derive() -> std::vector<std::unordered_map<std::string, Object>>
+auto ValueSetDistribution::derive() -> ParameterDistribution
 {
-  std::vector<std::unordered_map<std::string, Object>> parameters;
+  ParameterDistribution parameters;
   for (const auto & parameter_value_set : parameter_value_sets) {
     parameters.emplace_back(parameter_value_set.evaluate());
   }

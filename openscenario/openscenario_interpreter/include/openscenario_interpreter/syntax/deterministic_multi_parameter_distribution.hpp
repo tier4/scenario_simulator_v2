@@ -37,7 +37,7 @@ struct DeterministicMultiParameterDistribution : public DeterministicMultiParame
 {
   explicit DeterministicMultiParameterDistribution(const pugi::xml_node &, Scope & scope);
 
-  auto derive() -> std::vector<std::unordered_map<std::string, Object>> override;
+  auto derive() -> ParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
