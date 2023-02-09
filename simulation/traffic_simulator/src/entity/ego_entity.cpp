@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
+#include <traffic_simulator/entity/ego_entity.hpp>
+
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 #include <boost/lexical_cast.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <functional>
 #include <memory>
 #include <string>
 #include <system_error>
 #include <thread>
-#include <traffic_simulator/entity/ego_entity.hpp>
-#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -33,7 +36,7 @@ namespace entity
 {
 auto toString(const VehicleModelType datum) -> std::string
 {
-#define BOILERPLATE(IDENTIFIER)      \
+#define BOILERPLATE(IDENTIFIER) \
   case VehicleModelType::IDENTIFIER: \
     return #IDENTIFIER
 
@@ -79,20 +82,26 @@ auto EgoEntity::getVehicleModelType() -> VehicleModelType
 auto EgoEntity::makeSimulationModel(
   const VehicleModelType vehicle_model_type, const double step_time,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
-  -> const std::shared_ptr<SimModelInterface>
+-> const std::shared_ptr<SimModelInterface>
 {
   // clang-format off
-  const auto acc_time_constant   = getParameter<double>("acc_time_constant",     0.1);
-  const auto acc_time_delay      = getParameter<double>("acc_time_delay",        0.1);
-  const auto steer_lim           = getParameter<double>("steer_lim",            parameters.axles.front_axle.max_steering);  // 1.0
-  const auto steer_rate_lim      = getParameter<double>("steer_rate_lim",        5.0);
-  const auto steer_time_constant = getParameter<double>("steer_time_constant",   0.27);
-  const auto steer_time_delay    = getParameter<double>("steer_time_delay",      0.24);
-  const auto vel_lim             = getParameter<double>("vel_lim",              parameters.performance.max_speed);  // 50.0
-  const auto vel_rate_lim        = getParameter<double>("vel_rate_lim",         parameters.performance.max_acceleration);  // 7.0
-  const auto vel_time_constant   = getParameter<double>("vel_time_constant",     0.1);
-  const auto vel_time_delay      = getParameter<double>("vel_time_delay",        0.1);
-  const auto wheel_base          = getParameter<double>("wheel_base",           parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
+  const auto acc_time_constant = getParameter<double>("acc_time_constant", 0.1);
+  const auto acc_time_delay = getParameter<double>("acc_time_delay", 0.1);
+  const auto steer_lim =
+    getParameter<double>("steer_lim", parameters.axles.front_axle.max_steering);            // 1.0
+  const auto steer_rate_lim = getParameter<double>("steer_rate_lim", 5.0);
+  const auto steer_time_constant = getParameter<double>("steer_time_constant", 0.27);
+  const auto steer_time_delay = getParameter<double>("steer_time_delay", 0.24);
+  const auto vel_lim = getParameter<double>("vel_lim", parameters.performance.max_speed);   // 50.0
+  const auto vel_rate_lim = getParameter<double>(
+    "vel_rate_lim",
+    parameters.performance.max_acceleration);                                               // 7.0
+  const auto vel_time_constant = getParameter<double>("vel_time_constant", 0.1);
+  const auto vel_time_delay = getParameter<double>("vel_time_delay", 0.1);
+  const auto wheel_base = getParameter<double>(
+    "wheel_base",
+    parameters.axles.front_axle.position_x -
+    parameters.axles.rear_axle.position_x);
   // clang-format on
 
   switch (vehicle_model_type) {
@@ -127,28 +136,29 @@ auto EgoEntity::makeSimulationModel(
 }
 
 auto EgoEntity::makeAutoware(const Configuration & configuration)
-  -> std::unique_ptr<concealer::Autoware>
+-> std::unique_ptr<concealer::Autoware>
 {
   if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-      architecture_type == "awf/universe") {
+    architecture_type == "awf/universe")
+  {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
-    return getParameter<bool>("launch_autoware", true)
-             ? std::make_unique<concealer::AutowareUniverse>(
-                 getParameter<std::string>("autoware_launch_package"),
-                 getParameter<std::string>("autoware_launch_file"),
-                 "map_path:=" + configuration.map_path.string(),
-                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                 "rviz_config:=" + ((rviz_config == "")
-                                      ? configuration.rviz_config_path.string()
-                                      : Configuration::Pathname(rviz_config).string()),
-                 "scenario_simulation:=true", "perception/enable_traffic_light:=false")
-             : std::make_unique<concealer::AutowareUniverse>();
+    return getParameter<bool>("launch_autoware", true) ?
+           std::make_unique<concealer::AutowareUniverse>(
+      getParameter<std::string>("autoware_launch_package"),
+      getParameter<std::string>("autoware_launch_file"),
+      "map_path:=" + configuration.map_path.string(),
+      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+      "sensor_model:=" + getParameter<std::string>("sensor_model"),
+      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+      "rviz_config:=" + ((rviz_config == "") ?
+      configuration.rviz_config_path.string() :
+      Configuration::Pathname(rviz_config).string()),
+      "scenario_simulation:=true", "perception/enable_traffic_light:=false") :
+           std::make_unique<concealer::AutowareUniverse>();
   } else {
     throw common::SemanticError(
-      "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
+            "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
   }
 }
 
@@ -188,7 +198,7 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
-  -> const traffic_simulator_msgs::msg::EntityStatus
+-> const traffic_simulator_msgs::msg::EntityStatus
 {
   traffic_simulator_msgs::msg::EntityStatus status;
   {
@@ -198,24 +208,25 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     status.pose = getCurrentPose();
     status.action_status.twist = getCurrentTwist();
     status.action_status.accel = [&]() {
-      geometry_msgs::msg::Accel accel;
-      if (previous_angular_velocity_) {
-        accel.linear.x = vehicle_model_ptr_->getAx();
-        accel.angular.z =
-          (vehicle_model_ptr_->getWz() - previous_angular_velocity_.get()) / step_time;
-      }
-      return accel;
-    }();
+        geometry_msgs::msg::Accel accel;
+        if (previous_angular_velocity_) {
+          accel.linear.x = vehicle_model_ptr_->getAx();
+          accel.angular.z =
+            (vehicle_model_ptr_->getWz() - previous_angular_velocity_.get()) / step_time;
+        }
+        return accel;
+      }();
 
-    const auto route_lanelets = getRouteUniqueLanelets();
+    auto route_lanelets = getRouteLanelets();
+    const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(route_lanelets);
 
     boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
-    if (route_lanelets.empty()) {
+    if (unique_route_lanelets.empty()) {
       lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
     } else {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, route_lanelets, 1.0);
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
       if (!lanelet_pose) {
         lanelet_pose =
           hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
@@ -250,17 +261,15 @@ auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Ob
   return boost::none;
 }
 
-auto EgoEntity::getRouteUniqueLanelets() const -> std::vector<std::int64_t>
+auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 {
-  std::unordered_set<std::int64_t> unique_ids{};
+  std::vector<std::int64_t> ids{};
 
   if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get()); universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
-        std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::inserter(unique_ids, unique_ids.end()));
+      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }
   }
-
-  std::vector<std::int64_t> ids{unique_ids.begin(), unique_ids.end()};
 
   return ids;
 }
@@ -279,13 +288,13 @@ auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
   current_pose.position.y = initial_pose_.get().position.y + relative_position(1);
   current_pose.position.z = initial_pose_.get().position.z + relative_position(2);
   current_pose.orientation = [this]() {
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0;
-    rpy.y = 0;
-    rpy.z = vehicle_model_ptr_->getYaw();
-    return initial_pose_.get().orientation *
-           quaternion_operation::convertEulerAngleToQuaternion(rpy);
-  }();
+      geometry_msgs::msg::Vector3 rpy;
+      rpy.x = 0;
+      rpy.y = 0;
+      rpy.z = vehicle_model_ptr_->getYaw();
+      return initial_pose_.get().orientation *
+             quaternion_operation::convertEulerAngleToQuaternion(rpy);
+    }();
 
   return current_pose;
 }
@@ -437,7 +446,7 @@ auto EgoEntity::requestSpeedChange(
 }
 
 auto EgoEntity::getDefaultDynamicConstraints() const
-  -> const traffic_simulator_msgs::msg::DynamicConstraints &
+-> const traffic_simulator_msgs::msg::DynamicConstraints &
 {
   THROW_SEMANTIC_ERROR("getDefaultDynamicConstraints function does not support EgoEntity");
 }
@@ -453,11 +462,12 @@ auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
   const auto current_pose = getStatus().pose;
 
   if (autoware->initialized()) {
-    autoware->set([this]() {
-      geometry_msgs::msg::Accel message;
-      message.linear.x = vehicle_model_ptr_->getAx();
-      return message;
-    }());
+    autoware->set(
+      [this]() {
+        geometry_msgs::msg::Accel message;
+        message.linear.x = vehicle_model_ptr_->getAx();
+        return message;
+      }());
 
     autoware->set(current_pose);
 

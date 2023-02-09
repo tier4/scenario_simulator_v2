@@ -15,20 +15,24 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
-#include <algorithm>
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
 #include <concealer/autoware_universe.hpp>
-#include <memory>
-#include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
+
+#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
+
+#include <boost/filesystem.hpp>
+#include <boost/optional.hpp>
+
+#include <algorithm>
+#include <memory>
+#include <string>
 #include <vector>
 
-template <typename T>
+template<typename T>
 auto getParameter(const std::string & name, T value = {})
 {
   rclcpp::Node node{"get_parameter", "simulation"};
@@ -43,7 +47,8 @@ namespace traffic_simulator
 {
 namespace entity
 {
-enum class VehicleModelType {
+enum class VehicleModelType
+{
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
   DELAY_STEER_VEL,
@@ -71,10 +76,10 @@ class EgoEntity : public VehicleEntity
   static auto makeSimulationModel(
     const VehicleModelType, const double step_time,
     const traffic_simulator_msgs::msg::VehicleParameters &)
-    -> const std::shared_ptr<SimModelInterface>;
+  -> const std::shared_ptr<SimModelInterface>;
 
 public:
-  explicit EgoEntity() = delete;
+  EgoEntity() = delete;
 
   explicit EgoEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
@@ -100,18 +105,18 @@ public:
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
   auto getDefaultDynamicConstraints() const
-    -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
+  -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityStatus(const double, const double) const
-    -> const traffic_simulator_msgs::msg::EntityStatus;
+  -> const traffic_simulator_msgs::msg::EntityStatus;
 
   auto getEntityTypename() const -> const std::string & override;
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteUniqueLanelets() const -> std::vector<std::int64_t>;
+  auto getRouteLanelets() const -> std::vector<std::int64_t>;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
@@ -138,7 +143,7 @@ public:
     const speed_change::Constraint, const bool continuous) -> void override;
 
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
-    -> void override;
+  -> void override;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
 
