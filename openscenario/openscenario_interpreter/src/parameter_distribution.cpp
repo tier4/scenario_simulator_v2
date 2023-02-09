@@ -14,7 +14,8 @@
 
 #include <openscenario_interpreter/parameter_distribution.hpp>
 
-namespace openscenario_interpreter{
+namespace openscenario_interpreter
+{
 
 auto openscenario_interpreter::mergeParameterDistributionImpl(
   const ParameterDistribution & distribution, std::string single_parameter_name,
@@ -50,4 +51,4 @@ auto mergeParameterDistributionImpl(
 
   return merged_distribution;
 }
-}
+}  // namespace openscenario_interpreter

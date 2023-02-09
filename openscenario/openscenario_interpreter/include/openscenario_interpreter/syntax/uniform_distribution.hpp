@@ -33,7 +33,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct UniformDistribution : public ComplexType, private Scope, public SingleParameterDistributionBase
+struct UniformDistribution : public ComplexType,
+                             private Scope,
+                             public SingleParameterDistributionBase
 {
   const Range range;
 

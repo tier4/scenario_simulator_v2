@@ -15,11 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__POISSON_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__POISSON_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
 #include <random>
-#include <openscenario_interpreter/parameter_distribution.hpp>
 
 namespace openscenario_interpreter
 {
@@ -35,7 +35,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct PoissonDistribution : public ComplexType, private Scope, public SingleParameterDistributionBase
+struct PoissonDistribution : public ComplexType,
+                             private Scope,
+                             public SingleParameterDistributionBase
 {
   const Range range;
 

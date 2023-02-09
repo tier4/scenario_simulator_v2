@@ -15,11 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_SINGLE_PARAMETER_DISTRIBUTION_TYPE_HPP_
 #define OPENSCENARIO_INTERPRETER__DETERMINISTIC_SINGLE_PARAMETER_DISTRIBUTION_TYPE_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/distribution_range.hpp>
 #include <openscenario_interpreter/syntax/distribution_set.hpp>
 #include <openscenario_interpreter/syntax/user_defined_distribution.hpp>
-#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -44,9 +44,9 @@ struct DeterministicSingleParameterDistributionType : public Group
 
 DEFINE_LAZY_VISITOR(
   DeterministicSingleParameterDistributionType,
-  CASE(DistributionSet),          //
-  CASE(DistributionRange),        //
-//  CASE(UserDefinedDistribution),  //
+  CASE(DistributionSet),    //
+  CASE(DistributionRange),  //
+  //  CASE(UserDefinedDistribution),  //
 );
 }  // namespace syntax
 }  // namespace openscenario_interpreter

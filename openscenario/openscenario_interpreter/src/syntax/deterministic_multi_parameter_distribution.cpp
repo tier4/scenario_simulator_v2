@@ -25,8 +25,7 @@ DeterministicMultiParameterDistribution::DeterministicMultiParameterDistribution
 {
 }
 
-ParameterDistribution
-DeterministicMultiParameterDistribution::derive()
+ParameterDistribution DeterministicMultiParameterDistribution::derive()
 {
   return DeterministicMultiParameterDistributionType::derive();
 }
