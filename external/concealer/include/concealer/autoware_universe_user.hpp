@@ -42,6 +42,8 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
+#include <concealer/utility/subscriber_wrapper.hpp>
+
 namespace concealer
 {
 class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<AutowareUniverseUser>
