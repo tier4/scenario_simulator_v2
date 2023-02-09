@@ -118,7 +118,7 @@ public:
 
     // ====== Autoware =====
   CONCEALER_PUBLIC explicit AutowareUser(pid_t pid = 0)
-  : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+  : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
     process_id(pid)
   {
   }
