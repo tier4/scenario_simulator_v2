@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
-#define CONCEALER__AUTOWARE_UNIVERSE_HPP_
+#ifndef CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_
+#define CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
@@ -217,4 +217,4 @@ auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &
 auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
 }  // namespace autoware_auto_vehicle_msgs::msg
 
-#endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_
+#endif  // CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_

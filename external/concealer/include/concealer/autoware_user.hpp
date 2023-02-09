@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__AUTOWARE_HPP_
-#define CONCEALER__AUTOWARE_HPP_
+#ifndef CONCEALER__AUTOWARE_USER_HPP_
+#define CONCEALER__AUTOWARE_USER_HPP_
 
 // #define CONCEALER_ISOLATE_STANDARD_OUTPUT
 
@@ -208,4 +208,4 @@ public:
 };
 }  // namespace concealer
 
-#endif  // CONCEALER__AUTOWARE_HPP_
+#endif  // CONCEALER__AUTOWARE_USER_HPP_
