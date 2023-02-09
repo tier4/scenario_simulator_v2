@@ -53,9 +53,9 @@ namespace concealer
  *        initialize, plan, and engage.
  *
  * -------------------------------------------------------------------------- */
-class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Autoware>
+class AutowareUser : public rclcpp::Node, public ContinuousTransformBroadcaster<AutowareUser>
 {
-  friend class ContinuousTransformBroadcaster<Autoware>;
+  friend class ContinuousTransformBroadcaster<AutowareUser>;
 
   bool is_stop_requested = false;
 
@@ -117,7 +117,7 @@ public:
     }
 
     // ====== Autoware =====
-  CONCEALER_PUBLIC explicit Autoware(pid_t pid = 0)
+  CONCEALER_PUBLIC explicit AutowareUser(pid_t pid = 0)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
     process_id(pid)
   {
@@ -126,12 +126,12 @@ public:
 
     // ====== AutowareUser =====
   template <typename... Ts>
-  CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
-  : Autoware(ros2_launch(std::forward<decltype(xs)>(xs)...))
+  CONCEALER_PUBLIC explicit AutowareUser(Ts &&... xs)
+  : AutowareUser(ros2_launch(std::forward<decltype(xs)>(xs)...))
   {
   }
 
-  ~Autoware() override = default;
+  ~AutowareUser() override = default;
 
     // ====== AutowareUser =====
   /* ---- NOTE -------------------------------------------------------------------

@@ -54,7 +54,7 @@ enum class VehicleModelType {
 
 class EgoEntity : public VehicleEntity
 {
-  const std::unique_ptr<concealer::Autoware> autoware;
+  const std::unique_ptr<concealer::AutowareUser> autoware;
 
   const VehicleModelType vehicle_model_type_;
 
@@ -66,7 +66,7 @@ class EgoEntity : public VehicleEntity
 
   static auto getVehicleModelType() -> VehicleModelType;
 
-  static auto makeAutoware(const Configuration &) -> std::unique_ptr<concealer::Autoware>;
+  static auto makeAutoware(const Configuration &) -> std::unique_ptr<concealer::AutowareUser>;
 
   static auto makeSimulationModel(
     const VehicleModelType, const double step_time,
@@ -91,7 +91,7 @@ public:
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
 
-  auto asAutoware() const -> concealer::Autoware & override;
+  auto asAutoware() const -> concealer::AutowareUser & override;
 
   auto getCurrentAction() const -> std::string override;
 

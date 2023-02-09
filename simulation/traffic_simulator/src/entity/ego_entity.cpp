@@ -127,7 +127,7 @@ auto EgoEntity::makeSimulationModel(
 }
 
 auto EgoEntity::makeAutoware(const Configuration & configuration)
-  -> std::unique_ptr<concealer::Autoware>
+  -> std::unique_ptr<concealer::AutowareUser>
 {
   if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
       architecture_type == "awf/universe") {
@@ -163,7 +163,7 @@ EgoEntity::EgoEntity(
 {
 }
 
-auto EgoEntity::asAutoware() const -> concealer::Autoware &
+auto EgoEntity::asAutoware() const -> concealer::AutowareUser &
 {
   assert(autoware);
   return *autoware;

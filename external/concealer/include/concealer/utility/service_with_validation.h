@@ -26,7 +26,7 @@ template <typename T>
 class ServiceWithValidation
 {
 public:
-  explicit ServiceWithValidation(const std::string & service_name, Autoware & autoware)
+  explicit ServiceWithValidation(const std::string & service_name, AutowareUser & autoware)
   : service_name(service_name),
     logger(autoware.get_logger()),
     client(autoware.create_client<T>(service_name, rmw_qos_profile_default)),

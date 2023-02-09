@@ -52,7 +52,7 @@ public:
 
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray &);
 
-  virtual auto asAutoware() const -> concealer::Autoware &;
+  virtual auto asAutoware() const -> concealer::AutowareUser &;
 
   virtual void cancelRequest();
 

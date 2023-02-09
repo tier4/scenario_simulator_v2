@@ -44,7 +44,7 @@
 
 namespace concealer
 {
-class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUniverse>
+class AutowareUniverse : public AutowareUser, public TransitionAssertion<AutowareUniverse>
 {
   friend class TransitionAssertion<AutowareUniverse>;
 
@@ -128,7 +128,7 @@ public:
 
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareUniverse(Ts &&... xs)
-  : Autoware(std::forward<decltype(xs)>(xs)...),
+  : AutowareUser(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     CONCEALER_INIT_PUBLISHER(Acceleration, "/localization/acceleration"),
     CONCEALER_INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),

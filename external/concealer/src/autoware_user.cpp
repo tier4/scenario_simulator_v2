@@ -19,7 +19,7 @@
 
 namespace concealer
 {
-void Autoware::checkAutowareProcess()
+void AutowareUser::checkAutowareProcess()
 {
   if (process_id != 0) {
     int wstatus = 0;
@@ -47,7 +47,7 @@ void Autoware::checkAutowareProcess()
   }
 }
 
-auto Autoware::getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState
+auto AutowareUser::getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState
 {
   static auto emergency_state = []() {
     autoware_auto_system_msgs::msg::EmergencyState emergency_state;
@@ -58,7 +58,7 @@ auto Autoware::getEmergencyState() const -> autoware_auto_system_msgs::msg::Emer
   return emergency_state;
 }
 
-auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
+auto AutowareUser::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
 {
   static auto gear_command = []() {
     autoware_auto_vehicle_msgs::msg::GearCommand gear_command;
@@ -69,7 +69,7 @@ auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCo
   return gear_command;
 }
 
-auto Autoware::getTurnIndicatorsCommand() const
+auto AutowareUser::getTurnIndicatorsCommand() const
   -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   static auto turn_indicators_command = []() {
@@ -82,7 +82,7 @@ auto Autoware::getTurnIndicatorsCommand() const
   return turn_indicators_command;
 }
 
-void Autoware::shutdownAutoware()
+void AutowareUser::shutdownAutoware()
 {
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
   {
@@ -152,7 +152,7 @@ void Autoware::shutdownAutoware()
   }
 }
 
-void Autoware::rethrow() const
+void AutowareUser::rethrow() const
 {
   task_queue.rethrow();
 
@@ -161,23 +161,23 @@ void Autoware::rethrow() const
   }
 }
 
-void Autoware::resetTimerCallback()
+void AutowareUser::resetTimerCallback()
 {
   updater = create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });
 }
 
-auto Autoware::set(const geometry_msgs::msg::Accel & acceleration)
+auto AutowareUser::set(const geometry_msgs::msg::Accel & acceleration)
   -> const geometry_msgs::msg::Accel &
 {
   return current_acceleration = acceleration;
 }
 
-auto Autoware::set(const geometry_msgs::msg::Pose & pose) -> const geometry_msgs::msg::Pose &
+auto AutowareUser::set(const geometry_msgs::msg::Pose & pose) -> const geometry_msgs::msg::Pose &
 {
   return current_pose = pose;
 }
 
-auto Autoware::set(const geometry_msgs::msg::Twist & twist) -> const geometry_msgs::msg::Twist &
+auto AutowareUser::set(const geometry_msgs::msg::Twist & twist) -> const geometry_msgs::msg::Twist &
 {
   return current_twist = twist;
 }
