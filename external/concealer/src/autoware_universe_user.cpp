@@ -17,9 +17,9 @@
 
 namespace concealer
 {
-AutowareUniverse::~AutowareUniverse() { shutdownAutoware(); }
+AutowareUniverseUser::~AutowareUniverseUser() { shutdownAutoware(); }
 
-auto AutowareUniverse::approve(const CooperateStatusArray & cooperate_status_array) -> void
+auto AutowareUniverseUser::approve(const CooperateStatusArray & cooperate_status_array) -> void
 {
   auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
   request->stamp = cooperate_status_array.stamp;
@@ -49,7 +49,7 @@ auto AutowareUniverse::approve(const CooperateStatusArray & cooperate_status_arr
   }
 }
 
-auto AutowareUniverse::cooperate(const CooperateStatusArray & cooperate_status_array) -> void
+auto AutowareUniverseUser::cooperate(const CooperateStatusArray & cooperate_status_array) -> void
 {
   switch (current_cooperator) {
     case Cooperator::simulator:
@@ -60,7 +60,7 @@ auto AutowareUniverse::cooperate(const CooperateStatusArray & cooperate_status_a
   }
 }
 
-auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
+auto AutowareUniverseUser::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
@@ -87,7 +87,7 @@ auto AutowareUniverse::initialize(const geometry_msgs::msg::Pose & initial_pose)
   }
 }
 
-auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
+auto AutowareUniverseUser::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
   assert(not route.empty());
 
@@ -101,7 +101,7 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
   });
 }
 
-auto AutowareUniverse::engage() -> void
+auto AutowareUniverseUser::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
@@ -112,19 +112,19 @@ auto AutowareUniverse::engage() -> void
   });
 }
 
-auto AutowareUniverse::engageable() const -> bool
+auto AutowareUniverseUser::engageable() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isWaitingForEngage();
 }
 
-auto AutowareUniverse::engaged() const -> bool
+auto AutowareUniverseUser::engaged() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isDriving();
 }
 
-auto AutowareUniverse::update() -> void
+auto AutowareUniverseUser::update() -> void
 {
   setAcceleration([this]() {
     Acceleration message;
@@ -190,22 +190,22 @@ auto AutowareUniverse::update() -> void
   setTransform(current_pose);
 }
 
-auto AutowareUniverse::getAcceleration() const -> double
+auto AutowareUniverseUser::getAcceleration() const -> double
 {
   return getAckermannControlCommand().longitudinal.acceleration;
 }
 
-auto AutowareUniverse::getVelocity() const -> double
+auto AutowareUniverseUser::getVelocity() const -> double
 {
   return getAckermannControlCommand().longitudinal.speed;
 }
 
-auto AutowareUniverse::getSteeringAngle() const -> double
+auto AutowareUniverseUser::getSteeringAngle() const -> double
 {
   return getAckermannControlCommand().lateral.steering_tire_angle;
 }
 
-auto AutowareUniverse::getGearSign() const -> double
+auto AutowareUniverseUser::getGearSign() const -> double
 {
   using autoware_auto_vehicle_msgs::msg::GearCommand;
   return getGearCommand().command == GearCommand::REVERSE or
@@ -214,7 +214,7 @@ auto AutowareUniverse::getGearSign() const -> double
            : 1.0;
 }
 
-auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
+auto AutowareUniverseUser::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
 
@@ -225,13 +225,13 @@ auto AutowareUniverse::getWaypoints() const -> traffic_simulator_msgs::msg::Wayp
   return waypoints;
 }
 
-auto AutowareUniverse::restrictTargetSpeed(double value) const -> double
+auto AutowareUniverseUser::restrictTargetSpeed(double value) const -> double
 {
   // no restrictions here
   return value;
 }
 
-auto AutowareUniverse::getAutowareStateName() const -> std::string
+auto AutowareUniverseUser::getAutowareStateName() const -> std::string
 {
   using autoware_auto_system_msgs::msg::AutowareState;
 
@@ -255,12 +255,12 @@ auto AutowareUniverse::getAutowareStateName() const -> std::string
 #undef CASE
 }
 
-auto AutowareUniverse::sendSIGINT() -> void  //
+auto AutowareUniverseUser::sendSIGINT() -> void  //
 {
   ::kill(process_id, SIGINT);
 }
 
-auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
+auto AutowareUniverseUser::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<SetVelocityLimit::Request>();
@@ -270,7 +270,7 @@ auto AutowareUniverse::setVelocityLimit(double velocity_limit) -> void
   });
 }
 
-auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
+auto AutowareUniverseUser::getVehicleCommand() const -> std::tuple<
   autoware_auto_control_msgs::msg::AckermannControlCommand,
   autoware_auto_vehicle_msgs::msg::GearCommand>
 {

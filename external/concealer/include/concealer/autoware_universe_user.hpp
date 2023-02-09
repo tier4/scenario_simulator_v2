@@ -44,9 +44,9 @@
 
 namespace concealer
 {
-class AutowareUniverse : public AutowareUser, public TransitionAssertion<AutowareUniverse>
+class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<AutowareUniverseUser>
 {
-  friend class TransitionAssertion<AutowareUniverse>;
+  friend class TransitionAssertion<AutowareUniverseUser>;
 
   using Acceleration = geometry_msgs::msg::AccelWithCovarianceStamped;
   using Checkpoint = geometry_msgs::msg::PoseStamped;
@@ -127,7 +127,7 @@ public:
 #undef DEFINE_STATE_PREDICATE
 
   template <typename... Ts>
-  CONCEALER_PUBLIC explicit AutowareUniverse(Ts &&... xs)
+  CONCEALER_PUBLIC explicit AutowareUniverseUser(Ts &&... xs)
   : AutowareUser(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     CONCEALER_INIT_PUBLISHER(Acceleration, "/localization/acceleration"),
@@ -159,7 +159,7 @@ public:
     resetTimerCallback();
   }
 
-  ~AutowareUniverse() override;
+  ~AutowareUniverseUser() override;
 
   auto engage() -> void override;
 
