@@ -20,14 +20,55 @@
 
 namespace openscenario_interpreter
 {
+
+using ParameterList = std::unordered_map<std::string, Object>;
+using ParameterListSharedPtr = std::shared_ptr<ParameterList>;
+using ParameterDistribution = std::vector<ParameterListSharedPtr>;
+using SingleParameterDistribution = std::vector<Object>;
+
 struct SingleParameterDistributionBase
 {
-  virtual auto derive() -> std::vector<Object> = 0;
+  virtual auto derive() -> SingleParameterDistribution = 0;
 };
 
 struct MultiParameterDistributionBase
 {
-  virtual auto derive() -> std::vector<std::unordered_map<std::string, Object>> = 0;
+  virtual auto derive() -> ParameterDistribution = 0;
+};
+
+auto mergeParameterDistributionImpl(
+  const ParameterDistribution & distribution, std::string single_parameter_name,
+  SingleParameterDistribution && single_distribution) -> ParameterDistribution;
+
+auto mergeParameterDistributionImpl(
+  ParameterDistribution distribution, ParameterDistribution additional_distribution)
+  -> ParameterDistribution;
+
+template <typename DistributionT>
+ParameterDistribution mergeParameterDistribution(
+  ParameterDistribution && distribution, DistributionT && x)
+{
+  return mergeParameterDistributionImpl(distribution, x.derive());
+}
+
+template <typename DistributionT, typename... Ts>
+ParameterDistribution mergeParameterDistribution(
+  ParameterDistribution && distribution, DistributionT && x, Ts &&... xs)
+{
+  return mergeParameterDistribution(
+    distribution, std::forward<decltype(x)>(x),
+    mergeParameterDistribution(distribution, std::forward<decltype(xs)>(xs)...));
+}
+
+struct ParameterDistributionMergerBase
+{
+  template <typename... Ts>
+  explicit ParameterDistributionMergerBase(Ts... xs)
+  : distribution(mergeParameterDistribution(ParameterDistribution(), xs...))
+  {
+  }
+
+  ParameterDistribution distribution;
 };
 }  // namespace openscenario_interpreter
-#endif  //OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
