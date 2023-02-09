@@ -99,7 +99,7 @@ geometry_msgs::msg::Pose constructPose(
  * @param vector input std::vector
  * @return new std::vector without duplicates and with relative order preserved
  */
-template<typename T>
+template <typename T>
 std::vector<T> getUniqueValues(std::vector<T> input_vector)
 {
   std::vector<T> output_vector(input_vector);
@@ -107,7 +107,7 @@ std::vector<T> getUniqueValues(std::vector<T> input_vector)
   std::unordered_set<T> unique_values;
   auto empty_elements_start = std::remove_if(
     output_vector.begin(), output_vector.end(),
-    [&unique_values](T const & element) {return !unique_values.insert(element).second;});
+    [&unique_values](T const & element) { return !unique_values.insert(element).second; });
   output_vector.erase(empty_elements_start, output_vector.end());
 
   return output_vector;

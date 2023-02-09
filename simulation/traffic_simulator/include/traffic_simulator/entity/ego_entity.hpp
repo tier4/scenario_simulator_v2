@@ -32,7 +32,7 @@
 #include <string>
 #include <vector>
 
-template<typename T>
+template <typename T>
 auto getParameter(const std::string & name, T value = {})
 {
   rclcpp::Node node{"get_parameter", "simulation"};
@@ -47,8 +47,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
-enum class VehicleModelType
-{
+enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
   DELAY_STEER_VEL,
@@ -76,7 +75,7 @@ class EgoEntity : public VehicleEntity
   static auto makeSimulationModel(
     const VehicleModelType, const double step_time,
     const traffic_simulator_msgs::msg::VehicleParameters &)
-  -> const std::shared_ptr<SimModelInterface>;
+    -> const std::shared_ptr<SimModelInterface>;
 
 public:
   EgoEntity() = delete;
@@ -105,12 +104,12 @@ public:
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
   auto getDefaultDynamicConstraints() const
-  -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
+    -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityStatus(const double, const double) const
-  -> const traffic_simulator_msgs::msg::EntityStatus;
+    -> const traffic_simulator_msgs::msg::EntityStatus;
 
   auto getEntityTypename() const -> const std::string & override;
 
@@ -143,7 +142,7 @@ public:
     const speed_change::Constraint, const bool continuous) -> void override;
 
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
-  -> void override;
+    -> void override;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
 

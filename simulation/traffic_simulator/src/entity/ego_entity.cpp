@@ -36,7 +36,7 @@ namespace entity
 {
 auto toString(const VehicleModelType datum) -> std::string
 {
-#define BOILERPLATE(IDENTIFIER) \
+#define BOILERPLATE(IDENTIFIER)      \
   case VehicleModelType::IDENTIFIER: \
     return #IDENTIFIER
 
@@ -82,7 +82,7 @@ auto EgoEntity::getVehicleModelType() -> VehicleModelType
 auto EgoEntity::makeSimulationModel(
   const VehicleModelType vehicle_model_type, const double step_time,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
--> const std::shared_ptr<SimModelInterface>
+  -> const std::shared_ptr<SimModelInterface>
 {
   // clang-format off
   const auto acc_time_constant = getParameter<double>("acc_time_constant", 0.1);
@@ -136,29 +136,28 @@ auto EgoEntity::makeSimulationModel(
 }
 
 auto EgoEntity::makeAutoware(const Configuration & configuration)
--> std::unique_ptr<concealer::Autoware>
+  -> std::unique_ptr<concealer::Autoware>
 {
   if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-    architecture_type == "awf/universe")
-  {
+      architecture_type == "awf/universe") {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
-    return getParameter<bool>("launch_autoware", true) ?
-           std::make_unique<concealer::AutowareUniverse>(
-      getParameter<std::string>("autoware_launch_package"),
-      getParameter<std::string>("autoware_launch_file"),
-      "map_path:=" + configuration.map_path.string(),
-      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-      "sensor_model:=" + getParameter<std::string>("sensor_model"),
-      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-      "rviz_config:=" + ((rviz_config == "") ?
-      configuration.rviz_config_path.string() :
-      Configuration::Pathname(rviz_config).string()),
-      "scenario_simulation:=true", "perception/enable_traffic_light:=false") :
-           std::make_unique<concealer::AutowareUniverse>();
+    return getParameter<bool>("launch_autoware", true)
+             ? std::make_unique<concealer::AutowareUniverse>(
+                 getParameter<std::string>("autoware_launch_package"),
+                 getParameter<std::string>("autoware_launch_file"),
+                 "map_path:=" + configuration.map_path.string(),
+                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
+                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                 "rviz_config:=" + ((rviz_config == "")
+                                      ? configuration.rviz_config_path.string()
+                                      : Configuration::Pathname(rviz_config).string()),
+                 "scenario_simulation:=true", "perception/enable_traffic_light:=false")
+             : std::make_unique<concealer::AutowareUniverse>();
   } else {
     throw common::SemanticError(
-            "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
+      "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
   }
 }
 
@@ -198,7 +197,7 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
--> const traffic_simulator_msgs::msg::EntityStatus
+  -> const traffic_simulator_msgs::msg::EntityStatus
 {
   traffic_simulator_msgs::msg::EntityStatus status;
   {
@@ -208,14 +207,14 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     status.pose = getCurrentPose();
     status.action_status.twist = getCurrentTwist();
     status.action_status.accel = [&]() {
-        geometry_msgs::msg::Accel accel;
-        if (previous_angular_velocity_) {
-          accel.linear.x = vehicle_model_ptr_->getAx();
-          accel.angular.z =
-            (vehicle_model_ptr_->getWz() - previous_angular_velocity_.get()) / step_time;
-        }
-        return accel;
-      }();
+      geometry_msgs::msg::Accel accel;
+      if (previous_angular_velocity_) {
+        accel.linear.x = vehicle_model_ptr_->getAx();
+        accel.angular.z =
+          (vehicle_model_ptr_->getWz() - previous_angular_velocity_.get()) / step_time;
+      }
+      return accel;
+    }();
 
     auto route_lanelets = getRouteLanelets();
     const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(route_lanelets);
@@ -288,13 +287,13 @@ auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
   current_pose.position.y = initial_pose_.get().position.y + relative_position(1);
   current_pose.position.z = initial_pose_.get().position.z + relative_position(2);
   current_pose.orientation = [this]() {
-      geometry_msgs::msg::Vector3 rpy;
-      rpy.x = 0;
-      rpy.y = 0;
-      rpy.z = vehicle_model_ptr_->getYaw();
-      return initial_pose_.get().orientation *
-             quaternion_operation::convertEulerAngleToQuaternion(rpy);
-    }();
+    geometry_msgs::msg::Vector3 rpy;
+    rpy.x = 0;
+    rpy.y = 0;
+    rpy.z = vehicle_model_ptr_->getYaw();
+    return initial_pose_.get().orientation *
+           quaternion_operation::convertEulerAngleToQuaternion(rpy);
+  }();
 
   return current_pose;
 }
@@ -446,7 +445,7 @@ auto EgoEntity::requestSpeedChange(
 }
 
 auto EgoEntity::getDefaultDynamicConstraints() const
--> const traffic_simulator_msgs::msg::DynamicConstraints &
+  -> const traffic_simulator_msgs::msg::DynamicConstraints &
 {
   THROW_SEMANTIC_ERROR("getDefaultDynamicConstraints function does not support EgoEntity");
 }
@@ -462,12 +461,11 @@ auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
   const auto current_pose = getStatus().pose;
 
   if (autoware->initialized()) {
-    autoware->set(
-      [this]() {
-        geometry_msgs::msg::Accel message;
-        message.linear.x = vehicle_model_ptr_->getAx();
-        return message;
-      }());
+    autoware->set([this]() {
+      geometry_msgs::msg::Accel message;
+      message.linear.x = vehicle_model_ptr_->getAx();
+      return message;
+    }());
 
     autoware->set(current_pose);
 
