@@ -5,21 +5,19 @@ on:
   schedule:
     - cron: 0 0 * * *
   pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "README.md"
-      - "workflows/Docker.yaml"
-      - "workflows/Documentation.yaml"
-      - "workflows/NotifyFailure.yaml"
-      - "workflows/Release.yaml"
-      - "workflows/SpellCheck.yaml"
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!README.md'
+      - '!.github/**'
+      - '.github/workflows/Build.yaml'
+      - '!mkdocs.yml'
 
 jobs:
   build:
     name: build
     runs-on: ubuntu-20.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -60,7 +58,7 @@ jobs:
           package-name: ${{ steps.list_packages.outputs.package_list }}
           target-ros2-distro: ${{ matrix.rosdistro }}
           vcs-repo-file-url: dependency_${{ matrix.rosdistro }}.repos
-          extra-cmake-args: -DWITH_INTEGRATION_TEST=ON
+          extra-cmake-args: -DBUILD_CPP_MOCK_SCENARIOS=ON
           colcon-defaults: |
             {
               "build": {

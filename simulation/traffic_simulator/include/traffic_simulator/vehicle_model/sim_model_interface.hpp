@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,10 +17,6 @@
 
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <eigen3/Eigen/Core>
-
-using bool8_t = bool;
-using float32_t = float;
-using float64_t = double;
 
 /**
  * @class SimModelInterface
@@ -85,60 +81,60 @@ public:
    * @param [in] dt delta time [s]
    * @param [in] input vehicle input
    */
-  void updateRungeKutta(const float64_t & dt, const Eigen::VectorXd & input);
+  void updateRungeKutta(const double & dt, const Eigen::VectorXd & input);
 
   /**
    * @brief update vehicle states with Euler methods
    * @param [in] dt delta time [s]
    * @param [in] input vehicle input
    */
-  void updateEuler(const float64_t & dt, const Eigen::VectorXd & input);
+  void updateEuler(const double & dt, const Eigen::VectorXd & input);
 
   /**
    * @brief update vehicle states
    * @param [in] dt delta time [s]
    */
-  virtual void update(const float64_t & dt) = 0;
+  virtual void update(const double & dt) = 0;
 
   /**
    * @brief get vehicle position x
    */
-  virtual float64_t getX() = 0;
+  virtual double getX() = 0;
 
   /**
    * @brief get vehicle position y
    */
-  virtual float64_t getY() = 0;
+  virtual double getY() = 0;
 
   /**
    * @brief get vehicle angle yaw
    */
-  virtual float64_t getYaw() = 0;
+  virtual double getYaw() = 0;
 
   /**
    * @brief get vehicle velocity vx
    */
-  virtual float64_t getVx() = 0;
+  virtual double getVx() = 0;
 
   /**
    * @brief get vehicle lateral velocity
    */
-  virtual float64_t getVy() = 0;
+  virtual double getVy() = 0;
 
   /**
    * @brief get vehicle longitudinal acceleration
    */
-  virtual float64_t getAx() = 0;
+  virtual double getAx() = 0;
 
   /**
    * @brief get vehicle angular-velocity wz
    */
-  virtual float64_t getWz() = 0;
+  virtual double getWz() = 0;
 
   /**
    * @brief get vehicle steering angle
    */
-  virtual float64_t getSteer() = 0;
+  virtual double getSteer() = 0;
 
   /**
    * @brief get vehicle gear

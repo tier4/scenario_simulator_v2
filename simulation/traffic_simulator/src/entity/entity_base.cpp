@@ -29,11 +29,7 @@ namespace entity
 {
 EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
-: name(name),
-  verbose(true),
-  status_(entity_status),
-  status_before_update_(status_),
-  npc_logic_started_(false)
+: name(name), verbose(true), status_(entity_status), status_before_update_(status_)
 {
 }
 
@@ -209,6 +205,18 @@ auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msg
   return boost::none;
 }
 
+auto EntityBase::getLaneletPose(double matching_distance) const
+  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getStatus().type.type) {
+    return hdmap_utils_ptr_->toLaneletPose(
+      getMapPose(), getStatus().bounding_box, true, matching_distance);
+  } else {
+    return hdmap_utils_ptr_->toLaneletPose(
+      getMapPose(), getStatus().bounding_box, false, matching_distance);
+  }
+}
+
 auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
 
 auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
@@ -228,6 +236,8 @@ auto EntityBase::getStatus() const -> const traffic_simulator_msgs::msg::EntityS
 }
 
 auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
+
+auto EntityBase::getTraveledDistance() const -> double { return traveled_distance_; }
 
 auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 
@@ -737,5 +747,14 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
     return stand_still_duration_ = 0.0;
   }
 }
+
+auto EntityBase::updateTraveledDistance(const double step_time) -> double
+{
+  if (npc_logic_started_) {
+    traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
+  }
+  return traveled_distance_;
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator
