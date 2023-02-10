@@ -24,13 +24,13 @@ DistributionSet::DistributionSet(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto DistributionSet::derive() -> std::vector<Object>
+auto DistributionSet::derive() -> SingleUnnamedParameterDistribution
 {
-  std::vector<Object> list;
+  SingleUnnamedParameterDistribution distribution;
   for (const auto & element : elements) {
-    list.emplace_back(make<String>(element.value));
+    distribution.emplace_back(make<String>(element.value));
   }
-  return list;
+  return distribution;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

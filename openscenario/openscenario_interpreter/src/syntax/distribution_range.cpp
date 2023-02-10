@@ -26,14 +26,14 @@ DistributionRange::DistributionRange(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto DistributionRange::derive() -> std::vector<Object>
+auto DistributionRange::derive() -> SingleUnnamedParameterDistribution
 {
-  std::vector<Object> list;
+  SingleUnnamedParameterDistribution unnamed_distribution;
   for (double parameter = range.lower_limit; parameter <= range.upper_limit;
        parameter += step_width) {
-    list.emplace_back(make<Double>(parameter));
+    unnamed_distribution.emplace_back(make<Double>(parameter));
   }
-  return list;
+  return unnamed_distribution;
 }
 
 }  // namespace syntax

@@ -35,13 +35,13 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct DeterministicSingleParameterDistribution
 : public DeterministicSingleParameterDistributionType,
-  public SingleParameterDistributionBase
+  public SingleParameterDistributionContainer
 {
   const String parameter_name;
 
   explicit DeterministicSingleParameterDistribution(const pugi::xml_node &, Scope &);
 
-  auto derive() -> std::vector<Object> override;
+  auto derive() -> SingleParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

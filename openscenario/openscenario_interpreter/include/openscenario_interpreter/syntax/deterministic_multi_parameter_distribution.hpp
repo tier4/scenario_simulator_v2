@@ -33,7 +33,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct DeterministicMultiParameterDistribution : public DeterministicMultiParameterDistributionType,
-                                                 public MultiParameterDistributionBase
+                                                 public MultiParameterDistributionContainer
 {
   explicit DeterministicMultiParameterDistribution(const pugi::xml_node &, Scope & scope);
 

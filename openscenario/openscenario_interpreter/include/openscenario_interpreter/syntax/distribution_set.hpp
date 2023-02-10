@@ -38,7 +38,7 @@ struct DistributionSet : private Scope, public ComplexType, public SingleParamet
 
   explicit DistributionSet(const pugi::xml_node &, Scope & scope);
 
-  auto derive() -> std::vector<Object> override;
+  auto derive() -> SingleUnnamedParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
