@@ -14,8 +14,10 @@
 
 #include <boost/lexical_cast.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_v2_msgs/msg/user_defined_value.hpp>
-#include <scenario_simulator_v2_msgs/msg/user_defined_value_type.hpp>
+
+#if __has_include(<tier4_simulation_msgs/msg/user_defined_value.hpp>)
+#include <tier4_simulation_msgs/msg/user_defined_value.hpp>
+#endif
 
 int main(const int argc, char const * const * const argv)
 {
@@ -78,8 +80,9 @@ int main(const int argc, char const * const * const argv)
 
   auto node = std::make_shared<rclcpp::Node>("count_up");
 
-  using scenario_simulator_v2_msgs::msg::UserDefinedValue;
-  using scenario_simulator_v2_msgs::msg::UserDefinedValueType;
+#if __has_include(<tier4_simulation_msgs/msg/user_defined_value.hpp>)
+  using tier4_simulation_msgs::msg::UserDefinedValue;
+  using tier4_simulation_msgs::msg::UserDefinedValueType;
 
   auto publisher = node->create_publisher<UserDefinedValue>("/count_up", rclcpp::QoS(1).reliable());
 
@@ -98,6 +101,12 @@ int main(const int argc, char const * const * const argv)
 
   auto timer = node->create_wall_timer(
     std::chrono::milliseconds(100), [&]() { publisher->publish(make_message()); });
+#else
+  std::cout
+    << "The ability to have ROS2 topics as values for `UserDefinedValueCondition` is enabled only "
+       "when the `UserDefinedValue` type is present in the `tier4_simulation_msgs` package."
+    << std::endl;
+#endif
 
   rclcpp::executors::SingleThreadedExecutor executor;
 

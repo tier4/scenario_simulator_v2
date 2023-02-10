@@ -21,7 +21,6 @@
   <depend>rclcpp_components</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>scenario_simulator_exception</depend>
-  <depend>scenario_simulator_v2_msgs</depend>
   <depend>simple_junit</depend>
   <depend>std_msgs</depend>
   <depend>tier4_simulation_msgs</depend>
