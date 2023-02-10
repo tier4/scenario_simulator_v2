@@ -20,7 +20,6 @@
 
 namespace openscenario_interpreter
 {
-
 using ParameterList = std::unordered_map<std::string, Object>;
 using ParameterListSharedPtr = std::shared_ptr<ParameterList>;
 using ParameterDistribution = std::vector<ParameterListSharedPtr>;
