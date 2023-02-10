@@ -20,6 +20,9 @@ auto mergeParameterDistribution(
   ParameterDistribution & distribution, ParameterDistribution && additional_distribution)
   -> ParameterDistribution
 {
+  if (distribution.empty()) {
+    distribution.emplace_back(ParameterListSharedPtr());
+  }
   ParameterDistribution merged_distribution;
   merged_distribution.reserve(distribution.size() * additional_distribution.size());
 
