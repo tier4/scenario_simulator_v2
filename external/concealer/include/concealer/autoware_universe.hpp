@@ -17,7 +17,10 @@
 
 #include <concealer/autoware.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
+#include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
 #include <concealer/utility/subscriber_wrapper.hpp>
+#include <concealer/utility/publisher_wrapper.hpp>
 
 namespace concealer {
 
@@ -26,13 +29,28 @@ class AutowareUniverse : public Autoware
 {
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
+
+  using Acceleration = geometry_msgs::msg::AccelWithCovarianceStamped;
+  PublisherWrapper<Acceleration> setAcceleration;
+
+  using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
+  PublisherWrapper<SteeringReport> setSteeringReport;
+
 public:
 
   CONCEALER_PUBLIC explicit AutowareUniverse()
   : getAckermannControlCommand("/control/command/control_cmd", *this)
+  , setAcceleration("/localization/acceleration", *this)
+  , setSteeringReport("/vehicle/status/steering_status", *this)
   {}
 
   auto getAcceleration() const -> double override;
+
+  auto getSteeringAngle() const -> double override;
+
+  auto getVelocity() const -> double override;
+
+  auto update() -> void override;
 
 };
 

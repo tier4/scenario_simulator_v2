@@ -126,19 +126,6 @@ auto AutowareUniverseUser::engaged() const -> bool
 
 auto AutowareUniverseUser::update() -> void
 {
-  setAcceleration([this]() {
-    Acceleration message;
-    message.header.stamp = get_clock()->now();
-    message.header.frame_id = "/base_link";
-    message.accel.accel = current_acceleration;
-    message.accel.covariance.at(6 * 0 + 0) = 0.001;  // linear x
-    message.accel.covariance.at(6 * 1 + 1) = 0.001;  // linear y
-    message.accel.covariance.at(6 * 2 + 2) = 0.001;  // linear z
-    message.accel.covariance.at(6 * 3 + 3) = 0.001;  // angular x
-    message.accel.covariance.at(6 * 4 + 4) = 0.001;  // angular y
-    message.accel.covariance.at(6 * 5 + 5) = 0.001;  // angular z
-    return message;
-  }());
 
   setControlModeReport([this]() {
     ControlModeReport message;
@@ -157,13 +144,6 @@ auto AutowareUniverseUser::update() -> void
     TurnIndicatorsReport message;
     message.stamp = get_clock()->now();
     message.report = getTurnIndicatorsCommand().command;
-    return message;
-  }());
-
-  setSteeringReport([this]() {
-    SteeringReport message;
-    message.stamp = get_clock()->now();
-    message.steering_tire_angle = getSteeringAngle();
     return message;
   }());
 
@@ -188,16 +168,6 @@ auto AutowareUniverseUser::update() -> void
   }());
 
   setTransform(current_pose);
-}
-
-auto AutowareUniverseUser::getVelocity() const -> double
-{
-  return getAckermannControlCommand().longitudinal.speed;
-}
-
-auto AutowareUniverseUser::getSteeringAngle() const -> double
-{
-  return getAckermannControlCommand().lateral.steering_tire_angle;
 }
 
 auto AutowareUniverseUser::getGearSign() const -> double

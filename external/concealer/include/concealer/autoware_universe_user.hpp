@@ -24,7 +24,6 @@
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
@@ -32,7 +31,6 @@
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <concealer/task_queue.hpp>
-#include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
@@ -51,25 +49,21 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
 {
   friend class TransitionAssertion<AutowareUniverseUser>;
 
-  using Acceleration = geometry_msgs::msg::AccelWithCovarianceStamped;
   using Checkpoint = geometry_msgs::msg::PoseStamped;
   using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
   using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
   using GoalPose = geometry_msgs::msg::PoseStamped;
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
   using Odometry = nav_msgs::msg::Odometry;
-  using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
   using TurnIndicatorsReport = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
 
-  PublisherWrapper<Acceleration> setAcceleration;
   PublisherWrapper<Checkpoint> setCheckpoint;
   PublisherWrapper<ControlModeReport> setControlModeReport;
   PublisherWrapper<GearReport> setGearReport;
   PublisherWrapper<GoalPose> setGoalPose;
   PublisherWrapper<InitialPose> setInitialPose;
   PublisherWrapper<Odometry> setOdometry;
-  PublisherWrapper<SteeringReport> setSteeringReport;
   PublisherWrapper<TurnIndicatorsReport> setTurnIndicatorsReport;
   PublisherWrapper<VelocityReport> setVelocityReport;
 
@@ -134,14 +128,12 @@ public:
   CONCEALER_PUBLIC explicit AutowareUniverseUser(Ts &&... xs)
   : AutowareUser(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    setAcceleration("/localization/acceleration", *this),
     setCheckpoint("/planning/mission_planning/checkpoint", *this),
     setControlModeReport("/vehicle/status/control_mode", *this),
     setGearReport("/vehicle/status/gear_status", *this),
     setGoalPose("/planning/mission_planning/goal", *this),
     setInitialPose("/initialpose", *this),
     setOdometry("/localization/kinematic_state", *this),
-    setSteeringReport("/vehicle/status/steering_status", *this),
     setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
     setVelocityReport("/vehicle/status/velocity_status", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
@@ -173,13 +165,9 @@ public:
 
   auto getGearSign() const -> double override;
 
-  auto getSteeringAngle() const -> double override;
-
   auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand> override;
-
-  auto getVelocity() const -> double override;
 
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 

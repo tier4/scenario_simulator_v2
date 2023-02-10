@@ -16,4 +16,9 @@
 
 namespace concealer {
 
+  auto Autoware::set(const geometry_msgs::msg::Accel & acceleration) -> const geometry_msgs::msg::Accel &
+  {
+    return current_acceleration = acceleration;
+  }
+
 }

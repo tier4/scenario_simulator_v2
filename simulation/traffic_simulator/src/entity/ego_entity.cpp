@@ -321,18 +321,18 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC:
         input << autoware_user->getGearSign() * autoware->getAcceleration(),
-          autoware_user->getSteeringAngle();
+          autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
         input << autoware_user->getGearSign() * autoware->getAcceleration(),
-          autoware_user->getSteeringAngle();
+          autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
       case VehicleModelType::IDEAL_STEER_VEL:
-        input << autoware_user->getVelocity(), autoware_user->getSteeringAngle();
+        input << autoware->getVelocity(), autoware->getSteeringAngle();
         break;
 
       default:
@@ -360,6 +360,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 
   autoware_user->update();
+  autoware->update();
   autoware_user->spinSome();
   autoware->spinSome();
 
@@ -462,7 +463,7 @@ auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
   const auto current_pose = getStatus().pose;
 
   if (autoware_user->initialized()) {
-    autoware_user->set([this]() {
+    autoware->set([this]() {
       geometry_msgs::msg::Accel message;
       message.linear.x = vehicle_model_ptr_->getAx();
       return message;

@@ -161,12 +161,6 @@ void AutowareUser::rethrow() const
   }
 }
 
-auto AutowareUser::set(const geometry_msgs::msg::Accel & acceleration)
-  -> const geometry_msgs::msg::Accel &
-{
-  return current_acceleration = acceleration;
-}
-
 auto AutowareUser::set(const geometry_msgs::msg::Pose & pose) -> const geometry_msgs::msg::Pose &
 {
   return current_pose = pose;

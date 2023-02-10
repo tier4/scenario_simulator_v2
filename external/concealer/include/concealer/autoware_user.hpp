@@ -76,8 +76,6 @@ protected:
 
   bool initialize_was_called = false;
 
-  geometry_msgs::msg::Accel current_acceleration;
-
   geometry_msgs::msg::Pose current_pose;
 
   geometry_msgs::msg::Twist current_twist;
@@ -170,16 +168,12 @@ public:
   // returns -1.0 when gear is reverse and 1.0 otherwise
   virtual auto getGearSign() const -> double = 0;
 
-  virtual auto getSteeringAngle() const -> double = 0;
-
   virtual auto getTurnIndicatorsCommand() const
     -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
-
-  virtual auto getVelocity() const -> double = 0;
 
   virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 
@@ -189,8 +183,6 @@ public:
   virtual auto restrictTargetSpeed(double) const -> double = 0;
 
   /*   */ auto rethrow() const noexcept(false) -> void;
-
-  /*   */ auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
 
   /*   */ auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
 

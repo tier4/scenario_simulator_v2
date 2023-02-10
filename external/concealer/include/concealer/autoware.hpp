@@ -22,6 +22,10 @@
 namespace concealer {
 
 class Autoware : public rclcpp::Node {
+
+protected:
+  geometry_msgs::msg::Accel current_acceleration;
+
 public:
 
   CONCEALER_PUBLIC explicit Autoware()
@@ -30,6 +34,14 @@ public:
   }
 
   virtual auto getAcceleration() const -> double = 0;
+
+  virtual auto getSteeringAngle() const -> double = 0;
+
+  virtual auto getVelocity() const -> double = 0;
+
+  /*   */ auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
+
+  virtual auto update() -> void = 0;
 
   void spinSome() {
     if (rclcpp::ok()) {
