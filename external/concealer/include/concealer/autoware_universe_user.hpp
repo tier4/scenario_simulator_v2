@@ -159,8 +159,6 @@ public:
   // clang-format on
   {
     waitpid_options = 0;
-
-    resetTimerCallback();
   }
 
   ~AutowareUniverseUser() override;

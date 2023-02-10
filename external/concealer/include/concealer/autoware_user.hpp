@@ -59,8 +59,6 @@ class AutowareUser : public rclcpp::Node, public ContinuousTransformBroadcaster<
 
   bool is_stop_requested = false;
 
-  rclcpp::TimerBase::SharedPtr updater;
-
   bool is_thrown = false;
 
   std::exception_ptr thrown;
@@ -91,8 +89,6 @@ protected:
     return is_stop_requested;
   }
 
-  virtual auto update() -> void = 0;
-
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
   virtual void sendSIGINT() = 0;
@@ -101,9 +97,9 @@ protected:
   // because it is difficult to differentiate shutting down behavior in destructor of a base class
   void shutdownAutoware();
 
-  void resetTimerCallback();
-
 public:
+  virtual auto update() -> void = 0;
+
     void spinSome() {
         try {
             if (rclcpp::ok() and not isStopRequested()) {

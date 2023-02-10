@@ -161,11 +161,6 @@ void AutowareUser::rethrow() const
   }
 }
 
-void AutowareUser::resetTimerCallback()
-{
-  updater = create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });
-}
-
 auto AutowareUser::set(const geometry_msgs::msg::Accel & acceleration)
   -> const geometry_msgs::msg::Accel &
 {
