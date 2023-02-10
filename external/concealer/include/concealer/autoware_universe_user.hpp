@@ -43,6 +43,7 @@
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
 #include <concealer/utility/subscriber_wrapper.hpp>
+#include <concealer/utility/publisher_wrapper.hpp>
 
 namespace concealer
 {
@@ -61,7 +62,7 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using TurnIndicatorsReport = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
 
-  CONCEALER_DEFINE_PUBLISHER(Acceleration);
+  PublisherWrapper<Acceleration> setAcceleration;
   CONCEALER_DEFINE_PUBLISHER(Checkpoint);
   CONCEALER_DEFINE_PUBLISHER(ControlModeReport);
   CONCEALER_DEFINE_PUBLISHER(GearReport);
@@ -133,7 +134,7 @@ public:
   CONCEALER_PUBLIC explicit AutowareUniverseUser(Ts &&... xs)
   : AutowareUser(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    CONCEALER_INIT_PUBLISHER(Acceleration, "/localization/acceleration"),
+    setAcceleration("/localization/acceleration", *this),
     CONCEALER_INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     CONCEALER_INIT_PUBLISHER(ControlModeReport, "/vehicle/status/control_mode"),
     CONCEALER_INIT_PUBLISHER(GearReport, "/vehicle/status/gear_status"),
