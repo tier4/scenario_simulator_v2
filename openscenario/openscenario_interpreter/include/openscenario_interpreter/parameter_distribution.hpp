@@ -43,39 +43,14 @@ struct MultiParameterDistributionBase
 };
 
 // container types of distribution data generator
-struct SingleParameterDistributionContainer
-{
-  virtual auto derive() -> SingleParameterDistribution = 0;
-};
-
-struct MultiParameterDistributionContainer
+struct ParameterDistributionContainer
 {
   virtual auto derive() -> ParameterDistribution = 0;
 };
 
-auto mergeParameterDistributionImpl(
-  ParameterDistribution && distribution, SingleParameterDistribution && single_distribution)
+auto mergeParameterDistribution(
+  ParameterDistribution & distribution, ParameterDistribution && additional_distribution)
   -> ParameterDistribution;
-
-auto mergeParameterDistributionImpl(
-  ParameterDistribution && distribution, ParameterDistribution && additional_distribution)
-  -> ParameterDistribution;
-
-template <typename DistributionT>
-ParameterDistribution mergeParameterDistribution(
-  ParameterDistribution && distribution, DistributionT && x)
-{
-  return mergeParameterDistributionImpl(distribution, x.derive());
-}
-
-template <typename DistributionT, typename... Ts>
-ParameterDistribution mergeParameterDistribution(
-  ParameterDistribution && distribution, DistributionT && x, Ts &&... xs)
-{
-  return mergeParameterDistribution(
-    distribution, std::forward<decltype(x)>(x),
-    mergeParameterDistribution(distribution, std::forward<decltype(xs)>(xs)...));
-}
 
 template <typename DistributionT>
 ParameterDistribution mergeParameterDistribution(

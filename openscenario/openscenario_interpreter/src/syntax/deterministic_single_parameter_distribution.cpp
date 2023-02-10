@@ -25,13 +25,16 @@ DeterministicSingleParameterDistribution::DeterministicSingleParameterDistributi
   parameter_name(readAttribute<String>("parameterName", node, scope))
 {
 }
-SingleParameterDistribution DeterministicSingleParameterDistribution::derive()
+
+ParameterDistribution DeterministicSingleParameterDistribution::derive()
 {
-  return apply<SingleParameterDistribution>(
+  return apply<ParameterDistribution>(
     [this](auto & unnamed_distribution) {
-      SingleParameterDistribution distribution;
-      distribution.name = parameter_name;
-      distribution.distribution = unnamed_distribution.derive();
+      ParameterDistribution distribution;
+      for (const auto & parameter : unnamed_distribution.derive()) {
+        distribution.emplace_back(
+          std::make_shared<ParameterList>(ParameterList{{parameter_name, make(parameter)}}));
+      }
       return distribution;
     },
     *this);

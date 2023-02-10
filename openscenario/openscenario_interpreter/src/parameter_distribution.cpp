@@ -16,26 +16,9 @@
 
 namespace openscenario_interpreter
 {
-auto openscenario_interpreter::mergeParameterDistributionImpl(
-  const ParameterDistribution & distribution, std::string single_parameter_name,
-  SingleParameterDistribution && single_distribution) -> ParameterDistribution
-{
-  ParameterDistribution merged_distribution;
-  merged_distribution.reserve(distribution.size() * single_distribution.size());
-
-  for (const auto & single_parameter_value : single_distribution) {
-    for (const auto & list : distribution) {
-      merged_distribution.emplace_back(list);
-      merged_distribution.back()->at(single_parameter_name) = single_parameter_value;
-    }
-  }
-  return merged_distribution;
-}
-
-auto mergeParameterDistributionImpl(
-  std::vector<std::shared_ptr<std::unordered_map<std::string, Object>>> distribution,
-  std::vector<std::shared_ptr<std::unordered_map<std::string, Object>>> additional_distribution)
-  -> std::vector<std::shared_ptr<std::unordered_map<std::string, Object>>>
+auto mergeParameterDistribution(
+  ParameterDistribution & distribution, ParameterDistribution && additional_distribution)
+  -> ParameterDistribution
 {
   ParameterDistribution merged_distribution;
   merged_distribution.reserve(distribution.size() * additional_distribution.size());
