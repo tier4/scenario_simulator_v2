@@ -24,5 +24,11 @@ ParameterValueDistribution::ParameterValueDistribution(
 : DistributionDefinition(node, scope), scenario_file(readElement<File>("ScenarioFile", node, scope))
 {
 }
+
+ParameterDistribution ParameterValueDistribution::derive()
+{
+  return apply<ParameterDistribution>(
+    [](auto & distribution) { return distribution.derive(); }, *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
