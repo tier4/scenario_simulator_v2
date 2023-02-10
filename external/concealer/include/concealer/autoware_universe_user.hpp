@@ -63,15 +63,15 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
 
   PublisherWrapper<Acceleration> setAcceleration;
-  CONCEALER_DEFINE_PUBLISHER(Checkpoint);
-  CONCEALER_DEFINE_PUBLISHER(ControlModeReport);
-  CONCEALER_DEFINE_PUBLISHER(GearReport);
-  CONCEALER_DEFINE_PUBLISHER(GoalPose);
-  CONCEALER_DEFINE_PUBLISHER(InitialPose);
-  CONCEALER_DEFINE_PUBLISHER(Odometry);
-  CONCEALER_DEFINE_PUBLISHER(SteeringReport);
-  CONCEALER_DEFINE_PUBLISHER(TurnIndicatorsReport);
-  CONCEALER_DEFINE_PUBLISHER(VelocityReport);
+  PublisherWrapper<Checkpoint> setCheckpoint;
+  PublisherWrapper<ControlModeReport> setControlModeReport;
+  PublisherWrapper<GearReport> setGearReport;
+  PublisherWrapper<GoalPose> setGoalPose;
+  PublisherWrapper<InitialPose> setInitialPose;
+  PublisherWrapper<Odometry> setOdometry;
+  PublisherWrapper<SteeringReport> setSteeringReport;
+  PublisherWrapper<TurnIndicatorsReport> setTurnIndicatorsReport;
+  PublisherWrapper<VelocityReport> setVelocityReport;
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
@@ -135,15 +135,15 @@ public:
   : AutowareUser(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     setAcceleration("/localization/acceleration", *this),
-    CONCEALER_INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
-    CONCEALER_INIT_PUBLISHER(ControlModeReport, "/vehicle/status/control_mode"),
-    CONCEALER_INIT_PUBLISHER(GearReport, "/vehicle/status/gear_status"),
-    CONCEALER_INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
-    CONCEALER_INIT_PUBLISHER(InitialPose, "/initialpose"),
-    CONCEALER_INIT_PUBLISHER(Odometry, "/localization/kinematic_state"),
-    CONCEALER_INIT_PUBLISHER(SteeringReport, "/vehicle/status/steering_status"),
-    CONCEALER_INIT_PUBLISHER(TurnIndicatorsReport, "/vehicle/status/turn_indicators_status"),
-    CONCEALER_INIT_PUBLISHER(VelocityReport, "/vehicle/status/velocity_status"),
+    setCheckpoint("/planning/mission_planning/checkpoint", *this),
+    setControlModeReport("/vehicle/status/control_mode", *this),
+    setGearReport("/vehicle/status/gear_status", *this),
+    setGoalPose("/planning/mission_planning/goal", *this),
+    setInitialPose("/initialpose", *this),
+    setOdometry("/localization/kinematic_state", *this),
+    setSteeringReport("/vehicle/status/steering_status", *this),
+    setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
+    setVelocityReport("/vehicle/status/velocity_status", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
     getAutowareState("/autoware/state", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const CooperateStatusArray& v) {cooperate(v);}),
