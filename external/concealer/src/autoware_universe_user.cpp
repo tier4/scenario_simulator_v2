@@ -190,11 +190,6 @@ auto AutowareUniverseUser::update() -> void
   setTransform(current_pose);
 }
 
-auto AutowareUniverseUser::getAcceleration() const -> double
-{
-  return getAckermannControlCommand().longitudinal.acceleration;
-}
-
 auto AutowareUniverseUser::getVelocity() const -> double
 {
   return getAckermannControlCommand().longitudinal.speed;

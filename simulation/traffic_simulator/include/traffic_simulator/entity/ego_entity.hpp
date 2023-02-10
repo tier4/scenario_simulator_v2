@@ -20,6 +20,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <concealer/autoware_universe_user.hpp>
+#include <concealer/autoware.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
@@ -54,7 +55,8 @@ enum class VehicleModelType {
 
 class EgoEntity : public VehicleEntity
 {
-  const std::unique_ptr<concealer::AutowareUser> autoware;
+  const std::unique_ptr<concealer::AutowareUser> autoware_user;
+  const std::unique_ptr<concealer::Autoware> autoware;
 
   const VehicleModelType vehicle_model_type_;
 
@@ -66,7 +68,7 @@ class EgoEntity : public VehicleEntity
 
   static auto getVehicleModelType() -> VehicleModelType;
 
-  static auto makeAutoware(const Configuration &) -> std::unique_ptr<concealer::AutowareUser>;
+  static auto makeAutowareUser(const Configuration &) -> std::unique_ptr<concealer::AutowareUser>;
 
   static auto makeSimulationModel(
     const VehicleModelType, const double step_time,

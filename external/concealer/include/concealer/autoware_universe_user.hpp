@@ -170,8 +170,6 @@ public:
 
   auto engaged() const -> bool override;
 
-  auto getAcceleration() const -> double override;
-
   auto getAutowareStateName() const -> std::string override;
 
   auto getGearSign() const -> double override;

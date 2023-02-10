@@ -165,8 +165,6 @@ public:
    * -------------------------------------------------------------------------- */
   virtual auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void = 0;
 
-  virtual auto getAcceleration() const -> double = 0;
-
   virtual auto getAutowareStateName() const -> std::string = 0;
 
   virtual auto getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState;
