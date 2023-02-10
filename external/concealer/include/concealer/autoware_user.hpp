@@ -22,7 +22,6 @@
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
@@ -163,17 +162,9 @@ public:
 
   virtual auto getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState;
 
-  virtual auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand;
-
-  // returns -1.0 when gear is reverse and 1.0 otherwise
-  virtual auto getGearSign() const -> double = 0;
-
   virtual auto getTurnIndicatorsCommand() const
     -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  virtual auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
   virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 

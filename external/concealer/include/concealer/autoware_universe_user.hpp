@@ -23,7 +23,6 @@
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
@@ -51,7 +50,6 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
 
   using Checkpoint = geometry_msgs::msg::PoseStamped;
   using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
-  using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
   using GoalPose = geometry_msgs::msg::PoseStamped;
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
   using Odometry = nav_msgs::msg::Odometry;
@@ -60,7 +58,6 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
 
   PublisherWrapper<Checkpoint> setCheckpoint;
   PublisherWrapper<ControlModeReport> setControlModeReport;
-  PublisherWrapper<GearReport> setGearReport;
   PublisherWrapper<GoalPose> setGoalPose;
   PublisherWrapper<InitialPose> setInitialPose;
   PublisherWrapper<Odometry> setOdometry;
@@ -71,7 +68,6 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
-  using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
@@ -81,7 +77,6 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   SubscriberWrapper<CooperateStatusArray> getCooperateStatusArray;
 
   CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
-  CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
   SubscriberWrapper<PathWithLaneId> getPathWithLaneId;
   SubscriberWrapper<Trajectory> getTrajectory;
   CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
@@ -130,7 +125,6 @@ public:
     // clang-format off
     setCheckpoint("/planning/mission_planning/checkpoint", *this),
     setControlModeReport("/vehicle/status/control_mode", *this),
-    setGearReport("/vehicle/status/gear_status", *this),
     setGoalPose("/planning/mission_planning/goal", *this),
     setInitialPose("/initialpose", *this),
     setOdometry("/localization/kinematic_state", *this),
@@ -140,7 +134,6 @@ public:
     getAutowareState("/autoware/state", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const CooperateStatusArray& v) {cooperate(v);}),
     CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
-    CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this),
     getTrajectory("/planning/scenario_planning/trajectory", *this),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
@@ -162,12 +155,6 @@ public:
   auto engaged() const -> bool override;
 
   auto getAutowareStateName() const -> std::string override;
-
-  auto getGearSign() const -> double override;
-
-  auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 

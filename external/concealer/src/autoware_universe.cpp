@@ -49,6 +49,13 @@ namespace concealer {
       return message;
     }());
 
+    setGearReport([this]() {
+      GearReport message;
+      message.stamp = get_clock()->now();
+      message.report = getGearCommand().command;
+      return message;
+    }());
+
     setSteeringReport([this]() {
       SteeringReport message;
       message.stamp = get_clock()->now();
@@ -56,4 +63,25 @@ namespace concealer {
       return message;
     }());
   }
+
+  auto AutowareUniverse::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand {
+    return getGearCommandImpl();
+  }
+
+  auto AutowareUniverse::getGearSign() const -> double
+  {
+    using autoware_auto_vehicle_msgs::msg::GearCommand;
+    return getGearCommand().command == GearCommand::REVERSE or
+           getGearCommand().command == GearCommand::REVERSE_2
+           ? -1.0
+           : 1.0;
+  }
+
+  auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
+      autoware_auto_control_msgs::msg::AckermannControlCommand,
+      autoware_auto_vehicle_msgs::msg::GearCommand>
+  {
+    return std::make_tuple(getAckermannControlCommand(), getGearCommand());
+  }
+
 }

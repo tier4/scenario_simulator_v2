@@ -58,17 +58,6 @@ auto AutowareUser::getEmergencyState() const -> autoware_auto_system_msgs::msg::
   return emergency_state;
 }
 
-auto AutowareUser::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
-{
-  static auto gear_command = []() {
-    autoware_auto_vehicle_msgs::msg::GearCommand gear_command;
-    gear_command.command = autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE;
-    return gear_command;
-  }();
-  gear_command.stamp = now();
-  return gear_command;
-}
-
 auto AutowareUser::getTurnIndicatorsCommand() const
   -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {

@@ -18,6 +18,7 @@
 #include <concealer/autoware.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
 #include <concealer/utility/subscriber_wrapper.hpp>
 #include <concealer/utility/publisher_wrapper.hpp>
@@ -36,12 +37,20 @@ class AutowareUniverse : public Autoware
   using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
   PublisherWrapper<SteeringReport> setSteeringReport;
 
+  using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
+  PublisherWrapper<GearReport> setGearReport;
+
+  using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
+  SubscriberWrapper<GearCommand> getGearCommandImpl;
+
 public:
 
   CONCEALER_PUBLIC explicit AutowareUniverse()
   : getAckermannControlCommand("/control/command/control_cmd", *this)
   , setAcceleration("/localization/acceleration", *this)
   , setSteeringReport("/vehicle/status/steering_status", *this)
+  , setGearReport("/vehicle/status/gear_status", *this)
+  , getGearCommandImpl("/control/command/gear_cmd", *this)
   {}
 
   auto getAcceleration() const -> double override;
@@ -52,6 +61,13 @@ public:
 
   auto update() -> void override;
 
+  auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand override;
+
+  auto getGearSign() const -> double override;
+
+  auto getVehicleCommand() const -> std::tuple<
+      autoware_auto_control_msgs::msg::AckermannControlCommand,
+      autoware_auto_vehicle_msgs::msg::GearCommand> override;
 };
 
 }

@@ -21,4 +21,15 @@ namespace concealer {
     return current_acceleration = acceleration;
   }
 
+  auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
+  {
+    static auto gear_command = []() {
+      autoware_auto_vehicle_msgs::msg::GearCommand gear_command;
+      gear_command.command = autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE;
+      return gear_command;
+    }();
+    gear_command.stamp = now();
+    return gear_command;
+  }
+
 }

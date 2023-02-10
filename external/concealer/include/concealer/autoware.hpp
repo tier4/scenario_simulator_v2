@@ -17,6 +17,8 @@
 
 #include <concealer/utility/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 namespace concealer {
@@ -35,9 +37,18 @@ public:
 
   virtual auto getAcceleration() const -> double = 0;
 
+  virtual auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand;
+
   virtual auto getSteeringAngle() const -> double = 0;
 
   virtual auto getVelocity() const -> double = 0;
+
+  // returns -1.0 when gear is reverse and 1.0 otherwise
+  virtual auto getGearSign() const -> double = 0;
+
+  virtual auto getVehicleCommand() const -> std::tuple<
+      autoware_auto_control_msgs::msg::AckermannControlCommand,
+      autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
   /*   */ auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
 

@@ -133,13 +133,6 @@ auto AutowareUniverseUser::update() -> void
     return message;
   }());
 
-  setGearReport([this]() {
-    GearReport message;
-    message.stamp = get_clock()->now();
-    message.report = getGearCommand().command;
-    return message;
-  }());
-
   setTurnIndicatorsReport([this]() {
     TurnIndicatorsReport message;
     message.stamp = get_clock()->now();
@@ -168,15 +161,6 @@ auto AutowareUniverseUser::update() -> void
   }());
 
   setTransform(current_pose);
-}
-
-auto AutowareUniverseUser::getGearSign() const -> double
-{
-  using autoware_auto_vehicle_msgs::msg::GearCommand;
-  return getGearCommand().command == GearCommand::REVERSE or
-             getGearCommand().command == GearCommand::REVERSE_2
-           ? -1.0
-           : 1.0;
 }
 
 auto AutowareUniverseUser::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
@@ -233,13 +217,6 @@ auto AutowareUniverseUser::setVelocityLimit(double velocity_limit) -> void
     // We attempt to resend the service up to 30 times, but this number of times was determined by heuristics, not for any technical reason
     requestSetVelocityLimit(request, 30);
   });
-}
-
-auto AutowareUniverseUser::getVehicleCommand() const -> std::tuple<
-  autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
-{
-  return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
 }  // namespace concealer
 
