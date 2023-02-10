@@ -81,13 +81,14 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
-  CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
-  CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
+  SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
+  SubscriberWrapper<AutowareState> getAutowareState;
+  SubscriberWrapper<CooperateStatusArray> getCooperateStatusArray;
+
   CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
-  CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
-  CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
+  SubscriberWrapper<PathWithLaneId> getPathWithLaneId;
+  SubscriberWrapper<Trajectory> getTrajectory;
   CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
 
   using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
@@ -142,13 +143,13 @@ public:
     CONCEALER_INIT_PUBLISHER(SteeringReport, "/vehicle/status/steering_status"),
     CONCEALER_INIT_PUBLISHER(TurnIndicatorsReport, "/vehicle/status/turn_indicators_status"),
     CONCEALER_INIT_PUBLISHER(VelocityReport, "/vehicle/status/velocity_status"),
-    CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
-    CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
-    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
+    getAckermannControlCommand("/control/command/control_cmd", *this),
+    getAutowareState("/autoware/state", *this),
+    getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const CooperateStatusArray& v) {cooperate(v);}),
     CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
-    CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
-    CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
+    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this),
+    getTrajectory("/planning/scenario_planning/trajectory", *this),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/external/set/engage", *this),
