@@ -21,7 +21,12 @@
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
+#include "rclcpp/logger.hpp"
+#include "rclcpp/logging.hpp"
+
 // headers in STL
+#include <cmath>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -41,12 +46,14 @@ private:
   void onUpdate() override
   {
     // LCOV_EXCL_START
-    if (api_.getCurrentTime() >= 10 && 10.1 >= api_.getCurrentTime()) {
-      if (api_.getMetricLifecycle("ego_traveled_distance") != metrics::MetricLifecycle::ACTIVE) {
-        stop(cpp_mock_scenarios::Result::FAILURE);
-      }
+    const auto lanelet_pose = api_.getLaneletPose("ego");
+    const auto traveled_distance = api_.getTraveledDistance("ego");
+    const auto difference = std::abs(lanelet_pose->s - traveled_distance);
+    if (difference > std::numeric_limits<double>::epsilon()) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
+
     if (api_.getCurrentTime() >= 12) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
@@ -58,7 +65,6 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
     api_.setLinearVelocity("ego", 3);
     api_.requestSpeedChange("ego", 3, true);
-    api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
   }
 };
 

@@ -4,28 +4,23 @@
   <name>scenario_test_runner</name>
   <version>0.6.7</version>
   <description>scenario test runner package</description>
-  <maintainer email="taiki.tanaka@tier4.jp">Taiki Tanaka</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
-
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+  <depend>ament_copyright</depend>
+  <depend>ament_pep257</depend>
+  <depend>openscenario_interpreter</depend>
+  <depend>openscenario_preprocessor</depend>
+  <depend>openscenario_preprocessor_msgs</depend>
+  <depend>openscenario_utility</depend>
   <depend>openscenario_visualization</depend>
-  <depend>python3-xmlschema</depend>
   <depend>python-yamale-pip</depend>
+  <depend>python3-pytest</depend>
+  <depend>python3-xmlschema</depend>
   <depend>rclpy</depend>
-
-  <exec_depend>simple_sensor_simulator</exec_depend>
-  <exec_depend>openscenario_interpreter</exec_depend>
-  <exec_depend>openscenario_preprocessor</exec_depend>
-  <exec_depend>openscenario_preprocessor_msgs</exec_depend>
-  <exec_depend>openscenario_utility</exec_depend>
-
-  <!-- AutowareAuto launch -->
-  <!-- <exec_depend>scenario_simulator_launch</exec_depend> -->
-
-  <test_depend>ament_copyright</test_depend>
-  <test_depend>ament_pep257</test_depend>
-  <test_depend>python3-pytest</test_depend>
-
+  <depend>simple_sensor_simulator</depend>
   <export>
-    <build_type>ament_python</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>

@@ -264,6 +264,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
 
     setStatus(status_updated);
     updateStandStillDuration(step_time);
+    updateTraveledDistance(step_time);
   } else {
     updateEntityStatusTimestamp(current_time);
   }
