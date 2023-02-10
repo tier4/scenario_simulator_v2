@@ -24,5 +24,19 @@ StochasticDistribution::StochasticDistribution(const pugi::xml_node & node, Scop
   parameter_name(readAttribute<String>("parameterName", node, scope))
 {
 }
+
+auto StochasticDistribution::derive() -> ParameterDistribution
+{
+  return apply<ParameterDistribution>(
+    [this](auto & unnamed_distribution) {
+      ParameterDistribution distribution;
+      for (const auto & parameter : unnamed_distribution.derive()) {
+        distribution.emplace_back(
+          std::make_shared<ParameterList>(ParameterList{{parameter_name, make(parameter)}}));
+      }
+      return distribution;
+    },
+    *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

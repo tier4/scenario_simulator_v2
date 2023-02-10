@@ -39,7 +39,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct Stochastic : public ComplexType, public SingleParameterDistributionBase
+struct Stochastic : public ComplexType, public ParameterDistributionContainer
 {
   const UnsignedInt number_of_test_runs;
 
@@ -49,15 +49,14 @@ struct Stochastic : public ComplexType, public SingleParameterDistributionBase
 
   explicit Stochastic(const pugi::xml_node &, Scope & scope);
 
-  auto derive() -> std::vector<Object> override
+  auto derive() -> ParameterDistribution override
   {
-    std::vector<Object> parameters;
-    for (int i = 0; i < number_of_test_runs; i++) {
-      parameters.emplace_back(apply<std::vector<Object>>(
-                                [](auto & type) { return type.derive(); }, stochastic_distribution)
-                                .front());
+    ParameterDistribution distribution;
+    for (size_t i = 0; i < number_of_test_runs; i++) {
+      auto derived = stochastic_distribution.derive();
+      distribution.insert(distribution.end(), derived.begin(), derived.end());
     }
-    return parameters;
+    return distribution;
   }
 };
 }  // namespace syntax

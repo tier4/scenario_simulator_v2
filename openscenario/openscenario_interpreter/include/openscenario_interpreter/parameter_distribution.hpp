@@ -15,6 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
 
+#include <memory>
+#include <openscenario_interpreter/object.hpp>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -25,11 +28,6 @@ using ParameterList = std::unordered_map<std::string, Object>;
 using ParameterListSharedPtr = std::shared_ptr<ParameterList>;
 using ParameterDistribution = std::vector<ParameterListSharedPtr>;
 using SingleUnnamedParameterDistribution = std::vector<Object>;
-struct SingleParameterDistribution
-{
-  std::string name;
-  SingleUnnamedParameterDistribution distribution;
-};
 
 // generator types distribution
 struct SingleParameterDistributionBase
@@ -53,16 +51,18 @@ auto mergeParameterDistribution(
   -> ParameterDistribution;
 
 template <typename DistributionT>
-ParameterDistribution mergeParameterDistribution(
-  ParameterDistribution && distribution, const std::list<DistributionT> & distribution_list)
+ParameterDistribution mergeParameterDistributionList(
+  const ParameterDistribution & base_distribution,
+  const std::list<DistributionT> & distribution_list)
 {
+  ParameterDistribution merged_distribution{base_distribution};
   for (const auto & additional_distribution : distribution_list) {
-    distribution = mergeParameterDistributionImpl(
-      distribution,
+    merged_distribution = mergeParameterDistribution(
+      merged_distribution,
       apply(
         [](const auto & distribution) { return distribution.derive(); }, additional_distribution));
   }
-  return distribution;
+  return merged_distribution;
 }
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_

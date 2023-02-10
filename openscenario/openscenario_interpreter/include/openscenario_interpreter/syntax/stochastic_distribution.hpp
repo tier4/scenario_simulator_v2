@@ -34,11 +34,14 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct StochasticDistribution : public StochasticDistributionType
+struct StochasticDistribution : public StochasticDistributionType,
+                                public ParameterDistributionContainer
 {
   const String parameter_name;
 
   explicit StochasticDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> ParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
