@@ -23,8 +23,8 @@
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <chrono>
-#include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
@@ -32,10 +32,10 @@
 #include <concealer/utility/visibility.hpp>
 #include <exception>
 #include <geometry_msgs/msg/accel.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <limits>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <utility>
+#include <rclcpp/rclcpp.hpp>
 
 namespace concealer
 {
@@ -52,10 +52,8 @@ namespace concealer
  *        initialize, plan, and engage.
  *
  * -------------------------------------------------------------------------- */
-class AutowareUser : public rclcpp::Node, public ContinuousTransformBroadcaster<AutowareUser>
+class AutowareUser : public rclcpp::Node
 {
-  friend class ContinuousTransformBroadcaster<AutowareUser>;
-
   bool is_stop_requested = false;
 
   bool is_thrown = false;
@@ -74,10 +72,6 @@ protected:
   TaskQueue task_queue;
 
   bool initialize_was_called = false;
-
-  geometry_msgs::msg::Pose current_pose;
-
-  geometry_msgs::msg::Twist current_twist;
 
   void stopRequest() noexcept { is_stop_requested = true; }
 
@@ -174,10 +168,6 @@ public:
   virtual auto restrictTargetSpeed(double) const -> double = 0;
 
   /*   */ auto rethrow() const noexcept(false) -> void;
-
-  /*   */ auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
-
-  /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
 
   virtual auto setCooperator(const std::string &) -> void = 0;
 

@@ -21,6 +21,8 @@
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
+#include <nav_msgs/msg/odometry.hpp>
 #include <concealer/utility/subscriber_wrapper.hpp>
 #include <concealer/utility/publisher_wrapper.hpp>
 
@@ -38,10 +40,14 @@ class AutowareUniverse : public Autoware
   using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
   using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
   using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
+  using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
+  using Odometry = nav_msgs::msg::Odometry;
   PublisherWrapper<Acceleration> setAcceleration;
   PublisherWrapper<SteeringReport> setSteeringReport;
   PublisherWrapper<GearReport> setGearReport;
   PublisherWrapper<ControlModeReport> setControlModeReport;
+  PublisherWrapper<VelocityReport> setVelocityReport;
+  PublisherWrapper<Odometry> setOdometry;
 
 public:
 
@@ -52,6 +58,8 @@ public:
   , setSteeringReport("/vehicle/status/steering_status", *this)
   , setGearReport("/vehicle/status/gear_status", *this)
   , setControlModeReport("/vehicle/status/control_mode", *this)
+  , setVelocityReport("/vehicle/status/velocity_status", *this)
+  , setOdometry("/localization/kinematic_state", *this)
   {}
 
   auto getAcceleration() const -> double override;

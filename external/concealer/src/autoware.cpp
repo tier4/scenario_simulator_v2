@@ -16,11 +16,6 @@
 
 namespace concealer {
 
-  auto Autoware::set(const geometry_msgs::msg::Accel & acceleration) -> const geometry_msgs::msg::Accel &
-  {
-    return current_acceleration = acceleration;
-  }
-
   auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
   {
     static auto gear_command = []() {
@@ -32,4 +27,18 @@ namespace concealer {
     return gear_command;
   }
 
+  auto Autoware::set(const geometry_msgs::msg::Accel & acceleration) -> const geometry_msgs::msg::Accel &
+  {
+    return current_acceleration = acceleration;
+  }
+
+  auto Autoware::set(const geometry_msgs::msg::Twist & twist) -> const geometry_msgs::msg::Twist &
+  {
+    return current_twist = twist;
+  }
+
+  auto Autoware::set(const geometry_msgs::msg::Pose & pose) -> const geometry_msgs::msg::Pose &
+  {
+    return current_pose = pose;
+  }
 }

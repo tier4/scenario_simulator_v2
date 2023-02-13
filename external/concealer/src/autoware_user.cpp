@@ -149,14 +149,4 @@ void AutowareUser::rethrow() const
     std::rethrow_exception(thrown);
   }
 }
-
-auto AutowareUser::set(const geometry_msgs::msg::Pose & pose) -> const geometry_msgs::msg::Pose &
-{
-  return current_pose = pose;
-}
-
-auto AutowareUser::set(const geometry_msgs::msg::Twist & twist) -> const geometry_msgs::msg::Twist &
-{
-  return current_twist = twist;
-}
 }  // namespace concealer

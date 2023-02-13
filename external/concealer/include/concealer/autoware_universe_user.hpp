@@ -24,12 +24,12 @@
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <concealer/autoware_user.hpp>
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <concealer/task_queue.hpp>
-#include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
 #include <concealer/utility/service_with_validation.h>
@@ -50,16 +50,12 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using Checkpoint = geometry_msgs::msg::PoseStamped;
   using GoalPose = geometry_msgs::msg::PoseStamped;
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
-  using Odometry = nav_msgs::msg::Odometry;
   using TurnIndicatorsReport = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
-  using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
 
   PublisherWrapper<Checkpoint> setCheckpoint;
   PublisherWrapper<GoalPose> setGoalPose;
   PublisherWrapper<InitialPose> setInitialPose;
-  PublisherWrapper<Odometry> setOdometry;
   PublisherWrapper<TurnIndicatorsReport> setTurnIndicatorsReport;
-  PublisherWrapper<VelocityReport> setVelocityReport;
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
@@ -123,9 +119,7 @@ public:
     setCheckpoint("/planning/mission_planning/checkpoint", *this),
     setGoalPose("/planning/mission_planning/goal", *this),
     setInitialPose("/initialpose", *this),
-    setOdometry("/localization/kinematic_state", *this),
     setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
-    setVelocityReport("/vehicle/status/velocity_status", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
     getAutowareState("/autoware/state", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const CooperateStatusArray& v) {cooperate(v);}),

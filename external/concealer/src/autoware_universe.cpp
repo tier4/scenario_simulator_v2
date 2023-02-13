@@ -68,6 +68,28 @@ namespace concealer {
       message.steering_tire_angle = getSteeringAngle();
       return message;
     }());
+
+    setOdometry([this]() {
+      Odometry message;
+      message.header.stamp = get_clock()->now();
+      message.header.frame_id = "map";
+      message.pose.pose = current_pose;
+      message.pose.covariance = {};
+      message.twist.twist = current_twist;
+      return message;
+    }());
+
+    setVelocityReport([this]() {
+      VelocityReport message;
+      message.header.stamp = get_clock()->now();
+      message.header.frame_id = "base_link";
+      message.longitudinal_velocity = current_twist.linear.x;
+      message.lateral_velocity = current_twist.linear.y;
+      message.heading_rate = current_twist.angular.z;
+      return message;
+    }());
+
+    setTransform(current_pose);
   }
 
   auto AutowareUniverse::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand {

@@ -17,16 +17,24 @@
 
 #include <concealer/utility/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
+#include <geometry_msgs/msg/pose.h>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <concealer/continuous_transform_broadcaster.hpp>
 
 namespace concealer {
 
-class Autoware : public rclcpp::Node {
+class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Autoware>{
+  friend class ContinuousTransformBroadcaster<Autoware>;
 
 protected:
   geometry_msgs::msg::Accel current_acceleration;
+
+  geometry_msgs::msg::Twist current_twist;
+
+  geometry_msgs::msg::Pose current_pose;
 
 public:
 
@@ -51,6 +59,10 @@ public:
       autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
   /*   */ auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
+
+  /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
+
+  /*   */ auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
 
   virtual auto update() -> void = 0;
 

@@ -469,9 +469,9 @@ auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
       return message;
     }());
 
-    autoware_user->set(current_pose);
+    autoware->set(current_pose);
 
-    autoware_user->set(getCurrentTwist());
+    autoware->set(getCurrentTwist());
   }
 
   if (not initial_pose_) {

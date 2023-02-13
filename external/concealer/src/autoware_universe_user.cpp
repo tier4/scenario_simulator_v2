@@ -64,15 +64,14 @@ auto AutowareUniverseUser::initialize(const geometry_msgs::msg::Pose & initial_p
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
-      set(initial_pose);
       waitForAutowareStateToBeWaitingForRoute([&]() {
-        InitialPose initial_pose;
+        InitialPose initial_pose_msg;
         {
-          initial_pose.header.stamp = get_clock()->now();
-          initial_pose.header.frame_id = "map";
-          initial_pose.pose.pose = current_pose;
+          initial_pose_msg.header.stamp = get_clock()->now();
+          initial_pose_msg.header.frame_id = "map";
+          initial_pose_msg.pose.pose = initial_pose;
         }
-        return setInitialPose(initial_pose);
+        return setInitialPose(initial_pose_msg);
       });
 
       // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
@@ -133,27 +132,6 @@ auto AutowareUniverseUser::update() -> void
     return message;
   }());
 
-  setVelocityReport([this]() {
-    VelocityReport message;
-    message.header.stamp = get_clock()->now();
-    message.header.frame_id = "base_link";
-    message.longitudinal_velocity = current_twist.linear.x;
-    message.lateral_velocity = current_twist.linear.y;
-    message.heading_rate = current_twist.angular.z;
-    return message;
-  }());
-
-  setOdometry([this]() {
-    Odometry message;
-    message.header.stamp = get_clock()->now();
-    message.header.frame_id = "map";
-    message.pose.pose = current_pose;
-    message.pose.covariance = {};
-    message.twist.twist = current_twist;
-    return message;
-  }());
-
-  setTransform(current_pose);
 }
 
 auto AutowareUniverseUser::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
