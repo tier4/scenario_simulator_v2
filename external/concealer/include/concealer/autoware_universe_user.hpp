@@ -157,8 +157,6 @@ public:
   }
 
   auto setVelocityLimit(double) -> void override;
-
-  auto update() -> void override;
 };
 }  // namespace concealer
 

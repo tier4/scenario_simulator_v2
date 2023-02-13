@@ -89,8 +89,6 @@ protected:
   void shutdownAutoware();
 
 public:
-  virtual auto update() -> void = 0;
-
     void spinSome() {
         try {
             if (rclcpp::ok() and not isStopRequested()) {

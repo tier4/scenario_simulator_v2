@@ -123,10 +123,6 @@ auto AutowareUniverseUser::engaged() const -> bool
   return task_queue.exhausted() and isDriving();
 }
 
-auto AutowareUniverseUser::update() -> void
-{
-}
-
 auto AutowareUniverseUser::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
