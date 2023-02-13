@@ -53,44 +53,38 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   PublisherWrapper<GoalPose> setGoalPose;
   PublisherWrapper<InitialPose> setInitialPose;
 
-  using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
+  using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
   SubscriberWrapper<AutowareState> getAutowareState;
+  SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
   SubscriberWrapper<CooperateStatusArray> getCooperateStatusArray;
-
-  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
-  SubscriberWrapper<PathWithLaneId> getPathWithLaneId;
+  SubscriberWrapper<EmergencyState> getEmergencyStateImpl;
   SubscriberWrapper<Trajectory> getTrajectory;
-  CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
+  SubscriberWrapper<TurnIndicatorsCommand> getTurnIndicatorsCommandImpl;
 
-  using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
   using Engage = tier4_external_api_msgs::srv::Engage;
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
   using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
 
-  ServiceWithValidation<CooperateCommands> requestCooperateCommands;
   ServiceWithValidation<Engage> requestEngage;
   // TODO ServiceWithValidation<InitializePose> requestInitializePose;
   ServiceWithValidation<SetVelocityLimit> requestSetVelocityLimit;
 
-private:
+  TaskQueue cooperation_queue;
+  using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
+  ServiceWithValidation<CooperateCommands> requestCooperateCommands;
   Cooperator current_cooperator = Cooperator::simulator;
 
-  TaskQueue cooperation_queue;
-
   auto approve(const CooperateStatusArray &) -> void;
-
   auto cooperate(const CooperateStatusArray &) -> void;
 
-public:
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE) \
   auto is##NAME() const noexcept                             \
   {                                                          \
     using autoware_auto_system_msgs::msg::AutowareState;     \
@@ -98,15 +92,17 @@ public:
   }                                                          \
   static_assert(true, "")
 
-  DEFINE_STATE_PREDICATE(Initializing, INITIALIZING);            // 1
-  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);    // 2
-  DEFINE_STATE_PREDICATE(Planning, PLANNING);                    // 3
-  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);  // 4
-  DEFINE_STATE_PREDICATE(Driving, DRIVING);                      // 5
-  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVED_GOAL);             // 6
-  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);                // 7
-
+    DEFINE_STATE_PREDICATE(Initializing, INITIALIZING);            // 1
+    DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);    // 2
+    DEFINE_STATE_PREDICATE(Planning, PLANNING);                    // 3
+    DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);  // 4
+    DEFINE_STATE_PREDICATE(Driving, DRIVING);                      // 5
+    DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVED_GOAL);             // 6
+    DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);                // 7
 #undef DEFINE_STATE_PREDICATE
+
+public:
+  SubscriberWrapper<PathWithLaneId> getPathWithLaneId;
 
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareUniverseUser(Ts &&... xs)
@@ -115,17 +111,17 @@ public:
     setCheckpoint("/planning/mission_planning/checkpoint", *this),
     setGoalPose("/planning/mission_planning/goal", *this),
     setInitialPose("/initialpose", *this),
-    getAckermannControlCommand("/control/command/control_cmd", *this),
     getAutowareState("/autoware/state", *this),
+    getAckermannControlCommand("/control/command/control_cmd", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const CooperateStatusArray& v) {cooperate(v);}),
-    CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
-    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this),
+    getEmergencyStateImpl("/system/emergency/emergency_state", *this),
     getTrajectory("/planning/scenario_planning/trajectory", *this),
-    CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
-    requestCooperateCommands("/api/external/set/rtc_commands", *this),
+    getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
     requestEngage("/api/external/set/engage", *this),
     // TODO requestInitializePose("/api/autoware/set/initialize_pose", *this),
-    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this)
+    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
+    requestCooperateCommands("/api/external/set/rtc_commands", *this),
+    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
   // clang-format on
   {
     waitpid_options = 0;
@@ -143,6 +139,10 @@ public:
 
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
+  auto getTurnIndicatorsCommand() const -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
+
+  auto getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState override;
+
   auto initialize(const geometry_msgs::msg::Pose &) -> void override;
 
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
@@ -151,10 +151,7 @@ public:
 
   auto sendSIGINT() -> void override;
 
-  auto setCooperator(const std::string & cooperator) -> void override
-  {
-    current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
-  }
+  auto setCooperator(const std::string & cooperator) -> void override;
 
   auto setVelocityLimit(double) -> void override;
 };

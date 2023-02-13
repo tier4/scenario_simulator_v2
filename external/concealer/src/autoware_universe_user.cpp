@@ -134,6 +134,14 @@ auto AutowareUniverseUser::getWaypoints() const -> traffic_simulator_msgs::msg::
   return waypoints;
 }
 
+auto AutowareUniverseUser::getTurnIndicatorsCommand() const -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand {
+  return getTurnIndicatorsCommandImpl();
+}
+
+auto AutowareUniverseUser::getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState {
+  return getEmergencyStateImpl();
+}
+
 auto AutowareUniverseUser::restrictTargetSpeed(double value) const -> double
 {
   // no restrictions here
@@ -178,6 +186,11 @@ auto AutowareUniverseUser::setVelocityLimit(double velocity_limit) -> void
     requestSetVelocityLimit(request, 30);
   });
 }
+
+  auto AutowareUniverseUser::setCooperator(const std::string & cooperator) -> void
+  {
+    current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
+  }
 }  // namespace concealer
 
 namespace autoware_auto_system_msgs::msg
@@ -279,4 +292,5 @@ auto operator>>(std::istream & is, TurnIndicatorsCommand & message) -> std::istr
 
   return is;
 }
+
 }  // namespace autoware_auto_vehicle_msgs::msg

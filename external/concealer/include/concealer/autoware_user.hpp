@@ -41,7 +41,7 @@ namespace concealer
 {
 /* ---- NOTE -------------------------------------------------------------------
  *
- *  The magic class 'Autoware' is a class that makes it easy to work with
+ *  The magic class 'AutowareUser' is a class that makes it easy to work with
  *  Autoware from C++. The main features of this class are as follows
  *
  *    (1) Launch Autoware in an independent process upon instantiation of the

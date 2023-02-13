@@ -41,7 +41,6 @@ public:
 
   CONCEALER_PUBLIC explicit Autoware()
       : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)) {
-
   }
 
   virtual auto getAcceleration() const -> double = 0;
