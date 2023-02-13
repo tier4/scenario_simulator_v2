@@ -19,8 +19,8 @@
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <concealer/autoware_universe_user.hpp>
 #include <concealer/autoware.hpp>
+#include <concealer/autoware_universe_user.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>

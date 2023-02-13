@@ -15,6 +15,7 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/lexical_cast.hpp>
+#include <concealer/autoware_universe.hpp>
 #include <functional>
 #include <memory>
 #include <string>
@@ -26,8 +27,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-#include <concealer/autoware_universe.hpp>
 
 namespace traffic_simulator
 {
@@ -257,7 +256,8 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ids{};
 
-  if (const auto universe = dynamic_cast<concealer::AutowareUniverseUser *>(autoware_user.get()); universe) {
+  if (const auto universe = dynamic_cast<concealer::AutowareUniverseUser *>(autoware_user.get());
+      universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
       std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }

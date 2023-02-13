@@ -15,20 +15,20 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
-#include <concealer/autoware.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
+#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
-#include <nav_msgs/msg/odometry.hpp>
-#include <concealer/utility/subscriber_wrapper.hpp>
+#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
+#include <concealer/autoware.hpp>
 #include <concealer/utility/publisher_wrapper.hpp>
+#include <concealer/utility/subscriber_wrapper.hpp>
+#include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
+#include <nav_msgs/msg/odometry.hpp>
 
-namespace concealer {
-
+namespace concealer
+{
 
 class AutowareUniverse : public Autoware
 {
@@ -55,19 +55,19 @@ class AutowareUniverse : public Autoware
   PublisherWrapper<TurnIndicatorsReport> setTurnIndicatorsReport;
 
 public:
-
   CONCEALER_PUBLIC explicit AutowareUniverse()
-  : getAckermannControlCommand("/control/command/control_cmd", *this)
-  , getGearCommandImpl("/control/command/gear_cmd", *this)
-  , getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this)
-  , setAcceleration("/localization/acceleration", *this)
-  , setSteeringReport("/vehicle/status/steering_status", *this)
-  , setGearReport("/vehicle/status/gear_status", *this)
-  , setControlModeReport("/vehicle/status/control_mode", *this)
-  , setVelocityReport("/vehicle/status/velocity_status", *this)
-  , setOdometry("/localization/kinematic_state", *this)
-  , setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this)
-  {}
+  : getAckermannControlCommand("/control/command/control_cmd", *this),
+    getGearCommandImpl("/control/command/gear_cmd", *this),
+    getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
+    setAcceleration("/localization/acceleration", *this),
+    setSteeringReport("/vehicle/status/steering_status", *this),
+    setGearReport("/vehicle/status/gear_status", *this),
+    setControlModeReport("/vehicle/status/control_mode", *this),
+    setVelocityReport("/vehicle/status/velocity_status", *this),
+    setOdometry("/localization/kinematic_state", *this),
+    setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this)
+  {
+  }
 
   auto getAcceleration() const -> double override;
 
@@ -82,13 +82,13 @@ public:
   auto getGearSign() const -> double override;
 
   auto getVehicleCommand() const -> std::tuple<
-      autoware_auto_control_msgs::msg::AckermannControlCommand,
-      autoware_auto_vehicle_msgs::msg::GearCommand> override;
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
   auto getTurnIndicatorsCommand() const
-  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
+    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
 };
 
-}
+}  // namespace concealer
 
-#endif //CONCEALER__AUTOWARE_UNIVERSE_HPP_
+#endif  //CONCEALER__AUTOWARE_UNIVERSE_HPP_

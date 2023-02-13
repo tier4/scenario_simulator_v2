@@ -15,19 +15,22 @@
 #ifndef CONCEALER__AUTOWARE_HPP_
 #define CONCEALER__AUTOWARE_HPP_
 
+#include <geometry_msgs/msg/pose.h>
+
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
+#include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/utility/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
-#include <geometry_msgs/msg/pose.h>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <concealer/continuous_transform_broadcaster.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 
-namespace concealer {
+namespace concealer
+{
 
-class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Autoware>{
+class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Autoware>
+{
   friend class ContinuousTransformBroadcaster<Autoware>;
 
 protected:
@@ -38,9 +41,9 @@ protected:
   geometry_msgs::msg::Pose current_pose;
 
 public:
-
   CONCEALER_PUBLIC explicit Autoware()
-      : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)) {
+  : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false))
+  {
   }
 
   virtual auto getAcceleration() const -> double = 0;
@@ -55,11 +58,11 @@ public:
   virtual auto getGearSign() const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
+    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto getVehicleCommand() const -> std::tuple<
-      autoware_auto_control_msgs::msg::AckermannControlCommand,
-      autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
   /*   */ auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
 
@@ -69,12 +72,13 @@ public:
 
   virtual auto update() -> void = 0;
 
-  void spinSome() {
+  void spinSome()
+  {
     if (rclcpp::ok()) {
       rclcpp::spin_some(get_node_base_interface());
     }
   }
 };
-}
+}  // namespace concealer
 
-#endif //CONCEALER__AUTOWARE_HPP
+#endif  //CONCEALER__AUTOWARE_HPP

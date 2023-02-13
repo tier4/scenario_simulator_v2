@@ -17,19 +17,17 @@
 
 #include <utility>
 
-#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE, ...)                                                   \
-private:                                                                                           \
-  TYPE::ConstSharedPtr current_value_of_##TYPE = std::make_shared<const TYPE>();                   \
-  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;                                    \
-                                                                                                   \
-public:                                                                                            \
-  auto get##TYPE() const->TYPE __VA_ARGS__ { return *current_value_of_##TYPE; }                    \
+#define CONCEALER_DEFINE_SUBSCRIPTION(TYPE, ...)                                 \
+private:                                                                         \
+  TYPE::ConstSharedPtr current_value_of_##TYPE = std::make_shared<const TYPE>(); \
+  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;                  \
+                                                                                 \
+public:                                                                          \
+  auto get##TYPE() const->TYPE __VA_ARGS__ { return *current_value_of_##TYPE; }  \
   static_assert(true, "")
 
 #define CONCEALER_INIT_SUBSCRIPTION(TYPE, TOPIC)                                                \
   subscription_of_##TYPE(static_cast<AutowareUser &>(*this).template create_subscription<TYPE>( \
-    TOPIC, 1, [this](const TYPE::ConstSharedPtr message) {                                      \
-      current_value_of_##TYPE = message;                                                        \
-    }))
+    TOPIC, 1, [this](const TYPE::ConstSharedPtr message) { current_value_of_##TYPE = message; }))
 
 #endif  // CONCEALER__DIRTY_HACK_HPP_

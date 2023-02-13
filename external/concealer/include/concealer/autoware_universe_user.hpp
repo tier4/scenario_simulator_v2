@@ -22,22 +22,21 @@
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <concealer/autoware_user.hpp>
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <concealer/task_queue.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
 #include <concealer/utility/service_with_validation.h>
 
+#include <concealer/utility/publisher_wrapper.hpp>
+#include <concealer/utility/subscriber_wrapper.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
-
-#include <concealer/utility/subscriber_wrapper.hpp>
-#include <concealer/utility/publisher_wrapper.hpp>
 
 namespace concealer
 {
@@ -84,7 +83,7 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   auto approve(const CooperateStatusArray &) -> void;
   auto cooperate(const CooperateStatusArray &) -> void;
 
-#define DEFINE_STATE_PREDICATE(NAME, VALUE) \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
   auto is##NAME() const noexcept                             \
   {                                                          \
     using autoware_auto_system_msgs::msg::AutowareState;     \
@@ -92,13 +91,13 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   }                                                          \
   static_assert(true, "")
 
-    DEFINE_STATE_PREDICATE(Initializing, INITIALIZING);            // 1
-    DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);    // 2
-    DEFINE_STATE_PREDICATE(Planning, PLANNING);                    // 3
-    DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);  // 4
-    DEFINE_STATE_PREDICATE(Driving, DRIVING);                      // 5
-    DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVED_GOAL);             // 6
-    DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);                // 7
+  DEFINE_STATE_PREDICATE(Initializing, INITIALIZING);            // 1
+  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);    // 2
+  DEFINE_STATE_PREDICATE(Planning, PLANNING);                    // 3
+  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);  // 4
+  DEFINE_STATE_PREDICATE(Driving, DRIVING);                      // 5
+  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVED_GOAL);             // 6
+  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);                // 7
 #undef DEFINE_STATE_PREDICATE
 
 public:
@@ -139,7 +138,8 @@ public:
 
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
-  auto getTurnIndicatorsCommand() const -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
+  auto getTurnIndicatorsCommand() const
+    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
 
   auto getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState override;
 

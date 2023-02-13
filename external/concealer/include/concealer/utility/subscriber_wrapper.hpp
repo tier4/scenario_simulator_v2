@@ -20,9 +20,9 @@
 
 namespace concealer
 {
-template<typename MessageType>
-class SubscriberWrapper {
-
+template <typename MessageType>
+class SubscriberWrapper
+{
 private:
   typename MessageType::ConstSharedPtr current_value = std::make_shared<const MessageType>();
   typename rclcpp::Subscription<MessageType>::SharedPtr subscription;
@@ -30,24 +30,28 @@ private:
 public:
   auto operator()() const -> MessageType { return *current_value; }
 
-  template<typename NodeInterface>
-  SubscriberWrapper(std::string topic, NodeInterface& autoware_interface)
-  : subscription(autoware_interface.template create_subscription<MessageType>(topic, 1, [this](const typename MessageType::ConstSharedPtr message) {
-      current_value = message;
-    }))
-  {}
+  template <typename NodeInterface>
+  SubscriberWrapper(std::string topic, NodeInterface & autoware_interface)
+  : subscription(autoware_interface.template create_subscription<MessageType>(
+      topic, 1,
+      [this](const typename MessageType::ConstSharedPtr message) { current_value = message; }))
+  {
+  }
 
-  template<typename NodeInterface>
-  SubscriberWrapper(std::string topic, NodeInterface& autoware_interface, std::function<void(const MessageType&)> callback)
-      : subscription(autoware_interface.template create_subscription<MessageType>(topic, 1, [this, callback](const typename MessageType::ConstSharedPtr& message) {
-    current_value = message;
-    if (current_value) {
-      callback(*current_value);
-    }
-  }))
-  {}
+  template <typename NodeInterface>
+  SubscriberWrapper(
+    std::string topic, NodeInterface & autoware_interface,
+    std::function<void(const MessageType &)> callback)
+  : subscription(autoware_interface.template create_subscription<MessageType>(
+      topic, 1, [this, callback](const typename MessageType::ConstSharedPtr & message) {
+        current_value = message;
+        if (current_value) {
+          callback(*current_value);
+        }
+      }))
+  {
+  }
 };
-}
+}  // namespace concealer
 
-
-#endif //CONCEALER__SUBSCRIBER_WRAPPER_HPP_
+#endif  //CONCEALER__SUBSCRIBER_WRAPPER_HPP_

@@ -23,7 +23,6 @@
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <chrono>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
@@ -32,10 +31,11 @@
 #include <concealer/utility/visibility.hpp>
 #include <exception>
 #include <geometry_msgs/msg/accel.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <limits>
+#include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <utility>
-#include <rclcpp/rclcpp.hpp>
 
 namespace concealer
 {
@@ -75,10 +75,7 @@ protected:
 
   void stopRequest() noexcept { is_stop_requested = true; }
 
-  bool isStopRequested() const noexcept
-  {
-    return is_stop_requested;
-  }
+  bool isStopRequested() const noexcept { return is_stop_requested; }
 
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
@@ -89,17 +86,18 @@ protected:
   void shutdownAutoware();
 
 public:
-    void spinSome() {
-        try {
-            if (rclcpp::ok() and not isStopRequested()) {
-                checkAutowareProcess();
-                rclcpp::spin_some(get_node_base_interface());
-            }
-        } catch (...) {
-            thrown = std::current_exception();
-            is_thrown= true;
-        }
+  void spinSome()
+  {
+    try {
+      if (rclcpp::ok() and not isStopRequested()) {
+        checkAutowareProcess();
+        rclcpp::spin_some(get_node_base_interface());
+      }
+    } catch (...) {
+      thrown = std::current_exception();
+      is_thrown = true;
     }
+  }
 
   CONCEALER_PUBLIC explicit AutowareUser(pid_t pid = 0);
 
@@ -154,7 +152,7 @@ public:
   virtual auto restrictTargetSpeed(double) const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
+    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   /*   */ auto rethrow() const noexcept(false) -> void;
 

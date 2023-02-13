@@ -134,11 +134,15 @@ auto AutowareUniverseUser::getWaypoints() const -> traffic_simulator_msgs::msg::
   return waypoints;
 }
 
-auto AutowareUniverseUser::getTurnIndicatorsCommand() const -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand {
+auto AutowareUniverseUser::getTurnIndicatorsCommand() const
+  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
+{
   return getTurnIndicatorsCommandImpl();
 }
 
-auto AutowareUniverseUser::getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState {
+auto AutowareUniverseUser::getEmergencyState() const
+  -> autoware_auto_system_msgs::msg::EmergencyState
+{
   return getEmergencyStateImpl();
 }
 
@@ -187,10 +191,10 @@ auto AutowareUniverseUser::setVelocityLimit(double velocity_limit) -> void
   });
 }
 
-  auto AutowareUniverseUser::setCooperator(const std::string & cooperator) -> void
-  {
-    current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
-  }
+auto AutowareUniverseUser::setCooperator(const std::string & cooperator) -> void
+{
+  current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
+}
 }  // namespace concealer
 
 namespace autoware_auto_system_msgs::msg

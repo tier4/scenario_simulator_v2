@@ -19,11 +19,11 @@
 
 namespace concealer
 {
-  AutowareUser::AutowareUser(pid_t pid)
-  : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+AutowareUser::AutowareUser(pid_t pid)
+: rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid)
-      {
-      }
+{
+}
 
 void AutowareUser::checkAutowareProcess()
 {
@@ -68,7 +68,7 @@ void AutowareUser::shutdownAutoware()
 {
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
   {
-      stopRequest();
+    stopRequest();
   }
 
   if (process_id != 0 && not is_autoware_exited) {
@@ -135,12 +135,12 @@ void AutowareUser::shutdownAutoware()
 }
 
 auto AutowareUser::getTurnIndicatorsCommand() const
--> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
+  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   static auto turn_indicators_command = []() {
     autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
     turn_indicators_command.command =
-        autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
+      autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
     return turn_indicators_command;
   }();
   turn_indicators_command.stamp = now();
