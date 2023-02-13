@@ -156,16 +156,15 @@ public:
 
   virtual auto getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState;
 
-  virtual auto getTurnIndicatorsCommand() const
-    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
-
-
   virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   /*   */ auto initialized() const noexcept { return initialize_was_called; }
 
   // different autowares accept different initial target speed
   virtual auto restrictTargetSpeed(double) const -> double = 0;
+
+  virtual auto getTurnIndicatorsCommand() const
+  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   /*   */ auto rethrow() const noexcept(false) -> void;
 

@@ -89,6 +89,13 @@ namespace concealer {
       return message;
     }());
 
+    setTurnIndicatorsReport([this]() {
+      TurnIndicatorsReport message;
+      message.stamp = get_clock()->now();
+      message.report = getTurnIndicatorsCommand().command;
+      return message;
+    }());
+
     setTransform(current_pose);
   }
 
@@ -110,6 +117,11 @@ namespace concealer {
       autoware_auto_vehicle_msgs::msg::GearCommand>
   {
     return std::make_tuple(getAckermannControlCommand(), getGearCommand());
+  }
+
+  auto AutowareUniverse::getTurnIndicatorsCommand() const
+  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand {
+    return getTurnIndicatorsCommandImpl();
   }
 
 }

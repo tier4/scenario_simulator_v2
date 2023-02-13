@@ -22,8 +22,6 @@
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <concealer/autoware_user.hpp>
@@ -50,12 +48,10 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using Checkpoint = geometry_msgs::msg::PoseStamped;
   using GoalPose = geometry_msgs::msg::PoseStamped;
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
-  using TurnIndicatorsReport = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
 
   PublisherWrapper<Checkpoint> setCheckpoint;
   PublisherWrapper<GoalPose> setGoalPose;
   PublisherWrapper<InitialPose> setInitialPose;
-  PublisherWrapper<TurnIndicatorsReport> setTurnIndicatorsReport;
 
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AutowareState = autoware_auto_system_msgs::msg::AutowareState;
@@ -119,7 +115,6 @@ public:
     setCheckpoint("/planning/mission_planning/checkpoint", *this),
     setGoalPose("/planning/mission_planning/goal", *this),
     setInitialPose("/initialpose", *this),
-    setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
     getAutowareState("/autoware/state", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const CooperateStatusArray& v) {cooperate(v);}),

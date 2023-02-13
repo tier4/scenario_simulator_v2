@@ -23,6 +23,7 @@
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
+#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 
 namespace concealer {
 
@@ -53,6 +54,9 @@ public:
 
   // returns -1.0 when gear is reverse and 1.0 otherwise
   virtual auto getGearSign() const -> double = 0;
+
+  virtual auto getTurnIndicatorsCommand() const
+  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto getVehicleCommand() const -> std::tuple<
       autoware_auto_control_msgs::msg::AckermannControlCommand,
