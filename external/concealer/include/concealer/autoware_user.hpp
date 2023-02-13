@@ -60,7 +60,7 @@ class AutowareUser : public rclcpp::Node
 
   std::exception_ptr thrown;
 
-  std::atomic<bool> is_autoware_exited = false;
+  bool is_autoware_exited = false;
 
   void checkAutowareProcess();
 
@@ -101,15 +101,8 @@ public:
         }
     }
 
-    // ====== Autoware =====
-  CONCEALER_PUBLIC explicit AutowareUser(pid_t pid = 0)
-  : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    process_id(pid)
-  {
-  }
+  CONCEALER_PUBLIC explicit AutowareUser(pid_t pid = 0);
 
-
-    // ====== AutowareUser =====
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareUser(Ts &&... xs)
   : AutowareUser(ros2_launch(std::forward<decltype(xs)>(xs)...))
@@ -118,7 +111,6 @@ public:
 
   ~AutowareUser() override = default;
 
-    // ====== AutowareUser =====
   /* ---- NOTE -------------------------------------------------------------------
    *
    *  Send an engagement request to Autoware. If Autoware does not have an
