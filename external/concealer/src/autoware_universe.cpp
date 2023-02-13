@@ -35,6 +35,12 @@ namespace concealer {
 
   auto AutowareUniverse::update() -> void
   {
+    setControlModeReport([this]() {
+      ControlModeReport message;
+      message.mode = ControlModeReport::AUTONOMOUS;
+      return message;
+    }());
+
     setAcceleration([this]() {
       Acceleration message;
       message.header.stamp = get_clock()->now();

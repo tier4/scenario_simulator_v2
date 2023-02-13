@@ -21,7 +21,6 @@
 #include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
-#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
@@ -49,7 +48,6 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   friend class TransitionAssertion<AutowareUniverseUser>;
 
   using Checkpoint = geometry_msgs::msg::PoseStamped;
-  using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
   using GoalPose = geometry_msgs::msg::PoseStamped;
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
   using Odometry = nav_msgs::msg::Odometry;
@@ -57,7 +55,6 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
 
   PublisherWrapper<Checkpoint> setCheckpoint;
-  PublisherWrapper<ControlModeReport> setControlModeReport;
   PublisherWrapper<GoalPose> setGoalPose;
   PublisherWrapper<InitialPose> setInitialPose;
   PublisherWrapper<Odometry> setOdometry;
@@ -124,7 +121,6 @@ public:
   : AutowareUser(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     setCheckpoint("/planning/mission_planning/checkpoint", *this),
-    setControlModeReport("/vehicle/status/control_mode", *this),
     setGoalPose("/planning/mission_planning/goal", *this),
     setInitialPose("/initialpose", *this),
     setOdometry("/localization/kinematic_state", *this),

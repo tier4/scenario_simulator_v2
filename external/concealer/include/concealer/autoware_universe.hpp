@@ -20,6 +20,7 @@
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <concealer/utility/subscriber_wrapper.hpp>
 #include <concealer/utility/publisher_wrapper.hpp>
 
@@ -29,28 +30,28 @@ namespace concealer {
 class AutowareUniverse : public Autoware
 {
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
+  using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
+  SubscriberWrapper<GearCommand> getGearCommandImpl;
 
   using Acceleration = geometry_msgs::msg::AccelWithCovarianceStamped;
-  PublisherWrapper<Acceleration> setAcceleration;
-
   using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
-  PublisherWrapper<SteeringReport> setSteeringReport;
-
   using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
+  using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
+  PublisherWrapper<Acceleration> setAcceleration;
+  PublisherWrapper<SteeringReport> setSteeringReport;
   PublisherWrapper<GearReport> setGearReport;
-
-  using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
-  SubscriberWrapper<GearCommand> getGearCommandImpl;
+  PublisherWrapper<ControlModeReport> setControlModeReport;
 
 public:
 
   CONCEALER_PUBLIC explicit AutowareUniverse()
   : getAckermannControlCommand("/control/command/control_cmd", *this)
+  , getGearCommandImpl("/control/command/gear_cmd", *this)
   , setAcceleration("/localization/acceleration", *this)
   , setSteeringReport("/vehicle/status/steering_status", *this)
   , setGearReport("/vehicle/status/gear_status", *this)
-  , getGearCommandImpl("/control/command/gear_cmd", *this)
+  , setControlModeReport("/vehicle/status/control_mode", *this)
   {}
 
   auto getAcceleration() const -> double override;

@@ -126,13 +126,6 @@ auto AutowareUniverseUser::engaged() const -> bool
 
 auto AutowareUniverseUser::update() -> void
 {
-
-  setControlModeReport([this]() {
-    ControlModeReport message;
-    message.mode = ControlModeReport::AUTONOMOUS;
-    return message;
-  }());
-
   setTurnIndicatorsReport([this]() {
     TurnIndicatorsReport message;
     message.stamp = get_clock()->now();
