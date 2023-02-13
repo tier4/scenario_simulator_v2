@@ -27,32 +27,9 @@ public:                                                                         
   static_assert(true, "")
 
 #define CONCEALER_INIT_SUBSCRIPTION(TYPE, TOPIC)                                                \
-  subscription_of_##TYPE(static_cast<AutowareUser &>(*this).template create_subscription<TYPE>(     \
+  subscription_of_##TYPE(static_cast<AutowareUser &>(*this).template create_subscription<TYPE>( \
     TOPIC, 1, [this](const TYPE::ConstSharedPtr message) {                                      \
       current_value_of_##TYPE = message;                                                        \
     }))
-
-#define CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(TYPE, TOPIC, CALLBACK)                        \
-  subscription_of_##TYPE(static_cast<AutowareUser &>(*this).template create_subscription<TYPE>(     \
-    TOPIC, 1, [this](const TYPE::ConstSharedPtr message) {                                      \
-      current_value_of_##TYPE = message;                                                        \
-      CALLBACK(*current_value_of_##TYPE);                                                       \
-    }))
-
-#define CONCEALER_DEFINE_PUBLISHER(TYPE)                  \
-private:                                                  \
-  rclcpp::Publisher<TYPE>::SharedPtr publisher_of_##TYPE; \
-                                                          \
-public:                                                   \
-  auto set##TYPE(const TYPE & message)->decltype(auto)    \
-  {                                                       \
-    static_cast<AutowareUser &>(*this).rethrow();             \
-    return publisher_of_##TYPE->publish(message);         \
-  }                                                       \
-  static_assert(true, "")
-
-#define CONCEALER_INIT_PUBLISHER(TYPE, TOPIC) \
-  publisher_of_##TYPE(                        \
-    static_cast<Node &>(*this).template create_publisher<TYPE>(TOPIC, rclcpp::QoS(1).reliable()))
 
 #endif  // CONCEALER__DIRTY_HACK_HPP_
