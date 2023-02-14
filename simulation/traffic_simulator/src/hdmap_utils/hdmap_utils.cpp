@@ -884,10 +884,9 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(
 {
   std::vector<std::int64_t> ret;
   for (const auto & id : lanelet_ids) {
-    ret = concat(ret, getPreviousLaneletIds(id, turn_direction));
+    ret += getPreviousLaneletIds(id, turn_direction);
   }
-  sortAndUnique(ret);
-  return ret;
+  return sortAndUnique(ret);
 }
 
 std::vector<std::int64_t> HdMapUtils::getNextRoadShoulderLanelet(std::int64_t lanelet_id) const
