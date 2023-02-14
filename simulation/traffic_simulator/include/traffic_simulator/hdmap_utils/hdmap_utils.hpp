@@ -237,7 +237,7 @@ private:
     return ret;
   }
   template <typename T>
-  std::vector<T> sortAndUnique(const std::vector<T> & data) const
+  [[nodiscard]] auto sortAndUnique(const std::vector<T> & data) const -> std::vector<T>
   {
     std::vector<T> ret = data;
     std::sort(ret.begin(), ret.end());
