@@ -285,6 +285,10 @@ auto EntityManager::getLongitudinalDistance(
       return boost::none;
     }
   } else {
+    /**
+    * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function. 
+    * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
+    */
     auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
       hdmap_utils_ptr_->toMapPose(from).pose, from_pose.lanelet_id, 5.0,
       include_opposite_direction);
