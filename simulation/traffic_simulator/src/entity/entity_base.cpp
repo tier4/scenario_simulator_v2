@@ -59,7 +59,7 @@ auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose
     return ret.get();
   } else {
     THROW_SEMANTIC_ERROR(
-      "Lanelt pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
+      "Lanelet pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
       ",offset=", lanelet_pose.offset, ",rpy.x=", lanelet_pose.rpy.x, ",rpy.y=", lanelet_pose.rpy.y,
       ",rpy.z=", lanelet_pose.rpy.z, ") is invalid, please check lanelet length and connection.");
   }
