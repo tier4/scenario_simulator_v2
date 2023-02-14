@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# The TIER IV OpenSCENARIO Interpreter supports ASAM OpenSCENARIO 1.2.
+# openscenario_interpreter_node accepts scenario files (.xosc) that satisfy the
+# ASAM OpenSCENARIO 1.2 XML Schema distributed by ASAM, but note that not all
+# features and syntax of ASAM OpenSCENARIO 1.2 Note that not all ASAM
+# OpenSCENARIO 1.2 features and syntax are implemented.
+#
+# Since 2023/02
+echo "ASAM OpenSCENARIO 1.2"
+
+# The health check is a feature that allows the system running
+# scenario_simulator_v2 to monitor whether the components that make up
+# scenario_simulator_v2 are working properly.
+#
+# During its operation, scenario_simulator_v2, which supports the health check
+# function, outputs information to the `/tmp/<component_name>_status.json` file
+# every second to determine if the simulator is operating properly. If the
+# status file does not exist or the `good` element is false, the simulator is
+# likely unresponsive.
+#
+# See `<this repository>/common/status_monitor` for a detailed implementation
+# of this feature.
+#
+# Since 2023/02
+echo "health_check"

@@ -23,7 +23,6 @@
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
-#include <rclcpp_components/register_node_macro.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
@@ -92,15 +91,13 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       return Interpreter::Result::FAILURE;  // => Unconfigured
     },
     [this]() {
-      /* ---- NOTE -------------------------------------------------------------
-       *
-       *  The scenario_test_runner that launched this node considers that "the
-       *  scenario is not expected to finish" or "an abnormality has occurred
-       *  that prevents the interpreter from terminating itself" after the
-       *  specified time (specified by --global-timeout), and deactivates this
-       *  node.
-       *
-       * -------------------------------------------------------------------- */
+      /*
+         The scenario_test_runner that launched this node considers that "the
+         scenario is not expected to finish" or "an abnormality has occurred
+         that prevents the interpreter from terminating itself" after the
+         specified time (specified by --global-timeout), and deactivates this
+         node.
+      */
       result = common::junit::Failure(
         "Timeout",
         "The simulation time has exceeded the time specified by the scenario_test_runner.");
@@ -316,5 +313,3 @@ auto Interpreter::reset() -> void
   }
 }
 }  // namespace openscenario_interpreter
-
-RCLCPP_COMPONENTS_REGISTER_NODE(openscenario_interpreter::Interpreter)
