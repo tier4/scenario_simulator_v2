@@ -230,13 +230,6 @@ private:
     return ids;
   }
   template <typename T>
-  std::vector<T> concat(const std::vector<T> & v0, const std::vector<T> & v1) const
-  {
-    std::vector<T> ret = v0;
-    ret.insert(ret.end(), v1.begin(), v1.end());
-    return ret;
-  }
-  template <typename T>
   [[nodiscard]] auto sortAndUnique(const std::vector<T> & data) const -> std::vector<T>
   {
     std::vector<T> ret = data;
