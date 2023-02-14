@@ -304,7 +304,7 @@ auto EntityManager::getLongitudinalDistance(
     std::sort(distances.begin(), distances.end(), [](double a, double b) {
       return std::abs(a) < std::abs(b);
     });
-    return *distances.begin();
+    return distances.front();
   }
 }
 
