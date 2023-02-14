@@ -220,13 +220,13 @@ private:
   mutable RouteCache route_cache_;
   mutable CenterPointsCache center_points_cache_;
   mutable LaneletLengthCache lanelet_length_cache_;
-  template <typename LANELET>
-  std::vector<std::int64_t> getLaneletIds(const std::vector<LANELET> & lanelets) const
+  template <typename Lanelet>
+  std::vector<std::int64_t> getLaneletIds(const std::vector<Lanelet> & lanelets) const
   {
     std::vector<std::int64_t> ids;
     std::transform(
       lanelets.begin(), lanelets.end(), std::back_inserter(ids),
-      [](const LANELET & lanelet) { return lanelet.id(); });
+      [](const Lanelet & lanelet) { return lanelet.id(); });
     return ids;
   }
   template <typename T>

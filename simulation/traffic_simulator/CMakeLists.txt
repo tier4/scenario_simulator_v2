@@ -13,7 +13,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
-# Set ROS_DISTRO macros
+# Add compile definition for switching to_yaml function's namespace. 
+# (This function's namespace was changed in galactic => humble)
 set(ROS_DISTRO $ENV{ROS_DISTRO})
 if(${ROS_DISTRO} STREQUAL "rolling")
   add_compile_definitions(ROS_DISTRO_ROLLING)
