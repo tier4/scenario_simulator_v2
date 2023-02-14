@@ -87,39 +87,24 @@ HdMapUtils::HdMapUtils(
 auto HdMapUtils::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
   const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  if (0 <= lanelet_pose.s && lanelet_pose.s <= getLaneletLength(lanelet_pose.lanelet_id)) {
-    return lanelet_pose;
-  }
-  double rest_s = lanelet_pose.s;
-  std::int64_t lanelet_id = lanelet_pose.lanelet_id;
-  if (lanelet_pose.s < 0) {
-    while (rest_s < 0) {
-      const auto ids = getPreviousLaneletIds(lanelet_id);
-      if (ids.empty()) {
-        return boost::none;
-      }
-      rest_s = rest_s + getLaneletLength(ids[0]);
-      lanelet_id = ids[0];
+  auto clamped = lanelet_pose;
+  while (clamped.s < 0) {
+    if (const auto ids = getPreviousLaneletIds(clamped.lanelet_id); ids.empty()) {
+      return boost::none;
+    } else {
+      clamped.s += getLaneletLength(ids[0]);
+      clamped.lanelet_id = ids[0];
     }
-    traffic_simulator_msgs::msg::LaneletPose ret;
-    ret.lanelet_id = lanelet_id;
-    ret.s = rest_s;
-    return ret;
-  } else {
-    while (rest_s > getLaneletLength(lanelet_id)) {
-      const auto ids = getNextLaneletIds(lanelet_id);
-      if (ids.empty()) {
-        return boost::none;
-      }
-      rest_s = rest_s - getLaneletLength(lanelet_id);
-      lanelet_id = ids[0];
-    }
-    traffic_simulator_msgs::msg::LaneletPose ret;
-    ret.lanelet_id = lanelet_id;
-    ret.s = rest_s;
-    return ret;
   }
-  return boost::none;
+  while (clamped.s > getLaneletLength(clamped.lanelet_id)) {
+    if (const auto ids = getNextLaneletIds(clamped.lanelet_id); ids.empty()) {
+      return boost::none;
+    } else {
+      clamped.s -= getLaneletLength(clamped.lanelet_id);
+      clamped.lanelet_id = ids[0];
+    }
+  }
+  return clamped;
 }
 
 std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
