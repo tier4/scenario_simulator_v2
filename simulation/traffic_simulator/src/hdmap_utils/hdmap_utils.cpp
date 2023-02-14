@@ -946,7 +946,7 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
 {
   std::vector<std::int64_t> ret;
   for (const auto & id : lanelet_ids) {
-    ret = concat(ret, getNextLaneletIds(id, turn_direction));
+    ret += getNextLaneletIds(id, turn_direction);
   }
   return ret;
 }
