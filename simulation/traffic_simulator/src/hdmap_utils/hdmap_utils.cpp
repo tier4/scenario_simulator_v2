@@ -947,7 +947,7 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
   for (const auto & id : lanelet_ids) {
     ret += getNextLaneletIds(id, turn_direction);
   }
-  return ret;
+  return sortAndUnique(ret);
 }
 
 std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
