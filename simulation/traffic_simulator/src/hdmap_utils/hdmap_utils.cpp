@@ -524,14 +524,13 @@ std::vector<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPoses
   std::vector<traffic_simulator_msgs::msg::LaneletPose> ret;
   traffic_simulator_msgs::msg::EntityType type;
   type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-  std::vector<int64_t> lanelet_ids = concat(
-    {lanelet_id}, concat(
-                    getLeftLaneletIds(lanelet_id, type, include_opposite_direction),
-                    getRightLaneletIds(lanelet_id, type, include_opposite_direction)));
-  lanelet_ids = sortAndUnique(concat(
-    lanelet_ids, concat(getPreviousLaneletIds(lanelet_ids), getNextLaneletIds(lanelet_ids))));
-  for (const auto & id : lanelet_ids) {
-    if (const auto lanelet_pose = toLaneletPose(pose, id, matching_distance)) {
+  std::vector lanelet_ids = {lanelet_id};
+  lanelet_ids += getLeftLaneletIds(lanelet_id, type, include_opposite_direction);
+  lanelet_ids += getRightLaneletIds(lanelet_id, type, include_opposite_direction);
+  lanelet_ids += getPreviousLaneletIds(lanelet_ids);
+  lanelet_ids += getNextLaneletIds(lanelet_ids);
+  for (const auto & id : sortAndUnique(lanelet_ids)) {
+    if (const auto & lanelet_pose = toLaneletPose(pose, id, matching_distance)) {
       ret.emplace_back(lanelet_pose.get());
     }
   }
