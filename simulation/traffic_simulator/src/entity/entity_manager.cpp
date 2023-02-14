@@ -272,11 +272,7 @@ auto EntityManager::getLongitudinalDistance(
       to_pose.lanelet_id, to_pose.s, from_pose.lanelet_id, from_pose.s);
 
     if (forward_distance && backward_distance) {
-      if (forward_distance.get() >= backward_distance.get()) {
-        return -backward_distance.get();
-      } else {
-        return forward_distance.get();
-      }
+      return std::min(forward_distance.get(), std::abs(backward_distance.get()));
     } else if (forward_distance) {
       return forward_distance.get();
     } else if (backward_distance) {
