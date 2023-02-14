@@ -13,16 +13,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
-# Add compile definition for switching to_yaml function's namespace. 
-# (This function's namespace was changed in galactic => humble)
-set(ROS_DISTRO $ENV{ROS_DISTRO})
-if(${ROS_DISTRO} STREQUAL "rolling")
-  add_compile_definitions(ROS_DISTRO_ROLLING)
-elseif(${ROS_DISTRO} STREQUAL "galactic")
-  add_compile_definitions(ROS_DISTRO_GALACTIC)
-elseif(${ROS_DISTRO} STREQUAL "humble")
-  add_compile_definitions(ROS_DISTRO_HUMBLE)
-endif()
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 
 find_package(ament_cmake_auto REQUIRED)

@@ -1334,15 +1334,10 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
       pose->lanelet_id, pose->s, pose->offset,
       quaternion_operation::convertEulerAngleToQuaternion(pose->rpy));
   } else {
-#ifdef ROS_DISTRO_GALACTIC
     THROW_SEMANTIC_ERROR(
-      "Lanelet pose\n", rosidl_generator_traits::to_yaml(lanelet_pose),
-      "\nis invalid, please check lanelet length and connection.");
-#else
-    THROW_SEMANTIC_ERROR(
-      "Lanelet pose\n", traffic_simulator_msgs::msg::to_yaml(lanelet_pose),
-      "\nis invalid, please check lanelet length and connection.");
-#endif
+      "Lanelt pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
+      ",offset=", lanelet_pose.offset, ",rpy.x=", lanelet_pose.rpy.x, ",rpy.y=", lanelet_pose.rpy.y,
+      ",rpy.z=", lanelet_pose.rpy.z, ") is invalid, please check lanelet length and connection.");
   }
 }
 
