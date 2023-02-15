@@ -47,7 +47,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
 }
 
-Interpreter::~Interpreter() { SimulatorCore::deactivate(); }
+Interpreter::~Interpreter() {}
 
 auto Interpreter::currentLocalFrameRate() const -> std::chrono::milliseconds
 {
@@ -258,6 +258,8 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
 {
+  scenarios.clear();
+  script.reset();
   return Interpreter::Result::SUCCESS;  // => Unconfigured
 }
 
@@ -271,7 +273,9 @@ auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
 auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
 {
   timer.reset();
-
+  scenarios.clear();
+  script.reset();
+  SimulatorCore::deactivate();
   return Interpreter::Result::SUCCESS;  // => Finalized
 }
 
