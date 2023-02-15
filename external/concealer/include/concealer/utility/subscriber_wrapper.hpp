@@ -43,7 +43,7 @@ public:
     std::string topic, NodeInterface & autoware_interface,
     std::function<void(const MessageType &)> callback)
   : subscription(autoware_interface.template create_subscription<MessageType>(
-      topic, 1, [this, callback](const typename MessageType::ConstSharedPtr & message) {
+      topic, 1, [this, callback](const typename MessageType::ConstSharedPtr message) {
         current_value = message;
         if (current_value) {
           callback(*current_value);
