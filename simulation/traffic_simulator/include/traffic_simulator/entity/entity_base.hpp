@@ -46,9 +46,7 @@ namespace entity
 class EntityBase
 {
 public:
-  explicit EntityBase(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+  explicit EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &);
 
   virtual ~EntityBase() = default;
 
@@ -61,7 +59,8 @@ public:
   /*   */ auto clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
     -> traffic_simulator_msgs::msg::LaneletPose;
 
-  /*   */ auto clampLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
+  /*   */ auto clampLaneletPose(const traffic_simulator_msgs::msg::EntityStatus & status) const
+    -> traffic_simulator_msgs::msg::EntityStatus;
 
   /*   */ auto clampLaneletPoses(
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_poses) const

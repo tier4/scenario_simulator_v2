@@ -28,16 +28,14 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
 : name(name),
   verbose(true),
   status_(entity_status),
   status_before_update_(status_),
   npc_logic_started_(false)
 {
-  setHdMapUtils(hdmap_utils_ptr);
-  clampLaneletPose(status_);
+  status_ = clampLaneletPose(status_);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -65,17 +63,20 @@ auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose
   }
 }
 
-auto EntityBase::clampLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::EntityStatus & status) const
+  -> traffic_simulator_msgs::msg::EntityStatus
 {
+  traffic_simulator_msgs::msg::EntityStatus clamped_status = status;
   if (status.lanelet_pose_valid) {
     if (const auto lanelet_pose = hdmap_utils_ptr_->clampLaneletPose(status.lanelet_pose)) {
-      status.lanelet_pose_valid = true;
-      status.lanelet_pose = lanelet_pose.get();
+      clamped_status.lanelet_pose_valid = true;
+      clamped_status.lanelet_pose = lanelet_pose.get();
     } else {
-      status.lanelet_pose_valid = false;
-      status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+      clamped_status.lanelet_pose_valid = false;
+      clamped_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
     }
   }
+  return clamped_status;
 }
 
 auto EntityBase::clampLaneletPoses(
