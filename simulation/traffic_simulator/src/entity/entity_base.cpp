@@ -28,11 +28,13 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
   status_(entity_status),
   status_before_update_(status_),
+  hdmap_utils_ptr_(hdmap_utils_ptr),
   npc_logic_started_(false)
 {
   status_ = clampLaneletPose(status_);
@@ -698,11 +700,6 @@ void EntityBase::setEntityTypeList(
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & entity_type_list)
 {
   entity_type_list_ = entity_type_list;
-}
-
-void EntityBase::setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
-{
-  hdmap_utils_ptr_ = ptr;
 }
 
 void EntityBase::setOtherStatus(

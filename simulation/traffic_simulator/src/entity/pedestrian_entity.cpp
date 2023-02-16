@@ -29,17 +29,18 @@ PedestrianEntity::PedestrianEntity(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
   const std::string & plugin_name)
-: EntityBase(name, entity_status),
+: EntityBase(name, entity_status, hdmap_utils_ptr),
   plugin_name(plugin_name),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
-  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
+  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
+  route_planner_(hdmap_utils_ptr_)
 {
-  setHdMapUtils(hdmap_utils_ptr);
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
+  behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
 }
 
 void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
@@ -53,7 +54,7 @@ void PedestrianEntity::requestAssignRoute(
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_.lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, clampLaneletPoses(waypoints));
+    route_planner_.getRouteLanelets(status_.lanelet_pose, clampLaneletPoses(waypoints));
   }
 }
 
@@ -94,7 +95,7 @@ auto PedestrianEntity::getDefaultDynamicConstraints() const
 std::vector<std::int64_t> PedestrianEntity::getRouteLanelets(double horizon)
 {
   if (status_.lanelet_pose_valid) {
-    return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
+    return route_planner_.getRouteLanelets(status_.lanelet_pose, horizon);
   } else {
     return {};
   }
@@ -107,7 +108,7 @@ auto PedestrianEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::
 
 auto PedestrianEntity::getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
-  return route_planner_ptr_->getGoalPoses();
+  return route_planner_.getGoalPoses();
 }
 
 const traffic_simulator_msgs::msg::WaypointsArray PedestrianEntity::getWaypoints()
@@ -125,7 +126,7 @@ void PedestrianEntity::requestAcquirePosition(
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_.lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, clampLaneletPose(lanelet_pose));
+    route_planner_.getRouteLanelets(status_.lanelet_pose, clampLaneletPose(lanelet_pose));
   }
 }
 
@@ -143,20 +144,13 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 void PedestrianEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
-  route_planner_ptr_->cancelGoal();
+  route_planner_.cancelGoal();
 }
 
 auto PedestrianEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "PedestrianEntity";
   return result;
-}
-
-void PedestrianEntity::setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
-{
-  EntityBase::setHdMapUtils(ptr);
-  route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
-  behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
 }
 
 void PedestrianEntity::setTrafficLightManager(

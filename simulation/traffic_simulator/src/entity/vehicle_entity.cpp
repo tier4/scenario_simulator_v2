@@ -30,16 +30,17 @@ VehicleEntity::VehicleEntity(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const std::string & plugin_name)
-: EntityBase(name, entity_status),
+: EntityBase(name, entity_status, hdmap_utils_ptr),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
-  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
+  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
+  route_planner_(hdmap_utils_ptr_)
 {
-  setHdMapUtils(hdmap_utils_ptr);
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
+  behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
 }
 
 void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
@@ -51,7 +52,7 @@ void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & mar
 void VehicleEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
-  route_planner_ptr_->cancelGoal();
+  route_planner_.cancelGoal();
 }
 
 auto VehicleEntity::getCurrentAction() const -> std::string
@@ -83,7 +84,7 @@ auto VehicleEntity::getEntityTypename() const -> const std::string &
 
 auto VehicleEntity::getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
-  return route_planner_ptr_->getGoalPoses();
+  return route_planner_.getGoalPoses();
 }
 
 auto VehicleEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
@@ -94,7 +95,7 @@ auto VehicleEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg
 auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t>
 {
   if (status_.lanelet_pose_valid) {
-    return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
+    return route_planner_.getRouteLanelets(status_.lanelet_pose, horizon);
   } else {
     return {};
   }
@@ -167,7 +168,7 @@ void VehicleEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   if (status_.lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, clampLaneletPose(lanelet_pose));
+    route_planner_.getRouteLanelets(status_.lanelet_pose, clampLaneletPose(lanelet_pose));
   }
 }
 
@@ -186,7 +187,7 @@ void VehicleEntity::requestAssignRoute(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
   if (status_.lanelet_pose_valid) {
-    route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, clampLaneletPoses(waypoints));
+    route_planner_.getRouteLanelets(status_.lanelet_pose, clampLaneletPoses(waypoints));
   }
 }
 
@@ -264,13 +265,6 @@ void VehicleEntity::setBehaviorParameter(
   const traffic_simulator_msgs::msg::BehaviorParameter & parameter)
 {
   behavior_plugin_ptr_->setBehaviorParameter(parameter);
-}
-
-void VehicleEntity::setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
-{
-  EntityBase::setHdMapUtils(ptr);
-  route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
-  behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
 }
 
 void VehicleEntity::setTrafficLightManager(

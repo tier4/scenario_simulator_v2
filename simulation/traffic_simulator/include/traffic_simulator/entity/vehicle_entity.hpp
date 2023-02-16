@@ -109,15 +109,12 @@ public:
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
 
-protected:
-  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &) override;
-
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
 
   const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
 
-  std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
+  traffic_simulator::RoutePlanner route_planner_;
 
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 
