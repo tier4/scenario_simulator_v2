@@ -35,7 +35,7 @@ public:
   explicit MultiClient(
     const simulation_interface::TransportProtocol & protocol, const std::string & hostname);
   ~MultiClient();
-
+  void closeConnection();
   void call(
     const simulation_api_schema::InitializeRequest & req,
     simulation_api_schema::InitializeResponse & res);
