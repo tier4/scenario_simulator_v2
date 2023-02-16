@@ -58,7 +58,13 @@ public:
 
   static auto active() { return static_cast<bool>(core); }
 
-  static auto deactivate() -> void { core.reset(); }
+  static auto deactivate() -> void
+  {
+    if (active()) {
+      core->closeZMQConnection();
+      core.reset();
+    }
+  }
 
   static auto update() -> void { core->updateFrame(); }
 
