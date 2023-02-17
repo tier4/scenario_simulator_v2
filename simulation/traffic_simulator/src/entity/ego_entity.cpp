@@ -82,23 +82,17 @@ auto EgoEntity::makeSimulationModel(
   -> const std::shared_ptr<SimModelInterface>
 {
   // clang-format off
-  const auto acc_time_constant = getParameter<double>("acc_time_constant", 0.1);
-  const auto acc_time_delay = getParameter<double>("acc_time_delay", 0.1);
-  const auto steer_lim =
-    getParameter<double>("steer_lim", parameters.axles.front_axle.max_steering);            // 1.0
-  const auto steer_rate_lim = getParameter<double>("steer_rate_lim", 5.0);
-  const auto steer_time_constant = getParameter<double>("steer_time_constant", 0.27);
-  const auto steer_time_delay = getParameter<double>("steer_time_delay", 0.24);
-  const auto vel_lim = getParameter<double>("vel_lim", parameters.performance.max_speed);   // 50.0
-  const auto vel_rate_lim = getParameter<double>(
-    "vel_rate_lim",
-    parameters.performance.max_acceleration);                                               // 7.0
-  const auto vel_time_constant = getParameter<double>("vel_time_constant", 0.1);
-  const auto vel_time_delay = getParameter<double>("vel_time_delay", 0.1);
-  const auto wheel_base = getParameter<double>(
-    "wheel_base",
-    parameters.axles.front_axle.position_x -
-    parameters.axles.rear_axle.position_x);
+  const auto acc_time_constant   = getParameter<double>("acc_time_constant",     0.1);
+  const auto acc_time_delay      = getParameter<double>("acc_time_delay",        0.1);
+  const auto steer_lim           = getParameter<double>("steer_lim",            parameters.axles.front_axle.max_steering);  // 1.0
+  const auto steer_rate_lim      = getParameter<double>("steer_rate_lim",        5.0);
+  const auto steer_time_constant = getParameter<double>("steer_time_constant",   0.27);
+  const auto steer_time_delay    = getParameter<double>("steer_time_delay",      0.24);
+  const auto vel_lim             = getParameter<double>("vel_lim",              parameters.performance.max_speed);  // 50.0
+  const auto vel_rate_lim        = getParameter<double>("vel_rate_lim",         parameters.performance.max_acceleration);  // 7.0
+  const auto vel_time_constant   = getParameter<double>("vel_time_constant",     0.1);
+  const auto vel_time_delay      = getParameter<double>("vel_time_delay",        0.1);
+  const auto wheel_base          = getParameter<double>("wheel_base",           parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
   // clang-format on
 
   switch (vehicle_model_type) {
@@ -213,8 +207,8 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
       return accel;
     }();
 
-    auto route_lanelets = getRouteLanelets();
-    const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(route_lanelets);
+    const auto unique_route_lanelets =
+      traffic_simulator::helper::getUniqueValues(getRouteLanelets());
 
     boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 

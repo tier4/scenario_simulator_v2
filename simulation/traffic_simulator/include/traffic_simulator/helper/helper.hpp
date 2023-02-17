@@ -99,7 +99,7 @@ geometry_msgs::msg::Pose constructPose(
  * @return new std::vector without duplicates and with relative order preserved
  */
 template <typename T>
-std::vector<T> getUniqueValues(std::vector<T> input_vector)
+std::vector<T> getUniqueValues(const std::vector<T> & input_vector)
 {
   std::vector<T> output_vector(input_vector);
 

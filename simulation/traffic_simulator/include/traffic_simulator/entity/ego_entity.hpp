@@ -75,7 +75,7 @@ class EgoEntity : public VehicleEntity
     -> const std::shared_ptr<SimModelInterface>;
 
 public:
-  EgoEntity() = delete;
+  explicit EgoEntity() = delete;
 
   explicit EgoEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
