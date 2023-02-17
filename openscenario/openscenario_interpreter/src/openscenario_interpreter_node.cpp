@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <memory>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
+#include <status_monitor/status_monitor.hpp>
 
 int main(const int argc, char const * const * const argv)
 {
@@ -25,15 +26,16 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::init(argc, argv);
 
-  rclcpp::executors::SingleThreadedExecutor executor{};
+  rclcpp::executors::SingleThreadedExecutor executor;
 
-  rclcpp::NodeOptions options{};
+  auto node = std::make_shared<openscenario_interpreter::Interpreter>(rclcpp::NodeOptions());
 
-  auto node = std::make_shared<openscenario_interpreter::Interpreter>(options);
+  executor.add_node(node->get_node_base_interface());
 
-  executor.add_node((*node).get_node_base_interface());
-
-  executor.spin();
+  while (rclcpp::ok()) {
+    common::status_monitor.touch(__func__);
+    executor.spin_once();
+  }
 
   rclcpp::shutdown();
 
