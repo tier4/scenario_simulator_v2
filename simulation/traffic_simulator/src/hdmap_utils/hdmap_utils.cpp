@@ -766,7 +766,7 @@ std::shared_ptr<math::geometry::CatmullRomSpline> HdMapUtils::getCenterPointsSpl
 }
 
 std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
-  std::vector<std::int64_t> lanelet_ids) const
+  const std::vector<std::int64_t> & lanelet_ids) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
   if (lanelet_ids.empty()) {

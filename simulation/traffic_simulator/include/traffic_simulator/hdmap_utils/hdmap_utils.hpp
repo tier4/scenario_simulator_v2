@@ -137,7 +137,7 @@ public:
   std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getCenterPoints(
-    std::vector<std::int64_t> lanelet_ids) const;
+    const std::vector<std::int64_t> & lanelet_ids) const;
   std::shared_ptr<math::geometry::CatmullRomSpline> getCenterPointsSpline(
     std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(
