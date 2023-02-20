@@ -21,23 +21,31 @@ inline namespace syntax
 {
 DeterministicSingleParameterDistribution::DeterministicSingleParameterDistribution(
   const pugi::xml_node & node, Scope & scope)
-: DeterministicSingleParameterDistributionType(node, scope),
-  parameter_name(readAttribute<String>("parameterName", node, scope))
+: parameter_name(readAttribute<String>("parameterName", node, scope)),
+  deterministic_single_parameter_distributions(
+    readGroups<DeterministicSingleParameterDistributionType, 1>(node, scope))
 {
 }
 
 ParameterDistribution DeterministicSingleParameterDistribution::derive()
 {
-  return apply<ParameterDistribution>(
-    [this](auto & unnamed_distribution) {
-      ParameterDistribution distribution;
-      for (const auto & parameter : unnamed_distribution.derive()) {
-        distribution.emplace_back(
-          std::make_shared<ParameterList>(ParameterList{{parameter_name, make(parameter)}}));
-      }
-      return distribution;
-    },
-    *this);
+  std::cout << "DeterministicSingleParameterDistribution::derive" << std::endl;
+  ParameterDistribution distribution;
+  for (auto additional_distribution : deterministic_single_parameter_distributions) {
+    std::cout << "additional_distribution: " << std::endl;
+    distribution = mergeParameterDistribution(
+      distribution, apply<ParameterDistribution>(
+                      [this](auto & unnamed_distribution) {
+                        ParameterDistribution distribution;
+                        for (const auto & parameter : unnamed_distribution.derive()) {
+                          distribution.emplace_back(std::make_shared<ParameterList>(
+                            ParameterList{{parameter_name, make(parameter)}}));
+                        }
+                        return distribution;
+                      },
+                      additional_distribution));
+  }
+  return distribution;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
