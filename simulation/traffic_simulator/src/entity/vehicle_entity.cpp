@@ -168,7 +168,7 @@ void VehicleEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
   if (status_.lanelet_pose_valid) {
-    route_planner_.getRouteLanelets(status_.lanelet_pose, clampLaneletPose(lanelet_pose));
+    route_planner_.setWaypoints({clampLaneletPose(lanelet_pose)});
   }
 }
 
@@ -187,7 +187,7 @@ void VehicleEntity::requestAssignRoute(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
   if (status_.lanelet_pose_valid) {
-    route_planner_.getRouteLanelets(status_.lanelet_pose, clampLaneletPoses(waypoints));
+    route_planner_.setWaypoints(clampLaneletPoses(waypoints));
   }
 }
 

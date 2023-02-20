@@ -54,7 +54,7 @@ void PedestrianEntity::requestAssignRoute(
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_.lanelet_pose_valid) {
-    route_planner_.getRouteLanelets(status_.lanelet_pose, clampLaneletPoses(waypoints));
+    route_planner_.setWaypoints(clampLaneletPoses(waypoints));
   }
 }
 
@@ -126,7 +126,7 @@ void PedestrianEntity::requestAcquirePosition(
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_.lanelet_pose_valid) {
-    route_planner_.getRouteLanelets(status_.lanelet_pose, clampLaneletPose(lanelet_pose));
+    route_planner_.setWaypoints({clampLaneletPose(lanelet_pose)});
   }
 }
 

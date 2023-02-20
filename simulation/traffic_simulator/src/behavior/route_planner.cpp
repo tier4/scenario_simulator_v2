@@ -21,18 +21,21 @@ RoutePlanner::RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdma
 {
 }
 
+auto RoutePlanner::setWaypoints(
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) -> void
+{
+  waypoint_queue_.clear();
+  for (const auto & waypoint : waypoints) {
+    waypoint_queue_.push_back(waypoint);
+  }
+}
+
 auto RoutePlanner::getRouteLanelets(
   const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon)
   -> std::vector<std::int64_t>
 {
-  waypoint_queue_.clear();
-  if (waypoints.empty()) {
-    return getRouteLanelets(entity_lanelet_pose, horizon);
-  }
-  for (const auto & waypoint : waypoints) {
-    waypoint_queue_.push_back(waypoint);
-  }
+  setWaypoints(waypoints);
   return getRouteLanelets(entity_lanelet_pose, waypoint_queue_.front(), horizon);
 }
 
