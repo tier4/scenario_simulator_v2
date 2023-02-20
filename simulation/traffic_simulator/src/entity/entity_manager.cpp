@@ -253,13 +253,13 @@ auto EntityManager::getLongitudinalDistance(
   bool include_opposite_direction) -> boost::optional<double>
 {
   LaneletPose from_pose;
-  if (const auto lanelet_pose = hdmap_utils_ptr_->clampLaneletPose(from)) {
+  if (const auto lanelet_pose = hdmap_utils_ptr_->canonicalizeLaneletPose(from)) {
     from_pose = lanelet_pose.get();
   } else {
     return boost::none;
   }
   LaneletPose to_pose;
-  if (const auto lanelet_pose = hdmap_utils_ptr_->clampLaneletPose(to)) {
+  if (const auto lanelet_pose = hdmap_utils_ptr_->canonicalizeLaneletPose(to)) {
     to_pose = lanelet_pose.get();
   } else {
     return boost::none;

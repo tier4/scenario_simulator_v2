@@ -37,7 +37,7 @@ EntityBase::EntityBase(
   hdmap_utils_ptr_(hdmap_utils_ptr),
   npc_logic_started_(false)
 {
-  status_ = clampLaneletPose(status_);
+  status_ = canonicalizeLaneletPose(status_);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -52,10 +52,11 @@ auto EntityBase::asAutoware() const -> concealer::Autoware &
 
 void EntityBase::cancelRequest() {}
 
-auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
-  const -> traffic_simulator_msgs::msg::LaneletPose
+auto EntityBase::canonicalizeLaneletPose(
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+  -> traffic_simulator_msgs::msg::LaneletPose
 {
-  if (const auto ret = hdmap_utils_ptr_->clampLaneletPose(lanelet_pose)) {
+  if (const auto ret = hdmap_utils_ptr_->canonicalizeLaneletPose(lanelet_pose)) {
     return ret.get();
   } else {
     THROW_SEMANTIC_ERROR(
@@ -65,12 +66,12 @@ auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose
   }
 }
 
-auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::EntityStatus & status) const
-  -> traffic_simulator_msgs::msg::EntityStatus
+auto EntityBase::canonicalizeLaneletPose(const traffic_simulator_msgs::msg::EntityStatus & status)
+  const -> traffic_simulator_msgs::msg::EntityStatus
 {
   traffic_simulator_msgs::msg::EntityStatus clamped_status = status;
   if (status.lanelet_pose_valid) {
-    if (const auto lanelet_pose = hdmap_utils_ptr_->clampLaneletPose(status.lanelet_pose)) {
+    if (const auto lanelet_pose = hdmap_utils_ptr_->canonicalizeLaneletPose(status.lanelet_pose)) {
       clamped_status.lanelet_pose_valid = true;
       clamped_status.lanelet_pose = lanelet_pose.get();
     } else {
@@ -81,7 +82,7 @@ auto EntityBase::clampLaneletPose(const traffic_simulator_msgs::msg::EntityStatu
   return clamped_status;
 }
 
-auto EntityBase::clampLaneletPoses(
+auto EntityBase::canonicalizeLaneletPoses(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_poses) const
   -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
@@ -89,7 +90,7 @@ auto EntityBase::clampLaneletPoses(
   std::transform(
     lanelet_poses.begin(), lanelet_poses.end(), std::back_inserter(ret),
     [this](const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) {
-      return clampLaneletPose(lanelet_pose);
+      return canonicalizeLaneletPose(lanelet_pose);
     });
   return ret;
 }
@@ -743,7 +744,7 @@ auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   new_status.action_status.current_action = getCurrentAction();
 
   status_ = new_status;
-  clampLaneletPose(status_);
+  canonicalizeLaneletPose(status_);
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void

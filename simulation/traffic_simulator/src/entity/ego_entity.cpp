@@ -360,7 +360,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 void EgoEntity::requestAcquirePosition(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
 {
-  if (const auto pose = hdmap_utils_ptr_->clampLaneletPose(lanelet_pose)) {
+  if (const auto pose = hdmap_utils_ptr_->canonicalizeLaneletPose(lanelet_pose)) {
     requestAssignRoute({pose.get()});
   } else {
     THROW_SEMANTIC_ERROR(

@@ -58,13 +58,14 @@ public:
 
   virtual void cancelRequest();
 
-  /*   */ auto clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+  /*   */ auto canonicalizeLaneletPose(
+    const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
     -> traffic_simulator_msgs::msg::LaneletPose;
 
-  /*   */ auto clampLaneletPose(const traffic_simulator_msgs::msg::EntityStatus & status) const
-    -> traffic_simulator_msgs::msg::EntityStatus;
+  /*   */ auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::EntityStatus & status)
+    const -> traffic_simulator_msgs::msg::EntityStatus;
 
-  /*   */ auto clampLaneletPoses(
+  /*   */ auto canonicalizeLaneletPoses(
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_poses) const
     -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 

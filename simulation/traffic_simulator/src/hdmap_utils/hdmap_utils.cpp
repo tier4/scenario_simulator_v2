@@ -84,8 +84,9 @@ HdMapUtils::HdMapUtils(
     lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
-auto HdMapUtils::clampLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
-  const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+auto HdMapUtils::canonicalizeLaneletPose(
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   auto clamped = lanelet_pose;
   while (clamped.s < 0) {
@@ -1302,7 +1303,7 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
 {
-  if (const auto pose = clampLaneletPose(lanelet_pose)) {
+  if (const auto pose = canonicalizeLaneletPose(lanelet_pose)) {
     return toMapPose(
       pose->lanelet_id, pose->s, pose->offset,
       quaternion_operation::convertEulerAngleToQuaternion(pose->rpy));
