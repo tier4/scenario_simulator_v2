@@ -41,11 +41,6 @@ public:
 private:
   auto getRouteLanelets(
     const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon = 100)
-    -> std::vector<std::int64_t>;
-
-  auto getRouteLanelets(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
     const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon = 100)
     -> std::vector<std::int64_t>;
 

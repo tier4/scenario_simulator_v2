@@ -31,15 +31,6 @@ auto RoutePlanner::setWaypoints(
 }
 
 auto RoutePlanner::getRouteLanelets(
-  const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon)
-  -> std::vector<std::int64_t>
-{
-  setWaypoints(waypoints);
-  return getRouteLanelets(entity_lanelet_pose, waypoint_queue_.front(), horizon);
-}
-
-auto RoutePlanner::getRouteLanelets(
   const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon)
   -> std::vector<std::int64_t>
 {
