@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <glog/logging.h>
-
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <iostream>
 
@@ -28,12 +26,10 @@ CppScenarioNode::CppScenarioNode(
   scenario_filename_(scenario_filename),
   exception_expect_(false)
 {
-  google::InitGoogleLogging("");
   declare_parameter<std::string>("junit_path", "/tmp");
   get_parameter<std::string>("junit_path", junit_path_);
   declare_parameter<double>("timeout", 10.0);
   get_parameter<double>("timeout", timeout_);
-  google::InstallFailureSignalHandler();
 }
 
 void CppScenarioNode::update()

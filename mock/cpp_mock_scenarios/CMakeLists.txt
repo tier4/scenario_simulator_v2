@@ -31,7 +31,6 @@ target_link_libraries(cpp_scenario_node
   pthread
   sodium
   zmq
-  glog
 )
 
 # workaround to allow deprecated header to build on both galactic and humble
