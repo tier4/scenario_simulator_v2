@@ -50,7 +50,6 @@
 #include <string>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
-#include <traffic_simulator/util/util.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
@@ -229,14 +228,6 @@ private:
       lanelets.begin(), lanelets.end(), std::back_inserter(ids),
       [](const Lanelet & lanelet) { return lanelet.id(); });
     return ids;
-  }
-  template <typename T>
-  auto sortAndUnique(const std::vector<T> & data) const -> std::vector<T>
-  {
-    std::vector<T> ret = data;
-    std::sort(ret.begin(), ret.end());
-    ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
-    return ret;
   }
   std::vector<lanelet::AutowareTrafficLightConstPtr> getTrafficLights(
     const std::int64_t traffic_light_id) const;

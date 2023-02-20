@@ -113,4 +113,30 @@ std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternio
 
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose);
 
+template <typename T>
+auto operator+(const std::vector<T> & v0, const std::vector<T> & v1) -> decltype(auto)
+{
+  auto result = v0;
+  result.reserve(v0.size() + v1.size());
+  result.insert(result.end(), v1.begin(), v1.end());
+  return result;
+}
+
+template <typename T>
+auto operator+=(std::vector<T> & v0, const std::vector<T> & v1) -> decltype(auto)
+{
+  v0.reserve(v0.size() + v1.size());
+  v0.insert(v0.end(), v1.begin(), v1.end());
+  return v0;
+}
+
+template <typename T>
+auto sortAndUnique(const std::vector<T> & data) -> std::vector<T>
+{
+  std::vector<T> ret = data;
+  std::sort(ret.begin(), ret.end());
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+  return ret;
+}
+
 #endif  // TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
