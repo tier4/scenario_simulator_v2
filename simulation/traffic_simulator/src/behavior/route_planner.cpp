@@ -34,6 +34,9 @@ auto RoutePlanner::getRouteLanelets(
   const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon)
   -> std::vector<std::int64_t>
 {
+  if (!waypoint_queue_.empty()) {
+    plan(entity_lanelet_pose, waypoint_queue_.front());
+  }
   if (!whole_route_) {
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   }
@@ -62,7 +65,7 @@ auto RoutePlanner::getRouteLanelets(
   plan(entity_lanelet_pose, target_lanelet_pose);
 
   if (not whole_route_ or whole_route_->empty()) {
-    whole_route_ = boost::none;
+    cancelGoal();
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   } else {
     return hdmap_utils_ptr_->getFollowingLanelets(
