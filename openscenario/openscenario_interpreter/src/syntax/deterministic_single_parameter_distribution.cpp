@@ -28,23 +28,17 @@ DeterministicSingleParameterDistribution::DeterministicSingleParameterDistributi
 
 ParameterDistribution DeterministicSingleParameterDistribution::derive()
 {
-  std::cout << "DeterministicSingleParameterDistribution::derive" << std::endl;
   ParameterDistribution distribution;
-  for (auto additional_distribution : deterministic_single_parameter_distributions) {
-    std::cout << "additional_distribution: " << std::endl;
-    distribution = mergeParameterDistribution(
-      distribution, apply<ParameterDistribution>(
-                      [this](auto & unnamed_distribution) {
-                        ParameterDistribution distribution;
-                        for (const auto & parameter : unnamed_distribution.derive()) {
-                          distribution.emplace_back(std::make_shared<ParameterList>(
-                            ParameterList{{parameter_name, make(parameter)}}));
-                        }
-                        return distribution;
-                      },
-                      additional_distribution));
-  }
-  return distribution;
+  return apply<ParameterDistribution>(
+    [&](auto & unnamed_distribution) {
+      ParameterDistribution distribution;
+      for (const auto & unnamed_parameter : unnamed_distribution.derive()) {
+        distribution.emplace_back(
+          std::make_shared<ParameterList>(ParameterList{{parameter_name, unnamed_parameter}}));
+      }
+      return distribution;
+    },
+    *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
