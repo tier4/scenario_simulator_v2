@@ -36,6 +36,7 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
   random_engine(scope.seed)
 {
 }
+
 std::vector<Object> ProbabilityDistributionSet::derive()
 {
   size_t index = distribute(random_engine);

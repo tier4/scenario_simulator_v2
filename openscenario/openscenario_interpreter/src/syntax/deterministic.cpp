@@ -24,6 +24,7 @@ Deterministic::Deterministic(const pugi::xml_node & node, Scope & scope)
     readGroups<DeterministicParameterDistribution, 0>(node, scope))
 {
 }
+
 ParameterDistribution Deterministic::derive()
 {
   ParameterDistribution distribution;

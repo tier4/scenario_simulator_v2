@@ -27,6 +27,7 @@ UniformDistribution::UniformDistribution(
   random_engine(scope.seed)
 {
 }
+
 std::vector<Object> UniformDistribution::derive()
 {
   return std::vector<Object>({make<Double>(distribute(random_engine))});

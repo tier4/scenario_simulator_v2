@@ -28,6 +28,7 @@ PoissonDistribution::PoissonDistribution(
   random_engine(scope.seed)
 {
 }
+
 std::vector<Object> PoissonDistribution::derive()
 {
   return std::vector<Object>({make<Double>(distribute(random_engine))});

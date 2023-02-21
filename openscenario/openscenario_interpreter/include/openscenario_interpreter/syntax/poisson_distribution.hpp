@@ -48,6 +48,7 @@ struct PoissonDistribution : public ComplexType,
   std::mt19937 random_engine;
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
+
   auto derive() -> std::vector<Object> override;
 };
 }  // namespace syntax
