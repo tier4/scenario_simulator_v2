@@ -33,12 +33,11 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DeterministicSingleParameterDistribution : public ParameterDistributionContainer
+struct DeterministicSingleParameterDistribution
+: public DeterministicSingleParameterDistributionType,
+  public ParameterDistributionContainer
 {
   const String parameter_name;
-
-  const std::list<DeterministicSingleParameterDistributionType>
-    deterministic_single_parameter_distributions;
 
   explicit DeterministicSingleParameterDistribution(const pugi::xml_node &, Scope &);
 

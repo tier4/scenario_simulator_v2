@@ -21,9 +21,8 @@ inline namespace syntax
 {
 DeterministicSingleParameterDistribution::DeterministicSingleParameterDistribution(
   const pugi::xml_node & node, Scope & scope)
-: parameter_name(readAttribute<String>("parameterName", node, scope)),
-  deterministic_single_parameter_distributions(
-    readGroups<DeterministicSingleParameterDistributionType, 1>(node, scope))
+: DeterministicSingleParameterDistributionType(node, scope),
+  parameter_name(readAttribute<String>("parameterName", node, scope))
 {
 }
 
