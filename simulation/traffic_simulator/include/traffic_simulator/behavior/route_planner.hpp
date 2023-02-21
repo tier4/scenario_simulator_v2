@@ -39,18 +39,11 @@ public:
   std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame();
 
 private:
-  auto getRouteLanelets(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon = 100)
-    -> std::vector<std::int64_t>;
-
   void cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
 
-  void plan(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose);
+  void updateRoute(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
 
-  boost::optional<std::vector<std::int64_t>> whole_route_;
+  boost::optional<std::vector<std::int64_t>> route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
   /*

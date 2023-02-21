@@ -35,7 +35,7 @@ auto RoutePlanner::getRouteLanelets(
   -> std::vector<std::int64_t>
 {
   if (!waypoint_queue_.empty()) {
-    plan(entity_lanelet_pose, waypoint_queue_.front());
+    updateRoute(entity_lanelet_pose);
   }
   if (!route_) {
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
@@ -54,18 +54,7 @@ auto RoutePlanner::getRouteLanelets(
   if (waypoint_queue_.empty()) {
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   }
-  return getRouteLanelets(entity_lanelet_pose, waypoint_queue_.front(), horizon);
-}
-
-auto RoutePlanner::getRouteLanelets(
-  const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-  const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon)
-  -> std::vector<std::int64_t>
-{
-  plan(entity_lanelet_pose, target_lanelet_pose);
-
   if (not route_ or route_->empty()) {
-    cancelGoal();
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   } else {
     return hdmap_utils_ptr_->getFollowingLanelets(
@@ -108,28 +97,27 @@ std::vector<traffic_simulator_msgs::msg::LaneletPose> RoutePlanner::getGoalPoses
   return goal_poses;
 }
 
-void RoutePlanner::plan(
-  const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-  const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose)
+void RoutePlanner::updateRoute(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose)
 {
   if (
-    target_lanelet_pose.lanelet_id == entity_lanelet_pose.lanelet_id &&
-    target_lanelet_pose.s <= entity_lanelet_pose.s) {
+    waypoint_queue_.front().lanelet_id == entity_lanelet_pose.lanelet_id &&
+    waypoint_queue_.front().s <= entity_lanelet_pose.s) {
     cancelGoal(entity_lanelet_pose);
     if (waypoint_queue_.empty()) {
+      cancelGoal();
       return;
     }
   }
   if (!route_) {
-    route_ =
-      hdmap_utils_ptr_->getRoute(entity_lanelet_pose.lanelet_id, target_lanelet_pose.lanelet_id);
+    route_ = hdmap_utils_ptr_->getRoute(
+      entity_lanelet_pose.lanelet_id, waypoint_queue_.front().lanelet_id);
     return;
   }
   if (hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, route_.get())) {
     return;
   } else {
-    route_ =
-      hdmap_utils_ptr_->getRoute(entity_lanelet_pose.lanelet_id, target_lanelet_pose.lanelet_id);
+    route_ = hdmap_utils_ptr_->getRoute(
+      entity_lanelet_pose.lanelet_id, waypoint_queue_.front().lanelet_id);
     return;
   }
 }
