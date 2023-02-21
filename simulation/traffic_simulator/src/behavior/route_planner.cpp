@@ -53,7 +53,11 @@ auto RoutePlanner::getRouteLanelets(
   return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
 }
 
-void RoutePlanner::cancelRoute() { route_ = boost::none; }
+void RoutePlanner::cancelRoute()
+{
+  waypoint_queue_.clear();
+  route_ = boost::none;
+}
 
 void RoutePlanner::cancelWaypoint(
   const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose)
