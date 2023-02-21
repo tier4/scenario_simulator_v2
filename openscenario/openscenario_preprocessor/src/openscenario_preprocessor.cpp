@@ -85,16 +85,21 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
         script->category.is_also<ParameterValueDistribution>()) {
       auto & parameter_value_distribution = script->category.as<ParameterValueDistribution>();
       auto base_scenario_path = parameter_value_distribution.scenario_file.filepath;
+
       if (boost::filesystem::exists(base_scenario_path)) {
         if (validateXOSC(base_scenario_path, true)) {
           auto base_scenario = std::make_shared<OpenScenario>(base_scenario_path);
           auto p = parameter_value_distribution.derive();
+
           for (const auto & parameter_list : p | boost::adaptors::indexed()) {
             pugi::xml_document derived_script;
             derived_script.reset(base_scenario->script);  // deep copy
-            pugi::xpath_query query("/OpenSCENARIO/ParameterDeclarations");
+
             auto parameter_declarations =
-              derived_script.document_element().select_node(query).node();
+              derived_script.document_element()
+                .select_node(pugi::xpath_query{"/OpenSCENARIO/ParameterDeclarations"})
+                .node();
+
             for (const auto & [name, parameter] : *parameter_list.value()) {
               if (auto parameter_node =
                     parameter_declarations.find_child_by_attribute("name", name.c_str());
@@ -104,10 +109,13 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
                 std::cout << "Parameter " << name << " not found in base scenario" << std::endl;
               }
             }
+
             ScenarioSet derived_scenario = scenario;
             derived_scenario.path += "." + std::to_string(parameter_list.index());
+
             derived_script.save_file(derived_scenario.path.c_str());
-            preprocessed_scenarios.emplace_back(scenario);
+
+            preprocessed_scenarios.emplace_back(derived_scenario);
           }
         } else {
           throw common::Error("base scenario is not valid : " + base_scenario_path.string());
