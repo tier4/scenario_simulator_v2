@@ -24,6 +24,7 @@ RoutePlanner::RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdma
 auto RoutePlanner::setWaypoints(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) -> void
 {
+  // Just setting waypoints to the queue, do not planning route.
   waypoint_queue_.clear();
   for (const auto & waypoint : waypoints) {
     waypoint_queue_.push_back(waypoint);
@@ -34,23 +35,21 @@ auto RoutePlanner::getRouteLanelets(
   const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon)
   -> std::vector<std::int64_t>
 {
+  // If the queue is not empty, calculating route from the entity_lanelet_pose to waypoint_queue_.front()
   if (!waypoint_queue_.empty()) {
     updateRoute(entity_lanelet_pose);
   }
+  // If the route from the entity_lanelet_pose to waypoint_queue_.front() was failed to calculate in updateRoute function,
+  // use following lanelet as route.
   if (!route_) {
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   }
-  if (!waypoint_queue_.empty()) {
-    if (waypoint_queue_.front().lanelet_id == entity_lanelet_pose.lanelet_id) {
-      cancelGoal(entity_lanelet_pose);
-    }
-  } else {
-    if (hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, route_.get())) {
-      return hdmap_utils_ptr_->getFollowingLanelets(
-        entity_lanelet_pose.lanelet_id, route_.get(), horizon, true);
-    }
-  }
+  // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
   cancelGoal(entity_lanelet_pose);
+  if (hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, route_.get())) {
+    return hdmap_utils_ptr_->getFollowingLanelets(
+      entity_lanelet_pose.lanelet_id, route_.get(), horizon, true);
+  }
   if (waypoint_queue_.empty()) {
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   }
@@ -62,13 +61,14 @@ auto RoutePlanner::getRouteLanelets(
   }
 }
 
-void RoutePlanner::cancelGoal() { route_ = boost::none; }
+void RoutePlanner::cancelRoute() { route_ = boost::none; }
 
-void RoutePlanner::cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose)
+void RoutePlanner::cancelWaypoint(
+  const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose)
 {
   while (true) {
     if (waypoint_queue_.empty()) {
-      cancelGoal();
+      cancelRoute();
       break;
     }
     if (waypoint_queue_.front().lanelet_id == entity_lanelet_pose.lanelet_id) {
@@ -80,7 +80,7 @@ void RoutePlanner::cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & e
   }
 }
 
-std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame()
+std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame() const
 {
   std::vector<geometry_msgs::msg::Pose> ret;
   for (const auto & lanelet_pose : waypoint_queue_) {
@@ -89,7 +89,7 @@ std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame()
   return ret;
 }
 
-std::vector<traffic_simulator_msgs::msg::LaneletPose> RoutePlanner::getGoalPoses()
+std::vector<traffic_simulator_msgs::msg::LaneletPose> RoutePlanner::getGoalPoses() const
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> goal_poses;
   std::copy(
@@ -102,9 +102,9 @@ void RoutePlanner::updateRoute(const traffic_simulator_msgs::msg::LaneletPose & 
   if (
     waypoint_queue_.front().lanelet_id == entity_lanelet_pose.lanelet_id &&
     waypoint_queue_.front().s <= entity_lanelet_pose.s) {
-    cancelGoal(entity_lanelet_pose);
+    cancelWaypoint(entity_lanelet_pose);
     if (waypoint_queue_.empty()) {
-      cancelGoal();
+      cancelRoute();
       return;
     }
   }

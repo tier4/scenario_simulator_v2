@@ -144,7 +144,7 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 void PedestrianEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
-  route_planner_.cancelGoal();
+  route_planner_.cancelRoute();
 }
 
 auto PedestrianEntity::getEntityTypename() const -> const std::string &

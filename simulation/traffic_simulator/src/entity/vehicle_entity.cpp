@@ -52,7 +52,7 @@ void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & mar
 void VehicleEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
-  route_planner_.cancelGoal();
+  route_planner_.cancelRoute();
 }
 
 auto VehicleEntity::getCurrentAction() const -> std::string

@@ -34,12 +34,12 @@ public:
   auto setWaypoints(const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
     -> void;
 
-  void cancelGoal();
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses();
-  std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame();
+  void cancelRoute();
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() const;
+  std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame() const;
 
 private:
-  void cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
+  void cancelWaypoint(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
 
   void updateRoute(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
 
