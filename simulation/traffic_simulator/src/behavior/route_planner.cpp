@@ -50,12 +50,7 @@ auto RoutePlanner::getRouteLanelets(
     return hdmap_utils_ptr_->getFollowingLanelets(
       entity_lanelet_pose.lanelet_id, route_.get(), horizon, true);
   }
-  if (not route_ or route_->empty()) {
-    return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
-  } else {
-    return hdmap_utils_ptr_->getFollowingLanelets(
-      entity_lanelet_pose.lanelet_id, route_.get(), horizon, true);
-  }
+  return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
 }
 
 void RoutePlanner::cancelRoute() { route_ = boost::none; }
