@@ -24,10 +24,10 @@ namespace traffic_simulator
 {
 namespace entity_status
 {
-class CanonicalizedEntityStatus
+class CanonicalizedEntityStatusType
 {
 public:
-  explicit CanonicalizedEntityStatus(
+  explicit CanonicalizedEntityStatusType(
     const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
   explicit operator traffic_simulator_msgs::msg::EntityStatus() const noexcept
@@ -44,5 +44,9 @@ private:
 };
 }  // namespace entity_status
 }  // namespace traffic_simulator
+
+using EntityStatusType = traffic_simulator_msgs::msg::EntityStatus;
+using CanonicalizedEntityStatusType =
+  traffic_simulator::entity_status::CanonicalizedEntityStatusType;
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ENTITY_STATUS_HPP_

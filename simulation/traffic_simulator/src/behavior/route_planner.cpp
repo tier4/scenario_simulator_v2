@@ -87,11 +87,12 @@ std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame() c
   return ret;
 }
 
-std::vector<traffic_simulator_msgs::msg::LaneletPose> RoutePlanner::getGoalPoses() const
+std::vector<CanonicalizedLaneletPoseType> RoutePlanner::getGoalPoses() const
 {
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> goal_poses;
-  std::copy(
-    std::cbegin(waypoint_queue_), std::cend(waypoint_queue_), std::back_inserter(goal_poses));
+  std::vector<CanonicalizedLaneletPoseType> goal_poses;
+  for (const auto & waypoint : waypoint_queue_) {
+    goal_poses.emplace_back(CanonicalizedLaneletPoseType(waypoint, hdmap_utils_ptr_));
+  }
   return goal_poses;
 }
 

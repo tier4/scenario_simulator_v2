@@ -36,7 +36,8 @@ void MomentaryStopMetric::update()
   }
   distance_to_stopline_ = distance.get();
   linear_acceleration_ =
-    entity_manager_ptr_->getEntityStatus(target_entity).action_status.accel.linear.x;
+    static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(target_entity))
+      .action_status.accel.linear.x;
   if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
     if (standstill_duration_ = entity_manager_ptr_->getStandStillDuration(target_entity);
         entity_manager_ptr_->isStopping(target_entity) && standstill_duration_ >= stop_duration) {

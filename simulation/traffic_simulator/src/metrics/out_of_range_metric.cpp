@@ -34,7 +34,8 @@ void OutOfRangeMetric::update()
     success();
     return;
   }
-  const auto status = entity_manager_ptr_->getEntityStatus(target_entity);
+  const auto status =
+    static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(target_entity));
 
   linear_velocity_ = status.action_status.twist.linear.x;
   linear_acceleration_ = status.action_status.accel.linear.x;

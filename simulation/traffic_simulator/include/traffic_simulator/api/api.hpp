@@ -186,13 +186,13 @@ public:
 
   bool despawn(const std::string & name);
 
-  traffic_simulator_msgs::msg::EntityStatus getEntityStatus(const std::string & name);
+  CanonicalizedEntityStatusType getEntityStatus(const std::string & name);
 
   geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
   auto setEntityStatus(
     const std::string & name,
-    const traffic_simulator::entity_status::CanonicalizedEntityStatus & status) -> void;
+    const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void;
   auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
@@ -316,7 +316,7 @@ public:
     -> traffic_simulator::lanelet_pose::CanonicalizedLaneletPose;
   auto canonicalize(
     const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status) const
-    -> traffic_simulator::entity_status::CanonicalizedEntityStatus;
+    -> traffic_simulator::entity_status::CanonicalizedEntityStatusType;
 
 private:
   bool updateSensorFrame();

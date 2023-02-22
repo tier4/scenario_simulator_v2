@@ -51,7 +51,8 @@ public:
   };
 
   explicit PedestrianEntity(
-    const std::string & name, const traffic_simulator::entity_status::CanonicalizedEntityStatus &,
+    const std::string & name,
+    const traffic_simulator::entity_status::CanonicalizedEntityStatusType &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::PedestrianParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
@@ -103,7 +104,7 @@ public:
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> override;
+  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPoseType> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 

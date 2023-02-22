@@ -26,7 +26,8 @@ class MiscObjectEntity : public EntityBase
 {
 public:
   explicit MiscObjectEntity(
-    const std::string & name, const traffic_simulator::entity_status::CanonicalizedEntityStatus &,
+    const std::string & name,
+    const traffic_simulator::entity_status::CanonicalizedEntityStatusType &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
@@ -45,7 +46,7 @@ public:
 
   ~MiscObjectEntity() override = default;
 
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override { return {}; }
+  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPoseType> override { return {}; }
 
   boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {

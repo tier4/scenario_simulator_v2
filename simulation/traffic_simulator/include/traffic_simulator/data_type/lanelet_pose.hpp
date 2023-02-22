@@ -42,4 +42,7 @@ private:
 }  // namespace lanelet_pose
 }  // namespace traffic_simulator
 
+using LaneletPoseType = traffic_simulator_msgs::msg::LaneletPose;
+using CanonicalizedLaneletPoseType = traffic_simulator::lanelet_pose::CanonicalizedLaneletPose;
+
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_

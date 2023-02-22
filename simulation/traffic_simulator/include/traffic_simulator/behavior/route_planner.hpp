@@ -29,15 +29,13 @@ public:
   explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   auto getRouteLanelets(
-    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose & entity_lanelet_pose,
-    double horizon = 100) -> std::vector<std::int64_t>;
+    const CanonicalizedLaneletPoseType & entity_lanelet_pose, double horizon = 100)
+    -> std::vector<std::int64_t>;
 
-  auto setWaypoints(
-    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> & waypoints)
-    -> void;
+  auto setWaypoints(const std::vector<CanonicalizedLaneletPoseType> & waypoints) -> void;
 
   void cancelRoute();
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() const;
+  std::vector<CanonicalizedLaneletPoseType> getGoalPoses() const;
   std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame() const;
 
 private:

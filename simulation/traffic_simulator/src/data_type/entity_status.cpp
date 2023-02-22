@@ -19,14 +19,14 @@ namespace traffic_simulator
 {
 namespace entity_status
 {
-CanonicalizedEntityStatus::CanonicalizedEntityStatus(
+CanonicalizedEntityStatusType::CanonicalizedEntityStatusType(
   const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : entity_status_(canonicalize(may_non_canonicalized_entity_status, hdmap_utils))
 {
 }
 
-auto CanonicalizedEntityStatus::canonicalize(
+auto CanonicalizedEntityStatusType::canonicalize(
   const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
   -> traffic_simulator_msgs::msg::EntityStatus

@@ -27,7 +27,7 @@ namespace entity
 {
 VehicleEntity::VehicleEntity(
   const std::string & name,
-  const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status,
+  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const std::string & plugin_name)
@@ -83,7 +83,7 @@ auto VehicleEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto VehicleEntity::getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
+auto VehicleEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPoseType>
 {
   return route_planner_.getGoalPoses();
 }
@@ -159,7 +159,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
       }
     }
 
-    setStatus(traffic_simulator::entity_status::CanonicalizedEntityStatus(
+    setStatus(traffic_simulator::entity_status::CanonicalizedEntityStatusType(
       status_updated, hdmap_utils_ptr_));
     updateStandStillDuration(step_time);
     updateTraveledDistance(step_time);

@@ -102,8 +102,6 @@ class EntityManager
 
   const std::shared_ptr<TrafficLightManagerBase> traffic_light_manager_ptr_;
 
-  using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
-
 public:
   template <typename Node>
   auto getOrigin(Node & node) const
@@ -288,7 +286,7 @@ public:
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
-  auto getEntityStatus(const std::string & name) const -> traffic_simulator_msgs::msg::EntityStatus;
+  auto getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatusType;
 
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
@@ -296,19 +294,20 @@ public:
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   // clang-format off
-  auto getLateralDistance(const LaneletPose &, const LaneletPose &) const -> boost::optional<double>;
-  auto getLateralDistance(const LaneletPose &, const std::string &) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &, const LaneletPose &) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &, const std::string &) const -> boost::optional<double>;
-  auto getLateralDistance(const LaneletPose &, const LaneletPose &, double matching_distance) const -> boost::optional<double>;
-  auto getLateralDistance(const LaneletPose &, const std::string &, double matching_distance) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &, const LaneletPose &, double matching_distance) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &, const std::string &, double matching_distance) const -> boost::optional<double>;
-  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &, 
+  auto getLateralDistance(const CanonicalizedLaneletPoseType &, const CanonicalizedLaneletPoseType &)                           const -> boost::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPoseType &, const std::string &)                                            const -> boost::optional<double>;
+  auto getLateralDistance(const std::string &,                  const CanonicalizedLaneletPoseType &)                           const -> boost::optional<double>;
+  auto getLateralDistance(const std::string &,                  const std::string &)                                            const -> boost::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPoseType &, const CanonicalizedLaneletPoseType &, double matching_distance) const -> boost::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPoseType &, const std::string &,                  double matching_distance) const -> boost::optional<double>;
+  auto getLateralDistance(const std::string &,                  const CanonicalizedLaneletPoseType &, double matching_distance) const -> boost::optional<double>;
+  auto getLateralDistance(const std::string &,                  const std::string &,                  double matching_distance) const -> boost::optional<double>;
+
+  auto getLongitudinalDistance(const CanonicalizedLaneletPoseType &, const CanonicalizedLaneletPoseType &, 
     bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> boost::optional<double>;
-  auto getLongitudinalDistance(const LaneletPose &, const std::string &,
+  auto getLongitudinalDistance(const CanonicalizedLaneletPoseType &, const std::string &,
     bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> boost::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const LaneletPose &,
+  auto getLongitudinalDistance(const std::string &, const CanonicalizedLaneletPoseType &,
     bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> boost::optional<double>;
   auto getLongitudinalDistance(const std::string &, const std::string &,
     bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> boost::optional<double>;
@@ -320,14 +319,14 @@ public:
     -> boost::optional<traffic_simulator_msgs::msg::Obstacle>;
 
   // clang-format off
-  auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const geometry_msgs::msg::Pose & from, const std::string              & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string              & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string              & from, const std::string              & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const geometry_msgs::msg::Pose & from, const LaneletPose              & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const LaneletPose              & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string              & from, const LaneletPose              & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const LaneletPose              & from, const std::string              & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const std::string                  & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const std::string                  & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const CanonicalizedLaneletPoseType & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const CanonicalizedLaneletPoseType & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const std::string                  & from, const CanonicalizedLaneletPoseType & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const CanonicalizedLaneletPoseType & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
   // clang-format on
 
   auto getStepTime() const noexcept -> double;
@@ -337,7 +336,7 @@ public:
   template <typename T>
   auto getGoalPoses(const std::string & name) -> std::vector<T>
   {
-    if constexpr (std::is_same_v<std::decay_t<T>, traffic_simulator_msgs::msg::LaneletPose>) {
+    if constexpr (std::is_same_v<std::decay_t<T>, CanonicalizedLaneletPoseType>) {
       if (not npc_logic_started_) {
         return {};
       } else {
@@ -348,8 +347,7 @@ public:
         return {};
       } else {
         std::vector<geometry_msgs::msg::Pose> poses;
-        for (const auto & lanelet_pose :
-             getGoalPoses<traffic_simulator_msgs::msg::LaneletPose>(name)) {
+        for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPoseType>(name)) {
           poses.push_back(toMapPose(lanelet_pose));
         }
         return poses;
@@ -380,8 +378,8 @@ public:
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
   auto setEntityStatus(
-    const std::string & name, const traffic_simulator::entity_status::CanonicalizedEntityStatus &)
-    -> void;
+    const std::string & name,
+    const traffic_simulator::entity_status::CanonicalizedEntityStatusType &) -> void;
 
   void setVerbose(const bool verbose);
 
@@ -453,8 +451,7 @@ public:
     }
   }
 
-  auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &) const
-    -> const geometry_msgs::msg::Pose;
+  auto toMapPose(const CanonicalizedLaneletPoseType &) const -> const geometry_msgs::msg::Pose;
 
   template <typename MessageT, typename... Args>
   auto createPublisher(Args &&... args)

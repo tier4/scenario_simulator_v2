@@ -48,7 +48,8 @@ class EntityBase
 {
 public:
   explicit EntityBase(
-    const std::string & name, const traffic_simulator::entity_status::CanonicalizedEntityStatus &,
+    const std::string & name,
+    const traffic_simulator::entity_status::CanonicalizedEntityStatusType &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   virtual ~EntityBase() = default;
@@ -100,14 +101,14 @@ public:
 
   /*   */ auto getTraveledDistance() const -> double;
 
-  virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
+  virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPoseType> = 0;
 
   /*   */ auto getLinearJerk() const -> double;
 
-  /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+  /*   */ auto getLaneletPose() const -> boost::optional<CanonicalizedLaneletPoseType>;
 
   /*   */ auto getLaneletPose(double matching_distance) const
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    -> boost::optional<CanonicalizedLaneletPoseType>;
 
   /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 
@@ -184,7 +185,7 @@ public:
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &);
 
-  virtual auto setStatus(const traffic_simulator::entity_status::CanonicalizedEntityStatus &)
+  virtual auto setStatus(const traffic_simulator::entity_status::CanonicalizedEntityStatusType &)
     -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;

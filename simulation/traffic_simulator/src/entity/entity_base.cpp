@@ -29,7 +29,7 @@ namespace entity
 {
 EntityBase::EntityBase(
   const std::string & name,
-  const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status,
+  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
@@ -204,24 +204,32 @@ auto EntityBase::getEntityStatusBeforeUpdate() const
 
 auto EntityBase::getLinearJerk() const -> double { return getStatus().action_status.linear_jerk; }
 
-auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+auto EntityBase::getLaneletPose() const -> boost::optional<CanonicalizedLaneletPoseType>
 {
-  if (status_.lanelet_pose_valid) {
-    return status_.lanelet_pose;
+  const auto status = static_cast<EntityStatusType>(getStatus());
+  if (status.lanelet_pose_valid) {
+    return CanonicalizedLaneletPoseType(status.lanelet_pose, hdmap_utils_ptr_);
   }
   return boost::none;
 }
 
 auto EntityBase::getLaneletPose(double matching_distance) const
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+  -> boost::optional<CanonicalizedLaneletPoseType>
 {
   if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getStatus().type.type) {
-    return hdmap_utils_ptr_->toLaneletPose(
-      getMapPose(), getStatus().bounding_box, true, matching_distance);
+    if (
+      const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+        getMapPose(), getStatus().bounding_box, true, matching_distance)) {
+      return CanonicalizedLaneletPoseType(lanelet_pose.get(), hdmap_utils_ptr_);
+    }
   } else {
-    return hdmap_utils_ptr_->toLaneletPose(
-      getMapPose(), getStatus().bounding_box, false, matching_distance);
+    if (
+      const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+        getMapPose(), getStatus().bounding_box, false, matching_distance)) {
+      return CanonicalizedLaneletPoseType(lanelet_pose.get(), hdmap_utils_ptr_);
+    }
   }
+  return boost::none;
 }
 
 auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
@@ -684,7 +692,7 @@ void EntityBase::setOtherStatus(
 }
 
 auto EntityBase::setStatus(
-  const traffic_simulator::entity_status::CanonicalizedEntityStatus & status) -> void
+  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void
 {
   auto new_status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status);
 
@@ -708,14 +716,16 @@ auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
   auto status = getStatus();
   status.action_status.twist.linear.x = linear_velocity;
-  setStatus(traffic_simulator::entity_status::CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
+  setStatus(
+    traffic_simulator::entity_status::CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 {
   auto status = getStatus();
   status.action_status.accel.linear.x = linear_acceleration;
-  setStatus(traffic_simulator::entity_status::CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
+  setStatus(
+    traffic_simulator::entity_status::CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
 }
 
 void EntityBase::setTrafficLightManager(
