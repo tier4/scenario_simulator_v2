@@ -46,7 +46,7 @@ auto RoutePlanner::getRouteLanelets(
   }
   // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
   cancelWaypoint(entity_lanelet_pose);
-  if (hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, route_.get())) {
+  if (route_ && hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, route_.get())) {
     return hdmap_utils_ptr_->getFollowingLanelets(
       entity_lanelet_pose.lanelet_id, route_.get(), horizon, true);
   }
