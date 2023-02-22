@@ -12,34 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_
-#define TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_
+#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ENTITY_STATUS_HPP_
+#define TRAFFIC_SIMULATOR__DATA_TYPE__ENTITY_STATUS_HPP_
 
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_pose
+namespace entity_status
 {
-class CanonicalizedLaneletPose
+class CanonicalizedEntityStatus
 {
 public:
-  explicit CanonicalizedLaneletPose(
-    const traffic_simulator_msgs::msg::LaneletPose & maybe_non_canonicalized_lanelet_pose,
+  explicit CanonicalizedEntityStatus(
+    const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const noexcept
+  explicit operator traffic_simulator_msgs::msg::EntityStatus() const noexcept
   {
-    return lanelet_pose_;
+    return entity_status_;
   }
 
 private:
   auto canonicalize(
-    const traffic_simulator_msgs::msg::LaneletPose & may_non_canonicalized_lanelet_pose,
+    const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-    -> traffic_simulator_msgs::msg::LaneletPose;
-  const traffic_simulator_msgs::msg::LaneletPose lanelet_pose_;
+    -> traffic_simulator_msgs::msg::EntityStatus;
+  const traffic_simulator_msgs::msg::EntityStatus entity_status_;
 };
-}  // namespace lanelet_pose
+}  // namespace entity_status
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_
+#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ENTITY_STATUS_HPP_

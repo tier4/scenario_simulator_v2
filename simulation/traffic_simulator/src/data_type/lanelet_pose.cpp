@@ -19,14 +19,14 @@ namespace traffic_simulator
 {
 namespace lanelet_pose
 {
-CanonicalizedLanePosition::CanonicalizedLanePosition(
+CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const traffic_simulator_msgs::msg::LaneletPose & maybe_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils))
 {
 }
 
-auto CanonicalizedLanePosition::canonicalize(
+auto CanonicalizedLaneletPose::canonicalize(
   const traffic_simulator_msgs::msg::LaneletPose & may_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
   -> traffic_simulator_msgs::msg::LaneletPose

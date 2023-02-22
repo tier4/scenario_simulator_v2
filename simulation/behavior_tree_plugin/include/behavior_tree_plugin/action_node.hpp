@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/data_type/behavior.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>

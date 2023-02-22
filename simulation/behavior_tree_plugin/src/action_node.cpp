@@ -94,7 +94,7 @@ auto ActionNode::getOtherEntityStatus(std::int64_t lanelet_id) const
 {
   std::vector<traffic_simulator_msgs::msg::EntityStatus> ret;
   for (const auto & status : other_entity_status) {
-    if (status.second.lanelet_pose_valid) {
+    if (!status.second.status.lanelet_pose.empty()) {
       if (status.second.lanelet_pose.lanelet_id == lanelet_id) {
         ret.emplace_back(status.second);
       }
@@ -243,7 +243,7 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
   const math::geometry::CatmullRomSplineInterface & spline,
   const traffic_simulator_msgs::msg::EntityStatus & status) const -> boost::optional<double>
 {
-  if (status.lanelet_pose_valid) {
+  if (!status.lanelet_pose.empty()) {
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
     return spline.getCollisionPointIn2D(polygon, false, true);
   }
@@ -265,7 +265,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double length_extension_rear) const -> boost::optional<double>
 {
   const auto status = getEntityStatus(target_name);
-  if (status.lanelet_pose_valid == true) {
+  if (!status.lanelet_pose.empty()) {
     return getDistanceToTargetEntityPolygon(
       spline, status, width_extension_right, width_extension_left, length_extension_front,
       length_extension_rear);
@@ -279,7 +279,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_left, double length_extension_front, double length_extension_rear) const
   -> boost::optional<double>
 {
-  if (status.lanelet_pose_valid) {
+  if (!status.lanelet_pose.empty()) {
     const auto polygon = math::geometry::transformPoints(
       status.pose, math::geometry::getPointsFromBbox(
                      status.bounding_box, width_extension_right, width_extension_left,
@@ -479,7 +479,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;
   entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-  entity_status_updated.lanelet_pose_valid = false;
+  entity_status_updated.lanelet_pose.clear();
   return entity_status_updated;
 }
 

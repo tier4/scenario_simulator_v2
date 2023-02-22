@@ -371,7 +371,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.scale.z = 0.4;
   text_action.lifetime = rclcpp::Duration::from_seconds(0.1);
   text_action.text = status.action_status.current_action;
-  if (status.lanelet_pose_valid) {
+  if (!status.lanelet_pose.empty()) {
     text_action.text = text_action.text + "\nid:" + std::to_string(status.lanelet_pose.lanelet_id) +
                        "\ns:" + std::to_string(status.lanelet_pose.s) +
                        "\noffset:" + std::to_string(status.lanelet_pose.offset);
