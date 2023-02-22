@@ -407,4 +407,19 @@ void API::requestLaneChange(
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
 
+auto API::canonicalize(
+  const traffic_simulator_msgs::msg::LaneletPose & may_non_canonicalized_lanelet_pose) const
+  -> traffic_simulator::lanelet_pose::CanonicalizedLaneletPose
+{
+  return traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
+    may_non_canonicalized_lanelet_pose, entity_manager_ptr_->getHdmapUtils());
+}
+
+auto API::canonicalize(
+  const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status) const
+  -> traffic_simulator::entity_status::CanonicalizedEntityStatus
+{
+  return traffic_simulator::entity_status::CanonicalizedEntityStatus(
+    may_non_canonicalized_entity_status, entity_manager_ptr_->getHdmapUtils());
+}
 }  // namespace traffic_simulator

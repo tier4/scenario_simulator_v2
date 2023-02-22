@@ -29,7 +29,9 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -307,6 +309,12 @@ public:
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 #undef FORWARD_TO_ENTITY_MANAGER
+  auto canonicalize(
+    const traffic_simulator_msgs::msg::LaneletPose & maybe_non_canonicalized_lanelet_pose) const
+    -> traffic_simulator::lanelet_pose::CanonicalizedLaneletPose;
+  auto canonicalize(
+    const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status) const
+    -> traffic_simulator::entity_status::CanonicalizedEntityStatus;
 
 private:
   bool updateSensorFrame();

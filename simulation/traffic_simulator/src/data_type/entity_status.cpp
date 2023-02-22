@@ -39,6 +39,7 @@ auto CanonicalizedEntityStatus::canonicalize(
         may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils));
   } else {
     canonicalized.lanelet_pose_valid = false;
+    canonicalized.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
   }
   return canonicalized;
 }
