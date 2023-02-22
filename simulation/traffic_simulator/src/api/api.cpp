@@ -65,7 +65,8 @@ traffic_simulator_msgs::msg::EntityStatus API::getEntityStatus(const std::string
 }
 
 auto API::setEntityStatus(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+  const std::string & name,
+  const traffic_simulator::entity_status::CanonicalizedEntityStatus & status) -> void
 {
   entity_manager_ptr_->setEntityStatus(name, status);
 }
@@ -100,7 +101,7 @@ auto API::setEntityStatus(
   } else {
     status.lanelet_pose_valid = false;
   }
-  entity_manager_ptr_->setEntityStatus(name, status);
+  entity_manager_ptr_->setEntityStatus(name, canonicalize(status));
 }
 
 boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
@@ -138,14 +139,16 @@ bool API::reachPosition(
 }
 
 auto API::setEntityStatus(
-  const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
+  const std::string & name,
+  const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   traffic_simulator_msgs::msg::EntityStatus status;
-  status.lanelet_pose = lanelet_pose;
+  status.lanelet_pose = static_cast<traffic_simulator_msgs::msg::LaneletPose>(lanelet_pose);
   status.lanelet_pose_valid = true;
   status.bounding_box = entity_manager_ptr_->getEntityStatus(name).bounding_box;
-  status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
+  status.pose = entity_manager_ptr_->toMapPose(
+    static_cast<traffic_simulator_msgs::msg::LaneletPose>(lanelet_pose));
   status.name = name;
   const auto current_time = getCurrentTime();
   if (std::isnan(current_time)) {
@@ -154,7 +157,7 @@ auto API::setEntityStatus(
     status.time = 0;
   }
   status.action_status = action_status;
-  setEntityStatus(name, status);
+  setEntityStatus(name, canonicalize(status));
 }
 
 auto API::setEntityStatus(
@@ -179,7 +182,7 @@ auto API::setEntityStatus(
     status.time = 0;
   }
   status.bounding_box = entity_manager_ptr_->getEntityStatus(name).bounding_box;
-  setEntityStatus(name, status);
+  setEntityStatus(name, canonicalize(status));
 }
 
 bool API::initialize(double realtime_factor, double step_time)
@@ -324,7 +327,7 @@ bool API::updateEntityStatusInSim()
     }
     simulation_interface::toMsg(status.action_status().twist(), status_msg.action_status.twist);
     simulation_interface::toMsg(status.action_status().accel(), status_msg.action_status.accel);
-    entity_manager_ptr_->setEntityStatus(status.name(), status_msg);
+    entity_manager_ptr_->setEntityStatus(status.name(), canonicalize(status_msg));
   }
   return res.result().success();
 }

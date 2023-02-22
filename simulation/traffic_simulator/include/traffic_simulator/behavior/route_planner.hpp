@@ -17,6 +17,7 @@
 
 #include <deque>
 #include <memory>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 
@@ -28,10 +29,11 @@ public:
   explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   auto getRouteLanelets(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon = 100)
-    -> std::vector<std::int64_t>;
+    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose & entity_lanelet_pose,
+    double horizon = 100) -> std::vector<std::int64_t>;
 
-  auto setWaypoints(const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
+  auto setWaypoints(
+    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> & waypoints)
     -> void;
 
   void cancelRoute();

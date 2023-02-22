@@ -77,7 +77,7 @@ public:
   explicit EgoEntity() = delete;
 
   explicit EgoEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::string & name, const traffic_simulator::entity_status::CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
     const double step_time);
@@ -118,11 +118,13 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override;
+  void requestAcquirePosition(
+    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
-  void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override;
+  void requestAssignRoute(
+    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> &) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
@@ -141,7 +143,8 @@ public:
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
 
-  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
+  auto setStatus(const traffic_simulator::entity_status::CanonicalizedEntityStatus & status)
+    -> void override;
 
   void requestSpeedChange(double, bool continuous) override;
 

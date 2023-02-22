@@ -54,7 +54,7 @@ public:
   };
 
   explicit VehicleEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::string & name, const traffic_simulator::entity_status::CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
@@ -84,13 +84,14 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &);
+  void requestAcquirePosition(const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose &);
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
-  void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override;
+  void requestAssignRoute(
+    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> &) override;
 
   void requestLaneChange(const std::int64_t to_lanelet_id) override;
 

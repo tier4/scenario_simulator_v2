@@ -23,6 +23,7 @@
 #include <queue>
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -47,7 +48,7 @@ class EntityBase
 {
 public:
   explicit EntityBase(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::string & name, const traffic_simulator::entity_status::CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   virtual ~EntityBase() = default;
@@ -57,17 +58,6 @@ public:
   virtual auto asAutoware() const -> concealer::Autoware &;
 
   virtual void cancelRequest();
-
-  /*   */ auto canonicalizeLaneletPose(
-    const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
-    -> traffic_simulator_msgs::msg::LaneletPose;
-
-  /*   */ auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::EntityStatus & status)
-    const -> traffic_simulator_msgs::msg::EntityStatus;
-
-  /*   */ auto canonicalizeLaneletPoses(
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_poses) const
-    -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 
@@ -141,12 +131,13 @@ public:
 
   /*   */ void resetDynamicConstraints();
 
-  virtual void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) = 0;
+  virtual void requestAcquirePosition(
+    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose &) = 0;
 
   virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &) = 0;
 
   virtual void requestAssignRoute(
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) = 0;
+    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> &) = 0;
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
@@ -193,7 +184,8 @@ public:
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &);
 
-  virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> void;
+  virtual auto setStatus(const traffic_simulator::entity_status::CanonicalizedEntityStatus &)
+    -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 

@@ -28,16 +28,16 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::string & name,
+  const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
-  status_(entity_status),
+  status_(static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status)),
   status_before_update_(status_),
   hdmap_utils_ptr_(hdmap_utils_ptr),
   npc_logic_started_(false)
 {
-  status_ = canonicalizeLaneletPose(status_);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -51,49 +51,6 @@ auto EntityBase::asAutoware() const -> concealer::Autoware &
 }
 
 void EntityBase::cancelRequest() {}
-
-auto EntityBase::canonicalizeLaneletPose(
-  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
-  -> traffic_simulator_msgs::msg::LaneletPose
-{
-  if (const auto ret = hdmap_utils_ptr_->canonicalizeLaneletPose(lanelet_pose)) {
-    return ret.get();
-  } else {
-    THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
-      ",offset=", lanelet_pose.offset, ",rpy.x=", lanelet_pose.rpy.x, ",rpy.y=", lanelet_pose.rpy.y,
-      ",rpy.z=", lanelet_pose.rpy.z, ") is invalid, please check lanelet length and connection.");
-  }
-}
-
-auto EntityBase::canonicalizeLaneletPose(const traffic_simulator_msgs::msg::EntityStatus & status)
-  const -> traffic_simulator_msgs::msg::EntityStatus
-{
-  traffic_simulator_msgs::msg::EntityStatus clamped_status = status;
-  if (status.lanelet_pose_valid) {
-    if (const auto lanelet_pose = hdmap_utils_ptr_->canonicalizeLaneletPose(status.lanelet_pose)) {
-      clamped_status.lanelet_pose_valid = true;
-      clamped_status.lanelet_pose = lanelet_pose.get();
-    } else {
-      clamped_status.lanelet_pose_valid = false;
-      clamped_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-    }
-  }
-  return clamped_status;
-}
-
-auto EntityBase::canonicalizeLaneletPoses(
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_poses) const
-  -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
-{
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> ret;
-  std::transform(
-    lanelet_poses.begin(), lanelet_poses.end(), std::back_inserter(ret),
-    [this](const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) {
-      return canonicalizeLaneletPose(lanelet_pose);
-    });
-  return ret;
-}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
@@ -726,9 +683,10 @@ void EntityBase::setOtherStatus(
   }
 }
 
-auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+auto EntityBase::setStatus(
+  const traffic_simulator::entity_status::CanonicalizedEntityStatus & status) -> void
 {
-  auto new_status = status;
+  auto new_status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status);
 
   /*
      FIXME: DIRTY HACK!!!
@@ -744,21 +702,20 @@ auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
   new_status.action_status.current_action = getCurrentAction();
 
   status_ = new_status;
-  canonicalizeLaneletPose(status_);
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
   auto status = getStatus();
   status.action_status.twist.linear.x = linear_velocity;
-  setStatus(status);
+  setStatus(traffic_simulator::entity_status::CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 {
   auto status = getStatus();
   status.action_status.accel.linear.x = linear_acceleration;
-  setStatus(status);
+  setStatus(traffic_simulator::entity_status::CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 void EntityBase::setTrafficLightManager(

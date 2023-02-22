@@ -22,35 +22,37 @@ RoutePlanner::RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdma
 }
 
 auto RoutePlanner::setWaypoints(
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints) -> void
+  const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> & waypoints) -> void
 {
   // Just setting waypoints to the queue, do not planning route.
   waypoint_queue_.clear();
   for (const auto & waypoint : waypoints) {
-    waypoint_queue_.push_back(waypoint);
+    waypoint_queue_.push_back(static_cast<traffic_simulator_msgs::msg::LaneletPose>(waypoint));
   }
 }
 
 auto RoutePlanner::getRouteLanelets(
-  const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon)
-  -> std::vector<std::int64_t>
+  const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose & entity_lanelet_pose,
+  double horizon) -> std::vector<std::int64_t>
 {
+  const auto lanelet_pose =
+    static_cast<traffic_simulator_msgs::msg::LaneletPose>(entity_lanelet_pose);
   // If the queue is not empty, calculating route from the entity_lanelet_pose to waypoint_queue_.front()
   if (!waypoint_queue_.empty()) {
-    updateRoute(entity_lanelet_pose);
+    updateRoute(lanelet_pose);
   }
   // If the route from the entity_lanelet_pose to waypoint_queue_.front() was failed to calculate in updateRoute function,
   // use following lanelet as route.
   if (!route_) {
-    return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
+    return hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
   }
   // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
-  cancelWaypoint(entity_lanelet_pose);
-  if (route_ && hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, route_.get())) {
+  cancelWaypoint(lanelet_pose);
+  if (route_ && hdmap_utils_ptr_->isInRoute(lanelet_pose.lanelet_id, route_.get())) {
     return hdmap_utils_ptr_->getFollowingLanelets(
-      entity_lanelet_pose.lanelet_id, route_.get(), horizon, true);
+      lanelet_pose.lanelet_id, route_.get(), horizon, true);
   }
-  return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
+  return hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
 }
 
 void RoutePlanner::cancelRoute()

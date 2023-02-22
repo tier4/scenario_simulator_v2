@@ -191,13 +191,15 @@ public:
   geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
   auto setEntityStatus(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+    const std::string & name,
+    const traffic_simulator::entity_status::CanonicalizedEntityStatus & status) -> void;
   auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
   auto setEntityStatus(
-    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
+    const std::string & name,
+    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
   auto setEntityStatus(

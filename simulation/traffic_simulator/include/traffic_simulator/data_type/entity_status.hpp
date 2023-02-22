@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ENTITY_STATUS_HPP_
 #define TRAFFIC_SIMULATOR__DATA_TYPE__ENTITY_STATUS_HPP_
 
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>

@@ -26,7 +26,7 @@ class MiscObjectEntity : public EntityBase
 {
 public:
   explicit MiscObjectEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::string & name, const traffic_simulator::entity_status::CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
@@ -66,7 +66,8 @@ public:
 
   void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool) override;
 
-  void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override
+  void requestAssignRoute(
+    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> &) override
   {
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
@@ -76,7 +77,8 @@ public:
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
 
-  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override
+  void requestAcquirePosition(
+    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }
