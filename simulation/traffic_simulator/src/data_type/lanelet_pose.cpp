@@ -19,7 +19,6 @@ namespace traffic_simulator
 {
 namespace lanelet_pose
 {
-
 CanonicalizedLanePosition::CanonicalizedLanePosition(
   const traffic_simulator_msgs::msg::LaneletPose & maybe_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
