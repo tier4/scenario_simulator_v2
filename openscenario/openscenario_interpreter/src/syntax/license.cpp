@@ -21,11 +21,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-License::License(const pugi::xml_node & tree, Scope & scope)
-: name(readAttribute<String>("name", tree, scope)),
-  resource(readAttribute<String>("resource", tree, scope, String())),  // NOTE: Optional attribute
-  spdxId(readAttribute<String>("spdxId", tree, scope, String())),      // NOTE: Optional attribute
-  text(readContent<String>(tree, scope))                               // NOTE: Optional content
+License::License(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope)),
+  resource(readAttribute<String>("resource", node, scope, String())),  // NOTE: Optional attribute
+  spdx_id(readAttribute<String>("spdxId", node, scope, String())),      // NOTE: Optional attribute
+  text(readContent<String>(node, scope))                               // NOTE: Optional content
 {
 }
 }  // namespace syntax

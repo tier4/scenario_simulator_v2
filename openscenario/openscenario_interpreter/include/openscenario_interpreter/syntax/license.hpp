@@ -44,11 +44,11 @@ struct License
 
   const String resource;
 
-  const String spdxId;
+  const String spdx_id;
 
   const String text;
 
-  explicit License() = default;
+  License() = default;
 
   explicit License(const pugi::xml_node &, Scope &);
 };
