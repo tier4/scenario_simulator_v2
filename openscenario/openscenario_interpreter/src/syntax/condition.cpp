@@ -70,16 +70,54 @@ auto Condition::evaluate() -> Object
   if (next_delayed_evaluation == std::begin(evaluation_history)) {
     return false_v;
   }
-
-  // get the latest delayed entry
   auto delayed_evaluation = std::prev(next_delayed_evaluation);
   auto [current_time, current_result] = *delayed_evaluation;
 
-  // remove all delayed entries except the latest one
-  // NOTE: the latest delayed entry is left for use in next evaluation
-  evaluation_history.erase(std::begin(evaluation_history), delayed_evaluation);
+  switch (condition_edge) {
+    case ConditionEdge::rising:
+    case ConditionEdge::falling:
+    case ConditionEdge::risingOrFalling: {
+      // these condition edges require two evaluation entries,
+      // so if `delayed_evaluation` is the only entry, simply return `false_v`
+      if (delayed_evaluation == std::begin(evaluation_history)) {
+        return false_v;
+      }
+      auto previous_delayed_evaluation = std::prev(delayed_evaluation);
+      auto [previous_time, previous_result] = *previous_delayed_evaluation;
 
-  return asBoolean(current_value = current_result);
+      switch (condition_edge) {
+        case ConditionEdge::rising:
+          current_value = current_result and not previous_result;
+          break;
+
+        case ConditionEdge::falling:
+          current_value = not current_result and previous_result;
+          break;
+
+        case ConditionEdge::risingOrFalling:
+          current_value = current_result != previous_result;
+          break;
+
+        default:
+          throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
+      }
+
+      evaluation_history.erase(std::begin(evaluation_history), previous_delayed_evaluation);
+      break;
+    }
+
+    case ConditionEdge::none:
+    case ConditionEdge::sticky: {
+      current_value = current_result;
+      evaluation_history.erase(std::begin(evaluation_history), delayed_evaluation);
+      break;
+    }
+
+    default:
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
+  }
+
+  return asBoolean(current_value);
 }
 
 auto operator<<(nlohmann::json & json, const Condition & datum) -> nlohmann::json &
