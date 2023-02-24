@@ -24,7 +24,7 @@ inline namespace syntax
 License::License(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   resource(readAttribute<String>("resource", node, scope, String())),  // NOTE: Optional attribute
-  spdx_id(readAttribute<String>("spdxId", node, scope, String())),      // NOTE: Optional attribute
+  spdx_id(readAttribute<String>("spdxId", node, scope, String())),     // NOTE: Optional attribute
   text(readContent<String>(node, scope))                               // NOTE: Optional content
 {
 }
