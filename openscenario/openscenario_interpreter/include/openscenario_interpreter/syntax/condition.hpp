@@ -17,6 +17,7 @@
 
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -39,7 +40,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Condition : public ComplexType
+struct Condition : public ComplexType, private SimulatorCore::ConditionEvaluation
 {
   const String name;
 
@@ -49,9 +50,16 @@ struct Condition : public ComplexType
 
   bool current_value;
 
+private:
+  using EvaluationEntry = std::pair<double, bool>;
+
+  std::list<EvaluationEntry> evaluation_history;
+
+public:
   explicit Condition(const pugi::xml_node & node, Scope & scope);
 
   auto evaluate() -> Object;
+
 };
 
 auto operator<<(nlohmann::json &, const Condition &) -> nlohmann::json &;

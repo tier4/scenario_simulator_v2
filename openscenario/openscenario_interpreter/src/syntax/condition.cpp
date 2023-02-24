@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
+#include <iterator>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/by_entity_condition.hpp>
 #include <openscenario_interpreter/syntax/by_value_condition.hpp>
 #include <openscenario_interpreter/syntax/condition.hpp>
+#include <openscenario_interpreter/syntax/condition_edge.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 
 namespace openscenario_interpreter
@@ -45,9 +49,37 @@ auto Condition::evaluate() -> Object
 {
   if (condition_edge == ConditionEdge::sticky and current_value) {
     return true_v;
-  } else {
-    return asBoolean(current_value = Object::evaluate().as<Boolean>());
   }
+
+  // push evaluation entry to `evaluation_history`
+  // `evaluation_history` contains past evaluation entries in order of evaluation time
+  auto latest_time = evaluateSimulationTime();
+  auto latest_result = ComplexType::evaluate().as<Boolean>();
+  evaluation_history.emplace_back(latest_time, latest_result);
+
+  // find the oldest evaluation entry which was evaluated in the last `delay` time
+  auto next_delayed_evaluation = std::find_if(
+    std::begin(evaluation_history), std::end(evaluation_history),
+    [&](const EvaluationEntry & entry) {
+      const auto & [past_time, past_result] = entry;
+      return past_time >= latest_time - delay;
+    });
+
+  // if `next_delayed_evaluation` points the first entry of `evaluation_history`,
+  // ongoing simulation did not pass the `delay` time, so simply return `false_v` here
+  if (next_delayed_evaluation == std::begin(evaluation_history)) {
+    return false_v;
+  }
+
+  // get the latest delayed entry
+  auto delayed_evaluation = std::prev(next_delayed_evaluation);
+  auto [current_time, current_result] = *delayed_evaluation;
+
+  // remove all delayed entries except the latest one
+  // NOTE: the latest delayed entry is left for use in next evaluation
+  evaluation_history.erase(std::begin(evaluation_history), delayed_evaluation);
+
+  return asBoolean(current_value = current_result);
 }
 
 auto operator<<(nlohmann::json & json, const Condition & datum) -> nlohmann::json &
