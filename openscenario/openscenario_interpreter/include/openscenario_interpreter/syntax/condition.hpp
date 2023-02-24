@@ -59,7 +59,6 @@ public:
   explicit Condition(const pugi::xml_node & node, Scope & scope);
 
   auto evaluate() -> Object;
-
 };
 
 auto operator<<(nlohmann::json &, const Condition &) -> nlohmann::json &;
