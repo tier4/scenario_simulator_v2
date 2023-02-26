@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/move_backward_action.hpp>
+
 #include <optional>
 
 namespace entity_behavior
@@ -75,6 +76,10 @@ BT::NodeStatus MoveBackwardAction::tick()
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
+  }
+  if (!target_speed) {
+    target_speed = hdmap_utils->getSpeedLimit(
+      hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id));
   }
   setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.value()));
   const auto obstacle = calculateObstacle(waypoints);
