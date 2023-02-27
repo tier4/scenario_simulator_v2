@@ -265,7 +265,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double length_extension_rear) const -> boost::optional<double>
 {
   const auto status = getEntityStatus(target_name);
-  if (!status.lanelet_pose_valid) {
+  if (status.lanelet_pose_valid) {
     return getDistanceToTargetEntityPolygon(
       spline, status, width_extension_right, width_extension_left, length_extension_front,
       length_extension_rear);
@@ -279,7 +279,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_left, double length_extension_front, double length_extension_rear) const
   -> boost::optional<double>
 {
-  if (!status.lanelet_pose_valid) {
+  if (status.lanelet_pose_valid) {
     const auto polygon = math::geometry::transformPoints(
       status.pose, math::geometry::getPointsFromBbox(
                      status.bounding_box, width_extension_right, width_extension_left,
