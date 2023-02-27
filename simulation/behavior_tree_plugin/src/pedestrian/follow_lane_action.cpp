@@ -40,7 +40,7 @@ BT::NodeStatus FollowLaneAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (entity_status.lanelet_pose_valid) {
+  if (!entity_status.lanelet_pose_valid) {
     setOutput("updated_status", stopAtEndOfRoad());
     return BT::NodeStatus::RUNNING;
   }

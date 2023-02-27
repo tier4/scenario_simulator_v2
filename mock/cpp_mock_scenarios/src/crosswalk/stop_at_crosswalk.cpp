@@ -46,22 +46,17 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (t <= 1.0) {
-      const auto vel =
-        static_cast<EntityStatusType>(api_.getEntityStatus("bob")).action_status.twist.linear.x;
-      if (t != vel) {
+      if (t != api_.getCurrentTwist("bob").linear.x) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
     if (t >= 6.6) {
       if (7.5 >= t) {
-        const auto vel = api_.getCurrentTwist("ego").linear.x;
-        if (std::fabs(0.1) <= vel) {
+        if (std::fabs(0.1) <= api_.getCurrentTwist("ego").linear.x) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }
       } else {
-        const auto vel = api_.getCurrentTwist("ego").linear.x;
-        std::cout << vel << std::endl;
-        if (0.1 >= vel) {
+        if (0.1 >= api_.getCurrentTwist("ego").linear.x) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }
       }
