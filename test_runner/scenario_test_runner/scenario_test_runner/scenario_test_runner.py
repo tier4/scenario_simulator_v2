@@ -24,6 +24,7 @@ from shutil import rmtree
 from sys import exit
 from typing import List
 import os
+from rclpy.executors import ExternalShutdownException
 
 import rclpy
 from openscenario_preprocessor_msgs.srv import (
@@ -162,10 +163,9 @@ class ScenarioTestRunner(LifecycleController):
     def spin(self):
         """Run scenario."""
         time.sleep(self.SLEEP_RATE)
-
         while self.activate_node():
             start = time.time()
-            while True:
+            while rclpy.ok():
                 if self.get_lifecycle_state() == "inactive":
                     break
                 elif ((time.time() - start) > self.global_timeout
@@ -211,6 +211,7 @@ class ScenarioTestRunner(LifecycleController):
                 exit(1)
 
         self.shutdown()
+        self.destroy_node()
 
     def run_preprocessed_scenarios(self, scenarios: List[Scenario]):
         """
@@ -256,8 +257,11 @@ class ScenarioTestRunner(LifecycleController):
 
                 self.cleanup_node()
 
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, ExternalShutdownException):
             self.get_logger().warn("KeyboardInterrupt")
+            self.destroy_node()
+            rclpy.try_shutdown()
+            exit(0)
         except OSError as e:
             self.get_logger().warn("OSError: {}".format(e))
         except Exception as e:
