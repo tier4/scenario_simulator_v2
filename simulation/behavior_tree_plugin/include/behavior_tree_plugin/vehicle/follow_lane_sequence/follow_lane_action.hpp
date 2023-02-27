@@ -46,7 +46,7 @@ public:
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
 
 private:
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> target_lanelet_pose_;
+  boost::optional<LaneletPoseType> target_lanelet_pose_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

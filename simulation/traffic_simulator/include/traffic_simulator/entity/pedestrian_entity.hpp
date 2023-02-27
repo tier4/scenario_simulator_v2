@@ -65,8 +65,7 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(
-    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose & lanelet_pose) override;
+  void requestAcquirePosition(const CanonicalizedLaneletPoseType & lanelet_pose) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
@@ -89,9 +88,7 @@ public:
 
   void setDecelerationRateLimit(double deceleration) override;
 
-  void requestAssignRoute(
-    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> & waypoints)
-    override;
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> & waypoints) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 

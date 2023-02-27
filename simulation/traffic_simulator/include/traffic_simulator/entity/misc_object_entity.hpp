@@ -67,8 +67,7 @@ public:
 
   void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool) override;
 
-  void requestAssignRoute(
-    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> &) override
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> &) override
   {
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
@@ -78,8 +77,7 @@ public:
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
 
-  void requestAcquirePosition(
-    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose &) override
+  void requestAcquirePosition(const CanonicalizedLaneletPoseType &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }

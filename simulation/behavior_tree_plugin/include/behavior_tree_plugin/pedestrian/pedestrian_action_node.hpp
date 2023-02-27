@@ -51,7 +51,7 @@ protected:
 
 private:
   auto estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    -> boost::optional<LaneletPoseType>;
 };
 }  // namespace entity_behavior
 

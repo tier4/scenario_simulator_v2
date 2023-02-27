@@ -198,8 +198,7 @@ public:
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
   auto setEntityStatus(
-    const std::string & name,
-    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose & lanelet_pose,
+    const std::string & name, const CanonicalizedLaneletPoseType & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
   auto setEntityStatus(
@@ -219,7 +218,7 @@ public:
   bool reachPosition(
     const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance);
   bool reachPosition(
-    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & target_pose,
+    const std::string & name, const CanonicalizedLaneletPoseType & target_pose,
     const double tolerance);
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
@@ -311,9 +310,8 @@ public:
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 #undef FORWARD_TO_ENTITY_MANAGER
-  auto canonicalize(
-    const traffic_simulator_msgs::msg::LaneletPose & maybe_non_canonicalized_lanelet_pose) const
-    -> traffic_simulator::lanelet_pose::CanonicalizedLaneletPose;
+  auto canonicalize(const LaneletPoseType & maybe_non_canonicalized_lanelet_pose) const
+    -> CanonicalizedLaneletPoseType;
   auto canonicalize(
     const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status) const
     -> traffic_simulator::entity_status::CanonicalizedEntityStatusType;

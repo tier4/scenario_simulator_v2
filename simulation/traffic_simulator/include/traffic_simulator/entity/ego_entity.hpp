@@ -119,13 +119,11 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(
-    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose &) override;
+  void requestAcquirePosition(const CanonicalizedLaneletPoseType &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
-  void requestAssignRoute(
-    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> &) override;
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> &) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 

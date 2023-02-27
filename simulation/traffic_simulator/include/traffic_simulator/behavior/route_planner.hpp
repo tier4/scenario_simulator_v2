@@ -39,9 +39,9 @@ public:
   std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame() const;
 
 private:
-  void cancelWaypoint(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
+  void cancelWaypoint(const LaneletPoseType & entity_lanelet_pose);
 
-  void updateRoute(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
+  void updateRoute(const LaneletPoseType & entity_lanelet_pose);
 
   boost::optional<std::vector<std::int64_t>> route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
@@ -51,7 +51,7 @@ private:
      elements for getGoalPoses, so we use std::deque instead of std::queue
      which is not iterable.
   */
-  std::deque<traffic_simulator_msgs::msg::LaneletPose> waypoint_queue_;
+  std::deque<LaneletPoseType> waypoint_queue_;
 };
 }  // namespace traffic_simulator
 

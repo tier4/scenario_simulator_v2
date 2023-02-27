@@ -34,12 +34,11 @@ auto CanonicalizedEntityStatusType::canonicalize(
   auto canonicalized = may_non_canonicalized_entity_status;
   if (may_non_canonicalized_entity_status.lanelet_pose_valid) {
     canonicalized.lanelet_pose_valid = true;
-    canonicalized.lanelet_pose = static_cast<traffic_simulator_msgs::msg::LaneletPose>(
-      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
-        may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils));
+    canonicalized.lanelet_pose = static_cast<LaneletPoseType>(
+      CanonicalizedLaneletPoseType(may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils));
   } else {
     canonicalized.lanelet_pose_valid = false;
-    canonicalized.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    canonicalized.lanelet_pose = LaneletPoseType();
   }
   return canonicalized;
 }

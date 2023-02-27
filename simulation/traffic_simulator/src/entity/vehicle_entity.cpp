@@ -97,9 +97,7 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t
 {
   if (status_.lanelet_pose_valid) {
     return route_planner_.getRouteLanelets(
-      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
-        status_.lanelet_pose, hdmap_utils_ptr_),
-      horizon);
+      CanonicalizedLaneletPoseType(status_.lanelet_pose, hdmap_utils_ptr_), horizon);
   } else {
     return {};
   }
@@ -169,8 +167,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void VehicleEntity::requestAcquirePosition(
-  const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose & lanelet_pose)
+void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPoseType & lanelet_pose)
 {
   if (status_.lanelet_pose_valid) {
     route_planner_.setWaypoints({lanelet_pose});
@@ -182,15 +179,13 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
   if (const auto lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(map_pose, getStatus().bounding_box, false);
       lanelet_pose) {
-    requestAcquirePosition(traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
-      lanelet_pose.get(), hdmap_utils_ptr_));
+    requestAcquirePosition(CanonicalizedLaneletPoseType(lanelet_pose.get(), hdmap_utils_ptr_));
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
   }
 }
 
-void VehicleEntity::requestAssignRoute(
-  const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> & waypoints)
+void VehicleEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> & waypoints)
 {
   if (status_.lanelet_pose_valid) {
     route_planner_.setWaypoints(waypoints);
@@ -199,13 +194,12 @@ void VehicleEntity::requestAssignRoute(
 
 void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
-  std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> route;
+  std::vector<CanonicalizedLaneletPoseType> route;
   for (const auto & waypoint : waypoints) {
     if (const auto lanelet_waypoint =
           hdmap_utils_ptr_->toLaneletPose(waypoint, getStatus().bounding_box, false);
         lanelet_waypoint) {
-      route.emplace_back(traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
-        lanelet_waypoint.get(), hdmap_utils_ptr_));
+      route.emplace_back(CanonicalizedLaneletPoseType(lanelet_waypoint.get(), hdmap_utils_ptr_));
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
     }

@@ -127,11 +127,13 @@ bool API::reachPosition(
 }
 
 bool API::reachPosition(
-  const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & target_pose,
+  const std::string & name, const CanonicalizedLaneletPoseType & target_pose,
   const double tolerance)
 {
   return entity_manager_ptr_->reachPosition(
-    name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
+    name, static_cast<LaneletPoseType>(target_pose).lanelet_id,
+    static_cast<LaneletPoseType>(target_pose).s, static_cast<LaneletPoseType>(target_pose).offset,
+    tolerance);
 }
 
 bool API::reachPosition(
@@ -141,12 +143,11 @@ bool API::reachPosition(
 }
 
 auto API::setEntityStatus(
-  const std::string & name,
-  const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose & lanelet_pose,
+  const std::string & name, const CanonicalizedLaneletPoseType & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   traffic_simulator_msgs::msg::EntityStatus status;
-  status.lanelet_pose = static_cast<traffic_simulator_msgs::msg::LaneletPose>(lanelet_pose);
+  status.lanelet_pose = static_cast<LaneletPoseType>(lanelet_pose);
   status.lanelet_pose_valid = true;
   status.bounding_box =
     static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(name)).bounding_box;
@@ -330,7 +331,7 @@ bool API::updateEntityStatusInSim()
       status_msg.lanelet_pose = lanelet_pose.get();
     } else {
       status_msg.lanelet_pose_valid = false;
-      status_msg.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+      status_msg.lanelet_pose = LaneletPoseType();
     }
     simulation_interface::toMsg(status.action_status().twist(), status_msg.action_status.twist);
     simulation_interface::toMsg(status.action_status().accel(), status_msg.action_status.accel);
@@ -417,11 +418,10 @@ void API::requestLaneChange(
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
 
-auto API::canonicalize(
-  const traffic_simulator_msgs::msg::LaneletPose & may_non_canonicalized_lanelet_pose) const
-  -> traffic_simulator::lanelet_pose::CanonicalizedLaneletPose
+auto API::canonicalize(const LaneletPoseType & may_non_canonicalized_lanelet_pose) const
+  -> CanonicalizedLaneletPoseType
 {
-  return traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
+  return CanonicalizedLaneletPoseType(
     may_non_canonicalized_lanelet_pose, entity_manager_ptr_->getHdmapUtils());
 }
 

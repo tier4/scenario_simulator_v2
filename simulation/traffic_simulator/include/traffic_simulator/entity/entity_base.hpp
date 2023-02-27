@@ -132,13 +132,11 @@ public:
 
   /*   */ void resetDynamicConstraints();
 
-  virtual void requestAcquirePosition(
-    const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose &) = 0;
+  virtual void requestAcquirePosition(const CanonicalizedLaneletPoseType &) = 0;
 
   virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &) = 0;
 
-  virtual void requestAssignRoute(
-    const std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> &) = 0;
+  virtual void requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> &) = 0;
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 

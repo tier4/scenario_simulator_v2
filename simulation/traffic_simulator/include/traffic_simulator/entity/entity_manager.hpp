@@ -388,7 +388,7 @@ public:
     const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
   {
     auto makeEntityStatus = [&]() {
-      traffic_simulator_msgs::msg::EntityStatus entity_status;
+      EntityStatusType entity_status;
 
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
         if (auto iter = std::find_if(
@@ -417,9 +417,9 @@ public:
 
       entity_status.action_status = traffic_simulator_msgs::msg::ActionStatus();
 
-      if constexpr (std::is_same_v<std::decay_t<Pose>, traffic_simulator_msgs::msg::LaneletPose>) {
+      if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPoseType>) {
         entity_status.pose = toMapPose(pose);
-        entity_status.lanelet_pose = pose;
+        entity_status.lanelet_pose = static_cast<LaneletPoseType>(pose);
         entity_status.lanelet_pose_valid = true;
       } else {
         entity_status.pose = pose;
@@ -433,7 +433,7 @@ public:
         }
       }
 
-      return entity_status;
+      return CanonicalizedEntityStatusType(entity_status, hdmap_utils_ptr_);
     };
 
     if (const auto [iter, success] = entities_.emplace(

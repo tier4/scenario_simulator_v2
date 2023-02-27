@@ -89,11 +89,16 @@ public:
       }
     }
 
+    static auto canonicalize(const NativeLanePosition & native_lane_position)
+    {
+      return core->canonicalize(native_lane_position);
+    }
+
     template <
       typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
     static auto convert(const NativeLanePosition & native_lane_position)
     {
-      return core->toMapPose(native_lane_position);
+      return core->toMapPose(canonicalize(native_lane_position));
     }
 
     template <typename OSCLanePosition>
@@ -321,7 +326,8 @@ public:
     template <typename... Ts>
     static auto evaluateAcceleration(Ts &&... xs)
     {
-      return core->getEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.accel.linear.x;
+      return static_cast<EntityStatusType>(core->getEntityStatus(std::forward<decltype(xs)>(xs)...))
+        .action_status.accel.linear.x;
     }
 
     template <typename... Ts>
@@ -355,7 +361,8 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return core->getEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.twist.linear.x;
+      return static_cast<EntityStatusType>(core->getEntityStatus(std::forward<decltype(xs)>(xs)...))
+        .action_status.twist.linear.x;
     }
 
     template <typename... Ts>

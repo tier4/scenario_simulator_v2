@@ -46,7 +46,7 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (t <= 1.0) {
-      const auto vel = api_.getEntityStatus("bob").action_status.twist.linear.x;
+      const auto vel = api_.getCurrentTwist("bob").linear.x;
       if (t != vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
@@ -66,16 +66,17 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(120545, 0), getVehicleParameters());
+      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(120545, 0)),
+      getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 8, true);
     api_.requestAssignRoute(
-      "ego", std::vector<traffic_simulator_msgs::msg::LaneletPose>{
-               traffic_simulator::helper::constructLaneletPose(34675, 0.0),
-               traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
+      "ego", std::vector<CanonicalizedLaneletPoseType>{
+               api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)),
+               api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34690, 0.0))});
 
     api_.spawn(
-      "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+      "bob", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34378, 0.0)),
       getPedestrianParameters());
     api_.setLinearVelocity("bob", 0);
     api_.requestWalkStraight("bob");
