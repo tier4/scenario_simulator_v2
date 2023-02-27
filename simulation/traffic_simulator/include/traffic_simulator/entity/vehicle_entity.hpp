@@ -46,7 +46,7 @@ public:
 
     static auto contextGamma() -> const std::string &
     {
-      static const std::string name = "TODO";
+      static const std::string name = "context_gamma_planner/VehiclePlugin";
       return name;
     }
 
