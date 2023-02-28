@@ -28,6 +28,12 @@
 
 namespace concealer
 {
+  /**
+   * Provides an abstraction to communicate with Autoware in order to:
+   * - receive vehicle commands to simulate vehicle kinematics
+   * - provide vehicle state reports on an appropriate topics
+   * NOTE: This class is intended to be move to simple_sensor_simulation
+   */
 
 class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Autoware>
 {

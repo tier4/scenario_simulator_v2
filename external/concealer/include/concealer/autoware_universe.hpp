@@ -30,6 +30,10 @@
 namespace concealer
 {
 
+  /**
+   * Implements Autoware interface for Autoware Universe
+   * NOTE: This class is intended to be move to simple_sensor_simulation
+   */
 class AutowareUniverse : public Autoware
 {
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
