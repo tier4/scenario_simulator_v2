@@ -62,7 +62,7 @@ auto Condition::evaluate() -> Object
     std::begin(evaluation_history), std::end(evaluation_history),
     [&](const EvaluationEntry & entry) {
       const auto & [past_time, past_result] = entry;
-      return past_time >= latest_time - delay;
+      return past_time > latest_time - delay;
     });
 
   // if `next_delayed_evaluation` points the first entry of `evaluation_history`,
