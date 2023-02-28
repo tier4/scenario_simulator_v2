@@ -74,10 +74,10 @@ void TestExecutor::initialize()
 
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
     api_->spawn(
-      ego_name_, test_description_.ego_start_position, getVehicleParameters(),
+      ego_name_, api_->canonicalize(test_description_.ego_start_position), getVehicleParameters(),
       traffic_simulator::VehicleBehavior::autoware());
     api_->setEntityStatus(
-      ego_name_, test_description_.ego_start_position,
+      ego_name_, api_->canonicalize(test_description_.ego_start_position),
       traffic_simulator::helper::constructActionStatus());
 
     if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
@@ -95,8 +95,8 @@ void TestExecutor::initialize()
     std::this_thread::sleep_for(std::chrono::milliseconds{5000});
 
     api_->requestAssignRoute(
-      ego_name_,
-      std::vector<traffic_simulator_msgs::msg::LaneletPose>{test_description_.ego_goal_position});
+      ego_name_, std::vector<CanonicalizedLaneletPoseType>(
+                   {api_->canonicalize(test_description_.ego_goal_position)}));
     api_->asAutoware(ego_name_).engage();
 
     goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
@@ -104,9 +104,10 @@ void TestExecutor::initialize()
 
   for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
     const auto & npc_descr = test_description_.npcs_descriptions[i];
-    api_->spawn(npc_descr.name, npc_descr.start_position, getVehicleParameters());
+    api_->spawn(
+      npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters());
     api_->setEntityStatus(
-      npc_descr.name, npc_descr.start_position,
+      npc_descr.name, api_->canonicalize(npc_descr.start_position),
       traffic_simulator::helper::constructActionStatus(npc_descr.speed));
     api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
   }
@@ -118,7 +119,7 @@ void TestExecutor::update(double current_time)
     bool timeout_reached = current_time >= test_timeout;
     if (timeout_reached) {
       if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-        traffic_simulator_msgs::msg::EntityStatus status = api_->getEntityStatus(ego_name_);
+        const auto status = static_cast<EntityStatusType>(api_->getEntityStatus(ego_name_));
         if (!goal_reached_metric_.isGoalReached(status)) {
           RCLCPP_INFO(logger_, "Timeout reached");
           error_reporter_.reportTimeout();
@@ -129,7 +130,7 @@ void TestExecutor::update(double current_time)
     }
   }
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-    traffic_simulator_msgs::msg::EntityStatus status = api_->getEntityStatus(ego_name_);
+    const auto status = static_cast<EntityStatusType>(api_->getEntityStatus(ego_name_));
     for (const auto & npc : test_description_.npcs_descriptions) {
       if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
         if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
