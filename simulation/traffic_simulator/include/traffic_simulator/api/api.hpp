@@ -316,7 +316,7 @@ public:
   auto canonicalize(
     const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status) const
     -> traffic_simulator::entity_status::CanonicalizedEntityStatusType;
-    
+
 private:
   bool updateSensorFrame();
   bool updateEntityStatusInSim();
