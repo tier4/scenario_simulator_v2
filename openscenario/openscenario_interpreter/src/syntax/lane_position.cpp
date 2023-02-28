@@ -39,6 +39,11 @@ LanePosition::LanePosition(
 
 LanePosition::operator NativeLanePosition() const { return makeNativeLanePosition(*this); }
 
+LanePosition::operator CanonicalizedLanePosition() const
+{
+  return canonicalize(makeNativeLanePosition(*this));
+}
+
 LanePosition::operator NativeWorldPosition() const
 {
   return convert<NativeWorldPosition>(static_cast<NativeLanePosition>(*this));

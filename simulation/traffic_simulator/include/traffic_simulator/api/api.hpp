@@ -310,12 +310,13 @@ public:
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 #undef FORWARD_TO_ENTITY_MANAGER
+
   auto canonicalize(const LaneletPoseType & maybe_non_canonicalized_lanelet_pose) const
     -> CanonicalizedLaneletPoseType;
   auto canonicalize(
     const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status) const
     -> traffic_simulator::entity_status::CanonicalizedEntityStatusType;
-
+    
 private:
   bool updateSensorFrame();
   bool updateEntityStatusInSim();

@@ -34,5 +34,10 @@ Waypoint::operator traffic_simulator_msgs::msg::LaneletPose() const
     },
     position);
 }
+
+Waypoint::operator CanonicalizedLanePosition() const
+{
+  return canonicalize(static_cast<traffic_simulator_msgs::msg::LaneletPose>(*this));
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

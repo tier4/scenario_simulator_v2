@@ -37,6 +37,8 @@ using NativeRelativeWorldPosition = NativeWorldPosition;
 
 using NativeLanePosition = traffic_simulator_msgs::msg::LaneletPose;
 
+using CanonicalizedLanePosition = CanonicalizedLaneletPoseType;
+
 using NativeRelativeLanePosition = NativeLanePosition;
 
 class SimulatorCore
@@ -89,9 +91,10 @@ public:
       }
     }
 
-    static auto canonicalize(const NativeLanePosition & native_lane_position)
+    static auto canonicalize(const traffic_simulator_msgs::msg::LaneletPose & non_canonicalized)
+      -> CanonicalizedLanePosition
     {
-      return core->canonicalize(native_lane_position);
+      return core->canonicalize(non_canonicalized);
     }
 
     template <
@@ -428,7 +431,7 @@ public:
       const String & entity_ref, const OSCLanePosition & osc_lane_position)
     {
       NativeRelativeWorldPosition position =
-        core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position));
+        core->getRelativePose(entity_ref, canonicalize(makeNativeLanePosition(osc_lane_position)));
 
       const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(position.orientation);
 
