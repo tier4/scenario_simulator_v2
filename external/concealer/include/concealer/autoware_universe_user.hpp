@@ -24,14 +24,12 @@
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_user.hpp>
 #include <concealer/cooperator.hpp>
-#include <concealer/dirty_hack.hpp>
 #include <concealer/task_queue.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
 #include <concealer/utility/service_with_validation.h>
-
 #include <concealer/utility/publisher_wrapper.hpp>
 #include <concealer/utility/subscriber_wrapper.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
