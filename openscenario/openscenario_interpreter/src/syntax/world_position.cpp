@@ -37,11 +37,6 @@ WorldPosition::operator NativeLanePosition() const
   return convert<NativeLanePosition>(static_cast<NativeWorldPosition>(*this));
 }
 
-WorldPosition::operator traffic_simulator::CanonicalizedLaneletPoseType() const
-{
-  return canonicalize(static_cast<NativeLanePosition>(*this));
-}
-
 WorldPosition::operator NativeWorldPosition() const { return makeNativeWorldPosition(*this); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -55,8 +55,6 @@ struct LanePosition : private SimulatorCore::CoordinateSystemConversion
 
   explicit operator NativeLanePosition() const;
 
-  explicit operator traffic_simulator::CanonicalizedLaneletPoseType() const;
-
   explicit operator NativeWorldPosition() const;
 };
 }  // namespace syntax

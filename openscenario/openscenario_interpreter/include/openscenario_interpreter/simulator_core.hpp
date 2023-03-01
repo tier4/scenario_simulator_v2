@@ -35,7 +35,7 @@ using NativeWorldPosition = geometry_msgs::msg::Pose;
 
 using NativeRelativeWorldPosition = NativeWorldPosition;
 
-using NativeLanePosition = traffic_simulator::LaneletPoseType;
+using NativeLanePosition = traffic_simulator::CanonicalizedLaneletPoseType;
 
 using NativeRelativeLanePosition = NativeLanePosition;
 
@@ -99,13 +99,13 @@ public:
       typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
     static auto convert(const NativeLanePosition & native_lane_position)
     {
-      return core->toMapPose(canonicalize(native_lane_position));
+      return core->toMapPose(native_lane_position);
     }
 
     template <typename OSCLanePosition>
     static auto makeNativeLanePosition(const OSCLanePosition & osc_lane_position)
     {
-      NativeLanePosition native_lane_position;
+      traffic_simulator::LaneletPoseType native_lane_position;
       native_lane_position.lanelet_id =
         boost::lexical_cast<std::int64_t>(osc_lane_position.lane_id);
       native_lane_position.s = osc_lane_position.s;
@@ -113,7 +113,7 @@ public:
       native_lane_position.rpy.x = osc_lane_position.orientation.r;
       native_lane_position.rpy.y = osc_lane_position.orientation.p;
       native_lane_position.rpy.z = osc_lane_position.orientation.h;
-      return native_lane_position;
+      return canonicalize(native_lane_position);
     }
 
     template <typename OSCWorldPosition>
@@ -175,14 +175,14 @@ public:
         }
       };
 
-      NativeRelativeLanePosition position;
+      traffic_simulator::LaneletPoseType position;
       position.lanelet_id = std::numeric_limits<std::int64_t>::max();
       position.s = s(from, to);
       position.offset = t(from, to);
       position.rpy.x = std::numeric_limits<double>::quiet_NaN();
       position.rpy.y = std::numeric_limits<double>::quiet_NaN();
       position.rpy.z = std::numeric_limits<double>::quiet_NaN();
-      return position;
+      return canonicalize(position);
     }
 
     template <typename... Ts>
@@ -431,7 +431,7 @@ public:
       const String & entity_ref, const OSCLanePosition & osc_lane_position)
     {
       NativeRelativeWorldPosition position =
-        core->getRelativePose(entity_ref, canonicalize(makeNativeLanePosition(osc_lane_position)));
+        core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position));
 
       const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(position.orientation);
 

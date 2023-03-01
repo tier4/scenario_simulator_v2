@@ -432,4 +432,14 @@ auto API::canonicalize(
   return traffic_simulator::entity_status::CanonicalizedEntityStatusType(
     may_non_canonicalized_entity_status, entity_manager_ptr_->getHdmapUtils());
 }
+
+auto API::toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
+  -> boost::optional<CanonicalizedLaneletPoseType>
+{
+  if (const auto pose =
+        entity_manager_ptr_->getHdmapUtils()->toLaneletPose(map_pose, include_crosswalk)) {
+    return canonicalize(pose.get());
+  }
+  return boost::none;
+}
 }  // namespace traffic_simulator
