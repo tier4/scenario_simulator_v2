@@ -13,23 +13,19 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/file_header.hpp>
+#include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/syntax/license.hpp>
-#include <openscenario_interpreter/syntax/properties.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-FileHeader::FileHeader(const pugi::xml_node & tree, Scope & scope)
-: license(readElement<License>("License", tree, scope)),
-  properties(readElement<Properties>("Properties", tree, scope)),
-  revMajor(readAttribute<UnsignedShort>("revMajor", tree, scope)),
-  revMinor(readAttribute<UnsignedShort>("revMinor", tree, scope)),
-  date(readAttribute<String>("date", tree, scope)),
-  description(readAttribute<String>("description", tree, scope)),
-  author(readAttribute<String>("author", tree, scope))
+License::License(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope)),
+  resource(readAttribute<String>("resource", node, scope, String())),  // NOTE: Optional attribute
+  spdx_id(readAttribute<String>("spdxId", node, scope, String())),     // NOTE: Optional attribute
+  text(readContent<String>(node, scope))                               // NOTE: Optional content
 {
 }
 }  // namespace syntax
