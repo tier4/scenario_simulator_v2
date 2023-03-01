@@ -44,7 +44,7 @@ struct Waypoint : private SimulatorCore::CoordinateSystemConversion
 
   explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
 
-  explicit operator CanonicalizedLanePosition() const;
+  explicit operator CanonicalizedLaneletPoseType() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -54,7 +54,7 @@ struct RelativeWorldPosition : private SimulatorCore::CoordinateSystemConversion
 
   explicit operator NativeLanePosition() const;
 
-  explicit operator CanonicalizedLanePosition() const;
+  explicit operator CanonicalizedLaneletPoseType() const;
 
   explicit operator NativeWorldPosition() const;
 };

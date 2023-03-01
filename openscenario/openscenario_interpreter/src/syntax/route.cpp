@@ -40,12 +40,12 @@ Route::operator std::vector<traffic_simulator_msgs::msg::LaneletPose>() const
   return lanelet_poses;
 }
 
-Route::operator std::vector<CanonicalizedLanePosition>() const
+Route::operator std::vector<CanonicalizedLaneletPoseType>() const
 {
-  std::vector<CanonicalizedLanePosition> lanelet_poses{};
+  std::vector<CanonicalizedLaneletPoseType> lanelet_poses{};
 
   for (const auto & waypoint : waypoints) {
-    lanelet_poses.emplace_back(static_cast<CanonicalizedLanePosition>(waypoint));
+    lanelet_poses.emplace_back(static_cast<CanonicalizedLaneletPoseType>(waypoint));
   }
 
   return lanelet_poses;

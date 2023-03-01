@@ -35,7 +35,7 @@ Waypoint::operator traffic_simulator_msgs::msg::LaneletPose() const
     position);
 }
 
-Waypoint::operator CanonicalizedLanePosition() const
+Waypoint::operator CanonicalizedLaneletPoseType() const
 {
   return canonicalize(static_cast<traffic_simulator_msgs::msg::LaneletPose>(*this));
 }

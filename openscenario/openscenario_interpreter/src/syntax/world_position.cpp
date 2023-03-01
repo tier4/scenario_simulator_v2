@@ -37,7 +37,7 @@ WorldPosition::operator NativeLanePosition() const
   return convert<NativeLanePosition>(static_cast<NativeWorldPosition>(*this));
 }
 
-WorldPosition::operator CanonicalizedLanePosition() const
+WorldPosition::operator CanonicalizedLaneletPoseType() const
 {
   return canonicalize(static_cast<NativeLanePosition>(*this));
 }

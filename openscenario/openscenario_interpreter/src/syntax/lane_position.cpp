@@ -39,7 +39,7 @@ LanePosition::LanePosition(
 
 LanePosition::operator NativeLanePosition() const { return makeNativeLanePosition(*this); }
 
-LanePosition::operator CanonicalizedLanePosition() const
+LanePosition::operator CanonicalizedLaneletPoseType() const
 {
   return canonicalize(makeNativeLanePosition(*this));
 }

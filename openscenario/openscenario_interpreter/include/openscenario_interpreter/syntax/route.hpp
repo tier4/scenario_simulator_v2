@@ -48,7 +48,7 @@ struct Route : public Scope
 
   explicit operator std::vector<traffic_simulator_msgs::msg::LaneletPose>() const;
 
-  explicit operator std::vector<CanonicalizedLanePosition>() const;
+  explicit operator std::vector<CanonicalizedLaneletPoseType>() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
