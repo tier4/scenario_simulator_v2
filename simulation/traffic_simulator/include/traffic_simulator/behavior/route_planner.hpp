@@ -51,7 +51,7 @@ private:
      elements for getGoalPoses, so we use std::deque instead of std::queue
      which is not iterable.
   */
-  std::deque<LaneletPoseType> waypoint_queue_;
+  std::deque<traffic_simulator::LaneletPoseType> waypoint_queue_;
 };
 }  // namespace traffic_simulator
 

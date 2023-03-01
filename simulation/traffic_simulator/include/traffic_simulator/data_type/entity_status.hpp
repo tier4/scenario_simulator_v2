@@ -43,10 +43,10 @@ private:
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
 };
 }  // namespace entity_status
-}  // namespace traffic_simulator
 
 using EntityStatusType = traffic_simulator_msgs::msg::EntityStatus;
-using CanonicalizedEntityStatusType =
-  traffic_simulator::entity_status::CanonicalizedEntityStatusType;
+using CanonicalizedEntityStatusType = entity_status::CanonicalizedEntityStatusType;
+
+}  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ENTITY_STATUS_HPP_

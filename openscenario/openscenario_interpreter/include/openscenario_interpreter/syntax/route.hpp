@@ -46,9 +46,9 @@ struct Route : public Scope
 
   explicit Route(const pugi::xml_node &, Scope &);
 
-  explicit operator std::vector<LaneletPoseType>() const;
+  explicit operator std::vector<traffic_simulator::LaneletPoseType>() const;
 
-  explicit operator std::vector<CanonicalizedLaneletPoseType>() const;
+  explicit operator std::vector<traffic_simulator::CanonicalizedLaneletPoseType>() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

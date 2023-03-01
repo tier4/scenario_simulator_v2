@@ -66,7 +66,8 @@ auto TeleportAction::teleport(const EntityRef & entity_ref, const Position & pos
         position.orientation);
     },
     [&](const LanePosition & position) {
-      return applyTeleportAction(entity_ref, static_cast<CanonicalizedLaneletPoseType>(position));
+      return applyTeleportAction(
+        entity_ref, static_cast<traffic_simulator::CanonicalizedLaneletPoseType>(position));
     });
 
   return apply<void>(teleport, position);

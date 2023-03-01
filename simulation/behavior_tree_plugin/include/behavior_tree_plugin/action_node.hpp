@@ -118,7 +118,7 @@ protected:
   double step_time;
   boost::optional<double> target_speed;
   traffic_simulator_msgs::msg::EntityStatus updated_status;
-  std::unordered_map<std::string, EntityStatusType> other_entity_status;
+  std::unordered_map<std::string, traffic_simulator::EntityStatusType> other_entity_status;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list;
   std::vector<std::int64_t> route_lanelets;
 

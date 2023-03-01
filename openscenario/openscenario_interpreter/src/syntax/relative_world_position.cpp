@@ -46,9 +46,10 @@ RelativeWorldPosition::operator NativeLanePosition() const
   throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, LaneletPoseType);
 }
 
-RelativeWorldPosition::operator CanonicalizedLaneletPoseType() const
+RelativeWorldPosition::operator traffic_simulator::CanonicalizedLaneletPoseType() const
 {
-  throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, CanonicalizedLaneletPoseType);
+  throw UNSUPPORTED_CONVERSION_DETECTED(
+    RelativeWorldPosition, traffic_simulator::CanonicalizedLaneletPoseType);
 }
 
 RelativeWorldPosition::operator NativeWorldPosition() const

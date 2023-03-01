@@ -35,7 +35,7 @@ using NativeWorldPosition = geometry_msgs::msg::Pose;
 
 using NativeRelativeWorldPosition = NativeWorldPosition;
 
-using NativeLanePosition = LaneletPoseType;
+using NativeLanePosition = traffic_simulator::LaneletPoseType;
 
 using NativeRelativeLanePosition = NativeLanePosition;
 
@@ -89,8 +89,8 @@ public:
       }
     }
 
-    static auto canonicalize(const LaneletPoseType & non_canonicalized)
-      -> CanonicalizedLaneletPoseType
+    static auto canonicalize(const traffic_simulator::LaneletPoseType & non_canonicalized)
+      -> traffic_simulator::CanonicalizedLaneletPoseType
     {
       return core->canonicalize(non_canonicalized);
     }
@@ -327,7 +327,8 @@ public:
     template <typename... Ts>
     static auto evaluateAcceleration(Ts &&... xs)
     {
-      return static_cast<EntityStatusType>(core->getEntityStatus(std::forward<decltype(xs)>(xs)...))
+      return static_cast<traffic_simulator::EntityStatusType>(
+               core->getEntityStatus(std::forward<decltype(xs)>(xs)...))
         .action_status.accel.linear.x;
     }
 
@@ -362,7 +363,8 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return static_cast<EntityStatusType>(core->getEntityStatus(std::forward<decltype(xs)>(xs)...))
+      return static_cast<traffic_simulator::EntityStatusType>(
+               core->getEntityStatus(std::forward<decltype(xs)>(xs)...))
         .action_status.twist.linear.x;
     }
 

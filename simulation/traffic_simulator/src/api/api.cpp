@@ -131,9 +131,9 @@ bool API::reachPosition(
   const double tolerance)
 {
   return entity_manager_ptr_->reachPosition(
-    name, static_cast<LaneletPoseType>(target_pose).lanelet_id,
-    static_cast<LaneletPoseType>(target_pose).s, static_cast<LaneletPoseType>(target_pose).offset,
-    tolerance);
+    name, static_cast<traffic_simulator::LaneletPoseType>(target_pose).lanelet_id,
+    static_cast<traffic_simulator::LaneletPoseType>(target_pose).s,
+    static_cast<traffic_simulator::LaneletPoseType>(target_pose).offset, tolerance);
 }
 
 bool API::reachPosition(
@@ -147,7 +147,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   traffic_simulator_msgs::msg::EntityStatus status;
-  status.lanelet_pose = static_cast<LaneletPoseType>(lanelet_pose);
+  status.lanelet_pose = static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose);
   status.lanelet_pose_valid = true;
   status.bounding_box =
     static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(name)).bounding_box;
@@ -331,7 +331,7 @@ bool API::updateEntityStatusInSim()
       status_msg.lanelet_pose = lanelet_pose.get();
     } else {
       status_msg.lanelet_pose_valid = false;
-      status_msg.lanelet_pose = LaneletPoseType();
+      status_msg.lanelet_pose = traffic_simulator::LaneletPoseType();
     }
     simulation_interface::toMsg(status.action_status().twist(), status_msg.action_status.twist);
     simulation_interface::toMsg(status.action_status().accel(), status_msg.action_status.accel);

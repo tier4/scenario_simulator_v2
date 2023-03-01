@@ -95,7 +95,7 @@ void TestExecutor::initialize()
     std::this_thread::sleep_for(std::chrono::milliseconds{5000});
 
     api_->requestAssignRoute(
-      ego_name_, std::vector<CanonicalizedLaneletPoseType>(
+      ego_name_, std::vector<traffic_simulator::CanonicalizedLaneletPoseType>(
                    {api_->canonicalize(test_description_.ego_goal_position)}));
     api_->asAutoware(ego_name_).engage();
 
@@ -119,7 +119,8 @@ void TestExecutor::update(double current_time)
     bool timeout_reached = current_time >= test_timeout;
     if (timeout_reached) {
       if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-        const auto status = static_cast<EntityStatusType>(api_->getEntityStatus(ego_name_));
+        const auto status =
+          static_cast<traffic_simulator::EntityStatusType>(api_->getEntityStatus(ego_name_));
         if (!goal_reached_metric_.isGoalReached(status)) {
           RCLCPP_INFO(logger_, "Timeout reached");
           error_reporter_.reportTimeout();
@@ -130,7 +131,8 @@ void TestExecutor::update(double current_time)
     }
   }
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-    const auto status = static_cast<EntityStatusType>(api_->getEntityStatus(ego_name_));
+    const auto status =
+      static_cast<traffic_simulator::EntityStatusType>(api_->getEntityStatus(ego_name_));
     for (const auto & npc : test_description_.npcs_descriptions) {
       if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
         if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {

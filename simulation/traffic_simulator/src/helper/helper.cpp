@@ -39,7 +39,7 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
 LaneletPoseType constructLaneletPose(
   std::int64_t lanelet_id, double s, double offset, double roll, double pitch, double yaw)
 {
-  LaneletPoseType lanelet_pose;
+  traffic_simulator::LaneletPoseType lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s;
   lanelet_pose.offset = offset;
@@ -161,7 +161,7 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(std::ostream & os, const LaneletPoseType & ll_pose)
+std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPoseType & ll_pose)
 {
   os << "lanelet id : " << ll_pose.lanelet_id << "\ns : " << ll_pose.s;
   return os;

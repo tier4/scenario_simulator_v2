@@ -103,7 +103,7 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(std::ostream & os, const LaneletPoseType & ll_pose);
+std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPoseType & ll_pose);
 
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point);
 

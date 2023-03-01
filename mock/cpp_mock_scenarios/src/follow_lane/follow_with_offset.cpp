@@ -46,7 +46,7 @@ private:
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     const auto lanelet_pose = api_.getLaneletPose("ego");
-    if (!lanelet_pose || std::abs(static_cast<LaneletPoseType>(lanelet_pose.get()).offset) <= 2.8) {
+    if (!lanelet_pose || std::abs(static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose.get()).offset) <= 2.8) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
