@@ -103,7 +103,7 @@ class ScenarioTestRunner(LifecycleController):
 
         if self.output_directory.exists():
             glob_pattern = str(self.output_directory.resolve()) + "/*"
-            remove_targets = glob.glob(glob_pattern + "/*")
+            remove_targets = glob(glob_pattern + "/*")
             for target in remove_targets:
                 if os.path.isdir(target):
                     rmtree(target)
@@ -337,8 +337,6 @@ def main(args=None):
     )
 
     if args.scenario != Path("/dev/null"):
-        print(str(substitute_ros_package(args.scenario).resolve()))
-
         test_runner.run_scenarios(
             [Scenario(
                 substitute_ros_package(args.scenario).resolve(),

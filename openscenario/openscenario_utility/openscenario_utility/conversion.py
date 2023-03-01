@@ -68,36 +68,29 @@ class MacroExpander:
 
         paths = []
 
-        if self.specs is not None:
-            for bindings in product(*self.specs):
+        for bindings in product(*self.specs):
 
-                target = deepcopy(xosc)
+            target = deepcopy(xosc)
 
-                target_name = deepcopy(basename)
+            target_name = deepcopy(basename)
 
-                for binding in bindings:
-                    target_name += "__" + str(binding[0]) + "_" + str(binding[1])
-                    target = sub(str(binding[0]), str(binding[1]), target)
+            for binding in bindings:
+                target_name += "__" + str(binding[0]) + "_" + str(binding[1])
+                target = sub(str(binding[0]), str(binding[1]), target)
 
-                paths.append(output.joinpath(target_name + ".xosc"))
-
-                with paths[-1].open(mode="w") as file:
-                    file.write(target)
-
-                    try:
-                        self.schema.validate(target)
-
-                    except xmlschema.XMLSchemaValidationError as exception:
-                        print("File: " + str(paths[-1]), file=stderr)
-                        print("", file=stderr)
-                        print("Error: " + str(exception), file=stderr)
-                        exit()
-
-        else:
             paths.append(output.joinpath(target_name + ".xosc"))
 
-            with paths[-1].open(mode="w") as f:
-                f.write(xosc)
+            with paths[-1].open(mode="w") as file:
+                file.write(target)
+
+                try:
+                    self.schema.validate(target)
+
+                except xmlschema.XMLSchemaValidationError as exception:
+                    print("File: " + str(paths[-1]), file=stderr)
+                    print("", file=stderr)
+                    print("Error: " + str(exception), file=stderr)
+                    exit()
 
         return paths
 
