@@ -26,7 +26,7 @@
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -35,7 +35,7 @@ using NativeWorldPosition = geometry_msgs::msg::Pose;
 
 using NativeRelativeWorldPosition = NativeWorldPosition;
 
-using NativeLanePosition = traffic_simulator_msgs::msg::LaneletPose;
+using NativeLanePosition = LaneletPoseType;
 
 using NativeRelativeLanePosition = NativeLanePosition;
 
@@ -89,7 +89,7 @@ public:
       }
     }
 
-    static auto canonicalize(const traffic_simulator_msgs::msg::LaneletPose & non_canonicalized)
+    static auto canonicalize(const LaneletPoseType & non_canonicalized)
       -> CanonicalizedLaneletPoseType
     {
       return core->canonicalize(non_canonicalized);

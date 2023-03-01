@@ -42,7 +42,7 @@ struct Waypoint : private SimulatorCore::CoordinateSystemConversion
 
   explicit Waypoint(const pugi::xml_node &, Scope &);
 
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
+  explicit operator LaneletPoseType() const;
 
   explicit operator CanonicalizedLaneletPoseType() const;
 };

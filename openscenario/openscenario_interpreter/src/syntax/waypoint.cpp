@@ -26,18 +26,15 @@ Waypoint::Waypoint(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-Waypoint::operator traffic_simulator_msgs::msg::LaneletPose() const
+Waypoint::operator LaneletPoseType() const
 {
-  return apply<traffic_simulator_msgs::msg::LaneletPose>(
-    [](auto && position) {
-      return static_cast<traffic_simulator_msgs::msg::LaneletPose>(position);
-    },
-    position);
+  return apply<LaneletPoseType>(
+    [](auto && position) { return static_cast<LaneletPoseType>(position); }, position);
 }
 
 Waypoint::operator CanonicalizedLaneletPoseType() const
 {
-  return canonicalize(static_cast<traffic_simulator_msgs::msg::LaneletPose>(*this));
+  return canonicalize(static_cast<LaneletPoseType>(*this));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
