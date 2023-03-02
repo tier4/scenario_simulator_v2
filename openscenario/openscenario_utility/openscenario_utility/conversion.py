@@ -65,20 +65,18 @@ class MacroExpander:
                     )
 
     def __call__(self, xosc: str, output: Path, basename: str):
-
         paths = []
 
-        for bindings in product(*self.specs):
-
+        for index, bindings in enumerate(product(*self.specs)):
             target = deepcopy(xosc)
 
-            target_name = deepcopy(basename)
-
             for binding in bindings:
-                target_name += "__" + str(binding[0]) + "_" + str(binding[1])
                 target = sub(str(binding[0]), str(binding[1]), target)
 
-            paths.append(output.joinpath(target_name + ".xosc"))
+            if self.specs:
+                paths.append(output.joinpath(basename + "_" + str(index) + ".xosc"))
+            else:
+                paths.append(output.joinpath(basename + ".xosc"))
 
             with paths[-1].open(mode="w") as file:
                 file.write(target)
