@@ -33,7 +33,7 @@ EntityBase::EntityBase(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
-  status_(static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status)),
+  status_(static_cast<traffic_simulator::EntityStatusType>(entity_status)),
   status_before_update_(status_),
   hdmap_utils_ptr_(hdmap_utils_ptr),
   npc_logic_started_(false)
@@ -196,8 +196,7 @@ auto EntityBase::getDynamicConstraints() const
   return getBehaviorParameter().dynamic_constraints;
 }
 
-auto EntityBase::getEntityStatusBeforeUpdate() const
-  -> const traffic_simulator_msgs::msg::EntityStatus &
+auto EntityBase::getEntityStatusBeforeUpdate() const -> const traffic_simulator::EntityStatusType &
 {
   return status_before_update_;
 }
@@ -245,7 +244,7 @@ auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
   return ret;
 }
 
-auto EntityBase::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &
+auto EntityBase::getStatus() const -> const traffic_simulator::EntityStatusType &
 {
   return status_;
 }
@@ -669,7 +668,7 @@ void EntityBase::setEntityTypeList(
 }
 
 void EntityBase::setOtherStatus(
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
+  const std::unordered_map<std::string, traffic_simulator::EntityStatusType> & status)
 {
   other_status_.clear();
 
@@ -694,7 +693,7 @@ void EntityBase::setOtherStatus(
 auto EntityBase::setStatus(
   const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void
 {
-  auto new_status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status);
+  auto new_status = static_cast<traffic_simulator::EntityStatusType>(status);
 
   /*
      FIXME: DIRTY HACK!!!

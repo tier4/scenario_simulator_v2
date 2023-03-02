@@ -88,7 +88,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
-  traffic_simulator_msgs::msg::EntityStatus status;
+  traffic_simulator::EntityStatusType status;
   status.time = clock_.getCurrentSimulationTime();
   status.pose = pose;
   const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
@@ -146,7 +146,7 @@ auto API::setEntityStatus(
   const std::string & name, const CanonicalizedLaneletPoseType & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  traffic_simulator_msgs::msg::EntityStatus status;
+  traffic_simulator::EntityStatusType status;
   status.lanelet_pose = static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose);
   status.lanelet_pose_valid = true;
   status.bounding_box =
@@ -170,7 +170,7 @@ auto API::setEntityStatus(
   const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
     map_pose,
     static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(name)).bounding_box, false);
-  traffic_simulator_msgs::msg::EntityStatus status;
+  traffic_simulator::EntityStatusType status;
   if (lanelet_pose) {
     status.lanelet_pose = lanelet_pose.get();
   } else {
@@ -316,7 +316,7 @@ bool API::updateEntityStatusInSim()
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
   for (const auto & status : res.status()) {
-    traffic_simulator_msgs::msg::EntityStatus status_msg;
+    traffic_simulator::EntityStatusType status_msg;
     status_msg = static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(status.name()));
     geometry_msgs::msg::Pose pose;
     simulation_interface::toMsg(status.pose(), pose);
@@ -342,7 +342,7 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = boost::none;
+  boost::optional<traffic_simulator::EntityStatusType> ego_status_before_update = boost::none;
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
@@ -426,7 +426,7 @@ auto API::canonicalize(const LaneletPoseType & may_non_canonicalized_lanelet_pos
 }
 
 auto API::canonicalize(
-  const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status) const
+  const traffic_simulator::EntityStatusType & may_non_canonicalized_entity_status) const
   -> traffic_simulator::entity_status::CanonicalizedEntityStatusType
 {
   return traffic_simulator::entity_status::CanonicalizedEntityStatusType(

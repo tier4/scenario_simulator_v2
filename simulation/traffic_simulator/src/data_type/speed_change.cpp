@@ -31,9 +31,8 @@ static_assert(std::is_copy_assignable_v<RelativeTargetSpeed>);
 static_assert(std::is_move_assignable_v<RelativeTargetSpeed>);
 
 double RelativeTargetSpeed::getAbsoluteValue(
-  const traffic_simulator_msgs::msg::EntityStatus & status,
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
-  const
+  const traffic_simulator::EntityStatusType & status,
+  const std::unordered_map<std::string, traffic_simulator::EntityStatusType> & other_status) const
 {
   if (const auto iter = other_status.find(reference_entity_name); iter == other_status.end()) {
     if (status.name == reference_entity_name) {

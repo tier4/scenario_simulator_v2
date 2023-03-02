@@ -54,7 +54,7 @@ auto ActionNode::getBlackBoardValues() -> void
         "traffic_light_manager", traffic_light_manager)) {
     THROW_SIMULATION_ERROR("failed to get input traffic_light_manager in ActionNode");
   }
-  if (!getInput<traffic_simulator_msgs::msg::EntityStatus>("entity_status", entity_status)) {
+  if (!getInput<traffic_simulator::EntityStatusType>("entity_status", entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input entity_status in ActionNode");
   }
 
@@ -62,7 +62,7 @@ auto ActionNode::getBlackBoardValues() -> void
     target_speed = boost::none;
   }
 
-  if (!getInput<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus>>(
+  if (!getInput<std::unordered_map<std::string, traffic_simulator::EntityStatusType>>(
         "other_entity_status", other_entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status in ActionNode");
   }
@@ -80,9 +80,9 @@ auto ActionNode::getHorizon() const -> double
   return std::clamp(getCurrentTwist().linear.x * 5.0, 20.0, 50.0);
 }
 
-auto ActionNode::stopAtEndOfRoad() const -> traffic_simulator_msgs::msg::EntityStatus
+auto ActionNode::stopAtEndOfRoad() const -> traffic_simulator::EntityStatusType
 {
-  traffic_simulator_msgs::msg::EntityStatus entity_status_updated = entity_status;
+  traffic_simulator::EntityStatusType entity_status_updated = entity_status;
   entity_status_updated.time = current_time + step_time;
   entity_status_updated.action_status.twist = geometry_msgs::msg::Twist();
   entity_status_updated.action_status.accel = geometry_msgs::msg::Accel();
@@ -90,9 +90,9 @@ auto ActionNode::stopAtEndOfRoad() const -> traffic_simulator_msgs::msg::EntityS
 }
 
 auto ActionNode::getOtherEntityStatus(std::int64_t lanelet_id) const
-  -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
+  -> std::vector<traffic_simulator::EntityStatusType>
 {
-  std::vector<traffic_simulator_msgs::msg::EntityStatus> ret;
+  std::vector<traffic_simulator::EntityStatusType> ret;
   for (const auto & status : other_entity_status) {
     if (status.second.lanelet_pose_valid) {
       if (status.second.lanelet_pose.lanelet_id == lanelet_id) {
@@ -127,9 +127,9 @@ auto ActionNode::getYieldStopDistance(const std::vector<std::int64_t> & followin
 }
 
 auto ActionNode::getRightOfWayEntities(const std::vector<std::int64_t> & following_lanelets) const
-  -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
+  -> std::vector<traffic_simulator::EntityStatusType>
 {
-  std::vector<traffic_simulator_msgs::msg::EntityStatus> ret;
+  std::vector<traffic_simulator::EntityStatusType> ret;
   const auto lanelet_ids_list = hdmap_utils->getRightOfWayLaneletIds(following_lanelets);
   for (const auto & status : other_entity_status) {
     for (const auto & following_lanelet : following_lanelets) {
@@ -143,10 +143,9 @@ auto ActionNode::getRightOfWayEntities(const std::vector<std::int64_t> & followi
   return ret;
 }
 
-auto ActionNode::getRightOfWayEntities() const
-  -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
+auto ActionNode::getRightOfWayEntities() const -> std::vector<traffic_simulator::EntityStatusType>
 {
-  std::vector<traffic_simulator_msgs::msg::EntityStatus> ret;
+  std::vector<traffic_simulator::EntityStatusType> ret;
   const auto lanelet_ids =
     hdmap_utils->getRightOfWayLaneletIds(entity_status.lanelet_pose.lanelet_id);
   if (lanelet_ids.empty()) {
@@ -241,7 +240,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
 
 auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
   const math::geometry::CatmullRomSplineInterface & spline,
-  const traffic_simulator_msgs::msg::EntityStatus & status) const -> boost::optional<double>
+  const traffic_simulator::EntityStatusType & status) const -> boost::optional<double>
 {
   if (status.lanelet_pose_valid) {
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
@@ -251,7 +250,7 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
 }
 
 auto ActionNode::getEntityStatus(const std::string target_name) const
-  -> traffic_simulator_msgs::msg::EntityStatus
+  -> traffic_simulator::EntityStatusType
 {
   if (other_entity_status.find(target_name) != other_entity_status.end()) {
     return other_entity_status.at(target_name);
@@ -275,7 +274,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
 
 auto ActionNode::getDistanceToTargetEntityPolygon(
   const math::geometry::CatmullRomSplineInterface & spline,
-  const traffic_simulator_msgs::msg::EntityStatus & status, double width_extension_right,
+  const traffic_simulator::EntityStatusType & status, double width_extension_right,
   double width_extension_left, double length_extension_front, double length_extension_rear) const
   -> boost::optional<double>
 {
@@ -316,9 +315,9 @@ auto ActionNode::getDistanceToConflictingEntity(
 
 auto ActionNode::getConflictingEntityStatusOnCrossWalk(
   const std::vector<std::int64_t> & route_lanelets) const
-  -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
+  -> std::vector<traffic_simulator::EntityStatusType>
 {
-  std::vector<traffic_simulator_msgs::msg::EntityStatus> conflicting_entity_status;
+  std::vector<traffic_simulator::EntityStatusType> conflicting_entity_status;
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
@@ -332,9 +331,9 @@ auto ActionNode::getConflictingEntityStatusOnCrossWalk(
 }
 
 auto ActionNode::getConflictingEntityStatusOnLane(const std::vector<std::int64_t> & route_lanelets)
-  const -> std::vector<traffic_simulator_msgs::msg::EntityStatus>
+  const -> std::vector<traffic_simulator::EntityStatusType>
 {
-  std::vector<traffic_simulator_msgs::msg::EntityStatus> conflicting_entity_status;
+  std::vector<traffic_simulator::EntityStatusType> conflicting_entity_status;
   auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
@@ -371,7 +370,7 @@ auto ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
 
 auto ActionNode::calculateUpdatedEntityStatus(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
-  -> traffic_simulator_msgs::msg::EntityStatus
+  -> traffic_simulator::EntityStatusType
 {
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
@@ -391,7 +390,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
       hdmap_utils->getPreviousLaneletIds(entity_status.lanelet_pose.lanelet_id);
     new_lanelet_id = previous_lanelet_ids[0];
     new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id) - 0.01;
-    traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
+    traffic_simulator::EntityStatusType entity_status_updated;
     entity_status_updated.time = current_time + step_time;
     entity_status_updated.lanelet_pose.lanelet_id = new_lanelet_id;
     entity_status_updated.lanelet_pose.s = new_s;
@@ -431,7 +430,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
         "value "
         "is invalid in the target lanelet and adjacent lanelet");
     }
-    traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
+    traffic_simulator::EntityStatusType entity_status_updated;
     entity_status_updated.time = current_time + step_time;
     entity_status_updated.lanelet_pose.lanelet_id = new_lanelet_id;
     entity_status_updated.lanelet_pose.s = new_s;
@@ -447,7 +446,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
 
 auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
-  -> traffic_simulator_msgs::msg::EntityStatus
+  -> traffic_simulator::EntityStatusType
 {
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
@@ -473,7 +472,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   pose_new.position.x = trans_vec(0) + entity_status.pose.position.x;
   pose_new.position.y = trans_vec(1) + entity_status.pose.position.y;
   pose_new.position.z = trans_vec(2) + entity_status.pose.position.z;
-  traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
+  traffic_simulator::EntityStatusType entity_status_updated;
   entity_status_updated.time = current_time + step_time;
   entity_status_updated.pose = pose_new;
   entity_status_updated.action_status.twist = twist_new;

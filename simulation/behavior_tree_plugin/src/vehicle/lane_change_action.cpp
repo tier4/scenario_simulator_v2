@@ -208,7 +208,7 @@ BT::NodeStatus LaneChangeAction::tick()
     }
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
-      traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
+      traffic_simulator::EntityStatusType entity_status_updated;
       entity_status_updated.pose = pose;
       auto lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status.bounding_box, false);
       if (lanelet_pose) {
@@ -238,7 +238,7 @@ BT::NodeStatus LaneChangeAction::tick()
       curve_ = boost::none;
       current_s_ = 0;
       lane_change_velocity_ = 0;
-      traffic_simulator_msgs::msg::EntityStatus entity_status_updated;
+      traffic_simulator::EntityStatusType entity_status_updated;
       traffic_simulator::LaneletPoseType lanelet_pose;
       lanelet_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
       lanelet_pose.s = s;

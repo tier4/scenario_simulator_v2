@@ -190,9 +190,9 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
-  -> const traffic_simulator_msgs::msg::EntityStatus
+  -> const traffic_simulator::EntityStatusType
 {
-  traffic_simulator_msgs::msg::EntityStatus status;
+  traffic_simulator::EntityStatusType status;
   {
     status.time = time;
     status.type = getStatus().type;

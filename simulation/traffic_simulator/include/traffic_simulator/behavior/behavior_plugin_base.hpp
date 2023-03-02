@@ -18,10 +18,10 @@
 #include <boost/optional.hpp>
 #include <string>
 #include <traffic_simulator/data_type/behavior.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
@@ -41,8 +41,7 @@ public:
   virtual const std::string & getCurrentAction() const = 0;
 
   typedef std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> EntityTypeDict;
-  typedef std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus>
-    EntityStatusDict;
+  typedef std::unordered_map<std::string, traffic_simulator::EntityStatusType> EntityStatusDict;
 
 #define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
   virtual TYPE get##NAME() = 0;                    \
@@ -57,7 +56,7 @@ public:
   DEFINE_GETTER_SETTER(CurrentTime, "current_time", double)
   DEFINE_GETTER_SETTER(DebugMarker, "debug_marker", std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(BehaviorParameter, "behavior_parameter", traffic_simulator_msgs::msg::BehaviorParameter)
-  DEFINE_GETTER_SETTER(EntityStatus, "entity_status", traffic_simulator_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(EntityStatus, "entity_status", traffic_simulator::EntityStatusType)
   DEFINE_GETTER_SETTER(EntityTypeList, "entity_type_list", EntityTypeDict)
   DEFINE_GETTER_SETTER(GoalPoses, "goal_poses", std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils, "hdmap_utils", std::shared_ptr<hdmap_utils::HdMapUtils>)
@@ -71,7 +70,7 @@ public:
   DEFINE_GETTER_SETTER(TargetSpeed, "target_speed", boost::optional<double>)
   DEFINE_GETTER_SETTER(LaneChangeParameters, "lane_change_parameters", traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(TrafficLightManager, "traffic_light_manager", std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
-  DEFINE_GETTER_SETTER(UpdatedStatus, "updated_status", traffic_simulator_msgs::msg::EntityStatus)
+  DEFINE_GETTER_SETTER(UpdatedStatus, "updated_status", traffic_simulator::EntityStatusType)
   DEFINE_GETTER_SETTER(VehicleParameters, "vehicle_parameters", traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints, "waypoints", traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on

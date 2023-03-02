@@ -40,14 +40,14 @@ void PedestrianActionNode::getBlackBoardValues()
 }
 
 auto PedestrianActionNode::calculateUpdatedEntityStatus(double target_speed) const
-  -> traffic_simulator_msgs::msg::EntityStatus
+  -> traffic_simulator::EntityStatusType
 {
   return ActionNode::calculateUpdatedEntityStatus(
     target_speed, behavior_parameter.dynamic_constraints);
 }
 
 auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
-  -> traffic_simulator_msgs::msg::EntityStatus
+  -> traffic_simulator::EntityStatusType
 {
   auto updated_status = ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     target_speed, behavior_parameter.dynamic_constraints);
