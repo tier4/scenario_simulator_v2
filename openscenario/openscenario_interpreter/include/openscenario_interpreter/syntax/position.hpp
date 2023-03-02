@@ -46,6 +46,8 @@ struct Position : public ComplexType
   explicit Position(const pugi::xml_node &, Scope &);
 
   explicit operator geometry_msgs::msg::Pose() const;
+
+  explicit operator NativeLanePosition() const;
 };
 
 DEFINE_LAZY_VISITOR(

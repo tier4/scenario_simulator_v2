@@ -29,24 +29,12 @@ Route::Route(const pugi::xml_node & node, Scope & scope)
     node, "Waypoint", [&](auto && node) { return waypoints.emplace_back(node, local()); });
 }
 
-Route::operator std::vector<traffic_simulator::LaneletPoseType>() const
+Route::operator std::vector<NativeLanePosition>() const
 {
-  std::vector<traffic_simulator::LaneletPoseType> lanelet_poses{};
+  std::vector<NativeLanePosition> lanelet_poses{};
 
   for (const auto & waypoint : waypoints) {
-    lanelet_poses.emplace_back(static_cast<traffic_simulator::LaneletPoseType>(waypoint));
-  }
-
-  return lanelet_poses;
-}
-
-Route::operator std::vector<traffic_simulator::CanonicalizedLaneletPoseType>() const
-{
-  std::vector<traffic_simulator::CanonicalizedLaneletPoseType> lanelet_poses{};
-
-  for (const auto & waypoint : waypoints) {
-    lanelet_poses.emplace_back(
-      static_cast<traffic_simulator::CanonicalizedLaneletPoseType>(waypoint));
+    lanelet_poses.emplace_back(static_cast<NativeLanePosition>(waypoint));
   }
 
   return lanelet_poses;

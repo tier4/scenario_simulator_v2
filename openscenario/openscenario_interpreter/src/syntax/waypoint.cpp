@@ -26,16 +26,7 @@ Waypoint::Waypoint(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-Waypoint::operator traffic_simulator::LaneletPoseType() const
-{
-  return apply<traffic_simulator::LaneletPoseType>(
-    [](auto && position) { return static_cast<traffic_simulator::LaneletPoseType>(position); },
-    position);
-}
+Waypoint::operator NativeLanePosition() const { return static_cast<NativeLanePosition>(position); }
 
-Waypoint::operator traffic_simulator::CanonicalizedLaneletPoseType() const
-{
-  return canonicalize(static_cast<traffic_simulator::LaneletPoseType>(*this));
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

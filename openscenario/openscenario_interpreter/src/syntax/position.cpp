@@ -48,5 +48,18 @@ Position::operator geometry_msgs::msg::Pose() const
       ),
     *this);
 }
+
+Position::operator NativeLanePosition() const
+{
+  return apply<NativeLanePosition>(
+    overload(
+      // clang-format off
+      [&](const         WorldPosition & position) { return static_cast<NativeLanePosition>(position); },
+      [&](const RelativeWorldPosition & position) { return static_cast<NativeLanePosition>(position); },
+      [&](const          LanePosition & position) { return static_cast<NativeLanePosition>(position); }
+      // clang-format on
+      ),
+    *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

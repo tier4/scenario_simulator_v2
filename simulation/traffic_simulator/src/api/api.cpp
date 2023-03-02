@@ -436,8 +436,9 @@ auto API::canonicalize(
 auto API::toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
   -> boost::optional<CanonicalizedLaneletPoseType>
 {
-  if (const auto pose =
-        entity_manager_ptr_->getHdmapUtils()->toLaneletPose(map_pose, include_crosswalk)) {
+  if (
+    const auto pose =
+      entity_manager_ptr_->getHdmapUtils()->toLaneletPose(map_pose, include_crosswalk)) {
     return canonicalize(pose.get());
   }
   return boost::none;
