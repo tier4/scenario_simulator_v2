@@ -54,9 +54,8 @@ void PedestrianEntity::requestAssignRoute(
   }
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   goal_poses_.clear();
-  for (const auto & point :
-       route_points = hdmap_utils_ptr_->getCenterPoints(
-         route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints));) {
+  for (const auto & point : hdmap_utils_ptr_->getCenterPoints(
+         route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints))) {
     geometry_msgs::msg::Pose pose;
     pose.position = point;
     if (
