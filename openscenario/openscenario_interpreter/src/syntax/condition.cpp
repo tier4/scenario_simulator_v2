@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
+#include <numeric>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
@@ -22,6 +24,8 @@
 #include <openscenario_interpreter/syntax/condition.hpp>
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
+
+#include "openscenario_interpreter/object.hpp"
 
 namespace openscenario_interpreter
 {
@@ -47,76 +51,58 @@ Condition::Condition(const pugi::xml_node & node, Scope & scope)
 
 auto Condition::evaluate() -> Object
 {
-  if (condition_edge == ConditionEdge::sticky and current_value) {
-    return true_v;
-  }
+  using ResultSet = std::bitset<8>;
 
-  // push evaluation entry to `evaluation_history`
-  // `evaluation_history` contains past evaluation entries in order of evaluation time
-  auto latest_time = evaluateSimulationTime();
-  auto latest_result = ComplexType::evaluate().as<Boolean>();
-  evaluation_history.emplace_back(latest_time, latest_result);
+  auto update_condition = [&](std::size_t number, const auto & evaluator) -> bool {
+    auto latest_time = evaluateSimulationTime();
+    auto latest_result = ComplexType::evaluate().as<Boolean>();
+    evaluation_history.emplace_back(latest_time, latest_result);
 
-  // find the oldest evaluation entry which was evaluated in the last `delay` time
-  auto next_delayed_evaluation = std::find_if(
-    std::begin(evaluation_history), std::end(evaluation_history),
-    [&](const EvaluationEntry & entry) {
-      const auto & [past_time, past_result] = entry;
-      return past_time > latest_time - delay;
-    });
+    auto canary_cursol = std::find_if(
+      std::begin(evaluation_history), std::end(evaluation_history), [&](EvaluationEntry entry) {
+        auto [time, result] = entry;
+        return time < latest_time - delay;
+      });
 
-  // if `next_delayed_evaluation` points the first entry of `evaluation_history`,
-  // ongoing simulation did not pass the `delay` time, so simply return `false_v` here
-  if (next_delayed_evaluation == std::begin(evaluation_history)) {
-    return false_v;
-  }
-  auto delayed_evaluation = std::prev(next_delayed_evaluation);
-  auto [current_time, current_result] = *delayed_evaluation;
-
-  switch (condition_edge) {
-    case ConditionEdge::rising:
-    case ConditionEdge::falling:
-    case ConditionEdge::risingOrFalling: {
-      // these condition edges require two evaluation entries,
-      // so if `delayed_evaluation` is the only entry, simply return `false_v`
-      if (delayed_evaluation == std::begin(evaluation_history)) {
-        return false_v;
-      }
-      auto previous_delayed_evaluation = std::prev(delayed_evaluation);
-      auto [previous_time, previous_result] = *previous_delayed_evaluation;
-
-      switch (condition_edge) {
-        case ConditionEdge::rising:
-          current_value = current_result and not previous_result;
-          break;
-
-        case ConditionEdge::falling:
-          current_value = not current_result and previous_result;
-          break;
-
-        case ConditionEdge::risingOrFalling:
-          current_value = current_result != previous_result;
-          break;
-
-        default:
-          throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
-      }
-
-      evaluation_history.erase(std::begin(evaluation_history), previous_delayed_evaluation);
-      break;
+    auto results = ResultSet();
+    auto entry_count = std::size_t(0);
+    auto entry_cursol = std::reverse_iterator(canary_cursol);
+    while (entry_count < number and entry_cursol != std::rend(evaluation_history)) {
+      auto [time, result] = *entry_cursol;
+      results[entry_count] = result;
+      ++entry_cursol;
+      ++entry_count;
     }
 
-    case ConditionEdge::none:
-    case ConditionEdge::sticky: {
-      current_value = current_result;
-      evaluation_history.erase(std::begin(evaluation_history), delayed_evaluation);
-      break;
+    if (entry_count == number) {
+      evaluation_history.erase(std::begin(evaluation_history), entry_cursol.base());
+      return evaluator(results);
+    } else {
+      return false;
     }
+  };
 
-    default:
-      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
-  }
+  current_value = [&] {
+    switch (condition_edge) {
+      case ConditionEdge::rising:
+        return update_condition(2, [](ResultSet results) { return results[0] and not results[1]; });
 
+      case ConditionEdge::falling:
+        return update_condition(2, [](ResultSet results) { return not results[0] and results[1]; });
+
+      case ConditionEdge::risingOrFalling:
+        return update_condition(2, [](ResultSet results) { return results[0] xor results[1]; });
+
+      case ConditionEdge::none:
+        return update_condition(1, [](ResultSet results) { return results[0]; });
+
+      case ConditionEdge::sticky:
+        return current_value || update_condition(1, [](ResultSet results) { return results[0]; });
+
+      default:
+        throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
+    }
+  }();
   return asBoolean(current_value);
 }
 
