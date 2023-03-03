@@ -13,14 +13,19 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
+#include <openscenario_interpreter/syntax/license.hpp>
+#include <openscenario_interpreter/syntax/properties.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
 FileHeader::FileHeader(const pugi::xml_node & tree, Scope & scope)
-: revMajor(readAttribute<UnsignedShort>("revMajor", tree, scope)),
+: license(readElement<License>("License", tree, scope)),
+  properties(readElement<Properties>("Properties", tree, scope)),
+  revMajor(readAttribute<UnsignedShort>("revMajor", tree, scope)),
   revMinor(readAttribute<UnsignedShort>("revMinor", tree, scope)),
   date(readAttribute<String>("date", tree, scope)),
   description(readAttribute<String>("description", tree, scope)),

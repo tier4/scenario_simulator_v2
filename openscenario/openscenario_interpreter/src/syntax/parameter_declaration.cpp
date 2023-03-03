@@ -45,26 +45,6 @@ auto checkName(const std::string & name) -> decltype(auto)
   }
 }
 
-ParameterDeclaration::ParameterDeclaration(
-  const openscenario_msgs::msg::ParameterDeclaration & message)
-: name(message.name), parameter_type(message.parameter_type), value(message.value)
-{
-  for (const auto & constraint_group : message.constraint_groups) {
-    constraint_groups.emplace_back(constraint_group);
-  }
-  checkName(name);
-}
-
-ParameterDeclaration::ParameterDeclaration(
-  const openscenario_msgs::msg::ParameterDeclaration & message, Scope & scope)
-: name(message.name), parameter_type(message.parameter_type), value(message.value)
-{
-  for (const auto & constraint_group : message.constraint_groups) {
-    constraint_groups.emplace_back(constraint_group);
-  }
-  scope.insert(checkName(name), evaluate());
-}
-
 ParameterDeclaration::ParameterDeclaration(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
@@ -92,6 +72,7 @@ auto ParameterDeclaration::evaluate() const -> Object
     }
     // clang-format on
   };
+
   if (
     constraint_groups.empty() or
     std::any_of(
