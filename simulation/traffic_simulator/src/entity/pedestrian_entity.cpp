@@ -49,14 +49,14 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
 void PedestrianEntity::requestAssignRoute(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  lanelet::Ids route_ids;
-  if (status_.lanelet_pose_valid) {
-    route_ids = route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints);
+  if (!status_.lanelet_pose_valid) {
+    return;
   }
-  const auto route_points = hdmap_utils_ptr_->getCenterPoints(route_ids);
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   goal_poses_.clear();
-  for (const auto & point : route_points) {
+  for (const auto & point :
+       route_points = hdmap_utils_ptr_->getCenterPoints(
+         route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints));) {
     geometry_msgs::msg::Pose pose;
     pose.position = point;
     if (
