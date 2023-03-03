@@ -85,19 +85,23 @@ auto Condition::evaluate() -> Object
   current_value = [&] {
     switch (condition_edge) {
       case ConditionEdge::rising:
-        return update_condition(2, [](ResultSet results) { return results[0] and not results[1]; });
+        return update_condition(
+          2, [](ResultSet results) { return results.test(0) and not results.test(1); });
 
       case ConditionEdge::falling:
-        return update_condition(2, [](ResultSet results) { return not results[0] and results[1]; });
+        return update_condition(
+          2, [](ResultSet results) { return not results.test(0) and results.test(1); });
 
       case ConditionEdge::risingOrFalling:
-        return update_condition(2, [](ResultSet results) { return results[0] xor results[1]; });
+        return update_condition(
+          2, [](ResultSet results) { return results.test(0) xor results.test(1); });
 
       case ConditionEdge::none:
-        return update_condition(1, [](ResultSet results) { return results[0]; });
+        return update_condition(1, [](ResultSet results) { return results.test(0); });
 
       case ConditionEdge::sticky:
-        return current_value || update_condition(1, [](ResultSet results) { return results[0]; });
+        return current_value ||
+               update_condition(1, [](ResultSet results) { return results.test(0); });
 
       default:
         throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
