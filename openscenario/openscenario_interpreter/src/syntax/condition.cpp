@@ -61,7 +61,7 @@ auto Condition::evaluate() -> Object
     auto canary_iterator = std::find_if(
       std::begin(evaluation_history), std::end(evaluation_history), [&](EvaluationEntry entry) {
         auto [time, result] = entry;
-        return time < latest_time - delay;
+        return time > latest_time - delay;
       });
 
     auto results = ResultSet();
