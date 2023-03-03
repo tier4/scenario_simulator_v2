@@ -140,9 +140,8 @@ void PedestrianEntity::requestAcquirePosition(
   if (status_.lanelet_pose_valid) {
     route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, lanelet_pose);
   }
-  const auto map_pose_stamped =
-    hdmap_utils_ptr_->toMapPose(lanelet_pose.lanelet_id, lanelet_pose.s, lanelet_pose.offset);
-  goal_poses_ = {map_pose_stamped.pose};
+  goal_poses_ = {
+    hdmap_utils_ptr_->toMapPose(lanelet_pose.lanelet_id, lanelet_pose.s, lanelet_pose.offset).pose};
   behavior_plugin_ptr_->setGoalPoses(goal_poses_);
 }
 
