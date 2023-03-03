@@ -28,7 +28,7 @@ Minor Tweaks :oncoming_police_car:
 | `topic_status_checker`                   | Delete `topic_status_checker` package.                                                                                      | common                     | [#921](https://github.com/tier4/scenario_simulator_v2/pull/921) | [HansRobo](https://github.com/HansRobo)       |
 | Health check                             | Supported a function to monitor whether the running simulator has become unresponsive.                                      | common                     | [#932](https://github.com/tier4/scenario_simulator_v2/pull/932) | [yamacir-kit](https://github.com/yamacir-kit) |
 | OpenSCENARIO `UserDefinedValueCondition` | Remove the message type package `openscenario_msgs` and moved its contents to an external repository `tier4_autoware_msgs`. | `openscenario_interpreter` | [#874](https://github.com/tier4/scenario_simulator_v2/pull/874) | [yamacir-kit](https://github.com/yamacir-kit) |
-| Legacy parameter distribution            | Fix `openscenario_utility` to not to generate too long filenamed xosc.                                                      | `openscenario_utility`     | [#972](https://github.com/tier4/scenario_simulator_v2/pull/972) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Legacy parameter distribution            | Fix `openscenario_utility.convert` to not to generate too long filename.                                                    | `openscenario_utility`     | [#972](https://github.com/tier4/scenario_simulator_v2/pull/972) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.7
 
