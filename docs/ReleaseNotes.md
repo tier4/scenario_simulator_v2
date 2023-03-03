@@ -23,11 +23,11 @@ Bug Fixes:bug:
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature                | Brief summary                                                                          | Category | Pull request                                                    | Contributor                                   |
-|------------------------|----------------------------------------------------------------------------------------|----------|-----------------------------------------------------------------|-----------------------------------------------|
-| `topic_status_checker` | Delete `topic_status_checker` package.                                                 | common   | [#921](https://github.com/tier4/scenario_simulator_v2/pull/921) | [HansRobo](https://github.com/HansRobo)       |
-| Health check           | Supported a function to monitor whether the running simulator has become unresponsive. | common   | [#932](https://github.com/tier4/scenario_simulator_v2/pull/932) | [yamacir-kit](https://github.com/yamacir-kit) |
-
+| Feature                                  | Brief summary                                                                                                               | Category                   | Pull request                                                    | Contributor                                   |
+|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| `topic_status_checker`                   | Delete `topic_status_checker` package.                                                                                      | common                     | [#921](https://github.com/tier4/scenario_simulator_v2/pull/921) | [HansRobo](https://github.com/HansRobo)       |
+| Health check                             | Supported a function to monitor whether the running simulator has become unresponsive.                                      | common                     | [#932](https://github.com/tier4/scenario_simulator_v2/pull/932) | [yamacir-kit](https://github.com/yamacir-kit) |
+| OpenSCENARIO `UserDefinedValueCondition` | Remove the message type package `openscenario_msgs` and moved its contents to an external repository `tier4_autoware_msgs`. | `openscenario_interpreter` | [#874](https://github.com/tier4/scenario_simulator_v2/pull/874) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 ## Version 0.6.7
 

@@ -15,12 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_CONSTRAINT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_CONSTRAINT_HPP_
 
-#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include <openscenario_msgs/msg/value_constraint.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -42,8 +40,6 @@ struct ValueConstraint : public ComplexType
   const String value;
 
   explicit ValueConstraint(const pugi::xml_node &, Scope &);
-
-  explicit ValueConstraint(const openscenario_msgs::msg::ValueConstraint &);
 
   auto evaluate(const Object &) const -> bool;
 };

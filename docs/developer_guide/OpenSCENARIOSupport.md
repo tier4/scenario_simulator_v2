@@ -144,9 +144,9 @@ It is unlikely that you will need these commands for normal scenario creation.
 
 ### UserDefinedValueCondition
 
-This condition enables us to import external values and compare them with a specific value.    
+This condition enables us to import external values and compare them with a specific value.
 The boolean value of  the comparison result can be used as a condition to control the scenario.
-In scenario_simulator_v2, we use `UserDefinedValueCondition` to control the progress of the scenario by Autoware's state.  
+In scenario_simulator_v2, we use `UserDefinedValueCondition` to control the progress of the scenario by Autoware's state.
 
 ```XML
   <ByValueCondition>
@@ -155,11 +155,11 @@ In scenario_simulator_v2, we use `UserDefinedValueCondition` to control the prog
 ```
 #### Built-in conditions
 
-Like "currentState", the conditions start with "current" return Autoware-related conditions.  
+Like "currentState", the conditions start with "current" return Autoware-related conditions.
 And like "ego.currentState", they can specify the entity reference by prepending the name of the entity
 
-The following built-in conditions return a string that represents the state.   
-See Reference for specific strings.  
+The following built-in conditions return a string that represents the state.
+See Reference for specific strings.
 
 | Name                       | description                                         | Reference /                                                                                                                 |
 |:---------------------------|:----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
@@ -170,7 +170,7 @@ See Reference for specific strings.
 
 #### External ROS2 topic condition
 
-You can pass values from another ROS2 node to a scenario through ROS2 topics.  
+You can pass values from another ROS2 node to a scenario through ROS2 topics.
 The `name` field should be filled with the name of the ROS2 topic like below.
 ```XML
   <ByValueCondition>
@@ -178,7 +178,7 @@ The `name` field should be filled with the name of the ROS2 topic like below.
   </ByValueCondition>
 ```
 
-The type of topic must be `openscenario_msgs::msg::ParameterDeclaration` type.  
+The type of topic must be `tier4_simulation_msgs::msg::UserDefinedValue` type.
 You can handle the following through this function.
 
 - Boolean
@@ -189,7 +189,7 @@ You can handle the following through this function.
 - UnsignedInt
 - UnsignedShort
 
-See [Message Definitions](https://github.com/tier4/scenario_simulator_v2/tree/master/openscenario/openscenario_msgs/msg) for more information.
+See [Message Definitions](https://github.com/tier4/tier4_autoware_msgs/tree/tier4/universe/tier4_simulation_msgs) for more information.
 
 ## Non-Standard Extensions
 ---
