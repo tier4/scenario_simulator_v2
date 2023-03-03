@@ -58,7 +58,7 @@ auto Condition::evaluate() -> Object
     auto latest_result = ComplexType::evaluate().as<Boolean>();
     evaluation_history.emplace_back(latest_time, latest_result);
 
-    auto canary_cursol = std::find_if(
+    auto canary_cursor = std::find_if(
       std::begin(evaluation_history), std::end(evaluation_history), [&](EvaluationEntry entry) {
         auto [time, result] = entry;
         return time < latest_time - delay;
@@ -66,16 +66,16 @@ auto Condition::evaluate() -> Object
 
     auto results = ResultSet();
     auto entry_count = std::size_t(0);
-    auto entry_cursol = std::reverse_iterator(canary_cursol);
-    while (entry_count < number and entry_cursol != std::rend(evaluation_history)) {
-      auto [time, result] = *entry_cursol;
+    auto entry_cursor = std::reverse_iterator(canary_cursor);
+    while (entry_count < number and entry_cursor != std::rend(evaluation_history)) {
+      auto [time, result] = *entry_cursor;
       results[entry_count] = result;
-      ++entry_cursol;
+      ++entry_cursor;
       ++entry_count;
     }
 
     if (entry_count == number) {
-      evaluation_history.erase(std::begin(evaluation_history), entry_cursol.base());
+      evaluation_history.erase(std::begin(evaluation_history), entry_cursor.base());
       return evaluator(results);
     } else {
       return false;
