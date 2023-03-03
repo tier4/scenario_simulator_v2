@@ -120,8 +120,6 @@ private:
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 
   std::vector<std::int64_t> previous_route_lanelets_;
-
-  std::vector<geometry_msgs::msg::Pose> goal_poses_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

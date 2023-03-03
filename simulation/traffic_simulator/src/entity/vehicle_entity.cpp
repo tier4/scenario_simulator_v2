@@ -170,9 +170,9 @@ void VehicleEntity::requestAcquirePosition(
   if (status_.lanelet_pose_valid) {
     route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, lanelet_pose);
   }
-  goal_poses_ = {
-    hdmap_utils_ptr_->toMapPose(lanelet_pose.lanelet_id, lanelet_pose.s, lanelet_pose.offset).pose};
-  behavior_plugin_ptr_->setGoalPoses(goal_poses_);
+  behavior_plugin_ptr_->setGoalPoses(
+    {hdmap_utils_ptr_->toMapPose(lanelet_pose.lanelet_id, lanelet_pose.s, lanelet_pose.offset)
+       .pose});
 }
 
 void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
@@ -193,7 +193,7 @@ void VehicleEntity::requestAssignRoute(
   if (!status_.lanelet_pose_valid) {
     return;
   }
-  goal_poses_.clear();
+  std::vector<geometry_msgs::msg::Pose> goal_poses;
   for (const auto & point : hdmap_utils_ptr_->getCenterPoints(
          route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, waypoints))) {
     geometry_msgs::msg::Pose pose;
@@ -203,10 +203,10 @@ void VehicleEntity::requestAssignRoute(
         hdmap_utils_ptr_->toLaneletPose(pose, getStatus().bounding_box, true)) {
       const auto map_pose_stamped = hdmap_utils_ptr_->toMapPose(
         lanelet_pose.get().lanelet_id, lanelet_pose.get().s, lanelet_pose.get().offset);
-      goal_poses_.emplace_back(map_pose_stamped.pose);
+      goal_poses.emplace_back(map_pose_stamped.pose);
     }
   }
-  behavior_plugin_ptr_->setGoalPoses(goal_poses_);
+  behavior_plugin_ptr_->setGoalPoses(goal_poses);
 }
 
 void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
