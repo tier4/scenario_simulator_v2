@@ -12,38 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_CONSTRAINT_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_CONSTRAINT_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__LICENSE_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__LICENSE_HPP_
 
+#include <iostream>
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/double.hpp>
-#include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
+#include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ValueConstraint --------------------------------------------------------------
+/* ---- License ----------------------------------------------------------------
  *
- *  <xsd:complexType name="ValueConstraint">
- *    <xsd:attribute name="rule" type="Rule" use="required"/>
- *    <xsd:attribute name="value" type="String" use="required"/>
- *  </xsd:complexType>
+ * <xsd:complexType name="License">
+ *   <xsd:simpleContent>
+ *     <xsd:extension base="xsd:string">
+ *       <xsd:attribute name="name" type="String" use="required"/>
+ *       <xsd:attribute name="resource" type="String"/>
+ *       <xsd:attribute name="spdxId" type="String"/>
+ *     </xsd:extension>
+ *   </xsd:simpleContent>
+ * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ValueConstraint : public ComplexType
+struct License
 {
-  const Rule rule;
+  const String name;
 
-  const String value;
+  const String resource;
 
-  explicit ValueConstraint(const pugi::xml_node &, Scope &);
+  const String spdx_id;
 
-  auto evaluate(const Object &) const -> bool;
+  const String text;
+
+  License() = default;
+
+  explicit License(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_CONSTRAINT_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__LICENSE_HPP_

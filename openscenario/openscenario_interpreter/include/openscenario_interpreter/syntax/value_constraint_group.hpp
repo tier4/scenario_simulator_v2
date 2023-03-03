@@ -18,7 +18,6 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/value_constraint.hpp>
-#include <openscenario_msgs/msg/value_constraint_group.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -46,11 +45,8 @@ struct ValueConstraintGroup : public std::list<ValueConstraint>
 
   explicit ValueConstraintGroup(const pugi::xml_node &, Scope &);
 
-  explicit ValueConstraintGroup(const openscenario_msgs::msg::ValueConstraintGroup &);
-
   auto evaluate(const Object &) const -> bool;
 };
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
