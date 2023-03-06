@@ -11,9 +11,9 @@
 *.pcd
 
 # external packages
-external/autoware_auto_msgs
-external/tier4_msgs
-external/zmqpp_vendor
+external/*
+!external/lanelet2_matching
+!external/concealer
 
 # auto-generated files
 html

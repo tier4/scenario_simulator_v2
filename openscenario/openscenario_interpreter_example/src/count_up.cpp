@@ -13,9 +13,11 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
-#include <openscenario_msgs/msg/parameter_declaration.hpp>
-#include <openscenario_msgs/msg/parameter_type.hpp>
 #include <rclcpp/rclcpp.hpp>
+
+#if __has_include(<tier4_simulation_msgs/msg/user_defined_value.hpp>)
+#include <tier4_simulation_msgs/msg/user_defined_value.hpp>
+#endif
 
 int main(const int argc, char const * const * const argv)
 {
@@ -74,24 +76,22 @@ int main(const int argc, char const * const * const argv)
    *
    * ------------------------------------------------------------------------ */
 
-  using openscenario_msgs::msg::ParameterDeclaration;
-  using openscenario_msgs::msg::ParameterType;
-
   rclcpp::init(argc, argv);
 
   auto node = std::make_shared<rclcpp::Node>("count_up");
 
-  auto publisher =
-    node->create_publisher<ParameterDeclaration>("/count_up", rclcpp::QoS(1).reliable());
+#if __has_include(<tier4_simulation_msgs/msg/user_defined_value.hpp>)
+  using tier4_simulation_msgs::msg::UserDefinedValue;
+  using tier4_simulation_msgs::msg::UserDefinedValueType;
+
+  auto publisher = node->create_publisher<UserDefinedValue>("/count_up", rclcpp::QoS(1).reliable());
 
   auto make_message = [&, count = 0]() mutable  //
   {
-    ParameterDeclaration message;
+    UserDefinedValue message;
     {
-      message.name = "Currently ParameterDeclaration::name will be ignored.";
-      message.parameter_type.data = ParameterType::UNSIGNED_INT;
+      message.type.data = UserDefinedValueType::UNSIGNED_INT;
       message.value = boost::lexical_cast<decltype(message.value)>(++count);
-      // if you want to add constraints for parameter, please add constraints to message.constraint_groups
     }
 
     std::cout << "message.value = " << message.value << std::endl;
@@ -101,6 +101,12 @@ int main(const int argc, char const * const * const argv)
 
   auto timer = node->create_wall_timer(
     std::chrono::milliseconds(100), [&]() { publisher->publish(make_message()); });
+#else
+  std::cout
+    << "The ability to have ROS2 topics as values for `UserDefinedValueCondition` is enabled only "
+       "when the `UserDefinedValue` type is present in the `tier4_simulation_msgs` package."
+    << std::endl;
+#endif
 
   rclcpp::executors::SingleThreadedExecutor executor;
 

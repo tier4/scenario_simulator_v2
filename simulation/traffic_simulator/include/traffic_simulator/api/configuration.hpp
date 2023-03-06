@@ -83,11 +83,9 @@ struct Configuration
         "The map_path must be a directory (given an ", std::quoted(map_path.string()), ")");
     } else if (not contains(map_path, ".osm")) {
       throw common::SimulationError("The map_path must contain at least one *.osm file");
-    }
-    // else if (not contains(map_path, ".pcd")) {
-    //   throw common::SimulationError("The map_path must contain at least one *.pcd file");
-    // }
-    else {
+    } else if (not contains(map_path, ".pcd")) {
+      throw common::SimulationError("The map_path must contain at least one *.pcd file");
+    } else {
       return map_path;
     }
   }
