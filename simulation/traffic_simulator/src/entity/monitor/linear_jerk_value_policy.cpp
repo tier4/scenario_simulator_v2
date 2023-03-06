@@ -19,7 +19,7 @@
 
 namespace traffic_simulator::entity
 {
-auto LinearJerkValuePolicy::getValue(EntityBase & entity) const -> double
+auto LinearJerkValuePolicy::getValue(const EntityBase & entity) const -> double
 {
   return entity.getLinearJerk();
 }

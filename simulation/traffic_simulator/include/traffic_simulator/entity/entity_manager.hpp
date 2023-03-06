@@ -328,7 +328,7 @@ public:
 
   auto getStepTime() const noexcept -> double;
 
-  auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
+  auto getWaypoints(const std::string & name) const -> traffic_simulator_msgs::msg::WaypointsArray;
 
   template <typename T>
   auto getGoalPoses(const std::string & name) -> std::vector<T>

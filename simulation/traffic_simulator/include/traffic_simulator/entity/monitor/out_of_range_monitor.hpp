@@ -34,7 +34,7 @@ public:
    * @note If return value of ValuePolicy::getValue() goes outside of this range, an exception is thrown.
    */
   OutOfRangeMonitor(
-    EntityBase & entity, std::string name, std::optional<double> min_value,
+    const EntityBase & entity, std::string name, std::optional<double> min_value,
     std::optional<double> max_value, ValuePolicy policy = ValuePolicy())
   : ValuePolicy(policy),
     min_value(min_value),
@@ -61,7 +61,7 @@ public:
   const std::string name;
 
 private:
-  EntityBase & entity_;
+  const EntityBase & entity_;
 };
 }  // namespace traffic_simulator::entity
 

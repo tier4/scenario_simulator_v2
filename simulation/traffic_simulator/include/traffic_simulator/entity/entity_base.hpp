@@ -121,7 +121,7 @@ public:
 
   /*   */ auto getStandStillDuration() const -> double;
 
-  virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
+  virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   /*   */ auto isNpcLogicStarted() const -> bool;
 

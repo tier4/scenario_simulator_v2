@@ -297,7 +297,7 @@ auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
   return current_twist;
 }
 
-auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
+auto EgoEntity::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
 {
   return autoware->getWaypoints();
 }

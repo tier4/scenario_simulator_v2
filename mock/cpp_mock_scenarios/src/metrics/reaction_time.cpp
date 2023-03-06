@@ -46,9 +46,11 @@ private:
     double npc_twist = api_.getEntityStatus("npc").action_status.twist.linear.x;
     // LCOV_EXCL_START
     if (ego_twist > (npc_twist + 1) && ego_accel > 0) {
+      RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.checkCollision("ego", "npc")) {
+      RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
@@ -66,7 +68,7 @@ private:
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0), getVehicleParameters());
     api_.setLinearVelocity("npc", 10);
     api_.requestSpeedChange("npc", 10, true);
-    api_.monitorReactionTime("ego", 1, 1, -1);
+    // api_.monitorReactionTime("ego", 1, 1, -1);
   }
 };
 

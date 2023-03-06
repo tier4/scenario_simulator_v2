@@ -98,7 +98,7 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t
   }
 }
 
-auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
+auto VehicleEntity::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
 {
   if (!npc_logic_started_) {
     return traffic_simulator_msgs::msg::WaypointsArray();

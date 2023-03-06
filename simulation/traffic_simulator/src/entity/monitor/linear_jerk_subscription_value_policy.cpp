@@ -27,7 +27,7 @@ LinearJerkSubscriptionValuePolicy::LinearJerkSubscriptionValuePolicy(
 {
 }
 
-auto LinearJerkSubscriptionValuePolicy::getValue(EntityBase &) const -> double
+auto LinearJerkSubscriptionValuePolicy::getValue(const EntityBase &) const -> double
 {
   return linear_jerk_;
 }

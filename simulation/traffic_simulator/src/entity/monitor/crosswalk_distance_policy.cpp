@@ -26,7 +26,7 @@ CrosswalkDistancePolicy::CrosswalkDistancePolicy(HdMapUtilsPtr hdmap_utils_ptr)
 {
 }
 
-auto CrosswalkDistancePolicy::getDistance(EntityBase & entity, std::int64_t crosswalk_id)
+auto CrosswalkDistancePolicy::getDistance(const EntityBase & entity, std::int64_t crosswalk_id)
   -> std::optional<double>
 {
   auto waypoints = entity.getWaypoints().waypoints;

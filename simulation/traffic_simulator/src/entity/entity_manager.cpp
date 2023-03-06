@@ -396,7 +396,7 @@ auto EntityManager::getRelativePose(const LaneletPose & from, const std::string 
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
-auto EntityManager::getWaypoints(const std::string & name)
+auto EntityManager::getWaypoints(const std::string & name) const
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
   if (!npc_logic_started_) {

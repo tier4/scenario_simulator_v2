@@ -113,7 +113,7 @@ public:
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 
-  auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
+  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
   void onUpdate(double current_time, double step_time) override;
 

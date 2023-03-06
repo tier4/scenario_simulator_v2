@@ -22,7 +22,7 @@ namespace traffic_simulator::entity
 class LinearAccelerationValuePolicy
 {
 public:
-  auto getValue(EntityBase & entity) const -> double;
+  auto getValue(const EntityBase & entity) const -> double;
 };
 }  // namespace traffic_simulator::entity
 

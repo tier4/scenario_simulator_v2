@@ -17,7 +17,7 @@
 
 namespace traffic_simulator::entity
 {
-auto LinearAccelerationValuePolicy::getValue(EntityBase & entity) const -> double
+auto LinearAccelerationValuePolicy::getValue(const EntityBase & entity) const -> double
 {
   return entity.getCurrentAccel().linear.x;
 }

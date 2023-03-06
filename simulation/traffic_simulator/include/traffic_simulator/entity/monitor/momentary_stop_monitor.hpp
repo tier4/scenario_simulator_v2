@@ -39,7 +39,7 @@ public:
    * @param stop_duration If entities stop longer than stop_duration, then this monitor ends successfully.
    */
   MomentaryStopMonitor(
-    EntityBase & entity, double min_acceleration, double max_acceleration,
+    const EntityBase & entity, double min_acceleration, double max_acceleration,
     std::int64_t stop_target_lanelet_id, double stop_sequence_start_distance,
     double stop_sequence_end_distance, double stop_duration,
     DistancePolicy policy = DistancePolicy())
@@ -82,7 +82,7 @@ public:
   }
 
 private:
-  EntityBase & entity_;
+  const EntityBase & entity_;
   const double min_acceleration_;
   const double max_acceleration_;
   const std::int64_t stop_target_lanelet_id_;

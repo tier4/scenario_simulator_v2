@@ -17,7 +17,7 @@
 
 namespace traffic_simulator::entity
 {
-auto LinearVelocityValuePolicy::getValue(EntityBase & entity) const -> double
+auto LinearVelocityValuePolicy::getValue(const EntityBase & entity) const -> double
 {
   return entity.getCurrentTwist().linear.x;
 }

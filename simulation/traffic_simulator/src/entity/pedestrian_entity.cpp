@@ -108,7 +108,7 @@ auto PedestrianEntity::getGoalPoses() -> std::vector<traffic_simulator_msgs::msg
   return route_planner_ptr_->getGoalPoses();
 }
 
-const traffic_simulator_msgs::msg::WaypointsArray PedestrianEntity::getWaypoints()
+traffic_simulator_msgs::msg::WaypointsArray PedestrianEntity::getWaypoints() const
 {
   return traffic_simulator_msgs::msg::WaypointsArray();
 }

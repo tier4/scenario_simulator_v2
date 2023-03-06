@@ -105,7 +105,7 @@ public:
 
   auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> override;
 
-  auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
+  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
   const std::string plugin_name;
 

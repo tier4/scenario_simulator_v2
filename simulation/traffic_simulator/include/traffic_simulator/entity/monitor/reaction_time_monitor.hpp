@@ -32,7 +32,7 @@ public:
    * @param jerk_lower_threshold If not std::nullopt and the jerk of target entity falls below this value, this monitor throws SPECIFICATION_VIOLATION.
    */
   explicit ReactionTimeMonitor(
-    EntityBase & entity, double max_reaction_time, std::optional<double> upper_jerk_threshold,
+    const EntityBase & entity, double max_reaction_time, std::optional<double> upper_jerk_threshold,
     std::optional<double> lower_jerk_threshold);
 
   auto operator()(double) -> bool;
@@ -42,7 +42,7 @@ private:
   const std::optional<double> upper_jerk_threshold_;
   const std::optional<double> lower_jerk_threshold_;
 
-  EntityBase & entity_;
+  const EntityBase & entity_;
   double elapsed_duration_ = 0.0;
 };
 }  // namespace traffic_simulator::entity

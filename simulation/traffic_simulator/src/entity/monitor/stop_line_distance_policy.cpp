@@ -28,7 +28,7 @@ StopLineDistancePolicy::StopLineDistancePolicy(HdMapUtilsPtr hdmap_utils_ptr)
 {
 }
 
-auto StopLineDistancePolicy::getDistance(EntityBase & entity, std::int64_t stop_line_id)
+auto StopLineDistancePolicy::getDistance(const EntityBase & entity, std::int64_t stop_line_id)
   -> std::optional<double>
 {
   auto waypoints = entity.getWaypoints().waypoints;

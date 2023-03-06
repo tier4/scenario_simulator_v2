@@ -47,9 +47,11 @@ private:
     double npc_twist = api_.getEntityStatus("npc").action_status.twist.linear.x;
     // LCOV_EXCL_START
     if (ego_twist > (npc_twist + 1) && ego_accel > 0) {
+      RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.checkCollision("ego", "npc")) {
+      RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP

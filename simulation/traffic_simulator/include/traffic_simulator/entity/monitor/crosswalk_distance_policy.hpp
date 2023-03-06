@@ -28,7 +28,7 @@ public:
 
   explicit CrosswalkDistancePolicy(HdMapUtilsPtr hdmap_utils_ptr);
 
-  auto getDistance(EntityBase & entity, std::int64_t crosswalk_id) -> std::optional<double>;
+  auto getDistance(const EntityBase & entity, std::int64_t crosswalk_id) -> std::optional<double>;
 
 private:
   HdMapUtilsPtr hdmap_utils_ptr_;

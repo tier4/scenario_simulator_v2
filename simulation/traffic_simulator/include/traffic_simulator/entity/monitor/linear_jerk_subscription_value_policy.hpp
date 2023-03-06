@@ -34,7 +34,7 @@ public:
   LinearJerkSubscriptionValuePolicy(
     NodeTopicsInterfacePtr node_topics_interface_ptr, const std::string & topic_name);
 
-  auto getValue(EntityBase & entity) const -> double;
+  auto getValue(const EntityBase & entity) const -> double;
 
 private:
   SubscriptionPtr subscription_ptr_;

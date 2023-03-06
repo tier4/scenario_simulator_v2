@@ -20,7 +20,7 @@
 namespace traffic_simulator::entity
 {
 ReactionTimeMonitor::ReactionTimeMonitor(
-  EntityBase & entity, double max_reaction_time, std::optional<double> upper_jerk_threshold,
+  const EntityBase & entity, double max_reaction_time, std::optional<double> upper_jerk_threshold,
   std::optional<double> lower_jerk_threshold)
 : max_reaction_time_(max_reaction_time),
   upper_jerk_threshold_(upper_jerk_threshold),
