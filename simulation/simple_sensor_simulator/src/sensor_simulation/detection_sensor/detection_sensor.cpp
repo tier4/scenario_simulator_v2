@@ -157,10 +157,8 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
           status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
         object.shape.type = object.shape.BOUNDING_BOX;
 
-        if (auto recognition_lost_uniform_distribution =
-              std::uniform_real_distribution<>(0.0, 100.0);
-            recognition_lost_uniform_distribution(random_engine_) >
-            configuration_.probability_of_lost()) {
+        if (auto probability_of_lost = std::uniform_real_distribution();
+            probability_of_lost(random_engine_) > configuration_.probability_of_lost()) {
           msg.objects.push_back(applyPositionNoise(object));
         }
       }
