@@ -260,16 +260,16 @@ public:
 
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+          // clang-format off
+          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
-          configuration.set_architecture_type(
-            getParameter<std::string>("architecture_type", "awf/universe"));
-          configuration.set_update_duration(0.1);
-          configuration.set_resolution(0.5);
-          configuration.set_width(200);
+          configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
           configuration.set_range(300);
-          configuration.set_filter_by_range(
-            controller.properties.template get<Boolean>("isClairvoyant"));
+          configuration.set_resolution(0.5);
+          configuration.set_update_duration(0.1);
+          configuration.set_width(200);
+          // clang-format on
           return configuration;
         }());
 
