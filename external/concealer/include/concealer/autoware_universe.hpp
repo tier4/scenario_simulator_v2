@@ -117,8 +117,9 @@ private:
 
   std::string minimum_risk_maneuver_behavior;
 
-  template <typename T>
-  auto receiveMinimumRiskManeuverState(const T & msg) -> void;
+  auto receiveMrmState(const MrmState & msg) -> void;
+
+  auto receiveEmergencyState(const EmergencyState & msg) -> void;
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
@@ -156,9 +157,9 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
     CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
-    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(EmergencyState, "/system/emergency/emergency_state", receiveMinimumRiskManeuverState),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(EmergencyState, "/system/emergency/emergency_state", receiveEmergencyState),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
-    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(MrmState, "/api/fail_safe/mrm_state", receiveMinimumRiskManeuverState),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(MrmState, "/api/fail_safe/mrm_state", receiveMrmState),
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),

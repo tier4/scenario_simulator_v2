@@ -296,56 +296,55 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
 
-template <typename T>
-auto AutowareUniverse::receiveMinimumRiskManeuverState(const T & msg) -> void
+auto AutowareUniverse::receiveEmergencyState(const EmergencyState & msg) -> void
 {
 #define CASE(IDENTIFIER, VARIABLE) \
-  case T::IDENTIFIER:              \
+  case EmergencyState::IDENTIFIER:              \
     VARIABLE = #IDENTIFIER;        \
     break
 
-  using RAW_T = std::decay_t<T>;
-  if constexpr (std::is_same_v<RAW_T, autoware_auto_system_msgs::msg::EmergencyState>) {
-    switch (msg.state) {
-      CASE(MRM_FAILED, minimum_risk_maneuver_state);
-      CASE(MRM_OPERATING, minimum_risk_maneuver_state);
-      CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
-      CASE(NORMAL, minimum_risk_maneuver_state);
-      CASE(OVERRIDE_REQUESTING, minimum_risk_maneuver_state);
+  switch (msg.state) {
+    CASE(MRM_FAILED, minimum_risk_maneuver_state);
+    CASE(MRM_OPERATING, minimum_risk_maneuver_state);
+    CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
+    CASE(NORMAL, minimum_risk_maneuver_state);
+    CASE(OVERRIDE_REQUESTING, minimum_risk_maneuver_state);
 
-      default:
-        throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
-    }
-    minimum_risk_maneuver_behavior = "";
-  } else if constexpr (std::is_same_v<RAW_T, autoware_adapi_v1_msgs::msg::MrmState>) {
-    switch (msg.state) {
-      CASE(MRM_FAILED, minimum_risk_maneuver_state);
-      CASE(MRM_OPERATING, minimum_risk_maneuver_state);
-      CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
-      CASE(NORMAL, minimum_risk_maneuver_state);
-      CASE(UNKNOWN, minimum_risk_maneuver_state);
-      default:
-        throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
-    }
-
-    switch (msg.behavior) {
-      CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
-      CASE(EMERGENCY_STOP, minimum_risk_maneuver_behavior);
-      CASE(NONE, minimum_risk_maneuver_behavior);
-      CASE(UNKNOWN, minimum_risk_maneuver_behavior);
-      default:
-        throw common::Error(
-          "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.behavior));
-    }
+    default:
+      throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
   }
+  minimum_risk_maneuver_behavior = "";
+#undef CASE
 }
 
-template auto
-AutowareUniverse::receiveMinimumRiskManeuverState<autoware_auto_system_msgs::msg::EmergencyState>(
-  const autoware_auto_system_msgs::msg::EmergencyState &) -> void;
-template auto AutowareUniverse::receiveMinimumRiskManeuverState<
-  autoware_adapi_v1_msgs::msg::MrmState>(const autoware_adapi_v1_msgs::msg::MrmState &) -> void;
+auto AutowareUniverse::receiveMrmState(const MrmState & msg) -> void
+{
+#define CASE(IDENTIFIER, VARIABLE) \
+  case MrmState::IDENTIFIER:              \
+    VARIABLE = #IDENTIFIER;        \
+    break
 
+  switch (msg.state) {
+    CASE(MRM_FAILED, minimum_risk_maneuver_state);
+    CASE(MRM_OPERATING, minimum_risk_maneuver_state);
+    CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
+    CASE(NORMAL, minimum_risk_maneuver_state);
+    CASE(UNKNOWN, minimum_risk_maneuver_state);
+    default:
+      throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
+  }
+
+  switch (msg.behavior) {
+    CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
+    CASE(EMERGENCY_STOP, minimum_risk_maneuver_behavior);
+    CASE(NONE, minimum_risk_maneuver_behavior);
+    CASE(UNKNOWN, minimum_risk_maneuver_behavior);
+    default:
+      throw common::Error(
+        "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.behavior));
+  }
+#undef CASE
+}
 }  // namespace concealer
 
 namespace autoware_auto_vehicle_msgs::msg
