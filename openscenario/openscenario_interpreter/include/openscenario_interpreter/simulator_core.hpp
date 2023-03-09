@@ -58,7 +58,13 @@ public:
 
   static auto active() { return static_cast<bool>(core); }
 
-  static auto deactivate() -> void { core.reset(); }
+  static auto deactivate() -> void
+  {
+    if (active()) {
+      core->closeZMQConnection();
+      core.reset();
+    }
+  }
 
   static auto update() -> void { core->updateFrame(); }
 
@@ -244,6 +250,7 @@ public:
           configuration.set_entity(entity_ref);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_pos_noise_stddev(controller.properties.template get<Double>("detectedObjectPositionStandardDeviation"));
+          configuration.set_probability_of_lost(controller.properties.template get<Double>("detectedObjectMissingProbability"));
           configuration.set_random_seed(controller.properties.template get<UnsignedInteger>("randomSeed"));
           configuration.set_range(300);
           configuration.set_update_duration(0.1);
@@ -253,16 +260,16 @@ public:
 
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+          // clang-format off
+          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
-          configuration.set_architecture_type(
-            getParameter<std::string>("architecture_type", "awf/universe"));
-          configuration.set_update_duration(0.1);
-          configuration.set_resolution(0.5);
-          configuration.set_width(200);
+          configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
           configuration.set_range(300);
-          configuration.set_filter_by_range(
-            controller.properties.template get<Boolean>("isClairvoyant"));
+          configuration.set_resolution(0.5);
+          configuration.set_update_duration(0.1);
+          configuration.set_width(200);
+          // clang-format on
           return configuration;
         }());
 
@@ -345,7 +352,11 @@ public:
     template <typename... Ts>
     static auto evaluateSimulationTime(Ts &&... xs) -> double
     {
-      return core->getCurrentTime(std::forward<decltype(xs)>(xs)...);
+      if (SimulatorCore::active()) {
+        return core->getCurrentTime(std::forward<decltype(xs)>(xs)...);
+      } else {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
     }
 
     template <typename... Ts>

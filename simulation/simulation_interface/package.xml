@@ -13,16 +13,17 @@
   <depend>autoware_auto_control_msgs</depend>
   <depend>autoware_auto_perception_msgs</depend>
   <depend>autoware_auto_vehicle_msgs</depend>
+  <depend>boost</depend>
   <depend>builtin_interfaces</depend>
   <depend>geometry_msgs</depend>
-  <depend>zmqpp_vendor</depend>
   <depend>protobuf-dev</depend>
   <depend>protobuf</depend>
   <depend>rclcpp</depend>
   <depend>rosgraph_msgs</depend>
   <depend>scenario_simulator_exception</depend>
+  <depend>status_monitor</depend>
   <depend>traffic_simulator_msgs</depend>
-  <depend>boost</depend>
+  <depend>zmqpp_vendor</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>

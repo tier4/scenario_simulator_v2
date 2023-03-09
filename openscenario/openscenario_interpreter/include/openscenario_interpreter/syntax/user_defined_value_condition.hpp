@@ -43,7 +43,7 @@ class UserDefinedValueCondition : private SimulatorCore::NonStandardOperation
 {
   Object result;
 
-  std::function<Object()> evaluateValue;
+  std::function<Object()> evaluate_value;
 
 public:
   const String name;

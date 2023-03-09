@@ -16,29 +16,26 @@
 # limitations under the License.
 
 
-import argparse
+import os
+import rclpy
 import time
-import glob
+
+from argparse import ArgumentParser
+from glob import glob
+from lifecycle_controller import LifecycleController
+from openscenario_preprocessor_msgs.srv import CheckDerivativeRemained
+from openscenario_preprocessor_msgs.srv import Derive
+from openscenario_preprocessor_msgs.srv import Load
+from openscenario_utility.conversion import convert
 from pathlib import Path
+from rclpy.executors import ExternalShutdownException
 from shutil import rmtree
 from sys import exit
 from typing import List
-import os
-
-import rclpy
-from openscenario_preprocessor_msgs.srv import (
-    CheckDerivativeRemained,
-    Derive,
-    Load
-)
-from openscenario_utility.conversion import convert
-from lifecycle_controller import LifecycleController
-from workflow import (
-    Expect,
-    Scenario,
-    Workflow,
-    substitute_ros_package,
-)
+from workflow import Expect
+from workflow import Scenario
+from workflow import Workflow
+from workflow import substitute_ros_package
 
 
 def convert_scenarios_to_xosc(scenarios: List[Scenario], output_directory: Path):
@@ -106,7 +103,7 @@ class ScenarioTestRunner(LifecycleController):
 
         if self.output_directory.exists():
             glob_pattern = str(self.output_directory.resolve()) + "/*"
-            remove_targets = glob.glob(glob_pattern + "/*")
+            remove_targets = glob(glob_pattern + "/*")
             for target in remove_targets:
                 if os.path.isdir(target):
                     rmtree(target)
@@ -162,10 +159,9 @@ class ScenarioTestRunner(LifecycleController):
     def spin(self):
         """Run scenario."""
         time.sleep(self.SLEEP_RATE)
-
         while self.activate_node():
             start = time.time()
-            while True:
+            while rclpy.ok():
                 if self.get_lifecycle_state() == "inactive":
                     break
                 elif ((time.time() - start) > self.global_timeout
@@ -211,6 +207,7 @@ class ScenarioTestRunner(LifecycleController):
                 exit(1)
 
         self.shutdown()
+        self.destroy_node()
 
     def run_preprocessed_scenarios(self, scenarios: List[Scenario]):
         """
@@ -256,8 +253,11 @@ class ScenarioTestRunner(LifecycleController):
 
                 self.cleanup_node()
 
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, ExternalShutdownException):
             self.get_logger().warn("KeyboardInterrupt")
+            self.destroy_node()
+            rclpy.try_shutdown()
+            exit(0)
         except OSError as e:
             self.get_logger().warn("OSError: {}".format(e))
         except Exception as e:
@@ -305,7 +305,7 @@ def main(args=None):
 
     rclpy.init(args=args)
 
-    parser = argparse.ArgumentParser()
+    parser = ArgumentParser()
 
     parser.add_argument("--output-directory", default=Path("/tmp"), type=Path)
 
@@ -337,8 +337,6 @@ def main(args=None):
     )
 
     if args.scenario != Path("/dev/null"):
-        print(str(substitute_ros_package(args.scenario).resolve()))
-
         test_runner.run_scenarios(
             [Scenario(
                 substitute_ros_package(args.scenario).resolve(),

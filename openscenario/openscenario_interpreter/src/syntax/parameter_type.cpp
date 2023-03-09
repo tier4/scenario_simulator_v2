@@ -23,11 +23,6 @@ static_assert(std::is_standard_layout<ParameterType>::value, "");
 
 static_assert(std::is_trivial<ParameterType>::value, "");
 
-ParameterType::ParameterType(const openscenario_msgs::msg::ParameterType & message)
-: value(static_cast<value_type>(message.data))
-{
-}
-
 auto operator>>(std::istream & is, ParameterType & datum) -> std::istream &
 {
   std::string buffer;
