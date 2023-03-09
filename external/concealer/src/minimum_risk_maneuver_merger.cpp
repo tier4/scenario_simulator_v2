@@ -96,9 +96,7 @@ auto extractStateName(const T & msg) -> std::string
       default:
         throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
     }
-  }
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
-  else if constexpr (std::is_same_v<T, autoware_adapi_v1_msgs::msg::MrmState>) {
+  } else if constexpr (std::is_same_v<T, autoware_adapi_v1_msgs::msg::MrmState>) {
     switch (msg.state) {
       CASE(MRM_FAILED);
       CASE(MRM_OPERATING);
@@ -109,21 +107,16 @@ auto extractStateName(const T & msg) -> std::string
       default:
         throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
     }
-  }
-#endif
-  else {
+  } else {
     throw common::Error("Unsupported MrmState type : ", typeid(T).name());
   }
 #undef CASE
 }
 
-template auto
-extractStateName<autoware_auto_system_msgs::msg::EmergencyState>(
+template auto extractStateName<autoware_auto_system_msgs::msg::EmergencyState>(
   const autoware_auto_system_msgs::msg::EmergencyState &) -> std::string;
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
 template auto extractStateName<autoware_adapi_v1_msgs::msg::MrmState>(
   const autoware_adapi_v1_msgs::msg::MrmState &) -> std::string;
-#endif
 
 template <typename T>
 auto extractBehaviorName(const T & msg) -> std::string
@@ -137,9 +130,7 @@ auto extractBehaviorName(const T & msg) -> std::string
     throw common::Error(
       "autoware_auto_system_msgs::msg::EmergencyState has no behavior field for "
       "MinimumRiskManeuver");
-  }
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
-  else if constexpr (std::is_same_v<T, autoware_adapi_v1_msgs::msg::MrmState>) {
+  } else if constexpr (std::is_same_v<T, autoware_adapi_v1_msgs::msg::MrmState>) {
     switch (msg.behavior) {
       CASE(COMFORTABLE_STOP);
       CASE(EMERGENCY_STOP);
@@ -150,9 +141,7 @@ auto extractBehaviorName(const T & msg) -> std::string
         throw common::Error(
           "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.behavior));
     }
-  }
-#endif
-  else {
+  } else {
     throw common::Error("Unsupported type of MrmState");
   }
 #undef CASE
@@ -160,9 +149,7 @@ auto extractBehaviorName(const T & msg) -> std::string
 
 template auto extractBehaviorName<autoware_auto_system_msgs::msg::EmergencyState>(
   const autoware_auto_system_msgs::msg::EmergencyState &) -> std::string;
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
 template auto extractBehaviorName<autoware_adapi_v1_msgs::msg::MrmState>(
   const autoware_adapi_v1_msgs::msg::MrmState &) -> std::string;
-#endif
 
 }  // namespace concealer

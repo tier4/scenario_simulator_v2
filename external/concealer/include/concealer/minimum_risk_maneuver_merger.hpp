@@ -15,12 +15,10 @@
 #ifndef CONCEALER__MINIMUM_RISK_MANEUVER_MERGER_HPP_
 #define CONCEALER__MINIMUM_RISK_MANEUVER_MERGER_HPP_
 
+#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
-#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
-#endif
 
 namespace concealer
 {
@@ -40,9 +38,7 @@ private:
 public:
   //  auto set(const autoware_auto_system_msgs::msg::EmergencyState & msg) -> void;
 
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
-//  auto set(const autoware_adapi_v1_msgs::msg::MrmState & msg) -> void;
-#endif
+  //  auto set(const autoware_adapi_v1_msgs::msg::MrmState & msg) -> void;
 
   //  auto getStateName() const -> std::string;
 
