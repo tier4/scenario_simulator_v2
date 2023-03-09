@@ -95,11 +95,16 @@ public:
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
+  /*   */ auto getTraveledDistance() const -> double;
+
   virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
 
   /*   */ auto getLinearJerk() const -> double;
 
   /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
+  /*   */ auto getLaneletPose(double matching_distance) const
+    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 
@@ -196,6 +201,8 @@ public:
 
   /*   */ auto updateStandStillDuration(const double step_time) -> double;
 
+  /*   */ auto updateTraveledDistance(const double step_time) -> double;
+
   const std::string name;
 
   bool verbose;
@@ -208,12 +215,12 @@ protected:
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
 
-  bool npc_logic_started_;
+  bool npc_logic_started_ = false;
+  double stand_still_duration_ = 0.0;
+  double traveled_distance_ = 0.0;
 
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
-
-  double stand_still_duration_ = 0.0;
 
   boost::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;

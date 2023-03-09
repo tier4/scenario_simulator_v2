@@ -61,7 +61,7 @@ class DetectionSensor : public DetectionSensorBase
 
   std::mt19937 random_engine_;
 
-  auto applyNoise(autoware_auto_perception_msgs::msg::DetectedObject)
+  auto applyPositionNoise(autoware_auto_perception_msgs::msg::DetectedObject)
     -> autoware_auto_perception_msgs::msg::DetectedObject;
 
 public:
@@ -83,7 +83,7 @@ public:
 };
 
 template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyNoise(
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
   autoware_auto_perception_msgs::msg::DetectedObject)
   -> autoware_auto_perception_msgs::msg::DetectedObject;
 

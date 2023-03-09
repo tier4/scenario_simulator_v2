@@ -59,7 +59,7 @@ auto DetectionSensorBase::getSensorPose(
 }
 
 template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyNoise(
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
   autoware_auto_perception_msgs::msg::DetectedObject detected_object)
   -> autoware_auto_perception_msgs::msg::DetectedObject
 {
@@ -156,7 +156,11 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         simulation_interface::toMsg(
           status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
         object.shape.type = object.shape.BOUNDING_BOX;
-        msg.objects.push_back(applyNoise(object));
+
+        if (auto probability_of_lost = std::uniform_real_distribution();
+            probability_of_lost(random_engine_) > configuration_.probability_of_lost()) {
+          msg.objects.push_back(applyPositionNoise(object));
+        }
       }
     }
     publisher_ptr_->publish(msg);

@@ -6,11 +6,13 @@
   <description>Utility tools for ASAM OpenSCENARIO 1.2.0</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+  <depend>python3-numpy</depend>
   <depend>python3-xmlschema</depend>
   <depend>python3-yaml</depend>
-  <depend>python3-numpy</depend>
-  <depend>python3-setuptools</depend>
+  <depend>rclpy</depend>
   <export>
-    <build_type>ament_python</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>

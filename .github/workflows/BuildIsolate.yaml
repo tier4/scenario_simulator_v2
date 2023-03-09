@@ -12,7 +12,7 @@ jobs:
   build_isolate:
     name: build_isolate
     runs-on: ubuntu-20.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -27,7 +27,6 @@ jobs:
             openscenario_interpreter,
             openscenario_interpreter_example,
             openscenario_interpreter_msgs,
-            openscenario_msgs,
             openscenario_utility,
             openscenario_visualization,
             random_test_runner,
@@ -39,7 +38,6 @@ jobs:
             simulation_interface,
             traffic_simulator,
             traffic_simulator_msgs,
-            user_defined_value_condition_example,
           ]
         rosdistro: [galactic, humble]
         include:
@@ -70,7 +68,7 @@ jobs:
           package-name: ${{ matrix.package }}
           target-ros2-distro: ${{ matrix.rosdistro }}
           vcs-repo-file-url: dependency_${{ matrix.rosdistro }}.repos
-          extra-cmake-args: -DWITH_INTEGRATION_TEST=ON
+          extra-cmake-args: -DBUILD_CPP_MOCK_SCENARIOS=ON
           colcon-defaults: |
             {
               "build": {

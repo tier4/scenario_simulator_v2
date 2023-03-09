@@ -80,9 +80,11 @@ HdMapUtils::HdMapUtils(
   std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
   all_graphs.push_back(vehicle_routing_graph_ptr_);
   all_graphs.push_back(pedestrian_routing_graph_ptr_);
+  shoulder_lanelets_ =
+    lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
-const std::vector<std::int64_t> HdMapUtils::getLaneletIds()
+std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
 {
   std::vector<std::int64_t> ret;
   for (const auto & lanelet : lanelet_map_ptr_->laneletLayer) {
@@ -123,12 +125,13 @@ std::vector<std::int64_t> HdMapUtils::filterLaneletIds(
 }
 
 std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
-  const geometry_msgs::msg::Point & position, double distance_threshold) const
+  const geometry_msgs::msg::Point & position, double distance_threshold,
+  unsigned int search_count) const
 {
   std::vector<std::int64_t> lanelet_ids;
   lanelet::BasicPoint2d search_point(position.x, position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 5);
+    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, search_count);
   if (nearest_lanelet.empty()) {
     return {};
   }
@@ -141,12 +144,13 @@ std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
 }
 
 std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
-  const geometry_msgs::msg::Point & point, double distance_thresh, bool include_crosswalk) const
+  const geometry_msgs::msg::Point & point, double distance_thresh, bool include_crosswalk,
+  unsigned int search_count) const
 {
   std::vector<std::int64_t> lanelet_ids;
   lanelet::BasicPoint2d search_point(point.x, point.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 5);
+    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, search_count);
   if (include_crosswalk) {
     if (nearest_lanelet.empty()) {
       return {};
@@ -782,6 +786,18 @@ double HdMapUtils::getLaneletLength(std::int64_t lanelet_id)
   return ret;
 }
 
+std::vector<std::int64_t> HdMapUtils::getPreviousRoadShoulderLanelet(std::int64_t lanelet_id) const
+{
+  std::vector<std::int64_t> ret;
+  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : shoulder_lanelets_) {
+    if (lanelet::geometry::follows(shoulder_lanelet, lanelet)) {
+      ret.emplace_back(shoulder_lanelet.id());
+    }
+  }
+  return ret;
+}
+
 std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet_id) const
 {
   std::vector<std::int64_t> ret;
@@ -789,6 +805,9 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet
   const auto previous_lanelets = vehicle_routing_graph_ptr_->previous(lanelet);
   for (const auto & llt : previous_lanelets) {
     ret.push_back(llt.id());
+  }
+  for (const auto & id : getPreviousRoadShoulderLanelet(lanelet_id)) {
+    ret.emplace_back(id);
   }
   return ret;
 }
@@ -808,6 +827,18 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(
   return ret;
 }
 
+std::vector<std::int64_t> HdMapUtils::getNextRoadShoulderLanelet(std::int64_t lanelet_id) const
+{
+  std::vector<std::int64_t> ret;
+  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : shoulder_lanelets_) {
+    if (lanelet::geometry::follows(lanelet, shoulder_lanelet)) {
+      ret.emplace_back(shoulder_lanelet.id());
+    }
+  }
+  return ret;
+}
+
 std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(std::int64_t lanelet_id) const
 {
   std::vector<std::int64_t> ret;
@@ -815,6 +846,9 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(std::int64_t lanelet_id)
   const auto following_lanelets = vehicle_routing_graph_ptr_->following(lanelet);
   for (const auto & llt : following_lanelets) {
     ret.push_back(llt.id());
+  }
+  for (const auto & id : getNextRoadShoulderLanelet(lanelet_id)) {
+    ret.emplace_back(id);
   }
   return ret;
 }
@@ -1141,6 +1175,16 @@ bool HdMapUtils::canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lan
   const auto from_lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
   return traffic_rules_vehicle_ptr_->canChangeLane(from_lanelet, to_lanelet);
+}
+
+boost::optional<double> HdMapUtils::getLateralDistance(
+  traffic_simulator_msgs::msg::LaneletPose from, traffic_simulator_msgs::msg::LaneletPose to)
+{
+  const auto route = getRoute(from.lanelet_id, to.lanelet_id);
+  if (route.empty()) {
+    return boost::none;
+  }
+  return to.offset - from.offset;
 }
 
 boost::optional<double> HdMapUtils::getLongitudinalDistance(

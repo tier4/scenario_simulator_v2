@@ -17,6 +17,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+
 find_package(ament_cmake_auto REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)

@@ -17,7 +17,6 @@
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_auto_planning_msgs/msg/had_map_route.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>

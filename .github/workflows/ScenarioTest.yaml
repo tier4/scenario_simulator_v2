@@ -5,15 +5,13 @@ on:
   schedule:
     - cron: 0 0 * * *
   pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "README.md"
-      - "workflows/Docker.yaml"
-      - "workflows/Documentation.yaml"
-      - "workflows/NotifyFailure.yaml"
-      - "workflows/Release.yaml"
-      - "workflows/SpellCheck.yaml"
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!README.md'
+      - '!.github/**'
+      - '.github/workflows/ScenarioTest.yaml'
+      - '!mkdocs.yml'
   push:
     branches:
       - master
@@ -21,7 +19,7 @@ jobs:
   job1:
     name: ScenarioTest
     runs-on: ubuntu-20.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     container: ros:${{ matrix.rosdistro }}
     env:
       DEBIAN_FRONTEND: noninteractive
@@ -62,12 +60,12 @@ jobs:
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           cd ~/ros2_ws
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON
         shell: bash
 
       - name: Scenario test
         run: |
           source ~/ros2_ws/install/setup.bash
           ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' global_frame_rate:=20
-          ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
+          ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
         shell: bash

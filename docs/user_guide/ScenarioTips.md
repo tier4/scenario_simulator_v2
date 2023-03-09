@@ -32,7 +32,7 @@ Action:
 
 ## Exit with Success when Autoware reaches the target
 
-When the state of Autoware becomes `ARRIVED_GOAL`, execute `exitSuccess` of `CustomCommandAction`.  
+When the state of Autoware becomes `ARRIVED_GOAL`, execute `exitSuccess` of `CustomCommandAction`.
 If you have set multiple destinations, it is a good idea to use `DistanceCondition` to check if the Autoware have arrived at the correct destination.
 ```yaml
 Event:
@@ -57,7 +57,7 @@ Event:
 ```
 
 ## Exit with failure when scenario has timed out
-It's important to have a timeout in case the scenario or Autoware doesn't work as intended.  
+It's important to have a timeout in case the scenario or Autoware doesn't work as intended.
 The example below is written to time out after 3 minutes(180 seconds).
 ```yaml
 Event:
@@ -81,8 +81,8 @@ Event:
 ```
 
 ## Use custom topic content in scenario
-In `UserDefinedValueCondition`, you can treat ros2 topic content by writing the name of topic in the name field.  
-Caution: this function supports `openscenario_msgs::msg::ParameterDeclaration` type only  
+In `UserDefinedValueCondition`, you can treat ros2 topic content by writing the name of topic in the name field.
+Caution: this function supports `tier4_simulation_msgs::msg::UserDefinedValue` type only
 The example below is using the value from `/count_up` topic.
 ```yaml
 Condition:
