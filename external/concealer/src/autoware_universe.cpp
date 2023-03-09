@@ -14,7 +14,6 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware_universe.hpp>
-#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 
 namespace concealer
 {
@@ -318,9 +317,7 @@ auto AutowareUniverse::receiveMinimumRiskManeuverState(const T & msg) -> void
         throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
     }
     minimum_risk_maneuver_behavior = "";
-  }
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
-  else if constexpr (std::is_same_v<RAW_T, autoware_adapi_v1_msgs::msg::MrmState>) {
+  } else if constexpr (std::is_same_v<RAW_T, autoware_adapi_v1_msgs::msg::MrmState>) {
     switch (msg.state) {
       CASE(MRM_FAILED, minimum_risk_maneuver_state);
       CASE(MRM_OPERATING, minimum_risk_maneuver_state);
@@ -330,7 +327,6 @@ auto AutowareUniverse::receiveMinimumRiskManeuverState(const T & msg) -> void
       default:
         throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
     }
-#endif
 
     switch (msg.behavior) {
       CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
@@ -347,10 +343,8 @@ auto AutowareUniverse::receiveMinimumRiskManeuverState(const T & msg) -> void
 template auto
 AutowareUniverse::receiveMinimumRiskManeuverState<autoware_auto_system_msgs::msg::EmergencyState>(
   const autoware_auto_system_msgs::msg::EmergencyState &) -> void;
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
 template auto AutowareUniverse::receiveMinimumRiskManeuverState<
   autoware_adapi_v1_msgs::msg::MrmState>(const autoware_adapi_v1_msgs::msg::MrmState &) -> void;
-#endif
 
 }  // namespace concealer
 

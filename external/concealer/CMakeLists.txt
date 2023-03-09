@@ -13,23 +13,6 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-# for backward compatibility
-# DIRTY HACK! : this line is needed to build without sourcing install/setup.bash
-set(autoware_adapi_v1_msgs_CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/../autoware_adapi_v1_msgs/share/autoware_adapi_v1_msgs/cmake")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${autoware_adapi_v1_msgs_CMAKE_MODULE_PATH})
-find_package(autoware_adapi_v1_msgs)
-if( autoware_adapi_v1_msgs_FOUND )
-  # DIRTY HACK! : ament_cmake_auto
-  list(APPEND ${PROJECT_NAME}_BUILD_DEPENDS autoware_adapi_v1_msgs)
-  list(APPEND ${PROJECT_NAME}_BUILD_EXPORT_DEPENDS autoware_adapi_v1_msgs)
-  list(APPEND ${PROJECT_NAME}_EXEC_DEPENDS autoware_adapi_v1_msgs)
-
-  list(APPEND ${PROJECT_NAME}_FOUND_BUILD_DEPENDS autoware_adapi_v1_msgs)
-  list(APPEND ${PROJECT_NAME}_FOUND_DEFINITIONS ${autoware_adapi_v1_msgs_DEFINITIONS})
-  list(APPEND ${PROJECT_NAME}_FOUND_INCLUDE_DIRS ${autoware_adapi_v1_msgs_INCLUDE_DIRS})
-  list(APPEND ${PROJECT_NAME}_FOUND_LIBRARIES ${autoware_adapi_v1_msgs_LIBRARIES})
-endif()
-
 ament_auto_add_library(${PROJECT_NAME} SHARED
   src/autoware.cpp
   src/autoware_universe.cpp

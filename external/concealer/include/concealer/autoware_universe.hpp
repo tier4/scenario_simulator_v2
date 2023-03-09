@@ -15,6 +15,7 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
+#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
@@ -42,10 +43,6 @@
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
-
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
-#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
-#endif
 
 namespace concealer
 {
@@ -80,9 +77,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
   using MrmState = autoware_adapi_v1_msgs::msg::MrmState;
-#endif
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
@@ -92,9 +87,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
   CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
-#ifdef USE_ADAPI_V1_MSGS
   CONCEALER_DEFINE_SUBSCRIPTION(MrmState);
-#endif
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
   CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
@@ -165,9 +158,7 @@ public:
     CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
     CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(EmergencyState, "/system/emergency/emergency_state", receiveMinimumRiskManeuverState),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
-#if __has_include(<autoware_adapi_v1_msgs/msg/mrm_state.hpp>)
     CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(MrmState, "/api/fail_safe/mrm_state", receiveMinimumRiskManeuverState),
-#endif
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
