@@ -80,13 +80,11 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     const std::unordered_map<std::string, std::function<Object()>> dispatch{
       std::make_pair(
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
-#ifdef USE_ADAPI_V1_MSGS
       std::make_pair(
         "currentMinimumRiskManeuverState.behavior",
         [result]() {
           return make<String>(asAutoware(result.str(1)).getMinimumRiskManeuverBehaviorName());
         }),
-#endif
       std::make_pair(
         "currentMinimumRiskManeuverState.state",
         [result]() {
