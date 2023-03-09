@@ -31,21 +31,13 @@ public:
   auto operator()() const -> MessageType { return *current_value; }
 
   template <typename NodeInterface>
-  SubscriberWrapper(std::string topic, NodeInterface & autoware_interface)
-  : subscription(autoware_interface.template create_subscription<MessageType>(
-      topic, 1,
-      [this](const typename MessageType::ConstSharedPtr message) { current_value = message; }))
-  {
-  }
-
-  template <typename NodeInterface>
   SubscriberWrapper(
     std::string topic, NodeInterface & autoware_interface,
-    std::function<void(const MessageType &)> callback)
+    std::function<void(const MessageType &)> callback = {})
   : subscription(autoware_interface.template create_subscription<MessageType>(
       topic, 1, [this, callback](const typename MessageType::ConstSharedPtr message) {
         current_value = message;
-        if (current_value) {
+        if (current_value && callback) {
           callback(*current_value);
         }
       }))
