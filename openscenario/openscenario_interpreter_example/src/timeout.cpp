@@ -14,9 +14,11 @@
 
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <boost/lexical_cast.hpp>
-#include <openscenario_msgs/msg/parameter_declaration.hpp>
-#include <openscenario_msgs/msg/parameter_type.hpp>
 #include <rclcpp/rclcpp.hpp>
+
+#if __has_include(<tier4_simulation_msgs/msg/user_defined_value.hpp>)
+#include <tier4_simulation_msgs/msg/user_defined_value.hpp>
+#endif
 
 int main(const int argc, char const * const * const argv)
 {
@@ -75,23 +77,23 @@ int main(const int argc, char const * const * const argv)
    *
    * ------------------------------------------------------------------------ */
 
-  using openscenario_msgs::msg::ParameterDeclaration;
-  using openscenario_msgs::msg::ParameterType;
-
   rclcpp::init(argc, argv);
 
   auto node = std::make_shared<rclcpp::Node>("count_up");
 
+#if __has_include(<tier4_simulation_msgs/msg/user_defined_value.hpp>)
+  using tier4_simulation_msgs::msg::UserDefinedValue;
+  using tier4_simulation_msgs::msg::UserDefinedValueType;
+
   autoware_auto_system_msgs::msg::AutowareState status;
 
   auto subscription = node->create_subscription<autoware_auto_system_msgs::msg::AutowareState>(
-    "/autoware/status", rclcpp::QoS(1).reliable(),
+    "/autoware/state", rclcpp::QoS(1).reliable(),
     [&](const autoware_auto_system_msgs::msg::AutowareState::SharedPtr message) {
       status = *message;
     });
 
-  auto publisher =
-    node->create_publisher<ParameterDeclaration>("/timeout", rclcpp::QoS(1).reliable());
+  auto publisher = node->create_publisher<UserDefinedValue>("/timeout", rclcpp::QoS(1).reliable());
 
   auto make_message = [&](const auto & status) mutable  //
   {
@@ -101,17 +103,15 @@ int main(const int argc, char const * const * const argv)
       duration_since_autoware_engaged = std::chrono::high_resolution_clock::now();
     }
 
-    ParameterDeclaration message;
+    UserDefinedValue message;
     {
-      message.name = "";
-      message.parameter_type.data = ParameterType::BOOLEAN;
+      message.type.data = UserDefinedValueType::BOOLEAN;
       message.value =
         (10 < std::chrono::duration_cast<std::chrono::seconds>(
                 std::chrono::high_resolution_clock::now() - duration_since_autoware_engaged)
                 .count())
           ? "true"
           : "false";
-      // if you want to add constraints for parameter, please add constraints to message.constraint_groups
     }
 
     std::cout << "message.value = " << message.value << std::endl;
@@ -121,6 +121,12 @@ int main(const int argc, char const * const * const argv)
 
   auto timer = node->create_wall_timer(
     std::chrono::milliseconds(100), [&]() { publisher->publish(make_message(status)); });
+#else
+  std::cout
+    << "The ability to have ROS2 topics as values for `UserDefinedValueCondition` is enabled only "
+       "when the `UserDefinedValue` type is present in the `tier4_simulation_msgs` package."
+    << std::endl;
+#endif
 
   rclcpp::executors::SingleThreadedExecutor executor;
 

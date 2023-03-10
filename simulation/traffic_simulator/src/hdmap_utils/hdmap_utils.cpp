@@ -125,12 +125,13 @@ std::vector<std::int64_t> HdMapUtils::filterLaneletIds(
 }
 
 std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
-  const geometry_msgs::msg::Point & position, double distance_threshold) const
+  const geometry_msgs::msg::Point & position, double distance_threshold,
+  unsigned int search_count) const
 {
   std::vector<std::int64_t> lanelet_ids;
   lanelet::BasicPoint2d search_point(position.x, position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 5);
+    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, search_count);
   if (nearest_lanelet.empty()) {
     return {};
   }
@@ -143,12 +144,13 @@ std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
 }
 
 std::vector<std::int64_t> HdMapUtils::getNearbyLaneletIds(
-  const geometry_msgs::msg::Point & point, double distance_thresh, bool include_crosswalk) const
+  const geometry_msgs::msg::Point & point, double distance_thresh, bool include_crosswalk,
+  unsigned int search_count) const
 {
   std::vector<std::int64_t> lanelet_ids;
   lanelet::BasicPoint2d search_point(point.x, point.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 5);
+    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, search_count);
   if (include_crosswalk) {
     if (nearest_lanelet.empty()) {
       return {};

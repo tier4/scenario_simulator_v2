@@ -27,7 +27,6 @@ jobs:
             openscenario_interpreter,
             openscenario_interpreter_example,
             openscenario_interpreter_msgs,
-            openscenario_msgs,
             openscenario_utility,
             openscenario_visualization,
             random_test_runner,
@@ -39,7 +38,6 @@ jobs:
             simulation_interface,
             traffic_simulator,
             traffic_simulator_msgs,
-            user_defined_value_condition_example,
           ]
         rosdistro: [galactic, humble]
         include:

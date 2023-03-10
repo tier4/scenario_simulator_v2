@@ -58,14 +58,6 @@ auto DetectionSensorBase::getSensorPose(
   throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
 }
 
-auto DetectionSensorBase::recognizeWithProbability(std::mt19937 & random_engine) const -> bool
-{
-  std::uniform_real_distribution<double> recognition_lost_uniform_distribution(0.0, 100.0);
-  bool recognize_success =
-    recognition_lost_uniform_distribution(random_engine) > configuration_.probability_of_lost();
-  return recognize_success;
-}
-
 template <>
 auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
   autoware_auto_perception_msgs::msg::DetectedObject detected_object)
@@ -165,7 +157,8 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
           status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
         object.shape.type = object.shape.BOUNDING_BOX;
 
-        if (recognizeWithProbability(random_engine_)) {
+        if (auto probability_of_lost = std::uniform_real_distribution();
+            probability_of_lost(random_engine_) > configuration_.probability_of_lost()) {
           msg.objects.push_back(applyPositionNoise(object));
         }
       }

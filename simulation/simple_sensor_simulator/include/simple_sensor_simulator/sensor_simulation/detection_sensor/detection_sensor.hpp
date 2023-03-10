@@ -46,8 +46,6 @@ protected:
   auto getSensorPose(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
     -> geometry_msgs::Pose;
 
-  auto recognizeWithProbability(std::mt19937 &) const -> bool;
-
 public:
   virtual ~DetectionSensorBase() = default;
 
