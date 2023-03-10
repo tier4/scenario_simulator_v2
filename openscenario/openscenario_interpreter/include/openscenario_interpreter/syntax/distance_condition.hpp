@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
+#include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <pugixml.hpp>
@@ -30,51 +31,76 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistanceCondition (OpenSCENARIO 1.1) -----------------------------------
- *
- *  The current distance between an entity and a position is compared to a
- *  given distance (less, greater, equal). Several additional parameters like
- *  free space etc. can be defined. The property "alongRoute" is deprecated. If
- *  "coordinateSystem" or "relativeDistanceType" are set, "alongRoute" is
- *  ignored.
- *
- *  <xsd:complexType name="DistanceCondition">
- *    <xsd:all>
- *      <xsd:element name="Position" type="Position"/>
- *    </xsd:all>
- *    <xsd:attribute name="alongRoute" type="Boolean">
- *      <xsd:annotation>
- *        <xsd:appinfo>
- *          deprecated
- *        </xsd:appinfo>
- *      </xsd:annotation>
- *    </xsd:attribute>
- *    <xsd:attribute name="coordinateSystem" type="CoordinateSystem"/>
- *    <xsd:attribute name="freespace" type="Boolean" use="required"/>
- *    <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType"/>
- *    <xsd:attribute name="rule" type="Rule" use="required"/>
- *    <xsd:attribute name="value" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DistanceCondition (OpenSCENARIO 1.2)
+
+   The current distance between an entity and a position is compared to a given
+   distance (less, greater, equal). Several additional parameters like free
+   space etc. can be defined. The property "alongRoute" is deprecated. If
+   "coordinateSystem" or "relativeDistanceType" are set, "alongRoute" is
+   ignored.
+
+   <xsd:complexType name="DistanceCondition">
+     <xsd:all>
+       <xsd:element name="Position" type="Position"/>
+     </xsd:all>
+     <xsd:attribute name="alongRoute" type="Boolean">
+       <xsd:annotation>
+         <xsd:appinfo>
+           deprecated
+         </xsd:appinfo>
+       </xsd:annotation>
+     </xsd:attribute>
+     <xsd:attribute name="freespace" type="Boolean" use="required"/>
+     <xsd:attribute name="rule" type="Rule" use="required"/>
+     <xsd:attribute name="value" type="Double" use="required"/>
+     <xsd:attribute name="coordinateSystem" type="CoordinateSystem"/>
+     <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType"/>
+     <xsd:attribute name="routingAlgorithm" type="RoutingAlgorithm"/>
+   </xsd:complexType>
+*/
 struct DistanceCondition : private Scope, private SimulatorCore::CoordinateSystemConversion
 {
-  // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity". If set, "alongRoute" is ignored.
+  /*
+     Definition of the coordinate system to be used for calculations. If not
+     provided the value is interpreted as "entity". If set, "alongRoute" is
+     ignored.
+  */
   const CoordinateSystem coordinate_system;
 
-  // True: distance is measured between closest bounding box points. False: reference point distance is used.
+  /*
+     True: distance is measured between closest bounding box points.
+     False: reference point distance is used.
+  */
   const Boolean freespace;
 
-  // Definition of the coordinate system dimension(s) to be used for calculating distances. If set, "alongRoute" is ignored. If not provided, value is interpreted as "euclideanDistance".
+  /*
+     Definition of the coordinate system dimension(s) to be used for calculating
+     distances. If set, "alongRoute" is ignored. If not provided, value is
+     interpreted as "euclideanDistance".
+  */
   const RelativeDistanceType relative_distance_type;
 
-  // The operator (less, greater, equal).
+  /*
+     Algorithm for path selection/calculation between two positions across
+     roads. Only relevant, if CoordinateSystem is "road"/"lane". Default value
+     if omitted: "undefined".
+  */
+  const RoutingAlgorithm routing_algorithm;
+
+  /*
+     The operator (less, greater, equal).
+  */
   const Rule rule;
 
-  // The distance value. Unit: m; Range: [0..inf[.
+  /*
+     The distance value. Unit: m; Range: [0..inf[.
+  */
   const Double value;
 
-  // The given position the distance is related to.
+  /*
+     The given position the distance is related to.
+  */
   const Position position;
 
   const TriggeringEntities triggering_entities;
