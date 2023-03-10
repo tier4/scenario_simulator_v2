@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
+#include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
@@ -28,22 +29,23 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeDistanceCondition (OpenSCENARIO 1.1) ---------------------------
- *
- *  The current relative distance of a triggering entity/entities to a
- *  reference entity is compared to a given value. The logical operator used
- *  for comparison is defined in the rule attribute.
- *
- *  <xsd:complexType name="RelativeDistanceCondition">
- *    <xsd:attribute name="coordinateSystem" type="CoordinateSystem"/>
- *    <xsd:attribute name="entityRef" type="String" use="required"/>
- *    <xsd:attribute name="freespace" type="Boolean" use="required"/>
- *    <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType" use="required"/>
- *    <xsd:attribute name="rule" type="Rule" use="required"/>
- *    <xsd:attribute name="value" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   RelativeDistanceCondition (OpenSCENARIO 1.2)
+
+   The current relative distance of a triggering entity/entities to a reference
+   entity is compared to a given value. The logical operator used for comparison
+   is defined in the rule attribute.
+
+   <xsd:complexType name="RelativeDistanceCondition">
+     <xsd:attribute name="entityRef" type="String" use="required"/>
+     <xsd:attribute name="freespace" type="Boolean" use="required"/>
+     <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType" use="required"/>
+     <xsd:attribute name="rule" type="Rule" use="required"/>
+     <xsd:attribute name="value" type="Double" use="required"/>
+     <xsd:attribute name="coordinateSystem" type="CoordinateSystem"/>
+     <xsd:attribute name="routingAlgorithm" type="RoutingAlgorithm"/>
+   </xsd:complexType>
+*/
 struct RelativeDistanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   /*
@@ -68,6 +70,11 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
      calculating distances.
   */
   const RelativeDistanceType relative_distance_type;
+
+  /*
+     Algorithm for path selection/calculation between two positions across roads. Only relevant, if CoordinateSystem is "road"/"lane". Default value if omitted: "undefined".
+  */
+  const RoutingAlgorithm routing_algorithm;
 
   /*
      The operator (less, greater, equal).

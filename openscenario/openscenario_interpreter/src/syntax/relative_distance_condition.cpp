@@ -18,7 +18,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
-//ignore spell miss due to OpenSCENARIO standard
+// Ignore spell miss due to OpenSCENARIO standard.
 // cspell: ignore euclidian
 
 namespace openscenario_interpreter
@@ -33,6 +33,8 @@ RelativeDistanceCondition::RelativeDistanceCondition(
   entity_ref(readAttribute<String>("entityRef", node, scope)),
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope)),
+  routing_algorithm(
+    readAttribute<RoutingAlgorithm>("routingAlgorithm", node, scope, RoutingAlgorithm::undefined)),
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   triggering_entities(triggering_entities),

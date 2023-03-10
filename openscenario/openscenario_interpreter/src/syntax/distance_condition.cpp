@@ -38,7 +38,8 @@ DistanceCondition::DistanceCondition(
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   relative_distance_type(readAttribute<RelativeDistanceType>(
     "relativeDistanceType", node, scope, RelativeDistanceType::euclidianDistance)),
-  routing_algorithm(readAttribute<RoutingAlgorithm>("routingAlgorithm", node, scope)),
+  routing_algorithm(
+    readAttribute<RoutingAlgorithm>("routingAlgorithm", node, scope, RoutingAlgorithm::undefined)),
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   position(readElement<Position>("Position", node, scope)),
