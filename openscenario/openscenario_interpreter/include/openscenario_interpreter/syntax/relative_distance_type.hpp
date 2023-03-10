@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-//ignore spell miss due to OpenSCENARIO standard
+// Ignore spell miss due to OpenSCENARIO standard.
 // cspell: ignore euclidian
 
 namespace openscenario_interpreter
@@ -59,7 +59,7 @@ struct RelativeDistanceType
     euclidianDistance,
   } value;
 
-  explicit RelativeDistanceType() = default;
+  RelativeDistanceType() = default;
 
   constexpr RelativeDistanceType(value_type value) : value(value) {}
 
