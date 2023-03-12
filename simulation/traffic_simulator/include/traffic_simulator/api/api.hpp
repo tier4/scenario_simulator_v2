@@ -15,30 +15,31 @@
 #ifndef TRAFFIC_SIMULATOR__API__API_HPP_
 #define TRAFFIC_SIMULATOR__API__API_HPP_
 
-#include <simulation_api_schema.pb.h>
-
-#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
-#include <boost/variant.hpp>
-#include <cassert>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
-#include <stdexcept>
-#include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/metrics/metrics.hpp>
-#include <traffic_simulator/metrics/metrics_manager.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+
+#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
+#include <rosgraph_msgs/msg/clock.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
+
+#include <boost/variant.hpp>
+
+#include <simulation_api_schema.pb.h>
+
+#include <cassert>
+#include <memory>
+#include <stdexcept>
+#include <string>
 #include <utility>
 
 namespace traffic_simulator
@@ -69,7 +70,6 @@ public:
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getEntityPose(name); },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
-    metrics_manager_(configuration.metrics_log_path, configuration.verbose),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
@@ -77,21 +77,10 @@ public:
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     zeromq_client_(simulation_interface::protocol, configuration.simulator_host)
   {
-    metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
   }
 
   void closeZMQConnection() { zeromq_client_.closeConnection(); }
-
-  template <typename T, typename... Ts>
-  void addMetric(const std::string & name, Ts &&... xs)
-  {
-    metrics_manager_.addMetric<T>(name, std::forward<Ts>(xs)...);
-  }
-
-  metrics::MetricLifecycle getMetricLifecycle(const std::string & name);
-
-  bool metricExists(const std::string & name);
 
   void setVerbose(const bool verbose);
 
@@ -318,8 +307,6 @@ private:
   const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
 
   const std::shared_ptr<traffic_simulator::traffic::TrafficController> traffic_controller_ptr_;
-
-  metrics::MetricsManager metrics_manager_;
 
   const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
 

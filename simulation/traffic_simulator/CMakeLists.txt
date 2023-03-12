@@ -44,7 +44,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/helper/helper.cpp
   src/job/job.cpp
   src/job/job_list.cpp
-  src/metrics/out_of_range_metric.cpp
   src/simulation_clock/simulation_clock.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp

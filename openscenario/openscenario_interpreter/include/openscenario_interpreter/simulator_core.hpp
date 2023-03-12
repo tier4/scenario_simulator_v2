@@ -15,10 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <limits>
-#include <memory>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -26,7 +22,13 @@
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
+
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
+
+#include <limits>
+#include <memory>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -380,26 +382,6 @@ public:
   class NonStandardOperation : private CoordinateSystemConversion
   {
   protected:
-    template <typename Performance, typename Properties>
-    static auto activatePerformanceAssertion(
-      const std::string & entity_ref, const Performance & performance,
-      const Properties & properties)
-    {
-      core->addMetric<metrics::OutOfRangeMetric>(entity_ref + "-out-of-range", [&]() {
-        metrics::OutOfRangeMetric::Config configuration;
-        configuration.target_entity = entity_ref;
-        configuration.min_velocity = -performance.max_speed;
-        configuration.max_velocity = +performance.max_speed;
-        configuration.min_acceleration = -performance.max_deceleration;
-        configuration.max_acceleration = +performance.max_acceleration;
-        configuration.min_jerk = properties.template get<Double>("minJerk", Double::lowest());
-        configuration.max_jerk = properties.template get<Double>("maxJerk", Double::max());
-        configuration.jerk_topic =
-          "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
-        return configuration;
-      }());
-    }
-
     template <typename... Ts>
     static auto asAutoware(Ts &&... xs) -> decltype(auto)
     {

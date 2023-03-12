@@ -12,28 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/api/api.hpp>
+
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <limits>
 #include <memory>
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
-#include <traffic_simulator/api/api.hpp>
 
 namespace traffic_simulator
 {
-metrics::MetricLifecycle API::getMetricLifecycle(const std::string & name)
-{
-  return metrics_manager_.getLifecycle(name);
-}
-
-bool API::metricExists(const std::string & name) { return metrics_manager_.exists(name); }
-
 void API::setVerbose(const bool verbose)
 {
-  metrics_manager_.setVerbose(verbose);
   entity_manager_ptr_->setVerbose(verbose);
 }
 
@@ -349,7 +342,6 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    metrics_manager_.calculate();
     if (!updateEntityStatusInSim()) {
       return false;
     }
@@ -360,7 +352,6 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    metrics_manager_.calculate();
     return true;
   }
 }
