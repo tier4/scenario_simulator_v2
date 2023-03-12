@@ -28,7 +28,7 @@
 
 namespace concealer
 {
-  /**
+/**
    * Provides an abstraction to communicate with Autoware in order to:
    * - receive vehicle commands to simulate vehicle kinematics
    * - provide vehicle state reports on an appropriate topics

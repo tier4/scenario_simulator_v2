@@ -45,30 +45,30 @@ public:
   }
 };
 
-  template <typename MessageType>
-  class ThreadSafeSubscriberWrapper
+template <typename MessageType>
+class ThreadSafeSubscriberWrapper
+{
+private:
+  typename MessageType::ConstSharedPtr current_value = std::make_shared<MessageType>();
+  typename rclcpp::Subscription<MessageType>::SharedPtr subscription;
+
+public:
+  auto operator()() const -> MessageType { return *std::atomic_load(&current_value); }
+
+  template <typename NodeInterface>
+  ThreadSafeSubscriberWrapper(
+    std::string topic, NodeInterface & autoware_interface,
+    std::function<void(const MessageType &)> callback = {})
+  : subscription(autoware_interface.template create_subscription<MessageType>(
+      topic, 1, [this, callback](const typename MessageType::ConstSharedPtr message) {
+        std::atomic_store(&current_value, message);
+        if (current_value && callback) {
+          callback(*std::atomic_load(&current_value));
+        }
+      }))
   {
-  private:
-    typename MessageType::ConstSharedPtr current_value = std::make_shared<MessageType>();
-    typename rclcpp::Subscription<MessageType>::SharedPtr subscription;
-
-  public:
-    auto operator()() const -> MessageType { return *std::atomic_load(&current_value); }
-
-    template <typename NodeInterface>
-    ThreadSafeSubscriberWrapper(
-        std::string topic, NodeInterface & autoware_interface,
-        std::function<void(const MessageType &)> callback = {})
-        : subscription(autoware_interface.template create_subscription<MessageType>(
-        topic, 1, [this, callback](const typename MessageType::ConstSharedPtr message) {
-          std::atomic_store(&current_value, message);
-          if (current_value && callback) {
-            callback(*std::atomic_load(&current_value));
-          }
-        }))
-    {
-    }
-  };
+  }
+};
 }  // namespace concealer
 
 #endif  //CONCEALER__SUBSCRIBER_WRAPPER_HPP_
