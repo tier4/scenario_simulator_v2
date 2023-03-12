@@ -15,11 +15,12 @@
 #include <geometry/distance.hpp>
 #include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
-#include <limits>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
+
+#include <limits>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -31,6 +32,7 @@ EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
 : name(name), verbose(true), status_(entity_status), status_before_update_(status_)
 {
+  // addPermamentJobs();
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -264,6 +266,41 @@ void EntityBase::onUpdate(double /*current_time*/, double step_time)
 void EntityBase::onPostUpdate(double /*current_time*/, double step_time)
 {
   job_list_.update(step_time, job::Event::POST_UPDATE);
+}
+
+void EntityBase::addPermamentJobs()
+{
+  job_list_.append(
+    /**
+     * @brief Checking if the values of velocity, acceleration and jerk are within the acceptable
+     * range
+     */
+    [this](double) {
+      auto velocity_ = status_.action_status.twist.linear.x;
+      auto acceleration_ = status_.action_status.accel.linear.x;
+      auto jerk_ = status_.action_status.linear_jerk;
+
+      auto d_c = getBehaviorParameter().dynamic_constraints;
+      if (!(-d_c.max_speed <= velocity_ && velocity_ <= d_c.max_speed))
+        THROW_SPECIFICATION_VIOLATION(
+          "current velocity (which is ", velocity_, ") is out of range (which is [", -d_c.max_speed,
+          ", ", d_c.max_speed, "])");
+
+      if (!(-d_c.max_acceleration <= acceleration_ && acceleration_ <= d_c.max_acceleration))
+        THROW_SPECIFICATION_VIOLATION(
+          "current acceleration (which is ", acceleration_, ") is out of range (which is [",
+          d_c.max_acceleration, ", ", d_c.max_acceleration, "])");
+
+      if (!(-d_c.max_jerk <= jerk_ && jerk_ <= d_c.max_jerk))
+        THROW_SPECIFICATION_VIOLATION(
+          "current jerk (which is ", jerk_, ") is out of range (which is [", -d_c.max_jerk, ",",
+          d_c.max_jerk, "])");
+      return false;
+    },
+    /**
+     * @brief This job is always ACTIVE
+     */
+    [this]() {}, job::Type::OUT_OF_RANGE_DYNAMIC_CONSTRAINS, true, job::Event::POST_UPDATE);
 }
 
 void EntityBase::resetDynamicConstraints()
@@ -674,7 +711,8 @@ void EntityBase::setOtherStatus(
       */
       // const auto p0 = other_status.pose.position;
       // const auto p1 = status_.pose.position;
-      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance < 30) {
+      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance < 30)
+      // {
       other_status_.emplace(other_name, other_status);
       // }
     }

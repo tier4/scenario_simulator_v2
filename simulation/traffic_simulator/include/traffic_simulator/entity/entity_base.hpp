@@ -15,19 +15,16 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <boost/optional.hpp>
 #include <concealer/autoware.hpp>
-#include <memory>
-#include <queue>
-#include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -35,9 +32,15 @@
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
+
+#include <boost/optional.hpp>
+
+#include <memory>
+#include <queue>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {
@@ -229,6 +232,7 @@ protected:
     speed_planner_;
 
 private:
+  virtual auto addPermamentJobs() -> void;
   virtual auto requestSpeedChangeWithConstantAcceleration(
     const double target_speed, const speed_change::Transition, double acceleration,
     const bool continuous) -> void;

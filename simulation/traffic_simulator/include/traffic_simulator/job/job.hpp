@@ -28,6 +28,7 @@ enum class Type {
   LINEAR_ACCELERATION = 2,
   STAND_STILL_DURATION = 3,
   TRAVELED_DISTANCE = 4,
+  OUT_OF_RANGE_DYNAMIC_CONSTRAINS = 5
 };
 
 enum class Status {
