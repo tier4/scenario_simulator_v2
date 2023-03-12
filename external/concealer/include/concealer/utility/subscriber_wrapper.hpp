@@ -20,7 +20,9 @@
 
 namespace concealer
 {
-template <typename MessageType>
+enum ThreadSafetyImpl : bool { ThreadUnsafe, ThreadSafe };
+
+template <typename MessageType, ThreadSafetyImpl ThreadSafety = ThreadUnsafe>
 class SubscriberWrapper
 {
 private:
@@ -28,7 +30,19 @@ private:
   typename rclcpp::Subscription<MessageType>::SharedPtr subscription;
 
 public:
-  auto operator()() const -> const MessageType & { return *current_value; }
+  template <typename T = MessageType>
+  auto operator()() const -> const typename std::enable_if<ThreadSafety == ThreadUnsafe, T>::type &
+  {
+    std::cout << "<<<<< Thread unsafe: " << typeid(T).name() << std::endl;
+    return *current_value;
+  }
+
+  template <typename T = MessageType>
+  auto operator()() const -> typename std::enable_if<ThreadSafety == ThreadSafe, T>::type
+  {
+    std::cout << "<<<<< Thread safe: " << typeid(T).name() << std::endl;
+    return *std::atomic_load(&current_value);
+  }
 
   template <typename NodeInterface>
   SubscriberWrapper(
@@ -36,39 +50,24 @@ public:
     std::function<void(const MessageType &)> callback = {})
   : subscription(autoware_interface.template create_subscription<MessageType>(
       topic, 1, [this, callback](const typename MessageType::ConstSharedPtr message) {
-        current_value = message;
-        if (current_value && callback) {
-          callback(*current_value);
+        if constexpr (ThreadSafety == ThreadSafe) {
+          std::cout << "<<<<< Thread safe callback: " << typeid(MessageType).name() << std::endl;
+          std::atomic_store(&current_value, message);
+          if (current_value && callback) {
+            callback(*std::atomic_load(&current_value));
+          }
+        } else {
+          std::cout << "<<<<< Thread unsafe callback: " << typeid(MessageType).name() << std::endl;
+          current_value = message;
+          if (current_value && callback) {
+            callback(*current_value);
+          }
         }
       }))
   {
   }
 };
 
-template <typename MessageType>
-class ThreadSafeSubscriberWrapper
-{
-private:
-  typename MessageType::ConstSharedPtr current_value = std::make_shared<MessageType>();
-  typename rclcpp::Subscription<MessageType>::SharedPtr subscription;
-
-public:
-  auto operator()() const -> MessageType { return *std::atomic_load(&current_value); }
-
-  template <typename NodeInterface>
-  ThreadSafeSubscriberWrapper(
-    std::string topic, NodeInterface & autoware_interface,
-    std::function<void(const MessageType &)> callback = {})
-  : subscription(autoware_interface.template create_subscription<MessageType>(
-      topic, 1, [this, callback](const typename MessageType::ConstSharedPtr message) {
-        std::atomic_store(&current_value, message);
-        if (current_value && callback) {
-          callback(*std::atomic_load(&current_value));
-        }
-      }))
-  {
-  }
-};
 }  // namespace concealer
 
 #endif  //CONCEALER__SUBSCRIBER_WRAPPER_HPP_

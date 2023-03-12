@@ -59,7 +59,7 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  ThreadSafeSubscriberWrapper<AutowareState> getAutowareState;
+  SubscriberWrapper<AutowareState, ThreadSafe> getAutowareState;
   SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
   SubscriberWrapper<CooperateStatusArray> getCooperateStatusArray;
   SubscriberWrapper<EmergencyState> getEmergencyStateImpl;
