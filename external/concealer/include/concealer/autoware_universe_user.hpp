@@ -99,6 +99,9 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);                // 7
 #undef DEFINE_STATE_PREDICATE
 
+protected:
+  auto sendSIGINT() -> void override;
+
 public:
   SubscriberWrapper<PathWithLaneId> getPathWithLaneId;
 
@@ -147,8 +150,6 @@ public:
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
 
   auto restrictTargetSpeed(double) const -> double override;
-
-  auto sendSIGINT() -> void override;
 
   auto setCooperator(const std::string & cooperator) -> void override;
 
