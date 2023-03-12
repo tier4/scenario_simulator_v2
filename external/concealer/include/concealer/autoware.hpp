@@ -37,8 +37,6 @@ namespace concealer
 
 class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Autoware>
 {
-  friend class ContinuousTransformBroadcaster<Autoware>;
-
 protected:
   geometry_msgs::msg::Accel current_acceleration;
 
