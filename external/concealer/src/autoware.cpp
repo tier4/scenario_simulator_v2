@@ -16,7 +16,6 @@
 
 namespace concealer
 {
-
 auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
 {
   static auto gear_command = []() {

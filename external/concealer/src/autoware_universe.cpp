@@ -16,7 +16,6 @@
 
 namespace concealer
 {
-
 auto AutowareUniverse::getAcceleration() const -> double
 {
   return getAckermannControlCommand().longitudinal.acceleration;
