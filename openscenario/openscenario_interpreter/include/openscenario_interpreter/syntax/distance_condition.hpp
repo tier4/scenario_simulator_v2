@@ -113,7 +113,9 @@ struct DistanceCondition : private Scope, private SimulatorCore::CoordinateSyste
 
   auto distance(const EntityRef &) const -> double;
 
-  template <CoordinateSystem::value_type, RelativeDistanceType::value_type, bool>
+  template <
+    CoordinateSystem::value_type, RelativeDistanceType::value_type, RoutingAlgorithm::value_type,
+    bool>
   auto distance(const EntityRef &) const -> double
   {
     throw SyntaxError(__FILE__, ":", __LINE__);
@@ -126,11 +128,11 @@ struct DistanceCondition : private Scope, private SimulatorCore::CoordinateSyste
 // cspell: ignore euclidian
 
 // clang-format off
-template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const EntityRef &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           false>(const EntityRef &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined, false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           RoutingAlgorithm::undefined, false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      RoutingAlgorithm::undefined, false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           RoutingAlgorithm::undefined, false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      RoutingAlgorithm::undefined, false>(const EntityRef &) const -> double;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter
