@@ -56,110 +56,6 @@ auto RelativeDistanceCondition::description() const -> String
   return description.str();
 }
 
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::longitudinal, false>(
-  const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::lateral, false>(
-  const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true>(
-  const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return evaluateFreespaceEuclideanDistance(triggering_entity, entity_ref);
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(
-  const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::hypot(
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::lane, RelativeDistanceType::lateral, false>(const EntityRef & triggering_entity)
-  -> double
-{
-  if (
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return makeNativeRelativeLanePosition(triggering_entity, entity_ref).offset;
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::lane, RelativeDistanceType::longitudinal, false>(
-  const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return makeNativeRelativeLanePosition(triggering_entity, entity_ref).s;
-  } else {
-    return Double::nan();
-  }
-}
-
-#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity)
-
-#define SWITCH_FREESPACE(FUNCTION, ...) \
-  return freespace ? FUNCTION(__VA_ARGS__, true) : FUNCTION(__VA_ARGS__, false)
-
-#define SWITCH_RELATIVE_DISTANCE_TYPE(FUNCTION, ...)                  \
-  switch (relative_distance_type) {                                   \
-    case RelativeDistanceType::longitudinal:                          \
-      FUNCTION(__VA_ARGS__, RelativeDistanceType::longitudinal);      \
-      break;                                                          \
-    case RelativeDistanceType::lateral:                               \
-      FUNCTION(__VA_ARGS__, RelativeDistanceType::lateral);           \
-      break;                                                          \
-    case RelativeDistanceType::euclidianDistance:                     \
-      FUNCTION(__VA_ARGS__, RelativeDistanceType::euclidianDistance); \
-      break;                                                          \
-  }
-
 #define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)            \
   switch (coordinate_system) {                             \
     case CoordinateSystem::entity:                         \
@@ -176,12 +72,134 @@ auto RelativeDistanceCondition::distance<
       break;                                               \
   }
 
-#define APPLY(F, ...) F(__VA_ARGS__)
+#define SWITCH_RELATIVE_DISTANCE_TYPE(FUNCTION, ...)                  \
+  switch (relative_distance_type) {                                   \
+    case RelativeDistanceType::longitudinal:                          \
+      FUNCTION(__VA_ARGS__, RelativeDistanceType::longitudinal);      \
+      break;                                                          \
+    case RelativeDistanceType::lateral:                               \
+      FUNCTION(__VA_ARGS__, RelativeDistanceType::lateral);           \
+      break;                                                          \
+    case RelativeDistanceType::euclidianDistance:                     \
+      FUNCTION(__VA_ARGS__, RelativeDistanceType::euclidianDistance); \
+      break;                                                          \
+  }
+
+#define SWITCH_ROUTING_ALGORITHM(FUNCTION, ...)                     \
+  switch (routing_algorithm) {                                      \
+    case RoutingAlgorithm::assigned_route:                          \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::assigned_route);      \
+      break;                                                        \
+    case RoutingAlgorithm::fastest:                                 \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::fastest);             \
+      break;                                                        \
+    case RoutingAlgorithm::least_intersections:                     \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::least_intersections); \
+      break;                                                        \
+    case RoutingAlgorithm::shortest:                                \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::shortest);            \
+      break;                                                        \
+    case RoutingAlgorithm::undefined:                               \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::undefined);           \
+      break;                                                        \
+  }
+
+#define SWITCH_FREESPACE(FUNCTION, ...) \
+  return freespace ? FUNCTION(__VA_ARGS__, true) : FUNCTION(__VA_ARGS__, false)
+
+#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity)
 
 auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) -> double
 {
-  APPLY(SWITCH_COORDINATE_SYSTEM, SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_FREESPACE, DISTANCE);
+  SWITCH_COORDINATE_SYSTEM(
+    SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
   return Double::nan();
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
+  false>(const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return std::hypot(
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
+  true>(const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return evaluateFreespaceEuclideanDistance(triggering_entity, entity_ref);
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
+    return makeNativeRelativeLanePosition(triggering_entity, entity_ref).offset;
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return makeNativeRelativeLanePosition(triggering_entity, entity_ref).s;
+  } else {
+    return Double::nan();
+  }
 }
 
 auto RelativeDistanceCondition::evaluate() -> Object

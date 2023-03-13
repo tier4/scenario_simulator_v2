@@ -115,7 +115,7 @@ struct DistanceCondition : private Scope, private SimulatorCore::CoordinateSyste
 
   template <
     CoordinateSystem::value_type, RelativeDistanceType::value_type, RoutingAlgorithm::value_type,
-    bool>
+    Boolean::value_type>
   auto distance(const EntityRef &) const -> double
   {
     throw SyntaxError(__FILE__, ":", __LINE__);
@@ -124,7 +124,7 @@ struct DistanceCondition : private Scope, private SimulatorCore::CoordinateSyste
   auto evaluate() -> Object;
 };
 
-// NOTE: Ignore spell miss due to OpenSCENARIO standard.
+// Ignore spell miss due to OpenSCENARIO standard.
 // cspell: ignore euclidian
 
 // clang-format off

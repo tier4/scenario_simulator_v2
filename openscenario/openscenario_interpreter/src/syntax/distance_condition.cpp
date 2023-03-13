@@ -118,7 +118,7 @@ auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> d
 {
   SWITCH_COORDINATE_SYSTEM(
     SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
-  return std::numeric_limits<double>::quiet_NaN();
+  return Double::nan();
 }
 
 template <>
