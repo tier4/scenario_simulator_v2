@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
+#include <traffic_simulator/entity/ego_entity.hpp>
+
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 #include <boost/lexical_cast.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <functional>
 #include <memory>
 #include <string>
 #include <system_error>
 #include <thread>
-#include <traffic_simulator/entity/ego_entity.hpp>
-#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -182,8 +185,8 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
    * @brief TODO, Input values get from autoware.
    */
   parameter.see_around = true;
-  parameter.dynamic_constraints.max_acceleration = 0;
-  parameter.dynamic_constraints.max_deceleration = 0;
+  // parameter.dynamic_constraints.max_acceleration = 0;
+  // parameter.dynamic_constraints.max_deceleration = 0;
   return parameter;
 }
 

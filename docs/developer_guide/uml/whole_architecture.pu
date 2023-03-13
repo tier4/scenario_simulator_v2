@@ -3,7 +3,7 @@ allow_mixing
 title WholeArchitecture
 
 interface ros2lifecycle
-// DM TUTAJ
+
 Node openscenario_interpreter_node {
   class openscenario_interpreter::Interpreter
   class EntityManager

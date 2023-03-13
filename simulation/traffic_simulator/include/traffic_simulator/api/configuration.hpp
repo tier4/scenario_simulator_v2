@@ -15,15 +15,13 @@
 #ifndef TRAFFIC_SIMULATOR__API__CONFIGURATION_HPP_
 #define TRAFFIC_SIMULATOR__API__CONFIGURATION_HPP_
 
+#include <algorithm>
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/range/iterator_range.hpp>
-
-#include <algorithm>
 #include <iomanip>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 
 namespace traffic_simulator

@@ -32,7 +32,6 @@ EntityBase::EntityBase(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
 : name(name), verbose(true), status_(entity_status), status_before_update_(status_)
 {
-  // addPermamentJobs();
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -268,33 +267,37 @@ void EntityBase::onPostUpdate(double /*current_time*/, double step_time)
   job_list_.update(step_time, job::Event::POST_UPDATE);
 }
 
-void EntityBase::addPermamentJobs()
+void EntityBase::addOutOfRangeJob()
 {
+  /**
+   * @brief This value was determined heuristically rather than for
+   * technical reasons.
+   */
+  constexpr double tolerance = 0.01;
   job_list_.append(
     /**
      * @brief Checking if the values of velocity, acceleration and jerk are within the acceptable
      * range
      */
-    [this](double) {
+    [this, tolerance](double) {
       auto velocity_ = status_.action_status.twist.linear.x;
-      auto acceleration_ = status_.action_status.accel.linear.x;
+      auto accel_ = status_.action_status.accel.linear.x;
       auto jerk_ = status_.action_status.linear_jerk;
-
       auto d_c = getBehaviorParameter().dynamic_constraints;
-      if (!(-d_c.max_speed <= velocity_ && velocity_ <= d_c.max_speed))
+      if (std::abs(velocity_) - d_c.max_speed > tolerance)
         THROW_SPECIFICATION_VIOLATION(
-          "current velocity (which is ", velocity_, ") is out of range (which is [", -d_c.max_speed,
-          ", ", d_c.max_speed, "])");
+          "Entity: ", name, " - current velocity (which is ", velocity_,
+          ") is out of range (which is [", -d_c.max_speed, ", ", d_c.max_speed, "])");
 
-      if (!(-d_c.max_acceleration <= acceleration_ && acceleration_ <= d_c.max_acceleration))
+      if (accel_ - d_c.max_acceleration > tolerance || -accel_ - d_c.max_deceleration > tolerance)
         THROW_SPECIFICATION_VIOLATION(
-          "current acceleration (which is ", acceleration_, ") is out of range (which is [",
-          d_c.max_acceleration, ", ", d_c.max_acceleration, "])");
+          "Entity: ", name, " - current acceleration (which is ", accel_,
+          ") is out of range (which is [", -d_c.max_deceleration, ", ", d_c.max_acceleration, "])");
 
-      if (!(-d_c.max_jerk <= jerk_ && jerk_ <= d_c.max_jerk))
+      if (std::abs(jerk_) - d_c.max_jerk > tolerance)
         THROW_SPECIFICATION_VIOLATION(
-          "current jerk (which is ", jerk_, ") is out of range (which is [", -d_c.max_jerk, ",",
-          d_c.max_jerk, "])");
+          "Entity: ", name, " - current jerk (which is ", jerk_, ") is out of range (which is [",
+          -d_c.max_jerk, ",", d_c.max_jerk, "])");
       return false;
     },
     /**
@@ -711,7 +714,8 @@ void EntityBase::setOtherStatus(
       */
       // const auto p0 = other_status.pose.position;
       // const auto p1 = status_.pose.position;
-      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance < 30)
+      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance <
+      // 30)
       // {
       other_status_.emplace(other_name, other_status);
       // }

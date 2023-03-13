@@ -206,6 +206,8 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
+  virtual auto addOutOfRangeJob() -> void;
+
   const std::string name;
 
   bool verbose;
@@ -232,7 +234,6 @@ protected:
     speed_planner_;
 
 private:
-  virtual auto addPermamentJobs() -> void;
   virtual auto requestSpeedChangeWithConstantAcceleration(
     const double target_speed, const speed_change::Transition, double acceleration,
     const bool continuous) -> void;
