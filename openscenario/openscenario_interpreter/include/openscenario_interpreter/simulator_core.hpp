@@ -421,12 +421,10 @@ public:
     static auto evaluateRelativeHeading(
       const EntityRef & entity_ref, const OSCLanePosition & osc_lane_position)
     {
-      NativeRelativeWorldPosition position =
-        core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position));
-
-      const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(position.orientation);
-
-      return std::abs(rpy.z);
+      return std::abs(
+        quaternion_operation::convertQuaternionToEulerAngle(
+          core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position)).orientation)
+          .z);
     }
 
     template <typename EntityRef>
