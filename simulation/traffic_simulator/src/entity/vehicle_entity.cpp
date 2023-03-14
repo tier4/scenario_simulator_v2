@@ -40,6 +40,7 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_->setVehicleParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
+  default_dynamic_constraints_ = getDynamicConstraints();
   addOutOfRangeJob();
 }
 
@@ -67,8 +68,7 @@ auto VehicleEntity::getCurrentAction() const -> std::string
 auto VehicleEntity::getDefaultDynamicConstraints() const
   -> const traffic_simulator_msgs::msg::DynamicConstraints &
 {
-  static auto default_dynamic_constraints = traffic_simulator_msgs::msg::DynamicConstraints();
-  return default_dynamic_constraints;
+  return default_dynamic_constraints_;
 }
 
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
