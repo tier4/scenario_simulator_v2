@@ -490,6 +490,7 @@ void EgoEntity::requestSpeedChange(
 
 auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
+  EntityBase::setVelocityLimit(value);
   autoware->setVelocityLimit(value);
 }
 }  // namespace entity

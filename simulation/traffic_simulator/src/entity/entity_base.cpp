@@ -763,9 +763,19 @@ void EntityBase::setTrafficLightManager(
   traffic_light_manager_ = traffic_light_manager;
 }
 
-auto EntityBase::setVelocityLimit(double) -> void {}
+auto EntityBase::setVelocityLimit(double max_speed) -> void
+{
+  auto dynamic_constraints = getDynamicConstraints();
+  dynamic_constraints.max_speed = max_speed;
+  setDynamicConstraints(dynamic_constraints);
+}
 
-auto EntityBase::setJerkLimit(double) -> void {}
+auto EntityBase::setJerkLimit(double max_jerk) -> void
+{
+  auto dynamic_constraints = getDynamicConstraints();
+  dynamic_constraints.max_jerk = max_jerk;
+  setDynamicConstraints(dynamic_constraints);
+}
 
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
