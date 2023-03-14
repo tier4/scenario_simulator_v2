@@ -25,14 +25,9 @@ AutowareUser::AutowareUser(pid_t pid)
 {
 }
 
-auto AutowareUser::stopRequest() noexcept -> void {
-  is_stop_requested.store(true);
-}
+auto AutowareUser::stopRequest() noexcept -> void { is_stop_requested.store(true); }
 
-auto AutowareUser::isStopRequested() const noexcept -> bool
-{
-  return is_stop_requested.load();
-}
+auto AutowareUser::isStopRequested() const noexcept -> bool { return is_stop_requested.load(); }
 
 auto AutowareUser::spinSome() -> void
 {
