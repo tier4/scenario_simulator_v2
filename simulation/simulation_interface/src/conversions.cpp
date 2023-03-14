@@ -14,6 +14,7 @@
 
 #include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/conversions.hpp>
+
 #include <string>
 #include <vector>
 
@@ -122,6 +123,7 @@ void toProto(
   proto.set_max_deceleration(performance.max_deceleration);
   proto.set_max_deceleration_rate(performance.max_deceleration_rate);
   proto.set_max_speed(performance.max_speed);
+  // TODO proto.set_max_jerk(performance.max_jerk);
 }
 
 void toMsg(
@@ -133,6 +135,7 @@ void toMsg(
   performance.max_deceleration = proto.max_deceleration();
   performance.max_deceleration_rate = proto.max_deceleration_rate();
   performance.max_speed = proto.max_speed();
+  // TODO performance.max_jerk = proto.max_jerk();
 }
 
 void toProto(const traffic_simulator_msgs::msg::Axle & axle, traffic_simulator_msgs::Axle & proto)

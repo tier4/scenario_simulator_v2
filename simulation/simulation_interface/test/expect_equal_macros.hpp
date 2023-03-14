@@ -15,8 +15,8 @@
 #ifndef SIMULATION_INTERFACE__TEST__EXPECT_EQUAL_MACROS_HPP_
 #define SIMULATION_INTERFACE__TEST__EXPECT_EQUAL_MACROS_HPP_
 
-#include <geometry_msgs.pb.h>
-#include <gtest/gtest.h>
+#include <scenario_simulator_exception/exception.hpp>
+#include <simulation_interface/conversions.hpp>
 
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/point.hpp>
@@ -24,8 +24,10 @@
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <simulation_interface/conversions.hpp>
+
+#include <geometry_msgs.pb.h>
+#include <gtest/gtest.h>
+
 #include <string>
 
 /**
@@ -88,7 +90,7 @@
 /**
  * @brief Expect equal macros for traffic_simulator_msgs.
  */
-
+// TODO: EXPECT_DOUBLE_EQ(MSG.max_jerk, PROTO.max_jerk());
 #define EXPECT_PERFORMANCE_EQ(MSG, PROTO)                                     \
   EXPECT_DOUBLE_EQ(MSG.max_speed, PROTO.max_speed());                         \
   EXPECT_DOUBLE_EQ(MSG.max_acceleration, PROTO.max_acceleration());           \
