@@ -25,7 +25,24 @@ AutowareUser::AutowareUser(pid_t pid)
 {
 }
 
-void AutowareUser::checkAutowareProcess()
+auto AutowareUser::stopRequest() noexcept -> void {
+  is_stop_requested.store(true);
+}
+
+auto AutowareUser::isStopRequested() const noexcept -> bool
+{
+  return is_stop_requested.load();
+}
+
+auto AutowareUser::spinSome() -> void
+{
+  if (rclcpp::ok() and not isStopRequested()) {
+    checkAutowareProcess();
+    rclcpp::spin_some(get_node_base_interface());
+  }
+}
+
+auto AutowareUser::checkAutowareProcess() -> void
 {
   if (process_id != 0) {
     int wstatus = 0;
@@ -64,7 +81,7 @@ auto AutowareUser::getEmergencyState() const -> autoware_auto_system_msgs::msg::
   return emergency_state;
 }
 
-void AutowareUser::shutdownAutoware()
+auto AutowareUser::shutdownAutoware() -> void
 {
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
   {
@@ -122,6 +139,8 @@ void AutowareUser::shutdownAutoware()
     {
       int status = 0;
 
+      const int waitpid_options = 0;
+
       if (waitpid(process_id, &status, waitpid_options) < 0) {
         if (errno == ECHILD) {
           AUTOWARE_WARN_STREAM("Try to wait for the autoware process but it was already exited.");
@@ -147,12 +166,5 @@ auto AutowareUser::getTurnIndicatorsCommand() const
   return turn_indicators_command;
 }
 
-void AutowareUser::rethrow() const
-{
-  task_queue.rethrow();
-
-  if (is_thrown) {
-    std::rethrow_exception(thrown);
-  }
-}
+auto AutowareUser::rethrow() const -> void { task_queue.rethrow(); }
 }  // namespace concealer

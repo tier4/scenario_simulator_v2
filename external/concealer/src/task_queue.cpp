@@ -42,14 +42,15 @@ TaskQueue::TaskQueue()
   })
 {
 }
-
-TaskQueue::~TaskQueue()
+void TaskQueue::stopAndJoin()
 {
   if (dispatcher.joinable()) {
     is_stop_requested.store(true, std::memory_order_release);
     dispatcher.join();
   }
 }
+
+TaskQueue::~TaskQueue() { stopAndJoin(); }
 
 bool TaskQueue::exhausted() const noexcept { return thunks.empty(); }
 

@@ -29,26 +29,20 @@
 namespace concealer
 {
 /**
-   * Provides an abstraction to communicate with Autoware in order to:
-   * - receive vehicle commands to simulate vehicle kinematics
-   * - provide vehicle state reports on an appropriate topics
-   * NOTE: This class is intended to be move to simple_sensor_simulation
-   */
-
+  * Provides an abstraction to communicate with Autoware in order to:
+  * - receive vehicle commands to simulate vehicle kinematics
+  * - provide vehicle state reports on an appropriate topics
+  * NOTE: This class is intended to be move to simple_sensor_simulation
+  */
 class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Autoware>
 {
 protected:
   geometry_msgs::msg::Accel current_acceleration;
-
   geometry_msgs::msg::Twist current_twist;
-
   geometry_msgs::msg::Pose current_pose;
 
 public:
-  CONCEALER_PUBLIC explicit Autoware()
-  : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false))
-  {
-  }
+  CONCEALER_PUBLIC explicit Autoware();
 
   virtual auto getAcceleration() const -> double = 0;
 
@@ -76,12 +70,7 @@ public:
 
   virtual auto update() -> void = 0;
 
-  void spinSome()
-  {
-    if (rclcpp::ok()) {
-      rclcpp::spin_some(get_node_base_interface());
-    }
-  }
+  auto spinSome() -> void;
 };
 }  // namespace concealer
 

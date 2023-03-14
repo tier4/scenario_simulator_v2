@@ -16,6 +16,18 @@
 
 namespace concealer
 {
+Autoware::Autoware()
+  : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false))
+{
+}
+
+auto Autoware::spinSome() -> void
+{
+  if (rclcpp::ok()) {
+    rclcpp::spin_some(get_node_base_interface());
+  }
+}
+
 auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
 {
   static auto gear_command = []() {

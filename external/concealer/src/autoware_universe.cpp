@@ -117,11 +117,4 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 {
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
-
-auto AutowareUniverse::getTurnIndicatorsCommand() const
-  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
-{
-  return getTurnIndicatorsCommandImpl();
-}
-
 }  // namespace concealer

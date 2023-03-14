@@ -17,7 +17,12 @@
 
 namespace concealer
 {
-AutowareUniverseUser::~AutowareUniverseUser() { shutdownAutoware(); }
+AutowareUniverseUser::~AutowareUniverseUser()
+{
+  shutdownAutoware();
+  // All tasks should be complete before the services used in them will be deinitialized.
+  task_queue.stopAndJoin();
+}
 
 auto AutowareUniverseUser::approve(const CooperateStatusArray & cooperate_status_array) -> void
 {
@@ -53,7 +58,7 @@ auto AutowareUniverseUser::cooperate(const CooperateStatusArray & cooperate_stat
 {
   switch (current_cooperator) {
     case Cooperator::simulator:
-      return cooperation_queue.delay([=]() { return approve(cooperate_status_array); });
+      return task_queue.delay([=]() { return approve(cooperate_status_array); });
 
     default:
       return;
@@ -195,6 +200,7 @@ auto AutowareUniverseUser::setCooperator(const std::string & cooperator) -> void
 {
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
+
 }  // namespace concealer
 
 namespace autoware_auto_system_msgs::msg

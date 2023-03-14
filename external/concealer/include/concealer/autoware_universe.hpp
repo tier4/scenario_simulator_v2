@@ -40,7 +40,7 @@ class AutowareUniverse : public Autoware
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
   SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
   SubscriberWrapper<GearCommand> getGearCommandImpl;
-  SubscriberWrapper<TurnIndicatorsCommand> getTurnIndicatorsCommandImpl;
+  SubscriberWrapper<TurnIndicatorsCommand> getTurnIndicatorsCommand;
 
   using Acceleration = geometry_msgs::msg::AccelWithCovarianceStamped;
   using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
@@ -61,7 +61,7 @@ public:
   CONCEALER_PUBLIC explicit AutowareUniverse()
   : getAckermannControlCommand("/control/command/control_cmd", *this),
     getGearCommandImpl("/control/command/gear_cmd", *this),
-    getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
+    getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", *this),
     setAcceleration("/localization/acceleration", *this),
     setSteeringReport("/vehicle/status/steering_status", *this),
     setGearReport("/vehicle/status/gear_status", *this),
@@ -87,9 +87,6 @@ public:
   auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand> override;
-
-  auto getTurnIndicatorsCommand() const
-    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
 };
 
 }  // namespace concealer

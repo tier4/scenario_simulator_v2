@@ -54,51 +54,32 @@ namespace concealer
  * -------------------------------------------------------------------------- */
 class AutowareUser : public rclcpp::Node
 {
-  bool is_stop_requested = false;
-
-  bool is_thrown = false;
-
-  std::exception_ptr thrown;
+  std::atomic<bool> is_stop_requested = false;
 
   bool is_autoware_exited = false;
 
-  void checkAutowareProcess();
+  auto checkAutowareProcess() -> void;
 
 protected:
   const pid_t process_id = 0;
-
-  int waitpid_options = 0;
 
   TaskQueue task_queue;
 
   bool initialize_was_called = false;
 
-  void stopRequest() noexcept { is_stop_requested = true; }
+  auto stopRequest() noexcept -> void;
 
-  bool isStopRequested() const noexcept { return is_stop_requested; }
+  auto isStopRequested() const noexcept -> bool;
 
   // this method is purely virtual because different Autoware types are killed differently
   // currently, we are not sure why this is the case so detailed investigation is needed
-  virtual void sendSIGINT() = 0;
+  virtual auto sendSIGINT() -> void = 0;
 
   // method called in destructor of a derived class
   // because it is difficult to differentiate shutting down behavior in destructor of a base class
-  void shutdownAutoware();
+  auto shutdownAutoware() -> void;
 
 public:
-  void spinSome()
-  {
-    try {
-      if (rclcpp::ok() and not isStopRequested()) {
-        checkAutowareProcess();
-        rclcpp::spin_some(get_node_base_interface());
-      }
-    } catch (...) {
-      thrown = std::current_exception();
-      is_thrown = true;
-    }
-  }
-
   CONCEALER_PUBLIC explicit AutowareUser(pid_t pid = 0);
 
   template <typename... Ts>
@@ -108,6 +89,8 @@ public:
   }
 
   ~AutowareUser() override = default;
+
+  auto spinSome() -> void;
 
   /* ---- NOTE -------------------------------------------------------------------
    *
@@ -154,7 +137,7 @@ public:
   virtual auto getTurnIndicatorsCommand() const
     -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  /*   */ auto rethrow() const noexcept(false) -> void;
+  virtual auto rethrow() const noexcept(false) -> void;
 
   virtual auto setCooperator(const std::string &) -> void = 0;
 

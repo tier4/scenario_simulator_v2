@@ -74,7 +74,6 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   // TODO ServiceWithValidation<InitializePose> requestInitializePose;
   ServiceWithValidation<SetVelocityLimit> requestSetVelocityLimit;
 
-  TaskQueue cooperation_queue;
   using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
   ServiceWithValidation<CooperateCommands> requestCooperateCommands;
   Cooperator current_cooperator = Cooperator::simulator;
@@ -105,6 +104,7 @@ protected:
 public:
   SubscriberWrapper<PathWithLaneId> getPathWithLaneId;
 
+public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareUniverseUser(Ts &&... xs)
   : AutowareUser(std::forward<decltype(xs)>(xs)...),
@@ -125,7 +125,6 @@ public:
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
   // clang-format on
   {
-    waitpid_options = 0;
   }
 
   ~AutowareUniverseUser() override;
