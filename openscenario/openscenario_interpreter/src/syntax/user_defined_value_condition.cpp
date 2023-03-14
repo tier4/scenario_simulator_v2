@@ -102,9 +102,15 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
         std::make_pair(
           "RelativeHeadingCondition",
           [this, result](const auto & xs) {
-            // RelativeHeadingCondition(<ENTITY-REF>, <LANE-ID>, <S>)
-            return make<Double>(evaluateRelativeHeading(
-              xs[0], LanePosition("", xs[1], 0, boost::lexical_cast<Double>(xs[2]))));
+            switch (std::size(xs)) {
+              case 1:  // RelativeHeadingCondition(<ENTITY-REF>)
+                return make<Double>(evaluateRelativeHeading(xs[0]));
+              case 3:  // RelativeHeadingCondition(<ENTITY-REF>, <LANE-ID>, <S>)
+                return make<Double>(evaluateRelativeHeading(
+                  xs[0], LanePosition("", xs[1], 0, boost::lexical_cast<Double>(xs[2]))));
+              default:
+                return make<Double>(Double::nan());
+            }
           }),
       };
     evaluate_value =
