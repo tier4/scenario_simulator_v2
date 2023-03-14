@@ -33,14 +33,12 @@ public:
   template <typename T = MessageType>
   auto operator()() const -> const typename std::enable_if<ThreadSafety == ThreadUnsafe, T>::type &
   {
-    std::cout << "<<<<< Thread unsafe: " << typeid(T).name() << std::endl;
     return *current_value;
   }
 
   template <typename T = MessageType>
   auto operator()() const -> typename std::enable_if<ThreadSafety == ThreadSafe, T>::type
   {
-    std::cout << "<<<<< Thread safe: " << typeid(T).name() << std::endl;
     return *std::atomic_load(&current_value);
   }
 
@@ -51,13 +49,11 @@ public:
   : subscription(autoware_interface.template create_subscription<MessageType>(
       topic, 1, [this, callback](const typename MessageType::ConstSharedPtr message) {
         if constexpr (ThreadSafety == ThreadSafe) {
-          std::cout << "<<<<< Thread safe callback: " << typeid(MessageType).name() << std::endl;
           std::atomic_store(&current_value, message);
           if (current_value && callback) {
             callback(*std::atomic_load(&current_value));
           }
         } else {
-          std::cout << "<<<<< Thread unsafe callback: " << typeid(MessageType).name() << std::endl;
           current_value = message;
           if (current_value && callback) {
             callback(*current_value);
