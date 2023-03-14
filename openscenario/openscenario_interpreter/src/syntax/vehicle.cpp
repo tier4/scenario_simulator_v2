@@ -23,6 +23,7 @@ inline namespace syntax
 Vehicle::Vehicle(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
   vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, local())),
+  model3d(readAttribute<String>("model3d", node, local(), "")),
   parameter_declarations(
     readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
   bounding_box(readElement<BoundingBox>("BoundingBox", node, local())),
