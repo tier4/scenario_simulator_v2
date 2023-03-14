@@ -299,7 +299,7 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 auto AutowareUniverse::receiveEmergencyState(const EmergencyState & msg) -> void
 {
 #define CASE(IDENTIFIER, VARIABLE) \
-  case EmergencyState::IDENTIFIER:              \
+  case EmergencyState::IDENTIFIER: \
     VARIABLE = #IDENTIFIER;        \
     break
 
@@ -320,7 +320,7 @@ auto AutowareUniverse::receiveEmergencyState(const EmergencyState & msg) -> void
 auto AutowareUniverse::receiveMrmState(const MrmState & msg) -> void
 {
 #define CASE(IDENTIFIER, VARIABLE) \
-  case MrmState::IDENTIFIER:              \
+  case MrmState::IDENTIFIER:       \
     VARIABLE = #IDENTIFIER;        \
     break
 
