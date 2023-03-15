@@ -90,7 +90,7 @@ public:
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
   geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset);
   double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
-  const std::vector<std::int64_t> getLaneletIds();
+  std::vector<std::int64_t> getLaneletIds() const;
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(
@@ -152,10 +152,11 @@ public:
   boost::optional<std::int64_t> getClosestLaneletId(
     geometry_msgs::msg::Pose pose, double distance_thresh = 30.0, bool include_crosswalk = false);
   std::vector<std::int64_t> getNearbyLaneletIds(
-    const geometry_msgs::msg::Point & point, double distance_threshold) const;
-  std::vector<std::int64_t> getNearbyLaneletIds(
     const geometry_msgs::msg::Point & point, double distance_threshold,
-    bool include_crosswalk) const;
+    unsigned int search_count = 5) const;
+  std::vector<std::int64_t> getNearbyLaneletIds(
+    const geometry_msgs::msg::Point & point, double distance_threshold, bool include_crosswalk,
+    unsigned int search_count = 5) const;
   std::vector<std::int64_t> filterLaneletIds(
     const std::vector<std::int64_t> & lanelet_ids, const char subtype[]) const;
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
@@ -236,6 +237,9 @@ private:
     const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const;
   std::vector<geometry_msgs::msg::Point> toPolygon(
     const lanelet::ConstLineString3d & line_string) const;
+  lanelet::ConstLanelets shoulder_lanelets_;
+  std::vector<std::int64_t> getNextRoadShoulderLanelet(std::int64_t lanelet_id) const;
+  std::vector<std::int64_t> getPreviousRoadShoulderLanelet(std::int64_t lanelet_id) const;
 };
 }  // namespace hdmap_utils
 
