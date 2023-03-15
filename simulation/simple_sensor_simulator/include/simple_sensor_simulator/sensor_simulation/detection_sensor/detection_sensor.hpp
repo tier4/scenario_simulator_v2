@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <deque>
 
 namespace simple_sensor_simulator
 {
@@ -61,8 +62,9 @@ class DetectionSensor : public DetectionSensorBase
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
   std::mt19937 random_engine_;
+  double object_recognition_delay_;
 
-  std::vector<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
+  std::deque<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
     queue_objects_;
 
   auto applyPositionNoise(autoware_auto_perception_msgs::msg::DetectedObject)
@@ -75,7 +77,8 @@ public:
     const typename rclcpp::Publisher<T>::SharedPtr & publisher)
   : DetectionSensorBase(current_time, configuration),
     publisher_ptr_(publisher),
-    random_engine_(configuration.random_seed())
+    random_engine_(configuration.random_seed()),
+    object_recognition_delay_(configuration.object_recognition_delay())
   {
   }
 
