@@ -258,19 +258,16 @@ auto AutowareUniverse::getAutowareStateName() const -> std::string
 auto AutowareUniverse::getEmergencyStateName() const -> std::string
 {
   return minimum_risk_maneuver_state;
-  //  return minimum_risk_maneuver_merger.getStateName();
 }
 
 auto AutowareUniverse::getMinimumRiskManeuverBehaviorName() const -> std::string
 {
   return minimum_risk_maneuver_behavior;
-  //  return minimum_risk_maneuver_merger.getBehaviorName();
 }
 
 auto AutowareUniverse::getMinimumRiskManeuverStateName() const -> std::string
 {
   return minimum_risk_maneuver_state;
-  //  return minimum_risk_maneuver_merger.getStateName();
 }
 
 auto AutowareUniverse::sendSIGINT() -> void  //
@@ -299,7 +296,7 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 auto AutowareUniverse::receiveEmergencyState(const EmergencyState & msg) -> void
 {
 #define CASE(IDENTIFIER, VARIABLE) \
-  case EmergencyState::IDENTIFIER:              \
+  case EmergencyState::IDENTIFIER: \
     VARIABLE = #IDENTIFIER;        \
     break
 
@@ -320,7 +317,7 @@ auto AutowareUniverse::receiveEmergencyState(const EmergencyState & msg) -> void
 auto AutowareUniverse::receiveMrmState(const MrmState & msg) -> void
 {
 #define CASE(IDENTIFIER, VARIABLE) \
-  case MrmState::IDENTIFIER:              \
+  case MrmState::IDENTIFIER:       \
     VARIABLE = #IDENTIFIER;        \
     break
 

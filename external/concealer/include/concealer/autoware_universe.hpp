@@ -32,7 +32,6 @@
 #include <concealer/autoware.hpp>
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
-#include <concealer/minimum_risk_maneuver_merger.hpp>
 #include <concealer/task_queue.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
@@ -110,8 +109,6 @@ private:
   auto approve(const CooperateStatusArray &) -> void;
 
   auto cooperate(const CooperateStatusArray &) -> void;
-
-  MinimumRiskManeuverMerger minimum_risk_maneuver_merger;
 
   std::string minimum_risk_maneuver_state;
 
