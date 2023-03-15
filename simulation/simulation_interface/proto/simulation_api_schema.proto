@@ -37,7 +37,7 @@ message DetectionSensorConfiguration {
   double pos_noise_stddev = 6;          // standard deviation of position noise.
   int32 random_seed = 7;                // random_seed for noise generation.
   double probability_of_lost = 8;       // probability of lost recognition. (unit : percentage)
-  double object_recognition_delay = 8;  // object recognition delay. (unit : second) It delays only the position recognition. 
+  double object_recognition_delay = 9;  // object recognition delay. (unit : second) It delays only the position recognition. 
 }
 
 /**

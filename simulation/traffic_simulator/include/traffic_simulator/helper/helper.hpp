@@ -15,6 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
 #define TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
 
+#include <simulation_api_schema.pb.h>
+
+#include <cmath>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
