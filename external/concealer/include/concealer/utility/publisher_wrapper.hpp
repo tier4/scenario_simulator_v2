@@ -41,4 +41,4 @@ public:
 };
 }  // namespace concealer
 
-#endif  //CONCEALER__PUBLISHER_WRAPPER_HPP_
+#endif  // CONCEALER__PUBLISHER_WRAPPER_HPP_

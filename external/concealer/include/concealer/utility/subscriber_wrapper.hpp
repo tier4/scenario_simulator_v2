@@ -66,4 +66,4 @@ public:
 
 }  // namespace concealer
 
-#endif  //CONCEALER__SUBSCRIBER_WRAPPER_HPP_
+#endif  // CONCEALER__SUBSCRIBER_WRAPPER_HPP_

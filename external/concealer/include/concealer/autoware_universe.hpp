@@ -31,7 +31,7 @@ namespace concealer
 {
 /**
    * Implements Autoware interface for Autoware Universe
-   * NOTE: This class is intended to be move to simple_sensor_simulation
+   * NOTE: This class is intended to be move to simple_sensor_simulator
    */
 class AutowareUniverse : public Autoware
 {
@@ -91,4 +91,4 @@ public:
 
 }  // namespace concealer
 
-#endif  //CONCEALER__AUTOWARE_UNIVERSE_HPP_
+#endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_
