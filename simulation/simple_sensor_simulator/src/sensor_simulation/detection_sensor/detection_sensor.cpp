@@ -163,7 +163,15 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         }
       }
     }
-    publisher_ptr_->publish(msg);
+    autoware_auto_perception_msgs::msg::DetectedObjects delayed_msg;
+    double delay = 1.0;
+    queue_objects_.push_back(
+      std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>(msg, current_time));
+    if (current_time - queue_objects_.front().second >= delay) {
+      delayed_msg = queue_objects_.front().first;
+      queue_objects_.erase(queue_objects_.begin());
+    }
+    publisher_ptr_->publish(delayed_msg);
   }
 }
 }  // namespace simple_sensor_simulator
