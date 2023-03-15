@@ -166,7 +166,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 
     queue_objects_.emplace_back(msg, current_time);
     autoware_auto_perception_msgs::msg::DetectedObjects delayed_msg;
-    if (current_time - queue_objects_.front().second >= delay) {
+    if (current_time - queue_objects_.front().second >= configuration_.object_recognition_delay()) {
       delayed_msg = queue_objects_.front().first;
       queue_objects_.pop_front();
     }
