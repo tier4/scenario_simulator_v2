@@ -53,10 +53,17 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
 void PedestrianEntity::requestAssignRoute(
   const std::vector<CanonicalizedLaneletPoseType> & waypoints)
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  if (status_.lanelet_pose_valid) {
-    route_planner_.setWaypoints(waypoints);
+  const auto entity_lanelet_pose = getLaneletPose();
+  if (!entity_lanelet_pose) {
+    return;
   }
+  route_planner_.setWaypoints(waypoints);
+  std::vector<geometry_msgs::msg::Pose> goal_poses;
+  for (const auto & waypoint : waypoints) {
+    goal_poses.emplace_back(
+      hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(waypoint)).pose);
+  }
+  behavior_plugin_ptr_->setGoalPoses(goal_poses);
 }
 
 void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
@@ -129,6 +136,8 @@ void PedestrianEntity::requestAcquirePosition(const CanonicalizedLaneletPoseType
   if (status_.lanelet_pose_valid) {
     route_planner_.setWaypoints({lanelet_pose});
   }
+  behavior_plugin_ptr_->setGoalPoses(
+    {hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(lanelet_pose)).pose});
 }
 
 void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
