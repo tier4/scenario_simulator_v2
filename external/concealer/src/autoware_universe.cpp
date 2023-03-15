@@ -295,17 +295,17 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
 
 auto AutowareUniverse::receiveEmergencyState(const EmergencyState & msg) -> void
 {
-#define CASE(IDENTIFIER, VARIABLE) \
-  case EmergencyState::IDENTIFIER: \
-    VARIABLE = #IDENTIFIER;        \
+#define CASE(IDENTIFIER)                       \
+  case EmergencyState::IDENTIFIER:             \
+    minimum_risk_maneuver_state = #IDENTIFIER; \
     break
 
   switch (msg.state) {
-    CASE(MRM_FAILED, minimum_risk_maneuver_state);
-    CASE(MRM_OPERATING, minimum_risk_maneuver_state);
-    CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
-    CASE(NORMAL, minimum_risk_maneuver_state);
-    CASE(OVERRIDE_REQUESTING, minimum_risk_maneuver_state);
+    CASE(MRM_FAILED);
+    CASE(MRM_OPERATING);
+    CASE(MRM_SUCCEEDED);
+    CASE(NORMAL);
+    CASE(OVERRIDE_REQUESTING);
 
     default:
       throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
