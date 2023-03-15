@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/api/api.hpp>
+
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <limits>
 #include <memory>
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
-#include <traffic_simulator/api/api.hpp>
 
 namespace traffic_simulator
 {
@@ -214,11 +215,11 @@ bool API::attachDetectionSensor(
 
 bool API::attachDetectionSensor(
   const std::string & entity_name, double pos_noise_stddev, double probability_of_lost,
-  int random_seed)
+  double object_recognition_delay, int random_seed)
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
     entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1, 300, false,
-    pos_noise_stddev, random_seed, probability_of_lost));
+    pos_noise_stddev, random_seed, probability_of_lost, object_recognition_delay));
 }
 
 bool API::attachOccupancyGridSensor(
