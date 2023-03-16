@@ -15,6 +15,7 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_
 
+#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
@@ -55,6 +56,7 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
+  using MrmState = autoware_adapi_v1_msgs::msg::MrmState;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
@@ -62,7 +64,8 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   SubscriberWrapper<AutowareState, ThreadSafe> getAutowareState;
   SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
   SubscriberWrapper<CooperateStatusArray> getCooperateStatusArray;
-  SubscriberWrapper<EmergencyState> getEmergencyStateImpl;
+  SubscriberWrapper<EmergencyState> getEmergencyState;
+  SubscriberWrapper<MrmState> getMrmState;
   SubscriberWrapper<Trajectory> getTrajectory;
   SubscriberWrapper<TurnIndicatorsCommand> getTurnIndicatorsCommandImpl;
 
@@ -80,6 +83,14 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
 
   auto approve(const CooperateStatusArray &) -> void;
   auto cooperate(const CooperateStatusArray &) -> void;
+
+  std::string minimum_risk_maneuver_state;
+
+  std::string minimum_risk_maneuver_behavior;
+
+  auto receiveMrmState(const MrmState & msg) -> void;
+
+  auto receiveEmergencyState(const EmergencyState & msg) -> void;
 
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
   auto is##NAME() const noexcept                             \
@@ -115,7 +126,8 @@ public:
     getAutowareState("/autoware/state", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const CooperateStatusArray& v) {cooperate(v);}),
-    getEmergencyStateImpl("/system/emergency/emergency_state", *this),
+    getEmergencyState("/system/emergency/emergency_state", *this, [this](const EmergencyState& v) {receiveEmergencyState(v);}),
+    getMrmState("/api/fail_safe/mrm_state", *this, [this](const MrmState& v){receiveMrmState(v);}),
     getTrajectory("/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
     requestEngage("/api/external/set/engage", *this),
@@ -142,7 +154,11 @@ public:
   auto getTurnIndicatorsCommand() const
     -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
 
-  auto getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState override;
+  auto getEmergencyStateName() const -> std::string override;
+
+  auto getMinimumRiskManeuverBehaviorName() const -> std::string override;
+
+  auto getMinimumRiskManeuverStateName() const -> std::string override;
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void override;
 
@@ -155,14 +171,6 @@ public:
   auto setVelocityLimit(double) -> void override;
 };
 }  // namespace concealer
-
-// for boost::lexical_cast
-namespace autoware_auto_system_msgs::msg
-{
-auto operator<<(std::ostream &, const EmergencyState &) -> std::ostream &;
-
-auto operator>>(std::istream &, EmergencyState &) -> std::istream &;
-}  // namespace autoware_auto_system_msgs::msg
 
 namespace autoware_auto_vehicle_msgs::msg
 {

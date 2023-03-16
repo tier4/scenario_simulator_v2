@@ -145,12 +145,6 @@ auto AutowareUniverseUser::getTurnIndicatorsCommand() const
   return getTurnIndicatorsCommandImpl();
 }
 
-auto AutowareUniverseUser::getEmergencyState() const
-  -> autoware_auto_system_msgs::msg::EmergencyState
-{
-  return getEmergencyStateImpl();
-}
-
 auto AutowareUniverseUser::restrictTargetSpeed(double value) const -> double
 {
   // no restrictions here
@@ -181,6 +175,21 @@ auto AutowareUniverseUser::getAutowareStateName() const -> std::string
 #undef CASE
 }
 
+auto AutowareUniverseUser::getEmergencyStateName() const -> std::string
+{
+  return minimum_risk_maneuver_state;
+}
+
+auto AutowareUniverseUser::getMinimumRiskManeuverBehaviorName() const -> std::string
+{
+  return minimum_risk_maneuver_behavior;
+}
+
+auto AutowareUniverseUser::getMinimumRiskManeuverStateName() const -> std::string
+{
+  return minimum_risk_maneuver_state;
+}
+
 auto AutowareUniverseUser::sendSIGINT() -> void  //
 {
   ::kill(process_id, SIGINT);
@@ -191,7 +200,8 @@ auto AutowareUniverseUser::setVelocityLimit(double velocity_limit) -> void
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
-    // We attempt to resend the service up to 30 times, but this number of times was determined by heuristics, not for any technical reason
+    // We attempt to resend the service up to 30 times, but this number of times was determined by
+    // heuristics, not for any technical reason
     requestSetVelocityLimit(request, 30);
   });
 }
@@ -201,57 +211,56 @@ auto AutowareUniverseUser::setCooperator(const std::string & cooperator) -> void
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
 
-}  // namespace concealer
-
-namespace autoware_auto_system_msgs::msg
-{
-auto operator<<(std::ostream & out, const EmergencyState & message) -> std::ostream &
-{
-#define CASE(IDENTIFIER)           \
-  case EmergencyState::IDENTIFIER: \
-    out << #IDENTIFIER;            \
+  auto AutowareUniverseUser::receiveEmergencyState(const EmergencyState & msg) -> void
+  {
+#define CASE(IDENTIFIER)                       \
+  case EmergencyState::IDENTIFIER:             \
+    minimum_risk_maneuver_state = #IDENTIFIER; \
     break
 
-  switch (message.state) {
-    CASE(MRM_FAILED);
-    CASE(MRM_OPERATING);
-    CASE(MRM_SUCCEEDED);
-    CASE(NORMAL);
-    CASE(OVERRIDE_REQUESTING);
+    switch (msg.state) {
+      CASE(MRM_FAILED);
+      CASE(MRM_OPERATING);
+      CASE(MRM_SUCCEEDED);
+      CASE(NORMAL);
+      CASE(OVERRIDE_REQUESTING);
 
-    default:
-      throw common::Error(
-        "Unsupported EmergencyState, state number : ", static_cast<int>(message.state));
-  }
-
+      default:
+        throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
+    }
+    minimum_risk_maneuver_behavior = "";
 #undef CASE
-
-  return out;
-}
-
-auto operator>>(std::istream & is, EmergencyState & message) -> std::istream &
-{
-#define STATE(IDENTIFIER) {#IDENTIFIER, EmergencyState::IDENTIFIER}
-
-  std::unordered_map<std::string, std::uint8_t> state_dictionary{
-    STATE(MRM_FAILED), STATE(MRM_OPERATING),       STATE(MRM_SUCCEEDED),
-    STATE(NORMAL),     STATE(OVERRIDE_REQUESTING),
-  };
-
-#undef STATE
-
-  std::string state_string;
-  is >> state_string;
-
-  if (auto iter = state_dictionary.find(state_string); iter != state_dictionary.end()) {
-    message.set__state(iter->second);
-  } else {
-    throw common::Error("Unsupported EmergencyState::state : ", state_string.c_str());
   }
 
-  return is;
-}
-}  // namespace autoware_auto_system_msgs::msg
+  auto AutowareUniverseUser::receiveMrmState(const MrmState & msg) -> void
+  {
+#define CASE(IDENTIFIER, VARIABLE) \
+  case MrmState::IDENTIFIER:       \
+    VARIABLE = #IDENTIFIER;        \
+    break
+
+    switch (msg.state) {
+      CASE(MRM_FAILED, minimum_risk_maneuver_state);
+      CASE(MRM_OPERATING, minimum_risk_maneuver_state);
+      CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
+      CASE(NORMAL, minimum_risk_maneuver_state);
+      CASE(UNKNOWN, minimum_risk_maneuver_state);
+      default:
+        throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
+    }
+
+    switch (msg.behavior) {
+      CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
+      CASE(EMERGENCY_STOP, minimum_risk_maneuver_behavior);
+      CASE(NONE, minimum_risk_maneuver_behavior);
+      CASE(UNKNOWN, minimum_risk_maneuver_behavior);
+      default:
+        throw common::Error(
+            "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.behavior));
+    }
+#undef CASE
+  }
+}  // namespace concealer
 
 namespace autoware_auto_vehicle_msgs::msg
 {
