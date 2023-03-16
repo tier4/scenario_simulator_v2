@@ -478,7 +478,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;
   entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-  entity_status_updated.lanelet_pose_valid = true;
+  entity_status_updated.lanelet_pose_valid = false;
   entity_status_updated.lanelet_pose = traffic_simulator::LaneletPoseType();
   return entity_status_updated;
 }
