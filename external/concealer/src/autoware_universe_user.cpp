@@ -211,55 +211,55 @@ auto AutowareUniverseUser::setCooperator(const std::string & cooperator) -> void
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
 
-  auto AutowareUniverseUser::receiveEmergencyState(const EmergencyState & msg) -> void
-  {
+auto AutowareUniverseUser::receiveEmergencyState(const EmergencyState & msg) -> void
+{
 #define CASE(IDENTIFIER)                       \
   case EmergencyState::IDENTIFIER:             \
     minimum_risk_maneuver_state = #IDENTIFIER; \
     break
 
-    switch (msg.state) {
-      CASE(MRM_FAILED);
-      CASE(MRM_OPERATING);
-      CASE(MRM_SUCCEEDED);
-      CASE(NORMAL);
-      CASE(OVERRIDE_REQUESTING);
+  switch (msg.state) {
+    CASE(MRM_FAILED);
+    CASE(MRM_OPERATING);
+    CASE(MRM_SUCCEEDED);
+    CASE(NORMAL);
+    CASE(OVERRIDE_REQUESTING);
 
-      default:
-        throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
-    }
-    minimum_risk_maneuver_behavior = "";
-#undef CASE
+    default:
+      throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
   }
+  minimum_risk_maneuver_behavior = "";
+#undef CASE
+}
 
-  auto AutowareUniverseUser::receiveMrmState(const MrmState & msg) -> void
-  {
+auto AutowareUniverseUser::receiveMrmState(const MrmState & msg) -> void
+{
 #define CASE(IDENTIFIER, VARIABLE) \
   case MrmState::IDENTIFIER:       \
     VARIABLE = #IDENTIFIER;        \
     break
 
-    switch (msg.state) {
-      CASE(MRM_FAILED, minimum_risk_maneuver_state);
-      CASE(MRM_OPERATING, minimum_risk_maneuver_state);
-      CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
-      CASE(NORMAL, minimum_risk_maneuver_state);
-      CASE(UNKNOWN, minimum_risk_maneuver_state);
-      default:
-        throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
-    }
-
-    switch (msg.behavior) {
-      CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
-      CASE(EMERGENCY_STOP, minimum_risk_maneuver_behavior);
-      CASE(NONE, minimum_risk_maneuver_behavior);
-      CASE(UNKNOWN, minimum_risk_maneuver_behavior);
-      default:
-        throw common::Error(
-            "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.behavior));
-    }
-#undef CASE
+  switch (msg.state) {
+    CASE(MRM_FAILED, minimum_risk_maneuver_state);
+    CASE(MRM_OPERATING, minimum_risk_maneuver_state);
+    CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
+    CASE(NORMAL, minimum_risk_maneuver_state);
+    CASE(UNKNOWN, minimum_risk_maneuver_state);
+    default:
+      throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
   }
+
+  switch (msg.behavior) {
+    CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
+    CASE(EMERGENCY_STOP, minimum_risk_maneuver_behavior);
+    CASE(NONE, minimum_risk_maneuver_behavior);
+    CASE(UNKNOWN, minimum_risk_maneuver_behavior);
+    default:
+      throw common::Error(
+        "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.behavior));
+  }
+#undef CASE
+}
 }  // namespace concealer
 
 namespace autoware_auto_vehicle_msgs::msg
