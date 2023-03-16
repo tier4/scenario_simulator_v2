@@ -33,7 +33,7 @@
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <concealer/task_queue.hpp>
-#include <concealer/utility/service_with_validation.h>
+#include <concealer/utility/service_with_validation.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
