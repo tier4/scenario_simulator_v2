@@ -23,8 +23,8 @@
 #include <random>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace simple_sensor_simulator
 {
