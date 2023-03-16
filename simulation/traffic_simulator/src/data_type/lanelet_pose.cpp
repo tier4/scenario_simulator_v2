@@ -20,16 +20,15 @@ namespace traffic_simulator
 namespace lanelet_pose
 {
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
-  const traffic_simulator_msgs::msg::LaneletPose & maybe_non_canonicalized_lanelet_pose,
+  const LaneletPoseType & maybe_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils))
 {
 }
 
 auto CanonicalizedLaneletPose::canonicalize(
-  const traffic_simulator_msgs::msg::LaneletPose & may_non_canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-  -> traffic_simulator_msgs::msg::LaneletPose
+  const LaneletPoseType & may_non_canonicalized_lanelet_pose,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPoseType
 {
   if (
     const auto canonicalized =
@@ -45,6 +44,11 @@ auto CanonicalizedLaneletPose::canonicalize(
       ",rpy.z=", may_non_canonicalized_lanelet_pose.rpy.z,
       ") is invalid, please check lanelet length and connection.");
   }
+}
+
+bool isSameLaneletId(const CanonicalizedLaneletPose & p0, const CanonicalizedLaneletPose & p1)
+{
+  return static_cast<LaneletPoseType>(p0).lanelet_id && static_cast<LaneletPoseType>(p1).lanelet_id;
 }
 }  // namespace lanelet_pose
 }  // namespace traffic_simulator

@@ -19,29 +19,50 @@
 
 namespace traffic_simulator
 {
+using LaneletPoseType = traffic_simulator_msgs::msg::LaneletPose;
+
 namespace lanelet_pose
 {
 class CanonicalizedLaneletPose
 {
 public:
   explicit CanonicalizedLaneletPose(
-    const traffic_simulator_msgs::msg::LaneletPose & maybe_non_canonicalized_lanelet_pose,
+    const LaneletPoseType & maybe_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const noexcept
-  {
-    return lanelet_pose_;
+  explicit operator LaneletPoseType() const noexcept { return lanelet_pose_; }
+
+/**
+Note: The comparison operator for the CanonicalizedLaneletPose type compares the s values after making sure that the lanelet_id is the same.
+Offset and rpy values are not taken into account.
+*/
+#define DEFINE_COMPARISON_OPERATOR(OPERATOR)                                                \
+  bool operator OPERATOR(const CanonicalizedLaneletPose & rhs) const                        \
+  {                                                                                         \
+    if (                                                                                    \
+      static_cast<LaneletPoseType>(*this).lanelet_id ==                                     \
+        static_cast<LaneletPoseType>(rhs).lanelet_id &&                                     \
+      static_cast<LaneletPoseType>(*this).s OPERATOR static_cast<LaneletPoseType>(rhs).s) { \
+      return true;                                                                          \
+    }                                                                                       \
+    return false;                                                                           \
   }
+
+  DEFINE_COMPARISON_OPERATOR(<=)
+  DEFINE_COMPARISON_OPERATOR(<)
+  DEFINE_COMPARISON_OPERATOR(>=)
+  DEFINE_COMPARISON_OPERATOR(>)
+#undef DEFINE_COMPARISON_OPERATOR
 
 private:
   auto canonicalize(
-    const traffic_simulator_msgs::msg::LaneletPose & may_non_canonicalized_lanelet_pose,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-    -> traffic_simulator_msgs::msg::LaneletPose;
-  const traffic_simulator_msgs::msg::LaneletPose lanelet_pose_;
+    const LaneletPoseType & may_non_canonicalized_lanelet_pose,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPoseType;
+  const LaneletPoseType lanelet_pose_;
 };
+
+bool isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &);
 }  // namespace lanelet_pose
 
-using LaneletPoseType = traffic_simulator_msgs::msg::LaneletPose;
 using CanonicalizedLaneletPoseType = lanelet_pose::CanonicalizedLaneletPose;
 }  // namespace traffic_simulator
 
