@@ -47,17 +47,6 @@ void Autoware::checkAutowareProcess()
   }
 }
 
-auto Autoware::getEmergencyState() const -> autoware_auto_system_msgs::msg::EmergencyState
-{
-  static auto emergency_state = []() {
-    autoware_auto_system_msgs::msg::EmergencyState emergency_state;
-    emergency_state.state = autoware_auto_system_msgs::msg::EmergencyState::NORMAL;
-    return emergency_state;
-  }();
-  emergency_state.stamp = now();
-  return emergency_state;
-}
-
 auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
 {
   static auto gear_command = []() {
