@@ -18,13 +18,13 @@
 #include <simulation_api_schema.pb.h>
 
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
+#include <deque>
 #include <memory>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <vector>
 #include <utility>
-#include <deque>
 
 namespace simple_sensor_simulator
 {
@@ -63,8 +63,7 @@ class DetectionSensor : public DetectionSensorBase
 
   std::mt19937 random_engine_;
 
-  std::deque<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
-    queue_objects_;
+  std::deque<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>> queue_objects_;
 
   auto applyPositionNoise(autoware_auto_perception_msgs::msg::DetectedObject)
     -> autoware_auto_perception_msgs::msg::DetectedObject;
