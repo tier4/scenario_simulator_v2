@@ -165,12 +165,12 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     }
 
     queue_objects_.push(std::make_pair(msg, current_time));
-    autoware_auto_perception_msgs::msg::DetectedObjects delayed_message;
+    autoware_auto_perception_msgs::msg::DetectedObjects delayed_objects;
     if (current_time - queue_objects_.front().second >= configuration_.object_recognition_delay()) {
-      delayed_message = queue_objects_.front().first;
+      delayed_objects = queue_objects_.front().first;
       queue_objects_.pop();
     }
-    publisher_ptr_->publish(delayed_message);
+    publisher_ptr_->publish(delayed_objects);
   }
 }
 }  // namespace simple_sensor_simulator
