@@ -81,12 +81,12 @@ private:
           [&](const auto & entry) { return entry.time > histories.back().time - delay; });
         std::ptrdiff_t(sizeof...(Args)) <= std::distance(std::begin(histories), canary_iterator)) {
       auto iterator = std::reverse_iterator(canary_iterator);
-      auto results = std::tuple{[&] { return Args((iterator++)->result); }()...};
+      current_value = condition(Args((iterator++)->result)...);
       histories.erase(std::begin(histories), iterator.base());
-      return asBoolean(current_value = std::apply(condition, results));
     } else {
-      return asBoolean(current_value = false);
+      current_value = false;
     }
+    return asBoolean(current_value);
   }
 };
 
