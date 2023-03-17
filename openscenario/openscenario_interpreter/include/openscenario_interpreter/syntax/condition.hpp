@@ -79,7 +79,8 @@ private:
     if (auto iterator = std::find_if(
           std::begin(histories), std::end(histories),
           [this](const auto & entry) { return entry.time > histories.back().time - delay; });
-        static_cast<std::ptrdiff_t>(sizeof...(Booleans)) <= std::distance(std::begin(histories), iterator)) {
+        static_cast<std::ptrdiff_t>(sizeof...(Booleans)) <=
+        std::distance(std::begin(histories), iterator)) {
       current_value = std::apply(condition, std::tuple{Booleans((--iterator)->result)...});
       histories.erase(std::begin(histories), iterator);
     } else {
