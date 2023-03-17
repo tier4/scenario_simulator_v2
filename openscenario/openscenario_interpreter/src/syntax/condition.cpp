@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <algorithm>
-#include <cstddef>
-#include <iterator>
-#include <numeric>
+#include <functional>
+#include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
@@ -24,8 +22,6 @@
 #include <openscenario_interpreter/syntax/condition.hpp>
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
-
-#include "openscenario_interpreter/object.hpp"
 
 namespace openscenario_interpreter
 {
@@ -51,63 +47,25 @@ Condition::Condition(const pugi::xml_node & node, Scope & scope)
 
 auto Condition::evaluate() -> Object
 {
-  using ResultSet = std::bitset<8>;
+  switch (condition_edge) {
+    case ConditionEdge::rising:
+      return update_condition(std::function([](bool a, bool b) { return a and not b; }));
 
-  auto update_condition = [&](std::size_t number, const auto & evaluator) -> bool {
-    auto latest_time = evaluateSimulationTime();
-    auto latest_result = ComplexType::evaluate().as<Boolean>();
-    evaluation_history.emplace_back(latest_time, latest_result);
+    case ConditionEdge::falling:
+      return update_condition(std::function([](bool a, bool b) { return not a and b; }));
 
-    auto canary_iterator = std::find_if(
-      std::begin(evaluation_history), std::end(evaluation_history), [&](EvaluationEntry entry) {
-        auto [time, result] = entry;
-        return time > latest_time - delay;
-      });
+    case ConditionEdge::risingOrFalling:
+      return update_condition(std::function([](bool a, bool b) { return a xor b; }));
 
-    auto results = ResultSet();
-    auto entry_count = std::size_t(0);
-    auto entry_iterator = std::reverse_iterator(canary_iterator);
-    while (entry_count < number and entry_iterator != std::rend(evaluation_history)) {
-      auto [time, result] = *entry_iterator;
-      results[entry_count] = result;
-      ++entry_iterator;
-      ++entry_count;
-    }
+    case ConditionEdge::none:
+      return update_condition(std::function([](bool a) { return a; }));
 
-    if (entry_count == number) {
-      evaluation_history.erase(std::begin(evaluation_history), entry_iterator.base());
-      return evaluator(results);
-    } else {
-      return false;
-    }
-  };
+    case ConditionEdge::sticky:
+      return update_condition(std::function([this](bool a) { return current_value || a; }));
 
-  current_value = [&] {
-    switch (condition_edge) {
-      case ConditionEdge::rising:
-        return update_condition(
-          2, [](ResultSet results) { return results.test(0) and not results.test(1); });
-
-      case ConditionEdge::falling:
-        return update_condition(
-          2, [](ResultSet results) { return not results.test(0) and results.test(1); });
-
-      case ConditionEdge::risingOrFalling:
-        return update_condition(
-          2, [](ResultSet results) { return results.test(0) xor results.test(1); });
-
-      case ConditionEdge::none:
-        return update_condition(1, [](ResultSet results) { return results.test(0); });
-
-      case ConditionEdge::sticky:
-        return current_value ||
-               update_condition(1, [](ResultSet results) { return results.test(0); });
-
-      default:
-        throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
-    }
-  }();
-  return asBoolean(current_value);
+    default:
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
+  }
 }
 
 auto operator<<(nlohmann::json & json, const Condition & datum) -> nlohmann::json &

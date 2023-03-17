@@ -15,13 +15,20 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_
 
+#include <algorithm>
+#include <cstddef>
+#include <functional>
+#include <list>
 #include <nlohmann/json.hpp>
+#include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
+#include <tuple>
 
 namespace openscenario_interpreter
 {
@@ -51,14 +58,36 @@ struct Condition : public ComplexType, private SimulatorCore::ConditionEvaluatio
   bool current_value;
 
 private:
-  using EvaluationEntry = std::pair<double, bool>;
+  struct History
+  {
+    double time;
+    bool result;
+  };
 
-  std::list<EvaluationEntry> evaluation_history;
+  std::list<History> histories;
 
 public:
   explicit Condition(const pugi::xml_node & node, Scope & scope);
 
   auto evaluate() -> Object;
+
+private:
+  template <class R, class... Args>
+  auto update_condition(std::function<R(Args...)> condition) -> Object
+  {
+    histories.push_back({evaluateSimulationTime(), ComplexType::evaluate().as<Boolean>()});
+    if (auto canary_iterator = std::find_if(
+          std::begin(histories), std::end(histories),
+          [&](const auto & entry) { return entry.time > histories.back().time - delay; });
+        std::ptrdiff_t(sizeof...(Args)) <= std::distance(std::begin(histories), canary_iterator)) {
+      auto iterator = std::reverse_iterator(canary_iterator);
+      auto results = std::tuple{[&] { return Args((iterator++)->result); }()...};
+      histories.erase(std::begin(histories), iterator.base());
+      return asBoolean(current_value = std::apply(condition, results));
+    } else {
+      return asBoolean(current_value = false);
+    }
+  }
 };
 
 auto operator<<(nlohmann::json &, const Condition &) -> nlohmann::json &;
