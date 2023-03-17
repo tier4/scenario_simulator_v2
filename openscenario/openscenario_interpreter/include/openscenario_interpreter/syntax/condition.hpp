@@ -78,10 +78,10 @@ private:
     histories.push_back({evaluateSimulationTime(), ComplexType::evaluate().as<Boolean>()});
     if (auto canary_iterator = std::find_if(
           std::begin(histories), std::end(histories),
-          [&](const auto & entry) { return entry.time > histories.back().time - delay; });
+          [this](const auto & entry) { return entry.time > histories.back().time - delay; });
         std::ptrdiff_t(sizeof...(Args)) <= std::distance(std::begin(histories), canary_iterator)) {
       auto iterator = std::reverse_iterator(canary_iterator);
-      current_value = condition(Args((iterator++)->result)...);
+      current_value = std::apply(condition, std::tuple{Args((iterator++)->result)...});
       histories.erase(std::begin(histories), iterator.base());
     } else {
       current_value = false;
