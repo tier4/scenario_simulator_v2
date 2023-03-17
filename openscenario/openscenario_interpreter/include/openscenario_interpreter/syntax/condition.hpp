@@ -72,15 +72,15 @@ public:
   auto evaluate() -> Object;
 
 private:
-  template <class R, class... Args>
-  auto update_condition(std::function<R(Args...)> condition) -> Object
+  template <class... Booleans>
+  auto update_condition(std::function<bool(Booleans...)> condition) -> Object
   {
     histories.push_back({evaluateSimulationTime(), ComplexType::evaluate().as<Boolean>()});
     if (auto iterator = std::find_if(
           std::begin(histories), std::end(histories),
           [this](const auto & entry) { return entry.time > histories.back().time - delay; });
-        std::ptrdiff_t(sizeof...(Args)) <= std::distance(std::begin(histories), iterator)) {
-      current_value = std::apply(condition, std::tuple{Args((--iterator)->result)...});
+        std::ptrdiff_t(sizeof...(Booleans)) <= std::distance(std::begin(histories), iterator)) {
+      current_value = std::apply(condition, std::tuple{Booleans((--iterator)->result)...});
       histories.erase(std::begin(histories), iterator);
     } else {
       current_value = false;
