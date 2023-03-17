@@ -72,7 +72,7 @@ public:
   auto evaluate() -> Object;
 
 private:
-  template <class... Booleans>
+  template <typename... Booleans>
   auto update_condition(std::function<bool(Booleans...)> condition) -> Object
   {
     histories.push_back({evaluateSimulationTime(), ComplexType::evaluate().as<Boolean>()});
