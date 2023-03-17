@@ -49,19 +49,19 @@ auto Condition::evaluate() -> Object
 {
   switch (condition_edge) {
     case ConditionEdge::rising:
-      return update_condition(std::function([](bool a, bool b) -> bool { return a and not b; }));
+      return update_condition(std::function([](bool a, bool b) { return a and not b; }));
 
     case ConditionEdge::falling:
-      return update_condition(std::function([](bool a, bool b) -> bool { return not a and b; }));
+      return update_condition(std::function([](bool a, bool b) { return not a and b; }));
 
     case ConditionEdge::risingOrFalling:
-      return update_condition(std::function([](bool a, bool b) -> bool { return a xor b; }));
+      return update_condition(std::function([](bool a, bool b) { return a != b; }));
 
     case ConditionEdge::none:
-      return update_condition(std::function([](bool a) -> bool { return a; }));
+      return update_condition(std::function([](bool a) { return a; }));
 
     case ConditionEdge::sticky:
-      return update_condition(std::function([this](bool a) -> bool { return current_value or a; }));
+      return update_condition(std::function([this](bool a) { return current_value or a; }));
 
     default:
       throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
