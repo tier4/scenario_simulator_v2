@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <algorithm>
 #include <geometry/linear_algebra.hpp>
-#include <iostream>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
+
+#include <algorithm>
+#include <iostream>
 
 namespace traffic_simulator
 {
@@ -83,11 +84,10 @@ auto LongitudinalSpeedPlanner::getDynamicStates(
   const geometry_msgs::msg::Accel & current_accel) const
   -> std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
 {
-  if (std::fabs(target_speed) > constraints.max_speed) {
-    THROW_SEMANTIC_ERROR(
-      "Target speed is ", std::to_string(target_speed), " , it overs ", entity,
-      "'s max_speed:", std::to_string(constraints.max_speed));
-  }
+  target_speed = std::abs(target_speed) > constraints.max_speed
+                   ? std::copysign(constraints.max_speed, target_speed)
+                   : target_speed;
+
   double linear_jerk = planLinearJerk(target_speed, constraints, current_twist, current_accel);
   auto accel = forward(linear_jerk, current_accel, constraints);
   auto twist = forward(accel, current_twist, constraints);
@@ -272,7 +272,8 @@ auto LongitudinalSpeedPlanner::planLinearJerk(
         constraints.max_deceleration * -1, (target_speed - current_twist.linear.x) / step_time),
       0.0);
   }
-  return (accel_x_new - current_accel.linear.x) / step_time;
+  auto jerk = (accel_x_new - current_accel.linear.x) / step_time;
+  return std::abs(jerk) > constraints.max_jerk ? std::copysign(constraints.max_jerk, jerk) : jerk;
 }
 
 auto LongitudinalSpeedPlanner::forward(
