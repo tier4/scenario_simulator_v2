@@ -31,6 +31,12 @@ void JobList::append(
   list_.emplace_back(Job(func_on_update, func_on_cleanup, type, exclusive, event));
 }
 
+void JobList::inactivate(const job::Type type)
+{
+  for (auto & job : list_)
+    if (job.type == type) job.inactivate();
+}
+
 void JobList::update(const double step_time, const job::Event event)
 {
   for (auto & job : list_) {
