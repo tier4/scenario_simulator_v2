@@ -178,6 +178,18 @@ auto EgoEntity::getCurrentAction() const -> std::string
   return state.empty() ? "Launching" : state;
 }
 
+auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
+{
+  traffic_simulator_msgs::msg::BehaviorParameter parameter;
+  /**
+   * @brief TODO, Input values get from autoware.
+   */
+  parameter.see_around = true;
+  parameter.dynamic_constraints.max_acceleration = 0;
+  parameter.dynamic_constraints.max_deceleration = 0;
+  return parameter;
+}
+
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   -> const traffic_simulator_msgs::msg::EntityStatus
 {
@@ -426,6 +438,16 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
+auto EgoEntity::getDefaultDynamicConstraints() const
+  -> const traffic_simulator_msgs::msg::DynamicConstraints &
+{
+  THROW_SEMANTIC_ERROR("getDefaultDynamicConstraints function does not support EgoEntity");
+}
+
+auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) -> void
+{
+}
+
 auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   VehicleEntity::setStatus(status);
@@ -483,9 +505,6 @@ void EgoEntity::requestSpeedChange(double value, bool)
 void EgoEntity::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/)
 {
-  THROW_SEMANTIC_ERROR(
-    "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
-    "purposes only.");
 }
 
 auto EgoEntity::setVelocityLimit(double value) -> void  //

@@ -15,21 +15,18 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 
+#include <boost/optional.hpp>
+#include <memory>
 #include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
-
-#include <boost/optional.hpp>
-
-#include <memory>
-#include <string>
 #include <vector>
 
 namespace traffic_simulator
@@ -123,8 +120,6 @@ private:
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 
   std::vector<std::int64_t> previous_route_lanelets_;
-
-  traffic_simulator_msgs::msg::DynamicConstraints default_dynamic_constraints_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

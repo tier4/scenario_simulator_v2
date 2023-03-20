@@ -15,20 +15,17 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
+#include <algorithm>
+#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/optional.hpp>
 #include <concealer/autoware_universe.hpp>
+#include <memory>
+#include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
-
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
-
-#include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
-
-#include <algorithm>
-#include <memory>
-#include <string>
 #include <vector>
 
 template <typename T>
@@ -102,6 +99,11 @@ public:
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
+  auto getDefaultDynamicConstraints() const
+    -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
+
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
+
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
 
@@ -134,6 +136,9 @@ public:
   auto requestSpeedChange(
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool continuous) -> void override;
+
+  auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
+    -> void override;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
 
