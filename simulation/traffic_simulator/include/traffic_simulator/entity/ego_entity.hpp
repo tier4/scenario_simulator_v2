@@ -24,6 +24,7 @@
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
