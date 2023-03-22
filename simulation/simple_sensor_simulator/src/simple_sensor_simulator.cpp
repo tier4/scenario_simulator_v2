@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <limits>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
+
+#include <geometry_msgs/msg/pose_stamped.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <limits>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -32,7 +34,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("simple_sensor_simulator", options),
   sensor_sim_(),
   server_(
-    simulation_interface::protocol, simulation_interface::HostName::ANY,
+    simulation_interface::protocol, simulation_interface::HostName::ANY, getSocketPort(),
     std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(&ScenarioSimulator::updateFrame, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
@@ -63,6 +65,12 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 }
 
 ScenarioSimulator::~ScenarioSimulator() {}
+
+int ScenarioSimulator::getSocketPort()
+{
+  if (!has_parameter("port")) declare_parameter("port", 5555);
+  return get_parameter("port").as_int();
+}
 
 void ScenarioSimulator::initialize(
   const simulation_api_schema::InitializeRequest & req,

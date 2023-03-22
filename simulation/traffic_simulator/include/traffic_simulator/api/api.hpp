@@ -15,19 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__API__API_HPP_
 #define TRAFFIC_SIMULATOR__API__API_HPP_
 
-#include <simulation_api_schema.pb.h>
-
-#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
-#include <boost/variant.hpp>
-#include <cassert>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
-#include <stdexcept>
-#include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
@@ -38,7 +28,20 @@
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+
+#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
+#include <rosgraph_msgs/msg/clock.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
+
+#include <boost/variant.hpp>
+
+#include <simulation_api_schema.pb.h>
+
+#include <cassert>
+#include <memory>
+#include <stdexcept>
+#include <string>
 #include <utility>
 
 namespace traffic_simulator
@@ -75,10 +78,18 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    zeromq_client_(simulation_interface::protocol, configuration.simulator_host)
+    zeromq_client_(
+      simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
+  }
+
+  template <typename Node>
+  int getZMQSocketPort(Node & node)
+  {
+    if (!node.has_parameter("port")) node.declare_parameter("port", 5555);
+    return node.get_parameter("port").as_int();
   }
 
   void closeZMQConnection() { zeromq_client_.closeConnection(); }

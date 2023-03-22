@@ -15,22 +15,24 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SIMPLE_SENSOR_SIMULATOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SIMPLE_SENSOR_SIMULATOR_HPP_
 
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2_ros/transform_broadcaster.h>
-
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/transform_stamped.hpp>
-#include <map>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
+
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
+
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
+
+#include <map>
+#include <memory>
 #include <string>
 #include <thread>
 #include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
 
 #if __cplusplus
 extern "C" {
@@ -122,6 +124,7 @@ private:
   void updateTrafficLights(
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);
+  int getSocketPort();
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
   std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians_;
