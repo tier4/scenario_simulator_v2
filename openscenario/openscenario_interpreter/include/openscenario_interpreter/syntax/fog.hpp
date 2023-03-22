@@ -40,6 +40,7 @@ struct Fog
 
   const BoundingBox bounding_box;  // Dimensions and center of fog in fixed coordinates.
 
+  Fog() = default;
   explicit Fog(const pugi::xml_node &, Scope &);
 };
 

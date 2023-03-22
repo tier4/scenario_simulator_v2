@@ -53,6 +53,7 @@ struct Sun
   const Double intensity;  // DEPRECATED: Illuminance of the sun, direct sunlight is around 100,000
                            // lx. Unit: [lx]. Range: [0..inf[.
 
+  Sun() = default;
   explicit Sun(const pugi::xml_node &, Scope &);
 };
 
