@@ -15,85 +15,53 @@
 #include <rclcpp/utilities.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
+
 #include <string>
 namespace zeromq
 {
 MultiClient::MultiClient(
-  const simulation_interface::TransportProtocol & protocol, const std::string & hostname)
+  const simulation_interface::TransportProtocol & protocol, const std::string & hostname,
+  const unsigned int socket_port)
 : protocol(protocol),
   hostname(hostname),
   context_(zmqpp::context()),
   type_(zmqpp::socket_type::request),
-  socket_initialize_(context_, type_),
-  socket_update_frame_(context_, type_),
-  socket_update_sensor_frame_(context_, type_),
-  socket_spawn_vehicle_entity_(context_, type_),
-  socket_spawn_pedestrian_entity_(context_, type_),
-  socket_spawn_misc_object_entity_(context_, type_),
-  socket_despawn_entity_(context_, type_),
-  socket_update_entity_status_(context_, type_),
-  socket_attach_lidar_sensor_(context_, type_),
-  socket_attach_detection_sensor_(context_, type_),
-  socket_attach_occupancy_grid_sensor_(context_, type_),
-  socket_update_traffic_lights_(context_, type_)
+  socket_(context_, type_)
 {
-  socket_initialize_.connect(
-    simulation_interface::getEndPoint(protocol, hostname, simulation_interface::ports::initialize));
-  socket_update_frame_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_frame));
-  socket_update_sensor_frame_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_sensor_frame));
-  socket_spawn_vehicle_entity_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::spawn_vehicle_entity));
-  socket_spawn_pedestrian_entity_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::spawn_pedestrian_entity));
-  socket_spawn_misc_object_entity_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::spawn_misc_object_entity));
-  socket_despawn_entity_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::despawn_entity));
-  socket_update_entity_status_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_entity_status));
-  socket_attach_lidar_sensor_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::attach_lidar_sensor));
-  socket_attach_detection_sensor_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::attach_detection_sensor));
-  socket_attach_occupancy_grid_sensor_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::attach_occupancy_grid_sensor));
-  socket_update_traffic_lights_.connect(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_traffic_lights));
+  socket_.connect(simulation_interface::getEndPoint(protocol, hostname, socket_port));
 }
 
 void MultiClient::closeConnection()
 {
   if (is_running) {
     is_running = false;
-    socket_initialize_.close();
-    socket_update_frame_.close();
-    socket_update_sensor_frame_.close();
-    socket_spawn_vehicle_entity_.close();
-    socket_spawn_pedestrian_entity_.close();
-    socket_spawn_misc_object_entity_.close();
-    socket_despawn_entity_.close();
-    socket_update_entity_status_.close();
-    socket_attach_lidar_sensor_.close();
-    socket_attach_detection_sensor_.close();
-    socket_attach_occupancy_grid_sensor_.close();
-    socket_update_traffic_lights_.close();
+    socket_.close();
   }
 }
 
 MultiClient::~MultiClient() { closeConnection(); }
 
 void MultiClient::call(
+  const simulation_api_schema::SimulationRequest & req,
+  simulation_api_schema::SimulationResponse & res)
+{
+  zmqpp::message message = toZMQ(req);
+  socket_.send(message);
+  zmqpp::message buffer;
+  socket_.receive(buffer);
+  res = toProto<simulation_api_schema::SimulationResponse>(buffer);
+}
+
+void MultiClient::call(
   const simulation_api_schema::InitializeRequest & req,
   simulation_api_schema::InitializeResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_initialize_.send(message);
-    zmqpp::message buffer;
-    socket_initialize_.receive(buffer);
-    res = toProto<simulation_api_schema::InitializeResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_initialize() = req;
+    call(sim_request, sim_response);
+    res = sim_response.initialize();
   }
 }
 void MultiClient::call(
@@ -101,11 +69,11 @@ void MultiClient::call(
   simulation_api_schema::UpdateFrameResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_update_frame_.send(message);
-    zmqpp::message buffer;
-    socket_update_frame_.receive(buffer);
-    res = toProto<simulation_api_schema::UpdateFrameResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_update_frame() = req;
+    call(sim_request, sim_response);
+    res = sim_response.update_frame();
   }
 }
 void MultiClient::call(
@@ -113,11 +81,11 @@ void MultiClient::call(
   simulation_api_schema::UpdateSensorFrameResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_update_sensor_frame_.send(message);
-    zmqpp::message buffer;
-    socket_update_sensor_frame_.receive(buffer);
-    res = toProto<simulation_api_schema::UpdateSensorFrameResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_update_sensor_frame() = req;
+    call(sim_request, sim_response);
+    res = sim_response.update_sensor_frame();
   }
 }
 void MultiClient::call(
@@ -125,11 +93,11 @@ void MultiClient::call(
   simulation_api_schema::SpawnVehicleEntityResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_spawn_vehicle_entity_.send(message);
-    zmqpp::message buffer;
-    socket_spawn_vehicle_entity_.receive(buffer);
-    res = toProto<simulation_api_schema::SpawnVehicleEntityResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_spawn_vehicle_entity() = req;
+    call(sim_request, sim_response);
+    res = sim_response.spawn_vehicle_entity();
   }
 }
 void MultiClient::call(
@@ -137,11 +105,11 @@ void MultiClient::call(
   simulation_api_schema::SpawnPedestrianEntityResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_spawn_pedestrian_entity_.send(message);
-    zmqpp::message buffer;
-    socket_spawn_pedestrian_entity_.receive(buffer);
-    res = toProto<simulation_api_schema::SpawnPedestrianEntityResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_spawn_pedestrian_entity() = req;
+    call(sim_request, sim_response);
+    res = sim_response.spawn_pedestrian_entity();
   }
 }
 void MultiClient::call(
@@ -149,11 +117,11 @@ void MultiClient::call(
   simulation_api_schema::SpawnMiscObjectEntityResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_spawn_misc_object_entity_.send(message);
-    zmqpp::message buffer;
-    socket_spawn_misc_object_entity_.receive(buffer);
-    res = toProto<simulation_api_schema::SpawnMiscObjectEntityResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_spawn_misc_object_entity() = req;
+    call(sim_request, sim_response);
+    res = sim_response.spawn_misc_object_entity();
   }
 }
 void MultiClient::call(
@@ -161,11 +129,11 @@ void MultiClient::call(
   simulation_api_schema::DespawnEntityResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_despawn_entity_.send(message);
-    zmqpp::message buffer;
-    socket_despawn_entity_.receive(buffer);
-    res = toProto<simulation_api_schema::DespawnEntityResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_despawn_entity() = req;
+    call(sim_request, sim_response);
+    res = sim_response.despawn_entity();
   }
 }
 void MultiClient::call(
@@ -173,11 +141,11 @@ void MultiClient::call(
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_update_entity_status_.send(message);
-    zmqpp::message buffer;
-    socket_update_entity_status_.receive(buffer);
-    res = toProto<simulation_api_schema::UpdateEntityStatusResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_update_entity_status() = req;
+    call(sim_request, sim_response);
+    res = sim_response.update_entity_status();
   }
 }
 void MultiClient::call(
@@ -185,11 +153,11 @@ void MultiClient::call(
   simulation_api_schema::AttachLidarSensorResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_attach_lidar_sensor_.send(message);
-    zmqpp::message buffer;
-    socket_attach_lidar_sensor_.receive(buffer);
-    res = toProto<simulation_api_schema::AttachLidarSensorResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_attach_lidar_sensor() = req;
+    call(sim_request, sim_response);
+    res = sim_response.attach_lidar_sensor();
   }
 }
 void MultiClient::call(
@@ -197,11 +165,11 @@ void MultiClient::call(
   simulation_api_schema::AttachDetectionSensorResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_attach_detection_sensor_.send(message);
-    zmqpp::message buffer;
-    socket_attach_detection_sensor_.receive(buffer);
-    res = toProto<simulation_api_schema::AttachDetectionSensorResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_attach_detection_sensor() = req;
+    call(sim_request, sim_response);
+    res = sim_response.attach_detection_sensor();
   }
 }
 
@@ -210,11 +178,11 @@ void MultiClient::call(
   simulation_api_schema::AttachOccupancyGridSensorResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_attach_occupancy_grid_sensor_.send(message);
-    zmqpp::message buffer;
-    socket_attach_occupancy_grid_sensor_.receive(buffer);
-    res = toProto<simulation_api_schema::AttachOccupancyGridSensorResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_attach_occupancy_grid_sensor() = req;
+    call(sim_request, sim_response);
+    res = sim_response.attach_occupancy_grid_sensor();
   }
 }
 
@@ -223,11 +191,12 @@ void MultiClient::call(
   simulation_api_schema::UpdateTrafficLightsResponse & res)
 {
   if (is_running) {
-    zmqpp::message message = toZMQ(req);
-    socket_update_traffic_lights_.send(message);
-    zmqpp::message buffer;
-    socket_update_traffic_lights_.receive(buffer);
-    res = toProto<simulation_api_schema::UpdateTrafficLightsResponse>(buffer);
+    simulation_api_schema::SimulationRequest sim_request;
+    simulation_api_schema::SimulationResponse sim_response;
+    *sim_request.mutable_update_traffic_lights() = req;
+    call(sim_request, sim_response);
+    res = sim_response.update_traffic_lights();
   }
 }
+
 }  // namespace zeromq
