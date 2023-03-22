@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Weather (OpenSCENARIO V1.2.0) --------------------------------------------
+/* ---- Weather 1.2 ---------------------------------------------------
  *
  * <xsd:complexType name="Weather">
  * 　　<xsd:all>

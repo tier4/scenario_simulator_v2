@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- EnvironmentAction (OpenSCENARIO V1.2.0) -----------------------------
+/* ---- EnvironmentAction 1.2 ----------------------------------------------
  *
  * <xsd:complexType name="EnvironmentAction">
  *   <xsd:choice>

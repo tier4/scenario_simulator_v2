@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Environment (OpenSCENARIO V1.2.0) ------------------------------------
+/* ---- Environment 1.2 ----------------------------------------------------
  *
  * <xsd:complexType name="Environment">
  *   <xsd:all>

@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Sum (OpenSCENARIO V1.2.0) --------------------------------------------
+/* ---- Sun 1.2 -------------------------------------------------
  *
  * <xsd:complexType name="Sun">
  *   <xsd:attribute name="azimuth" type="Double" use="required"/>
