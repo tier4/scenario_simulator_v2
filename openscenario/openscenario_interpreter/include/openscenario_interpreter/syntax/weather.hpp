@@ -16,11 +16,13 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__WEATHER_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/dome_image.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/fog.hpp>
 #include <openscenario_interpreter/syntax/fractional_cloud_cover.hpp>
 #include <openscenario_interpreter/syntax/precipitation.hpp>
 #include <openscenario_interpreter/syntax/sun.hpp>
+#include <openscenario_interpreter/syntax/wind.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -71,7 +73,13 @@ struct Weather
   const Fog fog;  //	Definition of fog, i.e. visual range and bounding box.
 
   const Precipitation precipitation;  //	Definition of precipitation, i.e. type and
-                                      // intensity.
+  // intensity.
+
+  const Wind wind;  // 	Definition of the wind: direction and speed.
+
+  const DomeImage dome_image;  // 	Image reference to represent the sky. Mutually exclusive
+                               // with "fractionalCloudCover". If the image also contains lighting
+                               // information (HDRi) it is also mutually exclusive with "sun".
 
   explicit Weather(const pugi::xml_node &, Scope &);
 };

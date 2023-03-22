@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "openscenario_interpreter/reader/attribute.hpp"
-#include "openscenario_interpreter/syntax/precipitation_type.hpp"
-
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/precipitation.hpp>
+#include <openscenario_interpreter/syntax/precipitation_type.hpp>
 
 namespace openscenario_interpreter
 {

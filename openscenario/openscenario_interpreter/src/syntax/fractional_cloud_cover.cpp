@@ -17,10 +17,6 @@
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/fractional_cloud_cover.hpp>
 
-#include <iostream>
-#include <string>
-#include <type_traits>
-
 namespace openscenario_interpreter
 {
 inline namespace syntax

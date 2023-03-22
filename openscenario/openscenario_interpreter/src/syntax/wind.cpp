@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "openscenario_interpreter/reader/attribute.hpp"
-
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/wind.hpp>
 
 namespace openscenario_interpreter

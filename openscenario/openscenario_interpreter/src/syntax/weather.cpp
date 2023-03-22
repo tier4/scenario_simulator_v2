@@ -28,6 +28,8 @@ Weather::Weather(const pugi::xml_node & node, Scope & scope)
   sun(readElement<Sun>("Sun", node, scope)),
   fog(readElement<Fog>("Fog", node, scope)),
   precipitation(readElement<Precipitation>("Precipitation", node, scope)),
+  wind(readElement<Wind>("Wind", node, scope)),
+  dome_image(readElement<DomeImage>("DomeImage", node, scope))
 {
 }
 

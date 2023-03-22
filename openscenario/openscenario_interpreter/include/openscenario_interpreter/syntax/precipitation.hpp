@@ -15,11 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PRECIPITATION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PRECIPITATION_HPP_
 
-#include "openscenario_interpreter/syntax/precipitation_type.hpp"
-
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/precipitation_type.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
