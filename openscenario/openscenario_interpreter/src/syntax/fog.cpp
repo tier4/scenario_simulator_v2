@@ -25,9 +25,16 @@ inline namespace syntax
 {
 
 Fog::Fog(const pugi::xml_node & node, Scope & scope)
-: visualRange(readAttribute<Double>("visualRange", node, scope)),
-  boundingBox(readElement<BoundingBox>("BoundingBox", node, scope))
+: visual_range(readAttribute<Double>("visualRange", node, scope)),
+  bounding_box(readElement<BoundingBox>("BoundingBox", node, scope))
 {
+  auto visual_range_valid = visual_range >= 0;
+  if (!visual_range_valid) {
+    std::stringstream ss;
+    ss << "The parameter \"visualRange\" was required to be in the range of "
+       << "[0..inf], but it is out of range value: " << visual_range << ".";
+    throw common::SyntaxError(ss.str());
+  }
 }
 
 }  // namespace syntax

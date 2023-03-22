@@ -9,7 +9,7 @@ inline namespace syntax
 
 TimeOfDay::TimeOfDay(const pugi::xml_node & node, Scope & scope)
 : animation(readAttribute<Boolean>("animation", node, scope)),
-  dateTime(readAttribute<String>("dateTime", node, scope))
+  date_time(readAttribute<String>("dateTime", node, scope))
 {
 }
 

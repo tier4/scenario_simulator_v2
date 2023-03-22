@@ -36,9 +36,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Fog
 {
-  const Double visualRange;  // Unit: [m]. Range: [0..inf[.
+  const Double visual_range;  // Unit: [m]. Range: [0..inf[.
 
-  const BoundingBox boundingBox;  // Dimensions and center of fog in fixed coordinates.
+  const BoundingBox bounding_box;  // Dimensions and center of fog in fixed coordinates.
 
   explicit Fog(const pugi::xml_node &, Scope &);
 };

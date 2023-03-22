@@ -36,7 +36,7 @@ struct TimeOfDay
   const Boolean animation;
 
   // Actual type: DateTime
-  const String dateTime;
+  const String date_time;
 
   explicit TimeOfDay(const pugi::xml_node &, Scope &);
 };
