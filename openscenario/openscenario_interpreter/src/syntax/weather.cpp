@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "openscenario_interpreter/reader/element.hpp"
-#include "openscenario_interpreter/syntax/fractional_cloud_cover.hpp"
-
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/double.hpp>
-#include <openscenario_interpreter/syntax/sun.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/weather.hpp>
 
 namespace openscenario_interpreter
@@ -30,7 +26,8 @@ Weather::Weather(const pugi::xml_node & node, Scope & scope)
   temperature(readAttribute<Double>("temperature", node, scope)),
   fractional_cloud_cover(readAttribute<FractionalCloudCover>("fractionalCloudCover", node, scope)),
   sun(readElement<Sun>("Sun", node, scope)),
-  fog(readElement<Fog>("Fog", node, scope))
+  fog(readElement<Fog>("Fog", node, scope)),
+  precipitation(readElement<Precipitation>("Precipitation", node, scope)),
 {
 }
 

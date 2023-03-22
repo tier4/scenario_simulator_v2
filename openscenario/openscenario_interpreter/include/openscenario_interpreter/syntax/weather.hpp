@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/fog.hpp>
 #include <openscenario_interpreter/syntax/fractional_cloud_cover.hpp>
+#include <openscenario_interpreter/syntax/precipitation.hpp>
 #include <openscenario_interpreter/syntax/sun.hpp>
 #include <pugixml.hpp>
 
@@ -68,6 +69,9 @@ struct Weather
   const Sun sun;  // Definition of the sun, i.e. position and intensity.
 
   const Fog fog;  //	Definition of fog, i.e. visual range and bounding box.
+
+  const Precipitation precipitation;  //	Definition of precipitation, i.e. type and
+                                      // intensity.
 
   explicit Weather(const pugi::xml_node &, Scope &);
 };
