@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Fog ----------------------------------------------------------------
+/* ---- Fog (OpenSCENARIO V1.2.0) -------------------------------------------
  *
  * <xsd:complexType name="Fog">
  *   <xsd:all>
