@@ -63,6 +63,15 @@ ament_auto_add_library(traffic_simulator SHARED
   src/vehicle_model/sim_model_interface.cpp
 )
 
+ament_auto_add_executable(test_zmq_node
+  src/api/test_zmq_node.cpp
+)
+
+target_link_libraries(test_zmq_node
+  pthread
+  zmq
+  ${PROTOBUF_LIBRARY})
+
 target_link_libraries(traffic_simulator
   tinyxml2
   pugixml
