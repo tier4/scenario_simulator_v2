@@ -15,16 +15,15 @@
 #ifndef SIMULATION_INTERFACE__ZMQ_MULTI_SERVER_HPP_
 #define SIMULATION_INTERFACE__ZMQ_MULTI_SERVER_HPP_
 
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <simulation_interface/constants.hpp>
-#include <zmqpp/zmqpp.hpp>
-
 #include <simulation_api_schema.pb.h>
 
 #include <functional>
+#include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+#include <simulation_interface/constants.hpp>
 #include <string>
 #include <thread>
+#include <zmqpp/zmqpp.hpp>
 
 namespace zeromq
 {
