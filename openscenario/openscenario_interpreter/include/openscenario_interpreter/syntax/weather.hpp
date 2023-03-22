@@ -51,6 +51,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Weather
 {
+  // TODO: To realize "If one of the conditions is missing it means that it doesn't change.", we
+  // should use "optional" rather than default constructor of each element.
+
   const Double atmospheric_pressure;  // Reference atmospheric pressure at z=0.0 in world coordinate
                                       // system. Unit: [Pa]. Range: [80000..120000]. The actual
                                       // atmospheric pressure around the entities of the scenario
