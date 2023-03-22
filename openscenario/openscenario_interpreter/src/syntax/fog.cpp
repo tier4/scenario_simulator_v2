@@ -28,6 +28,8 @@ Fog::Fog(const pugi::xml_node & node, Scope & scope)
 : visual_range(readAttribute<Double>("visualRange", node, scope)),
   bounding_box(readElement<BoundingBox>("BoundingBox", node, scope))
 {
+  // Valid range information:
+  // https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Fog.html
   auto visual_range_valid = visual_range >= 0;
   if (!visual_range_valid) {
     std::stringstream ss;
