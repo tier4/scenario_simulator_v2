@@ -24,7 +24,8 @@ inline namespace syntax
 
 Environment::Environment(const pugi::xml_node & node, Scope & scope)
 // TODO: Does scope should have a name? How to determine such cases? catalog?
-: Scope(readAttribute<String>("name", node, local()), scope)
+: Scope(readAttribute<String>("name", node, local()), scope),
+  parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
 {
 }
 

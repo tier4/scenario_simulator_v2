@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENVIRONMENT_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -39,6 +40,8 @@ struct Environment : public Scope
 {
   explicit Environment();
   explicit Environment(const pugi::xml_node &, Scope &);
+
+  const ParameterDeclarations parameter_declarations;
 };
 
 }  // namespace syntax
