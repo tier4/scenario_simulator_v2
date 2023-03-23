@@ -1077,7 +1077,6 @@ See www.asam.net/license.html for further details.
     <xsd:attribute name="maxDeceleration" type="Double"/>
     <xsd:attribute name="maxDecelerationRate" type="Double"/>
     <xsd:attribute name="maxSpeed" type="Double"/>
-    <xsd:attribute name="maxJerk" type="Double"/>
   </xsd:complexType>
   <xsd:complexType name="EndOfRoadCondition">
     <xsd:attribute name="duration" type="Double" use="required"/>
@@ -1639,7 +1638,6 @@ See www.asam.net/license.html for further details.
     <xsd:attribute name="maxDeceleration" type="Double" use="required"/>
     <xsd:attribute name="maxDecelerationRate" type="Double"/>
     <xsd:attribute name="maxSpeed" type="Double" use="required"/>
-    <xsd:attribute name="maxJerk" type="Double"/>
   </xsd:complexType>
   <xsd:complexType name="Phase">
     <xsd:sequence>

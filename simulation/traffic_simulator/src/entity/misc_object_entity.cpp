@@ -58,7 +58,6 @@ auto MiscObjectEntity::getDefaultDynamicConstraints() const
 {
   static const auto default_dynamic_constraints = []() {
     auto dynamic_constraints = traffic_simulator_msgs::msg::DynamicConstraints();
-    dynamic_constraints.max_jerk = 0.0;
     dynamic_constraints.max_speed = 0.0;
     dynamic_constraints.max_acceleration = 0.0;
     dynamic_constraints.max_acceleration_rate = 0.0;

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
@@ -22,14 +23,11 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
-#include <pugixml.hpp>
-
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-
-#include <algorithm>
 #include <iostream>
+#include <pugixml.hpp>
 #include <sstream>
 #include <string>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <utility>
 
 namespace entity_behavior
@@ -130,10 +128,6 @@ auto VehicleBehaviorTree::setBehaviorParameter(
 
     result.dynamic_constraints.max_speed = std::clamp(
       result.dynamic_constraints.max_speed, 0.0, vehicle_parameters.performance.max_speed);
-
-    result.dynamic_constraints.max_jerk =
-      std::clamp(result.dynamic_constraints.max_jerk, 0.0, vehicle_parameters.performance.max_jerk);
-
     return result;
   };
 

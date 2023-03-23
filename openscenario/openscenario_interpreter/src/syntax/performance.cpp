@@ -21,13 +21,12 @@ inline namespace syntax
 {
 Performance::Performance(
   const Double max_acceleration, const Double max_acceleration_rate, const Double max_deceleration,
-  const Double max_deceleration_rate, const Double max_speed, const Double max_jerk)
+  const Double max_deceleration_rate, const Double max_speed)
 : max_acceleration(max_acceleration),
   max_acceleration_rate(max_acceleration_rate),
   max_deceleration(max_deceleration),
   max_deceleration_rate(max_deceleration_rate),
-  max_speed(max_speed),
-  max_jerk(max_jerk)
+  max_speed(max_speed)
 {
 }
 
@@ -38,8 +37,7 @@ Performance::Performance(const pugi::xml_node & node, Scope & scope)
   max_deceleration(readAttribute<Double>("maxDeceleration", node, scope, Double::infinity())),
   max_deceleration_rate(
     readAttribute<Double>("maxDecelerationRate", node, scope, Double::infinity())),
-  max_speed(readAttribute<Double>("maxSpeed", node, scope, Double::infinity())),
-  max_jerk(readAttribute<Double>("maxJerk", node, scope, Double::infinity()))
+  max_speed(readAttribute<Double>("maxSpeed", node, scope, Double::infinity()))
 {
 }
 
@@ -51,7 +49,6 @@ Performance::operator traffic_simulator_msgs::msg::Performance() const
   performance.max_deceleration = max_deceleration;
   performance.max_deceleration_rate = max_deceleration_rate;
   performance.max_speed = max_speed;
-  performance.max_jerk = max_jerk;
   return performance;
 }
 }  // namespace syntax
