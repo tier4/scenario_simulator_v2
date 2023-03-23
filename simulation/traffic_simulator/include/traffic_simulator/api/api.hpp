@@ -15,19 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__API__API_HPP_
 #define TRAFFIC_SIMULATOR__API__API_HPP_
 
-#include <simulation_api_schema.pb.h>
-
-#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
-#include <boost/variant.hpp>
-#include <cassert>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
-#include <stdexcept>
-#include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
@@ -36,7 +26,20 @@
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+
+#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
+#include <rosgraph_msgs/msg/clock.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
+
+#include <boost/variant.hpp>
+
+#include <simulation_api_schema.pb.h>
+
+#include <cassert>
+#include <memory>
+#include <stdexcept>
+#include <string>
 #include <utility>
 
 namespace traffic_simulator
@@ -290,6 +293,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
+  FORWARD_TO_ENTITY_MANAGER(setJerkLimit);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 

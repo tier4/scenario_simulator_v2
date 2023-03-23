@@ -272,8 +272,7 @@ auto LongitudinalSpeedPlanner::planLinearJerk(
         constraints.max_deceleration * -1, (target_speed - current_twist.linear.x) / step_time),
       0.0);
   }
-  auto jerk = (accel_x_new - current_accel.linear.x) / step_time;
-  return std::abs(jerk) > constraints.max_jerk ? std::copysign(constraints.max_jerk, jerk) : jerk;
+  return (accel_x_new - current_accel.linear.x) / step_time;
 }
 
 auto LongitudinalSpeedPlanner::forward(

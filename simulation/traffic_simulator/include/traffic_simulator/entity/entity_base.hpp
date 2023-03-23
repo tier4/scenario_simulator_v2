@@ -196,6 +196,8 @@ public:
 
   virtual auto setVelocityLimit(double) -> void;
 
+  virtual auto setJerkLimit(double) -> void;
+
   virtual void startNpcLogic();
 
   /*   */ void stopAtEndOfRoad();
@@ -248,6 +250,8 @@ private:
   /*   */ auto isTargetSpeedReached(double target_speed) const -> bool;
   /*   */ auto isTargetSpeedReached(const speed_change::RelativeTargetSpeed & target_speed) const
     -> bool;
+
+  double max_jerk_{500.0};
 };
 }  // namespace entity
 }  // namespace traffic_simulator

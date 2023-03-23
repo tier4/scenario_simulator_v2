@@ -294,10 +294,10 @@ void EntityBase::addOutOfRangeJob()
           "Entity: ", name, " - current acceleration (which is ", accel_,
           ") is out of range (which is [", -d_c.max_deceleration, ", ", d_c.max_acceleration, "])");
 
-      if (std::abs(jerk_) - d_c.max_jerk > tolerance)
+      if (std::abs(jerk_) - max_jerk_ > tolerance)
         THROW_SPECIFICATION_VIOLATION(
           "Entity: ", name, " - current jerk (which is ", jerk_, ") is out of range (which is [",
-          -d_c.max_jerk, ",", d_c.max_jerk, "])");
+          -max_jerk_, ", ", max_jerk_, "])");
       return false;
     },
     /**
@@ -767,6 +767,13 @@ auto EntityBase::setVelocityLimit(double max_speed) -> void
 {
   auto dynamic_constraints = getDynamicConstraints();
   dynamic_constraints.max_speed = max_speed;
+  setDynamicConstraints(dynamic_constraints);
+}
+
+auto EntityBase::setJerkLimit(double max_jerk) -> void
+{
+  auto dynamic_constraints = getDynamicConstraints();
+  max_jerk_ = max_jerk;
   setDynamicConstraints(dynamic_constraints);
 }
 

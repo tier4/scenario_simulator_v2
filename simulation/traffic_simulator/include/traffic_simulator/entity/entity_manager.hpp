@@ -25,14 +25,10 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #endif
 
-#include <boost/optional.hpp>
-#include <memory>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
 #include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <stdexcept>
-#include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
@@ -44,15 +40,22 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
+
+#include <boost/optional.hpp>
+
+#include <memory>
+#include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {
@@ -236,6 +239,7 @@ public:
   FORWARD_TO_ENTITY(setDecelerationRateLimit, );
   FORWARD_TO_ENTITY(setLinearVelocity, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
+  FORWARD_TO_ENTITY(setJerkLimit, );
 
 #undef FORWARD_TO_ENTITY
 

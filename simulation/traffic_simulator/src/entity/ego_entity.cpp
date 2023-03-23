@@ -164,7 +164,6 @@ EgoEntity::EgoEntity(
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
-  // deactivate non-Ego jobs
   // TODO: this job should be activate but needs data obtained from Autoware in BehaviorParameter
   job_list_.inactivate(traffic_simulator::job::Type::OUT_OF_RANGE_DYNAMIC_CONSTRAINS);
 }
