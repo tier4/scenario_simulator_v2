@@ -13,38 +13,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Install dict packages
-        run: |
-          for package in $(IFS=" " echo "https://github.com/tier4/cspell-dicts"); do
-            echo "Install $package."
-            npm install $package
-          done
-        shell: bash
-
-      - name: Retrieve remote dictionary
-        run: |
-          curl -fsSL -o remote.cspell.json https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/.cspell.json \
-            -H "Authorization: token ${{ github.token }}"
-        shell: bash
-
-      - name: Prepare local dictionary
-        run: |
-          if [ -f ".github/workflows/custom_spell.json" ]; then
-            cp .github/workflows/custom_spell.json local.cspell.json || true
-          else
-            echo "No local dictionary found."
-            echo "{}" > local.cspell.json
-          fi
-        shell: bash
-
-      - name: Create combined dictionary
-        run: |
-          echo '{ "import": ["./remote.cspell.json", "./local.cspell.json"] }' > .cspell.json
-        shell: bash
-
-      - name: Run spell check
-        uses: streetsidesoftware/cspell-action@v2
+      - name: Run spell-check
+        uses: autowarefoundation/autoware-github-actions/spell-check@v1
         with:
-          config: .cspell.json
-          incremental_files_only: true
-          verbose: true
+          cspell-json-url: https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/.cspell.json
+          local-cspell-json: .github/workflows/custom_spell.json
+          dict-packages: |
+            https://github.com/tier4/cspell-dicts
