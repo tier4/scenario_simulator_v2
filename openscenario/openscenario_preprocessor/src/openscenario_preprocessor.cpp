@@ -67,7 +67,7 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
 bool Preprocessor::validateXOSC(const boost::filesystem::path & file_name, bool verbose = false)
 {
   auto result =
-    concealer::dollar("ros2 run openscenario_utility validate-xosc " + file_name.string());
+    concealer::dollar("ros2 run openscenario_utility validation.py " + file_name.string());
   if (verbose) {
     std::cout << "validate : " << result << std::endl;
   }

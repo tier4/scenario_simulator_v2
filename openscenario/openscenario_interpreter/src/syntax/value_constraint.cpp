@@ -26,11 +26,6 @@ ValueConstraint::ValueConstraint(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-ValueConstraint::ValueConstraint(const openscenario_msgs::msg::ValueConstraint & message)
-: rule(boost::lexical_cast<Rule>(message.rule)), value(message.value)
-{
-}
-
 auto ValueConstraint::evaluate(const Object & object) const -> bool
 {
   return ParameterCondition::compare(object, rule, value);

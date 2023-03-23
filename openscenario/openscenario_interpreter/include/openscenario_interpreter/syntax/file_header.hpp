@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HEADER_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/license.hpp>
+#include <openscenario_interpreter/syntax/properties.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -25,6 +27,10 @@ inline namespace syntax
 /* ---- FileHeader -------------------------------------------------------------
  *
  *  <xsd:complexType name="FileHeader">
+ *    <xsd:sequence>
+ *      <xsd:element name="License" type="License" minOccurs="0"/>
+ *      <xsd:element name="Properties" type="Properties" minOccurs="0"/>
+ *    </xsd:sequence>
  *    <xsd:attribute name="revMajor" type="UnsignedShort" use="required"/>
  *    <xsd:attribute name="revMinor" type="UnsignedShort" use="required"/>
  *    <xsd:attribute name="date" type="DateTime" use="required"/>
@@ -35,6 +41,10 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct FileHeader
 {
+  const License license;
+
+  const Properties properties;
+
   const UnsignedShort revMajor;
 
   const UnsignedShort revMinor;

@@ -81,6 +81,8 @@ public:
     setVerbose(configuration.verbose);
   }
 
+  void closeZMQConnection() { zeromq_client_.closeConnection(); }
+
   template <typename T, typename... Ts>
   void addMetric(const std::string & name, Ts &&... xs)
   {
@@ -223,7 +225,9 @@ public:
     const std::string &, const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
 
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
-  bool attachDetectionSensor(const std::string &, double pos_noise_stddev, int random_seed = 0);
+  bool attachDetectionSensor(
+    const std::string &, double pos_noise_stddev, double probability_of_lost,
+    double object_recognition_delay, int random_seed = 0);
 
   bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
 

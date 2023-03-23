@@ -1,2 +1,0 @@
-string rule
-string value

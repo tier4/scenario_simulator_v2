@@ -14,7 +14,7 @@
 
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
-#include <string>
+#include <status_monitor/status_monitor.hpp>
 
 namespace zeromq
 {
@@ -246,9 +246,11 @@ void MultiServer::poll()
     update_traffic_lights_sock_.send(msg);
   }
 }
+
 void MultiServer::start_poll()
 {
   while (rclcpp::ok()) {
+    common::status_monitor.touch(__func__);
     poll();
   }
 }
