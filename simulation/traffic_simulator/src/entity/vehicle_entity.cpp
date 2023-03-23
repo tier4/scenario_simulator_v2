@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/entity/vehicle_entity.hpp>
-
-#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 
 namespace traffic_simulator

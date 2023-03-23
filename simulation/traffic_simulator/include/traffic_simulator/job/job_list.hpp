@@ -16,7 +16,6 @@
 #define TRAFFIC_SIMULATOR__JOB__JOB_LIST_HPP_
 
 #include <traffic_simulator/job/job.hpp>
-
 #include <vector>
 
 namespace traffic_simulator

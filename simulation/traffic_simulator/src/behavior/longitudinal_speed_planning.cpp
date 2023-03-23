@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <geometry/linear_algebra.hpp>
+#include <iostream>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
-
-#include <algorithm>
-#include <iostream>
 
 namespace traffic_simulator
 {

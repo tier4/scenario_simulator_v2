@@ -15,12 +15,11 @@
 #include <geometry/distance.hpp>
 #include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
+#include <limits>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/entity/entity_base.hpp>
-
-#include <limits>
 #include <string>
+#include <traffic_simulator/entity/entity_base.hpp>
 #include <unordered_map>
 #include <vector>
 
