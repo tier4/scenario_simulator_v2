@@ -6,6 +6,19 @@
     "openscenario/openscenario_utility/openscenario_utility/resources/*.xsd"
   ],
   "words": [
-
+    "ARGN",
+    "AUTORCC",
+    "classname",
+    "DBOOST",
+    "DWITH_INTEGRATION_TEST",
+    "engageable",
+    "libunwind",
+    "npcs",
+    "pluggable",
+    "randomizer",
+    "randomizers",
+    "subspline",
+    "TESTRANDOMIZER",
+    "travelling"
   ]
 }
