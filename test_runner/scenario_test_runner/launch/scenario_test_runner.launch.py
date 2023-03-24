@@ -72,6 +72,7 @@ def launch_setup(context, *args, **kwargs):
     record                  = LaunchConfiguration("record",                  default=True)
     rviz_config             = LaunchConfiguration("rviz_config",             default="")
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
+    scenario_parameters     = LaunchConfiguration("scenario_parameters",     default="")
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
     sigterm_timeout         = LaunchConfiguration("sigterm_timeout",         default=8)
     vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
@@ -92,6 +93,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"record                  := {record.perform(context)}")
     print(f"rviz_config             := {rviz_config.perform(context)}")
     print(f"scenario                := {scenario.perform(context)}")
+    print(f"scenario_parameters     := {scenario_parameters.perform(context)}")
     print(f"sensor_model            := {sensor_model.perform(context)}")
     print(f"sigterm_timeout         := {sigterm_timeout.perform(context)}")
     print(f"vehicle_model           := {vehicle_model.perform(context)}")
@@ -135,6 +137,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("output_directory",        default_value=output_directory       ),
         DeclareLaunchArgument("rviz_config",             default_value=rviz_config            ),
         DeclareLaunchArgument("scenario",                default_value=scenario               ),
+        DeclareLaunchArgument("scenario_parameters",     default_value=scenario_parameters    ),
         DeclareLaunchArgument("sensor_model",            default_value=sensor_model           ),
         DeclareLaunchArgument("sigterm_timeout",         default_value=sigterm_timeout        ),
         DeclareLaunchArgument("vehicle_model",           default_value=vehicle_model          ),
@@ -154,6 +157,7 @@ def launch_setup(context, *args, **kwargs):
                 "--global-timeout",          global_timeout,
                 "--output-directory",        output_directory,
                 "--scenario",                scenario,
+                "--scenario-parameters",     scenario_parameters,
                 "--workflow",                workflow,
                 # fmt: on
             ],

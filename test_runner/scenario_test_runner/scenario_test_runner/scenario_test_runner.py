@@ -16,6 +16,7 @@
 # limitations under the License.
 
 
+import json
 import os
 import rclpy
 import time
@@ -29,9 +30,10 @@ from openscenario_preprocessor_msgs.srv import Load
 from openscenario_utility.conversion import convert
 from pathlib import Path
 from rclpy.executors import ExternalShutdownException
-from shutil import rmtree
+from shutil import rmtree, copy
 from sys import exit
 from typing import List
+import xml.etree.ElementTree as ET
 from workflow import Expect
 from workflow import Scenario
 from workflow import Workflow
@@ -39,12 +41,12 @@ from workflow import substitute_ros_package
 
 
 def convert_scenarios_to_xosc(scenarios: List[Scenario], output_directory: Path):
-
     result = []
 
     for each in scenarios:
 
         if each.path.suffix == ".xosc":
+            each.path = Path(copy(each.path, output_directory))
             result.append(each)
 
         else:  # == '.yaml' or == '.yml'
@@ -52,6 +54,25 @@ def convert_scenarios_to_xosc(scenarios: List[Scenario], output_directory: Path)
                 result.append(Scenario(path, each.expect, each.frame_rate))
 
     return result
+
+
+def apply_scenario_parameters(scenarios: List[Scenario], parameters: dict):
+    for each in scenarios:
+        print(each.path.absolute())
+        tree = ET.parse(each.path.absolute())
+        parameter_declarations = tree.getroot().find('./ParameterDeclarations')
+        if parameter_declarations is not None:
+            for key, value in parameters.items():
+                for parameter_declaration in parameter_declarations:
+                    if parameter_declaration.get('name') == key:
+                        parameter_declaration.set('value', value)
+                        continue
+                else:
+                    print("given parameter '{}' not found in scenario '{}'".format(key, each.path))
+            tree.write(each.path)
+        else:
+            # unreachable due to
+            print("no ParameterDeclarations found in scenario '{}'".format(each.path))
 
 
 class ScenarioTestRunner(LifecycleController):
@@ -68,11 +89,12 @@ class ScenarioTestRunner(LifecycleController):
     SLEEP_RATE = 1
 
     def __init__(
-        self,  # Arguments are alphabetically sorted
-        global_frame_rate: float,
-        global_real_time_factor: float,
-        global_timeout: int,  # [sec]
-        output_directory: Path
+            self,  # Arguments are alphabetically sorted
+            global_frame_rate: float,
+            global_real_time_factor: float,
+            global_timeout: int,  # [sec]
+            output_directory: Path,
+            scenario_parameters: dict,
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -111,17 +133,26 @@ class ScenarioTestRunner(LifecycleController):
                     os.remove(target)
         self.output_directory.mkdir(parents=True, exist_ok=True)
 
+        try:
+            self.scenario_parameters = json.loads(scenario_parameters)
+        except:
+            print("Failed to parse scenario_parameters as JSON format")
+            print("given scenario_parameters: {}".format(scenario_parameters))
+            exit(1)
+
         self.current_workflow = None
 
         self.check_preprocessor_client = self.create_client(CheckDerivativeRemained,
                                                             '/simulation/openscenario_preprocessor/check')
         while not self.check_preprocessor_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn('/simulation/openscenario_preprocessor/check service not available, waiting again...')
+            self.get_logger().warn(
+                '/simulation/openscenario_preprocessor/check service not available, waiting again...')
 
         self.derive_preprocessor_client = self.create_client(Derive,
                                                              '/simulation/openscenario_preprocessor/derive')
         while not self.derive_preprocessor_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn('/simulation/openscenario_preprocessor/derive service not available, waiting again...')
+            self.get_logger().warn(
+                '/simulation/openscenario_preprocessor/derive service not available, waiting again...')
 
         self.load_preprocessor_client = self.create_client(Load,
                                                            '/simulation/openscenario_preprocessor/load')
@@ -165,7 +196,7 @@ class ScenarioTestRunner(LifecycleController):
                 if self.get_lifecycle_state() == "inactive":
                     break
                 elif ((time.time() - start) > self.global_timeout
-                        if self.global_timeout is not None else False):
+                if self.global_timeout is not None else False):
                     self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
                     self.deactivate_node()
                     break
@@ -174,8 +205,10 @@ class ScenarioTestRunner(LifecycleController):
 
     def run_scenarios(self, scenarios: List[Scenario]):
 
-        # convert t4v2/xosc to xosc
+        # expand ScenarioModifier & convert t4v2/xosc to xosc
         xosc_scenarios = convert_scenarios_to_xosc(scenarios, self.output_directory)
+
+        apply_scenario_parameters(xosc_scenarios, self.scenario_parameters)
 
         # post to preprocessor
         for xosc_scenario in xosc_scenarios:
@@ -302,7 +335,6 @@ class ScenarioTestRunner(LifecycleController):
 
 
 def main(args=None):
-
     rclpy.init(args=args)
 
     parser = ArgumentParser()
@@ -316,6 +348,8 @@ def main(args=None):
     parser.add_argument("-t", "--global-timeout", default=180, type=float)
 
     parser.add_argument("-s", "--scenario", default="/dev/null", type=Path)
+
+    parser.add_argument("-p", "--scenario-parameters", default="", type=str)
 
     parser.add_argument(
         "-w",
@@ -334,6 +368,7 @@ def main(args=None):
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
         output_directory=args.output_directory / "scenario_test_runner",
+        scenario_parameters=args.scenario_parameters,
     )
 
     if args.scenario != Path("/dev/null"):
