@@ -15,6 +15,7 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
+#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
@@ -32,12 +33,10 @@
 #include <concealer/cooperator.hpp>
 #include <concealer/dirty_hack.hpp>
 #include <concealer/task_queue.hpp>
+#include <concealer/utility/service_with_validation.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
-// TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
-#include <concealer/utility/service_with_validation.h>
-
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
@@ -75,6 +74,7 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
+  using MrmState = autoware_adapi_v1_msgs::msg::MrmState;
   using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
@@ -82,8 +82,9 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   CONCEALER_DEFINE_SUBSCRIPTION(AckermannControlCommand);
   CONCEALER_DEFINE_SUBSCRIPTION(AutowareState);
   CONCEALER_DEFINE_SUBSCRIPTION(CooperateStatusArray);
-  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState, override);
+  CONCEALER_DEFINE_SUBSCRIPTION(EmergencyState);
   CONCEALER_DEFINE_SUBSCRIPTION(GearCommand, override);
+  CONCEALER_DEFINE_SUBSCRIPTION(MrmState);
   CONCEALER_DEFINE_SUBSCRIPTION(PathWithLaneId);
   CONCEALER_DEFINE_SUBSCRIPTION(Trajectory);
   CONCEALER_DEFINE_SUBSCRIPTION(TurnIndicatorsCommand, override);
@@ -106,6 +107,14 @@ private:
   auto approve(const CooperateStatusArray &) -> void;
 
   auto cooperate(const CooperateStatusArray &) -> void;
+
+  std::string minimum_risk_maneuver_state;
+
+  std::string minimum_risk_maneuver_behavior;
+
+  auto receiveMrmState(const MrmState & msg) -> void;
+
+  auto receiveEmergencyState(const EmergencyState & msg) -> void;
 
 public:
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
@@ -143,8 +152,9 @@ public:
     CONCEALER_INIT_SUBSCRIPTION(AckermannControlCommand, "/control/command/control_cmd"),
     CONCEALER_INIT_SUBSCRIPTION(AutowareState, "/autoware/state"),
     CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(CooperateStatusArray, "/api/external/get/rtc_status", cooperate),
-    CONCEALER_INIT_SUBSCRIPTION(EmergencyState, "/system/emergency/emergency_state"),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(EmergencyState, "/system/emergency/emergency_state", receiveEmergencyState),
     CONCEALER_INIT_SUBSCRIPTION(GearCommand, "/control/command/gear_cmd"),
+    CONCEALER_INIT_SUBSCRIPTION_WITH_CALLBACK(MrmState, "/api/fail_safe/mrm_state", receiveMrmState),
     CONCEALER_INIT_SUBSCRIPTION(PathWithLaneId, "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id"),
     CONCEALER_INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory"),
     CONCEALER_INIT_SUBSCRIPTION(TurnIndicatorsCommand, "/control/command/turn_indicators_cmd"),
@@ -171,7 +181,13 @@ public:
 
   auto getAutowareStateName() const -> std::string override;
 
+  auto getEmergencyStateName() const -> std::string override;
+
   auto getGearSign() const -> double override;
+
+  auto getMinimumRiskManeuverBehaviorName() const -> std::string override;
+
+  auto getMinimumRiskManeuverStateName() const -> std::string override;
 
   auto getSteeringAngle() const -> double override;
 
@@ -203,13 +219,6 @@ public:
 }  // namespace concealer
 
 // for boost::lexical_cast
-namespace autoware_auto_system_msgs::msg
-{
-auto operator<<(std::ostream &, const EmergencyState &) -> std::ostream &;
-
-auto operator>>(std::istream &, EmergencyState &) -> std::istream &;
-}  // namespace autoware_auto_system_msgs::msg
-
 namespace autoware_auto_vehicle_msgs::msg
 {
 auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;

@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/value_constraint_group.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/content.hpp>
+#include <openscenario_interpreter/syntax/license.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-ValueConstraintGroup::ValueConstraintGroup(const pugi::xml_node & node, Scope & scope)
+License::License(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope)),
+  resource(readAttribute<String>("resource", node, scope, String())),  // NOTE: Optional attribute
+  spdx_id(readAttribute<String>("spdxId", node, scope, String())),     // NOTE: Optional attribute
+  text(readContent<String>(node, scope))                               // NOTE: Optional content
 {
-  traverse<1, unbounded>(node, "ValueConstraint", [&](auto && node) { emplace_back(node, scope); });
-}
-
-auto ValueConstraintGroup::evaluate(const Object & value) const -> bool
-{
-  return std::all_of(std::begin(*this), std::end(*this), [&](auto && constraint) {
-    return constraint.evaluate(value);
-  });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
