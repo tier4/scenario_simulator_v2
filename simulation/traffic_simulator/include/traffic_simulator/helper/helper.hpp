@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <algorithm>
 #include <cmath>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
@@ -25,6 +26,8 @@
 #include <string>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
+#include <unordered_set>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -89,6 +92,26 @@ geometry_msgs::msg::Vector3 constructRPYfromQuaternion(geometry_msgs::msg::Quate
 geometry_msgs::msg::Pose constructPose(
   double x, double y, double z, double roll, double pitch, double yaw);
 
+/**
+ * @brief helper function for creating vector without duplicates, with preserved order
+ *
+ * @param vector input std::vector
+ * @return new std::vector without duplicates and with relative order preserved
+ */
+template <typename T>
+std::vector<T> getUniqueValues(const std::vector<T> & input_vector)
+{
+  std::vector<T> output_vector(input_vector);
+
+  std::unordered_set<T> unique_values;
+  auto empty_elements_start = std::remove_if(
+    output_vector.begin(), output_vector.end(),
+    [&unique_values](T const & element) { return !unique_values.insert(element).second; });
+  output_vector.erase(empty_elements_start, output_vector.end());
+
+  return output_vector;
+}
+
 enum class LidarType { VLP16, VLP32 };
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
@@ -98,7 +121,8 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
   const std::string & entity, const std::string & architecture_type, const double update_duration,
   const double range = 300.0, bool filter_by_range = false, const double pos_noise_stddev = 0,
-  const int random_seed = 0, const double probability_of_lost = 0);
+  const int random_seed = 0, const double probability_of_lost = 0,
+  const double object_recognition_delay = 0);
 }  // namespace helper
 }  // namespace traffic_simulator
 

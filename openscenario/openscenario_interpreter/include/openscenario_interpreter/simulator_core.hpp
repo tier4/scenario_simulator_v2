@@ -423,16 +423,25 @@ public:
       return core->getCurrentAction(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename OSCLanePosition>
+    template <typename EntityRef, typename OSCLanePosition>
     static auto evaluateRelativeHeading(
-      const String & entity_ref, const OSCLanePosition & osc_lane_position)
+      const EntityRef & entity_ref, const OSCLanePosition & osc_lane_position)
     {
-      NativeRelativeWorldPosition position =
-        core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position));
+      return std::abs(
+        quaternion_operation::convertQuaternionToEulerAngle(
+          core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position)).orientation)
+          .z);
+    }
 
-      const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(position.orientation);
-
-      return std::abs(rpy.z);
+    template <typename EntityRef>
+    static auto evaluateRelativeHeading(const EntityRef & entity_ref)
+    {
+      if (auto entity_status = core->getEntityStatus(entity_ref);
+          entity_status.lanelet_pose_valid) {
+        return static_cast<Double>(std::abs(entity_status.lanelet_pose.rpy.z));
+      } else {
+        return Double::nan();
+      }
     }
   };
 };

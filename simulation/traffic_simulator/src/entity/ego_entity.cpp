@@ -207,15 +207,16 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
       return accel;
     }();
 
-    const auto route_lanelets = getRouteLanelets();
+    const auto unique_route_lanelets =
+      traffic_simulator::helper::getUniqueValues(getRouteLanelets());
 
     boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
-    if (route_lanelets.empty()) {
+    if (unique_route_lanelets.empty()) {
       lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
     } else {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, route_lanelets, 1.0);
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
       if (!lanelet_pose) {
         lanelet_pose =
           hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
@@ -258,7 +259,6 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
     for (const auto & point : universe->getPathWithLaneId().points) {
       std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }
-    ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
   }
 
   return ids;
