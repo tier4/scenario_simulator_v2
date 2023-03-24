@@ -84,6 +84,7 @@ nav:
       - developer_guide/Metrics.md
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
+# cspell: ignore TIERIV
       - developer_guide/TIERIVScenarioFormatVersion2.md
       - developer_guide/CONTRIBUTING.md
       - developer_guide/Communication.md
