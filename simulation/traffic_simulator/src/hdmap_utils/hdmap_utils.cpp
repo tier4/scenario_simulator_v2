@@ -12,6 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/utility/Units.h>
+#include <lanelet2_io/Io.h>
+#include <lanelet2_io/io_handlers/Serialize.h>
+#include <lanelet2_projection/UTM.h>
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <algorithm>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/box.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <deque>
 #include <geometry/linear_algebra.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/hermite_curve.hpp>
@@ -22,31 +37,14 @@
 #include <lanelet2_extension/utility/query.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
+#include <memory>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
+#include <set>
+#include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/box.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-
-#include <lanelet2_core/utility/Units.h>
-#include <lanelet2_io/Io.h>
-#include <lanelet2_io/io_handlers/Serialize.h>
-#include <lanelet2_projection/UTM.h>
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <algorithm>
-#include <deque>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
