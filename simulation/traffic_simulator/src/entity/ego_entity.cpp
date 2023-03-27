@@ -204,27 +204,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 
 auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
 {
-  Eigen::VectorXd relative_position(3);
-  relative_position(0) = ego_entity_simulation_.vehicle_model_ptr_->getX();
-  relative_position(1) = ego_entity_simulation_.vehicle_model_ptr_->getY();
-  relative_position(2) = 0.0;
-  relative_position =
-    quaternion_operation::getRotationMatrix(ego_entity_simulation_.initial_pose_->orientation) * relative_position;
-
-  geometry_msgs::msg::Pose current_pose;
-  current_pose.position.x = ego_entity_simulation_.initial_pose_->position.x + relative_position(0);
-  current_pose.position.y = ego_entity_simulation_.initial_pose_->position.y + relative_position(1);
-  current_pose.position.z = ego_entity_simulation_.initial_pose_->position.z + relative_position(2);
-  current_pose.orientation = [this]() {
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0;
-    rpy.y = 0;
-    rpy.z = ego_entity_simulation_.vehicle_model_ptr_->getYaw();
-    return ego_entity_simulation_.initial_pose_->orientation *
-           quaternion_operation::convertEulerAngleToQuaternion(rpy);
-  }();
-
-  return current_pose;
+  return ego_entity_simulation_.getCurrentPose();
 }
 
 auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
