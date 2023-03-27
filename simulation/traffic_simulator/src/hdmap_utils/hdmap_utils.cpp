@@ -12,21 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <lanelet2_core/utility/Units.h>
-#include <lanelet2_io/Io.h>
-#include <lanelet2_io/io_handlers/Serialize.h>
-#include <lanelet2_projection/UTM.h>
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <algorithm>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/box.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <deque>
 #include <geometry/linear_algebra.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/hermite_curve.hpp>
@@ -37,14 +22,31 @@
 #include <lanelet2_extension/utility/query.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
-#include <memory>
-#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
-#include <set>
-#include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/box.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+
+#include <lanelet2_core/utility/Units.h>
+#include <lanelet2_io/Io.h>
+#include <lanelet2_io/io_handlers/Serialize.h>
+#include <lanelet2_projection/UTM.h>
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <algorithm>
+#include <deque>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -894,22 +896,28 @@ std::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulbPosition
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
+
+  auto areBulbsAssignedToTrafficLight = [traffic_light_id](auto red_yellow_green_bulbs) -> bool {
+    return red_yellow_green_bulbs.hasAttribute("traffic_light_id") and
+           red_yellow_green_bulbs.attribute("traffic_light_id").asId() and
+           red_yellow_green_bulbs.attribute("traffic_light_id").asId().value() == traffic_light_id;
+  };
+
+  auto isBulbOfExpectedColor = [color_name](auto bulb) -> bool {
+    return bulb.hasAttribute("color") and !bulb.hasAttribute("arrow") and
+           bulb.attribute("color").value().compare(color_name) == 0;
+  };
+
   for (const auto & light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
-      if (
-        light_string.hasAttribute("traffic_light_id") and
-        light_string.attribute("traffic_light_id").asId() and
-        light_string.attribute("traffic_light_id").asId().value() == traffic_light_id) {
-        for (auto light_bulb : light->lightBulbs()) {
-          for (auto pt : static_cast<lanelet::ConstLineString3d>(light_bulb)) {
-            if (
-              pt.hasAttribute("color") and pt.attribute("color").value().compare(color_name) == 0) {
-              geometry_msgs::msg::Point point;
-              point.x = pt.x();
-              point.y = pt.y();
-              point.z = pt.z();
-              return point;
-            }
+    for (auto three_light_bulbs : light->lightBulbs()) {
+      if (areBulbsAssignedToTrafficLight(three_light_bulbs)) {
+        for (auto bulb : static_cast<lanelet::ConstLineString3d>(three_light_bulbs)) {
+          if (isBulbOfExpectedColor(bulb)) {
+            geometry_msgs::msg::Point point;
+            point.x = bulb.x();
+            point.y = bulb.y();
+            point.z = bulb.z();
+            return point;
           }
         }
       }
