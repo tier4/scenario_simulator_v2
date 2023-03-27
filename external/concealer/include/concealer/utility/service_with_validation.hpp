@@ -19,6 +19,7 @@
 #include <concealer/autoware.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <tier4_external_api_msgs/msg/response_status.hpp>
 
 namespace concealer
 {
