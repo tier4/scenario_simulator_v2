@@ -138,6 +138,14 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     UserDefinedValueCondition:
+                                      name: RelativeHeadingCondition(ego)
+                                      rule: lessThan
+                                      value: 0.1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
                                       name: ego.currentMinimumRiskManeuverState.state
                                       rule: equalTo
                                       value: NORMAL

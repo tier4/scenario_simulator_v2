@@ -21,3 +21,4 @@ jobs:
           dict-packages: |
             https://github.com/tier4/cspell-dicts
           incremental-files-only: false
+          verbose: true
