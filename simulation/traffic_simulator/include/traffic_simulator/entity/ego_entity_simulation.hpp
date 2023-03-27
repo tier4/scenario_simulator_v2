@@ -46,6 +46,7 @@ struct SimulatedEgoState {
 
 class EgoEntitySimulation {
 
+public:
   const std::unique_ptr<concealer::Autoware> autoware;
 
   const VehicleModelType vehicle_model_type_;
@@ -72,7 +73,7 @@ class EgoEntitySimulation {
   auto getCurrentAccel(const double step_time) const -> geometry_msgs::msg::Accel;
 
   auto setAutowareStatus() -> void;
-public:
+
   explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double);
 
   auto onUpdate(double step_time, bool npc_logic_started) -> void;

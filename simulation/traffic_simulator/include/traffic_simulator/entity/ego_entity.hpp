@@ -38,15 +38,8 @@ namespace entity
 class EgoEntity : public VehicleEntity
 {
   const std::unique_ptr<concealer::AutowareUser> autoware_user;
-  const std::unique_ptr<concealer::Autoware> autoware;
 
-  const VehicleModelType vehicle_model_type_;
-
-  const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
-
-  boost::optional<geometry_msgs::msg::Pose> initial_pose_;
-
-  boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
+  EgoEntitySimulation ego_entity_simulation_;
 
   static auto getVehicleModelType() -> VehicleModelType;
 
