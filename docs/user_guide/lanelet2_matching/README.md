@@ -3,7 +3,7 @@
 This module provides functions to determine in which lanelet an object is/could be currently located.
 
 ## Matching functions
-
+<!-- cspell: ignore Petrich, ITSC -->
 * **Deterministic matching**: Find all lanelets to which an object has less than a certain Euclidean distance.
   * as lanelets have an orientation, every lanelet is considered twice: regular and inverted, but with the same distance
 * **Probabilistic matching**: Compute the squared Mahalanobis distance of the object pose to the lanelet to reason about the probability of that match, as suggested by Petrich et al. ([DOI:0.1109/ITSC.2013.6728549](https://doi.org/10.1109/ITSC.2013.6728549))

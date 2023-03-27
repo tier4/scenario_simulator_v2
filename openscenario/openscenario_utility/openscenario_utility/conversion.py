@@ -65,39 +65,30 @@ class MacroExpander:
                     )
 
     def __call__(self, xosc: str, output: Path, basename: str):
-
         paths = []
 
-        if self.specs is not None:
-            for bindings in product(*self.specs):
+        for index, bindings in enumerate(product(*self.specs)):
+            target = deepcopy(xosc)
 
-                target = deepcopy(xosc)
+            for binding in bindings:
+                target = sub(str(binding[0]), str(binding[1]), target)
 
-                target_name = deepcopy(basename)
+            if self.specs:
+                paths.append(output.joinpath(basename + "_" + str(index) + ".xosc"))
+            else:
+                paths.append(output.joinpath(basename + ".xosc"))
 
-                for binding in bindings:
-                    target_name += "__" + str(binding[0]) + "_" + str(binding[1])
-                    target = sub(str(binding[0]), str(binding[1]), target)
+            with paths[-1].open(mode="w") as file:
+                file.write(target)
 
-                paths.append(output.joinpath(target_name + ".xosc"))
+                try:
+                    self.schema.validate(target)
 
-                with paths[-1].open(mode="w") as file:
-                    file.write(target)
-
-                    try:
-                        self.schema.validate(target)
-
-                    except xmlschema.XMLSchemaValidationError as exception:
-                        print("File: " + str(paths[-1]), file=stderr)
-                        print("", file=stderr)
-                        print("Error: " + str(exception), file=stderr)
-                        exit()
-
-        else:
-            paths.append(output.joinpath(target_name + ".xosc"))
-
-            with paths[-1].open(mode="w") as f:
-                f.write(xosc)
+                except xmlschema.XMLSchemaValidationError as exception:
+                    print("File: " + str(paths[-1]), file=stderr)
+                    print("", file=stderr)
+                    print("Error: " + str(exception), file=stderr)
+                    exit()
 
         return paths
 

@@ -250,6 +250,7 @@ public:
           configuration.set_entity(entity_ref);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_pos_noise_stddev(controller.properties.template get<Double>("detectedObjectPositionStandardDeviation"));
+          configuration.set_probability_of_lost(controller.properties.template get<Double>("detectedObjectMissingProbability"));
           configuration.set_random_seed(controller.properties.template get<UnsignedInteger>("randomSeed"));
           configuration.set_range(300);
           configuration.set_update_duration(0.1);
@@ -259,16 +260,16 @@ public:
 
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+          // clang-format off
+          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
-          configuration.set_architecture_type(
-            getParameter<std::string>("architecture_type", "awf/universe"));
-          configuration.set_update_duration(0.1);
-          configuration.set_resolution(0.5);
-          configuration.set_width(200);
+          configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
           configuration.set_range(300);
-          configuration.set_filter_by_range(
-            controller.properties.template get<Boolean>("isClairvoyant"));
+          configuration.set_resolution(0.5);
+          configuration.set_update_duration(0.1);
+          configuration.set_width(200);
+          // clang-format on
           return configuration;
         }());
 
@@ -416,16 +417,25 @@ public:
       return core->getCurrentAction(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename OSCLanePosition>
+    template <typename EntityRef, typename OSCLanePosition>
     static auto evaluateRelativeHeading(
-      const String & entity_ref, const OSCLanePosition & osc_lane_position)
+      const EntityRef & entity_ref, const OSCLanePosition & osc_lane_position)
     {
-      NativeRelativeWorldPosition position =
-        core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position));
+      return std::abs(
+        quaternion_operation::convertQuaternionToEulerAngle(
+          core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position)).orientation)
+          .z);
+    }
 
-      const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(position.orientation);
-
-      return std::abs(rpy.z);
+    template <typename EntityRef>
+    static auto evaluateRelativeHeading(const EntityRef & entity_ref)
+    {
+      if (auto entity_status = core->getEntityStatus(entity_ref);
+          entity_status.lanelet_pose_valid) {
+        return static_cast<Double>(std::abs(entity_status.lanelet_pose.rpy.z));
+      } else {
+        return Double::nan();
+      }
     }
   };
 };

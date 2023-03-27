@@ -24,6 +24,10 @@
 #include <regex>
 #include <unordered_map>
 
+#if __has_include(<tier4_simulation_msgs/msg/user_defined_value.hpp>)
+#include <tier4_simulation_msgs/msg/user_defined_value.hpp>
+#endif
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -74,17 +78,28 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
   value(readAttribute<String>("value", node, scope)),
   rule(readAttribute<Rule>("rule", node, scope))
 {
-  std::smatch result;
-
-  if (std::regex_match(name, result, std::regex(R"(([^.]+)\.(.+))"))) {
+  if (std::smatch result; std::regex_match(name, result, std::regex(R"(([^.]+)\.(.+))"))) {
     const std::unordered_map<std::string, std::function<Object()>> dispatch{
       std::make_pair(
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
       std::make_pair(
+        "currentMinimumRiskManeuverState.behavior",
+        [result]() {
+          return make<String>(asAutoware(result.str(1)).getMinimumRiskManeuverBehaviorName());
+        }),
+      std::make_pair(
+        "currentMinimumRiskManeuverState.state",
+        [result]() {
+          auto s = asAutoware(result.str(1)).getMinimumRiskManeuverStateName();
+          std::cout << "currentMinimumRiskManeuverState.state is called : " << s << std::endl;
+          return make<String>(s);
+        }),
+      std::make_pair(
         "currentEmergencyState",
         [result]() {
-          return make<String>(
-            boost::lexical_cast<String>(asAutoware(result.str(1)).getEmergencyState()));
+          auto s = asAutoware(result.str(1)).getEmergencyStateName();
+          std::cout << "currentEmergencyState is called : " << s << std::endl;
+          return make<String>(s);
         }),
       std::make_pair(
         "currentTurnIndicatorsState",
@@ -93,32 +108,61 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
             boost::lexical_cast<String>(asAutoware(result.str(1)).getTurnIndicatorsCommand()));
         }),
     };
-    evaluateValue = dispatch.at(result.str(2));  // XXX catch
+    evaluate_value = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, FunctionCallExpression::pattern())) {
     const std::unordered_map<std::string, std::function<Object(const std::vector<std::string> &)>>
       functions{
         std::make_pair(
           "RelativeHeadingCondition",
           [this, result](const auto & xs) {
-            // RelativeHeadingCondition(<ENTITY-REF>, <LANE-ID>, <S>)
-            return make<Double>(evaluateRelativeHeading(
-              xs[0], LanePosition("", xs[1], 0, boost::lexical_cast<Double>(xs[2]))));
+            switch (std::size(xs)) {
+              case 1:  // RelativeHeadingCondition(<ENTITY-REF>)
+                return make<Double>(evaluateRelativeHeading(xs[0]));
+              case 3:  // RelativeHeadingCondition(<ENTITY-REF>, <LANE-ID>, <S>)
+                return make<Double>(evaluateRelativeHeading(
+                  xs[0], LanePosition("", xs[1], 0, boost::lexical_cast<Double>(xs[2]))));
+              default:
+                return make<Double>(Double::nan());
+            }
           }),
       };
-    evaluateValue =
+    evaluate_value =
       curry2(functions.at(result.str(1)))(FunctionCallExpression::splitParameters(result.str(3)));
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {
-    evaluateValue =
-      [&, result,
-       current_message =
-         std::make_shared<MagicSubscription<openscenario_msgs::msg::ParameterDeclaration>>(
-           result.str(1) + "_subscription", result.str(0))]() {
-        if (not current_message->value.empty()) {
-          return ParameterDeclaration(*current_message).evaluate();
-        } else {
-          return unspecified;
+#if __has_include(<tier4_simulation_msgs/msg/user_defined_value.hpp>)
+    using tier4_simulation_msgs::msg::UserDefinedValue;
+    using tier4_simulation_msgs::msg::UserDefinedValueType;
+
+    evaluate_value = [&, current_message = std::make_shared<MagicSubscription<UserDefinedValue>>(
+                           result.str(1) + "_subscription", result.str(0))]() {
+      auto evaluate = [](const auto & user_defined_value) {
+        switch (user_defined_value.type.data) {
+          case UserDefinedValueType::BOOLEAN:
+            return make<Boolean>(user_defined_value.value);
+          case UserDefinedValueType::DATE_TIME:
+            return make<String>(user_defined_value.value);
+          case UserDefinedValueType::DOUBLE:
+            return make<Double>(user_defined_value.value);
+          case UserDefinedValueType::INTEGER:
+            return make<Integer>(user_defined_value.value);
+          case UserDefinedValueType::STRING:
+            return make<String>(user_defined_value.value);
+          case UserDefinedValueType::UNSIGNED_INT:
+            return make<UnsignedInt>(user_defined_value.value);
+          case UserDefinedValueType::UNSIGNED_SHORT:
+            return make<UnsignedShort>(user_defined_value.value);
+          default:
+            return unspecified;
         }
       };
+
+      return not current_message->value.empty() ? evaluate(*current_message) : unspecified;
+    };
+#else
+    throw SyntaxError(
+      "The ability to have ROS2 topics as values for `UserDefinedValueCondition` is enabled only "
+      "when the `UserDefinedValue` type is present in the `tier4_simulation_msgs` package.");
+#endif
   } else {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
@@ -135,9 +179,7 @@ auto UserDefinedValueCondition::description() const -> String
 
 auto UserDefinedValueCondition::evaluate() -> Object
 {
-  result = evaluateValue();
-
-  if (result == unspecified) {
+  if (result = evaluate_value(); result == unspecified) {
     return false_v;
   } else {
     return asBoolean(ParameterCondition::compare(result, rule, value));
