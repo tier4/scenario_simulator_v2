@@ -201,8 +201,9 @@ void VehicleEntity::requestAssignRoute(
     if (
       const auto lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(pose, getStatus().bounding_box, true)) {
+      if (!lanelet_pose.has_value()) THROW_SEMANTIC_ERROR("Optional lanelet_pose has no value!");
       const auto map_pose_stamped = hdmap_utils_ptr_->toMapPose(
-        lanelet_pose.get().lanelet_id, lanelet_pose.get().s, lanelet_pose.get().offset);
+        lanelet_pose.value().lanelet_id, lanelet_pose.value().s, lanelet_pose.value().offset);
       goal_poses.emplace_back(map_pose_stamped.pose);
     }
   }
