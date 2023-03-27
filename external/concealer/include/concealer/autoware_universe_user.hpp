@@ -57,7 +57,6 @@ class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<Aut
   using CooperateStatusArray = tier4_rtc_msgs::msg::CooperateStatusArray;
   using EmergencyState = autoware_auto_system_msgs::msg::EmergencyState;
   using MrmState = autoware_adapi_v1_msgs::msg::MrmState;
-  using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
@@ -113,6 +112,7 @@ protected:
   auto sendSIGINT() -> void override;
 
 public:
+  using PathWithLaneId = autoware_auto_planning_msgs::msg::PathWithLaneId;
   SubscriberWrapper<PathWithLaneId> getPathWithLaneId;
 
 public:

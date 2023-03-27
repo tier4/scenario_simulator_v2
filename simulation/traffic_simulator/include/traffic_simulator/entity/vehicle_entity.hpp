@@ -83,7 +83,7 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &);
+  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
