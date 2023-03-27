@@ -1,0 +1,403 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: '2023-03-03T13:35:36.253Z'
+    description: ''
+    author: ''
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+  Storyboard:
+    Init:
+      Actions:
+    Story:
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: test_rising_edge
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: rising
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=1.0, delay=0.0, test_rising_edge)
+
+                  - name: ''
+                    Event:
+                      - name: test_falling_edge
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 1.0
+                                  conditionEdge: falling
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: lessThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=1.0, delay=1.0, test_falling_edge)
+
+                  - name: ''
+                    Event:
+                      - name: test_rising_or_falling_edge_0
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: risingOrFalling
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 3.0
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=3.0, delay=0.0, test_rising_or_falling_edge_0)
+
+                  - name: ''
+                    Event:
+                      - name: test_rising_or_falling_edge_1
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 1.0
+                                  conditionEdge: risingOrFalling
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 3.0
+                                      rule: lessThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=3.0, delay=1.0, test_rising_or_falling_edge_1)
+
+                  - name: ''
+                    Event:
+                      - name: test_sticky_edge
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: test_rising_edge
+                                      storyboardElementType: action
+                                      state: runningState
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: test_falling_edge
+                                      storyboardElementType: action
+                                      state: runningState
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: test_rising_or_falling_edge_0
+                                      storyboardElementType: action
+                                      state: runningState
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: test_rising_or_falling_edge_1
+                                      storyboardElementType: action
+                                      state: runningState
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=N/A, delay=0.0, test_sticky_edge)
+
+                  - name: ''
+                    Event:
+                      - name: test_none_edge
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 2.0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: test_sticky_edge
+                                      storyboardElementType: action
+                                      state: completeState
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=N/A, delay=2.0, test_none_edge)
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: test_falling_edge_failure
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 1.0
+                                  conditionEdge: falling
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=1.0, delay=1.0, test_falling_edge_failure)
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+
+                  - name: ''
+                    Event:
+                      - name: test_falling_edge_timing
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 1.0
+                                  conditionEdge: falling
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: lessOrEqual
+                                - name: ''
+                                  delay: 1.0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: lessOrEqual
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=1.0, delay=1.0, test_falling_edge_timing)
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+
+                  - name: ''
+                    Event:
+                      - name: test_rising_edge_failure
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: rising
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: lessThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=1.0, delay=0.0, test_rising_edge_failure)
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+
+                  - name: ''
+                    Event:
+                      - name: test_rising_edge_timing
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: rising
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: greaterThan
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: lessOrEqual
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=1.0, delay=0.0, test_rising_edge_timing)
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+
+                  - name: ''
+                    Event:
+                      - name: test_rising_or_falling_edge_timing_0
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 1.0
+                                  conditionEdge: risingOrFalling
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: greaterThan
+                                - name: ''
+                                  delay: 1.0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: lessOrEqual
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=1.0, delay=1.0, test_rising_or_falling_edge_timing_0)
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+
+                  - name: ''
+                    Event:
+                      - name: test_rising_or_falling_edge_timing_1
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: risingOrFalling
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: lessOrEqual
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: lessOrEqual
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: test(time=1.0, delay=0.0, test_rising_or_falling_edge_timing_1)
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0.0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 15.0
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
