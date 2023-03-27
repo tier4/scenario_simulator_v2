@@ -32,6 +32,18 @@ namespace traffic_simulator
 {
 namespace entity
 {
+
+  template <typename T>
+  static auto getParameter(const std::string & name, T value = {})
+  {
+    rclcpp::Node node{"get_parameter", "simulation"};
+
+    node.declare_parameter<T>(name, value);
+    node.get_parameter<T>(name, value);
+
+    return value;
+  }
+
 auto toString(const VehicleModelType datum) -> std::string
 {
 #define BOILERPLATE(IDENTIFIER)      \

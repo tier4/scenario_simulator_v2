@@ -54,6 +54,17 @@
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
 
+template <typename T>
+static auto getParameter(const std::string & name, T value = {})
+{
+  rclcpp::Node node{"get_parameter", "simulation"};
+
+  node.declare_parameter<T>(name, value);
+  node.get_parameter<T>(name, value);
+
+  return value;
+}
+
 namespace traffic_simulator
 {
 namespace entity

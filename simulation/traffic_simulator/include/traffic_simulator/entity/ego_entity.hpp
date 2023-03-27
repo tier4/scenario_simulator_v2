@@ -25,35 +25,16 @@
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/entity/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
 
-template <typename T>
-auto getParameter(const std::string & name, T value = {})
-{
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  node.declare_parameter<T>(name, value);
-  node.get_parameter<T>(name, value);
-
-  return value;
-}
-
 namespace traffic_simulator
 {
 namespace entity
 {
-enum class VehicleModelType {
-  DELAY_STEER_ACC,
-  DELAY_STEER_ACC_GEARED,
-  DELAY_STEER_VEL,
-  IDEAL_STEER_ACC,
-  IDEAL_STEER_ACC_GEARED,
-  IDEAL_STEER_VEL,
-};
-
 class EgoEntity : public VehicleEntity
 {
   const std::unique_ptr<concealer::AutowareUser> autoware_user;

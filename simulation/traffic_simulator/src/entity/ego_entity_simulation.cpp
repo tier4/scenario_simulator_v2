@@ -22,7 +22,7 @@ namespace entity
 {
 
 template <typename T>
-auto getParameter(const std::string & name, T value = {})
+static auto getParameter(const std::string & name, T value = {})
 {
   rclcpp::Node node{"get_parameter", "simulation"};
 
@@ -39,7 +39,7 @@ EgoEntitySimulation::EgoEntitySimulation(const traffic_simulator_msgs::msg::Vehi
  , vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
  {}
 
-auto toString(const VehicleModelType datum) -> std::string
+static auto toString(const VehicleModelType datum) -> std::string
 {
 #define BOILERPLATE(IDENTIFIER)      \
 case VehicleModelType::IDENTIFIER: \
