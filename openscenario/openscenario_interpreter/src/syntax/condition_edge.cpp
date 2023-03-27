@@ -34,15 +34,6 @@ std::istream & operator>>(std::istream & is, ConditionEdge & edge)
 
   BOILERPLATE(none);
   BOILERPLATE(sticky);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                           \
-  if (buffer == #IDENTIFIER) {                                            \
-    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(ConditionEdge, buffer); \
-  }                                                                       \
-  static_assert(true, "")
-
   BOILERPLATE(rising);
   BOILERPLATE(falling);
   BOILERPLATE(risingOrFalling);
