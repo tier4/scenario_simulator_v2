@@ -44,12 +44,12 @@ auto RoutePlanner::getRouteLanelets(
   if (!route_) {
     return hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
   }
-  // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
-  cancelWaypoint(entity_lanelet_pose);
   if (route_ && hdmap_utils_ptr_->isInRoute(lanelet_pose.lanelet_id, route_.get())) {
     return hdmap_utils_ptr_->getFollowingLanelets(
       lanelet_pose.lanelet_id, route_.get(), horizon, true);
   }
+  // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
+  cancelWaypoint(entity_lanelet_pose);
   return hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
 }
 
