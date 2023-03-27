@@ -30,7 +30,6 @@ public:
     const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive,
     const job::Event event);
   void update(const double step_time, const job::Event event);
-  void inactivate(const job::Type type);
 
 private:
   std::vector<Job> list_;

@@ -79,6 +79,11 @@ try {
 
       TeleportAction::teleport(entity_ref, position);
       AssignControllerAction(entity.as<ScenarioObject>().object_controller)(entity_ref);
+      activatePerformanceAssertion(
+        entity_ref, vehicle.performance,
+        entity.as<ScenarioObject>().object_controller.is<Controller>()
+          ? entity.as<ScenarioObject>().object_controller.as<Controller>().properties
+          : Properties());
     },
     [&](const Pedestrian & pedestrian) {
       if (position.is<WorldPosition>()) {

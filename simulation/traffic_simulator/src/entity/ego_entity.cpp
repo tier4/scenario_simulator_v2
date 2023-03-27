@@ -161,8 +161,6 @@ EgoEntity::EgoEntity(
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
-  // TODO: this job should be activate but needs data obtained from Autoware in BehaviorParameter
-  job_list_.inactivate(traffic_simulator::job::Type::OUT_OF_RANGE_DYNAMIC_CONSTRAINS);
 }
 
 auto EgoEntity::asAutoware() const -> concealer::Autoware &
@@ -508,7 +506,6 @@ void EgoEntity::requestSpeedChange(
 
 auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
-  EntityBase::setVelocityLimit(value);
   autoware->setVelocityLimit(value);
 }
 }  // namespace entity

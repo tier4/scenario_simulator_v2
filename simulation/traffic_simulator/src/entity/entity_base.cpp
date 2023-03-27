@@ -266,45 +266,6 @@ void EntityBase::onPostUpdate(double /*current_time*/, double step_time)
   job_list_.update(step_time, job::Event::POST_UPDATE);
 }
 
-void EntityBase::addOutOfRangeJob()
-{
-  /**
-   * @brief This value was determined heuristically rather than for
-   * technical reasons.
-   */
-  constexpr double tolerance = 0.01;
-  job_list_.append(
-    /**
-     * @brief Checking if the values of velocity, acceleration and jerk are within the acceptable
-     * range
-     */
-    [this, tolerance](double) {
-      auto velocity_ = status_.action_status.twist.linear.x;
-      auto accel_ = status_.action_status.accel.linear.x;
-      auto jerk_ = status_.action_status.linear_jerk;
-      auto d_c = getBehaviorParameter().dynamic_constraints;
-      if (std::abs(velocity_) - d_c.max_speed > tolerance)
-        THROW_SPECIFICATION_VIOLATION(
-          "Entity: ", name, " - current velocity (which is ", velocity_,
-          ") is out of range (which is [", -d_c.max_speed, ", ", d_c.max_speed, "])");
-
-      if (accel_ - d_c.max_acceleration > tolerance || -accel_ - d_c.max_deceleration > tolerance)
-        THROW_SPECIFICATION_VIOLATION(
-          "Entity: ", name, " - current acceleration (which is ", accel_,
-          ") is out of range (which is [", -d_c.max_deceleration, ", ", d_c.max_acceleration, "])");
-
-      if (std::abs(jerk_) - max_jerk_ > tolerance)
-        THROW_SPECIFICATION_VIOLATION(
-          "Entity: ", name, " - current jerk (which is ", jerk_, ") is out of range (which is [",
-          -max_jerk_, ", ", max_jerk_, "])");
-      return false;
-    },
-    /**
-     * @brief This job is always ACTIVE
-     */
-    [this]() {}, job::Type::OUT_OF_RANGE_DYNAMIC_CONSTRAINS, true, job::Event::POST_UPDATE);
-}
-
 void EntityBase::resetDynamicConstraints()
 {
   setDynamicConstraints(getDefaultDynamicConstraints());
@@ -762,19 +723,51 @@ void EntityBase::setTrafficLightManager(
   traffic_light_manager_ = traffic_light_manager;
 }
 
-auto EntityBase::setVelocityLimit(double max_speed) -> void
+void EntityBase::activateOutOfRangeJob(
+  double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
+  double min_jerk, double max_jerk)
 {
-  auto dynamic_constraints = getDynamicConstraints();
-  dynamic_constraints.max_speed = max_speed;
-  setDynamicConstraints(dynamic_constraints);
+  /**
+   * @brief This value was determined heuristically rather than for
+   * technical reasons.
+   */
+  constexpr double tolerance = 0.01;
+  job_list_.append(
+    /**
+     * @brief Checking if the values of velocity, acceleration and jerk are within the acceptable
+     * range
+     */
+    [this, tolerance, max_velocity, min_velocity, min_acceleration, max_acceleration, min_jerk,
+     max_jerk](double) {
+      auto velocity_ = status_.action_status.twist.linear.x;
+      auto accel_ = status_.action_status.accel.linear.x;
+      auto jerk_ = status_.action_status.linear_jerk;
+      if (!(min_velocity <= velocity_ + tolerance && velocity_ - tolerance <= max_velocity)) {
+        THROW_SPECIFICATION_VIOLATION(
+          "Entity: ", name, " - current velocity (which is ", velocity_,
+          ") is out of range (which is [", min_velocity, ", ", max_velocity, "])");
+      }
+      if (!(min_acceleration <= accel_ + tolerance && accel_ - tolerance <= max_acceleration)) {
+        THROW_SPECIFICATION_VIOLATION(
+          "Entity: ", name, " - current acceleration (which is ", accel_,
+          ") is out of range (which is [", min_acceleration, ", ", max_acceleration, "])");
+      }
+      if (!(min_jerk <= jerk_ + tolerance && jerk_ - tolerance <= max_jerk)) {
+        THROW_SPECIFICATION_VIOLATION(
+          "Entity: ", name, " - current jerk (which is ", jerk_, ") is out of range (which is [",
+          min_jerk, ", ", max_jerk, "])");
+      }
+      return false;
+    },
+    /**
+     * @brief This job is always ACTIVE
+     */
+    [this]() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
 }
 
-auto EntityBase::setJerkLimit(double max_jerk) -> void
-{
-  auto dynamic_constraints = getDynamicConstraints();
-  max_jerk_ = max_jerk;
-  setDynamicConstraints(dynamic_constraints);
-}
+auto EntityBase::setVelocityLimit(double) -> void {}
+
+auto EntityBase::setJerkLimit(double) -> void {}
 
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 

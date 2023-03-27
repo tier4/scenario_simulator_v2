@@ -191,6 +191,10 @@ public:
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
 
+  virtual auto activateOutOfRangeJob(
+    double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
+    double min_jerk, double max_jerk) -> void;
+
   virtual auto setVelocityLimit(double) -> void;
 
   virtual auto setJerkLimit(double) -> void;
@@ -204,8 +208,6 @@ public:
   /*   */ auto updateStandStillDuration(const double step_time) -> double;
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
-
-  virtual auto addOutOfRangeJob() -> void;
 
   const std::string name;
 
@@ -247,8 +249,6 @@ private:
   /*   */ auto isTargetSpeedReached(double target_speed) const -> bool;
   /*   */ auto isTargetSpeedReached(const speed_change::RelativeTargetSpeed & target_speed) const
     -> bool;
-
-  double max_jerk_{500.0};
 };
 }  // namespace entity
 }  // namespace traffic_simulator

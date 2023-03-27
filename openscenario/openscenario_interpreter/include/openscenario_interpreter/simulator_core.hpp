@@ -15,6 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <limits>
+#include <memory>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -22,13 +26,7 @@
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
-
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
-
-#include <limits>
-#include <memory>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -385,6 +383,17 @@ public:
   class NonStandardOperation : private CoordinateSystemConversion
   {
   protected:
+    template <typename Performance, typename Properties>
+    static auto activatePerformanceAssertion(
+      const std::string & entity_ref, const Performance & performance,
+      const Properties & properties)
+    {
+      core->activateOutOfRangeJob(
+        entity_ref, -performance.max_speed, +performance.max_speed, -performance.max_deceleration,
+        +performance.max_acceleration, properties.template get<Double>("minJerk", Double::lowest()),
+        properties.template get<Double>("maxJerk", Double::max()));
+    }
+
     template <typename... Ts>
     static auto asAutoware(Ts &&... xs) -> decltype(auto)
     {
