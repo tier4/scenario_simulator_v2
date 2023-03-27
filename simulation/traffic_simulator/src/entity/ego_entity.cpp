@@ -418,33 +418,8 @@ auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & stat
 
 void EgoEntity::requestSpeedChange(double value, bool)
 {
-  Eigen::VectorXd v(ego_entity_simulation_.vehicle_model_ptr_->getDimX());
-
-  switch (ego_entity_simulation_.vehicle_model_type_) {
-    case VehicleModelType::DELAY_STEER_ACC:
-    case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      v << 0, 0, 0, autoware_user->restrictTargetSpeed(value), 0, 0;
-      break;
-
-    case VehicleModelType::IDEAL_STEER_ACC:
-    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-      v << 0, 0, 0, autoware_user->restrictTargetSpeed(value);
-      break;
-
-    case VehicleModelType::IDEAL_STEER_VEL:
-      v << 0, 0, 0;
-      break;
-
-    case VehicleModelType::DELAY_STEER_VEL:
-      v << 0, 0, 0, autoware_user->restrictTargetSpeed(value), 0;
-      break;
-
-    default:
-      THROW_SEMANTIC_ERROR(
-        "Unsupported simulation model ", toString(ego_entity_simulation_.vehicle_model_type_), " specified");
-  }
-
-  ego_entity_simulation_.vehicle_model_ptr_->setState(v);
+  autoware_user->restrictTargetSpeed(value);
+  ego_entity_simulation_.requestSpeedChange(value);
 }
 
 void EgoEntity::requestSpeedChange(
