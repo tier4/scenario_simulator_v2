@@ -441,8 +441,9 @@ public:
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
       if (auto entity_status = core->getEntityStatus(entity_ref);
-          entity_status.lanelet_pose_valid) {
-        return static_cast<Double>(std::abs(entity_status.lanelet_pose.rpy.z));
+          static_cast<traffic_simulator::EntityStatusType>(entity_status).lanelet_pose_valid) {
+        return static_cast<Double>(std::abs(
+          static_cast<traffic_simulator::EntityStatusType>(entity_status).lanelet_pose.rpy.z));
       } else {
         return Double::nan();
       }
