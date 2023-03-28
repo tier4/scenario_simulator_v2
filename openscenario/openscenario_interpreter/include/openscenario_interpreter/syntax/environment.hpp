@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENVIRONMENT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENVIRONMENT_HPP_
 
+#include <boost/optional/optional.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/road_condition.hpp>
@@ -46,11 +47,11 @@ struct Environment : public Scope
 
   const ParameterDeclarations parameter_declarations;
 
-  const TimeOfDay time_of_day;
+  boost::optional<const TimeOfDay> time_of_day;
 
-  const Weather weather;
+  boost::optional<const Weather> weather;
 
-  const RoadCondition road_condition;
+  boost::optional<const RoadCondition> road_condition;
 };
 
 }  // namespace syntax
