@@ -50,6 +50,9 @@ class EgoEntity : public VehicleEntity
     const traffic_simulator_msgs::msg::VehicleParameters &)
     -> const std::shared_ptr<SimModelInterface>;
 
+  auto getEntityStatus(const double, const double) const
+  -> const traffic_simulator_msgs::msg::EntityStatus;
+
 public:
   explicit EgoEntity() = delete;
 
@@ -80,9 +83,6 @@ public:
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
-
-  auto getEntityStatus(const double, const double) const
-    -> const traffic_simulator_msgs::msg::EntityStatus;
 
   auto getEntityTypename() const -> const std::string & override;
 

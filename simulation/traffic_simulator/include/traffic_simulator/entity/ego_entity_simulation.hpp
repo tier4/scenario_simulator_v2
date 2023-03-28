@@ -72,7 +72,7 @@ public:
 
   auto getCurrentAccel(const double step_time) const -> geometry_msgs::msg::Accel;
 
-  auto setAutowareStatus() -> void;
+  auto setAutowareStatus(const traffic_simulator_msgs::msg::EntityStatus& status) -> void;
 
   explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double);
 

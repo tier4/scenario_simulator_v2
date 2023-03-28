@@ -376,24 +376,7 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   VehicleEntity::setStatus(status);
-
-  const auto current_pose = getStatus().pose;
-
-  if (autoware_user->initialized()) {
-    ego_entity_simulation_.autoware->set([this]() {
-      geometry_msgs::msg::Accel message;
-      message.linear.x = ego_entity_simulation_.vehicle_model_ptr_->getAx();
-      return message;
-    }());
-
-    ego_entity_simulation_.autoware->set(current_pose);
-
-    ego_entity_simulation_.autoware->set(getCurrentTwist());
-  }
-
-  if (not ego_entity_simulation_.initial_pose_) {
-    ego_entity_simulation_.initial_pose_ = current_pose;
-  }
+  ego_entity_simulation_.setAutowareStatus(getStatus());
 }
 
 void EgoEntity::requestSpeedChange(double value, bool)

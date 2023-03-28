@@ -132,9 +132,9 @@ auto EgoEntitySimulation::makeSimulationModel(
   }
 }
 
-auto EgoEntitySimulation::setAutowareStatus() -> void
+auto EgoEntitySimulation::setAutowareStatus(const traffic_simulator_msgs::msg::EntityStatus& status) -> void
 {
-  const auto current_pose = getCurrentPose();
+  const auto current_pose = status.pose;
 
   autoware->set([this]() {
     geometry_msgs::msg::Accel message;
@@ -224,8 +224,6 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     state_.pose = getCurrentPose();
     state_.twist = getCurrentTwist();
     state_.acceleration = getCurrentAccel(step_time);
-
-    setAutowareStatus();
  }
 
   auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
