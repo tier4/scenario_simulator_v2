@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/math/constants/constants.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/wind.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace openscenario_interpreter
 {
@@ -23,7 +25,14 @@ Wind::Wind(const pugi::xml_node & node, Scope & scope)
 : direction(readAttribute<Double>("direction", node, scope)),
   speed(readAttribute<Double>("speed", node, scope))
 {
-  // TODO: range check
+  auto direction_valid = direction >= 0 and direction <= 2 * boost::math::constants::pi<double>();
+  if (!direction_valid) {
+    THROW_SYNTAX_ERROR(std::quoted("direction"), "is out of range [0...2 pi[");
+  }
+  auto speed_valid = speed >= 0;
+  if (!speed_valid) {
+    THROW_SYNTAX_ERROR(std::quoted("speed"), "is out of range [0...inf[");
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

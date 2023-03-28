@@ -26,7 +26,12 @@ RoadCondition::RoadCondition(const pugi::xml_node & node, Scope & scope)
   wetness(readAttribute<Wetness>("wetness", node, scope)),
   properties(readElement<Properties>("Properties", node, scope))
 {
-  // TODO: range check
+  // Valid range ref:
+  // https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/RoadCondition.html
+  auto friction_scale_factor_valid = friction_scale_factor >= 0;
+  if (!friction_scale_factor_valid) {
+    THROW_SYNTAX_ERROR(std::quoted("frictionScaleFactor"), "is out of range [0..inf[");
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

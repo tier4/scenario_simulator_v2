@@ -28,7 +28,18 @@ Precipitation::Precipitation(const pugi::xml_node & node, Scope & scope)
   precipitation_intensity(readAttribute<Double>("precipitationIntensity", node, scope)),
   precipitation_type(readAttribute<PrecipitationType>("precipitationType", node, scope))
 {
-  // TODO: range check
+  // Valid range ref:
+  // https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Precipitation.html
+
+  auto intensity_valid = 0 <= intensity and intensity <= 1;
+  if (!intensity_valid) {
+    THROW_SYNTAX_ERROR(std::quoted("intensity"), "is out of range [0..1]");
+  }
+
+  auto precipitation_intensity_valid = 0 <= intensity;
+  if (!precipitation_intensity_valid) {
+    THROW_SYNTAX_ERROR(std::quoted("precipitationIntensity"), "is out of range [0..inf[");
+  }
 }
 
 }  // namespace syntax

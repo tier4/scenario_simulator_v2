@@ -32,6 +32,18 @@ Weather::Weather(const pugi::xml_node & node, Scope & scope)
   wind(readElement<std::optional<Wind>>("Wind", node, scope)),
   dome_image(readElement<std::optional<DomeImage>>("DomeImage", node, scope))
 {
+  // [80000...120000]
+  auto atmospheric_pressure_valid =
+    atmospheric_pressure >= 80000 and atmospheric_pressure <= 120000;
+  if (!atmospheric_pressure_valid) {
+    THROW_SYNTAX_ERROR(std::quoted("atmosphericPressure"), "is out of range [80000...120000]");
+  }
+
+  // [170...340]
+  auto temperature_valid = temperature >= 170 and temperature <= 340;
+  if (!temperature_valid) {
+    THROW_SYNTAX_ERROR(std::quoted("temperature"), "is out of range [170...340]");
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
