@@ -77,13 +77,12 @@ auto API::setEntityStatus(
   const geometry_msgs::msg::Pose & relative_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  const auto pose =
-    entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
   traffic_simulator::EntityStatusType status;
   status.time = clock_.getCurrentSimulationTime();
-  status.pose = pose;
+  status.pose =
+    entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
   const auto lanelet_pose =
-    entity_manager_ptr_->toLaneletPose(pose, getBoundingBox(reference_entity_name), false);
+    entity_manager_ptr_->toLaneletPose(status.pose, getBoundingBox(reference_entity_name), false);
   status.action_status = action_status;
   if (lanelet_pose) {
     status.lanelet_pose_valid = true;
