@@ -173,8 +173,7 @@ auto EntityManager::getLateralDistance(
   -> boost::optional<double>
 {
   return hdmap_utils_ptr_->getLateralDistance(
-    static_cast<traffic_simulator::LaneletPoseType>(from),
-    static_cast<traffic_simulator::LaneletPoseType>(to));
+    static_cast<LaneletPoseType>(from), static_cast<LaneletPoseType>(to));
 }
 
 auto EntityManager::getLateralDistance(
@@ -213,8 +212,8 @@ auto EntityManager::getLateralDistance(
   double matching_distance) const -> boost::optional<double>
 {
   if (
-    std::abs(static_cast<traffic_simulator::LaneletPoseType>(from).offset) <= matching_distance &&
-    std::abs(static_cast<traffic_simulator::LaneletPoseType>(to).offset) <= matching_distance) {
+    std::abs(static_cast<LaneletPoseType>(from).offset) <= matching_distance &&
+    std::abs(static_cast<LaneletPoseType>(to).offset) <= matching_distance) {
     return getLateralDistance(from, to);
   }
   return boost::none;
@@ -262,12 +261,10 @@ auto EntityManager::getLongitudinalDistance(
 {
   if (!include_adjacent_lanelet) {
     auto forward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
-      static_cast<traffic_simulator::LaneletPoseType>(from),
-      static_cast<traffic_simulator::LaneletPoseType>(to));
+      static_cast<LaneletPoseType>(from), static_cast<LaneletPoseType>(to));
 
     auto backward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
-      static_cast<traffic_simulator::LaneletPoseType>(to),
-      static_cast<traffic_simulator::LaneletPoseType>(from));
+      static_cast<LaneletPoseType>(to), static_cast<LaneletPoseType>(from));
 
     if (forward_distance && backward_distance) {
       return std::min(forward_distance.get(), std::abs(backward_distance.get()));
@@ -284,18 +281,16 @@ auto EntityManager::getLongitudinalDistance(
     * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
     */
     auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
-      hdmap_utils_ptr_->toMapPose(static_cast<traffic_simulator::LaneletPoseType>(from)).pose,
-      static_cast<traffic_simulator::LaneletPoseType>(from).lanelet_id, 5.0,
-      include_opposite_direction);
+      hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(from)).pose,
+      static_cast<LaneletPoseType>(from).lanelet_id, 5.0, include_opposite_direction);
     from_poses.emplace_back(from);
     /**
     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function. 
     * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
     */
     auto to_poses = hdmap_utils_ptr_->toLaneletPoses(
-      hdmap_utils_ptr_->toMapPose(static_cast<traffic_simulator::LaneletPoseType>(to)).pose,
-      static_cast<traffic_simulator::LaneletPoseType>(to).lanelet_id, 5.0,
-      include_opposite_direction);
+      hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(to)).pose,
+      static_cast<LaneletPoseType>(to).lanelet_id, 5.0, include_opposite_direction);
     to_poses.emplace_back(to);
     std::vector<double> distances = {};
     for (const auto & from_pose : from_poses) {
@@ -613,8 +608,7 @@ void EntityManager::setVerbose(const bool verbose)
 auto EntityManager::toMapPose(const CanonicalizedLaneletPoseType & lanelet_pose) const
   -> const geometry_msgs::msg::Pose
 {
-  return hdmap_utils_ptr_->toMapPose(static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose))
-    .pose;
+  return hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(lanelet_pose)).pose;
 }
 
 auto EntityManager::updateNpcLogic(

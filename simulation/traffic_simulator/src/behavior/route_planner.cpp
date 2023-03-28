@@ -34,7 +34,7 @@ auto RoutePlanner::getRouteLanelets(
   const CanonicalizedLaneletPoseType & entity_lanelet_pose, double horizon)
   -> std::vector<std::int64_t>
 {
-  const auto lanelet_pose = static_cast<traffic_simulator::LaneletPoseType>(entity_lanelet_pose);
+  const auto lanelet_pose = static_cast<LaneletPoseType>(entity_lanelet_pose);
   // If the queue is not empty, calculating route from the entity_lanelet_pose to waypoint_queue_.front()
   if (!waypoint_queue_.empty()) {
     updateRoute(entity_lanelet_pose);
