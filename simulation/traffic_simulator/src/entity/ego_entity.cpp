@@ -201,10 +201,7 @@ auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
 
 auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
 {
-  geometry_msgs::msg::Twist current_twist;
-  current_twist.linear.x = ego_entity_simulation_.vehicle_model_ptr_->getVx();
-  current_twist.angular.z = ego_entity_simulation_.vehicle_model_ptr_->getWz();
-  return current_twist;
+  return ego_entity_simulation_.getCurrentTwist();
 }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
