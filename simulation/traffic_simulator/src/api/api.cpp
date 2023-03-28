@@ -99,8 +99,7 @@ boost::optional<double> API::getTimeHeadway(const std::string & from, const std:
   if (pose.position.x > 0) {
     return boost::none;
   }
-  const auto to_status = static_cast<EntityStatusType>(getEntityStatus(to));
-  double ret = (pose.position.x * -1) / (to_status.action_status.twist.linear.x);
+  double ret = (pose.position.x * -1) / (getCurrentTwist(to).linear.x);
   if (std::isnan(ret)) {
     return std::numeric_limits<double>::infinity();
   }
