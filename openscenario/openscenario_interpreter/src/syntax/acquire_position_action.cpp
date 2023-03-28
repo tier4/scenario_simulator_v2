@@ -33,12 +33,10 @@ auto AcquirePositionAction::start() -> void
       return applyAcquirePositionAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
     },
     [](const RelativeWorldPosition & position, auto && actor) {
-      return applyAcquirePositionAction(
-        actor, static_cast<traffic_simulator::CanonicalizedLaneletPoseType>(position));
+      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position));
     },
     [](const LanePosition & position, auto && actor) {
-      return applyAcquirePositionAction(
-        actor, static_cast<traffic_simulator::CanonicalizedLaneletPoseType>(position));
+      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position));
     });
 
   for (const auto & actor : actors) {

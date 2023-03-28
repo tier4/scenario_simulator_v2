@@ -68,8 +68,7 @@ try {
             : traffic_simulator::VehicleBehavior::defaultBehavior());
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
-          entity_ref,
-          static_cast<traffic_simulator::CanonicalizedLaneletPoseType>(position.as<LanePosition>()),
+          entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
           static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
           entity.as<ScenarioObject>().object_controller.isUserDefinedController()
             ? traffic_simulator::VehicleBehavior::autoware()
@@ -98,8 +97,7 @@ try {
           static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
-          entity_ref,
-          static_cast<traffic_simulator::CanonicalizedLaneletPoseType>(position.as<LanePosition>()),
+          entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
           static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
       } else {
         throw common::Error(__FILE__);
@@ -119,8 +117,7 @@ try {
           static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
-          entity_ref,
-          static_cast<traffic_simulator::CanonicalizedLaneletPoseType>(position.as<LanePosition>()),
+          entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
           static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
       } else {
         throw common::Error(__FILE__);

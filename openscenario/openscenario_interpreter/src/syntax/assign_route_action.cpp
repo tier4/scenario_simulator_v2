@@ -44,8 +44,7 @@ auto AssignRouteAction::start() -> void
 {
   for (const auto & actor : actors) {
     applyAssignRouteAction(
-      actor, static_cast<std::vector<traffic_simulator::CanonicalizedLaneletPoseType>>(
-               route.as<const Route>()));
+      actor, static_cast<std::vector<NativeLanePosition>>(route.as<const Route>()));
   }
 }
 }  // namespace syntax
