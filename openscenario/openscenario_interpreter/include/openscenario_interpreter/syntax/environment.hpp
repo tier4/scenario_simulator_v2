@@ -17,6 +17,9 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
+#include <openscenario_interpreter/syntax/road_condition.hpp>
+#include <openscenario_interpreter/syntax/time_of_day.hpp>
+#include <openscenario_interpreter/syntax/weather.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -42,6 +45,12 @@ struct Environment : public Scope
   explicit Environment(const pugi::xml_node &, Scope &);
 
   const ParameterDeclarations parameter_declarations;
+
+  const TimeOfDay time_of_day;
+
+  const Weather weather;
+
+  const RoadCondition road_condition;
 };
 
 }  // namespace syntax

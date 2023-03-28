@@ -21,9 +21,12 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Environment::Environment(const pugi::xml_node & node, Scope & scope)
-// TODO: Does scope should have a name? How to determine such cases? catalog?
 : Scope(readAttribute<String>("name", node, local()), scope),
-  parameter_declarations(readElement<ParameterDeclarations>("ParameterDeclarations", node, local()))
+  parameter_declarations(
+    readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),
+  time_of_day(readElement<TimeOfDay>("TimeOfDay", node, local())),
+  weather(readElement<Weather>("Weather", node, local())),
+  road_condition(readElement<RoadCondition>("RoadCondition", node, local()))
 {
 }
 }  // namespace syntax
