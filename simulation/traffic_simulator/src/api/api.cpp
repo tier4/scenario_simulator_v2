@@ -149,8 +149,7 @@ auto API::setEntityStatus(
   traffic_simulator::EntityStatusType status;
   status.lanelet_pose = static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose);
   status.lanelet_pose_valid = true;
-  status.bounding_box =
-    static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(name)).bounding_box;
+  status.bounding_box = getBoundingBox(name);
   status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
   status.name = name;
   const auto current_time = getCurrentTime();
@@ -167,9 +166,8 @@ auto API::setEntityStatus(
   const std::string & name, const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
-    map_pose,
-    static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(name)).bounding_box, false);
+  const auto lanelet_pose =
+    entity_manager_ptr_->toLaneletPose(map_pose, getBoundingBox(name), false);
   traffic_simulator::EntityStatusType status;
   if (lanelet_pose) {
     status.lanelet_pose = lanelet_pose.get();
@@ -185,8 +183,7 @@ auto API::setEntityStatus(
   } else {
     status.time = 0;
   }
-  status.bounding_box =
-    static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(name)).bounding_box;
+  status.bounding_box = getBoundingBox(name);
   setEntityStatus(name, canonicalize(status));
 }
 

@@ -54,52 +54,57 @@ void EntityBase::cancelRequest() {}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
-  const auto status = getStatus();
+  const auto bounding_box = getBoundingBox();
 
   std::vector<geometry_msgs::msg::Point> points_bbox;
   geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
 
-  p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p0.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p0.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p0.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p0.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p0.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p0);
 
-  p1.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p1.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p1.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p1.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p1.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p1.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p1);
 
-  p2.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p2.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p2.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p2.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p2.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p2.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p2);
 
-  p3.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p3.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p3.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p3.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p3.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p3.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p3);
 
-  p4.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p4.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p4.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p4.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p4.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p4.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p4);
 
-  p5.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p5.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p5.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p5.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p5.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p5.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p5);
 
-  p6.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p6.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p6.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p6.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p6.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p6.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p6);
 
-  p7.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p7.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p7.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p7.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p7.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p7.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p7);
 
   return math::geometry::get2DConvexHull(points_bbox);
+}
+
+auto EntityBase::getBoundingBox() const -> traffic_simulator_msgs::msg::BoundingBox
+{
+  return getStatus().bounding_box;
 }
 
 auto EntityBase::getCurrentAccel() const -> geometry_msgs::msg::Accel
@@ -707,7 +712,7 @@ auto EntityBase::setStatus(
   new_status.name = name;
   new_status.type = status_.type;
   new_status.subtype = status_.subtype;
-  new_status.bounding_box = status_.bounding_box;
+  new_status.bounding_box = getBoundingBox();
   new_status.action_status.current_action = getCurrentAction();
 
   status_ = new_status;

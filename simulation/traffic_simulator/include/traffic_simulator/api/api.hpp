@@ -274,6 +274,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
