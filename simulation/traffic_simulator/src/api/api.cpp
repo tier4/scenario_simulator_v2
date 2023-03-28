@@ -53,16 +53,6 @@ bool API::despawn(const std::string & name)
   return true;
 }
 
-geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
-{
-  return static_cast<EntityStatusType>(getEntityStatus(name)).pose;
-}
-
-CanonicalizedEntityStatusType API::getEntityStatus(const std::string & name)
-{
-  return entity_manager_ptr_->getEntityStatus(name);
-}
-
 auto API::setEntityStatus(
   const std::string & name,
   const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void
@@ -92,11 +82,8 @@ auto API::setEntityStatus(
   traffic_simulator::EntityStatusType status;
   status.time = clock_.getCurrentSimulationTime();
   status.pose = pose;
-  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
-    pose,
-    static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(reference_entity_name))
-      .bounding_box,
-    false);
+  const auto lanelet_pose =
+    entity_manager_ptr_->toLaneletPose(pose, getBoundingBox(reference_entity_name), false);
   status.action_status = action_status;
   if (lanelet_pose) {
     status.lanelet_pose_valid = true;
@@ -301,11 +288,11 @@ bool API::updateEntityStatusInSim()
       *req.mutable_vehicle_command());
     req.set_ego_entity_status_before_update_is_empty(false);
     simulation_interface::toProto(
-      entity_manager_ptr_->getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName()),
+      getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName()),
       *req.mutable_ego_entity_status_before_update());
   }
   for (const auto & name : entity_manager_ptr_->getEntityNames()) {
-    auto status = static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(name));
+    auto status = static_cast<EntityStatusType>(getEntityStatus(name));
     traffic_simulator_msgs::EntityStatus proto;
     status.name = name;
     simulation_interface::toProto(status, proto);

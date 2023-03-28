@@ -69,7 +69,7 @@ public:
     entity_manager_ptr_(std::make_shared<EntityManager>(node, configuration)),
     traffic_controller_ptr_(std::make_shared<traffic_simulator::traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
-      [this](const auto & name) { return API::getEntityPose(name); },
+      [this](const auto & name) { return API::getMapPose(name); },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
     metrics_manager_(configuration.metrics_log_path, configuration.verbose),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
@@ -186,10 +186,6 @@ public:
 
   bool despawn(const std::string & name);
 
-  CanonicalizedEntityStatusType getEntityStatus(const std::string & name);
-
-  geometry_msgs::msg::Pose getEntityPose(const std::string & name);
-
   auto setEntityStatus(
     const std::string & name,
     const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void;
@@ -284,10 +280,13 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getDistanceToRightLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
+  FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
+  FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(getLateralDistance);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
+  FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
