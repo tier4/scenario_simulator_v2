@@ -46,7 +46,6 @@ struct SimulatedEgoState {
 
 class EgoEntitySimulation {
 
-public:
   const std::unique_ptr<concealer::Autoware> autoware;
 
   const VehicleModelType vehicle_model_type_;
@@ -66,6 +65,7 @@ public:
       const traffic_simulator_msgs::msg::VehicleParameters &)
   -> const std::shared_ptr<SimModelInterface>;
 
+public:
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
