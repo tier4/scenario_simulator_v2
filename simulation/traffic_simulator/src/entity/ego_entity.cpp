@@ -134,15 +134,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     status.bounding_box = getStatus().bounding_box;
     status.pose = getCurrentPose();
     status.action_status.twist = getCurrentTwist();
-    status.action_status.accel = [&]() {
-      geometry_msgs::msg::Accel accel;
-      if (ego_entity_simulation_.previous_angular_velocity_) {
-        accel.linear.x = ego_entity_simulation_.vehicle_model_ptr_->getAx();
-        accel.angular.z =
-          (ego_entity_simulation_.vehicle_model_ptr_->getWz() - ego_entity_simulation_.previous_angular_velocity_.value()) / step_time;
-      }
-      return accel;
-    }();
+    status.action_status.accel = ego_entity_simulation_.getCurrentAccel(step_time);
 
     const auto unique_route_lanelets =
       traffic_simulator::helper::getUniqueValues(getRouteLanelets());
