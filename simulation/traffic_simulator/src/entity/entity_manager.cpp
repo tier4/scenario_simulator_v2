@@ -221,8 +221,7 @@ auto EntityManager::getLateralDistance(
   const CanonicalizedLaneletPoseType & from, const std::string & to, double matching_distance) const
   -> boost::optional<double>
 {
-  const auto to_pose = getLaneletPose(to, matching_distance);
-  if (to_pose) {
+  if (const auto to_pose = getLaneletPose(to, matching_distance)) {
     return getLateralDistance(from, to_pose.get(), matching_distance);
   }
   return boost::none;
@@ -232,8 +231,7 @@ auto EntityManager::getLateralDistance(
   const std::string & from, const CanonicalizedLaneletPoseType & to, double matching_distance) const
   -> boost::optional<double>
 {
-  const auto from_pose = getLaneletPose(from, matching_distance);
-  if (from_pose) {
+  if (const auto from_pose = getLaneletPose(from, matching_distance)) {
     return getLateralDistance(from_pose.get(), to, matching_distance);
   }
   return boost::none;
