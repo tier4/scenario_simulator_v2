@@ -95,7 +95,7 @@ public:
   virtual auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
 
-  /*   */ auto getEntityStatusBeforeUpdate() const -> const traffic_simulator::EntityStatusType &;
+  /*   */ auto getEntityStatusBeforeUpdate() const -> const EntityStatusType &;
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
@@ -119,7 +119,7 @@ public:
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
 
-  /*   */ auto getStatus() const -> const traffic_simulator::EntityStatusType &;
+  /*   */ auto getStatus() const -> const EntityStatusType &;
 
   /*   */ auto getStandStillDuration() const -> double;
 
@@ -183,8 +183,7 @@ public:
   /*   */ void setEntityTypeList(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);
 
-  /*   */ void setOtherStatus(
-    const std::unordered_map<std::string, traffic_simulator::EntityStatusType> &);
+  /*   */ void setOtherStatus(const std::unordered_map<std::string, EntityStatusType> &);
 
   virtual auto setStatus(const CanonicalizedEntityStatusType &) -> void;
 
@@ -212,9 +211,9 @@ public:
   bool verbose;
 
 protected:
-  traffic_simulator::EntityStatusType status_;
+  EntityStatusType status_;
 
-  traffic_simulator::EntityStatusType status_before_update_;
+  EntityStatusType status_before_update_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
@@ -223,7 +222,7 @@ protected:
   double stand_still_duration_ = 0.0;
   double traveled_distance_ = 0.0;
 
-  std::unordered_map<std::string, traffic_simulator::EntityStatusType> other_status_;
+  std::unordered_map<std::string, EntityStatusType> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
   boost::optional<double> target_speed_;

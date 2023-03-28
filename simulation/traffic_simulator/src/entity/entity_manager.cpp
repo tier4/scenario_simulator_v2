@@ -617,9 +617,10 @@ auto EntityManager::toMapPose(const CanonicalizedLaneletPoseType & lanelet_pose)
     .pose;
 }
 
-traffic_simulator::EntityStatusType EntityManager::updateNpcLogic(
+auto EntityManager::updateNpcLogic(
   const std::string & name,
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
+  -> EntityStatusType
 {
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
@@ -641,7 +642,7 @@ void EntityManager::update(const double current_time, const double step_time)
     traffic_light_manager_ptr_->update(step_time_);
   }
   auto type_list = getEntityTypeList();
-  std::unordered_map<std::string, traffic_simulator::EntityStatusType> all_status;
+  std::unordered_map<std::string, EntityStatusType> all_status;
   for (auto && [name, entity] : entities_) {
     all_status.emplace(name, entity->getStatus());
   }

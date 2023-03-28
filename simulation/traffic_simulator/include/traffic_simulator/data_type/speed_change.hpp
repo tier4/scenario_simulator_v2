@@ -60,9 +60,8 @@ struct RelativeTargetSpeed
   {
   }
   double getAbsoluteValue(
-    const traffic_simulator::EntityStatusType & status,
-    const std::unordered_map<std::string, traffic_simulator::EntityStatusType> & other_status)
-    const;
+    const EntityStatusType & status,
+    const std::unordered_map<std::string, EntityStatusType> & other_status) const;
   std::string reference_entity_name;
   Type type;
   double value;

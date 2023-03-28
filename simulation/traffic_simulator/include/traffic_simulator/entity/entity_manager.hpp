@@ -259,9 +259,10 @@ public:
     const speed_change::Transition transition, const speed_change::Constraint constraint,
     const bool continuous);
 
-  traffic_simulator::EntityStatusType updateNpcLogic(
+  auto updateNpcLogic(
     const std::string & name,
-    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list);
+    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
+    -> EntityStatusType;
 
   void broadcastEntityTransform();
 

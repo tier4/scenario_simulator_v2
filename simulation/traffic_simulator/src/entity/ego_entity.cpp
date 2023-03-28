@@ -189,9 +189,9 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
-  -> const traffic_simulator::EntityStatusType
+  -> const EntityStatusType
 {
-  traffic_simulator::EntityStatusType status;
+  EntityStatusType status;
   {
     status.time = time;
     status.type = getStatus().type;
@@ -211,7 +211,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     const auto unique_route_lanelets =
       traffic_simulator::helper::getUniqueValues(getRouteLanelets());
 
-    boost::optional<traffic_simulator::LaneletPoseType> lanelet_pose;
+    boost::optional<LaneletPoseType> lanelet_pose;
 
     if (unique_route_lanelets.empty()) {
       lanelet_pose =

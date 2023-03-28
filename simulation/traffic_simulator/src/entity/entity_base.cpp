@@ -32,7 +32,7 @@ EntityBase::EntityBase(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
-  status_(static_cast<traffic_simulator::EntityStatusType>(entity_status)),
+  status_(static_cast<EntityStatusType>(entity_status)),
   status_before_update_(status_),
   hdmap_utils_ptr_(hdmap_utils_ptr),
   npc_logic_started_(false)
@@ -200,7 +200,7 @@ auto EntityBase::getDynamicConstraints() const
   return getBehaviorParameter().dynamic_constraints;
 }
 
-auto EntityBase::getEntityStatusBeforeUpdate() const -> const traffic_simulator::EntityStatusType &
+auto EntityBase::getEntityStatusBeforeUpdate() const -> const EntityStatusType &
 {
   return status_before_update_;
 }
@@ -248,10 +248,7 @@ auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & rel
   return ret;
 }
 
-auto EntityBase::getStatus() const -> const traffic_simulator::EntityStatusType &
-{
-  return status_;
-}
+auto EntityBase::getStatus() const -> const EntityStatusType & { return status_; }
 
 auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
 
@@ -673,8 +670,7 @@ void EntityBase::setEntityTypeList(
   entity_type_list_ = entity_type_list;
 }
 
-void EntityBase::setOtherStatus(
-  const std::unordered_map<std::string, traffic_simulator::EntityStatusType> & status)
+void EntityBase::setOtherStatus(const std::unordered_map<std::string, EntityStatusType> & status)
 {
   other_status_.clear();
 
@@ -698,7 +694,7 @@ void EntityBase::setOtherStatus(
 
 auto EntityBase::setStatus(const CanonicalizedEntityStatusType & status) -> void
 {
-  auto new_status = static_cast<traffic_simulator::EntityStatusType>(status);
+  auto new_status = static_cast<EntityStatusType>(status);
 
   /*
      FIXME: DIRTY HACK!!!

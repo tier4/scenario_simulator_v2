@@ -106,8 +106,7 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
-  auto getEntityStatus(const double, const double) const
-    -> const traffic_simulator::EntityStatusType;
+  auto getEntityStatus(const double, const double) const -> const EntityStatusType;
 
   auto getEntityTypename() const -> const std::string & override;
 
