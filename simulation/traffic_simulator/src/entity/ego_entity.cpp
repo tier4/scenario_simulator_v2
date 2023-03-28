@@ -198,7 +198,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   ego_entity_simulation_.onUpdate(step_time, npc_logic_started_);
 
-  auto entity_status = getEntityStatus(current_time + step_time, step_time);
+  auto entity_status = getEntityStatus(current_time, step_time);
   entity_status.action_status.linear_jerk = ego_entity_simulation_.getLinearJerk(step_time);
   setStatus(entity_status);
   updateStandStillDuration(step_time);
