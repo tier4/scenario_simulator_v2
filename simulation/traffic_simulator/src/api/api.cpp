@@ -87,7 +87,8 @@ auto API::setEntityStatus(
   const geometry_msgs::msg::Pose & relative_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
+  const auto pose =
+    entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
   traffic_simulator::EntityStatusType status;
   status.time = clock_.getCurrentSimulationTime();
   status.pose = pose;

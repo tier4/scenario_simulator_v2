@@ -113,7 +113,8 @@ public:
 
   /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 
-  /*   */ auto getMapPose(const geometry_msgs::msg::Pose &) -> geometry_msgs::msg::Pose;
+  /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
+    -> geometry_msgs::msg::Pose;
 
   virtual auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
