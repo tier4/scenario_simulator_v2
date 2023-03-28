@@ -214,10 +214,11 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   autoware_user->rethrow();
 
   autoware_user->spinSome();
-  // Will be moved to simple_sensor_simulator
-  ego_entity_simulation_.autoware->spinSome();
 
   EntityBase::onUpdate(current_time, step_time);
+
+  // Will be moved to simple_sensor_simulator
+  ego_entity_simulation_.autoware->spinSome();
 
   if (npc_logic_started_) {
     Eigen::VectorXd input(ego_entity_simulation_.vehicle_model_ptr_->getDimU());
@@ -264,11 +265,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   ego_entity_simulation_.previous_linear_velocity_ = ego_entity_simulation_.vehicle_model_ptr_->getVx();
   ego_entity_simulation_.previous_angular_velocity_ = ego_entity_simulation_.vehicle_model_ptr_->getWz();
 
-  autoware_user->spinSome();
-
   // Will be moved to simple_sensor_simulator
   ego_entity_simulation_.autoware->update();
-  ego_entity_simulation_.autoware->spinSome();
 
   EntityBase::onPostUpdate(current_time, step_time);
 }
