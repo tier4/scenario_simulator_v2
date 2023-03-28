@@ -21,7 +21,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 EnvironmentAction::EnvironmentAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
@@ -39,6 +38,5 @@ auto EnvironmentAction::endsImmediately() noexcept -> bool { return false; }
 auto EnvironmentAction::run() -> void { LINE(); }
 
 auto EnvironmentAction::start() -> void { LINE(); }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

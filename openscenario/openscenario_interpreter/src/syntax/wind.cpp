@@ -19,13 +19,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 Wind::Wind(const pugi::xml_node & node, Scope & scope)
 : direction(readAttribute<Double>("direction", node, scope)),
   speed(readAttribute<Double>("speed", node, scope))
 {
   // TODO: range check
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

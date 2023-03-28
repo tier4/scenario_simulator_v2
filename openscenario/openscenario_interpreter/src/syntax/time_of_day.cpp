@@ -19,12 +19,10 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 TimeOfDay::TimeOfDay(const pugi::xml_node & node, Scope & scope)
 : animation(readAttribute<Boolean>("animation", node, scope)),
   date_time(readAttribute<String>("dateTime", node, scope))
 {
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -20,7 +20,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 Sun::Sun(const pugi::xml_node & node, Scope & scope)
 : azimuth(readAttribute<Double>("azimuth", node, scope)),
   elevation(readAttribute<Double>("elevation", node, scope)),
@@ -29,6 +28,5 @@ Sun::Sun(const pugi::xml_node & node, Scope & scope)
 {
   // TODO: Should range check?
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

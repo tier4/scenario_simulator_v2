@@ -21,13 +21,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 DomeImage::DomeImage(const pugi::xml_node & node, Scope & scope)
 : azimuth_offset(readAttribute<Double>("azimuthOffset", node, scope)),
   dome_file(readElement<File>("DomeFile", node, scope))
 {
   // TODO: range check
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -20,7 +20,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 Weather::Weather(const pugi::xml_node & node, Scope & scope)
 : atmospheric_pressure(readAttribute<Double>("atmosphericPressure", node, scope)),
   temperature(readAttribute<Double>("temperature", node, scope)),
@@ -32,6 +31,5 @@ Weather::Weather(const pugi::xml_node & node, Scope & scope)
   dome_image(readElement<DomeImage>("DomeImage", node, scope))
 {
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

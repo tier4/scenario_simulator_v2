@@ -22,7 +22,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 Fog::Fog(const pugi::xml_node & node, Scope & scope)
 : visual_range(readAttribute<Double>("visualRange", node, scope)),
   bounding_box(readElement<BoundingBox>("BoundingBox", node, scope))
@@ -37,6 +36,5 @@ Fog::Fog(const pugi::xml_node & node, Scope & scope)
     throw common::SyntaxError(ss.str());
   }
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
