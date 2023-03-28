@@ -82,13 +82,7 @@ public:
 
   auto requestSpeedChange(double value) -> void;
 
-  double getLinearJerk(double step_time) {
-    if (previous_linear_velocity_) {
-      return (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time;
-    } else {
-      return 0;
-    }
-  }
+  double getLinearJerk(double step_time);
 };
 }
 }

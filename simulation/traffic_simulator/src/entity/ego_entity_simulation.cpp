@@ -269,6 +269,14 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   auto EgoEntitySimulation::getStatus() const -> const SimulatedEgoState & {
     return state_;
   }
+
+  double EgoEntitySimulation::getLinearJerk(double step_time) {
+    if (previous_linear_velocity_) {
+      return (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time;
+    } else {
+      return 0;
+    }
+  }
 }
 }
 

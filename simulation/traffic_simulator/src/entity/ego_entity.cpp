@@ -219,12 +219,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   ego_entity_simulation_.onUpdate(step_time, npc_logic_started_);
 
   auto entity_status = getEntityStatus(current_time + step_time, step_time);
-  if (ego_entity_simulation_.previous_linear_velocity_) {
-    entity_status.action_status.linear_jerk =
-      (ego_entity_simulation_.vehicle_model_ptr_->getVx() - ego_entity_simulation_.previous_linear_velocity_.value()) / step_time;
-  } else {
-    entity_status.action_status.linear_jerk = 0;
-  }
+  entity_status.action_status.linear_jerk = ego_entity_simulation_.getLinearJerk(step_time);
   setStatus(entity_status);
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
@@ -348,5 +343,6 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
   autoware_user->setVelocityLimit(value);
 }
+
 }  // namespace entity
 }  // namespace traffic_simulator
