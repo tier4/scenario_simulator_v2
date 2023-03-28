@@ -28,7 +28,7 @@ Fog::Fog(const pugi::xml_node & node, Scope & scope)
 {
   // Valid range information:
   // https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Fog.html
-  auto visual_range_valid = visual_range >= 0;
+  auto visual_range_valid = 0 <= visual_range;
   if (!visual_range_valid) {
     THROW_SYNTAX_ERROR(std::quoted("visualRange"), "is out of range [0..inf[");
   }

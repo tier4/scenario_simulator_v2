@@ -25,11 +25,11 @@ Wind::Wind(const pugi::xml_node & node, Scope & scope)
 : direction(readAttribute<Double>("direction", node, scope)),
   speed(readAttribute<Double>("speed", node, scope))
 {
-  auto direction_valid = direction >= 0 and direction <= 2 * boost::math::constants::pi<double>();
+  auto direction_valid = 0 <= direction and direction <= 2 * boost::math::constants::pi<double>();
   if (!direction_valid) {
     THROW_SYNTAX_ERROR(std::quoted("direction"), "is out of range [0...2 pi[");
   }
-  auto speed_valid = speed >= 0;
+  auto speed_valid = 0 <= speed;
   if (!speed_valid) {
     THROW_SYNTAX_ERROR(std::quoted("speed"), "is out of range [0...inf[");
   }

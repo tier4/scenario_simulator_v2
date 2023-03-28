@@ -40,12 +40,12 @@ Sun::Sun(const pugi::xml_node & node, Scope & scope)
     THROW_SYNTAX_ERROR(std::quoted("elevation"), "is out of range [-PI..PI]");
   }
 
-  auto illuminance_valid = illuminance >= 0;
+  auto illuminance_valid = 0 <= illuminance;
   if (!illuminance_valid) {
     THROW_SYNTAX_ERROR(std::quoted("illuminance"), "is out of range [0..inf[");
   }
 
-  auto intensity_valid = intensity >= 0;
+  auto intensity_valid = 0 <= intensity;
   if (!intensity_valid) {
     THROW_SYNTAX_ERROR(std::quoted("intensity"), "is out of range [0..inf[");
   }

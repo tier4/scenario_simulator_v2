@@ -21,6 +21,7 @@
 #include <functional>
 #include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
+#include <openscenario_interpreter/type_traits/is_optional.hpp>
 #include <openscenario_interpreter/utility/highlighter.hpp>
 #include <pugixml.hpp>
 #include <regex>
@@ -28,8 +29,6 @@
 #include <string>
 #include <type_traits>
 #include <unordered_map>
-
-#include "openscenario_interpreter/type_traits/is_optional.hpp"
 
 namespace openscenario_interpreter
 {

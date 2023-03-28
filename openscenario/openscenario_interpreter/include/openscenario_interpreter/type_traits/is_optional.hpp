@@ -37,4 +37,4 @@ static constexpr auto is_optional_v = is_optional<T>::value;
 }  // namespace type_traits
 }  // namespace openscenario_interpreter
 
-#endif
+#endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IS_OPTIONAL_HPP_

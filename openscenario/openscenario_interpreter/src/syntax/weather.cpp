@@ -34,13 +34,13 @@ Weather::Weather(const pugi::xml_node & node, Scope & scope)
 {
   // [80000...120000]
   auto atmospheric_pressure_valid =
-    atmospheric_pressure >= 80000 and atmospheric_pressure <= 120000;
+    80000 <= atmospheric_pressure and atmospheric_pressure <= 120000;
   if (!atmospheric_pressure_valid) {
     THROW_SYNTAX_ERROR(std::quoted("atmosphericPressure"), "is out of range [80000...120000]");
   }
 
   // [170...340]
-  auto temperature_valid = temperature >= 170 and temperature <= 340;
+  auto temperature_valid = 170 <= temperature and temperature <= 340;
   if (!temperature_valid) {
     THROW_SYNTAX_ERROR(std::quoted("temperature"), "is out of range [170...340]");
   }
