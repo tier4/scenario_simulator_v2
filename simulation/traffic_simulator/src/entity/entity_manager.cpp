@@ -14,6 +14,7 @@
 
 #include <cstdint>
 #include <geometry/bounding_box.hpp>
+#include <geometry/distance.hpp>
 #include <geometry/intersection/collision.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
@@ -38,7 +39,7 @@ void EntityManager::broadcastEntityTransform()
   std::vector<std::string> names = getEntityNames();
   for (const auto & name : names) {
     geometry_msgs::msg::PoseStamped pose;
-    pose.pose = static_cast<EntityStatusType>(getEntityStatus(name)).pose;
+    pose.pose = getMapPose(name);
     pose.header.stamp = clock_ptr_->now();
     pose.header.frame_id = name;
     broadcastTransform(pose);
@@ -511,14 +512,7 @@ bool EntityManager::reachPosition(
   const std::string & name, const geometry_msgs::msg::Pose & target_pose,
   const double tolerance) const
 {
-  const auto pose = static_cast<EntityStatusType>(getEntityStatus(name)).pose;
-
-  const double distance = std::sqrt(
-    std::pow(pose.position.x - target_pose.position.x, 2) +
-    std::pow(pose.position.y - target_pose.position.y, 2) +
-    std::pow(pose.position.z - target_pose.position.z, 2));
-
-  return distance < tolerance;
+  return math::geometry::getDistance(getMapPose(name), target_pose) < tolerance;
 }
 
 bool EntityManager::reachPosition(
