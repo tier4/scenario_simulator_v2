@@ -591,8 +591,7 @@ void EntityManager::requestSpeedChange(
 }
 
 auto EntityManager::setEntityStatus(
-  const std::string & name,
-  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void
+  const std::string & name, const CanonicalizedEntityStatusType & status) -> void
 {
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR(

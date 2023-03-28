@@ -19,8 +19,7 @@ namespace traffic_simulator
 namespace entity
 {
 MiscObjectEntity::MiscObjectEntity(
-  const std::string & name,
-  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & entity_status,
+  const std::string & name, const CanonicalizedEntityStatusType & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::MiscObjectParameters &)
 : EntityBase(name, entity_status, hdmap_utils_ptr)

@@ -186,9 +186,8 @@ public:
 
   bool despawn(const std::string & name);
 
-  auto setEntityStatus(
-    const std::string & name,
-    const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void;
+  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatusType & status)
+    -> void;
   auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
@@ -308,7 +307,7 @@ public:
   auto canonicalize(const LaneletPoseType & maybe_non_canonicalized_lanelet_pose) const
     -> CanonicalizedLaneletPoseType;
   auto canonicalize(const traffic_simulator::EntityStatusType & may_non_canonicalized_entity_status)
-    const -> traffic_simulator::entity_status::CanonicalizedEntityStatusType;
+    const -> CanonicalizedEntityStatusType;
 
   auto toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
     -> boost::optional<CanonicalizedLaneletPoseType>;

@@ -48,8 +48,7 @@ class EntityBase
 {
 public:
   explicit EntityBase(
-    const std::string & name,
-    const traffic_simulator::entity_status::CanonicalizedEntityStatusType &,
+    const std::string & name, const CanonicalizedEntityStatusType &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   virtual ~EntityBase() = default;
@@ -187,8 +186,7 @@ public:
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, traffic_simulator::EntityStatusType> &);
 
-  virtual auto setStatus(const traffic_simulator::entity_status::CanonicalizedEntityStatusType &)
-    -> void;
+  virtual auto setStatus(const CanonicalizedEntityStatusType &) -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 

@@ -28,8 +28,7 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name,
-  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & entity_status,
+  const std::string & name, const CanonicalizedEntityStatusType & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
@@ -697,8 +696,7 @@ void EntityBase::setOtherStatus(
   }
 }
 
-auto EntityBase::setStatus(
-  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void
+auto EntityBase::setStatus(const CanonicalizedEntityStatusType & status) -> void
 {
   auto new_status = static_cast<traffic_simulator::EntityStatusType>(status);
 
@@ -722,16 +720,14 @@ auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
   auto status = getStatus();
   status.action_status.twist.linear.x = linear_velocity;
-  setStatus(
-    traffic_simulator::entity_status::CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 {
   auto status = getStatus();
   status.action_status.accel.linear.x = linear_acceleration;
-  setStatus(
-    traffic_simulator::entity_status::CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
 }
 
 void EntityBase::setTrafficLightManager(

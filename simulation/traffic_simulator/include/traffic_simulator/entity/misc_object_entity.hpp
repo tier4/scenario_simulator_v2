@@ -26,8 +26,7 @@ class MiscObjectEntity : public EntityBase
 {
 public:
   explicit MiscObjectEntity(
-    const std::string & name,
-    const traffic_simulator::entity_status::CanonicalizedEntityStatusType &,
+    const std::string & name, const CanonicalizedEntityStatusType &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::MiscObjectParameters &);
 

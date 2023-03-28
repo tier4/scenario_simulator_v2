@@ -153,8 +153,7 @@ auto EgoEntity::makeAutoware(const Configuration & configuration)
 }
 
 EgoEntity::EgoEntity(
-  const std::string & name,
-  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & entity_status,
+  const std::string & name, const CanonicalizedEntityStatusType & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration, const double step_time)
@@ -348,8 +347,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   } else {
     entity_status.action_status.linear_jerk = 0;
   }
-  setStatus(traffic_simulator::entity_status::CanonicalizedEntityStatusType(
-    entity_status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatusType(entity_status, hdmap_utils_ptr_));
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
@@ -447,8 +445,7 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 {
 }
 
-auto EgoEntity::setStatus(
-  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void
+auto EgoEntity::setStatus(const CanonicalizedEntityStatusType & status) -> void
 {
   VehicleEntity::setStatus(status);
 

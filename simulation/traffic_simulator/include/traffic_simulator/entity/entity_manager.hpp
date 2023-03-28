@@ -378,9 +378,7 @@ public:
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
-  auto setEntityStatus(
-    const std::string & name,
-    const traffic_simulator::entity_status::CanonicalizedEntityStatusType &) -> void;
+  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatusType &) -> void;
 
   void setVerbose(const bool verbose);
 

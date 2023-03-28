@@ -53,9 +53,8 @@ bool API::despawn(const std::string & name)
   return true;
 }
 
-auto API::setEntityStatus(
-  const std::string & name,
-  const traffic_simulator::entity_status::CanonicalizedEntityStatusType & status) -> void
+auto API::setEntityStatus(const std::string & name, const CanonicalizedEntityStatusType & status)
+  -> void
 {
   entity_manager_ptr_->setEntityStatus(name, status);
 }
@@ -282,11 +281,8 @@ bool API::updateEntityStatusInSim()
     geometry_msgs::msg::Pose pose;
     simulation_interface::toMsg(status.pose(), pose);
     status_msg.pose = pose;
-    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
-      pose,
-      static_cast<EntityStatusType>(entity_manager_ptr_->getEntityStatus(status.name()))
-        .bounding_box,
-      false);
+    const auto lanelet_pose =
+      entity_manager_ptr_->toLaneletPose(pose, getBoundingBox(status.name()), false);
     if (lanelet_pose) {
       status_msg.lanelet_pose_valid = true;
       status_msg.lanelet_pose = lanelet_pose.get();
@@ -303,7 +299,6 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
-  boost::optional<traffic_simulator::EntityStatusType> ego_status_before_update = boost::none;
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
@@ -388,9 +383,9 @@ auto API::canonicalize(const LaneletPoseType & may_non_canonicalized_lanelet_pos
 
 auto API::canonicalize(
   const traffic_simulator::EntityStatusType & may_non_canonicalized_entity_status) const
-  -> traffic_simulator::entity_status::CanonicalizedEntityStatusType
+  -> CanonicalizedEntityStatusType
 {
-  return traffic_simulator::entity_status::CanonicalizedEntityStatusType(
+  return CanonicalizedEntityStatusType(
     may_non_canonicalized_entity_status, entity_manager_ptr_->getHdmapUtils());
 }
 
