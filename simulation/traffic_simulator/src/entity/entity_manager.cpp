@@ -518,10 +518,12 @@ bool EntityManager::reachPosition(
 void EntityManager::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
-  if (
-    const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-      static_cast<EntityStatusType>(getEntityStatus(name)).lanelet_pose.lanelet_id, direction)) {
-    requestLaneChange(name, target.get());
+  if (const auto lanelet_pose = getLaneletPose(name)) {
+    if (
+      const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+        static_cast<LaneletPoseType>(lanelet_pose.get()).lanelet_id, direction)) {
+      requestLaneChange(name, target.get());
+    }
   }
 }
 
