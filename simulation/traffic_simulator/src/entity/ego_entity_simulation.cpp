@@ -39,7 +39,7 @@ EgoEntitySimulation::EgoEntitySimulation(const traffic_simulator_msgs::msg::Vehi
  , vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
  {}
 
-static auto toString(const VehicleModelType datum) -> std::string
+auto toString(const VehicleModelType datum) -> std::string
 {
 #define BOILERPLATE(IDENTIFIER)      \
 case VehicleModelType::IDENTIFIER: \
@@ -270,12 +270,20 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     return state_;
   }
 
-  double EgoEntitySimulation::getLinearJerk(double step_time) {
+  auto EgoEntitySimulation::getLinearJerk(double step_time) -> double {
     if (previous_linear_velocity_) {
       return (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time;
     } else {
       return 0;
     }
+  }
+
+  auto EgoEntitySimulation::updatePreviousValuesAndUpdateAutoware() -> void {
+    previous_linear_velocity_ = vehicle_model_ptr_->getVx();
+    previous_angular_velocity_ = vehicle_model_ptr_->getWz();
+
+    // Will be moved to simple_sensor_simulator
+    autoware->update();
   }
 }
 }

@@ -44,26 +44,6 @@ namespace entity
     return value;
   }
 
-auto toString(const VehicleModelType datum) -> std::string
-{
-#define BOILERPLATE(IDENTIFIER)      \
-  case VehicleModelType::IDENTIFIER: \
-    return #IDENTIFIER
-
-  switch (datum) {
-    BOILERPLATE(DELAY_STEER_ACC);
-    BOILERPLATE(DELAY_STEER_ACC_GEARED);
-    BOILERPLATE(DELAY_STEER_VEL);
-    BOILERPLATE(IDEAL_STEER_ACC);
-    BOILERPLATE(IDEAL_STEER_ACC_GEARED);
-    BOILERPLATE(IDEAL_STEER_VEL);
-  }
-
-#undef BOILERPLATE
-
-  THROW_SIMULATION_ERROR("Unsupported vehicle model type, failed to convert to string");
-}
-
 auto EgoEntity::makeAutowareUser(const Configuration & configuration)
   -> std::unique_ptr<concealer::AutowareUser>
 {
@@ -224,11 +204,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
-  ego_entity_simulation_.previous_linear_velocity_ = ego_entity_simulation_.vehicle_model_ptr_->getVx();
-  ego_entity_simulation_.previous_angular_velocity_ = ego_entity_simulation_.vehicle_model_ptr_->getWz();
-
-  // Will be moved to simple_sensor_simulator
-  ego_entity_simulation_.autoware->update();
+  ego_entity_simulation_.updatePreviousValuesAndUpdateAutoware();
 
   EntityBase::onPostUpdate(current_time, step_time);
 }

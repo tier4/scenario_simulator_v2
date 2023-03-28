@@ -78,11 +78,13 @@ public:
 
   auto onUpdate(double step_time, bool npc_logic_started) -> void;
 
+  auto updatePreviousValuesAndUpdateAutoware() -> void;
+
   auto getStatus() const -> const SimulatedEgoState &;
 
   auto requestSpeedChange(double value) -> void;
 
-  double getLinearJerk(double step_time);
+  auto getLinearJerk(double step_time) -> double;
 };
 }
 }
