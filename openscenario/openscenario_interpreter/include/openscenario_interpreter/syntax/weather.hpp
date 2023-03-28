@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/syntax/precipitation.hpp>
 #include <openscenario_interpreter/syntax/sun.hpp>
 #include <openscenario_interpreter/syntax/wind.hpp>
+#include <optional>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -57,29 +58,34 @@ struct Weather
   // TODO: To realize "If one of the conditions is missing it means that it doesn't change.", we
   // should use "optional" rather than default constructor of each element.
 
-  const Double atmospheric_pressure;  // Reference atmospheric pressure at z=0.0 in world coordinate
-                                      // system. Unit: [Pa]. Range: [80000..120000]. The actual
-                                      // atmospheric pressure around the entities of the scenario
-                                      // has to be calculated depending on their z position. See
-                                      // also the Standard Atmosphere as defined in ISO2533.
+  const std::optional<Double>
+    atmospheric_pressure;  // Reference atmospheric pressure at z=0.0 in world coordinate
+                           // system. Unit: [Pa]. Range: [80000..120000]. The actual
+                           // atmospheric pressure around the entities of the scenario
+                           // has to be calculated depending on their z position. See
+                           // also the Standard Atmosphere as defined in ISO2533.
 
-  const Double
+  const std::optional<Double>
     temperature;  // Definition of the cloud state, i.e. cloud state and sky visualization settings.
 
-  const FractionalCloudCover fractional_cloud_cover;  //	Definition of cloud states using the
-                                                      // fractional cloud cover in oktas.
-  const Sun sun;  // Definition of the sun, i.e. position and intensity.
+  const std::optional<FractionalCloudCover>
+    fractional_cloud_cover;      //	Definition of cloud states using the
+                                 // fractional cloud cover in oktas.
+  const std::optional<Sun> sun;  // Definition of the sun, i.e. position and intensity.
 
-  const Fog fog;  //	Definition of fog, i.e. visual range and bounding box.
+  const std::optional<Fog> fog;  //	Definition of fog, i.e. visual range and bounding box.
 
-  const Precipitation precipitation;  //	Definition of precipitation, i.e. type and
+  const std::optional<Precipitation> precipitation;  //	Definition of precipitation, i.e. type and
   // intensity.
 
-  const Wind wind;  // 	Definition of the wind: direction and speed.
+  const std::optional<Wind> wind;  // 	Definition of the wind: direction and speed.
 
-  const DomeImage dome_image;  // 	Image reference to represent the sky. Mutually exclusive
-                               // with "fractionalCloudCover". If the image also contains lighting
-                               // information (HDRi) it is also mutually exclusive with "sun".
+  const std::optional<DomeImage>
+    dome_image;  // 	Image reference to represent the sky. Mutually exclusive
+                 // with "fractionalCloudCover". If the image also contains lighting
+                 // information (HDRi) it is also mutually exclusive with "sun".
+
+  Weather() = default;
 
   explicit Weather(const pugi::xml_node &, Scope &);
 };

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iomanip>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/weather.hpp>
@@ -21,14 +22,15 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Weather::Weather(const pugi::xml_node & node, Scope & scope)
-: atmospheric_pressure(readAttribute<Double>("atmosphericPressure", node, scope)),
-  temperature(readAttribute<Double>("temperature", node, scope)),
-  fractional_cloud_cover(readAttribute<FractionalCloudCover>("fractionalCloudCover", node, scope)),
-  sun(readElement<Sun>("Sun", node, scope)),
-  fog(readElement<Fog>("Fog", node, scope)),
-  precipitation(readElement<Precipitation>("Precipitation", node, scope)),
-  wind(readElement<Wind>("Wind", node, scope)),
-  dome_image(readElement<DomeImage>("DomeImage", node, scope))
+: atmospheric_pressure(readAttribute<std::optional<Double>>("atmosphericPressure", node, scope)),
+  temperature(readAttribute<std::optional<Double>>("temperature", node, scope)),
+  fractional_cloud_cover(
+    readAttribute<std::optional<FractionalCloudCover>>("fractionalCloudCover", node, scope)),
+  sun(readElement<std::optional<Sun>>("Sun", node, scope)),
+  fog(readElement<std::optional<Fog>>("Fog", node, scope)),
+  precipitation(readElement<std::optional<Precipitation>>("Precipitation", node, scope)),
+  wind(readElement<std::optional<Wind>>("Wind", node, scope)),
+  dome_image(readElement<std::optional<DomeImage>>("DomeImage", node, scope))
 {
 }
 }  // namespace syntax
