@@ -392,21 +392,19 @@ auto EntityManager::getRelativePose(
 auto EntityManager::getRelativePose(
   const geometry_msgs::msg::Pose & from, const std::string & to) const -> geometry_msgs::msg::Pose
 {
-  return getRelativePose(from, static_cast<EntityStatusType>(getEntityStatus(to)).pose);
+  return getRelativePose(from, getMapPose(to));
 }
 
 auto EntityManager::getRelativePose(
   const std::string & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose
 {
-  return getRelativePose(static_cast<EntityStatusType>(getEntityStatus(from)).pose, to);
+  return getRelativePose(getMapPose(from), to);
 }
 
 auto EntityManager::getRelativePose(const std::string & from, const std::string & to) const
   -> geometry_msgs::msg::Pose
 {
-  return getRelativePose(
-    static_cast<EntityStatusType>(getEntityStatus(from)).pose,
-    static_cast<EntityStatusType>(getEntityStatus(to)).pose);
+  return getRelativePose(getMapPose(from), getMapPose(to));
 }
 
 auto EntityManager::getRelativePose(
@@ -427,14 +425,14 @@ auto EntityManager::getRelativePose(
   const std::string & from, const CanonicalizedLaneletPoseType & to) const
   -> geometry_msgs::msg::Pose
 {
-  return getRelativePose(static_cast<EntityStatusType>(getEntityStatus(from)).pose, toMapPose(to));
+  return getRelativePose(getMapPose(from), toMapPose(to));
 }
 
 auto EntityManager::getRelativePose(
   const CanonicalizedLaneletPoseType & from, const std::string & to) const
   -> geometry_msgs::msg::Pose
 {
-  return getRelativePose(toMapPose(from), static_cast<EntityStatusType>(getEntityStatus(to)).pose);
+  return getRelativePose(toMapPose(from), getMapPose(to));
 }
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
