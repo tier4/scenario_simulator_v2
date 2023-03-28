@@ -68,11 +68,9 @@ void EntityManager::broadcastTransform(
 
 bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
 {
-  return name0 != name1 and math::geometry::checkCollision2D(
-                              static_cast<EntityStatusType>(getEntityStatus(name0)).pose,
-                              static_cast<EntityStatusType>(getEntityStatus(name0)).bounding_box,
-                              static_cast<EntityStatusType>(getEntityStatus(name1)).pose,
-                              static_cast<EntityStatusType>(getEntityStatus(name1)).bounding_box);
+  return name0 != name1 and
+         math::geometry::checkCollision2D(
+           getMapPose(name0), getBoundingBox(name0), getMapPose(name1), getBoundingBox(name1));
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
