@@ -491,16 +491,13 @@ bool EntityManager::isInLanelet(
 
 bool EntityManager::isStopping(const std::string & name) const
 {
-  return std::fabs(
-           static_cast<EntityStatusType>(getEntityStatus(name)).action_status.twist.linear.x) <
-         std::numeric_limits<double>::epsilon();
+  return std::fabs(getCurrentTwist(name).linear.x) < std::numeric_limits<double>::epsilon();
 }
 
 bool EntityManager::reachPosition(
   const std::string & name, const std::string & target_name, const double tolerance) const
 {
-  return reachPosition(
-    name, static_cast<EntityStatusType>(getEntityStatus(target_name)).pose, tolerance);
+  return reachPosition(name, getMapPose(target_name), tolerance);
 }
 
 bool EntityManager::reachPosition(
