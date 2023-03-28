@@ -20,3 +20,4 @@ jobs:
           local-cspell-json: .github/workflows/custom_spell.json
           dict-packages: |
             https://github.com/tier4/cspell-dicts
+          verbose: true
