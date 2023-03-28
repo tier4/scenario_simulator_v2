@@ -81,10 +81,10 @@ auto API::setEntityStatus(
   status.time = clock_.getCurrentSimulationTime();
   status.pose =
     entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
-  const auto lanelet_pose =
-    entity_manager_ptr_->toLaneletPose(status.pose, getBoundingBox(reference_entity_name), false);
   status.action_status = action_status;
-  if (lanelet_pose) {
+  if (
+    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
+      status.pose, getBoundingBox(reference_entity_name), false)) {
     status.lanelet_pose_valid = true;
     status.lanelet_pose = lanelet_pose.get();
   } else {
@@ -104,28 +104,6 @@ boost::optional<double> API::getTimeHeadway(const std::string & from, const std:
     return std::numeric_limits<double>::infinity();
   }
   return ret;
-}
-
-bool API::reachPosition(
-  const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance)
-{
-  return entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
-}
-
-bool API::reachPosition(
-  const std::string & name, const CanonicalizedLaneletPoseType & target_pose,
-  const double tolerance)
-{
-  return entity_manager_ptr_->reachPosition(
-    name, static_cast<traffic_simulator::LaneletPoseType>(target_pose).lanelet_id,
-    static_cast<traffic_simulator::LaneletPoseType>(target_pose).s,
-    static_cast<traffic_simulator::LaneletPoseType>(target_pose).offset, tolerance);
-}
-
-bool API::reachPosition(
-  const std::string & name, const std::string & target_name, const double tolerance) const
-{
-  return entity_manager_ptr_->reachPosition(name, target_name, tolerance);
 }
 
 auto API::setEntityStatus(

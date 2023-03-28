@@ -529,19 +529,11 @@ bool EntityManager::reachPosition(
 }
 
 bool EntityManager::reachPosition(
-  const std::string & name, const std::int64_t lanelet_id, const double s, const double offset,
+  const std::string & name, const CanonicalizedLaneletPoseType & lanelet_pose,
   const double tolerance) const
 {
-  traffic_simulator::LaneletPoseType lanelet_pose;
-  {
-    lanelet_pose.lanelet_id = lanelet_id;
-    lanelet_pose.s = s;
-    lanelet_pose.offset = offset;
-  }
-
-  const auto target_pose = hdmap_utils_ptr_->toMapPose(lanelet_pose);
-
-  return reachPosition(name, target_pose.pose, tolerance);
+  return reachPosition(
+    name, hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(lanelet_pose)).pose, tolerance);
 }
 
 void EntityManager::requestLaneChange(

@@ -211,14 +211,6 @@ public:
 
   boost::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
-  bool reachPosition(
-    const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance);
-  bool reachPosition(
-    const std::string & name, const CanonicalizedLaneletPoseType & target_pose,
-    const double tolerance);
-  bool reachPosition(
-    const std::string & name, const std::string & target_name, const double tolerance) const;
-
   bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
   bool attachLidarSensor(
     const std::string &, const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
@@ -297,6 +289,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(laneMatchingSucceed);
+  FORWARD_TO_ENTITY_MANAGER(reachPosition);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);

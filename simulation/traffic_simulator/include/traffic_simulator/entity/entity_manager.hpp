@@ -370,7 +370,7 @@ public:
     const std::string & name, const geometry_msgs::msg::Pose & target_pose,
     const double tolerance) const;
   bool reachPosition(
-    const std::string & name, const std::int64_t lanelet_id, const double s, const double offset,
+    const std::string & name, const CanonicalizedLaneletPoseType & lanelet_pose,
     const double tolerance) const;
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
