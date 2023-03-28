@@ -34,6 +34,7 @@ public:
   {
     return entity_status_;
   }
+  bool laneMatchingSucceed() const noexcept { return entity_status_.lanelet_pose_valid; }
 
 private:
   auto canonicalize(

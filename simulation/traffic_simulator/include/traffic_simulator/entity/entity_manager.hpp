@@ -223,6 +223,7 @@ public:
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
+  FORWARD_TO_ENTITY(laneMatchingSucceed, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
@@ -270,8 +271,6 @@ public:
   bool despawnEntity(const std::string & name);
 
   bool entityExists(const std::string & name);
-
-  bool laneMatchingSucceed(const std::string & name) const;
 
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> boost::optional<double>;

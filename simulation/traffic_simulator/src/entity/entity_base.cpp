@@ -206,7 +206,7 @@ auto EntityBase::getLinearJerk() const -> double { return getStatus().action_sta
 auto EntityBase::getLaneletPose() const -> boost::optional<CanonicalizedLaneletPoseType>
 {
   const auto status = static_cast<EntityStatusType>(getStatus());
-  if (status.lanelet_pose_valid) {
+  if (laneMatchingSucceed()) {
     return CanonicalizedLaneletPoseType(status.lanelet_pose, hdmap_utils_ptr_);
   }
   return boost::none;
@@ -255,6 +255,8 @@ auto EntityBase::getTraveledDistance() const -> double { return traveled_distanc
 
 auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 
+auto EntityBase::laneMatchingSucceed() const -> bool { return getStatus().lanelet_pose_valid; }
+
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
 {
   return speed_planner_->isTargetSpeedReached(target_speed, getCurrentTwist());
@@ -300,7 +302,7 @@ void EntityBase::requestLaneChange(
 {
   std::int64_t reference_lanelet_id = 0;
   if (target.entity_name == name) {
-    if (!getStatus().lanelet_pose_valid) {
+    if (!laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");

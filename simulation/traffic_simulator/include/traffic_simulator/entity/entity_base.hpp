@@ -125,6 +125,8 @@ public:
 
   /*   */ auto isNpcLogicStarted() const -> bool;
 
+  /*   */ auto laneMatchingSucceed() const -> bool;
+
   virtual void onUpdate(double current_time, double step_time);
 
   virtual void onPostUpdate(double current_time, double step_time);

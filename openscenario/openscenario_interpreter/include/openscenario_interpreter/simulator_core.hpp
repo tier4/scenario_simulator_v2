@@ -328,9 +328,7 @@ public:
     template <typename... Ts>
     static auto evaluateAcceleration(Ts &&... xs)
     {
-      return static_cast<traffic_simulator::EntityStatusType>(
-               core->getEntityStatus(std::forward<decltype(xs)>(xs)...))
-        .action_status.accel.linear.x;
+      return core->getCurrentAccel(std::forward<decltype(xs)>(xs)...).linear.x;
     }
 
     template <typename... Ts>
@@ -364,9 +362,7 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return static_cast<traffic_simulator::EntityStatusType>(
-               core->getEntityStatus(std::forward<decltype(xs)>(xs)...))
-        .action_status.twist.linear.x;
+      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear.x;
     }
 
     template <typename... Ts>
@@ -440,10 +436,9 @@ public:
     template <typename EntityRef>
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
-      if (auto entity_status = core->getEntityStatus(entity_ref);
-          static_cast<traffic_simulator::EntityStatusType>(entity_status).lanelet_pose_valid) {
-        return static_cast<Double>(std::abs(
-          static_cast<traffic_simulator::EntityStatusType>(entity_status).lanelet_pose.rpy.z));
+      if (auto lanelet_pose = core->getLaneletPose(entity_ref)) {
+        return static_cast<Double>(
+          std::abs(static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose.get()).rpy.z));
       } else {
         return Double::nan();
       }

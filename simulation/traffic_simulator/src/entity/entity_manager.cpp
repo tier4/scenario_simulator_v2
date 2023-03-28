@@ -362,18 +362,6 @@ auto EntityManager::getLongitudinalDistance(
   }
 }
 
-/**
- * @brief If the target entity's lanelet pose is valid, return true
- *
- * @param name name of the target entity
- * @return true lane matching is succeed
- * @return false lane matching is failed
- */
-bool EntityManager::laneMatchingSucceed(const std::string & name) const
-{
-  return static_cast<EntityStatusType>(getEntityStatus(name)).lanelet_pose_valid;
-}
-
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
