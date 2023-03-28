@@ -34,11 +34,8 @@ void OutOfRangeMetric::update()
     success();
     return;
   }
-  const auto status = static_cast<traffic_simulator::EntityStatusType>(
-    entity_manager_ptr_->getEntityStatus(target_entity));
-
-  linear_velocity_ = status.action_status.twist.linear.x;
-  linear_acceleration_ = status.action_status.accel.linear.x;
+  linear_velocity_ = entity_manager_ptr_->getCurrentTwist(target_entity).linear.x;
+  linear_acceleration_ = entity_manager_ptr_->getCurrentAccel(target_entity).linear.x;
 
   if (!(min_velocity <= linear_velocity_ && linear_velocity_ <= max_velocity)) {
     failure(SPECIFICATION_VIOLATION(

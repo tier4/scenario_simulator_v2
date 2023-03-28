@@ -187,8 +187,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 
 void VehicleEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> & waypoints)
 {
-  const auto entity_lanelet_pose = getLaneletPose();
-  if (!entity_lanelet_pose) {
+  if (!laneMatchingSucceed()) {
     return;
   }
   route_planner_.setWaypoints(waypoints);

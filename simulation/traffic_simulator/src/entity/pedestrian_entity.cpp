@@ -52,8 +52,7 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
 void PedestrianEntity::requestAssignRoute(
   const std::vector<CanonicalizedLaneletPoseType> & waypoints)
 {
-  const auto entity_lanelet_pose = getLaneletPose();
-  if (!entity_lanelet_pose) {
+  if (!laneMatchingSucceed()) {
     return;
   }
   route_planner_.setWaypoints(waypoints);
