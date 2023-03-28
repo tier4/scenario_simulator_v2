@@ -97,8 +97,7 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
   -> boost::optional<double>
 {
   return math::geometry::getPolygonDistance(
-    getMapPose(from), static_cast<EntityStatusType>(getEntityStatus(from)).bounding_box,
-    getMapPose(to), static_cast<EntityStatusType>(getEntityStatus(to)).bounding_box);
+    getMapPose(from), getBoundingBox(from), getMapPose(to), getBoundingBox(to));
 }
 
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
