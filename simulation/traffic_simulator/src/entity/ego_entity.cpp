@@ -212,44 +212,11 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   autoware_user->rethrow();
-
   autoware_user->spinSome();
 
   EntityBase::onUpdate(current_time, step_time);
 
-  // Will be moved to simple_sensor_simulator
-  ego_entity_simulation_.autoware->spinSome();
-
-  if (npc_logic_started_) {
-    Eigen::VectorXd input(ego_entity_simulation_.vehicle_model_ptr_->getDimU());
-
-    switch (ego_entity_simulation_.vehicle_model_type_) {
-      case VehicleModelType::DELAY_STEER_ACC:
-      case VehicleModelType::IDEAL_STEER_ACC:
-        input << ego_entity_simulation_.autoware->getGearSign() * ego_entity_simulation_.autoware->getAcceleration(),
-            ego_entity_simulation_.autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input << ego_entity_simulation_.autoware->getGearSign() * ego_entity_simulation_.autoware->getAcceleration(),
-            ego_entity_simulation_.autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::DELAY_STEER_VEL:
-      case VehicleModelType::IDEAL_STEER_VEL:
-        input << ego_entity_simulation_.autoware->getVelocity(), ego_entity_simulation_.autoware->getSteeringAngle();
-        break;
-
-      default:
-        THROW_SEMANTIC_ERROR(
-          "Unsupported vehicle_model_type ", toString(ego_entity_simulation_.vehicle_model_type_), "specified");
-    }
-
-    ego_entity_simulation_.vehicle_model_ptr_->setGear(ego_entity_simulation_.autoware->getGearCommand().command);
-    ego_entity_simulation_.vehicle_model_ptr_->setInput(input);
-    ego_entity_simulation_.vehicle_model_ptr_->update(step_time);
-  }
+  ego_entity_simulation_.onUpdate(step_time, npc_logic_started_);
 
   auto entity_status = getEntityStatus(current_time + step_time, step_time);
   if (ego_entity_simulation_.previous_linear_velocity_) {

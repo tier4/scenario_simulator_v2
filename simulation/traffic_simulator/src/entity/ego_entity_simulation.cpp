@@ -187,9 +187,6 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   void EgoEntitySimulation::onUpdate(double step_time, bool npc_logic_started) {
     autoware->spinSome();
 
-    previous_linear_velocity_ = vehicle_model_ptr_->getVx();
-    previous_angular_velocity_ = vehicle_model_ptr_->getWz();
-
     if (npc_logic_started) {
       Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
 
@@ -220,10 +217,10 @@ void EgoEntitySimulation::requestSpeedChange(double value)
       vehicle_model_ptr_->setInput(input);
       vehicle_model_ptr_->update(step_time);
     }
-
-    state_.pose = getCurrentPose();
-    state_.twist = getCurrentTwist();
-    state_.acceleration = getCurrentAccel(step_time);
+//
+//    state_.pose = getCurrentPose();
+//    state_.twist = getCurrentTwist();
+//    state_.acceleration = getCurrentAccel(step_time);
  }
 
   auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
