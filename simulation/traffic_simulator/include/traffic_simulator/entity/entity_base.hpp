@@ -59,15 +59,33 @@ public:
 
   virtual void cancelRequest();
 
+#define DEFINE_GETTER(NAME, TYPE, RETURN_VARIABLE) \
+  /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
+
+  // clang-format off
+  DEFINE_GETTER(BoundingBox, traffic_simulator_msgs::msg::BoundingBox, getStatus().bounding_box)
+  DEFINE_GETTER(CurrentAccel, geometry_msgs::msg::Accel, getStatus().action_status.accel)
+  DEFINE_GETTER(CurrentTwist, geometry_msgs::msg::Twist, getStatus().action_status.twist)
+  DEFINE_GETTER(DynamicConstraints, traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
+  DEFINE_GETTER(EntityStatusBeforeUpdate, EntityStatusType, status_before_update_)
+  DEFINE_GETTER(LinearJerk, double, getStatus().action_status.linear_jerk)
+  DEFINE_GETTER(MapPose, geometry_msgs::msg::Pose, getStatus().pose)
+  DEFINE_GETTER(StandStillDuration, double, stand_still_duration_)
+  DEFINE_GETTER(Status, EntityStatusType, status_)
+  DEFINE_GETTER(TraveledDistance, double, traveled_distance_)
+  // clang-format on
+#undef DEFINE_GETTER
+
+#define DEFINE_CHECK_FUNCTION(FUNCTION_NAME, BOOL_VARIABLE) \
+  /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
+
+  DEFINE_CHECK_FUNCTION(isNpcLogicStarted, npc_logic_started_)
+  DEFINE_CHECK_FUNCTION(laneMatchingSucceed, getStatus().lanelet_pose_valid)
+#undef DEFINE_CHECK_FUNCTION
+
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 
-  /*   */ auto getBoundingBox() const -> traffic_simulator_msgs::msg::BoundingBox;
-
   virtual auto getCurrentAction() const -> std::string = 0;
-
-  /*   */ auto getCurrentAccel() const -> geometry_msgs::msg::Accel;
-
-  /*   */ auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
   /*   */ auto getDistanceToLaneBound() -> double;
 
@@ -89,28 +107,17 @@ public:
 
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
-  virtual auto getDynamicConstraints() const
-    -> const traffic_simulator_msgs::msg::DynamicConstraints;
-
   virtual auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
 
-  /*   */ auto getEntityStatusBeforeUpdate() const -> const EntityStatusType &;
-
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
-  /*   */ auto getTraveledDistance() const -> double;
-
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPoseType> = 0;
-
-  /*   */ auto getLinearJerk() const -> double;
 
   /*   */ auto getLaneletPose() const -> boost::optional<CanonicalizedLaneletPoseType>;
 
   /*   */ auto getLaneletPose(double matching_distance) const
     -> boost::optional<CanonicalizedLaneletPoseType>;
-
-  /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 
   /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
     -> geometry_msgs::msg::Pose;
@@ -119,15 +126,7 @@ public:
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
 
-  /*   */ auto getStatus() const -> const EntityStatusType &;
-
-  /*   */ auto getStandStillDuration() const -> double;
-
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
-
-  /*   */ auto isNpcLogicStarted() const -> bool;
-
-  /*   */ auto laneMatchingSucceed() const -> bool;
 
   virtual void onUpdate(double current_time, double step_time);
 

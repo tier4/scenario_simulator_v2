@@ -101,21 +101,6 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
   return math::geometry::get2DConvexHull(points_bbox);
 }
 
-auto EntityBase::getBoundingBox() const -> traffic_simulator_msgs::msg::BoundingBox
-{
-  return getStatus().bounding_box;
-}
-
-auto EntityBase::getCurrentAccel() const -> geometry_msgs::msg::Accel
-{
-  return getStatus().action_status.accel;
-}
-
-auto EntityBase::getCurrentTwist() const -> geometry_msgs::msg::Twist
-{
-  return getStatus().action_status.twist;
-}
-
 auto EntityBase::getDistanceToLaneBound() -> double
 {
   return std::min(getDistanceToLeftLaneBound(), getDistanceToRightLaneBound());
@@ -194,19 +179,6 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
   return *std::min_element(distances.begin(), distances.end());
 }
 
-auto EntityBase::getDynamicConstraints() const
-  -> const traffic_simulator_msgs::msg::DynamicConstraints
-{
-  return getBehaviorParameter().dynamic_constraints;
-}
-
-auto EntityBase::getEntityStatusBeforeUpdate() const -> const EntityStatusType &
-{
-  return status_before_update_;
-}
-
-auto EntityBase::getLinearJerk() const -> double { return getStatus().action_status.linear_jerk; }
-
 auto EntityBase::getLaneletPose() const -> boost::optional<CanonicalizedLaneletPoseType>
 {
   const auto status = static_cast<EntityStatusType>(getStatus());
@@ -235,8 +207,6 @@ auto EntityBase::getLaneletPose(double matching_distance) const
   return boost::none;
 }
 
-auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
-
 auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
   -> geometry_msgs::msg::Pose
 {
@@ -247,16 +217,6 @@ auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & rel
   tf2::toMsg(ref_transform * relative_transform, ret);
   return ret;
 }
-
-auto EntityBase::getStatus() const -> const EntityStatusType & { return status_; }
-
-auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
-
-auto EntityBase::getTraveledDistance() const -> double { return traveled_distance_; }
-
-auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
-
-auto EntityBase::laneMatchingSucceed() const -> bool { return getStatus().lanelet_pose_valid; }
 
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
 {
