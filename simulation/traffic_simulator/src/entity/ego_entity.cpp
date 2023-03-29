@@ -110,8 +110,8 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   traffic_simulator_msgs::msg::EntityStatus status;
   {
     status.time = time;
-    status.type = getStatus().type;
-    status.bounding_box = getStatus().bounding_box;
+    status.type = ego_entity_simulation_.getStatus().type;
+    status.bounding_box = ego_entity_simulation_.getStatus().bounding_box;
     status.pose = getCurrentPose();
     status.action_status.twist = getCurrentTwist();
     status.action_status.accel = ego_entity_simulation_.getCurrentAccel(step_time);
@@ -301,6 +301,7 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   VehicleEntity::setStatus(status);
+  ego_entity_simulation_.setStatus(status);
   ego_entity_simulation_.setAutowareStatus(getStatus());
 }
 
