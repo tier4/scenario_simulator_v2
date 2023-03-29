@@ -22,7 +22,8 @@ namespace lanelet_pose
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPoseType & maybe_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-: lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils))
+: lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
+  map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
 {
 }
 

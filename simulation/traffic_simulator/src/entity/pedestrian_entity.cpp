@@ -58,8 +58,7 @@ void PedestrianEntity::requestAssignRoute(
   route_planner_.setWaypoints(waypoints);
   std::vector<geometry_msgs::msg::Pose> goal_poses;
   for (const auto & waypoint : waypoints) {
-    goal_poses.emplace_back(
-      hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(waypoint)).pose);
+    goal_poses.emplace_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
   behavior_plugin_ptr_->setGoalPoses(goal_poses);
 }

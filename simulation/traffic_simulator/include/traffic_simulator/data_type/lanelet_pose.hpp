@@ -30,6 +30,7 @@ public:
     const LaneletPoseType & maybe_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
   explicit operator LaneletPoseType() const noexcept { return lanelet_pose_; }
+  explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
 
 /**
 Note: The comparison operator for the CanonicalizedLaneletPose type compares the s values after making sure that the lanelet_id is the same.
@@ -58,6 +59,7 @@ private:
     const LaneletPoseType & may_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPoseType;
   const LaneletPoseType lanelet_pose_;
+  const geometry_msgs::msg::Pose map_pose_;
 };
 
 bool isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &);
