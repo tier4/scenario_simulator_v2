@@ -194,8 +194,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
-  ego_entity_simulation_.updatePreviousValuesAndUpdateAutoware();
-
   EntityBase::onPostUpdate(current_time, step_time);
 }
 

@@ -219,6 +219,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     }
 
     updateStatus(time, step_time);
+    updatePreviousValuesAndUpdateAutoware();
  }
 
   auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
@@ -276,7 +277,6 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     previous_linear_velocity_ = vehicle_model_ptr_->getVx();
     previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 
-    // Will be moved to simple_sensor_simulator
     autoware->update();
   }
 

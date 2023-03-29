@@ -64,14 +64,14 @@ class EgoEntitySimulation {
   auto getCurrentAccel(const double step_time) const -> geometry_msgs::msg::Accel;
 
   auto getLinearJerk(double step_time) -> double;
+
+  auto updatePreviousValuesAndUpdateAutoware() -> void;
 public:
   auto setAutowareStatus(const traffic_simulator_msgs::msg::EntityStatus& status) -> void;
 
   explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double);
 
   auto onUpdate(double time, double step_time, bool npc_logic_started) -> void;
-
-  auto updatePreviousValuesAndUpdateAutoware() -> void;
 
   auto requestSpeedChange(double value) -> void;
 
