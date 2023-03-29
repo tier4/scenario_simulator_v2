@@ -190,7 +190,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   EntityBase::onUpdate(current_time, step_time);
 
-  setStatus(getEntityStatusAndFillLaneletPose());
+  setStatusInternal(getEntityStatusAndFillLaneletPose());
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
@@ -284,6 +284,10 @@ auto EgoEntity::getDefaultDynamicConstraints() const
 
 auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) -> void
 {
+}
+
+auto EgoEntity::setStatusInternal(const traffic_simulator_msgs::msg::EntityStatus & status) -> void {
+  VehicleEntity::setStatus(status);
 }
 
 auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void

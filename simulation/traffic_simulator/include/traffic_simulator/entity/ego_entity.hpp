@@ -53,6 +53,8 @@ class EgoEntity : public VehicleEntity
   auto getEntityStatusAndFillLaneletPose() const
   -> const traffic_simulator_msgs::msg::EntityStatus;
 
+  auto setStatusInternal(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+
 public:
   explicit EgoEntity() = delete;
 

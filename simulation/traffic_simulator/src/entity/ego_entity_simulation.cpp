@@ -220,6 +220,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
 
     updateStatus(time, step_time);
     updatePreviousValuesAndUpdateAutoware();
+    setAutowareStatus();
  }
 
   auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
