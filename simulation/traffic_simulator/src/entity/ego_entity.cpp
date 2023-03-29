@@ -104,10 +104,9 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
   return parameter;
 }
 
-auto EgoEntity::getEntityStatusAndFillLaneletPose() const
-  -> const traffic_simulator_msgs::msg::EntityStatus
+auto EgoEntity::addLaneletPoseToEntityStatus() -> void
 {
-  traffic_simulator_msgs::msg::EntityStatus status = ego_entity_simulation_.getStatus();
+  traffic_simulator_msgs::msg::EntityStatus status = status_;
 
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(getRouteLanelets());
@@ -138,7 +137,7 @@ auto EgoEntity::getEntityStatusAndFillLaneletPose() const
     status.lanelet_pose = lanelet_pose.get();
   }
 
-  return status;
+  setStatusInternal(status);
 }
 
 auto EgoEntity::getEntityTypename() const -> const std::string &
@@ -189,8 +188,9 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   autoware_user->spinSome();
 
   EntityBase::onUpdate(current_time, step_time);
+  setStatusInternal(ego_entity_simulation_.getStatus());
 
-  setStatusInternal(getEntityStatusAndFillLaneletPose());
+  addLaneletPoseToEntityStatus();
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
