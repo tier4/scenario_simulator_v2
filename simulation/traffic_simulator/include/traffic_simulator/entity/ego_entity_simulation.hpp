@@ -57,13 +57,14 @@ class EgoEntitySimulation {
 
   traffic_simulator_msgs::msg::EntityStatus status_;
 
-public:
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
   auto getCurrentAccel(const double step_time) const -> geometry_msgs::msg::Accel;
 
+  auto getLinearJerk(double step_time) -> double;
+public:
   auto setAutowareStatus(const traffic_simulator_msgs::msg::EntityStatus& status) -> void;
 
   explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double);
@@ -73,8 +74,6 @@ public:
   auto updatePreviousValuesAndUpdateAutoware() -> void;
 
   auto requestSpeedChange(double value) -> void;
-
-  auto getLinearJerk(double step_time) -> double;
 
   auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
 
