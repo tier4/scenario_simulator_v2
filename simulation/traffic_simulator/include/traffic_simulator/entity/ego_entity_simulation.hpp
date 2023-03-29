@@ -35,15 +35,6 @@ enum class VehicleModelType {
   IDEAL_STEER_VEL,
 };
 
-/**
- * 2D Ego state representation
- */
-struct SimulatedEgoState {
-  geometry_msgs::msg::Pose pose;
-  geometry_msgs::msg::Twist twist;
-  geometry_msgs::msg::Accel acceleration;
-};
-
 class EgoEntitySimulation {
 
   const std::unique_ptr<concealer::Autoware> autoware;
@@ -55,8 +46,6 @@ class EgoEntitySimulation {
   std::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 
   std::optional<geometry_msgs::msg::Pose> initial_pose_;
-
-  SimulatedEgoState state_;
 
   static auto getVehicleModelType() -> VehicleModelType;
 
@@ -79,8 +68,6 @@ public:
   auto onUpdate(double step_time, bool npc_logic_started) -> void;
 
   auto updatePreviousValuesAndUpdateAutoware() -> void;
-
-  auto getStatus() const -> const SimulatedEgoState &;
 
   auto requestSpeedChange(double value) -> void;
 

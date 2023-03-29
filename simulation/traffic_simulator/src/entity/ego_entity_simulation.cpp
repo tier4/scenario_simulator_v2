@@ -217,10 +217,6 @@ void EgoEntitySimulation::requestSpeedChange(double value)
       vehicle_model_ptr_->setInput(input);
       vehicle_model_ptr_->update(step_time);
     }
-//
-//    state_.pose = getCurrentPose();
-//    state_.twist = getCurrentTwist();
-//    state_.acceleration = getCurrentAccel(step_time);
  }
 
   auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
@@ -264,10 +260,6 @@ void EgoEntitySimulation::requestSpeedChange(double value)
           (vehicle_model_ptr_->getWz() - previous_angular_velocity_.value()) / step_time;
     }
     return accel;
-  }
-
-  auto EgoEntitySimulation::getStatus() const -> const SimulatedEgoState & {
-    return state_;
   }
 
   auto EgoEntitySimulation::getLinearJerk(double step_time) -> double {
