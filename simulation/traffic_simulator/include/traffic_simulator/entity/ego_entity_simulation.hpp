@@ -20,6 +20,7 @@
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
 
 namespace traffic_simulator
 {
@@ -54,6 +55,8 @@ class EgoEntitySimulation {
       const traffic_simulator_msgs::msg::VehicleParameters &)
   -> const std::shared_ptr<SimModelInterface>;
 
+  traffic_simulator_msgs::msg::EntityStatus status_;
+
 public:
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 
@@ -72,6 +75,10 @@ public:
   auto requestSpeedChange(double value) -> void;
 
   auto getLinearJerk(double step_time) -> double;
+
+  auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
+
+  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 };
 }
 }

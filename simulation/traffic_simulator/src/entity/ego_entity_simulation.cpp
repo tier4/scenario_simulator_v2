@@ -277,6 +277,14 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     // Will be moved to simple_sensor_simulator
     autoware->update();
   }
+
+  auto EgoEntitySimulation::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus & {
+    return status_;
+  }
+
+  auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void {
+    status_ = status;
+  }
 }
 }
 
