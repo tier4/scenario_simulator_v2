@@ -146,10 +146,6 @@ auto EgoEntitySimulation::setAutowareStatus() -> void
 
   autoware->set(getCurrentTwist());
 
-  if (not initial_pose_) {
-    initial_pose_ = current_pose;
-  }
-
   autoware->update();
 }
 
@@ -238,18 +234,18 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     relative_position(1) = vehicle_model_ptr_->getY();
     relative_position(2) = 0.0;
     relative_position =
-        quaternion_operation::getRotationMatrix(initial_pose_->orientation) * relative_position;
+        quaternion_operation::getRotationMatrix(initial_pose_.orientation) * relative_position;
 
     geometry_msgs::msg::Pose current_pose;
-    current_pose.position.x = initial_pose_->position.x + relative_position(0);
-    current_pose.position.y = initial_pose_->position.y + relative_position(1);
-    current_pose.position.z = initial_pose_->position.z + relative_position(2);
+    current_pose.position.x = initial_pose_.position.x + relative_position(0);
+    current_pose.position.y = initial_pose_.position.y + relative_position(1);
+    current_pose.position.z = initial_pose_.position.z + relative_position(2);
     current_pose.orientation = [this]() {
       geometry_msgs::msg::Vector3 rpy;
       rpy.x = 0;
       rpy.y = 0;
       rpy.z = vehicle_model_ptr_->getYaw();
-      return initial_pose_->orientation *
+      return initial_pose_.orientation *
              quaternion_operation::convertEulerAngleToQuaternion(rpy);
     }();
 
@@ -267,6 +263,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   }
 
   auto EgoEntitySimulation::getLinearJerk(double step_time) -> double {
+    // FIXME: This seems to be an acceleration, not jerk
     if (previous_linear_velocity_) {
       return (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time;
     } else {
@@ -285,8 +282,9 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     return status_;
   }
 
-  auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void {
+  auto EgoEntitySimulation::setInitialStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void {
     status_ = status;
+    initial_pose_ = status_.pose;
   }
 
   auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void {

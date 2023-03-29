@@ -45,11 +45,6 @@ class EgoEntity : public VehicleEntity
 
   static auto makeAutowareUser(const Configuration &) -> std::unique_ptr<concealer::AutowareUser>;
 
-  static auto makeSimulationModel(
-    const VehicleModelType, const double step_time,
-    const traffic_simulator_msgs::msg::VehicleParameters &)
-    -> const std::shared_ptr<SimModelInterface>;
-
   auto addLaneletPoseToEntityStatus() -> void;
 
   auto setStatusInternal(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;

@@ -293,8 +293,7 @@ auto EgoEntity::setStatusInternal(const traffic_simulator_msgs::msg::EntityStatu
 auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   VehicleEntity::setStatus(status);
-  ego_entity_simulation_.setStatus(status);
-  ego_entity_simulation_.setAutowareStatus();
+  ego_entity_simulation_.setInitialStatus(status);
 }
 
 void EgoEntity::requestSpeedChange(double value, bool)

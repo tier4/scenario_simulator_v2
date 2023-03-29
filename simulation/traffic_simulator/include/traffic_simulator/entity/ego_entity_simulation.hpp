@@ -46,7 +46,7 @@ class EgoEntitySimulation {
 
   std::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 
-  std::optional<geometry_msgs::msg::Pose> initial_pose_;
+  geometry_msgs::msg::Pose initial_pose_;
 
   static auto getVehicleModelType() -> VehicleModelType;
 
@@ -77,7 +77,7 @@ public:
 
   auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
 
-  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+  auto setInitialStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
   auto updateStatus(double time, double step_time) -> void;
 };
