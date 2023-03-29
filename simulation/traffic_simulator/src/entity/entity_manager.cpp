@@ -611,7 +611,7 @@ auto EntityManager::updateNpcLogic(
 }
 
 void EntityManager::update(const double current_time, const double step_time)
-{  
+{
   traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
     "EntityManager::update", configuration.verbose);
   step_time_ = step_time;
