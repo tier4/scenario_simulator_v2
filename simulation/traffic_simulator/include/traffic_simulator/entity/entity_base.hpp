@@ -63,16 +63,16 @@ public:
   /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
 
   // clang-format off
-  DEFINE_GETTER(BoundingBox, traffic_simulator_msgs::msg::BoundingBox, getStatus().bounding_box)
-  DEFINE_GETTER(CurrentAccel, geometry_msgs::msg::Accel, getStatus().action_status.accel)
-  DEFINE_GETTER(CurrentTwist, geometry_msgs::msg::Twist, getStatus().action_status.twist)
-  DEFINE_GETTER(DynamicConstraints, traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
-  DEFINE_GETTER(EntityStatusBeforeUpdate, EntityStatusType, status_before_update_)
-  DEFINE_GETTER(LinearJerk, double, getStatus().action_status.linear_jerk)
-  DEFINE_GETTER(MapPose, geometry_msgs::msg::Pose, getStatus().pose)
-  DEFINE_GETTER(StandStillDuration, double, stand_still_duration_)
-  DEFINE_GETTER(Status, EntityStatusType, status_)
-  DEFINE_GETTER(TraveledDistance, double, traveled_distance_)
+  DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        getStatus().bounding_box)
+  DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       getStatus().action_status.accel)
+  DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       getStatus().action_status.twist)
+  DEFINE_GETTER(DynamicConstraints,       traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
+  DEFINE_GETTER(EntityStatusBeforeUpdate, EntityStatusType,                                status_before_update_)
+  DEFINE_GETTER(LinearJerk,               double,                                          getStatus().action_status.linear_jerk)
+  DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        getStatus().pose)
+  DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
+  DEFINE_GETTER(Status,                   EntityStatusType,                                status_)
+  DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
   // clang-format on
 #undef DEFINE_GETTER
 
@@ -109,6 +109,8 @@ public:
 
   virtual auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
+
+  virtual auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & = 0;
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 

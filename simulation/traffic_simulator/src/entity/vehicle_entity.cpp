@@ -76,6 +76,13 @@ auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg:
   return behavior_plugin_ptr_->getBehaviorParameter();
 }
 
+auto VehicleEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
+{
+  static traffic_simulator_msgs::msg::EntityType type;
+  type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
+  return type;
+}
+
 auto VehicleEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "VehicleEntity";

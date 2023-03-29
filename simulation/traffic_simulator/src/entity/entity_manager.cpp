@@ -449,7 +449,7 @@ auto EntityManager::getWaypoints(const std::string & name)
 bool EntityManager::isEgo(const std::string & name) const
 {
   using traffic_simulator_msgs::msg::EntityType;
-  return static_cast<EntityStatusType>(getEntityStatus(name)).type.type == EntityType::EGO and
+  return getEntityType(name).type == EntityType::EGO and
          dynamic_cast<EgoEntity const *>(entities_.at(name).get());
 }
 

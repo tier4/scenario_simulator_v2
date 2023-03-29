@@ -194,8 +194,8 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
   EntityStatusType status;
   {
     status.time = time;
-    status.type = getStatus().type;
-    status.bounding_box = getStatus().bounding_box;
+    status.type = getEntityType();
+    status.bounding_box = getBoundingBox();
     status.pose = getCurrentPose();
     status.action_status.twist = getCurrentTwist();
     status.action_status.accel = [&]() {
@@ -245,6 +245,13 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "EgoEntity";
   return result;
+}
+
+auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
+{
+  static traffic_simulator_msgs::msg::EntityType type;
+  type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+  return type;
 }
 
 auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
