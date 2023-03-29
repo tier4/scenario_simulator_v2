@@ -68,7 +68,7 @@ public:
 
   explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double);
 
-  auto onUpdate(double step_time, bool npc_logic_started) -> void;
+  auto onUpdate(double time, double step_time, bool npc_logic_started) -> void;
 
   auto updatePreviousValuesAndUpdateAutoware() -> void;
 
@@ -79,6 +79,8 @@ public:
   auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+
+  auto updateStatus(double time, double step_time) -> void;
 };
 }
 }

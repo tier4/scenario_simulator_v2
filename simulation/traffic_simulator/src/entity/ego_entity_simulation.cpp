@@ -184,7 +184,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
-  void EgoEntitySimulation::onUpdate(double step_time, bool npc_logic_started) {
+  void EgoEntitySimulation::onUpdate(double time, double step_time, bool npc_logic_started) {
     autoware->spinSome();
 
     if (npc_logic_started) {
@@ -217,6 +217,8 @@ void EgoEntitySimulation::requestSpeedChange(double value)
       vehicle_model_ptr_->setInput(input);
       vehicle_model_ptr_->update(step_time);
     }
+
+    updateStatus(time, step_time);
  }
 
   auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
@@ -283,6 +285,19 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   }
 
   auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void {
+    status_ = status;
+  }
+
+  auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void {
+    traffic_simulator_msgs::msg::EntityStatus status;
+    status.time = time;
+    status.type = status_.type;
+    status.bounding_box = status_.bounding_box;
+    status.pose = getCurrentPose();
+    status.action_status.twist = getCurrentTwist();
+    status.action_status.accel = getCurrentAccel(step_time);
+    status.action_status.linear_jerk = getLinearJerk(step_time);
+
     status_ = status;
   }
 }

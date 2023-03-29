@@ -104,46 +104,38 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
   return parameter;
 }
 
-auto EgoEntity::getEntityStatus(const double time, const double step_time) const
+auto EgoEntity::getEntityStatus() const
   -> const traffic_simulator_msgs::msg::EntityStatus
 {
-  traffic_simulator_msgs::msg::EntityStatus status;
-  {
-    status.time = time;
-    status.type = ego_entity_simulation_.getStatus().type;
-    status.bounding_box = ego_entity_simulation_.getStatus().bounding_box;
-    status.pose = getCurrentPose();
-    status.action_status.twist = getCurrentTwist();
-    status.action_status.accel = ego_entity_simulation_.getCurrentAccel(step_time);
+  traffic_simulator_msgs::msg::EntityStatus status = ego_entity_simulation_.getStatus();
 
-    const auto unique_route_lanelets =
-      traffic_simulator::helper::getUniqueValues(getRouteLanelets());
+  const auto unique_route_lanelets =
+    traffic_simulator::helper::getUniqueValues(getRouteLanelets());
 
-    boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
-    if (unique_route_lanelets.empty()) {
+  if (unique_route_lanelets.empty()) {
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
+  } else {
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+    if (!lanelet_pose) {
       lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
-    } else {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
-      if (!lanelet_pose) {
-        lanelet_pose =
-          hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
-      }
     }
+  }
 
-    if (lanelet_pose) {
-      math::geometry::CatmullRomSpline spline(
-        hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
-      if (const auto s_value = spline.getSValue(status.pose)) {
-        status.pose.position.z = spline.getPoint(s_value.get()).z;
-      }
+  if (lanelet_pose) {
+    math::geometry::CatmullRomSpline spline(
+      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+    if (const auto s_value = spline.getSValue(status.pose)) {
+      status.pose.position.z = spline.getPoint(s_value.get()).z;
     }
+  }
 
-    status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-    if (status.lanelet_pose_valid) {
-      status.lanelet_pose = lanelet_pose.get();
-    }
+  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
+  if (status.lanelet_pose_valid) {
+    status.lanelet_pose = lanelet_pose.get();
   }
 
   return status;
@@ -196,10 +188,9 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   EntityBase::onUpdate(current_time, step_time);
 
-  ego_entity_simulation_.onUpdate(step_time, npc_logic_started_);
+  ego_entity_simulation_.onUpdate(current_time, step_time, npc_logic_started_);
 
-  auto entity_status = getEntityStatus(current_time, step_time);
-  entity_status.action_status.linear_jerk = ego_entity_simulation_.getLinearJerk(step_time);
+  auto entity_status = getEntityStatus();
   setStatus(entity_status);
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
