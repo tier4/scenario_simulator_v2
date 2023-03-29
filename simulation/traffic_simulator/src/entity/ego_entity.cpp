@@ -183,12 +183,12 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
+  ego_entity_simulation_.onUpdate(current_time, step_time, npc_logic_started_);
+
   autoware_user->rethrow();
   autoware_user->spinSome();
 
   EntityBase::onUpdate(current_time, step_time);
-
-  ego_entity_simulation_.onUpdate(current_time, step_time, npc_logic_started_);
 
   setStatus(getEntityStatusAndFillLaneletPose());
   updateStandStillDuration(step_time);
