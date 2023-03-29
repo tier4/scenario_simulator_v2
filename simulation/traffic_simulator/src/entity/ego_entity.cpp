@@ -104,7 +104,7 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
   return parameter;
 }
 
-auto EgoEntity::getEntityStatus() const
+auto EgoEntity::getEntityStatusAndFillLaneletPose() const
   -> const traffic_simulator_msgs::msg::EntityStatus
 {
   traffic_simulator_msgs::msg::EntityStatus status = ego_entity_simulation_.getStatus();
@@ -168,7 +168,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 
 auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
 {
-  return ego_entity_simulation_.getCurrentPose();
+  return ego_entity_simulation_.getStatus().pose;
 }
 
 auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
@@ -190,8 +190,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   ego_entity_simulation_.onUpdate(current_time, step_time, npc_logic_started_);
 
-  auto entity_status = getEntityStatus();
-  setStatus(entity_status);
+  setStatus(getEntityStatusAndFillLaneletPose());
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 

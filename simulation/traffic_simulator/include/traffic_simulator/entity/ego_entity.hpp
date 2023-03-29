@@ -50,7 +50,7 @@ class EgoEntity : public VehicleEntity
     const traffic_simulator_msgs::msg::VehicleParameters &)
     -> const std::shared_ptr<SimModelInterface>;
 
-  auto getEntityStatus() const
+  auto getEntityStatusAndFillLaneletPose() const
   -> const traffic_simulator_msgs::msg::EntityStatus;
 
 public:
