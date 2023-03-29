@@ -67,7 +67,7 @@ class EgoEntitySimulation {
 
   auto updatePreviousValuesAndUpdateAutoware() -> void;
 public:
-  auto setAutowareStatus(const traffic_simulator_msgs::msg::EntityStatus& status) -> void;
+  auto setAutowareStatus() -> void;
 
   explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double);
 

@@ -132,9 +132,9 @@ auto EgoEntitySimulation::makeSimulationModel(
   }
 }
 
-auto EgoEntitySimulation::setAutowareStatus(const traffic_simulator_msgs::msg::EntityStatus& status) -> void
+auto EgoEntitySimulation::setAutowareStatus() -> void
 {
-  const auto current_pose = status.pose;
+  const auto current_pose = status_.pose;
 
   autoware->set([this]() {
     geometry_msgs::msg::Accel message;
