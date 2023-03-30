@@ -79,7 +79,7 @@ std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame() c
 {
   std::vector<geometry_msgs::msg::Pose> ret;
   for (const auto & lanelet_pose : waypoint_queue_) {
-    ret.emplace_back(hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(lanelet_pose)).pose);
+    ret.emplace_back(static_cast<geometry_msgs::msg::Pose>(lanelet_pose));
   }
   return ret;
 }

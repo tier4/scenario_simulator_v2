@@ -263,7 +263,7 @@ bool API::updateEntityStatusInSim()
       *req.mutable_vehicle_command());
     req.set_ego_entity_status_before_update_is_empty(false);
     simulation_interface::toProto(
-      getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName()),
+      static_cast<EntityStatusType>(getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName())),
       *req.mutable_ego_entity_status_before_update());
   }
   for (const auto & name : entity_manager_ptr_->getEntityNames()) {

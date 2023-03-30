@@ -32,7 +32,7 @@ EntityBase::EntityBase(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
-  status_(static_cast<EntityStatusType>(entity_status)),
+  status_(entity_status),
   status_before_update_(status_),
   hdmap_utils_ptr_(hdmap_utils_ptr),
   npc_logic_started_(false)
@@ -191,16 +191,16 @@ auto EntityBase::getLaneletPose() const -> boost::optional<CanonicalizedLaneletP
 auto EntityBase::getLaneletPose(double matching_distance) const
   -> boost::optional<CanonicalizedLaneletPoseType>
 {
-  if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getStatus().type.type) {
+  if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getEntityType().type) {
     if (
-      const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        getMapPose(), getStatus().bounding_box, true, matching_distance)) {
+      const auto lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), true, matching_distance)) {
       return CanonicalizedLaneletPoseType(lanelet_pose.get(), hdmap_utils_ptr_);
     }
   } else {
     if (
-      const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        getMapPose(), getStatus().bounding_box, false, matching_distance)) {
+      const auto lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), false, matching_distance)) {
       return CanonicalizedLaneletPoseType(lanelet_pose.get(), hdmap_utils_ptr_);
     }
   }
@@ -262,25 +262,27 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::Constraint & constraint)
 {
   std::int64_t reference_lanelet_id = 0;
-  if (target.entity_name == name) {
-    if (!laneMatchingSucceed()) {
+  const auto lanelet_pose = getLaneletPose();
+  if (lanelet_pose && target.entity_name == name) {
+    if (!lanelet_pose) {
       THROW_SEMANTIC_ERROR(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");
     }
-    reference_lanelet_id = getStatus().lanelet_pose.lanelet_id;
+    reference_lanelet_id = static_cast<LaneletPoseType>(lanelet_pose.get()).lanelet_id;
   } else {
     if (other_status_.find(target.entity_name) == other_status_.end()) {
       THROW_SEMANTIC_ERROR(
         "Target entity : ", target.entity_name, " does not exist. Please check ",
         target.entity_name, " exists.");
     }
-    if (!other_status_.at(target.entity_name).lanelet_pose_valid) {
+    if (!other_status_.at(target.entity_name).laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");
     }
-    reference_lanelet_id = other_status_.at(target.entity_name).lanelet_pose.lanelet_id;
+    reference_lanelet_id =
+      static_cast<EntityStatusType>(other_status_.at(target.entity_name)).lanelet_pose.lanelet_id;
   }
   const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
     reference_lanelet_id, target.direction, target.shift);
@@ -630,7 +632,8 @@ void EntityBase::setEntityTypeList(
   entity_type_list_ = entity_type_list;
 }
 
-void EntityBase::setOtherStatus(const std::unordered_map<std::string, EntityStatusType> & status)
+void EntityBase::setOtherStatus(
+  const std::unordered_map<std::string, CanonicalizedEntityStatusType> & status)
 {
   other_status_.clear();
 
@@ -664,24 +667,23 @@ auto EntityBase::setStatus(const CanonicalizedEntityStatusType & status) -> void
      for the lack of set status.
   */
   new_status.name = name;
-  new_status.type = status_.type;
-  new_status.subtype = status_.subtype;
+  new_status.type = getEntityType();
+  new_status.subtype = getEntitySubtype();
   new_status.bounding_box = getBoundingBox();
   new_status.action_status.current_action = getCurrentAction();
-
-  status_ = new_status;
+  status_ = CanonicalizedEntityStatusType(new_status, hdmap_utils_ptr_);
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
-  auto status = getStatus();
+  auto status = static_cast<EntityStatusType>(getStatus());
   status.action_status.twist.linear.x = linear_velocity;
   setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 {
-  auto status = getStatus();
+  auto status = static_cast<EntityStatusType>(getStatus());
   status.action_status.accel.linear.x = linear_acceleration;
   setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
 }
@@ -698,25 +700,28 @@ void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
 void EntityBase::stopAtEndOfRoad()
 {
-  status_.action_status.twist = geometry_msgs::msg::Twist();
-  status_.action_status.accel = geometry_msgs::msg::Accel();
-  status_.action_status.linear_jerk = 0;
+  auto status = static_cast<EntityStatusType>(getStatus());
+  status.action_status.twist = geometry_msgs::msg::Twist();
+  status.action_status.accel = geometry_msgs::msg::Accel();
+  status.action_status.linear_jerk = 0;
+  setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
-  status_.time = current_time;
+  auto status = static_cast<EntityStatusType>(getStatus());
+  status.time = current_time;
+  setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::updateStandStillDuration(const double step_time) -> double
 {
   if (
     npc_logic_started_ and
-    std::abs(status_.action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
+    std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
     return stand_still_duration_ += step_time;
-  } else {
-    return stand_still_duration_ = 0.0;
   }
+  return stand_still_duration_ = 0.0;
 }
 
 auto EntityBase::updateTraveledDistance(const double step_time) -> double

@@ -144,7 +144,7 @@ auto EntityManager::getEntityStatus(const std::string & name) const -> Canonical
   if (const auto iter = entities_.find(name); iter == entities_.end()) {
     THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   } else {
-    auto entity_status = iter->second->getStatus();
+    auto entity_status = static_cast<EntityStatusType>(iter->second->getStatus());
     entity_status.action_status.current_action = getCurrentAction(name);
     entity_status.time = current_time_;
     return CanonicalizedEntityStatusType(entity_status, hdmap_utils_ptr_);
@@ -156,7 +156,7 @@ auto EntityManager::getEntityTypeList() const
 {
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> ret;
   for (auto && [name, entity] : entities_) {
-    ret.emplace(name, entity->getStatus().type);
+    ret.emplace(name, getEntityType(name));
   }
   return ret;
 }
@@ -277,16 +277,16 @@ auto EntityManager::getLongitudinalDistance(
     * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
     */
     auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
-      hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(from)).pose,
-      static_cast<LaneletPoseType>(from).lanelet_id, 5.0, include_opposite_direction);
+      static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPoseType>(from).lanelet_id,
+      5.0, include_opposite_direction);
     from_poses.emplace_back(from);
     /**
     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function. 
     * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
     */
     auto to_poses = hdmap_utils_ptr_->toLaneletPoses(
-      hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(to)).pose,
-      static_cast<LaneletPoseType>(to).lanelet_id, 5.0, include_opposite_direction);
+      static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPoseType>(to).lanelet_id, 5.0,
+      include_opposite_direction);
     to_poses.emplace_back(to);
     std::vector<double> distances = {};
     for (const auto & from_pose : from_poses) {
@@ -511,8 +511,7 @@ bool EntityManager::reachPosition(
   const std::string & name, const CanonicalizedLaneletPoseType & lanelet_pose,
   const double tolerance) const
 {
-  return reachPosition(
-    name, hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(lanelet_pose)).pose, tolerance);
+  return reachPosition(name, static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
 }
 
 void EntityManager::requestLaneChange(
@@ -594,13 +593,13 @@ void EntityManager::setVerbose(const bool verbose)
 auto EntityManager::toMapPose(const CanonicalizedLaneletPoseType & lanelet_pose) const
   -> const geometry_msgs::msg::Pose
 {
-  return hdmap_utils_ptr_->toMapPose(static_cast<LaneletPoseType>(lanelet_pose)).pose;
+  return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 }
 
 auto EntityManager::updateNpcLogic(
   const std::string & name,
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
-  -> EntityStatusType
+  -> const CanonicalizedEntityStatusType &
 {
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
@@ -621,7 +620,7 @@ void EntityManager::update(const double current_time, const double step_time)
     traffic_light_manager_ptr_->update(step_time_);
   }
   auto type_list = getEntityTypeList();
-  std::unordered_map<std::string, EntityStatusType> all_status;
+  std::unordered_map<std::string, CanonicalizedEntityStatusType> all_status;
   for (auto && [name, entity] : entities_) {
     all_status.emplace(name, entity->getStatus());
   }
@@ -648,7 +647,7 @@ void EntityManager::update(const double current_time, const double step_time)
     } else {
       status_with_trajectory.obstacle_find = false;
     }
-    status_with_trajectory.status = status;
+    status_with_trajectory.status = static_cast<EntityStatusType>(status);
     status_with_trajectory.name = name;
     status_with_trajectory.time = current_time + step_time;
     status_array_msg.data.emplace_back(status_with_trajectory);

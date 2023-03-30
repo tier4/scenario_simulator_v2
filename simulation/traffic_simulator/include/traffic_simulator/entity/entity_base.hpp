@@ -63,15 +63,16 @@ public:
   /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
 
   // clang-format off
-  DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        getStatus().bounding_box)
-  DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       getStatus().action_status.accel)
-  DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       getStatus().action_status.twist)
+  DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        static_cast<EntityStatusType>(getStatus()).bounding_box)
+  DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       static_cast<EntityStatusType>(getStatus()).action_status.accel)
+  DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       static_cast<EntityStatusType>(getStatus()).action_status.twist)
   DEFINE_GETTER(DynamicConstraints,       traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
-  DEFINE_GETTER(EntityStatusBeforeUpdate, EntityStatusType,                                status_before_update_)
-  DEFINE_GETTER(LinearJerk,               double,                                          getStatus().action_status.linear_jerk)
-  DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        getStatus().pose)
+  DEFINE_GETTER(EntityStatusBeforeUpdate, const CanonicalizedEntityStatusType &,           status_before_update_)
+  DEFINE_GETTER(EntitySubtype,            traffic_simulator_msgs::msg::EntitySubtype,      static_cast<EntityStatusType>(getStatus()).subtype)
+  DEFINE_GETTER(LinearJerk,               double,                                          static_cast<EntityStatusType>(getStatus()).action_status.linear_jerk)
+  DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        static_cast<EntityStatusType>(getStatus()).pose)
   DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
-  DEFINE_GETTER(Status,                   EntityStatusType,                                status_)
+  DEFINE_GETTER(Status,                   const CanonicalizedEntityStatusType &,           status_)
   DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
   // clang-format on
 #undef DEFINE_GETTER
@@ -80,7 +81,8 @@ public:
   /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
 
   DEFINE_CHECK_FUNCTION(isNpcLogicStarted, npc_logic_started_)
-  DEFINE_CHECK_FUNCTION(laneMatchingSucceed, getStatus().lanelet_pose_valid)
+  DEFINE_CHECK_FUNCTION(
+    laneMatchingSucceed, static_cast<EntityStatusType>(getStatus()).lanelet_pose_valid)
 #undef DEFINE_CHECK_FUNCTION
 
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
@@ -184,7 +186,8 @@ public:
   /*   */ void setEntityTypeList(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);
 
-  /*   */ void setOtherStatus(const std::unordered_map<std::string, EntityStatusType> &);
+  /*   */ void setOtherStatus(
+    const std::unordered_map<std::string, CanonicalizedEntityStatusType> &);
 
   virtual auto setStatus(const CanonicalizedEntityStatusType &) -> void;
 
@@ -212,9 +215,9 @@ public:
   bool verbose;
 
 protected:
-  EntityStatusType status_;
+  CanonicalizedEntityStatusType status_;
 
-  EntityStatusType status_before_update_;
+  CanonicalizedEntityStatusType status_before_update_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
@@ -223,7 +226,7 @@ protected:
   double stand_still_duration_ = 0.0;
   double traveled_distance_ = 0.0;
 
-  std::unordered_map<std::string, EntityStatusType> other_status_;
+  std::unordered_map<std::string, CanonicalizedEntityStatusType> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
   boost::optional<double> target_speed_;

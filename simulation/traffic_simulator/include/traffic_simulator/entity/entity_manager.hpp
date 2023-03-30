@@ -263,7 +263,7 @@ public:
   auto updateNpcLogic(
     const std::string & name,
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
-    -> EntityStatusType;
+    -> const CanonicalizedEntityStatusType &;
 
   void broadcastEntityTransform();
 
@@ -412,11 +412,12 @@ public:
 
       entity_status.time = getCurrentTime();
 
-      entity_status.name = parameters.name;
+      entity_status.name = name;
 
       entity_status.bounding_box = parameters.bounding_box;
 
       entity_status.action_status = traffic_simulator_msgs::msg::ActionStatus();
+      entity_status.action_status.current_action = "waiting for initialize";
 
       if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPoseType>) {
         entity_status.pose = toMapPose(pose);

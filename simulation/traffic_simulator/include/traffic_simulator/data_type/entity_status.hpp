@@ -22,6 +22,8 @@
 
 namespace traffic_simulator
 {
+using EntityStatusType = traffic_simulator_msgs::msg::EntityStatus;
+
 namespace entity_status
 {
 class CanonicalizedEntityStatusType
@@ -30,22 +32,33 @@ public:
   explicit CanonicalizedEntityStatusType(
     const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
+  explicit CanonicalizedEntityStatusType(const CanonicalizedEntityStatusType & obj);
   explicit operator traffic_simulator_msgs::msg::EntityStatus() const noexcept
   {
     return entity_status_;
+  }
+  explicit operator traffic_simulator_msgs::msg::LaneletPose() const
+  {
+    if (!laneMatchingSucceed()) {
+      THROW_SEMANTIC_ERROR("Target entity statu did not matched to lanelet pose.");
+    }
+    return entity_status_.lanelet_pose;
+  }
+  CanonicalizedEntityStatusType & operator=(const CanonicalizedEntityStatusType & obj)
+  {
+    this->entity_status_ = obj.entity_status_;
+    return *this;
   }
   bool laneMatchingSucceed() const noexcept { return entity_status_.lanelet_pose_valid; }
 
 private:
   auto canonicalize(
-    const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-    -> traffic_simulator_msgs::msg::EntityStatus;
-  const traffic_simulator_msgs::msg::EntityStatus entity_status_;
+    const EntityStatusType & may_non_canonicalized_entity_status,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> EntityStatusType;
+  EntityStatusType entity_status_;
 };
 }  // namespace entity_status
 
-using EntityStatusType = traffic_simulator_msgs::msg::EntityStatus;
 using CanonicalizedEntityStatusType = entity_status::CanonicalizedEntityStatusType;
 
 }  // namespace traffic_simulator

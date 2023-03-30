@@ -6,14 +6,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(traffic_simulator REQUIRED)
-find_package(behaviortree_cpp_v3 REQUIRED)
-find_package(pluginlib REQUIRED)
-find_package(quaternion_operation REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
 
-add_library(behavior_tree_plugin SHARED
+ament_auto_find_build_dependencies()
+
+ament_auto_add_library(behavior_tree_plugin SHARED
   src/action_node.cpp
   src/pedestrian/behavior_tree.cpp
   src/pedestrian/follow_lane_action.cpp
@@ -34,12 +31,6 @@ add_library(behavior_tree_plugin SHARED
   src/vehicle/vehicle_action_node.cpp
 )
 
-target_include_directories(
-  behavior_tree_plugin
-  PRIVATE
-  include
-)
-
 # workaround to allow deprecated header to build on both galactic and humble
 if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
   target_compile_definitions(behavior_tree_plugin PUBLIC
@@ -47,34 +38,12 @@ if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
   )
 endif()
 
-ament_target_dependencies(behavior_tree_plugin
-  rclcpp
-  traffic_simulator
-  behaviortree_cpp_v3
-  pluginlib
-  quaternion_operation
-)
-
 pluginlib_export_plugin_description_file(traffic_simulator plugins.xml)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
-
-ament_export_include_directories(
-  include
-)
-ament_export_libraries(
-  behavior_tree_plugin
-)
-ament_export_dependencies(behavior_tree_plugin
-  rclcpp
-  traffic_simulator
-  behaviortree_cpp_v3
-  pluginlib
-  quaternion_operation
-)
 
 install(
   TARGETS behavior_tree_plugin
@@ -85,4 +54,4 @@ install(
   DIRECTORY config
   DESTINATION share/${PROJECT_NAME})
 
-  ament_package()
+ament_auto_package()

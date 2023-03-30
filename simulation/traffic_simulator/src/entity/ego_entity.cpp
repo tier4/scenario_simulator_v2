@@ -214,13 +214,11 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     boost::optional<LaneletPoseType> lanelet_pose;
 
     if (unique_route_lanelets.empty()) {
-      lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
     } else {
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
       if (!lanelet_pose) {
-        lanelet_pose =
-          hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
+        lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
       }
     }
 
@@ -400,7 +398,7 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 
   if (not autoware->initialized()) {
-    autoware->initialize(getStatus().pose);
+    autoware->initialize(getMapPose());
     autoware->plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
@@ -455,7 +453,7 @@ auto EgoEntity::setStatus(const CanonicalizedEntityStatusType & status) -> void
 {
   VehicleEntity::setStatus(status);
 
-  const auto current_pose = getStatus().pose;
+  const auto current_pose = getMapPose();
 
   if (autoware->initialized()) {
     autoware->set([this]() {

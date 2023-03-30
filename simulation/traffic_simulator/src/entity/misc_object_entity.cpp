@@ -28,10 +28,13 @@ MiscObjectEntity::MiscObjectEntity(
 
 void MiscObjectEntity::onUpdate(double, double)
 {
-  status_.action_status.accel = geometry_msgs::msg::Accel();
-  status_.action_status.twist = geometry_msgs::msg::Twist();
-  status_.action_status.current_action = "static";
-  status_before_update_ = status_;
+  auto status = static_cast<EntityStatusType>(status_);
+  status.action_status.twist = geometry_msgs::msg::Twist();
+  status.action_status.accel = geometry_msgs::msg::Accel();
+  status.action_status.linear_jerk = 0;
+  status.action_status.current_action = "static";
+  status_ = CanonicalizedEntityStatusType(status, hdmap_utils_ptr_);
+  status_before_update_ = CanonicalizedEntityStatusType(status, hdmap_utils_ptr_);
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string
@@ -39,7 +42,7 @@ auto MiscObjectEntity::getCurrentAction() const -> std::string
   if (not npc_logic_started_) {
     return "waiting";
   } else {
-    return status_.action_status.current_action;
+    return static_cast<EntityStatusType>(status_).action_status.current_action;
   }
 }
 
