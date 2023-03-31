@@ -28,9 +28,10 @@ DomeImage::DomeImage(const pugi::xml_node & node, Scope & scope)
 {
   // Valid range ref:
   // https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/DomeImage.html
-  auto azimuth_offset_valid =
-    0 <= azimuth_offset and azimuth_offset <= boost::math::constants::pi<double>();
-  if (!azimuth_offset_valid) {
+
+  if (auto azimuth_offset_valid =
+        0 <= azimuth_offset and azimuth_offset <= boost::math::constants::pi<double>();
+      not azimuth_offset_valid) {
     THROW_SYNTAX_ERROR(std::quoted("DomeImage::azimuthOffset"), "is out of range [0..2*PI]");
   }
 }

@@ -32,17 +32,19 @@ Weather::Weather(const pugi::xml_node & node, Scope & scope)
   wind(readElement<std::optional<Wind>>("Wind", node, scope)),
   dome_image(readElement<std::optional<DomeImage>>("DomeImage", node, scope))
 {
+  // Valid range ref:
+  // https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Weather.html
+
   // [80000...120000]
-  auto atmospheric_pressure_valid =
-    80000 <= atmospheric_pressure and atmospheric_pressure <= 120000;
-  if (!atmospheric_pressure_valid) {
+  if (auto atmospheric_pressure_valid =
+        80000 <= atmospheric_pressure and atmospheric_pressure <= 120000;
+      not atmospheric_pressure_valid) {
     THROW_SYNTAX_ERROR(
       std::quoted("Weather::atmosphericPressure"), "is out of range [80000...120000]");
   }
 
   // [170...340]
-  auto temperature_valid = 170 <= temperature and temperature <= 340;
-  if (!temperature_valid) {
+  if (auto temperature_valid = 170 <= temperature and temperature <= 340; not temperature_valid) {
     THROW_SYNTAX_ERROR(std::quoted("Weather::temperature"), "is out of range [170...340]");
   }
 }

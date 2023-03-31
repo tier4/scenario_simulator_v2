@@ -25,12 +25,16 @@ Wind::Wind(const pugi::xml_node & node, Scope & scope)
 : direction(readAttribute<Double>("direction", node, scope)),
   speed(readAttribute<Double>("speed", node, scope))
 {
-  auto direction_valid = 0 <= direction and direction <= 2 * boost::math::constants::pi<double>();
-  if (!direction_valid) {
+  // Valid range ref:
+  // https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Wind.html
+
+  if (auto direction_valid =
+        0 <= direction and direction <= 2 * boost::math::constants::pi<double>();
+      not direction_valid) {
     THROW_SYNTAX_ERROR(std::quoted("Wind::direction"), "is out of range [0...2 pi[");
   }
-  auto speed_valid = 0 <= speed;
-  if (!speed_valid) {
+
+  if (auto speed_valid = 0 <= speed; not speed_valid) {
     THROW_SYNTAX_ERROR(std::quoted("Wind::speed"), "is out of range [0...inf[");
   }
 }
