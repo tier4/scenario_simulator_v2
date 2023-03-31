@@ -47,7 +47,7 @@ struct Sun
   const Double
     elevation;  // Solar elevation angle, 0=x/y plane, PI/2=zenith. Unit: [rad]. Range: [-PI..PI].
 
-  const Double illuminance;  //	Illuminance of the sun, direct sunlight is around 100,000 lx. Unit:
+  const Double illuminance;  // Illuminance of the sun, direct sunlight is around 100,000 lx. Unit:
                              // [lx]. Range: [0..inf[. Default if missing: 0.
 
   const Double intensity;  // DEPRECATED: Illuminance of the sun, direct sunlight is around 100,000

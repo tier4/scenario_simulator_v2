@@ -41,7 +41,7 @@ struct DomeImage
                                 // left and right borders of the image are aligned with the y-axis
                                 // of the world coordinate system. Default if omitted: 0.
 
-  const File dome_file;  //	Filepath to the dome file.
+  const File dome_file;  // Filepath to the dome file.
 
   DomeImage() = default;
 

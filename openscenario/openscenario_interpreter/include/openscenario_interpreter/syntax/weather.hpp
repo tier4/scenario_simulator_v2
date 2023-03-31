@@ -69,19 +69,19 @@ struct Weather
     temperature;  // Definition of the cloud state, i.e. cloud state and sky visualization settings.
 
   const std::optional<FractionalCloudCover>
-    fractional_cloud_cover;      //	Definition of cloud states using the
+    fractional_cloud_cover;      // Definition of cloud states using the
                                  // fractional cloud cover in oktas.
   const std::optional<Sun> sun;  // Definition of the sun, i.e. position and intensity.
 
-  const std::optional<Fog> fog;  //	Definition of fog, i.e. visual range and bounding box.
+  const std::optional<Fog> fog;  // Definition of fog, i.e. visual range and bounding box.
 
-  const std::optional<Precipitation> precipitation;  //	Definition of precipitation, i.e. type and
+  const std::optional<Precipitation> precipitation;  // Definition of precipitation, i.e. type and
   // intensity.
 
-  const std::optional<Wind> wind;  // 	Definition of the wind: direction and speed.
+  const std::optional<Wind> wind;  // Definition of the wind: direction and speed.
 
   const std::optional<DomeImage>
-    dome_image;  // 	Image reference to represent the sky. Mutually exclusive
+    dome_image;  // Image reference to represent the sky. Mutually exclusive
                  // with "fractionalCloudCover". If the image also contains lighting
                  // information (HDRi) it is also mutually exclusive with "sun".
 
