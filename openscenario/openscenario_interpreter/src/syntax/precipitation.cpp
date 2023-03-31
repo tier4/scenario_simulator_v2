@@ -21,8 +21,8 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Precipitation::Precipitation(const pugi::xml_node & node, Scope & scope)
-: intensity(readAttribute<Double>("intensity", node, scope)),
-  precipitation_intensity(readAttribute<Double>("precipitationIntensity", node, scope)),
+: intensity(readAttribute<Double>("intensity", node, scope, 0)),
+  precipitation_intensity(readAttribute<Double>("precipitationIntensity", node, scope, 0)),
   precipitation_type(readAttribute<PrecipitationType>("precipitationType", node, scope))
 {
   // Valid range ref:

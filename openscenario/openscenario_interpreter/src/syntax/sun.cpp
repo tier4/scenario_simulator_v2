@@ -25,7 +25,7 @@ Sun::Sun(const pugi::xml_node & node, Scope & scope)
 : azimuth(readAttribute<Double>("azimuth", node, scope)),
   elevation(readAttribute<Double>("elevation", node, scope)),
   illuminance(readAttribute<Double>("illuminance", node, scope, 0)),
-  intensity(readAttribute<Double>("intensity", node, scope))
+  intensity(readAttribute<Double>("intensity", node, scope, 0))
 {
   // Valid range ref:
   // https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Sun.html
