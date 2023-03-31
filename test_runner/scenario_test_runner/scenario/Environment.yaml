@@ -28,7 +28,7 @@ OpenSCENARIO:
               Weather:
                 atmosphericPressure: 80000
                 fractionalCloudCover: threeOktas
-                temprature: 10
+                temperature: 10
                 Sun:
                   azimuth: 0.0
                   elevation: 0.0
