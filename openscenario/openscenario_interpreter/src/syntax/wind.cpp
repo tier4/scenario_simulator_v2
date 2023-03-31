@@ -27,11 +27,11 @@ Wind::Wind(const pugi::xml_node & node, Scope & scope)
 {
   auto direction_valid = 0 <= direction and direction <= 2 * boost::math::constants::pi<double>();
   if (!direction_valid) {
-    THROW_SYNTAX_ERROR(std::quoted("direction"), "is out of range [0...2 pi[");
+    THROW_SYNTAX_ERROR(std::quoted("Wind::direction"), "is out of range [0...2 pi[");
   }
   auto speed_valid = 0 <= speed;
   if (!speed_valid) {
-    THROW_SYNTAX_ERROR(std::quoted("speed"), "is out of range [0...inf[");
+    THROW_SYNTAX_ERROR(std::quoted("Wind::speed"), "is out of range [0...inf[");
   }
 }
 }  // namespace syntax

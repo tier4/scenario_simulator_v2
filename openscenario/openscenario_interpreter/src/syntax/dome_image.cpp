@@ -31,7 +31,7 @@ DomeImage::DomeImage(const pugi::xml_node & node, Scope & scope)
   auto azimuth_offset_valid =
     0 <= azimuth_offset and azimuth_offset <= boost::math::constants::pi<double>();
   if (!azimuth_offset_valid) {
-    THROW_SYNTAX_ERROR(std::quoted("azimuthOffset"), "is out of range [0..2*PI]");
+    THROW_SYNTAX_ERROR(std::quoted("DomeImage::azimuthOffset"), "is out of range [0..2*PI]");
   }
 }
 }  // namespace syntax

@@ -31,23 +31,23 @@ Sun::Sun(const pugi::xml_node & node, Scope & scope)
   // https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Sun.html
   auto azimuth_valid = 0 <= azimuth and azimuth <= 2 * boost::math::constants::pi<double>();
   if (!azimuth_valid) {
-    THROW_SYNTAX_ERROR(std::quoted("azimuth"), "is out of range [0..2*PI]");
+    THROW_SYNTAX_ERROR(std::quoted("Sun::azimuth"), "is out of range [0..2*PI]");
   }
 
   auto elevation_valid = -boost::math::constants::pi<double>() <= elevation and
                          elevation <= boost::math::constants::pi<double>();
   if (!elevation_valid) {
-    THROW_SYNTAX_ERROR(std::quoted("elevation"), "is out of range [-PI..PI]");
+    THROW_SYNTAX_ERROR(std::quoted("Sun::elevation"), "is out of range [-PI..PI]");
   }
 
   auto illuminance_valid = 0 <= illuminance;
   if (!illuminance_valid) {
-    THROW_SYNTAX_ERROR(std::quoted("illuminance"), "is out of range [0..inf[");
+    THROW_SYNTAX_ERROR(std::quoted("Sun::illuminance"), "is out of range [0..inf[");
   }
 
   auto intensity_valid = 0 <= intensity;
   if (!intensity_valid) {
-    THROW_SYNTAX_ERROR(std::quoted("intensity"), "is out of range [0..inf[");
+    THROW_SYNTAX_ERROR(std::quoted("Sun::intensity"), "is out of range [0..inf[");
   }
 }
 }  // namespace syntax
