@@ -33,9 +33,13 @@ class MultiClient
 {
 public:
   explicit MultiClient(
-    const simulation_interface::TransportProtocol & protocol, const std::string & hostname);
+    const simulation_interface::TransportProtocol & protocol, const std::string & hostname,
+    const unsigned int socket_port);
   ~MultiClient();
   void closeConnection();
+  void call(
+    const simulation_api_schema::SimulationRequest & req,
+    simulation_api_schema::SimulationResponse & res);
   void call(
     const simulation_api_schema::InitializeRequest & req,
     simulation_api_schema::InitializeResponse & res);
@@ -79,18 +83,7 @@ public:
 private:
   zmqpp::context context_;
   const zmqpp::socket_type type_;
-  zmqpp::socket socket_initialize_;
-  zmqpp::socket socket_update_frame_;
-  zmqpp::socket socket_update_sensor_frame_;
-  zmqpp::socket socket_spawn_vehicle_entity_;
-  zmqpp::socket socket_spawn_pedestrian_entity_;
-  zmqpp::socket socket_spawn_misc_object_entity_;
-  zmqpp::socket socket_despawn_entity_;
-  zmqpp::socket socket_update_entity_status_;
-  zmqpp::socket socket_attach_lidar_sensor_;
-  zmqpp::socket socket_attach_detection_sensor_;
-  zmqpp::socket socket_attach_occupancy_grid_sensor_;
-  zmqpp::socket socket_update_traffic_lights_;
+  zmqpp::socket socket_;
 
   bool is_running = true;
 };

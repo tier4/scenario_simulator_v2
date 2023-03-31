@@ -76,10 +76,18 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    zeromq_client_(simulation_interface::protocol, configuration.simulator_host)
+    zeromq_client_(
+      simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
+  }
+
+  template <typename Node>
+  int getZMQSocketPort(Node & node)
+  {
+    if (!node.has_parameter("port")) node.declare_parameter("port", 5555);
+    return node.get_parameter("port").as_int();
   }
 
   void closeZMQConnection() { zeromq_client_.closeConnection(); }
