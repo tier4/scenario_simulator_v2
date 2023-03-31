@@ -21,7 +21,6 @@
 #include <functional>
 #include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
-#include <openscenario_interpreter/type_traits/is_optional.hpp>
 #include <openscenario_interpreter/utility/highlighter.hpp>
 #include <pugixml.hpp>
 #include <regex>
@@ -63,7 +62,8 @@ auto substitute(std::string attribute, Scope & scope)
   };
 
   auto var = [](auto && name, auto && scope) {
-    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
+    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO
+    // parameter.
     if (const auto found = scope.ref(name); found) {
       return boost::lexical_cast<String>(found);
     } else {
@@ -135,7 +135,8 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
     }
   };
 
-  // NOTE: https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
+  // NOTE:
+  // https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
 
   if (const auto & attribute = node.attribute(name.c_str())) {
     // NOTE: `substitute` is TIER IV extension (Non-OpenSCENARIO standard)

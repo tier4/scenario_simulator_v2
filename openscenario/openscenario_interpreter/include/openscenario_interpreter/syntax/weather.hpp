@@ -23,7 +23,6 @@
 #include <openscenario_interpreter/syntax/precipitation.hpp>
 #include <openscenario_interpreter/syntax/sun.hpp>
 #include <openscenario_interpreter/syntax/wind.hpp>
-#include <optional>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -55,32 +54,40 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Weather
 {
-  const std::optional<Double>
-    atmospheric_pressure;  // Reference atmospheric pressure at z=0.0 in world coordinate
-                           // system. Unit: [Pa]. Range: [80000..120000]. The actual
-                           // atmospheric pressure around the entities of the scenario
-                           // has to be calculated depending on their z position. See
-                           // also the Standard Atmosphere as defined in ISO2533.
+  /*
+   * Warn: Model specification(ref) has following statement.
+   * > If one of the conditions is missing it means that it doesn't change.
+   * However, current implementation does not represent that condition is missing.
+   * Instead, conditions are filled with its default state (from default constructor).
+   * This difference may cause unspecified behavior.
+   * TODO: Follow the model specification as described above.
+   *
+   * ref:
+   * https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Weather.html
+   */
+  const Double atmospheric_pressure;  // Reference atmospheric pressure at z=0.0 in world coordinate
+                                      // system. Unit: [Pa]. Range: [80000..120000]. The actual
+                                      // atmospheric pressure around the entities of the scenario
+                                      // has to be calculated depending on their z position. See
+                                      // also the Standard Atmosphere as defined in ISO2533.
 
-  const std::optional<Double>
+  const Double
     temperature;  // Definition of the cloud state, i.e. cloud state and sky visualization settings.
 
-  const std::optional<FractionalCloudCover>
-    fractional_cloud_cover;      // Definition of cloud states using the
-                                 // fractional cloud cover in oktas.
-  const std::optional<Sun> sun;  // Definition of the sun, i.e. position and intensity.
+  const FractionalCloudCover fractional_cloud_cover;  // Definition of cloud states using the
+                                                      // fractional cloud cover in oktas.
+  const Sun sun;  // Definition of the sun, i.e. position and intensity.
 
-  const std::optional<Fog> fog;  // Definition of fog, i.e. visual range and bounding box.
+  const Fog fog;  // Definition of fog, i.e. visual range and bounding box.
 
-  const std::optional<Precipitation> precipitation;  // Definition of precipitation, i.e. type and
+  const Precipitation precipitation;  // Definition of precipitation, i.e. type and
   // intensity.
 
-  const std::optional<Wind> wind;  // Definition of the wind: direction and speed.
+  const Wind wind;  // Definition of the wind: direction and speed.
 
-  const std::optional<DomeImage>
-    dome_image;  // Image reference to represent the sky. Mutually exclusive
-                 // with "fractionalCloudCover". If the image also contains lighting
-                 // information (HDRi) it is also mutually exclusive with "sun".
+  const DomeImage dome_image;  // Image reference to represent the sky. Mutually exclusive
+                               // with "fractionalCloudCover". If the image also contains lighting
+                               // information (HDRi) it is also mutually exclusive with "sun".
 
   Weather() = default;
 

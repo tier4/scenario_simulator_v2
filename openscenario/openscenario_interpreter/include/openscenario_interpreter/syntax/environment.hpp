@@ -20,7 +20,6 @@
 #include <openscenario_interpreter/syntax/road_condition.hpp>
 #include <openscenario_interpreter/syntax/time_of_day.hpp>
 #include <openscenario_interpreter/syntax/weather.hpp>
-#include <optional>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -42,17 +41,29 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Environment : public Scope
 {
+  /*
+   * Warn: Model specification(ref) has following statement.
+   * > If one of the conditions is missing it means that it doesn't change.
+   * However, current implementation does not represent that condition is missing.
+   * Instead, conditions are filled with its default state (from default constructor).
+   * This difference may cause unspecified behavior.
+   * TODO: Follow the model specification as described above.
+   *
+   * ref:
+   * https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Environment.html
+   */
+
   Environment() = default;
 
   explicit Environment(const pugi::xml_node &, Scope &);
 
   const ParameterDeclarations parameter_declarations;
 
-  std::optional<const TimeOfDay> time_of_day;
+  const TimeOfDay time_of_day;
 
-  std::optional<const Weather> weather;
+  const Weather weather;
 
-  std::optional<const RoadCondition> road_condition;
+  const RoadCondition road_condition;
 };
 
 }  // namespace syntax
