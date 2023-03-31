@@ -20,9 +20,7 @@
 #include <limits>
 #include <openscenario_interpreter/iterator/size.hpp>
 #include <openscenario_interpreter/object.hpp>
-#include <openscenario_interpreter/type_traits/is_optional.hpp>
 #include <openscenario_interpreter/type_traits/must_be_default_constructible.hpp>
-#include <optional>
 #include <pugixml.hpp>
 #include <string>
 #include <type_traits>
@@ -77,26 +75,17 @@ template <typename T, typename Scope>
 auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope)
 {
   if (const auto child = parent.child(name.c_str())) {
-    if constexpr (is_optional_v<T>) {
-      return T(std::in_place, child, scope);
-    } else {
-      return T(child, scope);
-    }
+    return T(child, scope);
   } else {
-    if constexpr (is_optional_v<T>) {
-      return T(std::nullopt);
-    } else {
-      /* ---- NOTE ---------------------------------------------------------------
-       *
-       *  If the given XML node does not have a child element (T type) with the
-       *  specified name, it assumes that the T type is an optional element and
-       *  attempts to build a default T type.
-       *
-       * ---------------------------------------------------------------------- */
-
-      return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
-        parent.name(), " requires class ", name, " as element, but there is no declaration"));
-    }
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  If the given XML node does not have a child element (T type) with the
+     *  specified name, it assumes that the T type is an optional element and
+     *  attempts to build a default T type.
+     *
+     * ---------------------------------------------------------------------- */
+    return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
+      parent.name(), " requires class ", name, " as element, but there is no declaration"));
   }
 }
 
