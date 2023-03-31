@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Wind 1.2 -----------------------------------------------------------
+/* ---- DomeImage 1.2 --------------------------------------------------------
  *
  * <xsd:complexType name="DomeImage">
  *   <xsd:sequence>
@@ -36,7 +36,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct DomeImage
 {
-  const Double azimuth_offset;  // 		Offset to north / y-axis of world coordinate system
+  const Double azimuth_offset;  // Offset to north / y-axis of world coordinate system
                                 // (counter-clockwise). Unit: [rad]. Range: [0..2*PI]. 0 means the
                                 // left and right borders of the image are aligned with the y-axis
                                 // of the world coordinate system. Default if omitted: 0.
@@ -44,6 +44,7 @@ struct DomeImage
   const File dome_file;  //	Filepath to the dome file.
 
   DomeImage() = default;
+
   explicit DomeImage(const pugi::xml_node &, Scope &);
 };
 

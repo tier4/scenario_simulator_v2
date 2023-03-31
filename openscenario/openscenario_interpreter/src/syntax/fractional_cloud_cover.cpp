@@ -38,7 +38,6 @@ auto operator>>(std::istream & is, FractionalCloudCover & datum) -> std::istream
   }                                                 \
   static_assert(true, "")
 
-  // 不毛
   BOILERPLATE(zeroOktas);
   BOILERPLATE(oneOktas);
   BOILERPLATE(twoOktas);

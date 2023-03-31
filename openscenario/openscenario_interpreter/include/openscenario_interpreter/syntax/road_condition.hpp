@@ -38,13 +38,14 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct RoadCondition
 {
-  const Double friction_scale_factor;  // 	Friction scale factor. Range: [0..inf[.
+  const Double friction_scale_factor;  // Friction scale factor. Range: [0..inf[.
 
-  const Wetness wetness;  //	Definition of the wetness of the road.
+  const Wetness wetness;  // Definition of the wetness of the road.
 
   const Properties properties;  // Additional properties to describe the road condition.
 
   RoadCondition() = default;
+
   explicit RoadCondition(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax

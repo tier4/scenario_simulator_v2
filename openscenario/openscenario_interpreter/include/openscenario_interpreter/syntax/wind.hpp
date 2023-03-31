@@ -33,14 +33,14 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Wind
 {
-  const Double
-    direction;  // 	The target direction of the wind (not the origin direction) in the
-                // ground/xy-plane of the world coordinate system. Corresponds to the heading/yaw
-                // angle. x-axis-direction is 0 rad. Unit: [rad]. Range: [0..2*PI[.
+  const Double direction;  // The target direction of the wind (not the origin direction) in the
+    // ground/xy-plane of the world coordinate system. Corresponds to the heading/yaw
+    // angle. x-axis-direction is 0 rad. Unit: [rad]. Range: [0..2*PI[.
 
   const Double speed;  // The wind speed. Unit: [m/s]. Range: [0..inf[
 
   Wind() = default;
+
   explicit Wind(const pugi::xml_node &, Scope &);
 };
 

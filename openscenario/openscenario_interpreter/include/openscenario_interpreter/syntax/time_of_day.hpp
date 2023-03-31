@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- TimeOfDay --------------------------------------------------------------
+/* ---- TimeOfDay 1.2 -----------------------------------------------------------
  *
  * <xsd:complexType name="TimeOfDay">
  *   <xsd:attribute name="animation" type="Boolean" use="required"/>

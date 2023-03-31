@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- FractionalCloudCover (OpenSCENARIO 1.2) --------------------------------
+/* ---- FractionalCloudCover 1.2 ----------------------------------------
  *
  * <xsd:simpleType name="FractionalCloudCover">
  *   <xsd:union>

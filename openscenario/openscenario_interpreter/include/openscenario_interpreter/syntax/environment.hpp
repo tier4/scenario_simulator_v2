@@ -42,7 +42,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Environment : public Scope
 {
-  explicit Environment();
+  Environment() = default;
+
   explicit Environment(const pugi::xml_node &, Scope &);
 
   const ParameterDeclarations parameter_declarations;
