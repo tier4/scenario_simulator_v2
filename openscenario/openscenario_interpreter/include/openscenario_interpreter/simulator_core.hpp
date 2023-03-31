@@ -233,10 +233,6 @@ public:
         entity_ref, controller.properties.template get<Double>(
                       "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
-      core->setJerkLimit(
-        entity_ref, controller.properties.template get<Double>(
-                      "maxJerk", std::numeric_limits<Double::value_type>::max()));
-
       core->setBehaviorParameter(entity_ref, [&]() {
         auto message = core->getBehaviorParameter(entity_ref);
         message.see_around = not controller.properties.template get<Boolean>("isBlind");

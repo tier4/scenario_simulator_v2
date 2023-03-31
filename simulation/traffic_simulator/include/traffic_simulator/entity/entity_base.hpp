@@ -197,8 +197,6 @@ public:
 
   virtual auto setVelocityLimit(double) -> void;
 
-  virtual auto setJerkLimit(double) -> void;
-
   virtual void startNpcLogic();
 
   /*   */ void stopAtEndOfRoad();

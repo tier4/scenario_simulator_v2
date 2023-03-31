@@ -767,8 +767,6 @@ void EntityBase::activateOutOfRangeJob(
 
 auto EntityBase::setVelocityLimit(double) -> void {}
 
-auto EntityBase::setJerkLimit(double) -> void {}
-
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
 void EntityBase::stopAtEndOfRoad()
