@@ -32,6 +32,7 @@ Minor Tweaks :oncoming_police_car:
 | OpenSCENARIO `UserDefinedValueCondition` | Remove the message type package `openscenario_msgs` and moved its contents to an external repository `tier4_autoware_msgs`. | `openscenario_interpreter`              | [#874](https://github.com/tier4/scenario_simulator_v2/pull/874) | [yamacir-kit](https://github.com/yamacir-kit) |
 | Legacy parameter distribution            | Fix `openscenario_utility.convert` to not to generate too long filename.                                                    | `openscenario_utility`                  | [#972](https://github.com/tier4/scenario_simulator_v2/pull/972) | [yamacir-kit](https://github.com/yamacir-kit) |
 | OpenSCENARIO `UserDefinedValueCondition` | Support ADAPI interface for minimum-risk-maneuver state with backward compatibility for legacy emergency state              | `openscenario_interpreter`, `concealer` | [#975](https://github.com/tier4/scenario_simulator_v2/pull/975) | [HansRobo](https://github.com/HansRobo)       |
+| Port management                          | Change communication between `traffic_simulator` and `simple_sensor_simulator` from multi-port to single-port.              | `simulation_interface`                  | [#981](https://github.com/tier4/scenario_simulator_v2/pull/981) | [dmoszynski](https://github.com/dmoszynski)   |
 
 ## Version 0.6.7
 
