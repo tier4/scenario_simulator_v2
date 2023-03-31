@@ -40,7 +40,7 @@ public:
   explicit operator traffic_simulator_msgs::msg::LaneletPose() const
   {
     if (!laneMatchingSucceed()) {
-      THROW_SEMANTIC_ERROR("Target entity statu did not matched to lanelet pose.");
+      THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
     }
     return entity_status_.lanelet_pose;
   }
