@@ -20,9 +20,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-// TODO
-Precipitation::Precipitation() : precipitation_type(PrecipitationType::dry) {}
-
 Precipitation::Precipitation(const pugi::xml_node & node, Scope & scope)
 : intensity(readAttribute<Double>("intensity", node, scope)),
   precipitation_intensity(readAttribute<Double>("precipitationIntensity", node, scope)),

@@ -49,7 +49,8 @@ struct Precipitation
 
   const PrecipitationType precipitation_type;
 
-  Precipitation();
+  Precipitation() = default;
+
   explicit Precipitation(const pugi::xml_node &, Scope &);
 };
 
