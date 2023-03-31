@@ -27,7 +27,6 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <type_traits>
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -64,8 +63,7 @@ auto substitute(std::string attribute, Scope & scope)
   };
 
   auto var = [](auto && name, auto && scope) {
-    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO
-    // parameter.
+    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
     if (const auto found = scope.ref(name); found) {
       return boost::lexical_cast<String>(found);
     } else {
@@ -104,14 +102,12 @@ auto substitute(std::string attribute, Scope & scope)
 template <typename T, typename Node, typename Scope>
 auto readAttribute(const std::string & name, const Node & node, const Scope & scope) -> T
 {
-  using TInner = std::conditional_t<is_optional_v<T>, typename T::value_type, T>;
   auto is_openscenario_standard_expression = [](const auto & s) {
     return s.substr(0, 2) == "${" and s.back() == '}';
   };
 
   auto read_openscenario_standard_expression = [&](const auto & s) {
-    return boost::lexical_cast<TInner>(
-      evaluate(std::string(std::begin(s) + 2, std::end(s) - 1), scope));
+    return boost::lexical_cast<T>(evaluate(std::string(std::begin(s) + 2, std::end(s) - 1), scope));
   };
 
   auto is_openscenario_standard_parameter_reference = [](const auto & s) {
@@ -121,7 +117,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
   auto read_openscenario_standard_parameter_reference = [&](const auto & s) {
     // TODO Use `return scope.template ref<T>(s.substr(1));`
     if (auto && object = scope.ref(s.substr(1)); object) {
-      return boost::lexical_cast<TInner>(boost::lexical_cast<String>(object));
+      return boost::lexical_cast<T>(boost::lexical_cast<String>(object));
     } else {
       throw SyntaxError(
         "There is no parameter named ", std::quoted(s.substr(1)), " (Attribute ", std::quoted(name),
@@ -131,16 +127,15 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
 
   auto read_openscenario_standard_literal = [&](const auto & s) {
     try {
-      return boost::lexical_cast<TInner>(s);
+      return boost::lexical_cast<T>(s);
     } catch (const boost::bad_lexical_cast &) {
       throw SyntaxError(
         "Value ", std::quoted(s), " specified for attribute ", std::quoted(name),
-        " is invalid (Is not value of type ", makeTypename(typeid(TInner)), ")");
+        " is invalid (Is not value of type ", makeTypename(typeid(T)), ")");
     }
   };
 
-  // NOTE:
-  // https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
+  // NOTE: https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
 
   if (const auto & attribute = node.attribute(name.c_str())) {
     // NOTE: `substitute` is TIER IV extension (Non-OpenSCENARIO standard)
