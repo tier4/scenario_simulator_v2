@@ -15,13 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
-#include <color_names/color_names.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-
 #include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
-#include <geometry_msgs/msg/point.hpp>
-
+#include <color_names/color_names.hpp>
 #include <cstdint>
+#include <geometry_msgs/msg/point.hpp>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -29,6 +26,7 @@
 #include <regex>
 #include <set>
 #include <stdexcept>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
