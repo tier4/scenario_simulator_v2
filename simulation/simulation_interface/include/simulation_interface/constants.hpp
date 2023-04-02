@@ -29,22 +29,6 @@ std::string enumToString(const HostName & hostname);
 
 const TransportProtocol protocol = TransportProtocol::TCP;
 
-namespace ports
-{
-const unsigned int initialize = 5555;
-const unsigned int update_frame = 5556;
-const unsigned int update_sensor_frame = 5557;
-const unsigned int spawn_vehicle_entity = 5558;
-const unsigned int spawn_pedestrian_entity = 5559;
-const unsigned int spawn_misc_object_entity = 5560;
-const unsigned int despawn_entity = 5561;
-const unsigned int update_entity_status = 5562;
-const unsigned int attach_lidar_sensor = 5563;
-const unsigned int attach_detection_sensor = 5564;
-const unsigned int attach_occupancy_grid_sensor = 5565;
-const unsigned int update_traffic_lights = 5566;
-}  // namespace ports
-
 std::string getEndPoint(
   const TransportProtocol & protocol, const HostName & hostname, const unsigned int & port);
 
