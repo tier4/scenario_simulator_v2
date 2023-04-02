@@ -58,11 +58,11 @@ public:
   virtual auto getGearSign() const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
+    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto getVehicleCommand() const -> std::tuple<
-      autoware_auto_control_msgs::msg::AckermannControlCommand,
-      autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
   auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
 
@@ -70,7 +70,7 @@ public:
 
   auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
 
-  virtual auto rethrow() -> void {};
+  virtual auto rethrow() -> void;
 };
 }  // namespace concealer
 

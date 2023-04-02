@@ -30,13 +30,11 @@ AutowareUniverse::AutowareUniverse()
 {
   using std::chrono_literals::operator""ms;
   // autoware.universe requires localization topics to send data at 50Hz
-  localization_update_timer = rclcpp::create_timer(this, get_clock(), 20ms, [this]() {
-    updateLocalization();
-  });
+  localization_update_timer =
+    rclcpp::create_timer(this, get_clock(), 20ms, [this]() { updateLocalization(); });
   // autoware.universe requires vehicle state topics to send data at 30Hz
-  vehicle_state_update_timer = rclcpp::create_timer(this, get_clock(), 33.33ms, [this]() {
-    updateVehicleState();
-  });
+  vehicle_state_update_timer =
+    rclcpp::create_timer(this, get_clock(), 33.33ms, [this]() { updateVehicleState(); });
 
   localization_and_vehicle_state_update_thread = std::thread([this]() {
     try {
@@ -50,17 +48,17 @@ AutowareUniverse::AutowareUniverse()
   });
 }
 
-AutowareUniverse::~AutowareUniverse() {
-  stopAndJoin();
-}
+AutowareUniverse::~AutowareUniverse() { stopAndJoin(); }
 
-auto AutowareUniverse::rethrow() -> void {
+auto AutowareUniverse::rethrow() -> void
+{
   if (is_thrown.load()) {
     throw thrown;
   }
 }
 
-auto AutowareUniverse::stopAndJoin() -> void {
+auto AutowareUniverse::stopAndJoin() -> void
+{
   is_stop_requested.store(true);
   localization_and_vehicle_state_update_thread.join();
 }
@@ -109,7 +107,8 @@ auto AutowareUniverse::updateLocalization() -> void
   setTransform(current_pose);
 }
 
-auto AutowareUniverse::updateVehicleState() -> void {
+auto AutowareUniverse::updateVehicleState() -> void
+{
   setControlModeReport([this]() {
     ControlModeReport message;
     message.mode = ControlModeReport::AUTONOMOUS;

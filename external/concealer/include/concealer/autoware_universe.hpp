@@ -88,8 +88,8 @@ public:
   auto getGearSign() const -> double override;
 
   auto getVehicleCommand() const -> std::tuple<
-      autoware_auto_control_msgs::msg::AckermannControlCommand,
-      autoware_auto_vehicle_msgs::msg::GearCommand> override;
+    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_auto_vehicle_msgs::msg::GearCommand> override;
 };
 
 }  // namespace concealer
