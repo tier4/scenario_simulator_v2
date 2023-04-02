@@ -22,6 +22,9 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/execute.cpp
   src/task_queue.cpp)
 
+target_link_libraries(${PROJECT_NAME}
+  atomic)
+
 # workaround to allow deprecated header to build on both galactic and humble
 if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
   target_compile_definitions(${PROJECT_NAME} PUBLIC

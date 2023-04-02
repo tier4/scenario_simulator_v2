@@ -84,7 +84,7 @@ auto AutowareUniverse::updateLocalization() -> void
     Acceleration message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "/base_link";
-    message.accel.accel = current_acceleration;
+    message.accel.accel = current_acceleration.load();
     message.accel.covariance.at(6 * 0 + 0) = 0.001;  // linear x
     message.accel.covariance.at(6 * 1 + 1) = 0.001;  // linear y
     message.accel.covariance.at(6 * 2 + 2) = 0.001;  // linear z
@@ -98,13 +98,13 @@ auto AutowareUniverse::updateLocalization() -> void
     Odometry message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "map";
-    message.pose.pose = current_pose;
+    message.pose.pose = current_pose.load();
     message.pose.covariance = {};
-    message.twist.twist = current_twist;
+    message.twist.twist = current_twist.load();
     return message;
   }());
 
-  setTransform(current_pose);
+  setTransform(current_pose.load());
 }
 
 auto AutowareUniverse::updateVehicleState() -> void
@@ -130,12 +130,13 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 
   setVelocityReport([this]() {
+    geometry_msgs::msg::Twist twist = current_twist.load();
     VelocityReport message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "base_link";
-    message.longitudinal_velocity = current_twist.linear.x;
-    message.lateral_velocity = current_twist.linear.y;
-    message.heading_rate = current_twist.angular.z;
+    message.longitudinal_velocity = twist.linear.x;
+    message.lateral_velocity = twist.linear.y;
+    message.heading_rate = twist.angular.z;
     return message;
   }());
 
