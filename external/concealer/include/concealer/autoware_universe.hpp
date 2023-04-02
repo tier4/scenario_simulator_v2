@@ -38,9 +38,9 @@ class AutowareUniverse : public Autoware
   using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
   using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
-  SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
-  SubscriberWrapper<GearCommand> getGearCommandImpl;
-  SubscriberWrapper<TurnIndicatorsCommand> getTurnIndicatorsCommand;
+  SubscriberWrapper<AckermannControlCommand, ThreadSafe> getAckermannControlCommand;
+  SubscriberWrapper<GearCommand, ThreadSafe> getGearCommandImpl;
+  SubscriberWrapper<TurnIndicatorsCommand, ThreadSafe> getTurnIndicatorsCommand;
 
   using Acceleration = geometry_msgs::msg::AccelWithCovarianceStamped;
   using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
@@ -50,27 +50,28 @@ class AutowareUniverse : public Autoware
   using Odometry = nav_msgs::msg::Odometry;
   using TurnIndicatorsReport = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
   PublisherWrapper<Acceleration> setAcceleration;
+  PublisherWrapper<Odometry> setOdometry;
   PublisherWrapper<SteeringReport> setSteeringReport;
   PublisherWrapper<GearReport> setGearReport;
   PublisherWrapper<ControlModeReport> setControlModeReport;
   PublisherWrapper<VelocityReport> setVelocityReport;
-  PublisherWrapper<Odometry> setOdometry;
   PublisherWrapper<TurnIndicatorsReport> setTurnIndicatorsReport;
 
+  rclcpp::TimerBase::SharedPtr localization_update_timer;
+  rclcpp::TimerBase::SharedPtr vehicle_state_update_timer;
+  std::thread localization_and_vehicle_state_update_thread;
+  std::atomic<bool> is_stop_requested = false;
+  std::atomic<bool> is_thrown = false;
+  std::exception_ptr thrown;
+
+  auto stopAndJoin() -> void;
+
 public:
-  CONCEALER_PUBLIC explicit AutowareUniverse()
-  : getAckermannControlCommand("/control/command/control_cmd", *this),
-    getGearCommandImpl("/control/command/gear_cmd", *this),
-    getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", *this),
-    setAcceleration("/localization/acceleration", *this),
-    setSteeringReport("/vehicle/status/steering_status", *this),
-    setGearReport("/vehicle/status/gear_status", *this),
-    setControlModeReport("/vehicle/status/control_mode", *this),
-    setVelocityReport("/vehicle/status/velocity_status", *this),
-    setOdometry("/localization/kinematic_state", *this),
-    setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this)
-  {
-  }
+  CONCEALER_PUBLIC explicit AutowareUniverse();
+
+  ~AutowareUniverse();
+
+  auto rethrow() -> void override;
 
   auto getAcceleration() const -> double override;
 
@@ -78,15 +79,17 @@ public:
 
   auto getVelocity() const -> double override;
 
-  auto update() -> void override;
+  auto updateLocalization() -> void;
+
+  auto updateVehicleState() -> void;
 
   auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand override;
 
   auto getGearSign() const -> double override;
 
   auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> override;
+      autoware_auto_control_msgs::msg::AckermannControlCommand,
+      autoware_auto_vehicle_msgs::msg::GearCommand> override;
 };
 
 }  // namespace concealer

@@ -16,6 +16,55 @@
 
 namespace concealer
 {
+AutowareUniverse::AutowareUniverse()
+: getAckermannControlCommand("/control/command/control_cmd", *this),
+  getGearCommandImpl("/control/command/gear_cmd", *this),
+  getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", *this),
+  setAcceleration("/localization/acceleration", *this),
+  setOdometry("/localization/kinematic_state", *this),
+  setSteeringReport("/vehicle/status/steering_status", *this),
+  setGearReport("/vehicle/status/gear_status", *this),
+  setControlModeReport("/vehicle/status/control_mode", *this),
+  setVelocityReport("/vehicle/status/velocity_status", *this),
+  setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this)
+{
+  using std::chrono_literals::operator""ms;
+  // autoware.universe requires localization topics to send data at 50Hz
+  localization_update_timer = rclcpp::create_timer(this, get_clock(), 20ms, [this]() {
+    updateLocalization();
+  });
+  // autoware.universe requires vehicle state topics to send data at 30Hz
+  vehicle_state_update_timer = rclcpp::create_timer(this, get_clock(), 33.33ms, [this]() {
+    updateVehicleState();
+  });
+
+  localization_and_vehicle_state_update_thread = std::thread([this]() {
+    try {
+      while (rclcpp::ok() && !is_stop_requested.load()) {
+        rclcpp::spin_some(get_node_base_interface());
+      }
+    } catch (...) {
+      thrown = std::current_exception();
+      is_thrown.store(true);
+    }
+  });
+}
+
+AutowareUniverse::~AutowareUniverse() {
+  stopAndJoin();
+}
+
+auto AutowareUniverse::rethrow() -> void {
+  if (is_thrown.load()) {
+    throw thrown;
+  }
+}
+
+auto AutowareUniverse::stopAndJoin() -> void {
+  is_stop_requested.store(true);
+  localization_and_vehicle_state_update_thread.join();
+}
+
 auto AutowareUniverse::getAcceleration() const -> double
 {
   return getAckermannControlCommand().longitudinal.acceleration;
@@ -31,14 +80,8 @@ auto AutowareUniverse::getSteeringAngle() const -> double
   return getAckermannControlCommand().lateral.steering_tire_angle;
 }
 
-auto AutowareUniverse::update() -> void
+auto AutowareUniverse::updateLocalization() -> void
 {
-  setControlModeReport([this]() {
-    ControlModeReport message;
-    message.mode = ControlModeReport::AUTONOMOUS;
-    return message;
-  }());
-
   setAcceleration([this]() {
     Acceleration message;
     message.header.stamp = get_clock()->now();
@@ -53,6 +96,26 @@ auto AutowareUniverse::update() -> void
     return message;
   }());
 
+  setOdometry([this]() {
+    Odometry message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "map";
+    message.pose.pose = current_pose;
+    message.pose.covariance = {};
+    message.twist.twist = current_twist;
+    return message;
+  }());
+
+  setTransform(current_pose);
+}
+
+auto AutowareUniverse::updateVehicleState() -> void {
+  setControlModeReport([this]() {
+    ControlModeReport message;
+    message.mode = ControlModeReport::AUTONOMOUS;
+    return message;
+  }());
+
   setGearReport([this]() {
     GearReport message;
     message.stamp = get_clock()->now();
@@ -64,16 +127,6 @@ auto AutowareUniverse::update() -> void
     SteeringReport message;
     message.stamp = get_clock()->now();
     message.steering_tire_angle = getSteeringAngle();
-    return message;
-  }());
-
-  setOdometry([this]() {
-    Odometry message;
-    message.header.stamp = get_clock()->now();
-    message.header.frame_id = "map";
-    message.pose.pose = current_pose;
-    message.pose.covariance = {};
-    message.twist.twist = current_twist;
     return message;
   }());
 
@@ -93,8 +146,6 @@ auto AutowareUniverse::update() -> void
     message.report = getTurnIndicatorsCommand().command;
     return message;
   }());
-
-  setTransform(current_pose);
 }
 
 auto AutowareUniverse::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand

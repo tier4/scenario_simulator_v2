@@ -41,6 +41,8 @@ protected:
   geometry_msgs::msg::Twist current_twist;
   geometry_msgs::msg::Pose current_pose;
 
+  auto spinSome() -> void;
+
 public:
   CONCEALER_PUBLIC explicit Autoware();
 
@@ -56,21 +58,19 @@ public:
   virtual auto getGearSign() const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
+  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
+      autoware_auto_control_msgs::msg::AckermannControlCommand,
+      autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
-  /*   */ auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
+  auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
 
-  /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
+  auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
 
-  /*   */ auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
+  auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
 
-  virtual auto update() -> void = 0;
-
-  auto spinSome() -> void;
+  virtual auto rethrow() -> void {};
 };
 }  // namespace concealer
 

@@ -308,10 +308,9 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   autoware_user->rethrow();
+  autoware->rethrow();
 
   autoware_user->spinSome();
-  // Will be moved to simple_sensor_simulator
-  autoware->spinSome();
 
   EntityBase::onUpdate(current_time, step_time);
 
@@ -361,10 +360,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 
   autoware_user->spinSome();
-
-  // Will be moved to simple_sensor_simulator
-  autoware->update();
-  autoware->spinSome();
 
   EntityBase::onPostUpdate(current_time, step_time);
 }
