@@ -17,15 +17,11 @@
 namespace concealer
 {
 Autoware::Autoware()
-: rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false))
+: rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+  current_acceleration(geometry_msgs::msg::Accel()),
+  current_twist(geometry_msgs::msg::Twist()),
+  current_pose(geometry_msgs::msg::Pose())
 {
-}
-
-auto Autoware::spinSome() -> void
-{
-  if (rclcpp::ok()) {
-    rclcpp::spin_some(get_node_base_interface());
-  }
 }
 
 auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
@@ -39,21 +35,14 @@ auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCo
   return gear_command;
 }
 
-auto Autoware::set(const geometry_msgs::msg::Accel & acceleration)
-  -> const geometry_msgs::msg::Accel &
+auto Autoware::set(const geometry_msgs::msg::Accel & acceleration) -> void
 {
-  return current_acceleration = acceleration;
+  current_acceleration.store(acceleration);
 }
 
-auto Autoware::set(const geometry_msgs::msg::Twist & twist) -> const geometry_msgs::msg::Twist &
-{
-  return current_twist = twist;
-}
+auto Autoware::set(const geometry_msgs::msg::Twist & twist) -> void { current_twist.store(twist); }
 
-auto Autoware::set(const geometry_msgs::msg::Pose & pose) -> const geometry_msgs::msg::Pose &
-{
-  return current_pose = pose;
-}
+auto Autoware::set(const geometry_msgs::msg::Pose & pose) -> void { current_pose.store(pose); }
 
 auto Autoware::getTurnIndicatorsCommand() const
   -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
@@ -67,4 +56,6 @@ auto Autoware::getTurnIndicatorsCommand() const
   turn_indicators_command.stamp = now();
   return turn_indicators_command;
 }
+
+auto Autoware::rethrow() -> void{};
 }  // namespace concealer

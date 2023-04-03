@@ -145,8 +145,6 @@ auto EgoEntitySimulation::setAutowareStatus() -> void
   autoware->set(current_pose);
 
   autoware->set(getCurrentTwist());
-
-  autoware->update();
 }
 
 void EgoEntitySimulation::requestSpeedChange(double value)
@@ -181,8 +179,6 @@ void EgoEntitySimulation::requestSpeedChange(double value)
 }
 
   void EgoEntitySimulation::onUpdate(double time, double step_time, bool npc_logic_started) {
-    autoware->spinSome();
-
     if (npc_logic_started) {
       Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
 
@@ -215,7 +211,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     }
 
     updateStatus(time, step_time);
-    updatePreviousValuesAndUpdateAutoware();
+    updatePreviousValues();
     setAutowareStatus();
  }
 
@@ -271,11 +267,9 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     }
   }
 
-  auto EgoEntitySimulation::updatePreviousValuesAndUpdateAutoware() -> void {
+  auto EgoEntitySimulation::updatePreviousValues() -> void {
     previous_linear_velocity_ = vehicle_model_ptr_->getVx();
     previous_angular_velocity_ = vehicle_model_ptr_->getWz();
-
-    autoware->update();
   }
 
   auto EgoEntitySimulation::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus & {

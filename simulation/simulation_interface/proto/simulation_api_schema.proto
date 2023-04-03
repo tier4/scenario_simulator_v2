@@ -29,14 +29,15 @@ message LidarConfiguration {
  * Parameter configuration of the detection sensor
  **/
 message DetectionSensorConfiguration {
-  string entity = 1;              // Name of the entity which you want to attach detection sensor.
-  double update_duration = 2;     // Update duration of the detection sensor. (unit : second)
-  double range = 3;               // Sensor detection range. (unit : meter)
-  string architecture_type = 4;   // Autoware architecture type.
-  bool filter_by_range = 5;       // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
-  double pos_noise_stddev = 6;    // standard deviation of position noise.
-  int32 random_seed = 7;          // random_seed for noise generation.
-  double probability_of_lost = 8; // probability of lost recognition. (unit : percentage)
+  string entity = 1;                    // Name of the entity which you want to attach detection sensor.
+  double update_duration = 2;           // Update duration of the detection sensor. (unit : second)
+  double range = 3;                     // Sensor detection range. (unit : meter)
+  string architecture_type = 4;         // Autoware architecture type.
+  bool filter_by_range = 5;             // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
+  double pos_noise_stddev = 6;          // standard deviation of position noise.
+  int32 random_seed = 7;                // random_seed for noise generation.
+  double probability_of_lost = 8;       // probability of lost recognition. (unit : percentage)
+  double object_recognition_delay = 9;  // object recognition delay. (unit : second) It delays only the position recognition. 
 }
 
 /**
@@ -256,4 +257,46 @@ message UpdateTrafficLightsRequest {
  **/
 message UpdateTrafficLightsResponse {
   Result result = 1; // Result of [DespawnEntityRequest](#DespawnEntityRequest)
+}
+
+
+/**
+ * Universal message for Request
+ **/
+message SimulationRequest {
+  oneof request {
+    InitializeRequest initialize = 1;
+    UpdateFrameRequest update_frame = 2;
+    UpdateSensorFrameRequest update_sensor_frame = 3;
+    SpawnVehicleEntityRequest spawn_vehicle_entity = 4;
+    SpawnPedestrianEntityRequest spawn_pedestrian_entity = 5;
+    SpawnMiscObjectEntityRequest  spawn_misc_object_entity = 6;
+    DespawnEntityRequest despawn_entity = 7;
+    UpdateEntityStatusRequest update_entity_status = 8;
+    AttachLidarSensorRequest attach_lidar_sensor = 9;
+    AttachDetectionSensorRequest attach_detection_sensor = 10;
+    AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 11;
+    UpdateTrafficLightsRequest update_traffic_lights = 12;
+  }
+}
+
+
+/**
+ * Universal message for Response
+ **/
+message SimulationResponse {
+  oneof response {
+    InitializeResponse initialize = 1;
+    UpdateFrameResponse update_frame = 2;
+    UpdateSensorFrameResponse update_sensor_frame = 3;
+    SpawnVehicleEntityResponse spawn_vehicle_entity = 4;
+    SpawnPedestrianEntityResponse spawn_pedestrian_entity = 5;
+    SpawnMiscObjectEntityResponse  spawn_misc_object_entity = 6;
+    DespawnEntityResponse despawn_entity = 7;
+    UpdateEntityStatusResponse update_entity_status = 8;
+    AttachLidarSensorResponse attach_lidar_sensor = 9;
+    AttachDetectionSensorResponse attach_detection_sensor = 10;
+    AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 11;
+    UpdateTrafficLightsResponse update_traffic_lights = 12;
+  }
 }

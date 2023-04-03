@@ -65,7 +65,7 @@ class EgoEntitySimulation {
 
   auto getLinearJerk(double step_time) -> double;
 
-  auto updatePreviousValuesAndUpdateAutoware() -> void;
+  auto updatePreviousValues() -> void;
 public:
   auto setAutowareStatus() -> void;
 

@@ -30,9 +30,8 @@
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 // TODO #include <tier4_external_api_msgs/srv/initialize_pose.hpp>
-#include <concealer/utility/service_with_validation.h>
-
 #include <concealer/utility/publisher_wrapper.hpp>
+#include <concealer/utility/service_with_validation.hpp>
 #include <concealer/utility/subscriber_wrapper.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>

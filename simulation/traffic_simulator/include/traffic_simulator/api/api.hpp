@@ -75,10 +75,18 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    zeromq_client_(simulation_interface::protocol, configuration.simulator_host)
+    zeromq_client_(
+      simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
+  }
+
+  template <typename Node>
+  int getZMQSocketPort(Node & node)
+  {
+    if (!node.has_parameter("port")) node.declare_parameter("port", 5555);
+    return node.get_parameter("port").as_int();
   }
 
   void closeZMQConnection() { zeromq_client_.closeConnection(); }
@@ -226,7 +234,8 @@ public:
 
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
   bool attachDetectionSensor(
-    const std::string &, double pos_noise_stddev, double probability_of_lost, int random_seed = 0);
+    const std::string &, double pos_noise_stddev, double probability_of_lost,
+    double object_recognition_delay, int random_seed = 0);
 
   bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
 

@@ -17,6 +17,7 @@
 
 #include <geometry_msgs/msg/pose.h>
 
+#include <atomic>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
@@ -37,9 +38,9 @@ namespace concealer
 class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Autoware>
 {
 protected:
-  geometry_msgs::msg::Accel current_acceleration;
-  geometry_msgs::msg::Twist current_twist;
-  geometry_msgs::msg::Pose current_pose;
+  std::atomic<geometry_msgs::msg::Accel> current_acceleration;
+  std::atomic<geometry_msgs::msg::Twist> current_twist;
+  std::atomic<geometry_msgs::msg::Pose> current_pose;
 
 public:
   CONCEALER_PUBLIC explicit Autoware();
@@ -62,15 +63,13 @@ public:
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
-  /*   */ auto set(const geometry_msgs::msg::Accel &) -> const geometry_msgs::msg::Accel &;
+  auto set(const geometry_msgs::msg::Accel &) -> void;
 
-  /*   */ auto set(const geometry_msgs::msg::Twist &) -> const geometry_msgs::msg::Twist &;
+  auto set(const geometry_msgs::msg::Twist &) -> void;
 
-  /*   */ auto set(const geometry_msgs::msg::Pose &) -> const geometry_msgs::msg::Pose &;
+  auto set(const geometry_msgs::msg::Pose &) -> void;
 
-  virtual auto update() -> void = 0;
-
-  auto spinSome() -> void;
+  virtual auto rethrow() -> void;
 };
 }  // namespace concealer
 
