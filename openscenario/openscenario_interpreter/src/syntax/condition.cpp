@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <functional>
+#include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/by_entity_condition.hpp>
 #include <openscenario_interpreter/syntax/by_value_condition.hpp>
 #include <openscenario_interpreter/syntax/condition.hpp>
+#include <openscenario_interpreter/syntax/condition_edge.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 
 namespace openscenario_interpreter
@@ -43,10 +47,24 @@ Condition::Condition(const pugi::xml_node & node, Scope & scope)
 
 auto Condition::evaluate() -> Object
 {
-  if (condition_edge == ConditionEdge::sticky and current_value) {
-    return true_v;
-  } else {
-    return asBoolean(current_value = Object::evaluate().as<Boolean>());
+  switch (condition_edge) {
+    case ConditionEdge::rising:
+      return update_condition(std::function([](bool a, bool b) { return a and not b; }));
+
+    case ConditionEdge::falling:
+      return update_condition(std::function([](bool a, bool b) { return not a and b; }));
+
+    case ConditionEdge::risingOrFalling:
+      return update_condition(std::function([](bool a, bool b) { return a != b; }));
+
+    case ConditionEdge::none:
+      return update_condition(std::function([](bool a) { return a; }));
+
+    case ConditionEdge::sticky:
+      return update_condition(std::function([this](bool a) { return current_value or a; }));
+
+    default:
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, condition_edge);
   }
 }
 

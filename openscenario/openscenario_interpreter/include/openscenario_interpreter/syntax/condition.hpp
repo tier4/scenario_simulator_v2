@@ -15,12 +15,20 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_
 
+#include <algorithm>
+#include <cstddef>
+#include <functional>
+#include <list>
 #include <nlohmann/json.hpp>
+#include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
+#include <tuple>
 
 namespace openscenario_interpreter
 {
@@ -39,7 +47,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Condition : public ComplexType
+struct Condition : public ComplexType, private SimulatorCore::ConditionEvaluation
 {
   const String name;
 
@@ -49,9 +57,37 @@ struct Condition : public ComplexType
 
   bool current_value;
 
+private:
+  struct History
+  {
+    double time;
+    bool result;
+  };
+
+  std::list<History> histories;
+
+public:
   explicit Condition(const pugi::xml_node & node, Scope & scope);
 
   auto evaluate() -> Object;
+
+private:
+  template <typename... Booleans>
+  auto update_condition(std::function<bool(Booleans...)> condition) -> Object
+  {
+    histories.push_back({evaluateSimulationTime(), ComplexType::evaluate().as<Boolean>()});
+    if (auto iterator = std::find_if(
+          std::begin(histories), std::end(histories),
+          [this](const auto & entry) { return entry.time > histories.back().time - delay; });
+        static_cast<std::ptrdiff_t>(sizeof...(Booleans)) <=
+        std::distance(std::begin(histories), iterator)) {
+      current_value = std::apply(condition, std::tuple{Booleans((--iterator)->result)...});
+      histories.erase(std::begin(histories), iterator);
+    } else {
+      current_value = false;
+    }
+    return asBoolean(current_value);
+  }
 };
 
 auto operator<<(nlohmann::json &, const Condition &) -> nlohmann::json &;
