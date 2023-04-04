@@ -57,5 +57,5 @@ auto Autoware::getTurnIndicatorsCommand() const
   return turn_indicators_command;
 }
 
-auto Autoware::rethrow() -> void{};
+auto Autoware::rethrow() -> void {}
 }  // namespace concealer

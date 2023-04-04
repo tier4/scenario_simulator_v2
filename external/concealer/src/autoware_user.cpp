@@ -19,7 +19,7 @@
 
 namespace concealer
 {
-AutowareUser::AutowareUser(pid_t pid)
+AutowareUser::AutowareUser(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid)
 {

@@ -24,7 +24,8 @@ AutowareUniverseUser::~AutowareUniverseUser()
   task_queue.stopAndJoin();
 }
 
-auto AutowareUniverseUser::approve(const CooperateStatusArray & cooperate_status_array) -> void
+auto AutowareUniverseUser::approve(
+  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
 {
   auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
   request->stamp = cooperate_status_array.stamp;
@@ -54,7 +55,8 @@ auto AutowareUniverseUser::approve(const CooperateStatusArray & cooperate_status
   }
 }
 
-auto AutowareUniverseUser::cooperate(const CooperateStatusArray & cooperate_status_array) -> void
+auto AutowareUniverseUser::cooperate(
+  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
 {
   switch (current_cooperator) {
     case Cooperator::simulator:
@@ -70,12 +72,10 @@ auto AutowareUniverseUser::initialize(const geometry_msgs::msg::Pose & initial_p
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBeWaitingForRoute([&]() {
-        InitialPose initial_pose_msg;
-        {
-          initial_pose_msg.header.stamp = get_clock()->now();
-          initial_pose_msg.header.frame_id = "map";
-          initial_pose_msg.pose.pose = initial_pose;
-        }
+        geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
+        initial_pose_msg.header.stamp = get_clock()->now();
+        initial_pose_msg.header.frame_id = "map";
+        initial_pose_msg.pose.pose = initial_pose;
         return setInitialPose(initial_pose_msg);
       });
 
@@ -109,7 +109,7 @@ auto AutowareUniverseUser::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
-      auto request = std::make_shared<Engage::Request>();
+      auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
       requestEngage(request);
     });
@@ -198,7 +198,7 @@ auto AutowareUniverseUser::sendSIGINT() -> void  //
 auto AutowareUniverseUser::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {
-    auto request = std::make_shared<SetVelocityLimit::Request>();
+    auto request = std::make_shared<tier4_external_api_msgs::srv::SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
     // We attempt to resend the service up to 30 times, but this number of times was determined by
     // heuristics, not for any technical reason
@@ -211,14 +211,15 @@ auto AutowareUniverseUser::setCooperator(const std::string & cooperator) -> void
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
 
-auto AutowareUniverseUser::receiveEmergencyState(const EmergencyState & msg) -> void
+auto AutowareUniverseUser::receiveEmergencyState(
+  const autoware_auto_system_msgs::msg::EmergencyState & message) -> void
 {
-#define CASE(IDENTIFIER)                       \
-  case EmergencyState::IDENTIFIER:             \
-    minimum_risk_maneuver_state = #IDENTIFIER; \
+#define CASE(IDENTIFIER)                                           \
+  case autoware_auto_system_msgs::msg::EmergencyState::IDENTIFIER: \
+    minimum_risk_maneuver_state = #IDENTIFIER;                     \
     break
 
-  switch (msg.state) {
+  switch (message.state) {
     CASE(MRM_FAILED);
     CASE(MRM_OPERATING);
     CASE(MRM_SUCCEEDED);
@@ -226,37 +227,40 @@ auto AutowareUniverseUser::receiveEmergencyState(const EmergencyState & msg) -> 
     CASE(OVERRIDE_REQUESTING);
 
     default:
-      throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
+      throw common::Error("Unsupported MrmState::state, number: ", static_cast<int>(message.state));
   }
+
   minimum_risk_maneuver_behavior = "";
 #undef CASE
 }
 
-auto AutowareUniverseUser::receiveMrmState(const MrmState & msg) -> void
+auto AutowareUniverseUser::receiveMrmState(const autoware_adapi_v1_msgs::msg::MrmState & message)
+  -> void
 {
-#define CASE(IDENTIFIER, VARIABLE) \
-  case MrmState::IDENTIFIER:       \
-    VARIABLE = #IDENTIFIER;        \
+#define CASE(IDENTIFIER, VARIABLE)                        \
+  case autoware_adapi_v1_msgs::msg::MrmState::IDENTIFIER: \
+    VARIABLE = #IDENTIFIER;                               \
     break
 
-  switch (msg.state) {
+  switch (message.state) {
     CASE(MRM_FAILED, minimum_risk_maneuver_state);
     CASE(MRM_OPERATING, minimum_risk_maneuver_state);
     CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
     CASE(NORMAL, minimum_risk_maneuver_state);
     CASE(UNKNOWN, minimum_risk_maneuver_state);
     default:
-      throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
+      throw common::Error(
+        "Unsupported MrmState::state, number : ", static_cast<int>(message.state));
   }
 
-  switch (msg.behavior) {
+  switch (message.behavior) {
     CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
     CASE(EMERGENCY_STOP, minimum_risk_maneuver_behavior);
     CASE(NONE, minimum_risk_maneuver_behavior);
     CASE(UNKNOWN, minimum_risk_maneuver_behavior);
     default:
       throw common::Error(
-        "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.behavior));
+        "Unsupported MrmState::behavior, number : ", static_cast<int>(message.behavior));
   }
 #undef CASE
 }
@@ -264,11 +268,13 @@ auto AutowareUniverseUser::receiveMrmState(const MrmState & msg) -> void
 
 namespace autoware_auto_vehicle_msgs::msg
 {
-auto operator<<(std::ostream & out, const TurnIndicatorsCommand & message) -> std::ostream &
+auto operator<<(
+  std::ostream & out, const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+  -> std::ostream &
 {
-#define CASE(IDENTIFIER)                  \
-  case TurnIndicatorsCommand::IDENTIFIER: \
-    out << #IDENTIFIER;                   \
+#define CASE(IDENTIFIER)                                                   \
+  case autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER: \
+    out << #IDENTIFIER;                                                    \
     break
 
   switch (message.command) {
@@ -287,9 +293,11 @@ auto operator<<(std::ostream & out, const TurnIndicatorsCommand & message) -> st
   return out;
 }
 
-auto operator>>(std::istream & is, TurnIndicatorsCommand & message) -> std::istream &
+auto operator>>(std::istream & is, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+  -> std::istream &
 {
-#define STATE(IDENTIFIER) {#IDENTIFIER, TurnIndicatorsCommand::IDENTIFIER}
+#define STATE(IDENTIFIER) \
+  {#IDENTIFIER, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER}
 
   std::unordered_map<std::string, std::uint8_t> state_dictionary{
     STATE(DISABLE),
@@ -311,5 +319,4 @@ auto operator>>(std::istream & is, TurnIndicatorsCommand & message) -> std::istr
 
   return is;
 }
-
 }  // namespace autoware_auto_vehicle_msgs::msg

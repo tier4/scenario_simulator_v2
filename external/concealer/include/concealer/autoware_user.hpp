@@ -81,7 +81,7 @@ protected:
   auto shutdownAutoware() -> void;
 
 public:
-  CONCEALER_PUBLIC explicit AutowareUser(pid_t pid = 0);
+  CONCEALER_PUBLIC explicit AutowareUser(const pid_t = 0);
 
   template <typename... Ts>
   CONCEALER_PUBLIC explicit AutowareUser(Ts &&... xs)

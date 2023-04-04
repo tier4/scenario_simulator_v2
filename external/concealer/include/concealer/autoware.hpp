@@ -15,8 +15,6 @@
 #ifndef CONCEALER__AUTOWARE_HPP_
 #define CONCEALER__AUTOWARE_HPP_
 
-#include <geometry_msgs/msg/pose.h>
-
 #include <atomic>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
@@ -24,6 +22,7 @@
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/utility/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 
@@ -39,7 +38,9 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 {
 protected:
   std::atomic<geometry_msgs::msg::Accel> current_acceleration;
+
   std::atomic<geometry_msgs::msg::Twist> current_twist;
+
   std::atomic<geometry_msgs::msg::Pose> current_pose;
 
 public:

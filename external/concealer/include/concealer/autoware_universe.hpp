@@ -29,39 +29,36 @@
 
 namespace concealer
 {
-/**
-   * Implements Autoware interface for Autoware Universe
-   * NOTE: This class is intended to be move to simple_sensor_simulator
-   */
+/*
+ * Implements Autoware interface for Autoware Universe
+ * NOTE: This class is intended to be move to simple_sensor_simulator
+ */
 class AutowareUniverse : public Autoware
 {
-  using AckermannControlCommand = autoware_auto_control_msgs::msg::AckermannControlCommand;
-  using GearCommand = autoware_auto_vehicle_msgs::msg::GearCommand;
-  using TurnIndicatorsCommand = autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
-  SubscriberWrapper<AckermannControlCommand, ThreadSafe> getAckermannControlCommand;
-  SubscriberWrapper<GearCommand, ThreadSafe> getGearCommandImpl;
-  SubscriberWrapper<TurnIndicatorsCommand, ThreadSafe> getTurnIndicatorsCommand;
+  // clang-format off
+  SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand, ThreadSafety::safe> getAckermannControlCommand;
+  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
+  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
 
-  using Acceleration = geometry_msgs::msg::AccelWithCovarianceStamped;
-  using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
-  using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
-  using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
-  using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
-  using Odometry = nav_msgs::msg::Odometry;
-  using TurnIndicatorsReport = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
-  PublisherWrapper<Acceleration> setAcceleration;
-  PublisherWrapper<Odometry> setOdometry;
-  PublisherWrapper<SteeringReport> setSteeringReport;
-  PublisherWrapper<GearReport> setGearReport;
-  PublisherWrapper<ControlModeReport> setControlModeReport;
-  PublisherWrapper<VelocityReport> setVelocityReport;
-  PublisherWrapper<TurnIndicatorsReport> setTurnIndicatorsReport;
+  PublisherWrapper<geometry_msgs::msg::AccelWithCovarianceStamped>        setAcceleration;
+  PublisherWrapper<nav_msgs::msg::Odometry>                               setOdometry;
+  PublisherWrapper<autoware_auto_vehicle_msgs::msg::SteeringReport>       setSteeringReport;
+  PublisherWrapper<autoware_auto_vehicle_msgs::msg::GearReport>           setGearReport;
+  PublisherWrapper<autoware_auto_vehicle_msgs::msg::ControlModeReport>    setControlModeReport;
+  PublisherWrapper<autoware_auto_vehicle_msgs::msg::VelocityReport>       setVelocityReport;
+  PublisherWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport> setTurnIndicatorsReport;
+  // clang-format on
 
-  rclcpp::TimerBase::SharedPtr localization_update_timer;
-  rclcpp::TimerBase::SharedPtr vehicle_state_update_timer;
+  const rclcpp::TimerBase::SharedPtr localization_update_timer;
+
+  const rclcpp::TimerBase::SharedPtr vehicle_state_update_timer;
+
   std::thread localization_and_vehicle_state_update_thread;
-  std::atomic<bool> is_stop_requested = false;
+
+  std::atomic<bool> is_stop_requested = false;  // IS THIS INTENDED?
+
   std::atomic<bool> is_thrown = false;
+
   std::exception_ptr thrown;
 
   auto stopAndJoin() -> void;
