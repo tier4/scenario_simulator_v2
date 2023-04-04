@@ -37,6 +37,7 @@
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
+#include <traffic_simulator/entity/ego_entity_simulation.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
@@ -93,6 +94,8 @@ class EntityManager
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
   std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
+  // will be moved to simple_sensor_simulator
+  std::unique_ptr<traffic_simulator::entity::EgoEntitySimulation> ego_entity_simulation_;
 
   double step_time_;
 
@@ -448,6 +451,10 @@ public:
           name, std::make_unique<Entity>(
                   name, makeEntityStatus(), parameters, std::forward<decltype(xs)>(xs)...));
         success) {
+      if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
+        ego_entity_simulation_ = std::make_unique<EgoEntitySimulation>(parameters, std::forward<decltype(xs)>(xs)...);
+        ego_entity_simulation_->setInitialStatus(iter->second->getStatus());
+      }
       iter->second->setHdMapUtils(hdmap_utils_ptr_);
       iter->second->setTrafficLightManager(traffic_light_manager_ptr_);
       if (npc_logic_started_ && not isEgo(name)) {

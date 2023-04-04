@@ -25,7 +25,6 @@
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/entity/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
@@ -38,10 +37,6 @@ namespace entity
 class EgoEntity : public VehicleEntity
 {
   const std::unique_ptr<concealer::AutowareUser> autoware_user;
-
-  EgoEntitySimulation ego_entity_simulation_;
-
-  static auto getVehicleModelType() -> VehicleModelType;
 
   static auto makeAutowareUser(const Configuration &) -> std::unique_ptr<concealer::AutowareUser>;
 

@@ -73,10 +73,9 @@ auto EgoEntity::makeAutowareUser(const Configuration & configuration)
 EgoEntity::EgoEntity(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-  const Configuration & configuration, const double step_time)
+  const Configuration & configuration, const double)
 : VehicleEntity(name, entity_status, parameters),
-  autoware_user(makeAutowareUser(configuration)),
-  ego_entity_simulation_(parameters, step_time)
+  autoware_user(makeAutowareUser(configuration))
 {
 }
 
@@ -182,9 +181,6 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  ego_entity_simulation_.onUpdate(current_time, step_time, npc_logic_started_);
-  setStatusExtenaly(ego_entity_simulation_.getStatus());
-
   autoware_user->rethrow();
   autoware_user->spinSome();
 
@@ -298,13 +294,11 @@ auto EgoEntity::setStatusExtenaly(const traffic_simulator_msgs::msg::EntityStatu
 auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   VehicleEntity::setStatus(status);
-  ego_entity_simulation_.setInitialStatus(status);
 }
 
 void EgoEntity::requestSpeedChange(double value, bool)
 {
   autoware_user->restrictTargetSpeed(value);
-  ego_entity_simulation_.requestSpeedChange(value);
 }
 
 void EgoEntity::requestSpeedChange(
