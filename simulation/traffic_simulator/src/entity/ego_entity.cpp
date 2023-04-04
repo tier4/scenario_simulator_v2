@@ -290,6 +290,10 @@ auto EgoEntity::setStatusInternal(const traffic_simulator_msgs::msg::EntityStatu
   VehicleEntity::setStatus(status);
 }
 
+auto EgoEntity::setStatusExtenaly(const traffic_simulator_msgs::msg::EntityStatus & status) -> void {
+  externaly_updated_status_ = status;
+}
+
 auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   VehicleEntity::setStatus(status);

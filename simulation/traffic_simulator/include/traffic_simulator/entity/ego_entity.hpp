@@ -49,6 +49,8 @@ class EgoEntity : public VehicleEntity
 
   auto setStatusInternal(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
+  traffic_simulator_msgs::msg::EntityStatus externaly_updated_status_;
+
 public:
   explicit EgoEntity() = delete;
 
@@ -112,6 +114,8 @@ public:
 
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
+
+  auto setStatusExtenaly(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
 
