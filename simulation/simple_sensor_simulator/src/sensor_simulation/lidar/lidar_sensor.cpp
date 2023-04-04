@@ -14,8 +14,8 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <boost/optional.hpp>
 #include <memory>
+#include <optional>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
@@ -29,7 +29,7 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
   -> sensor_msgs::msg::PointCloud2
 {
-  boost::optional<geometry_msgs::msg::Pose> ego_pose;
+  std::optional<geometry_msgs::msg::Pose> ego_pose;
   for (const auto & s : status) {
     if (configuration_.entity() == s.name()) {
       geometry_msgs::msg::Pose pose;
@@ -56,7 +56,7 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     for (const auto v : configuration_.vertical_angles()) {
       vertical_angles.emplace_back(v);
     }
-    const auto pointcloud = raycaster_.raycast("base_link", stamp, ego_pose.get());
+    const auto pointcloud = raycaster_.raycast("base_link", stamp, ego_pose.value());
     detected_objects_ = raycaster_.getDetectedObject();
     return pointcloud;
   }

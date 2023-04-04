@@ -36,8 +36,8 @@ message DetectionSensorConfiguration {
   bool filter_by_range = 5;             // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
   double pos_noise_stddev = 6;          // standard deviation of position noise.
   int32 random_seed = 7;                // random_seed for noise generation.
-  double probability_of_lost = 8;       // probability of lost recognition. (unit : percentage)
-  double object_recognition_delay = 9;  // object recognition delay. (unit : second) It delays only the position recognition. 
+  double probability_of_lost = 8;       // probability of lost recognition. (0.0 ~ 1.0)
+  double object_recognition_delay = 9;  // object recognition delay. (unit : second) It delays only the position recognition.
 }
 
 /**

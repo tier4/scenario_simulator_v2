@@ -22,6 +22,7 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <regex>
 #include <set>
 #include <stdexcept>
@@ -255,7 +256,7 @@ struct TrafficLight
 
   std::set<Bulb> bulbs;
 
-  const std::map<Bulb::Hash, boost::optional<geometry_msgs::msg::Point>> positions;
+  const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
 
   explicit TrafficLight(const std::int64_t, hdmap_utils::HdMapUtils &);
 
@@ -273,9 +274,9 @@ struct TrafficLight
   template <typename Markers, typename Now>
   auto draw(Markers & markers, const Now & now, const std::string & frame_id) const
   {
-    auto position = [this](auto && bulb) {
+    auto optional_position = [this](auto && bulb) {
       try {
-        return positions.at(bulb.hash() & 0b1111'0000'1111'1111).get();  // NOTE: Ignore status
+        return positions.at(bulb.hash() & 0b1111'0000'1111'1111);  // NOTE: Ignore status
       } catch (const std::out_of_range &) {
         throw common::scenario_simulator_exception::Error(
           "There is no position for bulb {", bulb, "}.");
@@ -283,7 +284,7 @@ struct TrafficLight
     };
 
     for (auto && bulb : bulbs) {
-      if (bulb.is(Shape::Category::circle)) {
+      if (optional_position(bulb).has_value() and bulb.is(Shape::Category::circle)) {
         visualization_msgs::msg::Marker marker;
         marker.header.stamp = now;
         marker.header.frame_id = frame_id;
@@ -291,7 +292,7 @@ struct TrafficLight
         marker.ns = "bulb";
         marker.id = id;
         marker.type = marker.SPHERE;
-        marker.pose.position = position(bulb);
+        marker.pose.position = optional_position(bulb).value();
         marker.pose.orientation = geometry_msgs::msg::Quaternion();
         marker.scale.x = 0.3;
         marker.scale.y = 0.3;

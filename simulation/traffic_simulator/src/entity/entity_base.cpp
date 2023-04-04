@@ -197,16 +197,16 @@ auto EntityBase::getEntityStatusBeforeUpdate() const
 
 auto EntityBase::getLinearJerk() const -> double { return getStatus().action_status.linear_jerk; }
 
-auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+auto EntityBase::getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   if (status_.lanelet_pose_valid) {
     return status_.lanelet_pose;
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 auto EntityBase::getLaneletPose(double matching_distance) const
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getStatus().type.type) {
     return hdmap_utils_ptr_->toLaneletPose(
@@ -309,7 +309,7 @@ void EntityBase::requestLaneChange(
     reference_lanelet_id, target.direction, target.shift);
   if (lane_change_target_id) {
     requestLaneChange(
-      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
+      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);
   } else {
     THROW_SEMANTIC_ERROR(
@@ -587,7 +587,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cancel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      [this]() { target_speed_ = std::nullopt; }, job::Type::LINEAR_VELOCITY, true,
       job::Event::POST_UPDATE);
   }
 }
@@ -629,7 +629,7 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief Cancel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      [this]() { target_speed_ = std::nullopt; }, job::Type::LINEAR_VELOCITY, true,
       job::Event::POST_UPDATE);
   }
 }
@@ -662,7 +662,6 @@ void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
 {
   other_status_.clear();
-
   for (const auto & [other_name, other_status] : status) {
     if (other_name != name) {
       /*

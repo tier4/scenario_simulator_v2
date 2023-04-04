@@ -50,8 +50,8 @@ struct MiscObject : public Scope
 
   const MiscObjectCategory misc_object_category;  // Categorization of the miscellaneous object.
 
-  // const String
-  //   model3d;  // Definition of the model of the miscellaneous object as a model type or a relative or absolute file path.
+  const String
+    model3d;  // Definition of the model of the miscellaneous object as a model type or a relative or absolute file path.
 
   const ParameterDeclarations parameter_declarations;  // Definition of additional parameters.
 

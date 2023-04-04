@@ -18,6 +18,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/transform.hpp>
 #include <memory>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <vector>
@@ -31,10 +32,10 @@ LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfi
 {
 }
 
-const boost::optional<traffic_simulator_msgs::msg::Obstacle> LaneChangeAction::calculateObstacle(
+const std::optional<traffic_simulator_msgs::msg::Obstacle> LaneChangeAction::calculateObstacle(
   const traffic_simulator_msgs::msg::WaypointsArray &)
 {
-  return boost::none;
+  return std::nullopt;
 }
 
 const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
@@ -80,7 +81,7 @@ void LaneChangeAction::getBlackBoardValues()
   traffic_simulator::lane_change::Parameter lane_change_parameters;
   if (!getInput<traffic_simulator::lane_change::Parameter>(
         "lane_change_parameters", lane_change_parameters)) {
-    lane_change_parameters_ = boost::none;
+    lane_change_parameters_ = std::nullopt;
   } else {
     lane_change_parameters_ = lane_change_parameters;
   }
@@ -90,12 +91,12 @@ BT::NodeStatus LaneChangeAction::tick()
 {
   getBlackBoardValues();
   if (request != traffic_simulator::behavior::Request::LANE_CHANGE) {
-    curve_ = boost::none;
+    curve_ = std::nullopt;
     current_s_ = 0;
     return BT::NodeStatus::FAILURE;
   }
   if (!lane_change_parameters_) {
-    curve_ = boost::none;
+    curve_ = std::nullopt;
     current_s_ = 0;
     return BT::NodeStatus::FAILURE;
   }
@@ -105,33 +106,33 @@ BT::NodeStatus LaneChangeAction::tick()
             entity_status.lanelet_pose.lanelet_id, lane_change_parameters_->target.lanelet_id)) {
         return BT::NodeStatus::FAILURE;
       }
-      boost::optional<std::pair<math::geometry::HermiteCurve, double>> traj_with_goal;
+      std::optional<std::pair<math::geometry::HermiteCurve, double>> traj_with_goal;
       traffic_simulator_msgs::msg::LaneletPose along_pose, goal_pose;
       switch (lane_change_parameters_->constraint.type) {
         case traffic_simulator::lane_change::Constraint::Type::NONE:
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
-            hdmap_utils->toMapPose(entity_status.lanelet_pose).pose, lane_change_parameters_.get(),
-            10.0, 20.0, 1.0);
+            hdmap_utils->toMapPose(entity_status.lanelet_pose).pose,
+            lane_change_parameters_.value(), 10.0, 20.0, 1.0);
           along_pose = hdmap_utils->getAlongLaneletPose(
             entity_status.lanelet_pose,
             traffic_simulator::lane_change::Parameter::default_lanechange_distance);
           break;
         case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
-            entity_status.lanelet_pose, lane_change_parameters_.get());
+            entity_status.lanelet_pose, lane_change_parameters_.value());
           along_pose = hdmap_utils->getAlongLaneletPose(
             entity_status.lanelet_pose,
             traffic_simulator::lane_change::Parameter::default_lanechange_distance);
           break;
         case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
-            entity_status.lanelet_pose, lane_change_parameters_.get());
+            entity_status.lanelet_pose, lane_change_parameters_.value());
           along_pose = hdmap_utils->getAlongLaneletPose(
             entity_status.lanelet_pose, lane_change_parameters_->constraint.value);
           break;
         case traffic_simulator::lane_change::Constraint::Type::TIME:
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
-            entity_status.lanelet_pose, lane_change_parameters_.get());
+            entity_status.lanelet_pose, lane_change_parameters_.value());
           along_pose = hdmap_utils->getAlongLaneletPose(
             entity_status.lanelet_pose, lane_change_parameters_->constraint.value);
           break;
@@ -212,7 +213,7 @@ BT::NodeStatus LaneChangeAction::tick()
       entity_status_updated.pose = pose;
       auto lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status.bounding_box, false);
       if (lanelet_pose) {
-        entity_status_updated.lanelet_pose = lanelet_pose.get();
+        entity_status_updated.lanelet_pose = lanelet_pose.value();
       } else {
         entity_status_updated.lanelet_pose_valid = false;
       }
@@ -235,7 +236,7 @@ BT::NodeStatus LaneChangeAction::tick()
       setOutput("waypoints", waypoints);
       setOutput("obstacle", obstacle);
       double s = (current_s_ - curve_->getLength()) + target_s_;
-      curve_ = boost::none;
+      curve_ = std::nullopt;
       current_s_ = 0;
       lane_change_velocity_ = 0;
       traffic_simulator_msgs::msg::EntityStatus entity_status_updated;

@@ -17,7 +17,7 @@
 #ifndef RANDOM_TEST_RUNNER__TESTRANDOMIZER_HPP
 #define RANDOM_TEST_RUNNER__TESTRANDOMIZER_HPP
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <rclcpp/logger.hpp>
 
 #include "random_test_runner/data_types.hpp"
