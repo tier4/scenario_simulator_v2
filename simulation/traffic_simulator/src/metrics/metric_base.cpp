@@ -21,7 +21,7 @@ namespace metrics
 MetricBase::MetricBase(std::string metrics_type) : metrics_type(metrics_type)
 {
   lifecycle_ = MetricLifecycle::INACTIVE;
-  error_ = boost::none;
+  error_ = std::nullopt;
 }
 
 MetricBase::~MetricBase() {}
@@ -83,7 +83,7 @@ nlohmann::json MetricBase::toBaseJson()
 void MetricBase::throwException()
 {
   if (error_) {
-    throw error_.get();
+    throw error_.value();
   }
   THROW_SIMULATION_ERROR("error is empty");
 }

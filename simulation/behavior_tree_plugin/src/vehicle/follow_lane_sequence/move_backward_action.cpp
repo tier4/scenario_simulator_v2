@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/move_backward_action.hpp>
+#include <optional>
 
 namespace entity_behavior
 {
@@ -26,10 +27,10 @@ MoveBackwardAction::MoveBackwardAction(
 {
 }
 
-const boost::optional<traffic_simulator_msgs::msg::Obstacle> MoveBackwardAction::calculateObstacle(
+const std::optional<traffic_simulator_msgs::msg::Obstacle> MoveBackwardAction::calculateObstacle(
   const traffic_simulator_msgs::msg::WaypointsArray &)
 {
-  return boost::none;
+  return std::nullopt;
 }
 
 const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoints()
@@ -79,7 +80,7 @@ BT::NodeStatus MoveBackwardAction::tick()
     target_speed = hdmap_utils->getSpeedLimit(
       hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id));
   }
-  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.value()));
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

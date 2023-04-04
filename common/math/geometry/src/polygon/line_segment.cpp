@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <optional>
 
 namespace math
 {
@@ -61,11 +62,11 @@ bool LineSegment::isIntersect2D(const LineSegment & l0) const
   return true;
 }
 
-boost::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
+std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
   const LineSegment & line) const
 {
   if (!isIntersect2D(line)) {
-    return boost::none;
+    return std::nullopt;
   }
   const auto det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
                    (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);

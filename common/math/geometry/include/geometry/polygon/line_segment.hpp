@@ -15,10 +15,10 @@
 #ifndef GEOMETRY__POLYGON__LINE_SEGMENT_
 #define GEOMETRY__POLYGON__LINE_SEGMENT_
 
-#include <boost/optional.hpp>
 #include <geometry/polygon/polygon.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <optional>
 
 namespace math
 {
@@ -37,8 +37,8 @@ public:
   const geometry_msgs::msg::Point start_point;
   const geometry_msgs::msg::Point end_point;
   bool isIntersect2D(const LineSegment & l0) const;
-  boost::optional<geometry_msgs::msg::Point> getIntersection2D(const LineSegment & line) const;
-  boost::optional<geometry_msgs::msg::Point> getIntersection2DWithXAxis(double x) const;
+  std::optional<geometry_msgs::msg::Point> getIntersection2D(const LineSegment & line) const;
+  std::optional<geometry_msgs::msg::Point> getIntersection2DWithXAxis(double x) const;
 
   geometry_msgs::msg::Vector3 getVector() const;
   geometry_msgs::msg::Vector3 get2DVector() const;
