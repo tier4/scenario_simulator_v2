@@ -19,7 +19,7 @@ namespace traffic_simulator
 namespace entity
 {
 MiscObjectEntity::MiscObjectEntity(
-  const std::string & name, const CanonicalizedEntityStatusType & entity_status,
+  const std::string & name, const CanonicalizedEntityStatus & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::MiscObjectParameters &)
 : EntityBase(name, entity_status, hdmap_utils_ptr)
@@ -33,8 +33,8 @@ void MiscObjectEntity::onUpdate(double, double)
   status.action_status.accel = geometry_msgs::msg::Accel();
   status.action_status.linear_jerk = 0;
   status.action_status.current_action = "static";
-  status_ = CanonicalizedEntityStatusType(status, hdmap_utils_ptr_);
-  status_before_update_ = CanonicalizedEntityStatusType(status, hdmap_utils_ptr_);
+  status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
+  status_before_update_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string

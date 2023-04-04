@@ -26,7 +26,7 @@ namespace traffic_simulator
 namespace entity
 {
 VehicleEntity::VehicleEntity(
-  const std::string & name, const CanonicalizedEntityStatusType & entity_status,
+  const std::string & name, const CanonicalizedEntityStatus & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const std::string & plugin_name)
@@ -89,7 +89,7 @@ auto VehicleEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto VehicleEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPoseType>
+auto VehicleEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
 {
   return route_planner_.getGoalPoses();
 }
@@ -103,7 +103,7 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t
 {
   if (status_.laneMatchingSucceed()) {
     return route_planner_.getRouteLanelets(
-      CanonicalizedLaneletPoseType(
+      CanonicalizedLaneletPose(
         static_cast<EntityStatusType>(status_).lanelet_pose, hdmap_utils_ptr_),
       horizon);
   } else {
@@ -135,7 +135,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   if (npc_logic_started_) {
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
-    behavior_plugin_ptr_->setEntityStatus(std::make_unique<CanonicalizedEntityStatusType>(status_));
+    behavior_plugin_ptr_->setEntityStatus(std::make_unique<CanonicalizedEntityStatus>(status_));
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
 
     std::vector<std::int64_t> route_lanelets = getRouteLanelets();
@@ -173,7 +173,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPoseType & lanelet_pose)
+void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
   if (status_.laneMatchingSucceed()) {
     route_planner_.setWaypoints({lanelet_pose});
@@ -185,13 +185,13 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 {
   if (const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false);
       lanelet_pose) {
-    requestAcquirePosition(CanonicalizedLaneletPoseType(lanelet_pose.get(), hdmap_utils_ptr_));
+    requestAcquirePosition(CanonicalizedLaneletPose(lanelet_pose.get(), hdmap_utils_ptr_));
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
   }
 }
 
-void VehicleEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> & waypoints)
+void VehicleEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
 {
   if (!laneMatchingSucceed()) {
     return;
@@ -206,12 +206,12 @@ void VehicleEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPos
 
 void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
-  std::vector<CanonicalizedLaneletPoseType> route;
+  std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (const auto lanelet_waypoint =
           hdmap_utils_ptr_->toLaneletPose(waypoint, getBoundingBox(), false);
         lanelet_waypoint) {
-      route.emplace_back(CanonicalizedLaneletPoseType(lanelet_waypoint.get(), hdmap_utils_ptr_));
+      route.emplace_back(CanonicalizedLaneletPose(lanelet_waypoint.get(), hdmap_utils_ptr_));
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
     }

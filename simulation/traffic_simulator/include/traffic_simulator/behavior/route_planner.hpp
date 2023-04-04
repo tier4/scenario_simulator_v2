@@ -28,20 +28,19 @@ class RoutePlanner
 public:
   explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
-  auto getRouteLanelets(
-    const CanonicalizedLaneletPoseType & entity_lanelet_pose, double horizon = 100)
+  auto getRouteLanelets(const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon = 100)
     -> std::vector<std::int64_t>;
 
-  auto setWaypoints(const std::vector<CanonicalizedLaneletPoseType> & waypoints) -> void;
+  auto setWaypoints(const std::vector<CanonicalizedLaneletPose> & waypoints) -> void;
 
   void cancelRoute();
-  std::vector<CanonicalizedLaneletPoseType> getGoalPoses() const;
+  std::vector<CanonicalizedLaneletPose> getGoalPoses() const;
   std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame() const;
 
 private:
-  void cancelWaypoint(const CanonicalizedLaneletPoseType & entity_lanelet_pose);
+  void cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose);
 
-  void updateRoute(const CanonicalizedLaneletPoseType & entity_lanelet_pose);
+  void updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose);
 
   boost::optional<std::vector<std::int64_t>> route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
@@ -51,7 +50,7 @@ private:
      elements for getGoalPoses, so we use std::deque instead of std::queue
      which is not iterable.
   */
-  std::deque<traffic_simulator::CanonicalizedLaneletPoseType> waypoint_queue_;
+  std::deque<traffic_simulator::CanonicalizedLaneletPose> waypoint_queue_;
 };
 }  // namespace traffic_simulator
 

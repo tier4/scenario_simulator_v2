@@ -71,7 +71,7 @@ private:
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 8, true);
     api_.requestAssignRoute(
-      "ego", std::vector<traffic_simulator::CanonicalizedLaneletPoseType>{
+      "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
                api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)),
                api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34690, 0.0))});
 

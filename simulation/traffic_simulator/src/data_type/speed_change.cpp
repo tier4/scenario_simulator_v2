@@ -31,8 +31,8 @@ static_assert(std::is_copy_assignable_v<RelativeTargetSpeed>);
 static_assert(std::is_move_assignable_v<RelativeTargetSpeed>);
 
 double RelativeTargetSpeed::getAbsoluteValue(
-  const CanonicalizedEntityStatusType & status,
-  const std::unordered_map<std::string, CanonicalizedEntityStatusType> & other_status) const
+  const CanonicalizedEntityStatus & status,
+  const std::unordered_map<std::string, CanonicalizedEntityStatus> & other_status) const
 {
   if (const auto iter = other_status.find(reference_entity_name); iter == other_status.end()) {
     if (static_cast<EntityStatusType>(status).name == reference_entity_name) {

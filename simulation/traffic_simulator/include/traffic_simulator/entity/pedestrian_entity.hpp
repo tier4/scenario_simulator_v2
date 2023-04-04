@@ -51,7 +51,7 @@ public:
   };
 
   explicit PedestrianEntity(
-    const std::string & name, const CanonicalizedEntityStatusType &,
+    const std::string & name, const CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::PedestrianParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
@@ -66,7 +66,7 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const CanonicalizedLaneletPoseType & lanelet_pose) override;
+  void requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
@@ -89,7 +89,7 @@ public:
 
   void setDecelerationRateLimit(double deceleration) override;
 
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> & waypoints) override;
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
@@ -102,7 +102,7 @@ public:
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPoseType> override;
+  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 

@@ -26,17 +26,17 @@ using EntityStatusType = traffic_simulator_msgs::msg::EntityStatus;
 
 namespace entity_status
 {
-class CanonicalizedEntityStatusType
+class CanonicalizedEntityStatus
 {
 public:
-  explicit CanonicalizedEntityStatusType(
+  explicit CanonicalizedEntityStatus(
     const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
-  explicit CanonicalizedEntityStatusType(
+  explicit CanonicalizedEntityStatus(
     const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
     const std::vector<std::int64_t> & route_lanelets);
-  explicit CanonicalizedEntityStatusType(const CanonicalizedEntityStatusType & obj);
+  explicit CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator traffic_simulator_msgs::msg::EntityStatus() const noexcept
   {
     return entity_status_;
@@ -49,7 +49,7 @@ public:
     }
     return entity_status_.lanelet_pose;
   }
-  CanonicalizedEntityStatusType & operator=(const CanonicalizedEntityStatusType & obj)
+  CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj)
   {
     this->entity_status_ = obj.entity_status_;
     return *this;
@@ -72,7 +72,7 @@ private:
 };
 }  // namespace entity_status
 
-using CanonicalizedEntityStatusType = entity_status::CanonicalizedEntityStatusType;
+using CanonicalizedEntityStatus = entity_status::CanonicalizedEntityStatus;
 
 }  // namespace traffic_simulator
 

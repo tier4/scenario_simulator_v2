@@ -186,14 +186,13 @@ public:
 
   bool despawn(const std::string & name);
 
-  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatusType & status)
-    -> void;
+  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
   auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
   auto setEntityStatus(
-    const std::string & name, const CanonicalizedLaneletPoseType & lanelet_pose,
+    const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
   auto setEntityStatus(
@@ -305,12 +304,12 @@ public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
   auto canonicalize(const LaneletPoseType & maybe_non_canonicalized_lanelet_pose) const
-    -> CanonicalizedLaneletPoseType;
+    -> CanonicalizedLaneletPose;
   auto canonicalize(const EntityStatusType & may_non_canonicalized_entity_status) const
-    -> CanonicalizedEntityStatusType;
+    -> CanonicalizedEntityStatus;
 
   auto toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
-    -> boost::optional<CanonicalizedLaneletPoseType>;
+    -> boost::optional<CanonicalizedLaneletPose>;
 
 private:
   bool updateSensorFrame();

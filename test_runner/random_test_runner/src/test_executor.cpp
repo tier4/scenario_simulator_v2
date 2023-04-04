@@ -95,7 +95,7 @@ void TestExecutor::initialize()
     std::this_thread::sleep_for(std::chrono::milliseconds{5000});
 
     api_->requestAssignRoute(
-      ego_name_, std::vector<traffic_simulator::CanonicalizedLaneletPoseType>(
+      ego_name_, std::vector<traffic_simulator::CanonicalizedLaneletPose>(
                    {api_->canonicalize(test_description_.ego_goal_position)}));
     api_->asAutoware(ego_name_).engage();
 

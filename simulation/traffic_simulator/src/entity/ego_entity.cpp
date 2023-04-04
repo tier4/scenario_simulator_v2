@@ -153,7 +153,7 @@ auto EgoEntity::makeAutoware(const Configuration & configuration)
 }
 
 EgoEntity::EgoEntity(
-  const std::string & name, const CanonicalizedEntityStatusType & entity_status,
+  const std::string & name, const CanonicalizedEntityStatus & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration, const double step_time)
@@ -352,7 +352,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   } else {
     entity_status.action_status.linear_jerk = 0;
   }
-  setStatus(CanonicalizedEntityStatusType(entity_status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_));
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
@@ -362,7 +362,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPoseType & lanelet_pose)
+void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
   requestAssignRoute({lanelet_pose});
 }
@@ -372,7 +372,7 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
   requestAssignRoute({map_pose});
 }
 
-void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> & waypoints)
+void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
 {
   std::vector<geometry_msgs::msg::Pose> route;
 
@@ -449,7 +449,7 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 {
 }
 
-auto EgoEntity::setStatus(const CanonicalizedEntityStatusType & status) -> void
+auto EgoEntity::setStatus(const CanonicalizedEntityStatus & status) -> void
 {
   VehicleEntity::setStatus(status);
 

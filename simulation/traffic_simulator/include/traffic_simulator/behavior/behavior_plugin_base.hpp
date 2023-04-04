@@ -34,7 +34,7 @@ namespace entity_behavior
 {
 using EntityTypeDict = std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
 using EntityStatusDict =
-  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatusType>;
+  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>;
 
 class BehaviorPluginBase
 {
@@ -57,7 +57,7 @@ public:
   DEFINE_GETTER_SETTER(CurrentTime,          "current_time",           double)
   DEFINE_GETTER_SETTER(DebugMarker,          "debug_marker",           std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(BehaviorParameter,    "behavior_parameter",     traffic_simulator_msgs::msg::BehaviorParameter)
-  DEFINE_GETTER_SETTER(EntityStatus,         "entity_status",          std::shared_ptr<traffic_simulator::CanonicalizedEntityStatusType>)
+  DEFINE_GETTER_SETTER(EntityStatus,         "entity_status",          std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(EntityTypeList,       "entity_type_list",       EntityTypeDict)
   DEFINE_GETTER_SETTER(GoalPoses,            "goal_poses",             std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils,           "hdmap_utils",            std::shared_ptr<hdmap_utils::HdMapUtils>)
@@ -71,7 +71,7 @@ public:
   DEFINE_GETTER_SETTER(TargetSpeed,          "target_speed",           boost::optional<double>)
   DEFINE_GETTER_SETTER(LaneChangeParameters, "lane_change_parameters", traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(TrafficLightManager,  "traffic_light_manager",  std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
-  DEFINE_GETTER_SETTER(UpdatedStatus,        "updated_status",         std::shared_ptr<traffic_simulator::CanonicalizedEntityStatusType>)
+  DEFINE_GETTER_SETTER(UpdatedStatus,        "updated_status",         std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(VehicleParameters,    "vehicle_parameters",     traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,            "waypoints",              traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on

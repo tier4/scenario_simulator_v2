@@ -60,8 +60,8 @@ struct RelativeTargetSpeed
   {
   }
   double getAbsoluteValue(
-    const CanonicalizedEntityStatusType & status,
-    const std::unordered_map<std::string, CanonicalizedEntityStatusType> & other_status) const;
+    const CanonicalizedEntityStatus & status,
+    const std::unordered_map<std::string, CanonicalizedEntityStatus> & other_status) const;
   std::string reference_entity_name;
   Type type;
   double value;

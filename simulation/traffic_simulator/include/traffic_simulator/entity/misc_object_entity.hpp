@@ -26,7 +26,7 @@ class MiscObjectEntity : public EntityBase
 {
 public:
   explicit MiscObjectEntity(
-    const std::string & name, const CanonicalizedEntityStatusType &,
+    const std::string & name, const CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
@@ -52,7 +52,7 @@ public:
 
   ~MiscObjectEntity() override = default;
 
-  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPoseType> override { return {}; }
+  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override { return {}; }
 
   boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
@@ -73,7 +73,7 @@ public:
 
   void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool) override;
 
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> &) override
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override
   {
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
@@ -83,7 +83,7 @@ public:
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
 
-  void requestAcquirePosition(const CanonicalizedLaneletPoseType &) override
+  void requestAcquirePosition(const CanonicalizedLaneletPose &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }

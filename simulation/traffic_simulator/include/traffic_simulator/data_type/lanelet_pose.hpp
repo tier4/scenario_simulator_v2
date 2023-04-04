@@ -73,7 +73,7 @@ private:
 bool isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &);
 }  // namespace lanelet_pose
 
-using CanonicalizedLaneletPoseType = lanelet_pose::CanonicalizedLaneletPose;
+using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_

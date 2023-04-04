@@ -137,7 +137,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   }
   if (!distance_to_stop_target_) {
     setOutput(
-      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
                           calculateUpdatedEntityStatus(0)));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
@@ -152,7 +152,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     target_speed = target_linear_speed.get();
   }
   setOutput(
-    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
+    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
                         calculateUpdatedEntityStatus(target_speed.get())));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));

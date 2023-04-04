@@ -48,7 +48,7 @@ class EntityBase
 {
 public:
   explicit EntityBase(
-    const std::string & name, const CanonicalizedEntityStatusType &,
+    const std::string & name, const CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   virtual ~EntityBase() = default;
@@ -67,12 +67,12 @@ public:
   DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       static_cast<EntityStatusType>(getStatus()).action_status.accel)
   DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       static_cast<EntityStatusType>(getStatus()).action_status.twist)
   DEFINE_GETTER(DynamicConstraints,       traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
-  DEFINE_GETTER(EntityStatusBeforeUpdate, const CanonicalizedEntityStatusType &,           status_before_update_)
+  DEFINE_GETTER(EntityStatusBeforeUpdate, const CanonicalizedEntityStatus &,           status_before_update_)
   DEFINE_GETTER(EntitySubtype,            traffic_simulator_msgs::msg::EntitySubtype,      static_cast<EntityStatusType>(getStatus()).subtype)
   DEFINE_GETTER(LinearJerk,               double,                                          static_cast<EntityStatusType>(getStatus()).action_status.linear_jerk)
   DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        static_cast<EntityStatusType>(getStatus()).pose)
   DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
-  DEFINE_GETTER(Status,                   const CanonicalizedEntityStatusType &,           status_)
+  DEFINE_GETTER(Status,                   const CanonicalizedEntityStatus &,           status_)
   DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
   // clang-format on
 #undef DEFINE_GETTER
@@ -116,12 +116,12 @@ public:
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
-  virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPoseType> = 0;
+  virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
 
-  /*   */ auto getLaneletPose() const -> boost::optional<CanonicalizedLaneletPoseType>;
+  /*   */ auto getLaneletPose() const -> boost::optional<CanonicalizedLaneletPose>;
 
   /*   */ auto getLaneletPose(double matching_distance) const
-    -> boost::optional<CanonicalizedLaneletPoseType>;
+    -> boost::optional<CanonicalizedLaneletPose>;
 
   /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
     -> geometry_msgs::msg::Pose;
@@ -138,11 +138,11 @@ public:
 
   /*   */ void resetDynamicConstraints();
 
-  virtual void requestAcquirePosition(const CanonicalizedLaneletPoseType &) = 0;
+  virtual void requestAcquirePosition(const CanonicalizedLaneletPose &) = 0;
 
   virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &) = 0;
 
-  virtual void requestAssignRoute(const std::vector<CanonicalizedLaneletPoseType> &) = 0;
+  virtual void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) = 0;
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
@@ -186,10 +186,9 @@ public:
   /*   */ void setEntityTypeList(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);
 
-  /*   */ void setOtherStatus(
-    const std::unordered_map<std::string, CanonicalizedEntityStatusType> &);
+  /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
-  virtual auto setStatus(const CanonicalizedEntityStatusType &) -> void;
+  virtual auto setStatus(const CanonicalizedEntityStatus &) -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 
@@ -215,9 +214,9 @@ public:
   bool verbose;
 
 protected:
-  CanonicalizedEntityStatusType status_;
+  CanonicalizedEntityStatus status_;
 
-  CanonicalizedEntityStatusType status_before_update_;
+  CanonicalizedEntityStatus status_before_update_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
@@ -226,7 +225,7 @@ protected:
   double stand_still_duration_ = 0.0;
   double traveled_distance_ = 0.0;
 
-  std::unordered_map<std::string, CanonicalizedEntityStatusType> other_status_;
+  std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
   boost::optional<double> target_speed_;

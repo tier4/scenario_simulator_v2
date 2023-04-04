@@ -219,8 +219,8 @@ BT::NodeStatus LaneChangeAction::tick()
       entity_status_updated.action_status = getActionStatus();
       setOutput(
         "updated_status",
-        std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
-          traffic_simulator::CanonicalizedEntityStatusType(entity_status_updated, hdmap_utils)));
+        std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+          traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils)));
       const auto waypoints = calculateWaypoints();
       if (waypoints.waypoints.empty()) {
         return BT::NodeStatus::FAILURE;
@@ -251,8 +251,8 @@ BT::NodeStatus LaneChangeAction::tick()
       entity_status_updated.action_status = getActionStatus();
       setOutput(
         "updated_status",
-        std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
-          traffic_simulator::CanonicalizedEntityStatusType(entity_status_updated, hdmap_utils)));
+        std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+          traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils)));
       return BT::NodeStatus::SUCCESS;
     }
   }

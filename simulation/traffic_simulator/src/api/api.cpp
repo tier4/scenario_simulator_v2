@@ -53,7 +53,7 @@ bool API::despawn(const std::string & name)
   return true;
 }
 
-auto API::setEntityStatus(const std::string & name, const CanonicalizedEntityStatusType & status)
+auto API::setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status)
   -> void
 {
   entity_manager_ptr_->setEntityStatus(name, status);
@@ -106,7 +106,7 @@ boost::optional<double> API::getTimeHeadway(const std::string & from, const std:
 }
 
 auto API::setEntityStatus(
-  const std::string & name, const CanonicalizedLaneletPoseType & lanelet_pose,
+  const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   EntityStatusType status;
@@ -375,21 +375,21 @@ void API::requestLaneChange(
 }
 
 auto API::canonicalize(const LaneletPoseType & may_non_canonicalized_lanelet_pose) const
-  -> CanonicalizedLaneletPoseType
+  -> CanonicalizedLaneletPose
 {
-  return CanonicalizedLaneletPoseType(
+  return CanonicalizedLaneletPose(
     may_non_canonicalized_lanelet_pose, entity_manager_ptr_->getHdmapUtils());
 }
 
 auto API::canonicalize(const EntityStatusType & may_non_canonicalized_entity_status) const
-  -> CanonicalizedEntityStatusType
+  -> CanonicalizedEntityStatus
 {
-  return CanonicalizedEntityStatusType(
+  return CanonicalizedEntityStatus(
     may_non_canonicalized_entity_status, entity_manager_ptr_->getHdmapUtils());
 }
 
 auto API::toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
-  -> boost::optional<CanonicalizedLaneletPoseType>
+  -> boost::optional<CanonicalizedLaneletPose>
 {
   if (
     const auto pose =

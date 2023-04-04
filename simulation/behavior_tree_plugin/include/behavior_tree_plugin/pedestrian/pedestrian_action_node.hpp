@@ -42,9 +42,9 @@ public:
   }
   traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
   auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
-    -> traffic_simulator::CanonicalizedEntityStatusType;
+    -> traffic_simulator::CanonicalizedEntityStatus;
   auto calculateUpdatedEntityStatus(double target_speed) const
-    -> traffic_simulator::CanonicalizedEntityStatusType;
+    -> traffic_simulator::CanonicalizedEntityStatus;
 
 protected:
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;

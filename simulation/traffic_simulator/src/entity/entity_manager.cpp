@@ -139,7 +139,7 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
   return names;
 }
 
-auto EntityManager::getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatusType
+auto EntityManager::getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus
 {
   if (const auto iter = entities_.find(name); iter == entities_.end()) {
     THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
@@ -147,7 +147,7 @@ auto EntityManager::getEntityStatus(const std::string & name) const -> Canonical
     auto entity_status = static_cast<EntityStatusType>(iter->second->getStatus());
     entity_status.action_status.current_action = getCurrentAction(name);
     entity_status.time = current_time_;
-    return CanonicalizedEntityStatusType(entity_status, hdmap_utils_ptr_);
+    return CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_);
   }
 }
 
@@ -167,7 +167,7 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
 }
 
 auto EntityManager::getLateralDistance(
-  const CanonicalizedLaneletPoseType & from, const CanonicalizedLaneletPoseType & to) const
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to) const
   -> boost::optional<double>
 {
   return hdmap_utils_ptr_->getLateralDistance(
@@ -175,8 +175,7 @@ auto EntityManager::getLateralDistance(
 }
 
 auto EntityManager::getLateralDistance(
-  const CanonicalizedLaneletPoseType & from, const std::string & to) const
-  -> boost::optional<double>
+  const CanonicalizedLaneletPose & from, const std::string & to) const -> boost::optional<double>
 {
   if (const auto to_pose = getLaneletPose(to)) {
     return getLateralDistance(from, to_pose.get());
@@ -185,8 +184,7 @@ auto EntityManager::getLateralDistance(
 }
 
 auto EntityManager::getLateralDistance(
-  const std::string & from, const CanonicalizedLaneletPoseType & to) const
-  -> boost::optional<double>
+  const std::string & from, const CanonicalizedLaneletPose & to) const -> boost::optional<double>
 {
   if (const auto from_pose = getLaneletPose(from)) {
     return getLateralDistance(from_pose.get(), to);
@@ -206,7 +204,7 @@ auto EntityManager::getLateralDistance(const std::string & from, const std::stri
 }
 
 auto EntityManager::getLateralDistance(
-  const CanonicalizedLaneletPoseType & from, const CanonicalizedLaneletPoseType & to,
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   double matching_distance) const -> boost::optional<double>
 {
   if (
@@ -218,7 +216,7 @@ auto EntityManager::getLateralDistance(
 }
 
 auto EntityManager::getLateralDistance(
-  const CanonicalizedLaneletPoseType & from, const std::string & to, double matching_distance) const
+  const CanonicalizedLaneletPose & from, const std::string & to, double matching_distance) const
   -> boost::optional<double>
 {
   if (const auto to_pose = getLaneletPose(to, matching_distance)) {
@@ -228,7 +226,7 @@ auto EntityManager::getLateralDistance(
 }
 
 auto EntityManager::getLateralDistance(
-  const std::string & from, const CanonicalizedLaneletPoseType & to, double matching_distance) const
+  const std::string & from, const CanonicalizedLaneletPose & to, double matching_distance) const
   -> boost::optional<double>
 {
   if (const auto from_pose = getLaneletPose(from, matching_distance)) {
@@ -252,7 +250,7 @@ auto EntityManager::getLateralDistance(
 }
 
 auto EntityManager::getLongitudinalDistance(
-  const CanonicalizedLaneletPoseType & from, const CanonicalizedLaneletPoseType & to,
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool include_adjacent_lanelet, bool include_opposite_direction) -> boost::optional<double>
 {
   if (!include_adjacent_lanelet) {
@@ -293,8 +291,8 @@ auto EntityManager::getLongitudinalDistance(
       for (const auto & to_pose : to_poses) {
         if (
           const auto distance = getLongitudinalDistance(
-            CanonicalizedLaneletPoseType(from_pose, hdmap_utils_ptr_),
-            CanonicalizedLaneletPoseType(to_pose, hdmap_utils_ptr_), false,
+            CanonicalizedLaneletPose(from_pose, hdmap_utils_ptr_),
+            CanonicalizedLaneletPose(to_pose, hdmap_utils_ptr_), false,
             include_opposite_direction)) {
           distances.emplace_back(distance.get());
         }
@@ -311,7 +309,7 @@ auto EntityManager::getLongitudinalDistance(
 }
 
 auto EntityManager::getLongitudinalDistance(
-  const CanonicalizedLaneletPoseType & from, const std::string & to, bool include_adjacent_lanelet,
+  const CanonicalizedLaneletPose & from, const std::string & to, bool include_adjacent_lanelet,
   bool include_opposite_direction) -> boost::optional<double>
 {
   const auto to_pose = getLaneletPose(to);
@@ -324,7 +322,7 @@ auto EntityManager::getLongitudinalDistance(
 }
 
 auto EntityManager::getLongitudinalDistance(
-  const std::string & from, const CanonicalizedLaneletPoseType & to, bool include_adjacent_lanelet,
+  const std::string & from, const CanonicalizedLaneletPose & to, bool include_adjacent_lanelet,
   bool include_opposite_direction) -> boost::optional<double>
 {
   const auto from_pose = getLaneletPose(from);
@@ -408,29 +406,27 @@ auto EntityManager::getRelativePose(const std::string & from, const std::string 
 }
 
 auto EntityManager::getRelativePose(
-  const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPoseType & to) const
+  const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to) const
   -> geometry_msgs::msg::Pose
 {
   return getRelativePose(from, toMapPose(to));
 }
 
 auto EntityManager::getRelativePose(
-  const CanonicalizedLaneletPoseType & from, const geometry_msgs::msg::Pose & to) const
+  const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to) const
   -> geometry_msgs::msg::Pose
 {
   return getRelativePose(toMapPose(from), to);
 }
 
 auto EntityManager::getRelativePose(
-  const std::string & from, const CanonicalizedLaneletPoseType & to) const
-  -> geometry_msgs::msg::Pose
+  const std::string & from, const CanonicalizedLaneletPose & to) const -> geometry_msgs::msg::Pose
 {
   return getRelativePose(getMapPose(from), toMapPose(to));
 }
 
 auto EntityManager::getRelativePose(
-  const CanonicalizedLaneletPoseType & from, const std::string & to) const
-  -> geometry_msgs::msg::Pose
+  const CanonicalizedLaneletPose & from, const std::string & to) const -> geometry_msgs::msg::Pose
 {
   return getRelativePose(toMapPose(from), getMapPose(to));
 }
@@ -508,7 +504,7 @@ bool EntityManager::reachPosition(
 }
 
 bool EntityManager::reachPosition(
-  const std::string & name, const CanonicalizedLaneletPoseType & lanelet_pose,
+  const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
   const double tolerance) const
 {
   return reachPosition(name, static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
@@ -571,7 +567,7 @@ void EntityManager::requestSpeedChange(
 }
 
 auto EntityManager::setEntityStatus(
-  const std::string & name, const CanonicalizedEntityStatusType & status) -> void
+  const std::string & name, const CanonicalizedEntityStatus & status) -> void
 {
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR(
@@ -590,7 +586,7 @@ void EntityManager::setVerbose(const bool verbose)
   }
 }
 
-auto EntityManager::toMapPose(const CanonicalizedLaneletPoseType & lanelet_pose) const
+auto EntityManager::toMapPose(const CanonicalizedLaneletPose & lanelet_pose) const
   -> const geometry_msgs::msg::Pose
 {
   return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
@@ -599,7 +595,7 @@ auto EntityManager::toMapPose(const CanonicalizedLaneletPoseType & lanelet_pose)
 auto EntityManager::updateNpcLogic(
   const std::string & name,
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
-  -> const CanonicalizedEntityStatusType &
+  -> const CanonicalizedEntityStatus &
 {
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
@@ -620,7 +616,7 @@ void EntityManager::update(const double current_time, const double step_time)
     traffic_light_manager_ptr_->update(step_time_);
   }
   auto type_list = getEntityTypeList();
-  std::unordered_map<std::string, CanonicalizedEntityStatusType> all_status;
+  std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {
     all_status.emplace(name, entity->getStatus());
   }

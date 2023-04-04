@@ -114,12 +114,12 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  const double ftont_entity_linear_velocity =
+  const double front_entity_linear_velocity =
     static_cast<traffic_simulator::EntityStatusType>(front_entity_status)
       .action_status.twist.linear.x;
-  if (target_speed.get() <= ftont_entity_linear_velocity) {
+  if (target_speed.get() <= front_entity_linear_velocity) {
     setOutput(
-      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
                           calculateUpdatedEntityStatus(target_speed.get())));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
@@ -131,8 +131,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     (calculateStopDistance(behavior_parameter.dynamic_constraints) +
      vehicle_parameters.bounding_box.dimensions.x + 5)) {
     setOutput(
-      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
-                          calculateUpdatedEntityStatus(ftont_entity_linear_velocity + 2)));
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+                          calculateUpdatedEntityStatus(front_entity_linear_velocity + 2)));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;
@@ -140,15 +140,15 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     distance_to_front_entity_.get() <=
     calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     setOutput(
-      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
-                          calculateUpdatedEntityStatus(ftont_entity_linear_velocity - 2)));
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+                          calculateUpdatedEntityStatus(front_entity_linear_velocity - 2)));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;
   } else {
     setOutput(
-      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
-                          calculateUpdatedEntityStatus(ftont_entity_linear_velocity)));
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+                          calculateUpdatedEntityStatus(front_entity_linear_velocity)));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;

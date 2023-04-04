@@ -21,7 +21,7 @@ RoutePlanner::RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdma
 {
 }
 
-auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPoseType> & waypoints) -> void
+auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & waypoints) -> void
 {
   // Just setting waypoints to the queue, do not planning route.
   waypoint_queue_.clear();
@@ -31,8 +31,7 @@ auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPoseType> 
 }
 
 auto RoutePlanner::getRouteLanelets(
-  const CanonicalizedLaneletPoseType & entity_lanelet_pose, double horizon)
-  -> std::vector<std::int64_t>
+  const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon) -> std::vector<std::int64_t>
 {
   const auto lanelet_pose = static_cast<LaneletPoseType>(entity_lanelet_pose);
   // If the queue is not empty, calculating route from the entity_lanelet_pose to waypoint_queue_.front()
@@ -59,7 +58,7 @@ void RoutePlanner::cancelRoute()
   route_ = boost::none;
 }
 
-void RoutePlanner::cancelWaypoint(const CanonicalizedLaneletPoseType & entity_lanelet_pose)
+void RoutePlanner::cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose)
 {
   while (true) {
     if (waypoint_queue_.empty()) {
@@ -84,16 +83,16 @@ std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame() c
   return ret;
 }
 
-std::vector<CanonicalizedLaneletPoseType> RoutePlanner::getGoalPoses() const
+std::vector<CanonicalizedLaneletPose> RoutePlanner::getGoalPoses() const
 {
-  std::vector<CanonicalizedLaneletPoseType> goal_poses;
+  std::vector<CanonicalizedLaneletPose> goal_poses;
   for (const auto & waypoint : waypoint_queue_) {
     goal_poses.emplace_back(waypoint);
   }
   return goal_poses;
 }
 
-void RoutePlanner::updateRoute(const CanonicalizedLaneletPoseType & entity_lanelet_pose)
+void RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose)
 {
   if (waypoint_queue_.front() <= entity_lanelet_pose) {
     cancelWaypoint(entity_lanelet_pose);

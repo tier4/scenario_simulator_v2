@@ -35,7 +35,7 @@ using NativeWorldPosition = geometry_msgs::msg::Pose;
 
 using NativeRelativeWorldPosition = NativeWorldPosition;
 
-using NativeLanePosition = traffic_simulator::CanonicalizedLaneletPoseType;
+using NativeLanePosition = traffic_simulator::CanonicalizedLaneletPose;
 
 using NativeRelativeLanePosition = NativeLanePosition;
 
@@ -90,7 +90,7 @@ public:
     }
 
     static auto canonicalize(const traffic_simulator::LaneletPoseType & non_canonicalized)
-      -> traffic_simulator::CanonicalizedLaneletPoseType
+      -> traffic_simulator::CanonicalizedLaneletPose
     {
       return core->canonicalize(non_canonicalized);
     }

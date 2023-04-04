@@ -118,7 +118,7 @@ auto HdMapUtils::canonicalizeLaneletPose(
 {
   auto clamped = lanelet_pose;
   while (clamped.s < 0) {
-    // When canonicalizeing to backward lanelet_id, do not consider route
+    // When canonicalizing to backward lanelet_id, do not consider route
     if (const auto ids = getPreviousLaneletIds(clamped.lanelet_id); ids.empty()) {
       return {boost::none, clamped.lanelet_id};
     } else {
@@ -128,7 +128,7 @@ auto HdMapUtils::canonicalizeLaneletPose(
   }
   while (clamped.s > getLaneletLength(clamped.lanelet_id)) {
     bool next_lanelet_found = false;
-    // When canonicalizeing to forward lanelet_id, consider route
+    // When canonicalizing to forward lanelet_id, consider route
     for (const auto id : getNextLaneletIds(clamped.lanelet_id)) {
       if (std::any_of(route_lanelets.begin(), route_lanelets.end(), [id](auto id_on_route) {
             return id == id_on_route;

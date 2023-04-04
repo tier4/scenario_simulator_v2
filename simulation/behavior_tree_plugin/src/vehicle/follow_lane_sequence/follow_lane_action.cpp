@@ -129,7 +129,7 @@ BT::NodeStatus FollowLaneAction::tick()
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   setOutput(
-    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
+    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
                         calculateUpdatedEntityStatus(target_speed.get())));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));

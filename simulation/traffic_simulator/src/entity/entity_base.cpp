@@ -28,7 +28,7 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name, const CanonicalizedEntityStatusType & entity_status,
+  const std::string & name, const CanonicalizedEntityStatus & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
@@ -179,29 +179,29 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
   return *std::min_element(distances.begin(), distances.end());
 }
 
-auto EntityBase::getLaneletPose() const -> boost::optional<CanonicalizedLaneletPoseType>
+auto EntityBase::getLaneletPose() const -> boost::optional<CanonicalizedLaneletPose>
 {
   const auto status = static_cast<EntityStatusType>(getStatus());
   if (laneMatchingSucceed()) {
-    return CanonicalizedLaneletPoseType(status.lanelet_pose, hdmap_utils_ptr_);
+    return CanonicalizedLaneletPose(status.lanelet_pose, hdmap_utils_ptr_);
   }
   return boost::none;
 }
 
 auto EntityBase::getLaneletPose(double matching_distance) const
-  -> boost::optional<CanonicalizedLaneletPoseType>
+  -> boost::optional<CanonicalizedLaneletPose>
 {
   if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getEntityType().type) {
     if (
       const auto lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), true, matching_distance)) {
-      return CanonicalizedLaneletPoseType(lanelet_pose.get(), hdmap_utils_ptr_);
+      return CanonicalizedLaneletPose(lanelet_pose.get(), hdmap_utils_ptr_);
     }
   } else {
     if (
       const auto lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), false, matching_distance)) {
-      return CanonicalizedLaneletPoseType(lanelet_pose.get(), hdmap_utils_ptr_);
+      return CanonicalizedLaneletPose(lanelet_pose.get(), hdmap_utils_ptr_);
     }
   }
   return boost::none;
@@ -633,7 +633,7 @@ void EntityBase::setEntityTypeList(
 }
 
 void EntityBase::setOtherStatus(
-  const std::unordered_map<std::string, CanonicalizedEntityStatusType> & status)
+  const std::unordered_map<std::string, CanonicalizedEntityStatus> & status)
 {
   other_status_.clear();
 
@@ -655,7 +655,7 @@ void EntityBase::setOtherStatus(
   }
 }
 
-auto EntityBase::setStatus(const CanonicalizedEntityStatusType & status) -> void
+auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
 {
   auto new_status = static_cast<EntityStatusType>(status);
 
@@ -671,21 +671,21 @@ auto EntityBase::setStatus(const CanonicalizedEntityStatusType & status) -> void
   new_status.subtype = getEntitySubtype();
   new_status.bounding_box = getBoundingBox();
   new_status.action_status.current_action = getCurrentAction();
-  status_ = CanonicalizedEntityStatusType(new_status, hdmap_utils_ptr_);
+  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
   auto status = static_cast<EntityStatusType>(getStatus());
   status.action_status.twist.linear.x = linear_velocity;
-  setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 {
   auto status = static_cast<EntityStatusType>(getStatus());
   status.action_status.accel.linear.x = linear_acceleration;
-  setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 void EntityBase::setTrafficLightManager(
@@ -704,14 +704,14 @@ void EntityBase::stopAtEndOfRoad()
   status.action_status.twist = geometry_msgs::msg::Twist();
   status.action_status.accel = geometry_msgs::msg::Accel();
   status.action_status.linear_jerk = 0;
-  setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
   auto status = static_cast<EntityStatusType>(getStatus());
   status.time = current_time;
-  setStatus(CanonicalizedEntityStatusType(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::updateStandStillDuration(const double step_time) -> double
