@@ -179,6 +179,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
 }
 
   void EgoEntitySimulation::onUpdate(double time, double step_time, bool npc_logic_started) {
+    autoware->rethrow();
     if (npc_logic_started) {
       Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
 
