@@ -84,6 +84,7 @@ HdMapUtils::HdMapUtils(
     lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
+// If route is not specified, the lanlelet_id with the lowest array index is used as a candidate for canonicalize destination.
 auto HdMapUtils::canonicalizeLaneletPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> std::tuple<

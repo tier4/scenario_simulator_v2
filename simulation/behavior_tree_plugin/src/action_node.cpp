@@ -404,6 +404,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
   if (
     const auto canonicalized_lanelet_pose =
       std::get<boost::optional<traffic_simulator_msgs::msg::LaneletPose>>(canonicalized)) {
+    // If canonicalize succeed, set canonicalized pose and set other values.
     traffic_simulator::EntityStatusType entity_status_updated;
     {
       entity_status_updated.time = current_time + step_time;
@@ -415,6 +416,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
     }
     return traffic_simulator::CanonicalizedEntityStatusType(entity_status_updated, hdmap_utils);
   } else {
+    // If canonicalize failed, set end of road lanelet pose.
     if (
       const auto end_of_road_lanelet_id = std::get<boost::optional<std::int64_t>>(canonicalized)) {
       if (lanelet_pose.s < 0) {
