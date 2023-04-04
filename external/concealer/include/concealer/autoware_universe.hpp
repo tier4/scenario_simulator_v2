@@ -55,7 +55,7 @@ class AutowareUniverse : public Autoware
 
   std::thread localization_and_vehicle_state_update_thread;
 
-  std::atomic<bool> is_stop_requested = false;  // IS THIS INTENDED?
+  std::atomic<bool> is_stop_requested = false;
 
   std::atomic<bool> is_thrown = false;
 
