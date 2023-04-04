@@ -48,7 +48,7 @@ BT::NodeStatus WalkStraightAction::tick()
     target_speed = 1.111;
   }
   setOutput(
-    "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
                         calculateUpdatedEntityStatusInWorldFrame(target_speed.get())));
   return BT::NodeStatus::RUNNING;
 }

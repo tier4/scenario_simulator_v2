@@ -86,11 +86,13 @@ public:
     return {
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-      BT::InputPort<traffic_simulator::EntityStatusType>("entity_status"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatusType>>(
+        "entity_status"),
       BT::InputPort<double>("current_time"),
       BT::InputPort<double>("step_time"),
       BT::InputPort<boost::optional<double>>("target_speed"),
-      BT::OutputPort<traffic_simulator::EntityStatusType>("updated_status"),
+      BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatusType>>(
+        "updated_status"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::unordered_map<std::string, traffic_simulator::EntityStatusType>>(
         "other_entity_status"),
@@ -121,11 +123,11 @@ protected:
   traffic_simulator::behavior::Request request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager;
-  std::unique_ptr<traffic_simulator::CanonicalizedEntityStatusType> entity_status;
+  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatusType> entity_status;
   double current_time;
   double step_time;
   boost::optional<double> target_speed;
-  std::unique_ptr<traffic_simulator::CanonicalizedEntityStatusType> updated_status;
+  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatusType> updated_status;
   std::unordered_map<std::string, traffic_simulator::EntityStatusType> other_entity_status;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list;
   std::vector<std::int64_t> route_lanelets;

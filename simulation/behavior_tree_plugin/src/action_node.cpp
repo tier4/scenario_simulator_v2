@@ -54,12 +54,10 @@ auto ActionNode::getBlackBoardValues() -> void
         "traffic_light_manager", traffic_light_manager)) {
     THROW_SIMULATION_ERROR("failed to get input traffic_light_manager in ActionNode");
   }
-  traffic_simulator::EntityStatusType status;
-  if (!getInput<traffic_simulator::EntityStatusType>("entity_status", status)) {
+  if (!getInput<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatusType>>(
+        "entity_status", entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input entity_status in ActionNode");
   }
-  entity_status =
-    std::make_unique<traffic_simulator::CanonicalizedEntityStatusType>(status, hdmap_utils);
 
   if (!getInput<boost::optional<double>>("target_speed", target_speed)) {
     target_speed = boost::none;
@@ -454,6 +452,8 @@ auto ActionNode::calculateUpdatedEntityStatus(
         }
         return traffic_simulator::CanonicalizedEntityStatusType(entity_status_updated, hdmap_utils);
       }
+    } else {
+      THROW_SIMULATION_ERROR("Failed to find trailing laenlet_id.");
     }
   }
 }

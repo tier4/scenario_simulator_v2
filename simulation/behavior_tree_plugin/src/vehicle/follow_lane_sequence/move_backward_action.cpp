@@ -81,7 +81,7 @@ BT::NodeStatus MoveBackwardAction::tick()
       hdmap_utils->getSpeedLimit(hdmap_utils->getPreviousLanelets(getLaneletPose().lanelet_id));
   }
   setOutput(
-    "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
                         calculateUpdatedEntityStatus(target_speed.get())));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));

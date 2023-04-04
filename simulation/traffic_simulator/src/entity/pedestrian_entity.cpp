@@ -234,13 +234,14 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
     }
     behavior_plugin_ptr_->setOtherEntityStatus(other_status);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
-    behavior_plugin_ptr_->setEntityStatus(status_);
+    behavior_plugin_ptr_->setEntityStatus(
+      std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(status_));
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
     behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
     behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
-    if (status_updated.laneMatchingSucceed()) {
-      const auto lanelet_pose = static_cast<LaneletPoseType>(status_updated);
+    if (status_updated->laneMatchingSucceed()) {
+      const auto lanelet_pose = static_cast<LaneletPoseType>(*status_updated);
       if (
         hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
         hdmap_utils_ptr_->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s) {
@@ -248,7 +249,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    setStatus(status_updated);
+    setStatus(*status_updated);
     updateStandStillDuration(step_time);
     updateTraveledDistance(step_time);
   } else {

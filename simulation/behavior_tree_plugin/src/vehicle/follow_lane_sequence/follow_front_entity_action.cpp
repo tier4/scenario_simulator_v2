@@ -119,7 +119,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
       .action_status.twist.linear.x;
   if (target_speed.get() <= ftont_entity_linear_velocity) {
     setOutput(
-      "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
                           calculateUpdatedEntityStatus(target_speed.get())));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
@@ -131,7 +131,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     (calculateStopDistance(behavior_parameter.dynamic_constraints) +
      vehicle_parameters.bounding_box.dimensions.x + 5)) {
     setOutput(
-      "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
                           calculateUpdatedEntityStatus(ftont_entity_linear_velocity + 2)));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
@@ -140,14 +140,14 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     distance_to_front_entity_.get() <=
     calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     setOutput(
-      "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
                           calculateUpdatedEntityStatus(ftont_entity_linear_velocity - 2)));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;
   } else {
     setOutput(
-      "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
                           calculateUpdatedEntityStatus(ftont_entity_linear_velocity)));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));

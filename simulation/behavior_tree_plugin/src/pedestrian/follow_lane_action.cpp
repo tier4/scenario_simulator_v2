@@ -42,7 +42,7 @@ BT::NodeStatus FollowLaneAction::tick()
   }
   if (!entity_status->laneMatchingSucceed()) {
     stopEntity();
-    setOutput("updated_status", static_cast<traffic_simulator::EntityStatusType>(*entity_status));
+    setOutput("updated_status", entity_status);
     return BT::NodeStatus::RUNNING;
   }
   auto following_lanelets = hdmap_utils->getFollowingLanelets(getLaneletPose().lanelet_id);
@@ -50,7 +50,7 @@ BT::NodeStatus FollowLaneAction::tick()
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
   setOutput(
-    "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatusType>(
                         calculateUpdatedEntityStatus(target_speed.get())));
   return BT::NodeStatus::RUNNING;
 }
