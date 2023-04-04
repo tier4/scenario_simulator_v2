@@ -33,7 +33,7 @@ public:
   }
 
   template <typename NodeInterface>
-  PublisherWrapper(std::string topic, NodeInterface & autoware_interface)
+  explicit PublisherWrapper(std::string topic, NodeInterface & autoware_interface)
   : publisher(
       autoware_interface.template create_publisher<MessageType>(topic, rclcpp::QoS(1).reliable()))
   {
