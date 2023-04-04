@@ -29,6 +29,10 @@ public:
   explicit CanonicalizedLaneletPose(
     const LaneletPoseType & maybe_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
+  explicit CanonicalizedLaneletPose(
+    const LaneletPoseType & maybe_non_canonicalized_lanelet_pose,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+    const std::vector<std::int64_t> & route_lanelets);
   explicit operator LaneletPoseType() const noexcept { return lanelet_pose_; }
   explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
 
@@ -58,6 +62,10 @@ private:
   auto canonicalize(
     const LaneletPoseType & may_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPoseType;
+  auto canonicalize(
+    const LaneletPoseType & may_non_canonicalized_lanelet_pose,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+    const std::vector<std::int64_t> & route_lanelets) -> LaneletPoseType;
   const LaneletPoseType lanelet_pose_;
   const geometry_msgs::msg::Pose map_pose_;
 };

@@ -70,6 +70,11 @@ public:
   auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
     -> std::tuple<
       boost::optional<traffic_simulator_msgs::msg::LaneletPose>, boost::optional<std::int64_t>>;
+  auto canonicalizeLaneletPose(
+    const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
+    const std::vector<std::int64_t> & route_lanelets) const
+    -> std::tuple<
+      boost::optional<traffic_simulator_msgs::msg::LaneletPose>, boost::optional<std::int64_t>>;
 
   const autoware_auto_mapping_msgs::msg::HADMapBin toMapBin();
   void insertMarkerArray(

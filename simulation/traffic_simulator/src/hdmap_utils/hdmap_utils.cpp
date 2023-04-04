@@ -109,6 +109,46 @@ auto HdMapUtils::canonicalizeLaneletPose(
   return {clamped, boost::none};
 }
 
+auto HdMapUtils::canonicalizeLaneletPose(
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
+  const std::vector<std::int64_t> & route_lanelets) const
+  -> std::tuple<
+    boost::optional<traffic_simulator_msgs::msg::LaneletPose>, boost::optional<std::int64_t>>
+{
+  auto clamped = lanelet_pose;
+  while (clamped.s < 0) {
+    bool next_lanelet_found = false;
+    for (const auto id : getPreviousLaneletIds(clamped.lanelet_id)) {
+      if (std::any_of(route_lanelets.begin(), route_lanelets.end(), [id](auto id_on_route) {
+            return id == id_on_route;
+          })) {
+        clamped.s += getLaneletLength(id);
+        clamped.lanelet_id = id;
+        next_lanelet_found = true;
+      }
+    }
+    if (!next_lanelet_found) {
+      return {boost::none, clamped.lanelet_id};
+    }
+  }
+  while (clamped.s > getLaneletLength(clamped.lanelet_id)) {
+    bool next_lanelet_found = false;
+    for (const auto id : getNextLaneletIds(clamped.lanelet_id)) {
+      if (std::any_of(route_lanelets.begin(), route_lanelets.end(), [id](auto id_on_route) {
+            return id == id_on_route;
+          })) {
+        clamped.s -= getLaneletLength(clamped.lanelet_id);
+        clamped.lanelet_id = id;
+        next_lanelet_found = true;
+      }
+    }
+    if (!next_lanelet_found) {
+      return {boost::none, clamped.lanelet_id};
+    }
+  }
+  return {clamped, boost::none};
+}
+
 std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
 {
   std::vector<std::int64_t> ret;

@@ -400,7 +400,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
   auto lanelet_pose = getLaneletPose();
   lanelet_pose.s =
     lanelet_pose.s + (twist_new.linear.x + getCurrentTwist().linear.x) / 2.0 * step_time;
-  const auto canonicalized = hdmap_utils->canonicalizeLaneletPose(lanelet_pose);
+  const auto canonicalized = hdmap_utils->canonicalizeLaneletPose(lanelet_pose, route_lanelets);
   if (
     const auto canonicalized_lanelet_pose =
       std::get<boost::optional<traffic_simulator_msgs::msg::LaneletPose>>(canonicalized)) {

@@ -32,6 +32,10 @@ public:
   explicit CanonicalizedEntityStatusType(
     const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
+  explicit CanonicalizedEntityStatusType(
+    const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+    const std::vector<std::int64_t> & route_lanelets);
   explicit CanonicalizedEntityStatusType(const CanonicalizedEntityStatusType & obj);
   explicit operator traffic_simulator_msgs::msg::EntityStatus() const noexcept
   {
@@ -60,6 +64,10 @@ private:
   auto canonicalize(
     const EntityStatusType & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> EntityStatusType;
+  auto canonicalize(
+    const EntityStatusType & may_non_canonicalized_entity_status,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+    const std::vector<std::int64_t> & route_lanelets) -> EntityStatusType;
   EntityStatusType entity_status_;
 };
 }  // namespace entity_status
