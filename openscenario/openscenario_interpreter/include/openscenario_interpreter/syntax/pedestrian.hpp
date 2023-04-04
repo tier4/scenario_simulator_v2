@@ -36,6 +36,7 @@ inline namespace syntax
  *      <xsd:element name="Properties" type="Properties"/>
  *    </xsd:all>
  *    <xsd:attribute name="model" type="String" use="required"/>
+ *    <xsd:attribute name="model3d" type="String" />
  *    <xsd:attribute name="mass" type="Double" use="required"/>
  *    <xsd:attribute name="name" type="String" use="required"/>
  *    <xsd:attribute name="pedestrianCategory" type="PedestrianCategory" use="required"/>
@@ -47,6 +48,8 @@ struct Pedestrian : public Scope
   const Double mass;
 
   const String model;
+
+  const String model3d;
 
   const PedestrianCategory pedestrian_category;
 
