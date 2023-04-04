@@ -47,8 +47,9 @@ BT::NodeStatus WalkStraightAction::tick()
   if (!target_speed) {
     target_speed = 1.111;
   }
-  auto updated_status = calculateUpdatedEntityStatusInWorldFrame(target_speed.get());
-  setOutput("updated_status", updated_status);
+  setOutput(
+    "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+                        calculateUpdatedEntityStatusInWorldFrame(target_speed.get())));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian

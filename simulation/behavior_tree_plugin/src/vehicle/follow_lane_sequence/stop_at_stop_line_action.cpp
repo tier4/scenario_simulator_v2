@@ -52,17 +52,17 @@ StopAtStopLineAction::calculateObstacle(const traffic_simulator_msgs::msg::Waypo
 
 const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
 {
-  if (!entity_status.lanelet_pose_valid) {
+  if (!entity_status->laneMatchingSucceed()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (entity_status.action_status.twist.linear.x >= 0) {
+  if (getCurrentTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon = getHorizon();
+    const auto lanelet_pose = getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
-      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0,
-      entity_status.lanelet_pose.offset);
+      lanelet_pose.s, lanelet_pose.s + horizon, 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
-      reference_trajectory, entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon);
+      reference_trajectory, lanelet_pose.s, lanelet_pose.s + horizon);
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -127,7 +127,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     }
   }
 
-  if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
+  if (std::fabs(getCurrentTwist().linear.x) < 0.001) {
     if (distance_to_stopline_) {
       if (distance_to_stopline_.get() <= vehicle_parameters.bounding_box.dimensions.x + 5) {
         stopped_ = true;
@@ -140,19 +140,21 @@ BT::NodeStatus StopAtStopLineAction::tick()
     }
     if (!distance_to_stopline_) {
       stopped_ = false;
-      setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
-      const auto obstacle = calculateObstacle(waypoints);
+      setOutput(
+        "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+                            calculateUpdatedEntityStatus(target_speed.get())));
       setOutput("waypoints", waypoints);
-      setOutput("obstacle", obstacle);
+      setOutput("obstacle", calculateObstacle(waypoints));
       return BT::NodeStatus::SUCCESS;
     }
-    setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
-    const auto obstacle = calculateObstacle(waypoints);
+    setOutput(
+      "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+                          calculateUpdatedEntityStatus(target_speed.get())));
     setOutput("waypoints", waypoints);
-    setOutput("obstacle", obstacle);
+    setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;
   }
-  auto target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);
+  auto target_linear_speed = calculateTargetSpeed(getCurrentTwist().linear.x);
   if (!target_linear_speed) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
@@ -164,11 +166,12 @@ BT::NodeStatus StopAtStopLineAction::tick()
   } else {
     target_speed = target_linear_speed.get();
   }
-  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
+  setOutput(
+    "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+                        calculateUpdatedEntityStatus(target_speed.get())));
   stopped_ = false;
-  const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
-  setOutput("obstacle", obstacle);
+  setOutput("obstacle", calculateObstacle(waypoints));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

@@ -32,8 +32,8 @@ auto CanonicalizedLaneletPose::canonicalize(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPoseType
 {
   if (
-    const auto canonicalized =
-      hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose)) {
+    const auto canonicalized = std::get<boost::optional<traffic_simulator::LaneletPoseType>>(
+      hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose))) {
     return canonicalized.get();
   } else {
     THROW_SEMANTIC_ERROR(

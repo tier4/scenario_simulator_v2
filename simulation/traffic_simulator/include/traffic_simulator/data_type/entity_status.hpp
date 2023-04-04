@@ -37,6 +37,7 @@ public:
   {
     return entity_status_;
   }
+  explicit operator geometry_msgs::msg::Pose() const noexcept { return entity_status_.pose; }
   explicit operator traffic_simulator_msgs::msg::LaneletPose() const
   {
     if (!laneMatchingSucceed()) {
@@ -50,6 +51,10 @@ public:
     return *this;
   }
   bool laneMatchingSucceed() const noexcept { return entity_status_.lanelet_pose_valid; }
+  void setTwist(const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist());
+  void setLinearVelocity(double linear_velocity);
+  void setAccel(const geometry_msgs::msg::Accel & accel = geometry_msgs::msg::Accel());
+  void setTime(double time);
 
 private:
   auto canonicalize(

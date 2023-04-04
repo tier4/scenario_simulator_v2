@@ -139,7 +139,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     }
     behavior_plugin_ptr_->setOtherEntityStatus(other_status);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
-    behavior_plugin_ptr_->setEntityStatus(static_cast<EntityStatusType>(status_));
+    behavior_plugin_ptr_->setEntityStatus(status_);
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
 
     std::vector<std::int64_t> route_lanelets = getRouteLanelets();
@@ -158,8 +158,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     }
     behavior_plugin_ptr_->setReferenceTrajectory(spline_);
     behavior_plugin_ptr_->update(current_time, step_time);
-    auto status_updated =
-      CanonicalizedEntityStatusType(behavior_plugin_ptr_->getUpdatedStatus(), hdmap_utils_ptr_);
+    auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (status_updated.laneMatchingSucceed()) {
       const auto lanelet_pose = static_cast<LaneletPoseType>(status_updated);
       if (

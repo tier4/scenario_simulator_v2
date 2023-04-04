@@ -51,17 +51,16 @@ StopAtTrafficLightAction::calculateObstacle(const traffic_simulator_msgs::msg::W
 
 const traffic_simulator_msgs::msg::WaypointsArray StopAtTrafficLightAction::calculateWaypoints()
 {
-  if (!entity_status.lanelet_pose_valid) {
+  if (!entity_status->laneMatchingSucceed()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (entity_status.action_status.twist.linear.x >= 0) {
+  if (getCurrentTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
+    const auto lanelet_pose = getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
-      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
-      entity_status.lanelet_pose.offset);
+      lanelet_pose.s, lanelet_pose.s + getHorizon(), 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
-      reference_trajectory, entity_status.lanelet_pose.s,
-      entity_status.lanelet_pose.s + getHorizon());
+      reference_trajectory, lanelet_pose.s, lanelet_pose.s + getHorizon());
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -92,7 +91,7 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!entity_status.lanelet_pose_valid) {
+  if (!entity_status->laneMatchingSucceed()) {
     return BT::NodeStatus::FAILURE;
   }
   if (!behavior_parameter.see_around) {
@@ -114,15 +113,16 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
     if (distance_to_stop_target_.get() > getHorizon()) {
       return BT::NodeStatus::FAILURE;
     }
-    target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);
+    target_linear_speed = calculateTargetSpeed(getCurrentTwist().linear.x);
   } else {
     return BT::NodeStatus::FAILURE;
   }
   if (!distance_to_stop_target_) {
-    setOutput("updated_status", calculateUpdatedEntityStatus(0));
-    const auto obstacle = calculateObstacle(waypoints);
+    setOutput(
+      "updated_status",
+      static_cast<traffic_simulator::EntityStatusType>(calculateUpdatedEntityStatus(0)));
     setOutput("waypoints", waypoints);
-    setOutput("obstacle", obstacle);
+    setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::SUCCESS;
   }
   if (target_speed) {
@@ -132,7 +132,9 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   } else {
     target_speed = target_linear_speed.get();
   }
-  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
+  setOutput(
+    "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+                        calculateUpdatedEntityStatus(target_speed.get())));
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

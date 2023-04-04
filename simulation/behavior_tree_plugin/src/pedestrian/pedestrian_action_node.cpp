@@ -40,17 +40,18 @@ void PedestrianActionNode::getBlackBoardValues()
 }
 
 auto PedestrianActionNode::calculateUpdatedEntityStatus(double target_speed) const
-  -> traffic_simulator::EntityStatusType
+  -> traffic_simulator::CanonicalizedEntityStatusType
 {
   return ActionNode::calculateUpdatedEntityStatus(
     target_speed, behavior_parameter.dynamic_constraints);
 }
 
 auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
-  -> traffic_simulator::EntityStatusType
+  -> traffic_simulator::CanonicalizedEntityStatusType
 {
-  auto updated_status = ActionNode::calculateUpdatedEntityStatusInWorldFrame(
-    target_speed, behavior_parameter.dynamic_constraints);
+  auto updated_status = static_cast<traffic_simulator::EntityStatusType>(
+    ActionNode::calculateUpdatedEntityStatusInWorldFrame(
+      target_speed, behavior_parameter.dynamic_constraints));
   const auto lanelet_pose = estimateLaneletPose(updated_status.pose);
   if (lanelet_pose) {
     updated_status.lanelet_pose_valid = true;
@@ -59,17 +60,17 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
     updated_status.lanelet_pose_valid = false;
     updated_status.lanelet_pose = traffic_simulator::LaneletPoseType();
   }
-  return updated_status;
+  return traffic_simulator::CanonicalizedEntityStatusType(updated_status, hdmap_utils);
 }
 
 auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
   -> boost::optional<traffic_simulator::LaneletPoseType>
 {
   boost::optional<traffic_simulator::LaneletPoseType> lanelet_pose;
-  if (entity_status.lanelet_pose_valid) {
-    lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status.lanelet_pose.lanelet_id, 1.0);
+  if (entity_status->laneMatchingSucceed()) {
+    lanelet_pose = hdmap_utils->toLaneletPose(pose, getLaneletPose().lanelet_id, 1.0);
   } else {
-    lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status.bounding_box, true);
+    lanelet_pose = hdmap_utils->toLaneletPose(pose, getBoundingBox(), true);
   }
   if (!lanelet_pose) {
     lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);

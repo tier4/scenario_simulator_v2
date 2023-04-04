@@ -52,6 +52,7 @@
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -67,7 +68,8 @@ public:
   explicit HdMapUtils(const boost::filesystem::path &, const geographic_msgs::msg::GeoPoint &);
 
   auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    -> std::tuple<
+      boost::optional<traffic_simulator_msgs::msg::LaneletPose>, boost::optional<std::int64_t>>;
 
   const autoware_auto_mapping_msgs::msg::HADMapBin toMapBin();
   void insertMarkerArray(

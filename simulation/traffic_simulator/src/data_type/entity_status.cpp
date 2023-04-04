@@ -47,5 +47,22 @@ auto CanonicalizedEntityStatusType::canonicalize(
   }
   return canonicalized;
 }
+
+void CanonicalizedEntityStatusType::setTwist(const geometry_msgs::msg::Twist & twist)
+{
+  entity_status_.action_status.twist = twist;
+}
+
+void CanonicalizedEntityStatusType::setLinearVelocity(double linear_velocity)
+{
+  entity_status_.action_status.twist.linear.x = linear_velocity;
+}
+
+void CanonicalizedEntityStatusType::setAccel(const geometry_msgs::msg::Accel & accel)
+{
+  entity_status_.action_status.accel = accel;
+}
+
+void CanonicalizedEntityStatusType::setTime(double time) { entity_status_.time = time; }
 }  // namespace entity_status
 }  // namespace traffic_simulator

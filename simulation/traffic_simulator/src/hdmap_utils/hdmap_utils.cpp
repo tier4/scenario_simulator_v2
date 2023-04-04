@@ -86,12 +86,13 @@ HdMapUtils::HdMapUtils(
 
 auto HdMapUtils::canonicalizeLaneletPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+  -> std::tuple<
+    boost::optional<traffic_simulator_msgs::msg::LaneletPose>, boost::optional<std::int64_t>>
 {
   auto clamped = lanelet_pose;
   while (clamped.s < 0) {
     if (const auto ids = getPreviousLaneletIds(clamped.lanelet_id); ids.empty()) {
-      return boost::none;
+      return {boost::none, clamped.lanelet_id};
     } else {
       clamped.s += getLaneletLength(ids[0]);
       clamped.lanelet_id = ids[0];
@@ -99,13 +100,13 @@ auto HdMapUtils::canonicalizeLaneletPose(
   }
   while (clamped.s > getLaneletLength(clamped.lanelet_id)) {
     if (const auto ids = getNextLaneletIds(clamped.lanelet_id); ids.empty()) {
-      return boost::none;
+      return {boost::none, clamped.lanelet_id};
     } else {
       clamped.s -= getLaneletLength(clamped.lanelet_id);
       clamped.lanelet_id = ids[0];
     }
   }
-  return clamped;
+  return {clamped, boost::none};
 }
 
 std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
@@ -1305,7 +1306,9 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
 {
-  if (const auto pose = canonicalizeLaneletPose(lanelet_pose)) {
+  if (
+    const auto pose = std::get<boost::optional<traffic_simulator_msgs::msg::LaneletPose>>(
+      canonicalizeLaneletPose(lanelet_pose))) {
     return toMapPose(
       pose->lanelet_id, pose->s, pose->offset,
       quaternion_operation::convertEulerAngleToQuaternion(pose->rpy));

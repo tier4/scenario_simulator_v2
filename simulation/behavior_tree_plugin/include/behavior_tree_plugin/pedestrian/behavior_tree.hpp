@@ -48,28 +48,45 @@ public:
   }
 
   // clang-format off
-  DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter)
-  DEFINE_GETTER_SETTER(CurrentTime, double)
-  DEFINE_GETTER_SETTER(DebugMarker, std::vector<visualization_msgs::msg::Marker>)
-  DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator::EntityStatusType)
-  DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
-  DEFINE_GETTER_SETTER(GoalPoses, std::vector<geometry_msgs::msg::Pose>)
-  DEFINE_GETTER_SETTER(HdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)
+  DEFINE_GETTER_SETTER(BehaviorParameter,    traffic_simulator_msgs::msg::BehaviorParameter)
+  DEFINE_GETTER_SETTER(CurrentTime,          double)
+  DEFINE_GETTER_SETTER(DebugMarker,          std::vector<visualization_msgs::msg::Marker>)
+  DEFINE_GETTER_SETTER(EntityTypeList,       EntityTypeDict)
+  DEFINE_GETTER_SETTER(GoalPoses,            std::vector<geometry_msgs::msg::Pose>)
+  DEFINE_GETTER_SETTER(HdMapUtils,           std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters, traffic_simulator::lane_change::Parameter)
-  DEFINE_GETTER_SETTER(Obstacle, boost::optional<traffic_simulator_msgs::msg::Obstacle>)
-  DEFINE_GETTER_SETTER(OtherEntityStatus, EntityStatusDict)
+  DEFINE_GETTER_SETTER(Obstacle,             boost::optional<traffic_simulator_msgs::msg::Obstacle>)
+  DEFINE_GETTER_SETTER(OtherEntityStatus,    EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters, traffic_simulator_msgs::msg::PedestrianParameters)
-  DEFINE_GETTER_SETTER(ReferenceTrajectory, std::shared_ptr<math::geometry::CatmullRomSpline>)
-  DEFINE_GETTER_SETTER(Request, traffic_simulator::behavior::Request)
-  DEFINE_GETTER_SETTER(RouteLanelets, std::vector<std::int64_t>)
-  DEFINE_GETTER_SETTER(StepTime, double)
-  DEFINE_GETTER_SETTER(TargetSpeed, boost::optional<double>)
-  DEFINE_GETTER_SETTER(TrafficLightManager, std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
-  DEFINE_GETTER_SETTER(UpdatedStatus, traffic_simulator::EntityStatusType)
-  DEFINE_GETTER_SETTER(VehicleParameters, traffic_simulator_msgs::msg::VehicleParameters)
-  DEFINE_GETTER_SETTER(Waypoints, traffic_simulator_msgs::msg::WaypointsArray)
+  DEFINE_GETTER_SETTER(ReferenceTrajectory,  std::shared_ptr<math::geometry::CatmullRomSpline>)
+  DEFINE_GETTER_SETTER(Request,              traffic_simulator::behavior::Request)
+  DEFINE_GETTER_SETTER(RouteLanelets,        std::vector<std::int64_t>)
+  DEFINE_GETTER_SETTER(StepTime,             double)
+  DEFINE_GETTER_SETTER(TargetSpeed,          boost::optional<double>)
+  DEFINE_GETTER_SETTER(TrafficLightManager,  std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
+  DEFINE_GETTER_SETTER(VehicleParameters,    traffic_simulator_msgs::msg::VehicleParameters)
+  DEFINE_GETTER_SETTER(Waypoints,            traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on
 
+#undef DEFINE_GETTER_SETTER
+
+#define DEFINE_GETTER_SETTER(NAME)                                                        \
+  traffic_simulator::CanonicalizedEntityStatusType get##NAME() override                   \
+  {                                                                                       \
+    return traffic_simulator::CanonicalizedEntityStatusType(                              \
+      tree_.rootBlackboard()->get<traffic_simulator::EntityStatusType>(get##NAME##Key()), \
+      getHdMapUtils());                                                                   \
+  }                                                                                       \
+  void set##NAME(const traffic_simulator::CanonicalizedEntityStatusType & value) override \
+  {                                                                                       \
+    tree_.rootBlackboard()->set<traffic_simulator::EntityStatusType>(                     \
+      get##NAME##Key(), static_cast<traffic_simulator::EntityStatusType>(value));         \
+  }
+
+  // clang-format off
+  DEFINE_GETTER_SETTER(EntityStatus)
+  DEFINE_GETTER_SETTER(UpdatedStatus)
+  // clang-format on
 #undef DEFINE_GETTER_SETTER
 
 private:

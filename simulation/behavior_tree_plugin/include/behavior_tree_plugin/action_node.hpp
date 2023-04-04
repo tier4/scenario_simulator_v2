@@ -55,18 +55,26 @@ public:
   auto getDistanceToTrafficLightStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> boost::optional<double>;
-  auto getRightOfWayEntities() const -> std::vector<traffic_simulator::EntityStatusType>;
+  auto getRightOfWayEntities() const
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatusType>;
   auto getRightOfWayEntities(const std::vector<std::int64_t> & following_lanelets) const
-    -> std::vector<traffic_simulator::EntityStatusType>;
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatusType>;
   auto getYieldStopDistance(const std::vector<std::int64_t> & following_lanelets) const
     -> boost::optional<double>;
   auto getOtherEntityStatus(std::int64_t lanelet_id) const
-    -> std::vector<traffic_simulator::EntityStatusType>;
-  auto stopAtEndOfRoad() const -> traffic_simulator::EntityStatusType;
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatusType>;
+  auto stopEntity() const -> void;
   auto getHorizon() const -> double;
-  auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
-  auto getCurrentAccel() const -> geometry_msgs::msg::Accel;
-  auto getCurrentLinearJerk() const -> double;
+  auto getCurrentTwist() const noexcept -> geometry_msgs::msg::Twist;
+  auto getCurrentAccel() const noexcept -> geometry_msgs::msg::Accel;
+  auto getCurrentLinearJerk() const noexcept -> double;
+  auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
+  auto getEntityPose() const noexcept -> geometry_msgs::msg::Pose;
+  auto getEntityPosition() const noexcept -> geometry_msgs::msg::Point;
+  auto getEntityOrientation() const noexcept -> geometry_msgs::msg::Quaternion;
+  auto getActionStatus() const noexcept -> traffic_simulator_msgs::msg::ActionStatus;
+  auto getEntityName() const noexcept -> std::string;
+  auto getLaneletPose() const -> traffic_simulator::LaneletPoseType;
 
   /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;
@@ -95,7 +103,8 @@ public:
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
   }
   auto getBlackBoardValues() -> void;
-  auto getEntityStatus(const std::string target_name) const -> traffic_simulator::EntityStatusType;
+  auto getEntityStatus(const std::string target_name) const
+    -> traffic_simulator::CanonicalizedEntityStatusType;
   auto getDistanceToTargetEntityPolygon(
     const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
     double width_extension_right = 0.0, double width_extension_left = 0.0,
@@ -103,20 +112,20 @@ public:
     -> boost::optional<double>;
   auto calculateUpdatedEntityStatus(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
-    -> traffic_simulator::EntityStatusType;
+    -> traffic_simulator::CanonicalizedEntityStatusType;
   auto calculateUpdatedEntityStatusInWorldFrame(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
-    -> traffic_simulator::EntityStatusType;
+    -> traffic_simulator::CanonicalizedEntityStatusType;
 
 protected:
   traffic_simulator::behavior::Request request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
   std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager;
-  traffic_simulator::EntityStatusType entity_status;
+  std::unique_ptr<traffic_simulator::CanonicalizedEntityStatusType> entity_status;
   double current_time;
   double step_time;
   boost::optional<double> target_speed;
-  traffic_simulator::EntityStatusType updated_status;
+  std::unique_ptr<traffic_simulator::CanonicalizedEntityStatusType> updated_status;
   std::unordered_map<std::string, traffic_simulator::EntityStatusType> other_entity_status;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list;
   std::vector<std::int64_t> route_lanelets;
@@ -124,18 +133,20 @@ protected:
 private:
   auto getDistanceToTargetEntityOnCrosswalk(
     const math::geometry::CatmullRomSplineInterface & spline,
-    const traffic_simulator::EntityStatusType & status) const -> boost::optional<double>;
+    const traffic_simulator::CanonicalizedEntityStatusType & status) const
+    -> boost::optional<double>;
   auto getDistanceToTargetEntityPolygon(
     const math::geometry::CatmullRomSplineInterface & spline,
-    const traffic_simulator::EntityStatusType & status, double width_extension_right = 0.0,
-    double width_extension_left = 0.0, double length_extension_front = 0.0,
-    double length_extension_rear = 0.0) const -> boost::optional<double>;
+    const traffic_simulator::CanonicalizedEntityStatusType & status,
+    double width_extension_right = 0.0, double width_extension_left = 0.0,
+    double length_extension_front = 0.0, double length_extension_rear = 0.0) const
+    -> boost::optional<double>;
   auto getConflictingEntityStatus(const std::vector<std::int64_t> & following_lanelets) const
-    -> boost::optional<traffic_simulator::EntityStatusType>;
+    -> boost::optional<traffic_simulator::CanonicalizedEntityStatusType>;
   auto getConflictingEntityStatusOnCrossWalk(const std::vector<std::int64_t> & route_lanelets) const
-    -> std::vector<traffic_simulator::EntityStatusType>;
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatusType>;
   auto getConflictingEntityStatusOnLane(const std::vector<std::int64_t> & route_lanelets) const
-    -> std::vector<traffic_simulator::EntityStatusType>;
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatusType>;
 };
 }  // namespace entity_behavior
 

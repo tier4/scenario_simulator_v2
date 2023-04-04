@@ -40,16 +40,18 @@ BT::NodeStatus FollowLaneAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!entity_status.lanelet_pose_valid) {
-    setOutput("updated_status", stopAtEndOfRoad());
+  if (!entity_status->laneMatchingSucceed()) {
+    stopEntity();
+    setOutput("updated_status", static_cast<traffic_simulator::EntityStatusType>(*entity_status));
     return BT::NodeStatus::RUNNING;
   }
-  auto following_lanelets =
-    hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id);
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(getLaneletPose().lanelet_id);
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
-  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
+  setOutput(
+    "updated_status", static_cast<traffic_simulator::EntityStatusType>(
+                        calculateUpdatedEntityStatus(target_speed.get())));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian
