@@ -133,11 +133,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
   if (npc_logic_started_) {
-    entity_behavior::EntityStatusDict other_status;
-    for (const auto & status : other_status_) {
-      other_status.emplace(status.first, status.second);
-    }
-    behavior_plugin_ptr_->setOtherEntityStatus(other_status);
+    behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(std::make_unique<CanonicalizedEntityStatusType>(status_));
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);

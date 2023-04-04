@@ -21,6 +21,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <memory>
 #include <string>
+#include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
@@ -94,8 +95,7 @@ public:
       BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatusType>>(
         "updated_status"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
-      BT::InputPort<std::unordered_map<std::string, traffic_simulator::EntityStatusType>>(
-        "other_entity_status"),
+      BT::InputPort<EntityStatusDict>("other_entity_status"),
       BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>(
         "entity_type_list"),
       BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
@@ -105,7 +105,7 @@ public:
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
   }
   auto getBlackBoardValues() -> void;
-  auto getEntityStatus(const std::string target_name) const
+  auto getEntityStatus(const std::string & target_name) const
     -> traffic_simulator::CanonicalizedEntityStatusType;
   auto getDistanceToTargetEntityPolygon(
     const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
@@ -128,7 +128,7 @@ protected:
   double step_time;
   boost::optional<double> target_speed;
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatusType> updated_status;
-  std::unordered_map<std::string, traffic_simulator::EntityStatusType> other_entity_status;
+  EntityStatusDict other_entity_status;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list;
   std::vector<std::int64_t> route_lanelets;
 

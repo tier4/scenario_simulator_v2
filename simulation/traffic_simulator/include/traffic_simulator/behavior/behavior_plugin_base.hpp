@@ -33,7 +33,8 @@
 namespace entity_behavior
 {
 using EntityTypeDict = std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
-using EntityStatusDict = std::unordered_map<std::string, traffic_simulator::EntityStatusType>;
+using EntityStatusDict =
+  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatusType>;
 
 class BehaviorPluginBase
 {

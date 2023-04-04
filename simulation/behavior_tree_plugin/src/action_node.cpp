@@ -63,8 +63,7 @@ auto ActionNode::getBlackBoardValues() -> void
     target_speed = boost::none;
   }
 
-  if (!getInput<std::unordered_map<std::string, traffic_simulator::EntityStatusType>>(
-        "other_entity_status", other_entity_status)) {
+  if (!getInput<EntityStatusDict>("other_entity_status", other_entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status in ActionNode");
   }
   if (!getInput<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>(
@@ -93,11 +92,10 @@ auto ActionNode::getOtherEntityStatus(std::int64_t lanelet_id) const
 {
   std::vector<traffic_simulator::CanonicalizedEntityStatusType> ret;
   for (const auto & status : other_entity_status) {
-    if (status.second.lanelet_pose_valid) {
-      if (status.second.lanelet_pose.lanelet_id == lanelet_id) {
-        ret.emplace_back(
-          traffic_simulator::CanonicalizedEntityStatusType(status.second, hdmap_utils));
-      }
+    if (
+      status.second.laneMatchingSucceed() &&
+      static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id == lanelet_id) {
+      ret.emplace_back(status.second);
     }
   }
   return ret;
@@ -135,9 +133,10 @@ auto ActionNode::getRightOfWayEntities(const std::vector<std::int64_t> & followi
   for (const auto & status : other_entity_status) {
     for (const auto & following_lanelet : following_lanelets) {
       for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
-        if (lanelet_id == status.second.lanelet_pose.lanelet_id) {
-          ret.emplace_back(
-            traffic_simulator::CanonicalizedEntityStatusType(status.second, hdmap_utils));
+        if (
+          status.second.laneMatchingSucceed() &&
+          static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id == lanelet_id) {
+          ret.emplace_back(status.second);
         }
       }
     }
@@ -158,9 +157,10 @@ auto ActionNode::getRightOfWayEntities() const
   }
   for (const auto & status : other_entity_status) {
     for (const std::int64_t & lanelet_id : lanelet_ids) {
-      if (lanelet_id == status.second.lanelet_pose.lanelet_id) {
-        ret.emplace_back(
-          traffic_simulator::CanonicalizedEntityStatusType(status.second, hdmap_utils));
+      if (
+        status.second.laneMatchingSucceed() &&
+        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id == lanelet_id) {
+        ret.emplace_back(status.second);
       }
     }
   }
@@ -220,7 +220,8 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   for (const auto & each : other_entity_status) {
     const auto distance = getDistanceToTargetEntityPolygon(spline, each.first);
     const auto quat = quaternion_operation::getRotation(
-      getEntityOrientation(), other_entity_status.at(each.first).pose.orientation);
+      getEntityOrientation(),
+      static_cast<geometry_msgs::msg::Pose>(other_entity_status.at(each.first)).orientation);
     /**
      * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
      */
@@ -257,12 +258,11 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
   return boost::none;
 }
 
-auto ActionNode::getEntityStatus(const std::string target_name) const
+auto ActionNode::getEntityStatus(const std::string & target_name) const
   -> traffic_simulator::CanonicalizedEntityStatusType
 {
   if (other_entity_status.find(target_name) != other_entity_status.end()) {
-    return traffic_simulator::CanonicalizedEntityStatusType(
-      other_entity_status.at(target_name), hdmap_utils);
+    return traffic_simulator::CanonicalizedEntityStatusType(other_entity_status.at(target_name));
   }
   THROW_SIMULATION_ERROR("other entity : ", target_name, " does not exist.");
 }
@@ -332,11 +332,11 @@ auto ActionNode::getConflictingEntityStatusOnCrossWalk(
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
+      status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_pose.lanelet_id) >= 1) {
-      conflicting_entity_status.emplace_back(
-        traffic_simulator::CanonicalizedEntityStatusType(status.second, hdmap_utils));
+        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id) >= 1) {
+      conflicting_entity_status.emplace_back(status.second);
     }
   }
   return conflicting_entity_status;
@@ -349,11 +349,11 @@ auto ActionNode::getConflictingEntityStatusOnLane(const std::vector<std::int64_t
   auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
+      status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_lanes.begin(), conflicting_lanes.end(),
-        status.second.lanelet_pose.lanelet_id) >= 1) {
-      conflicting_entity_status.emplace_back(
-        traffic_simulator::CanonicalizedEntityStatusType(status.second, hdmap_utils));
+        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id) >= 1) {
+      conflicting_entity_status.emplace_back(status.second);
     }
   }
   return conflicting_entity_status;
@@ -366,15 +366,17 @@ auto ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(following_lanelets);
   for (const auto & status : other_entity_status) {
     if (
+      status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_pose.lanelet_id) >= 1) {
+        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id) >= 1) {
       return true;
     }
     if (
+      status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_lanes.begin(), conflicting_lanes.end(),
-        status.second.lanelet_pose.lanelet_id) >= 1) {
+        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id) >= 1) {
       return true;
     }
   }
