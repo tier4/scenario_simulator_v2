@@ -179,32 +179,32 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
   return *std::min_element(distances.begin(), distances.end());
 }
 
-auto EntityBase::getLaneletPose() const -> boost::optional<CanonicalizedLaneletPose>
+auto EntityBase::getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
 {
   const auto status = static_cast<EntityStatusType>(getStatus());
   if (laneMatchingSucceed()) {
     return CanonicalizedLaneletPose(status.lanelet_pose, hdmap_utils_ptr_);
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 auto EntityBase::getLaneletPose(double matching_distance) const
-  -> boost::optional<CanonicalizedLaneletPose>
+  -> std::optional<CanonicalizedLaneletPose>
 {
   if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getEntityType().type) {
     if (
       const auto lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), true, matching_distance)) {
-      return CanonicalizedLaneletPose(lanelet_pose.get(), hdmap_utils_ptr_);
+      return CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_);
     }
   } else {
     if (
       const auto lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), false, matching_distance)) {
-      return CanonicalizedLaneletPose(lanelet_pose.get(), hdmap_utils_ptr_);
+      return CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_);
     }
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
@@ -269,7 +269,7 @@ void EntityBase::requestLaneChange(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");
     }
-    reference_lanelet_id = static_cast<LaneletPoseType>(lanelet_pose.get()).lanelet_id;
+    reference_lanelet_id = static_cast<LaneletPoseType>(lanelet_pose.value()).lanelet_id;
   } else {
     if (other_status_.find(target.entity_name) == other_status_.end()) {
       THROW_SEMANTIC_ERROR(
@@ -288,7 +288,7 @@ void EntityBase::requestLaneChange(
     reference_lanelet_id, target.direction, target.shift);
   if (lane_change_target_id) {
     requestLaneChange(
-      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
+      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);
   } else {
     THROW_SEMANTIC_ERROR(
@@ -566,7 +566,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cancel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      [this]() { target_speed_ = std::nullopt; }, job::Type::LINEAR_VELOCITY, true,
       job::Event::POST_UPDATE);
   }
 }
@@ -608,7 +608,7 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief Cancel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      [this]() { target_speed_ = std::nullopt; }, job::Type::LINEAR_VELOCITY, true,
       job::Event::POST_UPDATE);
   }
 }
@@ -636,7 +636,6 @@ void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, CanonicalizedEntityStatus> & status)
 {
   other_status_.clear();
-
   for (const auto & [other_name, other_status] : status) {
     if (other_name != name) {
       /*

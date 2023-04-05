@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <utility>
@@ -31,21 +32,21 @@ StopAtTrafficLightAction::StopAtTrafficLightAction(
 {
 }
 
-const boost::optional<traffic_simulator_msgs::msg::Obstacle>
+const std::optional<traffic_simulator_msgs::msg::Obstacle>
 StopAtTrafficLightAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stop_target_) {
-    return boost::none;
+    return std::nullopt;
   }
-  if (distance_to_stop_target_.get() < 0) {
-    return boost::none;
+  if (distance_to_stop_target_.value() < 0) {
+    return std::nullopt;
   }
-  if (distance_to_stop_target_.get() > trajectory->getLength()) {
-    return boost::none;
+  if (distance_to_stop_target_.value() > trajectory->getLength()) {
+    return std::nullopt;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
   obstacle.type = obstacle.ENTITY;
-  obstacle.s = distance_to_stop_target_.get();
+  obstacle.s = distance_to_stop_target_.value();
   return obstacle;
 }
 
@@ -67,16 +68,16 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtTrafficLightAction::calc
   }
 }
 
-boost::optional<double> StopAtTrafficLightAction::calculateTargetSpeed(double current_velocity)
+std::optional<double> StopAtTrafficLightAction::calculateTargetSpeed(double current_velocity)
 {
   if (!distance_to_stop_target_) {
-    return boost::none;
+    return std::nullopt;
   }
   /**
    * @brief hard coded parameter!! 1.0 is a stop margin
    */
   double rest_distance =
-    distance_to_stop_target_.get() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
+    distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
   if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     return 0;
   }
@@ -108,9 +109,9 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   distance_to_stop_target_ = getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
-  boost::optional<double> target_linear_speed;
+  std::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
-    if (distance_to_stop_target_.get() > getHorizon()) {
+    if (distance_to_stop_target_.value() > getHorizon()) {
       return BT::NodeStatus::FAILURE;
     }
     target_linear_speed = calculateTargetSpeed(getCurrentTwist().linear.x);
@@ -126,15 +127,15 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
     return BT::NodeStatus::SUCCESS;
   }
   if (target_speed) {
-    if (target_speed.get() > target_linear_speed.get()) {
-      target_speed = target_linear_speed.get();
+    if (target_speed.value() > target_linear_speed.value()) {
+      target_speed = target_linear_speed.value();
     }
   } else {
-    target_speed = target_linear_speed.get();
+    target_speed = target_linear_speed.value();
   }
   setOutput(
     "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                        calculateUpdatedEntityStatus(target_speed.get())));
+                        calculateUpdatedEntityStatus(target_speed.value())));
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

@@ -25,8 +25,8 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #endif
 
-#include <boost/optional.hpp>
 #include <memory>
+#include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
 #include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -277,15 +277,15 @@ public:
   bool entityExists(const std::string & name);
 
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
-    -> boost::optional<double>;
+    -> std::optional<double>;
 
   auto getCurrentTime() const noexcept -> double;
 
   auto getDistanceToCrosswalk(const std::string & name, const std::int64_t target_crosswalk_id)
-    -> boost::optional<double>;
+    -> std::optional<double>;
 
   auto getDistanceToStopLine(const std::string & name, const std::int64_t target_stop_line_id)
-    -> boost::optional<double>;
+    -> std::optional<double>;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
@@ -297,29 +297,25 @@ public:
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   // clang-format off
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &)                           const -> boost::optional<double>;
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &)                                            const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &,                  const CanonicalizedLaneletPose &)                           const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &,                  const std::string &)                                            const -> boost::optional<double>;
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, double matching_distance) const -> boost::optional<double>;
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &,                  double matching_distance) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &,                  const CanonicalizedLaneletPose &, double matching_distance) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &,                  const std::string &,                  double matching_distance) const -> boost::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &)                           const -> std::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &)                                        const -> std::optional<double>;
+  auto getLateralDistance(const std::string &,              const CanonicalizedLaneletPose &)                           const -> std::optional<double>;
+  auto getLateralDistance(const std::string &,              const std::string &)                                        const -> std::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &,              double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &,              const CanonicalizedLaneletPose &, double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &,              const std::string &,              double matching_distance) const -> std::optional<double>;
 
-  auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, 
-    bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> boost::optional<double>;
-  auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const std::string &,
-    bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> boost::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const CanonicalizedLaneletPose &,
-    bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> boost::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const std::string &,
-    bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> boost::optional<double>;
+  auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
+  auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const std::string &,              bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
+  auto getLongitudinalDistance(const std::string &,              const CanonicalizedLaneletPose &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
+  auto getLongitudinalDistance(const std::string &,              const std::string &,              bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
   // clang-format on
 
   auto getNumberOfEgo() const -> std::size_t;
 
   auto getObstacle(const std::string & name)
-    -> boost::optional<traffic_simulator_msgs::msg::Obstacle>;
+    -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
 
   // clang-format off
   auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;

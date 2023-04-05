@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
 #include <memory>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>
@@ -55,7 +56,7 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
   const auto lanelet_pose = estimateLaneletPose(updated_status.pose);
   if (lanelet_pose) {
     updated_status.lanelet_pose_valid = true;
-    updated_status.lanelet_pose = lanelet_pose.get();
+    updated_status.lanelet_pose = static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose.value());
   } else {
     updated_status.lanelet_pose_valid = false;
     updated_status.lanelet_pose = traffic_simulator::LaneletPoseType();
@@ -64,9 +65,9 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
 }
 
 auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
-  -> boost::optional<traffic_simulator::LaneletPoseType>
+  -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
 {
-  boost::optional<traffic_simulator::LaneletPoseType> lanelet_pose;
+  std::optional<traffic_simulator::LaneletPoseType> lanelet_pose;
   if (entity_status->laneMatchingSucceed()) {
     lanelet_pose = hdmap_utils->toLaneletPose(pose, getLaneletPose().lanelet_id, 1.0);
   } else {
@@ -75,6 +76,11 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
   if (!lanelet_pose) {
     lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);
   }
-  return lanelet_pose;
+  if(lanelet_pose) {
+    return traffic_simulator::CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils);
+  }
+  else {
+    return std::nullopt;
+  }
 }
 }  // namespace entity_behavior

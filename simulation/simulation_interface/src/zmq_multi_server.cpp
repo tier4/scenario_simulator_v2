@@ -20,7 +20,7 @@ namespace zeromq
 {
 MultiServer::MultiServer(
   const simulation_interface::TransportProtocol & protocol,
-  const simulation_interface::HostName & hostname,
+  const simulation_interface::HostName & hostname, const unsigned int socket_port,
   std::function<void(
     const simulation_api_schema::InitializeRequest &, simulation_api_schema::InitializeResponse &)>
     initialize_func,
@@ -70,67 +70,22 @@ MultiServer::MultiServer(
     update_traffic_lights_func)
 : context_(zmqpp::context()),
   type_(zmqpp::socket_type::reply),
-  initialize_sock_(context_, type_),
+  socket_(context_, type_),
   initialize_func_(initialize_func),
-  update_frame_sock_(context_, type_),
   update_frame_func_(update_frame_func),
-  update_sensor_frame_sock_(context_, type_),
   update_sensor_frame_func_(update_sensor_frame_func),
-  spawn_vehicle_entity_sock_(context_, type_),
   spawn_vehicle_entity_func_(spawn_vehicle_entity_func),
-  spawn_pedestrian_entity_sock_(context_, type_),
   spawn_pedestrian_entity_func_(spawn_pedestrian_entity_func),
-  spawn_misc_object_entity_sock_(context_, type_),
   spawn_misc_object_entity_func_(spawn_misc_object_entity_func),
-  despawn_entity_sock_(context_, type_),
   despawn_entity_func_(despawn_entity_func),
-  update_entity_status_sock_(context_, type_),
   update_entity_status_func_(update_entity_status_func),
-  attach_lidar_sensor_sock_(context_, type_),
   attach_lidar_sensor_func_(attach_lidar_sensor_func),
-  attach_detection_sensor_sock_(context_, type_),
   attach_detection_sensor_func_(attach_detection_sensor_func),
-  attach_occupancy_grid_sensor_sock_(context_, type_),
   attach_occupancy_grid_sensor_func_(attach_occupancy_sensor_func),
-  update_traffic_lights_sock_(context_, type_),
   update_traffic_lights_func_(update_traffic_lights_func)
 {
-  initialize_sock_.bind(
-    simulation_interface::getEndPoint(protocol, hostname, simulation_interface::ports::initialize));
-  update_entity_status_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_entity_status));
-  update_frame_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_frame));
-  spawn_vehicle_entity_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::spawn_vehicle_entity));
-  spawn_pedestrian_entity_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::spawn_pedestrian_entity));
-  spawn_misc_object_entity_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::spawn_misc_object_entity));
-  despawn_entity_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::despawn_entity));
-  update_sensor_frame_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_sensor_frame));
-  attach_lidar_sensor_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::attach_lidar_sensor));
-  attach_detection_sensor_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::attach_detection_sensor));
-  attach_occupancy_grid_sensor_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::attach_occupancy_grid_sensor));
-  update_traffic_lights_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_traffic_lights));
-  poller_.add(initialize_sock_);
-  poller_.add(update_frame_sock_);
-  poller_.add(update_sensor_frame_sock_);
-  poller_.add(spawn_vehicle_entity_sock_);
-  poller_.add(spawn_pedestrian_entity_sock_);
-  poller_.add(spawn_misc_object_entity_sock_);
-  poller_.add(despawn_entity_sock_);
-  poller_.add(update_entity_status_sock_);
-  poller_.add(attach_lidar_sensor_sock_);
-  poller_.add(attach_detection_sensor_sock_);
-  poller_.add(attach_occupancy_grid_sensor_sock_);
-  poller_.add(update_traffic_lights_sock_);
+  socket_.bind(simulation_interface::getEndPoint(protocol, hostname, socket_port));
+  poller_.add(socket_);
   thread_ = std::thread(&MultiServer::start_poll, this);
 }
 
@@ -140,110 +95,90 @@ void MultiServer::poll()
 {
   constexpr long timeout_ms = 1L;
   poller_.poll(timeout_ms);
-  if (poller_.has_input(initialize_sock_)) {
-    zmqpp::message request;
-    initialize_sock_.receive(request);
-    simulation_api_schema::InitializeResponse response;
-    initialize_func_(toProto<simulation_api_schema::InitializeRequest>(request), response);
-    auto msg = toZMQ(response);
-    initialize_sock_.send(msg);
-  }
-  if (poller_.has_input(update_frame_sock_)) {
-    zmqpp::message request;
-    update_frame_sock_.receive(request);
-    simulation_api_schema::UpdateFrameResponse response;
-    update_frame_func_(toProto<simulation_api_schema::UpdateFrameRequest>(request), response);
-    auto msg = toZMQ(response);
-    update_frame_sock_.send(msg);
-  }
-  if (poller_.has_input(update_sensor_frame_sock_)) {
-    zmqpp::message request;
-    update_sensor_frame_sock_.receive(request);
-    simulation_api_schema::UpdateSensorFrameResponse response;
-    update_sensor_frame_func_(
-      toProto<simulation_api_schema::UpdateSensorFrameRequest>(request), response);
-    auto msg = toZMQ(response);
-    update_sensor_frame_sock_.send(msg);
-  }
-  if (poller_.has_input(spawn_vehicle_entity_sock_)) {
-    zmqpp::message request;
-    spawn_vehicle_entity_sock_.receive(request);
-    simulation_api_schema::SpawnVehicleEntityResponse response;
-    spawn_vehicle_entity_func_(
-      toProto<simulation_api_schema::SpawnVehicleEntityRequest>(request), response);
-    auto msg = toZMQ(response);
-    spawn_vehicle_entity_sock_.send(msg);
-  }
-  if (poller_.has_input(spawn_pedestrian_entity_sock_)) {
-    zmqpp::message request;
-    spawn_pedestrian_entity_sock_.receive(request);
-    simulation_api_schema::SpawnPedestrianEntityResponse response;
-    spawn_pedestrian_entity_func_(
-      toProto<simulation_api_schema::SpawnPedestrianEntityRequest>(request), response);
-    auto msg = toZMQ(response);
-    spawn_pedestrian_entity_sock_.send(msg);
-  }
-  if (poller_.has_input(spawn_misc_object_entity_sock_)) {
-    zmqpp::message request;
-    spawn_misc_object_entity_sock_.receive(request);
-    simulation_api_schema::SpawnMiscObjectEntityResponse response;
-    spawn_misc_object_entity_func_(
-      toProto<simulation_api_schema::SpawnMiscObjectEntityRequest>(request), response);
-    auto msg = toZMQ(response);
-    spawn_misc_object_entity_sock_.send(msg);
-  }
-  if (poller_.has_input(despawn_entity_sock_)) {
-    zmqpp::message request;
-    despawn_entity_sock_.receive(request);
-    simulation_api_schema::DespawnEntityResponse response;
-    despawn_entity_func_(toProto<simulation_api_schema::DespawnEntityRequest>(request), response);
-    auto msg = toZMQ(response);
-    despawn_entity_sock_.send(msg);
-  }
-  if (poller_.has_input(update_entity_status_sock_)) {
-    zmqpp::message request;
-    update_entity_status_sock_.receive(request);
-    simulation_api_schema::UpdateEntityStatusResponse response;
-    update_entity_status_func_(
-      toProto<simulation_api_schema::UpdateEntityStatusRequest>(request), response);
-    auto msg = toZMQ(response);
-    update_entity_status_sock_.send(msg);
-  }
-  if (poller_.has_input(attach_lidar_sensor_sock_)) {
-    zmqpp::message request;
-    attach_lidar_sensor_sock_.receive(request);
-    simulation_api_schema::AttachLidarSensorResponse response;
-    attach_lidar_sensor_func_(
-      toProto<simulation_api_schema::AttachLidarSensorRequest>(request), response);
-    auto msg = toZMQ(response);
-    attach_lidar_sensor_sock_.send(msg);
-  }
-  if (poller_.has_input(attach_detection_sensor_sock_)) {
-    zmqpp::message request;
-    attach_detection_sensor_sock_.receive(request);
-    simulation_api_schema::AttachDetectionSensorResponse response;
-    attach_detection_sensor_func_(
-      toProto<simulation_api_schema::AttachDetectionSensorRequest>(request), response);
-    auto msg = toZMQ(response);
-    attach_detection_sensor_sock_.send(msg);
-  }
-  if (poller_.has_input(attach_occupancy_grid_sensor_sock_)) {
-    zmqpp::message request;
-    attach_occupancy_grid_sensor_sock_.receive(request);
-    simulation_api_schema::AttachOccupancyGridSensorResponse response;
-    attach_occupancy_grid_sensor_func_(
-      toProto<simulation_api_schema::AttachOccupancyGridSensorRequest>(request), response);
-    auto msg = toZMQ(response);
-    attach_occupancy_grid_sensor_sock_.send(msg);
-  }
-  if (poller_.has_input(update_traffic_lights_sock_)) {
-    zmqpp::message request;
-    update_traffic_lights_sock_.receive(request);
-    simulation_api_schema::UpdateTrafficLightsResponse response;
-    update_traffic_lights_func_(
-      toProto<simulation_api_schema::UpdateTrafficLightsRequest>(request), response);
-    auto msg = toZMQ(response);
-    update_traffic_lights_sock_.send(msg);
+  if (poller_.has_input(socket_)) {
+    simulation_api_schema::SimulationResponse sim_response;
+    zmqpp::message sim_request;
+    socket_.receive(sim_request);
+    auto proto = toProto<simulation_api_schema::SimulationRequest>(sim_request);
+    switch (proto.request_case()) {
+      case simulation_api_schema::SimulationRequest::RequestCase::kInitialize: {
+        simulation_api_schema::InitializeResponse response;
+        initialize_func_(proto.initialize(), response);
+        *sim_response.mutable_initialize() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateFrame: {
+        simulation_api_schema::UpdateFrameResponse response;
+        update_frame_func_(proto.update_frame(), response);
+        *sim_response.mutable_update_frame() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateSensorFrame: {
+        simulation_api_schema::UpdateSensorFrameResponse response;
+        update_sensor_frame_func_(proto.update_sensor_frame(), response);
+        *sim_response.mutable_update_sensor_frame() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kSpawnVehicleEntity: {
+        simulation_api_schema::SpawnVehicleEntityResponse response;
+        spawn_vehicle_entity_func_(proto.spawn_vehicle_entity(), response);
+        *sim_response.mutable_spawn_vehicle_entity() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kSpawnPedestrianEntity: {
+        simulation_api_schema::SpawnPedestrianEntityResponse response;
+        spawn_pedestrian_entity_func_(proto.spawn_pedestrian_entity(), response);
+        *sim_response.mutable_spawn_pedestrian_entity() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kSpawnMiscObjectEntity: {
+        simulation_api_schema::SpawnMiscObjectEntityResponse response;
+        spawn_misc_object_entity_func_(proto.spawn_misc_object_entity(), response);
+        *sim_response.mutable_spawn_misc_object_entity() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kDespawnEntity: {
+        simulation_api_schema::DespawnEntityResponse response;
+        despawn_entity_func_(proto.despawn_entity(), response);
+        *sim_response.mutable_despawn_entity() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateEntityStatus: {
+        simulation_api_schema::UpdateEntityStatusResponse response;
+        update_entity_status_func_(proto.update_entity_status(), response);
+        *sim_response.mutable_update_entity_status() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kAttachLidarSensor: {
+        simulation_api_schema::AttachLidarSensorResponse response;
+        attach_lidar_sensor_func_(proto.attach_lidar_sensor(), response);
+        *sim_response.mutable_attach_lidar_sensor() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kAttachDetectionSensor: {
+        simulation_api_schema::AttachDetectionSensorResponse response;
+        attach_detection_sensor_func_(proto.attach_detection_sensor(), response);
+        *sim_response.mutable_attach_detection_sensor() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kAttachOccupancyGridSensor: {
+        simulation_api_schema::AttachOccupancyGridSensorResponse response;
+        attach_occupancy_grid_sensor_func_(proto.attach_occupancy_grid_sensor(), response);
+        *sim_response.mutable_attach_occupancy_grid_sensor() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateTrafficLights: {
+        simulation_api_schema::UpdateTrafficLightsResponse response;
+        update_traffic_lights_func_(proto.update_traffic_lights(), response);
+        *sim_response.mutable_update_traffic_lights() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::REQUEST_NOT_SET: {
+        THROW_SIMULATION_ERROR("No case defined for oneof in SimulationRequest message");
+      }
+    }
+    auto msg = toZMQ(sim_response);
+    socket_.send(msg);
   }
 }
 

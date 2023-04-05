@@ -42,7 +42,7 @@ private:
 
   void updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose);
 
-  boost::optional<std::vector<std::int64_t>> route_;
+  std::optional<std::vector<std::int64_t>> route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
   /*

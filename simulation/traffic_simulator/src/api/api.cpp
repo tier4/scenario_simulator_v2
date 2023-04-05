@@ -16,6 +16,7 @@
 
 #include <limits>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
@@ -85,18 +86,18 @@ auto API::setEntityStatus(
     const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
       status.pose, getBoundingBox(reference_entity_name), false)) {
     status.lanelet_pose_valid = true;
-    status.lanelet_pose = lanelet_pose.get();
+    status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
   }
   entity_manager_ptr_->setEntityStatus(name, canonicalize(status));
 }
 
-boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
+std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
 {
   geometry_msgs::msg::Pose pose = getRelativePose(from, to);
   if (pose.position.x > 0) {
-    return boost::none;
+    return std::nullopt;
   }
   double ret = (pose.position.x * -1) / (getCurrentTwist(to).linear.x);
   if (std::isnan(ret)) {
@@ -133,7 +134,7 @@ auto API::setEntityStatus(
     entity_manager_ptr_->toLaneletPose(map_pose, getBoundingBox(name), false);
   EntityStatusType status;
   if (lanelet_pose) {
-    status.lanelet_pose = lanelet_pose.get();
+    status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
   }
@@ -285,7 +286,7 @@ bool API::updateEntityStatusInSim()
       entity_manager_ptr_->toLaneletPose(pose, getBoundingBox(status.name()), false);
     if (lanelet_pose) {
       status_msg.lanelet_pose_valid = true;
-      status_msg.lanelet_pose = lanelet_pose.get();
+      status_msg.lanelet_pose = lanelet_pose.value();
     } else {
       status_msg.lanelet_pose_valid = false;
       status_msg.lanelet_pose = LaneletPoseType();
@@ -389,13 +390,13 @@ auto API::canonicalize(const EntityStatusType & may_non_canonicalized_entity_sta
 }
 
 auto API::toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
-  -> boost::optional<CanonicalizedLaneletPose>
+  -> std::optional<CanonicalizedLaneletPose>
 {
   if (
     const auto pose =
       entity_manager_ptr_->getHdmapUtils()->toLaneletPose(map_pose, include_crosswalk)) {
-    return canonicalize(pose.get());
+    return canonicalize(pose.value());
   }
-  return boost::none;
+  return std::nullopt;
 }
 }  // namespace traffic_simulator

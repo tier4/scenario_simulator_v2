@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__METRICS__OUT_OF_RANGE_METRIC_HPP_
 
 #include <limits>
+#include <optional>
 #include <rclcpp/qos.hpp>
 #include <string>
 #include <tier4_debug_msgs/msg/float32_stamped.hpp>
@@ -38,7 +39,7 @@ public:
     double min_jerk = -std::numeric_limits<double>::max();
     double max_jerk = std::numeric_limits<double>::max();
 
-    boost::optional<std::string> jerk_topic = boost::none;
+    std::optional<std::string> jerk_topic = std::nullopt;
   };
 
   explicit OutOfRangeMetric(const Config & config)
@@ -61,7 +62,7 @@ public:
   OutOfRangeMetric(
     std::string target_entity, double min_velocity, double max_velocity, double min_acceleration,
     double max_acceleration, double min_jerk, double max_jerk,
-    boost::optional<std::string> jerk_topic = boost::none)
+    std::optional<std::string> jerk_topic = std::nullopt)
   : MetricBase("MomentaryStop"),
     target_entity(std::move(target_entity)),
     min_velocity(min_velocity),
@@ -89,7 +90,7 @@ public:
   const double max_acceleration;
   const double min_jerk;
   const double max_jerk;
-  const boost::optional<std::string> jerk_topic;
+  const std::optional<std::string> jerk_topic;
 
 private:
   double linear_velocity_ = 0;

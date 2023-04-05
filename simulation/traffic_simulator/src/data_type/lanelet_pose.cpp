@@ -41,9 +41,9 @@ auto CanonicalizedLaneletPose::canonicalize(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPoseType
 {
   if (
-    const auto canonicalized = std::get<boost::optional<traffic_simulator::LaneletPoseType>>(
+    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPoseType>>(
       hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose))) {
-    return canonicalized.get();
+    return canonicalized.value();
   } else {
     THROW_SEMANTIC_ERROR(
       "Lanelet pose (id=", may_non_canonicalized_lanelet_pose.lanelet_id,
@@ -62,9 +62,9 @@ auto CanonicalizedLaneletPose::canonicalize(
   const std::vector<std::int64_t> & route_lanelets) -> LaneletPoseType
 {
   if (
-    const auto canonicalized = std::get<boost::optional<traffic_simulator::LaneletPoseType>>(
+    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPoseType>>(
       hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose, route_lanelets))) {
-    return canonicalized.get();
+    return canonicalized.value();
   } else {
     THROW_SEMANTIC_ERROR(
       "Lanelet pose (id=", may_non_canonicalized_lanelet_pose.lanelet_id,

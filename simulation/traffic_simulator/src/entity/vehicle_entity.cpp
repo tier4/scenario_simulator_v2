@@ -94,7 +94,7 @@ auto VehicleEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
   return route_planner_.getGoalPoses();
 }
 
-auto VehicleEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
+auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return behavior_plugin_ptr_->getObstacle();
 }
@@ -185,7 +185,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 {
   if (const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false);
       lanelet_pose) {
-    requestAcquirePosition(CanonicalizedLaneletPose(lanelet_pose.get(), hdmap_utils_ptr_));
+    requestAcquirePosition(CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_));
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
   }
@@ -211,7 +211,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
     if (const auto lanelet_waypoint =
           hdmap_utils_ptr_->toLaneletPose(waypoint, getBoundingBox(), false);
         lanelet_waypoint) {
-      route.emplace_back(CanonicalizedLaneletPose(lanelet_waypoint.get(), hdmap_utils_ptr_));
+      route.emplace_back(CanonicalizedLaneletPose(lanelet_waypoint.value(), hdmap_utils_ptr_));
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
     }

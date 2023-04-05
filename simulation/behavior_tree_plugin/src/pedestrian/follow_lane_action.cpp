@@ -51,7 +51,7 @@ BT::NodeStatus FollowLaneAction::tick()
   }
   setOutput(
     "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                        calculateUpdatedEntityStatus(target_speed.get())));
+                        calculateUpdatedEntityStatus(target_speed.value())));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian

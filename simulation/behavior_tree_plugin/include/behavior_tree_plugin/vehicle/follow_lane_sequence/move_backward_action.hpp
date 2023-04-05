@@ -17,6 +17,7 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -42,11 +43,11 @@ public:
     return ports;
   }
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;
-  const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
+  const std::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
 
 private:
-  boost::optional<traffic_simulator::LaneletPoseType> target_lanelet_pose_;
+  std::optional<traffic_simulator::LaneletPoseType> target_lanelet_pose_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

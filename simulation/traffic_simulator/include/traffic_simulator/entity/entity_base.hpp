@@ -17,9 +17,9 @@
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <boost/optional.hpp>
 #include <concealer/autoware.hpp>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
@@ -118,15 +118,15 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
 
-  /*   */ auto getLaneletPose() const -> boost::optional<CanonicalizedLaneletPose>;
+  /*   */ auto getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
 
   /*   */ auto getLaneletPose(double matching_distance) const
-    -> boost::optional<CanonicalizedLaneletPose>;
+    -> std::optional<CanonicalizedLaneletPose>;
 
   /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
     -> geometry_msgs::msg::Pose;
 
-  virtual auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
+  virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
 
@@ -228,7 +228,7 @@ protected:
   std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
-  boost::optional<double> target_speed_;
+  std::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
 
   std::unique_ptr<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>

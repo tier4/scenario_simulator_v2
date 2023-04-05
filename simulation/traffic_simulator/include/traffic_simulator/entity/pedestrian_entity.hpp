@@ -15,8 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 
-#include <boost/optional.hpp>
 #include <memory>
+#include <optional>
 #include <pluginlib/class_loader.hpp>
 #include <pugixml.hpp>
 #include <string>
@@ -100,7 +100,7 @@ public:
 
   auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
 
-  auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
+  auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
 

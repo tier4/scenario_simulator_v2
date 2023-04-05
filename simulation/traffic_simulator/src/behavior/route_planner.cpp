@@ -43,9 +43,9 @@ auto RoutePlanner::getRouteLanelets(
   if (!route_) {
     return hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
   }
-  if (route_ && hdmap_utils_ptr_->isInRoute(lanelet_pose.lanelet_id, route_.get())) {
+  if (route_ && hdmap_utils_ptr_->isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return hdmap_utils_ptr_->getFollowingLanelets(
-      lanelet_pose.lanelet_id, route_.get(), horizon, true);
+      lanelet_pose.lanelet_id, route_.value(), horizon, true);
   }
   // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
   cancelWaypoint(entity_lanelet_pose);
@@ -55,7 +55,7 @@ auto RoutePlanner::getRouteLanelets(
 void RoutePlanner::cancelRoute()
 {
   waypoint_queue_.clear();
-  route_ = boost::none;
+  route_ = std::nullopt;
 }
 
 void RoutePlanner::cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose)
@@ -107,7 +107,7 @@ void RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_p
       lanelet_pose.lanelet_id, static_cast<LaneletPoseType>(waypoint_queue_.front()).lanelet_id);
     return;
   }
-  if (hdmap_utils_ptr_->isInRoute(lanelet_pose.lanelet_id, route_.get())) {
+  if (hdmap_utils_ptr_->isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return;
   } else {
     route_ = hdmap_utils_ptr_->getRoute(

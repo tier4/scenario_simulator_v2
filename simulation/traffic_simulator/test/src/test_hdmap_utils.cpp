@@ -48,14 +48,14 @@ TEST(HdMapUtils, MatchToLane)
       hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(120659, 1, 0)).pose,
       bbox, false);
     EXPECT_TRUE(id);
-    EXPECT_EQ(id.get(), 120659);
+    EXPECT_EQ(id.value(), 120659);
   }
   {
     const auto id = hdmap_utils.matchToLane(
       hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34411, 1, 0)).pose,
       bbox, false);
     EXPECT_TRUE(id);
-    EXPECT_EQ(id.get(), 34411);
+    EXPECT_EQ(id.value(), 34411);
   }
 }
 

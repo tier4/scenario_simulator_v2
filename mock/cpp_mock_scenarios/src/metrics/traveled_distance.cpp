@@ -52,7 +52,7 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     const auto difference = std::abs(
-      static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose.get()).s - traveled_distance);
+      static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose.value()).s - traveled_distance);
     if (difference > std::numeric_limits<double>::epsilon()) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
