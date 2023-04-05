@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <concealer/autoware_user.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <cstdlib>
 #include <exception>
 #include <scenario_simulator_exception/exception.hpp>

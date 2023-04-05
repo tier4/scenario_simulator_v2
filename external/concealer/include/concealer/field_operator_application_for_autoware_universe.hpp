@@ -23,7 +23,7 @@
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <concealer/autoware_user.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <concealer/cooperator.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/utility/publisher_wrapper.hpp>

@@ -16,7 +16,7 @@
 #define CONCEALER__SERVICE_WITH_VALIDATION_HPP_
 
 #include <chrono>
-#include <concealer/autoware_user.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>

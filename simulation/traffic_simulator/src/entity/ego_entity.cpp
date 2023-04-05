@@ -16,7 +16,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <functional>
-#include <concealer/autoware_universe_user.hpp>
+#include <concealer/field_operator_application_for_autoware_universe.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <optional>

@@ -19,7 +19,7 @@
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
 #include <concealer/autoware.hpp>
-#include <concealer/autoware_user.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <memory>
 #include <optional>
 #include <string>
