@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/syntax/environment.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
@@ -40,7 +41,7 @@ Catalog::Catalog(const pugi::xml_node & node, Scope & scope)
   READ_CATEGORY(Controller);
   READ_CATEGORY(Pedestrian);
   READ_CATEGORY(MiscObject);
-  // READ_CATEGORY(Environment);
+  READ_CATEGORY(Environment);
   READ_CATEGORY(Maneuver);
   // READ_CATEGORY(Trajectory);
   READ_CATEGORY(Route);

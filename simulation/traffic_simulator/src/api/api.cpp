@@ -16,6 +16,7 @@
 
 #include <limits>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
@@ -96,18 +97,18 @@ auto API::setEntityStatus(
   status.action_status = action_status;
   if (lanelet_pose) {
     status.lanelet_pose_valid = true;
-    status.lanelet_pose = lanelet_pose.get();
+    status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
   }
   entity_manager_ptr_->setEntityStatus(name, status);
 }
 
-boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
+std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
 {
   geometry_msgs::msg::Pose pose = getRelativePose(from, to);
   if (pose.position.x > 0) {
-    return boost::none;
+    return std::nullopt;
   }
   traffic_simulator_msgs::msg::EntityStatus to_status = getEntityStatus(to);
   double ret = (pose.position.x * -1) / (to_status.action_status.twist.linear.x);
@@ -165,7 +166,7 @@ auto API::setEntityStatus(
     map_pose, entity_manager_ptr_->getEntityStatus(name).bounding_box, false);
   traffic_simulator_msgs::msg::EntityStatus status;
   if (lanelet_pose) {
-    status.lanelet_pose = lanelet_pose.get();
+    status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
   }
@@ -317,7 +318,7 @@ bool API::updateEntityStatusInSim()
       pose, entity_manager_ptr_->getEntityStatus(status.name()).bounding_box, false);
     if (lanelet_pose) {
       status_msg.lanelet_pose_valid = true;
-      status_msg.lanelet_pose = lanelet_pose.get();
+      status_msg.lanelet_pose = lanelet_pose.value();
     } else {
       status_msg.lanelet_pose_valid = false;
       status_msg.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
@@ -331,7 +332,7 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = boost::none;
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = std::nullopt;
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 

@@ -17,8 +17,8 @@
 #ifndef RANDOM_TEST_RUNNER__ALMOST_STANDSTILL_METRIC_H
 #define RANDOM_TEST_RUNNER__ALMOST_STANDSTILL_METRIC_H
 
-#include <boost/optional.hpp>
 #include <iostream>
+#include <optional>
 
 #include "random_test_runner/data_types.hpp"
 
@@ -58,7 +58,7 @@ private:
   const double last_data_timeout_ = 2.0;
 
   double almost_standstill_time_ = 0.0;
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> last_status_;
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> last_status_;
 };
 
 #endif  // RANDOM_TEST_RUNNER__ALMOST_STANDSTILL_METRIC_H

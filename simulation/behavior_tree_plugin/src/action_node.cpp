@@ -18,6 +18,7 @@
 #include <behavior_tree_plugin/action_node.hpp>
 #include <geometry/bounding_box.hpp>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
@@ -58,8 +59,8 @@ auto ActionNode::getBlackBoardValues() -> void
     THROW_SIMULATION_ERROR("failed to get input entity_status in ActionNode");
   }
 
-  if (!getInput<boost::optional<double>>("target_speed", target_speed)) {
-    target_speed = boost::none;
+  if (!getInput<std::optional<double>>("target_speed", target_speed)) {
+    target_speed = std::nullopt;
   }
 
   if (!getInput<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus>>(
@@ -104,7 +105,7 @@ auto ActionNode::getOtherEntityStatus(std::int64_t lanelet_id) const
 }
 
 auto ActionNode::getYieldStopDistance(const std::vector<std::int64_t> & following_lanelets) const
-  -> boost::optional<double>
+  -> std::optional<double>
 {
   std::set<double> distances;
   for (const auto & lanelet : following_lanelets) {
@@ -115,7 +116,7 @@ auto ActionNode::getYieldStopDistance(const std::vector<std::int64_t> & followin
         auto distance = hdmap_utils->getLongitudinalDistance(
           entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s, lanelet, 0);
         if (distance) {
-          distances.insert(distance.get());
+          distances.insert(distance.value());
         }
       }
     }
@@ -123,7 +124,7 @@ auto ActionNode::getYieldStopDistance(const std::vector<std::int64_t> & followin
       return *distances.begin();
     }
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 auto ActionNode::getRightOfWayEntities(const std::vector<std::int64_t> & following_lanelets) const
@@ -164,11 +165,11 @@ auto ActionNode::getRightOfWayEntities() const
 
 auto ActionNode::getDistanceToTrafficLightStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const math::geometry::CatmullRomSplineInterface & spline) const -> boost::optional<double>
+  const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
   const auto traffic_light_ids = hdmap_utils->getTrafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   std::set<double> collision_points = {};
   for (const auto id : traffic_light_ids) {
@@ -180,35 +181,35 @@ auto ActionNode::getDistanceToTrafficLightStopLine(
         traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
       const auto collision_point = hdmap_utils->getDistanceToTrafficLightStopLine(spline, id);
       if (collision_point) {
-        collision_points.insert(collision_point.get());
+        collision_points.insert(collision_point.value());
       }
     }
   }
   if (collision_points.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   return *collision_points.begin();
 }
 
 auto ActionNode::getDistanceToStopLine(
   const std::vector<std::int64_t> & route_lanelets,
-  const std::vector<geometry_msgs::msg::Point> & waypoints) const -> boost::optional<double>
+  const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>
 {
   return hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints);
 }
 
 auto ActionNode::getDistanceToFrontEntity(
-  const math::geometry::CatmullRomSplineInterface & spline) const -> boost::optional<double>
+  const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
   auto name = getFrontEntityName(spline);
   if (!name) {
-    return boost::none;
+    return std::nullopt;
   }
-  return getDistanceToTargetEntityPolygon(spline, name.get());
+  return getDistanceToTargetEntityPolygon(spline, name.value());
 }
 
 auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
-  -> boost::optional<std::string>
+  -> std::optional<std::string>
 {
   std::vector<double> distances;
   std::vector<std::string> entities;
@@ -222,9 +223,9 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     if (
       std::fabs(quaternion_operation::convertQuaternionToEulerAngle(quat).z) <=
       boost::math::constants::half_pi<double>()) {
-      if (distance && distance.get() < 40) {
+      if (distance && distance.value() < 40) {
         entities.emplace_back(each.first);
-        distances.emplace_back(distance.get());
+        distances.emplace_back(distance.value());
       }
     }
   }
@@ -232,7 +233,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     THROW_SIMULATION_ERROR("size of entities and distances vector does not match.");
   }
   if (distances.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   std::vector<double>::iterator iter = std::min_element(distances.begin(), distances.end());
   size_t index = std::distance(distances.begin(), iter);
@@ -241,13 +242,13 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
 
 auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
   const math::geometry::CatmullRomSplineInterface & spline,
-  const traffic_simulator_msgs::msg::EntityStatus & status) const -> boost::optional<double>
+  const traffic_simulator_msgs::msg::EntityStatus & status) const -> std::optional<double>
 {
   if (status.lanelet_pose_valid) {
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
     return spline.getCollisionPointIn2D(polygon, false, true);
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 auto ActionNode::getEntityStatus(const std::string target_name) const
@@ -262,7 +263,7 @@ auto ActionNode::getEntityStatus(const std::string target_name) const
 auto ActionNode::getDistanceToTargetEntityPolygon(
   const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
   double width_extension_right, double width_extension_left, double length_extension_front,
-  double length_extension_rear) const -> boost::optional<double>
+  double length_extension_rear) const -> std::optional<double>
 {
   const auto status = getEntityStatus(target_name);
   if (status.lanelet_pose_valid == true) {
@@ -270,14 +271,14 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
       spline, status, width_extension_right, width_extension_left, length_extension_front,
       length_extension_rear);
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 auto ActionNode::getDistanceToTargetEntityPolygon(
   const math::geometry::CatmullRomSplineInterface & spline,
   const traffic_simulator_msgs::msg::EntityStatus & status, double width_extension_right,
   double width_extension_left, double length_extension_front, double length_extension_rear) const
-  -> boost::optional<double>
+  -> std::optional<double>
 {
   if (status.lanelet_pose_valid) {
     const auto polygon = math::geometry::transformPoints(
@@ -286,12 +287,12 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
                      length_extension_front, length_extension_rear));
     return spline.getCollisionPointIn2D(polygon, false, true);
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 auto ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & route_lanelets,
-  const math::geometry::CatmullRomSplineInterface & spline) const -> boost::optional<double>
+  const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
   auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets);
   auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets);
@@ -299,17 +300,17 @@ auto ActionNode::getDistanceToConflictingEntity(
   for (const auto & status : crosswalk_entity_status) {
     const auto s = getDistanceToTargetEntityOnCrosswalk(spline, status);
     if (s) {
-      distances.insert(s.get());
+      distances.insert(s.value());
     }
   }
   for (const auto & status : lane_entity_status) {
     const auto s = getDistanceToTargetEntityPolygon(spline, status, 0.0, 0.0, 0.0, 1.0);
     if (s) {
-      distances.insert(s.get());
+      distances.insert(s.value());
     }
   }
   if (distances.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   return *distances.begin();
 }

@@ -44,9 +44,9 @@ auto FollowPolylineTrajectoryAction::calculateWaypoints()
 
 auto FollowPolylineTrajectoryAction::calculateObstacle(
   const traffic_simulator_msgs::msg::WaypointsArray &)
-  -> const boost::optional<traffic_simulator_msgs::msg::Obstacle>
+  -> const std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  return boost::none;
+  return std::nullopt;
 }
 
 auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList

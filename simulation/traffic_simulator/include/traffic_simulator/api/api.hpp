@@ -22,6 +22,7 @@
 #include <boost/variant.hpp>
 #include <cassert>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/conversions.hpp>
@@ -218,7 +219,7 @@ public:
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
 
-  boost::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
+  std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
   bool reachPosition(
     const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance);

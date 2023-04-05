@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <utility>
@@ -32,21 +33,21 @@ StopAtStopLineAction::StopAtStopLineAction(
   stopped_ = false;
 }
 
-const boost::optional<traffic_simulator_msgs::msg::Obstacle>
-StopAtStopLineAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
+const std::optional<traffic_simulator_msgs::msg::Obstacle> StopAtStopLineAction::calculateObstacle(
+  const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stopline_) {
-    return boost::none;
+    return std::nullopt;
   }
-  if (distance_to_stopline_.get() < 0) {
-    return boost::none;
+  if (distance_to_stopline_.value() < 0) {
+    return std::nullopt;
   }
-  if (distance_to_stopline_.get() > trajectory->getLength()) {
-    return boost::none;
+  if (distance_to_stopline_.value() > trajectory->getLength()) {
+    return std::nullopt;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
   obstacle.type = obstacle.ENTITY;
-  obstacle.s = distance_to_stopline_.get();
+  obstacle.s = distance_to_stopline_.value();
   return obstacle;
 }
 
@@ -69,16 +70,16 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculat
   }
 }
 
-boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(double current_velocity)
+std::optional<double> StopAtStopLineAction::calculateTargetSpeed(double current_velocity)
 {
   if (!distance_to_stopline_) {
-    return boost::none;
+    return std::nullopt;
   }
   /**
    * @brief hard coded parameter!! 1.0 is a stop margin
    */
   double rest_distance =
-    distance_to_stopline_.get() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
+    distance_to_stopline_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
   if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     return 0;
   }
@@ -115,13 +116,13 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (distance_to_front_entity) {
-    if (distance_to_front_entity.get() <= distance_to_stopline_.get()) {
+    if (distance_to_front_entity.value() <= distance_to_stopline_.value()) {
       stopped_ = false;
       return BT::NodeStatus::FAILURE;
     }
   }
   if (distance_to_stop_target) {
-    if (distance_to_stop_target.get() <= distance_to_stopline_.get()) {
+    if (distance_to_stop_target.value() <= distance_to_stopline_.value()) {
       stopped_ = false;
       return BT::NodeStatus::FAILURE;
     }
@@ -129,7 +130,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
 
   if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
     if (distance_to_stopline_) {
-      if (distance_to_stopline_.get() <= vehicle_parameters.bounding_box.dimensions.x + 5) {
+      if (distance_to_stopline_.value() <= vehicle_parameters.bounding_box.dimensions.x + 5) {
         stopped_ = true;
       }
     }
@@ -140,13 +141,13 @@ BT::NodeStatus StopAtStopLineAction::tick()
     }
     if (!distance_to_stopline_) {
       stopped_ = false;
-      setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
+      setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.value()));
       const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
       setOutput("obstacle", obstacle);
       return BT::NodeStatus::SUCCESS;
     }
-    setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
+    setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.value()));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
@@ -158,13 +159,13 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (target_speed) {
-    if (target_speed.get() > target_linear_speed.get()) {
-      target_speed = target_linear_speed.get();
+    if (target_speed.value() > target_linear_speed.value()) {
+      target_speed = target_linear_speed.value();
     }
   } else {
-    target_speed = target_linear_speed.get();
+    target_speed = target_linear_speed.value();
   }
-  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.value()));
   stopped_ = false;
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);

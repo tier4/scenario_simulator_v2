@@ -28,7 +28,7 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
 
   Parameter parameter;
 
-  boost::optional<double> target_speed;
+  std::optional<double> target_speed;
 
   geometry_msgs::msg::Vector3 velocity;  // world coordinate
 
@@ -41,7 +41,7 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
   auto calculateWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
-    -> const boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
+    -> const std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   static auto providedPorts() -> BT::PortsList;
 

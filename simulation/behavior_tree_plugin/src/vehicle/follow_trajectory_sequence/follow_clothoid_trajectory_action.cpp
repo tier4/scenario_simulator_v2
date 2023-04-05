@@ -26,9 +26,9 @@ auto FollowClothoidTrajectoryAction::calculateWaypoints()
 
 auto FollowClothoidTrajectoryAction::calculateObstacle(
   const traffic_simulator_msgs::msg::WaypointsArray &)
-  -> const boost::optional<traffic_simulator_msgs::msg::Obstacle>
+  -> const std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  return boost::none;
+  return std::nullopt;
 }
 
 auto FollowClothoidTrajectoryAction::tick() -> BT::NodeStatus { return BT::NodeStatus::FAILURE; }

@@ -28,7 +28,7 @@ struct FollowNurbsTrajectoryAction : public VehicleActionNode
   auto calculateWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
-    -> const boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
+    -> const std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto tick() -> BT::NodeStatus override;
 };

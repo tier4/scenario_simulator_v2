@@ -21,6 +21,7 @@
 #include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
 #include <iostream>
+#include <optional>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
 #include <vector>
@@ -136,36 +137,36 @@ unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
   return geometry_id;
 }
 
-boost::optional<double> Primitive::getMax(const math::geometry::Axis & axis) const
+std::optional<double> Primitive::getMax(const math::geometry::Axis & axis) const
 {
   if (vertices_.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   return math::geometry::getMaxValue(toPoints(transform()), axis);
 }
 
-boost::optional<double> Primitive::getMin(const math::geometry::Axis & axis) const
+std::optional<double> Primitive::getMin(const math::geometry::Axis & axis) const
 {
   if (vertices_.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   return math::geometry::getMinValue(toPoints(transform()), axis);
 }
 
-boost::optional<double> Primitive::getMax(
+std::optional<double> Primitive::getMax(
   const math::geometry::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
 {
   if (vertices_.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   return math::geometry::getMaxValue(toPoints(transform(sensor_pose)), axis);
 }
 
-boost::optional<double> Primitive::getMin(
+std::optional<double> Primitive::getMin(
   const math::geometry::Axis & axis, const geometry_msgs::msg::Pose & sensor_pose) const
 {
   if (vertices_.empty()) {
-    return boost::none;
+    return std::nullopt;
   }
   return math::geometry::getMinValue(toPoints(transform(sensor_pose)), axis);
 }
