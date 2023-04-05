@@ -14,7 +14,7 @@ Major Changes :race_car: :red_car: :blue_car:
 | OpenSCENARIO 1.2 `Controller.Properties.Property`                    | By setting `detectedObjectMissingProbability` to `Controller.Properties.Property`, it is now possible to lost object recognition data with a specified probability.                                      | `openscenario_interpreter` | [#973](https://github.com/tier4/scenario_simulator_v2/pull/973) | [yamacir-kit](https://github.com/yamacir-kit) |
 | UserDefinedValueCondition `RelativeHeadingCondition`                 | Added one-argument version to `RelativeHeadingCondition`. This version of `RelativeHeadingCondition` returns the lane coordinate system heading of the entity with the name given in the first argument. | `openscenario_interpreter` | [#978](https://github.com/tier4/scenario_simulator_v2/pull/978) | [yamacir-kit](https://github.com/yamacir-kit) |
 | OpenSCENARIO 1.2 `Controller.Properties.Property`                    | Added support for delaying the publication of object detection data by setting the value `detectedObjectPublishingDelay` (in seconds) to `Controller.Properties.Property`.                               | `openscenario_interpreter` | [#986](https://github.com/tier4/scenario_simulator_v2/pull/986) | [yamacir-kit](https://github.com/yamacir-kit) |
-
+| OpenSCENARIO 1.2 `EnvironmentAction`                                 | The parsing of `EnvironmentAction` is now supported                                                                                                                                                      | `openscenario_interpreter` | [#980](https://github.com/tier4/scenario_simulator_v2/pull/980) | [f0reachARR](https://github.com/f0reachARR)   |
 
 Bug Fixes:bug:
 
