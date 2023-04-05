@@ -1,0 +1,92 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader:
+    author: Yasuyuki Arikawa
+    date: "2023-03-31T09:00:00+09:00"
+    description: Scenario with environment
+    revMajor: 0
+    revMinor: 0
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+  Entities:
+  Storyboard:
+    Init:
+      Actions:
+        GlobalAction:
+          EnvironmentAction:
+            Environment:
+              name: "Sample env"
+              TimeOfDay:
+                animation: true
+                dateTime: "2023-03-31T09:00:00+09:00"
+              Weather:
+                atmosphericPressure: 80000
+                fractionalCloudCover: threeOktas
+                temperature: 200
+                Sun:
+                  azimuth: 0.0
+                  elevation: 0.0
+                Fog:
+                  visualRange: 100.1
+                Precipitation:
+                  precipitationType: dry
+                  precipitationIntensity: 10.0
+                Wind:
+                  direction: 0.2
+                  speed: 1.0
+                DomeImage:
+                  DomeFile:
+                    filepath: $(find-pkg-share kashiwanoha_map)/dome
+              RoadCondition:
+                frictionScaleFactor: 0.1
+                wetness: wetWithPuddles
+    Story:
+      - name: ""
+        Act:
+          - name: ""
+            ManeuverGroup:
+              - name: ""
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ""
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
