@@ -32,7 +32,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("simple_sensor_simulator", options),
   sensor_sim_(),
   server_(
-    simulation_interface::protocol, simulation_interface::HostName::ANY,
+    simulation_interface::protocol, simulation_interface::HostName::ANY, getSocketPort(),
     std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(&ScenarioSimulator::updateFrame, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
@@ -63,6 +63,12 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 }
 
 ScenarioSimulator::~ScenarioSimulator() {}
+
+int ScenarioSimulator::getSocketPort()
+{
+  if (!has_parameter("port")) declare_parameter("port", 5555);
+  return get_parameter("port").as_int();
+}
 
 void ScenarioSimulator::initialize(
   const simulation_api_schema::InitializeRequest & req,

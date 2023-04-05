@@ -21,6 +21,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_subspline.hpp>
 #include <memory>
+#include <optional>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
@@ -54,7 +55,7 @@ public:
   auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
     -> traffic_simulator_msgs::msg::EntityStatus;
   virtual const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() = 0;
-  virtual const boost::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
+  virtual const std::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) = 0;
 
 protected:

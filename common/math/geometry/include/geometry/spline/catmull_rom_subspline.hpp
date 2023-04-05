@@ -20,6 +20,7 @@
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -39,7 +40,7 @@ public:
 
   double getLength() const override;
 
-  boost::optional<double> getCollisionPointIn2D(
+  std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const override;
 

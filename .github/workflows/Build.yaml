@@ -48,7 +48,7 @@ jobs:
       - name: Search packages in this repository
         id: list_packages
         run: |
-          echo ::set-output name=package_list::$(colcon list --names-only | sed -e ':loop; N; $!b loop; s/\n/ /g')
+          echo package_list=$(colcon list --names-only | sed -e ':loop; N; $!b loop; s/\n/ /g') >> $GITHUB_OUTPUT
       - name: Show target packages
         run: |
           echo "Target packages: ${{ steps.list_packages.outputs.package_list }}"
@@ -73,7 +73,7 @@ jobs:
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml
       - name: show failure test result
         if: always()
-        run : |
+        run: |
           cd /__w/scenario_simulator_v2/scenario_simulator_v2/ros_ws
           colcon test-result --verbose
       - name: publish codecov result

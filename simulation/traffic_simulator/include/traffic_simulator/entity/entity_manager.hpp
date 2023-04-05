@@ -25,8 +25,8 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #endif
 
-#include <boost/optional.hpp>
 #include <memory>
+#include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
 #include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -277,15 +277,15 @@ public:
   bool laneMatchingSucceed(const std::string & name) const;
 
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
-    -> boost::optional<double>;
+    -> std::optional<double>;
 
   auto getCurrentTime() const noexcept -> double;
 
   auto getDistanceToCrosswalk(const std::string & name, const std::int64_t target_crosswalk_id)
-    -> boost::optional<double>;
+    -> std::optional<double>;
 
   auto getDistanceToStopLine(const std::string & name, const std::int64_t target_stop_line_id)
-    -> boost::optional<double>;
+    -> std::optional<double>;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
@@ -297,24 +297,24 @@ public:
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   // clang-format off
-  auto getLateralDistance(const LaneletPose &, const LaneletPose &) const -> boost::optional<double>;
-  auto getLateralDistance(const LaneletPose &, const std::string &) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &, const LaneletPose &) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &, const std::string &) const -> boost::optional<double>;
-  auto getLateralDistance(const LaneletPose &, const LaneletPose &, double matching_distance) const -> boost::optional<double>;
-  auto getLateralDistance(const LaneletPose &, const std::string &, double matching_distance) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &, const LaneletPose &, double matching_distance) const -> boost::optional<double>;
-  auto getLateralDistance(const std::string &, const std::string &, double matching_distance) const -> boost::optional<double>;
-  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &) const -> boost::optional<double>;
-  auto getLongitudinalDistance(const LaneletPose &, const std::string &) const -> boost::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const LaneletPose &) const -> boost::optional<double>;
-  auto getLongitudinalDistance(const std::string &, const std::string &) const -> boost::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const LaneletPose &) const -> std::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const std::string &) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &, const LaneletPose &) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &, const std::string &) const -> std::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const LaneletPose &, double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const LaneletPose &, const std::string &, double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &, const LaneletPose &, double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &, const std::string &, double matching_distance) const -> std::optional<double>;
+  auto getLongitudinalDistance(const LaneletPose &, const LaneletPose &) const -> std::optional<double>;
+  auto getLongitudinalDistance(const LaneletPose &, const std::string &) const -> std::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const LaneletPose &) const -> std::optional<double>;
+  auto getLongitudinalDistance(const std::string &, const std::string &) const -> std::optional<double>;
   // clang-format on
 
   auto getNumberOfEgo() const -> std::size_t;
 
   auto getObstacle(const std::string & name)
-    -> boost::optional<traffic_simulator_msgs::msg::Obstacle>;
+    -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
 
   // clang-format off
   auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose;

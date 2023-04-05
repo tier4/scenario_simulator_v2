@@ -27,7 +27,7 @@ TrafficSignalController::TrafficSignalController(const pugi::xml_node & node, Sc
   reference(readAttribute<String>("reference", node, scope, "")),
   phases(readElements<Phase, 0>("Phase", node, scope)),
   current_phase(std::begin(phases), std::end(phases), std::end(phases)),
-  change_to_begin_time(boost::none),
+  change_to_begin_time(std::nullopt),
   current_phase_started_at(std::numeric_limits<double>::min())
 {
   if (delay < 0) {
@@ -119,7 +119,7 @@ auto TrafficSignalController::shouldChangePhaseToBegin() -> bool
     return current_phase == std::end(phases);  // if current_phase haven't been initialized
   } else if (
     change_to_begin_time.has_value() and change_to_begin_time.value() < evaluateSimulationTime()) {
-    change_to_begin_time = boost::none;
+    change_to_begin_time = std::nullopt;
     return true;
   } else {
     return false;

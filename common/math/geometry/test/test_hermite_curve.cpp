@@ -45,7 +45,7 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
   p.position.z = 0;
   EXPECT_TRUE(curve.getSValue(p, 1, true));
   EXPECT_TRUE(
-    (curve.getSValue(p, 1, true).get() > 0.099) && (curve.getSValue(p, 1, true).get() < 0.101));
+    (curve.getSValue(p, 1, true).value() > 0.099) && (curve.getSValue(p, 1, true).value() < 0.101));
   {
     geometry_msgs::msg::Point start;
     start.x = 0.1;
@@ -58,7 +58,7 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
     EXPECT_FALSE(curve.getCollisionPointIn2D({start}));
     EXPECT_TRUE(collision_s);
     if (collision_s) {
-      EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+      EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
     }
   }
   {
@@ -71,7 +71,7 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
     auto collision_s = curve.getCollisionPointIn2D(start, goal);
     EXPECT_TRUE(collision_s);
     if (collision_s) {
-      EXPECT_DOUBLE_EQ(collision_s.get(), 0.15);
+      EXPECT_DOUBLE_EQ(collision_s.value(), 0.15);
     }
   }
 }

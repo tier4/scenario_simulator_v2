@@ -41,12 +41,16 @@ inline namespace syntax
  *   </xsd:all>
  *   <xsd:attribute name="name" type="String" use="required"/>
  *   <xsd:attribute name="vehicleCategory" type="VehicleCategory" use="required"/>
+ *   <xsd:attribute name="model3d" type="String"/>
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct Vehicle : public Scope  // for ParameterDeclarations
 {
   const VehicleCategory vehicle_category;  // Category of the vehicle (bicycle, train,...).
+
+  const String
+    model3d;  // Definition of the model of the vehicle as a model type or a relative or absolute file path.
 
   const ParameterDeclarations parameter_declarations;  // Definition of additional parameters.
 

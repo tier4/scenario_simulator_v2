@@ -22,6 +22,7 @@
 #include <boost/variant.hpp>
 #include <cassert>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/conversions.hpp>
@@ -72,9 +73,17 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    zeromq_client_(simulation_interface::protocol, configuration.simulator_host)
+    zeromq_client_(
+      simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
     setVerbose(configuration.verbose);
+  }
+
+  template <typename Node>
+  int getZMQSocketPort(Node & node)
+  {
+    if (!node.has_parameter("port")) node.declare_parameter("port", 5555);
+    return node.get_parameter("port").as_int();
   }
 
   void closeZMQConnection() { zeromq_client_.closeConnection(); }
@@ -196,7 +205,7 @@ public:
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
 
-  boost::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
+  std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
   bool reachPosition(
     const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance);

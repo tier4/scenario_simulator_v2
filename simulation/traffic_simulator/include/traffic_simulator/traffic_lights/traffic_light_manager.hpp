@@ -65,15 +65,15 @@ protected:
   virtual auto publishTrafficLightStateArray() const -> void = 0;
 
 public:
-  auto getTrafficLight(const LaneletID lanelet_id) -> auto &
+  auto getTrafficLight(const LaneletID traffic_light_id) -> auto &
   {
-    if (auto iter = traffic_lights_.find(lanelet_id); iter != std::end(traffic_lights_)) {
+    if (auto iter = traffic_lights_.find(traffic_light_id); iter != std::end(traffic_lights_)) {
       return iter->second;
     } else {
       traffic_lights_.emplace(
-        std::piecewise_construct, std::forward_as_tuple(lanelet_id),
-        std::forward_as_tuple(lanelet_id, *hdmap_));
-      return traffic_lights_.at(lanelet_id);
+        std::piecewise_construct, std::forward_as_tuple(traffic_light_id),
+        std::forward_as_tuple(traffic_light_id, *hdmap_));
+      return traffic_lights_.at(traffic_light_id);
     }
   }
 
