@@ -17,14 +17,14 @@
 
 namespace concealer
 {
-FieldOperatorApplicationFor<AutowareUniverse>::~FieldOperatorApplicationFor()
+FieldOperatorApplicationFor<AutowareUniverseTemp>::~FieldOperatorApplicationFor()
 {
   shutdownAutoware();
   // All tasks should be complete before the services used in them will be deinitialized.
   task_queue.stopAndJoin();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::approve(
   const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
 {
   auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
@@ -55,7 +55,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::cooperate(
   const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
 {
   switch (current_cooperator) {
@@ -67,7 +67,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::initialize(
   const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
@@ -92,7 +92,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::plan(
   const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
   assert(not route.empty());
@@ -107,7 +107,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
@@ -118,19 +118,19 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::engageable() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isWaitingForEngage();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::engaged() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isDriving();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getWaypoints() const
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
@@ -142,20 +142,20 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
   return waypoints;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getTurnIndicatorsCommand() const
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getTurnIndicatorsCommand() const
   -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   return getTurnIndicatorsCommandImpl();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double value) const
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::restrictTargetSpeed(double value) const
   -> double
 {
   // no restrictions here
   return value;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getAutowareStateName() const -> std::string
 {
   using autoware_auto_system_msgs::msg::AutowareState;
 
@@ -179,29 +179,29 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const
 #undef CASE
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getEmergencyStateName() const -> std::string
 {
   return minimum_risk_maneuver_state;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverBehaviorName() const
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getMinimumRiskManeuverBehaviorName() const
   -> std::string
 {
   return minimum_risk_maneuver_behavior;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverStateName() const
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getMinimumRiskManeuverStateName() const
   -> std::string
 {
   return minimum_risk_maneuver_state;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::sendSIGINT() -> void  //
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::sendSIGINT() -> void  //
 {
   ::kill(process_id, SIGINT);
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit) -> void
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<tier4_external_api_msgs::srv::SetVelocityLimit::Request>();
@@ -212,13 +212,13 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::string & cooperator)
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::setCooperator(const std::string & cooperator)
   -> void
 {
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::receiveEmergencyState(
   const autoware_auto_system_msgs::msg::EmergencyState & message) -> void
 {
 #define CASE(IDENTIFIER)                                           \
@@ -241,7 +241,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
 #undef CASE
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
+auto FieldOperatorApplicationFor<AutowareUniverseTemp>::receiveMrmState(
   const autoware_adapi_v1_msgs::msg::MrmState & message) -> void
 {
 #define CASE(IDENTIFIER, VARIABLE)                        \

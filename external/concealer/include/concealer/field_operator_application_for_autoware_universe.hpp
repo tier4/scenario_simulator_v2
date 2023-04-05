@@ -36,16 +36,16 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
+class AutowareUniverseTemp;
+
 namespace concealer
 {
-class AutowareUniverse;
-
 template <>
-class FieldOperatorApplicationFor<AutowareUniverse>
+class FieldOperatorApplicationFor<AutowareUniverseTemp>
 : public FieldOperatorApplication,
-  public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
+  public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverseTemp>>
 {
-  friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
+  friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverseTemp>>;
 
   // clang-format off
   PublisherWrapper<geometry_msgs::msg::PoseStamped>               setCheckpoint;

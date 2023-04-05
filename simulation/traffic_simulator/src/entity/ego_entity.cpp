@@ -137,7 +137,7 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<
-                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
+                 concealer::FieldOperatorApplicationFor<AutowareUniverseTemp>>(
                  getParameter<std::string>("autoware_launch_package"),
                  getParameter<std::string>("autoware_launch_file"),
                  "map_path:=" + configuration.map_path.string(),
@@ -150,7 +150,7 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
                                       : Configuration::Pathname(rviz_config).string()),
                  "scenario_simulation:=true", "perception/enable_traffic_light:=false")
              : std::make_unique<
-                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
+                 concealer::FieldOperatorApplicationFor<AutowareUniverseTemp>>();
   } else {
     throw common::SemanticError(
       "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
@@ -262,7 +262,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   std::vector<std::int64_t> ids{};
 
   if (const auto universe =
-        dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
+        dynamic_cast<concealer::FieldOperatorApplicationFor<AutowareUniverseTemp> *>(
           field_operator_application.get());
       universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
