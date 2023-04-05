@@ -1164,8 +1164,7 @@ auto HdMapUtils::getRightLaneletIds(
   }
 }
 
-std::optional<std::pair<math::geometry::HermiteCurve, double>>
-HdMapUtils::getLaneChangeTrajectory(
+std::optional<std::pair<math::geometry::HermiteCurve, double>> HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter) const
 {

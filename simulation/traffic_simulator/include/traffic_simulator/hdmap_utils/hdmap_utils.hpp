@@ -118,7 +118,8 @@ public:
   std::optional<int64_t> getLaneChangeableLaneletId(
     std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction) const;
   std::optional<int64_t> getLaneChangeableLaneletId(
-    std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction, uint8_t shift) const;
+    std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction,
+    uint8_t shift) const;
   std::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
@@ -128,9 +129,11 @@ public:
   double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s) const;
   std::optional<double> getLateralDistance(
-    const traffic_simulator_msgs::msg::LaneletPose & from, const traffic_simulator_msgs::msg::LaneletPose & to) const;
+    const traffic_simulator_msgs::msg::LaneletPose & from,
+    const traffic_simulator_msgs::msg::LaneletPose & to) const;
   std::optional<double> getLongitudinalDistance(
-    const traffic_simulator_msgs::msg::LaneletPose & from, const traffic_simulator_msgs::msg::LaneletPose & to) const;
+    const traffic_simulator_msgs::msg::LaneletPose & from,
+    const traffic_simulator_msgs::msg::LaneletPose & to) const;
   std::optional<double> getLongitudinalDistance(
     std::int64_t from_lanelet_id, double from_s, std::int64_t to_lanelet_id, double to_s) const;
   double getSpeedLimit(const std::vector<std::int64_t> & lanelet_ids) const;
@@ -138,9 +141,10 @@ public:
   std::vector<std::int64_t> getFollowingLanelets(
     std::int64_t lanelet_id, double distance = 100, bool include_self = true) const;
   std::vector<std::int64_t> getFollowingLanelets(
-    std::int64_t lanelet_id, const std::vector<std::int64_t> & candidate_lanelet_ids, double distance = 100,
-    bool include_self = true) const;
-  std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100) const;
+    std::int64_t lanelet_id, const std::vector<std::int64_t> & candidate_lanelet_ids,
+    double distance = 100, bool include_self = true) const;
+  std::vector<std::int64_t> getPreviousLanelets(
+    std::int64_t lanelet_id, double distance = 100) const;
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getCenterPoints(
     const std::vector<std::int64_t> & lanelet_ids) const;
@@ -236,7 +240,7 @@ private:
   mutable CenterPointsCache center_points_cache_;
   mutable LaneletLengthCache lanelet_length_cache_;
   // @}
-  
+
   template <typename Lanelet>
   std::vector<std::int64_t> getLaneletIds(const std::vector<Lanelet> & lanelets) const
   {
