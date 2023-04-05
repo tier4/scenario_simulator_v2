@@ -38,20 +38,20 @@ TEST(CatmullRomSpline, GetCollisionPointIn2D)
   auto collision_s = spline.getCollisionPointIn2D(start, goal, false);
   EXPECT_TRUE(collision_s);
   if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
   }
   collision_s = spline.getCollisionPointIn2D({start, goal}, false);
   if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
   }
   collision_s = spline.getCollisionPointIn2D(start, goal, true);
   EXPECT_TRUE(collision_s);
   if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
   }
   collision_s = spline.getCollisionPointIn2D({start, goal}, true);
   if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
   }
 }
 
@@ -142,8 +142,8 @@ TEST(CatmullRomSpline, GetSValue)
   p.position.z = 0;
   const auto result = spline.getSValue(p);
   EXPECT_TRUE(result);
-  EXPECT_TRUE(result.get() > 0.099);
-  EXPECT_TRUE(result.get() < 0.101);
+  EXPECT_TRUE(result.value() > 0.099);
+  EXPECT_TRUE(result.value() < 0.101);
   p.position.x = 10;
   p.position.y = 0;
   p.position.z = 0;

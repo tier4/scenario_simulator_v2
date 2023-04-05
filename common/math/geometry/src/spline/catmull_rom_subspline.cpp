@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/optional.hpp>
 #include <geometry/spline/catmull_rom_subspline.hpp>
+#include <optional>
 #include <vector>
 
 namespace math
@@ -22,21 +22,21 @@ namespace geometry
 {
 double CatmullRomSubspline::getLength() const { return end_s_ - start_s_; }
 
-boost::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
+std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
   bool close_start_end) const
 {
   auto s = spline_->getCollisionPointIn2D(polygon, search_backward, close_start_end);
 
   if (!s) {
-    return boost::none;
+    return std::nullopt;
   }
 
-  if (s.get() < start_s_ || end_s_ < s.get()) {
-    return boost::none;
+  if (s.value() < start_s_ || end_s_ < s.value()) {
+    return std::nullopt;
   }
 
-  return s.get() - start_s_;
+  return s.value() - start_s_;
 }
 }  // namespace geometry
 }  // namespace math

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <optional>
 #include <string>
 #include <traffic_simulator/metrics/momentary_stop_metric.hpp>
 
@@ -19,7 +20,7 @@ namespace metrics
 {
 void MomentaryStopMetric::update()
 {
-  boost::optional<double> distance;
+  std::optional<double> distance;
   switch (stop_target_lanelet_type) {
     case StopTargetLaneletType::STOP_LINE:
       distance = entity_manager_ptr_->getDistanceToStopLine(target_entity, stop_target_lanelet_id);
@@ -34,7 +35,7 @@ void MomentaryStopMetric::update()
   if (!distance) {
     THROW_SIMULATION_ERROR("failed to calculate distance to stop line.");
   }
-  distance_to_stopline_ = distance.get();
+  distance_to_stopline_ = distance.value();
   linear_acceleration_ =
     entity_manager_ptr_->getEntityStatus(target_entity).action_status.accel.linear.x;
   if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
@@ -42,7 +43,7 @@ void MomentaryStopMetric::update()
         entity_manager_ptr_->isStopping(target_entity) && standstill_duration_ >= stop_duration) {
       success();
     }
-    if (distance.get() <= stop_sequence_end_distance) {
+    if (distance.value() <= stop_sequence_end_distance) {
       failure(SPECIFICATION_VIOLATION("overrun detected"));
     }
     return;
@@ -53,7 +54,7 @@ void MomentaryStopMetric::update()
 
 bool MomentaryStopMetric::activateTrigger()
 {
-  boost::optional<double> distance;
+  std::optional<double> distance;
   switch (stop_target_lanelet_type) {
     case StopTargetLaneletType::STOP_LINE:
       distance = entity_manager_ptr_->getDistanceToStopLine(target_entity, stop_target_lanelet_id);
@@ -68,7 +69,7 @@ bool MomentaryStopMetric::activateTrigger()
   if (!distance) {
     return false;
   }
-  if (distance.get() <= stop_sequence_start_distance) {
+  if (distance.value() <= stop_sequence_start_distance) {
     return true;
   }
   return false;

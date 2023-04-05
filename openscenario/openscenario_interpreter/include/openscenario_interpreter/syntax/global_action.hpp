@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__GLOBAL_ACTION_HPP_
 
 #include <openscenario_interpreter/syntax/entity_action.hpp>
+#include <openscenario_interpreter/syntax/environment_action.hpp>
 #include <openscenario_interpreter/syntax/infrastructure_action.hpp>
 #include <openscenario_interpreter/syntax/parameter_action.hpp>
 #include <pugixml.hpp>
@@ -51,8 +52,8 @@ struct GlobalAction : public ComplexType
 };
 
 DEFINE_LAZY_VISITOR(
-  GlobalAction,
-  // CASE(EnvironmentAction),
+  GlobalAction,                //
+  CASE(EnvironmentAction),     //
   CASE(EntityAction),          //
   CASE(ParameterAction),       //
   CASE(InfrastructureAction),  //
@@ -60,8 +61,8 @@ DEFINE_LAZY_VISITOR(
 );
 
 DEFINE_LAZY_VISITOR(
-  const GlobalAction,
-  // CASE(EnvironmentAction),
+  const GlobalAction,          //
+  CASE(EnvironmentAction),     //
   CASE(EntityAction),          //
   CASE(ParameterAction),       //
   CASE(InfrastructureAction),  //

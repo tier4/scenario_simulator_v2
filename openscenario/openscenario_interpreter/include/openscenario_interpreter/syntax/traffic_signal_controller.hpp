@@ -15,13 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 
-#include <boost/optional.hpp>
 #include <openscenario_interpreter/iterator/circular_iterator.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <optional>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -67,7 +67,7 @@ struct TrafficSignalController : private SimulatorCore::ConditionEvaluation
 private:
   CircularIterator<std::list<Phase>> current_phase;
 
-  boost::optional<double> change_to_begin_time;
+  std::optional<double> change_to_begin_time;
 
   double current_phase_started_at;
 
