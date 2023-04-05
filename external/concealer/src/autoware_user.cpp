@@ -19,17 +19,17 @@
 
 namespace concealer
 {
-AutowareUser::AutowareUser(const pid_t pid)
+FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid)
 {
 }
 
-auto AutowareUser::stopRequest() noexcept -> void { is_stop_requested.store(true); }
+auto FieldOperatorApplication::stopRequest() noexcept -> void { is_stop_requested.store(true); }
 
-auto AutowareUser::isStopRequested() const noexcept -> bool { return is_stop_requested.load(); }
+auto FieldOperatorApplication::isStopRequested() const noexcept -> bool { return is_stop_requested.load(); }
 
-auto AutowareUser::spinSome() -> void
+auto FieldOperatorApplication::spinSome() -> void
 {
   if (rclcpp::ok() and not isStopRequested()) {
     checkAutowareProcess();
@@ -37,7 +37,7 @@ auto AutowareUser::spinSome() -> void
   }
 }
 
-auto AutowareUser::checkAutowareProcess() -> void
+auto FieldOperatorApplication::checkAutowareProcess() -> void
 {
   if (process_id != 0) {
     int wstatus = 0;
@@ -65,7 +65,7 @@ auto AutowareUser::checkAutowareProcess() -> void
   }
 }
 
-auto AutowareUser::shutdownAutoware() -> void
+auto FieldOperatorApplication::shutdownAutoware() -> void
 {
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
   {
@@ -137,7 +137,7 @@ auto AutowareUser::shutdownAutoware() -> void
   }
 }
 
-auto AutowareUser::getTurnIndicatorsCommand() const
+auto FieldOperatorApplication::getTurnIndicatorsCommand() const
   -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   static auto turn_indicators_command = []() {
@@ -150,5 +150,60 @@ auto AutowareUser::getTurnIndicatorsCommand() const
   return turn_indicators_command;
 }
 
-auto AutowareUser::rethrow() const -> void { task_queue.rethrow(); }
+auto FieldOperatorApplication::rethrow() const -> void { task_queue.rethrow(); }
 }  // namespace concealer
+
+namespace autoware_auto_vehicle_msgs::msg
+{
+  auto operator<<(
+      std::ostream & out, const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+  -> std::ostream &
+  {
+#define CASE(IDENTIFIER)                                                   \
+  case autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER: \
+    out << #IDENTIFIER;                                                    \
+    break
+
+    switch (message.command) {
+      CASE(DISABLE);
+      CASE(ENABLE_LEFT);
+      CASE(ENABLE_RIGHT);
+      CASE(NO_COMMAND);
+
+      default:
+        throw common::Error(
+            "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
+    }
+
+#undef CASE
+
+    return out;
+  }
+
+  auto operator>>(std::istream & is, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+  -> std::istream &
+  {
+#define STATE(IDENTIFIER) \
+  {#IDENTIFIER, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER}
+
+    std::unordered_map<std::string, std::uint8_t> state_dictionary{
+        STATE(DISABLE),
+        STATE(ENABLE_LEFT),
+        STATE(ENABLE_RIGHT),
+        STATE(NO_COMMAND),
+    };
+
+#undef STATE
+
+    std::string command_string;
+    is >> command_string;
+
+    if (auto iter = state_dictionary.find(command_string); iter != state_dictionary.end()) {
+      message.set__command(iter->second);
+    } else {
+      throw common::Error("Unsupported TurnIndicatorsCommand::command : ", command_string.c_str());
+    }
+
+    return is;
+  }
+}  // namespace autoware_auto_vehicle_msgs::msg

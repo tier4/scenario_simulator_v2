@@ -36,11 +36,15 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
+
 namespace concealer
 {
-class AutowareUniverseUser : public AutowareUser, public TransitionAssertion<AutowareUniverseUser>
+class AutowareUniverse;
+
+template<>
+class FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorApplication, public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
 {
-  friend class TransitionAssertion<AutowareUniverseUser>;
+  friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
   PublisherWrapper<geometry_msgs::msg::PoseStamped>               setCheckpoint;
@@ -99,8 +103,8 @@ public:
 
 public:
   template <typename... Ts>
-  CONCEALER_PUBLIC explicit AutowareUniverseUser(Ts &&... xs)
-  : AutowareUser(std::forward<decltype(xs)>(xs)...),
+  CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
+  : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     setCheckpoint("/planning/mission_planning/checkpoint", *this),
     setGoalPose("/planning/mission_planning/goal", *this),
@@ -120,7 +124,7 @@ public:
   {
   }
 
-  ~AutowareUniverseUser() override;
+  ~FieldOperatorApplicationFor() override;
 
   auto engage() -> void override;
 
@@ -152,12 +156,5 @@ public:
   auto setVelocityLimit(double) -> void override;
 };
 }  // namespace concealer
-
-namespace autoware_auto_vehicle_msgs::msg
-{
-auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
-
-auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
-}  // namespace autoware_auto_vehicle_msgs::msg
 
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_

@@ -19,7 +19,7 @@
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
 #include <concealer/autoware.hpp>
-#include <concealer/autoware_universe_user.hpp>
+#include <concealer/autoware_user.hpp>
 #include <memory>
 #include <optional>
 #include <string>
@@ -56,7 +56,7 @@ enum class VehicleModelType {
 
 class EgoEntity : public VehicleEntity
 {
-  const std::unique_ptr<concealer::AutowareUser> autoware_user;
+  const std::unique_ptr<concealer::FieldOperatorApplication> field_operator_application;
   const std::unique_ptr<concealer::Autoware> autoware;
 
   const VehicleModelType vehicle_model_type_;
@@ -69,7 +69,7 @@ class EgoEntity : public VehicleEntity
 
   static auto getVehicleModelType() -> VehicleModelType;
 
-  static auto makeAutowareUser(const Configuration &) -> std::unique_ptr<concealer::AutowareUser>;
+  static auto makeFieldOperatorApplication(const Configuration &) -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
   static auto makeSimulationModel(
     const VehicleModelType, const double step_time,
@@ -94,7 +94,7 @@ public:
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
 
-  auto asAutoware() const -> concealer::AutowareUser & override;
+  auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication & override;
 
   auto getCurrentAction() const -> std::string override;
 

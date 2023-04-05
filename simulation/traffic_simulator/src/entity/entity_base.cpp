@@ -35,7 +35,7 @@ EntityBase::EntityBase(
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
 
-auto EntityBase::asAutoware() const -> concealer::AutowareUser &
+auto EntityBase::asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &
 {
   throw common::Error(
     "An operation was requested for Entity ", std::quoted(name),
