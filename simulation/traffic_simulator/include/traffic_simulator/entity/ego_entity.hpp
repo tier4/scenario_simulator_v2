@@ -69,7 +69,8 @@ class EgoEntity : public VehicleEntity
 
   static auto getVehicleModelType() -> VehicleModelType;
 
-  static auto makeFieldOperatorApplication(const Configuration &) -> std::unique_ptr<concealer::FieldOperatorApplication>;
+  static auto makeFieldOperatorApplication(const Configuration &)
+    -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
   static auto makeSimulationModel(
     const VehicleModelType, const double step_time,

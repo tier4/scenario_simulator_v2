@@ -40,7 +40,8 @@
 
 namespace concealer
 {
-template<typename T> class FieldOperatorApplicationFor;
+template <typename T>
+class FieldOperatorApplicationFor;
 
 /* ---- NOTE -------------------------------------------------------------------
  *
@@ -154,10 +155,9 @@ public:
 
 namespace autoware_auto_vehicle_msgs::msg
 {
-  auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
+auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
 
-  auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
+auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
 }  // namespace autoware_auto_vehicle_msgs::msg
-
 
 #endif  // CONCEALER__AUTOWARE_USER_HPP_

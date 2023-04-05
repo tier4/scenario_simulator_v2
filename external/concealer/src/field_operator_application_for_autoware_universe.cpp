@@ -67,7 +67,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
+  const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
@@ -91,7 +92,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(const geometry_ms
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
+  const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
   assert(not route.empty());
 
@@ -128,7 +130,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool
   return task_queue.exhausted() and isDriving();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
+auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
+  -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
 
@@ -145,7 +148,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getTurnIndicatorsCommand() c
   return getTurnIndicatorsCommandImpl();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double value) const -> double
+auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double value) const
+  -> double
 {
   // no restrictions here
   return value;
@@ -180,12 +184,14 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() cons
   return minimum_risk_maneuver_state;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverBehaviorName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverBehaviorName() const
+  -> std::string
 {
   return minimum_risk_maneuver_behavior;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverStateName() const
+  -> std::string
 {
   return minimum_risk_maneuver_state;
 }
@@ -206,7 +212,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::string & cooperator) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::string & cooperator)
+  -> void
 {
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
@@ -234,8 +241,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
 #undef CASE
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(const autoware_adapi_v1_msgs::msg::MrmState & message)
-  -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
+  const autoware_adapi_v1_msgs::msg::MrmState & message) -> void
 {
 #define CASE(IDENTIFIER, VARIABLE)                        \
   case autoware_adapi_v1_msgs::msg::MrmState::IDENTIFIER: \
@@ -265,4 +272,3 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(const autowa
 #undef CASE
 }
 }  // namespace concealer
-

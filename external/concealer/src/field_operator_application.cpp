@@ -27,7 +27,10 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 
 auto FieldOperatorApplication::stopRequest() noexcept -> void { is_stop_requested.store(true); }
 
-auto FieldOperatorApplication::isStopRequested() const noexcept -> bool { return is_stop_requested.load(); }
+auto FieldOperatorApplication::isStopRequested() const noexcept -> bool
+{
+  return is_stop_requested.load();
+}
 
 auto FieldOperatorApplication::spinSome() -> void
 {
@@ -155,55 +158,55 @@ auto FieldOperatorApplication::rethrow() const -> void { task_queue.rethrow(); }
 
 namespace autoware_auto_vehicle_msgs::msg
 {
-  auto operator<<(
-      std::ostream & out, const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+auto operator<<(
+  std::ostream & out, const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
   -> std::ostream &
-  {
+{
 #define CASE(IDENTIFIER)                                                   \
   case autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER: \
     out << #IDENTIFIER;                                                    \
     break
 
-    switch (message.command) {
-      CASE(DISABLE);
-      CASE(ENABLE_LEFT);
-      CASE(ENABLE_RIGHT);
-      CASE(NO_COMMAND);
+  switch (message.command) {
+    CASE(DISABLE);
+    CASE(ENABLE_LEFT);
+    CASE(ENABLE_RIGHT);
+    CASE(NO_COMMAND);
 
-      default:
-        throw common::Error(
-            "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
-    }
+    default:
+      throw common::Error(
+        "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
+  }
 
 #undef CASE
 
-    return out;
-  }
+  return out;
+}
 
-  auto operator>>(std::istream & is, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+auto operator>>(std::istream & is, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
   -> std::istream &
-  {
+{
 #define STATE(IDENTIFIER) \
   {#IDENTIFIER, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER}
 
-    std::unordered_map<std::string, std::uint8_t> state_dictionary{
-        STATE(DISABLE),
-        STATE(ENABLE_LEFT),
-        STATE(ENABLE_RIGHT),
-        STATE(NO_COMMAND),
-    };
+  std::unordered_map<std::string, std::uint8_t> state_dictionary{
+    STATE(DISABLE),
+    STATE(ENABLE_LEFT),
+    STATE(ENABLE_RIGHT),
+    STATE(NO_COMMAND),
+  };
 
 #undef STATE
 
-    std::string command_string;
-    is >> command_string;
+  std::string command_string;
+  is >> command_string;
 
-    if (auto iter = state_dictionary.find(command_string); iter != state_dictionary.end()) {
-      message.set__command(iter->second);
-    } else {
-      throw common::Error("Unsupported TurnIndicatorsCommand::command : ", command_string.c_str());
-    }
-
-    return is;
+  if (auto iter = state_dictionary.find(command_string); iter != state_dictionary.end()) {
+    message.set__command(iter->second);
+  } else {
+    throw common::Error("Unsupported TurnIndicatorsCommand::command : ", command_string.c_str());
   }
+
+  return is;
+}
 }  // namespace autoware_auto_vehicle_msgs::msg

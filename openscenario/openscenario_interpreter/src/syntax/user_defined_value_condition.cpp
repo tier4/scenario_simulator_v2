@@ -85,7 +85,8 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
       std::make_pair(
         "currentMinimumRiskManeuverState.behavior",
         [result]() {
-          return make<String>(asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverBehaviorName());
+          return make<String>(
+            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverBehaviorName());
         }),
       std::make_pair(
         "currentMinimumRiskManeuverState.state",
@@ -104,8 +105,8 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
       std::make_pair(
         "currentTurnIndicatorsState",
         [result]() {
-          return make<String>(
-            boost::lexical_cast<String>(asFieldOperatorApplication(result.str(1)).getTurnIndicatorsCommand()));
+          return make<String>(boost::lexical_cast<String>(
+            asFieldOperatorApplication(result.str(1)).getTurnIndicatorsCommand()));
         }),
     };
     evaluate_value = dispatch.at(result.str(2));  // XXX catch

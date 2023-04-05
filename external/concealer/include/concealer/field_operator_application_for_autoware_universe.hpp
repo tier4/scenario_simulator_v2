@@ -23,8 +23,8 @@
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <concealer/field_operator_application.hpp>
 #include <concealer/cooperator.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/utility/publisher_wrapper.hpp>
 #include <concealer/utility/service_with_validation.hpp>
@@ -36,13 +36,14 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
-
 namespace concealer
 {
 class AutowareUniverse;
 
-template<>
-class FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorApplication, public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
+template <>
+class FieldOperatorApplicationFor<AutowareUniverse>
+: public FieldOperatorApplication,
+  public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
 {
   friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
