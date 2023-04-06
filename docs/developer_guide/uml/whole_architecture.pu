@@ -8,15 +8,12 @@ Node openscenario_interpreter_node {
   class openscenario_interpreter::Interpreter
   class EntityManager
   class TrafficLightManager
-  class MetricsManager
   class traffic_simulator::API
   class ZeroMQRequestSocket
   openscenario_interpreter::Interpreter o-- traffic_simulator::API
   traffic_simulator::API o-- EntityManager
   traffic_simulator::API o-- TrafficLightManager
-  traffic_simulator::API o-- MetricsManager
   TrafficLightManager -right-> EntityManager
-  EntityManager -right-> MetricsManager
   class EgoEntity
   class VehicleEntity
   class PedestrianEntity

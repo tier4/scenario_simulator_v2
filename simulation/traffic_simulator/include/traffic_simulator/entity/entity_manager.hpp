@@ -231,6 +231,7 @@ public:
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
+  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
   FORWARD_TO_ENTITY(setBehaviorParameter, );
