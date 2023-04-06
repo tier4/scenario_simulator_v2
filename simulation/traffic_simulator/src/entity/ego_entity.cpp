@@ -136,7 +136,8 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
       architecture_type == "awf/universe") {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
-             ? std::make_unique<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
+             ? std::make_unique<
+                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
                  getParameter<std::string>("autoware_launch_package"),
                  getParameter<std::string>("autoware_launch_file"),
                  "map_path:=" + configuration.map_path.string(),
@@ -148,7 +149,8 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
                  "scenario_simulation:=true", "perception/enable_traffic_light:=false")
-             : std::make_unique<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
+             : std::make_unique<
+                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
   } else {
     throw common::SemanticError(
       "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");

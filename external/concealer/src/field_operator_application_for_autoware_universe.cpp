@@ -201,8 +201,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendSIGINT() -> void  //
   ::kill(process_id, SIGINT);
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit)
-  -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<tier4_external_api_msgs::srv::SetVelocityLimit::Request>();
@@ -213,8 +212,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(
-  const std::string & cooperator) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::string & cooperator)
+  -> void
 {
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
