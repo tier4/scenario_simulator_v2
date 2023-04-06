@@ -17,14 +17,14 @@
 
 namespace concealer
 {
-FieldOperatorApplicationFor<AutowareUniverseTemp>::~FieldOperatorApplicationFor()
+FieldOperatorApplicationFor<AutowareUniverse>::~FieldOperatorApplicationFor()
 {
   shutdownAutoware();
   // All tasks should be complete before the services used in them will be deinitialized.
   task_queue.stopAndJoin();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::approve(
+auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
   const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
 {
   auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
@@ -55,7 +55,7 @@ auto FieldOperatorApplicationFor<AutowareUniverseTemp>::approve(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::cooperate(
+auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
 {
   switch (current_cooperator) {
@@ -67,7 +67,7 @@ auto FieldOperatorApplicationFor<AutowareUniverseTemp>::cooperate(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::initialize(
+auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
@@ -92,7 +92,7 @@ auto FieldOperatorApplicationFor<AutowareUniverseTemp>::initialize(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::plan(
+auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
   const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
   assert(not route.empty());
@@ -107,7 +107,7 @@ auto FieldOperatorApplicationFor<AutowareUniverseTemp>::plan(
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::engage() -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
@@ -118,19 +118,19 @@ auto FieldOperatorApplicationFor<AutowareUniverseTemp>::engage() -> void
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::engageable() const -> bool
+auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isWaitingForEngage();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::engaged() const -> bool
+auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isDriving();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getWaypoints() const
+auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
@@ -142,20 +142,20 @@ auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getWaypoints() const
   return waypoints;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getTurnIndicatorsCommand() const
+auto FieldOperatorApplicationFor<AutowareUniverse>::getTurnIndicatorsCommand() const
   -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   return getTurnIndicatorsCommandImpl();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::restrictTargetSpeed(double value) const
+auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double value) const
   -> double
 {
   // no restrictions here
   return value;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getAutowareStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
 {
   using autoware_auto_system_msgs::msg::AutowareState;
 
@@ -179,29 +179,29 @@ auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getAutowareStateName() c
 #undef CASE
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getEmergencyStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const -> std::string
 {
   return minimum_risk_maneuver_state;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getMinimumRiskManeuverBehaviorName() const
+auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverBehaviorName() const
   -> std::string
 {
   return minimum_risk_maneuver_behavior;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::getMinimumRiskManeuverStateName() const
+auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverStateName() const
   -> std::string
 {
   return minimum_risk_maneuver_state;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::sendSIGINT() -> void  //
+auto FieldOperatorApplicationFor<AutowareUniverse>::sendSIGINT() -> void  //
 {
   ::kill(process_id, SIGINT);
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::setVelocityLimit(double velocity_limit)
+auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit)
   -> void
 {
   task_queue.delay([this, velocity_limit]() {
@@ -213,13 +213,13 @@ auto FieldOperatorApplicationFor<AutowareUniverseTemp>::setVelocityLimit(double 
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::setCooperator(
+auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(
   const std::string & cooperator) -> void
 {
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::receiveEmergencyState(
+auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
   const autoware_auto_system_msgs::msg::EmergencyState & message) -> void
 {
 #define CASE(IDENTIFIER)                                           \
@@ -242,7 +242,7 @@ auto FieldOperatorApplicationFor<AutowareUniverseTemp>::receiveEmergencyState(
 #undef CASE
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverseTemp>::receiveMrmState(
+auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
   const autoware_adapi_v1_msgs::msg::MrmState & message) -> void
 {
 #define CASE(IDENTIFIER, VARIABLE)                        \

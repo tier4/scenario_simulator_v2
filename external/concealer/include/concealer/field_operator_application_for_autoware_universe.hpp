@@ -23,6 +23,7 @@
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <concealer/autoware_universe.hpp>
 #include <concealer/cooperator.hpp>
 #include <concealer/field_operator_application.hpp>
 #include <concealer/task_queue.hpp>
@@ -36,16 +37,14 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
-class AutowareUniverseTemp;
-
 namespace concealer
 {
 template <>
-class FieldOperatorApplicationFor<AutowareUniverseTemp>
+class FieldOperatorApplicationFor<AutowareUniverse>
 : public FieldOperatorApplication,
-  public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverseTemp>>
+  public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
 {
-  friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverseTemp>>;
+  friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
   PublisherWrapper<geometry_msgs::msg::PoseStamped>               setCheckpoint;
