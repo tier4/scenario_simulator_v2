@@ -13,12 +13,10 @@
 // limitations under the License.
 
 #include <concealer/autoware_universe.hpp>
-#include <traffic_simulator/entity/ego_entity_simulation.hpp>
+#include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
-namespace traffic_simulator
-{
-namespace entity
+namespace vehicle_simulation
 {
 
 template <typename T>
@@ -33,7 +31,7 @@ static auto getParameter(const std::string & name, T value = {})
 }
 
 EgoEntitySimulation::EgoEntitySimulation(
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters, const Configuration &,
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters, const traffic_simulator::Configuration &,
   double step_time)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
@@ -300,5 +298,4 @@ auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
 
   status_ = status;
 }
-}  // namespace entity
-}  // namespace traffic_simulator
+}  // namespace vehicle_simulator

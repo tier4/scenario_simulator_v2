@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_SIMULATION_HPP_
-#define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_SIMULATION_HPP_
+#ifndef TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
+#define TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 
 #include <concealer/autoware.hpp>
 #include <memory>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/vehicle_model/sim_model.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 
-namespace traffic_simulator
-{
-namespace entity
-{
+namespace vehicle_simulation {
 enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
@@ -71,7 +68,7 @@ public:
   auto setAutowareStatus() -> void;
 
   explicit EgoEntitySimulation(
-    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &, double);
+    const traffic_simulator_msgs::msg::VehicleParameters &, const traffic_simulator::Configuration &, double);
 
   auto onUpdate(double time, double step_time) -> void;
 
@@ -83,7 +80,6 @@ public:
 
   auto updateStatus(double time, double step_time) -> void;
 };
-}  // namespace entity
-}  // namespace traffic_simulator
+}  // namespace vehicle_simulation
 
-#endif  // TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_SIMULATION_HPP_
+#endif  // TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_

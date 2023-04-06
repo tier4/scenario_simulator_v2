@@ -35,7 +35,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/data_type/lane_change.cpp
   src/data_type/speed_change.cpp
   src/entity/ego_entity.cpp
-  src/entity/ego_entity_simulation.cpp
   src/entity/entity_base.cpp
   src/entity/entity_manager.cpp
   src/entity/misc_object_entity.cpp
@@ -50,13 +49,14 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic/traffic_sink.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
-  src/vehicle_model/sim_model_delay_steer_acc.cpp
-  src/vehicle_model/sim_model_delay_steer_acc_geared.cpp
-  src/vehicle_model/sim_model_delay_steer_vel.cpp
-  src/vehicle_model/sim_model_ideal_steer_acc.cpp
-  src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
-  src/vehicle_model/sim_model_ideal_steer_vel.cpp
-  src/vehicle_model/sim_model_interface.cpp
+  src/vehicle_simulation/ego_entity_simulation.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_vel.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_vel.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
 )
 
 target_link_libraries(traffic_simulator
