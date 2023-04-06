@@ -278,8 +278,7 @@ struct TrafficLight
       try {
         return positions.at(bulb.hash() & 0b1111'0000'1111'1111);  // NOTE: Ignore status
       } catch (const std::out_of_range &) {
-        throw common::scenario_simulator_exception::Error(
-          "There is no position for bulb {", bulb, "}.");
+        return std::optional<geometry_msgs::msg::Point>(std::nullopt);
       }
     };
 
