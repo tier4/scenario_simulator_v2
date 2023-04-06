@@ -17,11 +17,11 @@
 
 #include <concealer/autoware.hpp>
 #include <memory>
-#include <traffic_simulator/vehicle_model/sim_model.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator/api/configuration.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/vehicle_model/sim_model.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 
 namespace traffic_simulator
 {
@@ -36,8 +36,8 @@ enum class VehicleModelType {
   IDEAL_STEER_VEL,
 };
 
-class EgoEntitySimulation {
-
+class EgoEntitySimulation
+{
   const std::unique_ptr<concealer::Autoware> autoware;
 
   const VehicleModelType vehicle_model_type_;
@@ -51,9 +51,9 @@ class EgoEntitySimulation {
   static auto getVehicleModelType() -> VehicleModelType;
 
   static auto makeSimulationModel(
-      const VehicleModelType, const double step_time,
-      const traffic_simulator_msgs::msg::VehicleParameters &)
-  -> const std::shared_ptr<SimModelInterface>;
+    const VehicleModelType, const double step_time,
+    const traffic_simulator_msgs::msg::VehicleParameters &)
+    -> const std::shared_ptr<SimModelInterface>;
 
   traffic_simulator_msgs::msg::EntityStatus status_;
 
@@ -66,10 +66,12 @@ class EgoEntitySimulation {
   auto getLinearJerk(double step_time) -> double;
 
   auto updatePreviousValues() -> void;
+
 public:
   auto setAutowareStatus() -> void;
 
-  explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &, double);
+  explicit EgoEntitySimulation(
+    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &, double);
 
   auto onUpdate(double time, double step_time) -> void;
 
@@ -81,7 +83,7 @@ public:
 
   auto updateStatus(double time, double step_time) -> void;
 };
-}
-}
+}  // namespace entity
+}  // namespace traffic_simulator
 
-#endif // TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_SIMULATION_HPP_
+#endif  // TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_SIMULATION_HPP_

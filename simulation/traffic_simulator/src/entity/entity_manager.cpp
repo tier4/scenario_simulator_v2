@@ -563,7 +563,6 @@ auto EntityManager::setEntityStatus(
   } else {
     if (isEgo(name)) {
       ego_entity_simulation_->setInitialStatus(status);
-
     }
     entities_.at(name)->setStatus(status);
   }
@@ -593,7 +592,8 @@ traffic_simulator_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
   entities_[name]->setEntityTypeList(type_list);
   if (isEgo(name)) {
     ego_entity_simulation_->onUpdate(current_time_, step_time_);
-    dynamic_cast<EgoEntity*>(entities_[name].get())->setStatusExtenaly(ego_entity_simulation_->getStatus());
+    dynamic_cast<EgoEntity *>(entities_[name].get())
+      ->setStatusExtenaly(ego_entity_simulation_->getStatus());
   }
   entities_[name]->onUpdate(current_time_, step_time_);
   return entities_[name]->getStatus();

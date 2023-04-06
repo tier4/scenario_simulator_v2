@@ -35,16 +35,16 @@ namespace traffic_simulator
 namespace entity
 {
 
-  template <typename T>
-  static auto getParameter(const std::string & name, T value = {})
-  {
-    rclcpp::Node node{"get_parameter", "simulation"};
+template <typename T>
+static auto getParameter(const std::string & name, T value = {})
+{
+  rclcpp::Node node{"get_parameter", "simulation"};
 
-    node.declare_parameter<T>(name, value);
-    node.get_parameter<T>(name, value);
+  node.declare_parameter<T>(name, value);
+  node.get_parameter<T>(name, value);
 
-    return value;
-  }
+  return value;
+}
 
 auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration)
   -> std::unique_ptr<concealer::FieldOperatorApplication>
@@ -111,8 +111,7 @@ auto EgoEntity::addLaneletPoseToEntityStatus() -> void
 {
   traffic_simulator_msgs::msg::EntityStatus status = status_;
 
-  const auto unique_route_lanelets =
-    traffic_simulator::helper::getUniqueValues(getRouteLanelets());
+  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
 
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
@@ -170,10 +169,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
   return ids;
 }
 
-auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
-{
-  return status_.pose;
-}
+auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose { return status_.pose; }
 
 auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
 {
@@ -289,11 +285,13 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 {
 }
 
-auto EgoEntity::setStatusInternal(const traffic_simulator_msgs::msg::EntityStatus & status) -> void {
+auto EgoEntity::setStatusInternal(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+{
   VehicleEntity::setStatus(status);
 }
 
-auto EgoEntity::setStatusExtenaly(const traffic_simulator_msgs::msg::EntityStatus & status) -> void {
+auto EgoEntity::setStatusExtenaly(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+{
   externaly_updated_status_ = status;
 }
 

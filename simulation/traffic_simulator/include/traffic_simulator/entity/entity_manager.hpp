@@ -453,7 +453,8 @@ public:
                   name, makeEntityStatus(), parameters, std::forward<decltype(xs)>(xs)...));
         success) {
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
-        ego_entity_simulation_ = std::make_unique<EgoEntitySimulation>(parameters, std::forward<decltype(xs)>(xs)...);
+        ego_entity_simulation_ =
+          std::make_unique<EgoEntitySimulation>(parameters, std::forward<decltype(xs)>(xs)...);
         ego_entity_simulation_->setInitialStatus(iter->second->getStatus());
       }
       iter->second->setHdMapUtils(hdmap_utils_ptr_);
