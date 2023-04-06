@@ -13,18 +13,19 @@
 // limitations under the License.
 
 #include <boost/range/adaptor/sliced.hpp>
-#include <concealer/autoware_universe_user.hpp>
+#include <concealer/field_operator_application_for_autoware_universe.hpp>
 
 namespace concealer
 {
-AutowareUniverseUser::~AutowareUniverseUser()
+FieldOperatorApplicationFor<AutowareUniverse>::~FieldOperatorApplicationFor()
 {
   shutdownAutoware();
   // All tasks should be complete before the services used in them will be deinitialized.
   task_queue.stopAndJoin();
 }
 
-auto AutowareUniverseUser::approve(const CooperateStatusArray & cooperate_status_array) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
+  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
 {
   auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
   request->stamp = cooperate_status_array.stamp;
@@ -54,7 +55,8 @@ auto AutowareUniverseUser::approve(const CooperateStatusArray & cooperate_status
   }
 }
 
-auto AutowareUniverseUser::cooperate(const CooperateStatusArray & cooperate_status_array) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
+  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
 {
   switch (current_cooperator) {
     case Cooperator::simulator:
@@ -65,17 +67,16 @@ auto AutowareUniverseUser::cooperate(const CooperateStatusArray & cooperate_stat
   }
 }
 
-auto AutowareUniverseUser::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
+  const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBeWaitingForRoute([&]() {
-        InitialPose initial_pose_msg;
-        {
-          initial_pose_msg.header.stamp = get_clock()->now();
-          initial_pose_msg.header.frame_id = "map";
-          initial_pose_msg.pose.pose = initial_pose;
-        }
+        geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
+        initial_pose_msg.header.stamp = get_clock()->now();
+        initial_pose_msg.header.frame_id = "map";
+        initial_pose_msg.pose.pose = initial_pose;
         return setInitialPose(initial_pose_msg);
       });
 
@@ -91,7 +92,8 @@ auto AutowareUniverseUser::initialize(const geometry_msgs::msg::Pose & initial_p
   }
 }
 
-auto AutowareUniverseUser::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
+  const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
   assert(not route.empty());
 
@@ -105,30 +107,31 @@ auto AutowareUniverseUser::plan(const std::vector<geometry_msgs::msg::PoseStampe
   });
 }
 
-auto AutowareUniverseUser::engage() -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
-      auto request = std::make_shared<Engage::Request>();
+      auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
       requestEngage(request);
     });
   });
 }
 
-auto AutowareUniverseUser::engageable() const -> bool
+auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isWaitingForEngage();
 }
 
-auto AutowareUniverseUser::engaged() const -> bool
+auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isDriving();
 }
 
-auto AutowareUniverseUser::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
+auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
+  -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
 
@@ -139,19 +142,20 @@ auto AutowareUniverseUser::getWaypoints() const -> traffic_simulator_msgs::msg::
   return waypoints;
 }
 
-auto AutowareUniverseUser::getTurnIndicatorsCommand() const
+auto FieldOperatorApplicationFor<AutowareUniverse>::getTurnIndicatorsCommand() const
   -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   return getTurnIndicatorsCommandImpl();
 }
 
-auto AutowareUniverseUser::restrictTargetSpeed(double value) const -> double
+auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double value) const
+  -> double
 {
   // no restrictions here
   return value;
 }
 
-auto AutowareUniverseUser::getAutowareStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
 {
   using autoware_auto_system_msgs::msg::AutowareState;
 
@@ -175,30 +179,32 @@ auto AutowareUniverseUser::getAutowareStateName() const -> std::string
 #undef CASE
 }
 
-auto AutowareUniverseUser::getEmergencyStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const -> std::string
 {
   return minimum_risk_maneuver_state;
 }
 
-auto AutowareUniverseUser::getMinimumRiskManeuverBehaviorName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverBehaviorName() const
+  -> std::string
 {
   return minimum_risk_maneuver_behavior;
 }
 
-auto AutowareUniverseUser::getMinimumRiskManeuverStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverStateName() const
+  -> std::string
 {
   return minimum_risk_maneuver_state;
 }
 
-auto AutowareUniverseUser::sendSIGINT() -> void  //
+auto FieldOperatorApplicationFor<AutowareUniverse>::sendSIGINT() -> void  //
 {
   ::kill(process_id, SIGINT);
 }
 
-auto AutowareUniverseUser::setVelocityLimit(double velocity_limit) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {
-    auto request = std::make_shared<SetVelocityLimit::Request>();
+    auto request = std::make_shared<tier4_external_api_msgs::srv::SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
     // We attempt to resend the service up to 30 times, but this number of times was determined by
     // heuristics, not for any technical reason
@@ -206,19 +212,21 @@ auto AutowareUniverseUser::setVelocityLimit(double velocity_limit) -> void
   });
 }
 
-auto AutowareUniverseUser::setCooperator(const std::string & cooperator) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::string & cooperator)
+  -> void
 {
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
 
-auto AutowareUniverseUser::receiveEmergencyState(const EmergencyState & msg) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
+  const autoware_auto_system_msgs::msg::EmergencyState & message) -> void
 {
-#define CASE(IDENTIFIER)                       \
-  case EmergencyState::IDENTIFIER:             \
-    minimum_risk_maneuver_state = #IDENTIFIER; \
+#define CASE(IDENTIFIER)                                           \
+  case autoware_auto_system_msgs::msg::EmergencyState::IDENTIFIER: \
+    minimum_risk_maneuver_state = #IDENTIFIER;                     \
     break
 
-  switch (msg.state) {
+  switch (message.state) {
     CASE(MRM_FAILED);
     CASE(MRM_OPERATING);
     CASE(MRM_SUCCEEDED);
@@ -226,90 +234,41 @@ auto AutowareUniverseUser::receiveEmergencyState(const EmergencyState & msg) -> 
     CASE(OVERRIDE_REQUESTING);
 
     default:
-      throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
+      throw common::Error("Unsupported MrmState::state, number: ", static_cast<int>(message.state));
   }
+
   minimum_risk_maneuver_behavior = "";
 #undef CASE
 }
 
-auto AutowareUniverseUser::receiveMrmState(const MrmState & msg) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
+  const autoware_adapi_v1_msgs::msg::MrmState & message) -> void
 {
-#define CASE(IDENTIFIER, VARIABLE) \
-  case MrmState::IDENTIFIER:       \
-    VARIABLE = #IDENTIFIER;        \
+#define CASE(IDENTIFIER, VARIABLE)                        \
+  case autoware_adapi_v1_msgs::msg::MrmState::IDENTIFIER: \
+    VARIABLE = #IDENTIFIER;                               \
     break
 
-  switch (msg.state) {
+  switch (message.state) {
     CASE(MRM_FAILED, minimum_risk_maneuver_state);
     CASE(MRM_OPERATING, minimum_risk_maneuver_state);
     CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
     CASE(NORMAL, minimum_risk_maneuver_state);
     CASE(UNKNOWN, minimum_risk_maneuver_state);
     default:
-      throw common::Error("Unsupported MrmState::state, number : ", static_cast<int>(msg.state));
+      throw common::Error(
+        "Unsupported MrmState::state, number : ", static_cast<int>(message.state));
   }
 
-  switch (msg.behavior) {
+  switch (message.behavior) {
     CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
     CASE(EMERGENCY_STOP, minimum_risk_maneuver_behavior);
     CASE(NONE, minimum_risk_maneuver_behavior);
     CASE(UNKNOWN, minimum_risk_maneuver_behavior);
     default:
       throw common::Error(
-        "Unsupported MrmState::behavior, number : ", static_cast<int>(msg.behavior));
+        "Unsupported MrmState::behavior, number : ", static_cast<int>(message.behavior));
   }
 #undef CASE
 }
 }  // namespace concealer
-
-namespace autoware_auto_vehicle_msgs::msg
-{
-auto operator<<(std::ostream & out, const TurnIndicatorsCommand & message) -> std::ostream &
-{
-#define CASE(IDENTIFIER)                  \
-  case TurnIndicatorsCommand::IDENTIFIER: \
-    out << #IDENTIFIER;                   \
-    break
-
-  switch (message.command) {
-    CASE(DISABLE);
-    CASE(ENABLE_LEFT);
-    CASE(ENABLE_RIGHT);
-    CASE(NO_COMMAND);
-
-    default:
-      throw common::Error(
-        "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
-  }
-
-#undef CASE
-
-  return out;
-}
-
-auto operator>>(std::istream & is, TurnIndicatorsCommand & message) -> std::istream &
-{
-#define STATE(IDENTIFIER) {#IDENTIFIER, TurnIndicatorsCommand::IDENTIFIER}
-
-  std::unordered_map<std::string, std::uint8_t> state_dictionary{
-    STATE(DISABLE),
-    STATE(ENABLE_LEFT),
-    STATE(ENABLE_RIGHT),
-    STATE(NO_COMMAND),
-  };
-
-#undef STATE
-
-  std::string command_string;
-  is >> command_string;
-
-  if (auto iter = state_dictionary.find(command_string); iter != state_dictionary.end()) {
-    message.set__command(iter->second);
-  } else {
-    throw common::Error("Unsupported TurnIndicatorsCommand::command : ", command_string.c_str());
-  }
-
-  return is;
-}
-
-}  // namespace autoware_auto_vehicle_msgs::msg

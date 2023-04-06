@@ -26,26 +26,24 @@ AutowareUniverse::AutowareUniverse()
   setGearReport("/vehicle/status/gear_status", *this),
   setControlModeReport("/vehicle/status/control_mode", *this),
   setVelocityReport("/vehicle/status/velocity_status", *this),
-  setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this)
-{
-  using std::chrono_literals::operator""ms;
-  // autoware.universe requires localization topics to send data at 50Hz
-  localization_update_timer =
-    rclcpp::create_timer(this, get_clock(), 20ms, [this]() { updateLocalization(); });
-  // autoware.universe requires vehicle state topics to send data at 30Hz
-  vehicle_state_update_timer =
-    rclcpp::create_timer(this, get_clock(), 33.33ms, [this]() { updateVehicleState(); });
-
-  localization_and_vehicle_state_update_thread = std::thread([this]() {
+  setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
+  // Autoware.Universe requires localization topics to send data at 50Hz
+  localization_update_timer(rclcpp::create_timer(
+    this, get_clock(), std::chrono::milliseconds(20), [this]() { updateLocalization(); })),
+  // Autoware.Universe requires vehicle state topics to send data at 30Hz
+  vehicle_state_update_timer(rclcpp::create_timer(
+    this, get_clock(), std::chrono::milliseconds(33), [this]() { updateVehicleState(); })),
+  localization_and_vehicle_state_update_thread(std::thread([this]() {
     try {
-      while (rclcpp::ok() && !is_stop_requested.load()) {
+      while (rclcpp::ok() and not is_stop_requested.load()) {
         rclcpp::spin_some(get_node_base_interface());
       }
     } catch (...) {
       thrown = std::current_exception();
       is_thrown.store(true);
     }
-  });
+  }))
+{
 }
 
 AutowareUniverse::~AutowareUniverse() { stopAndJoin(); }
@@ -81,7 +79,7 @@ auto AutowareUniverse::getSteeringAngle() const -> double
 auto AutowareUniverse::updateLocalization() -> void
 {
   setAcceleration([this]() {
-    Acceleration message;
+    geometry_msgs::msg::AccelWithCovarianceStamped message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "/base_link";
     message.accel.accel = current_acceleration.load();
@@ -95,7 +93,7 @@ auto AutowareUniverse::updateLocalization() -> void
   }());
 
   setOdometry([this]() {
-    Odometry message;
+    nav_msgs::msg::Odometry message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "map";
     message.pose.pose = current_pose.load();
@@ -110,28 +108,28 @@ auto AutowareUniverse::updateLocalization() -> void
 auto AutowareUniverse::updateVehicleState() -> void
 {
   setControlModeReport([this]() {
-    ControlModeReport message;
-    message.mode = ControlModeReport::AUTONOMOUS;
+    autoware_auto_vehicle_msgs::msg::ControlModeReport message;
+    message.mode = autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS;
     return message;
   }());
 
   setGearReport([this]() {
-    GearReport message;
+    autoware_auto_vehicle_msgs::msg::GearReport message;
     message.stamp = get_clock()->now();
     message.report = getGearCommand().command;
     return message;
   }());
 
   setSteeringReport([this]() {
-    SteeringReport message;
+    autoware_auto_vehicle_msgs::msg::SteeringReport message;
     message.stamp = get_clock()->now();
     message.steering_tire_angle = getSteeringAngle();
     return message;
   }());
 
   setVelocityReport([this]() {
-    geometry_msgs::msg::Twist twist = current_twist.load();
-    VelocityReport message;
+    const auto twist = current_twist.load();
+    autoware_auto_vehicle_msgs::msg::VelocityReport message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "base_link";
     message.longitudinal_velocity = twist.linear.x;
@@ -141,7 +139,7 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 
   setTurnIndicatorsReport([this]() {
-    TurnIndicatorsReport message;
+    autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport message;
     message.stamp = get_clock()->now();
     message.report = getTurnIndicatorsCommand().command;
     return message;

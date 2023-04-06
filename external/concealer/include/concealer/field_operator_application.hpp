@@ -40,9 +40,12 @@
 
 namespace concealer
 {
+template <typename T>
+class FieldOperatorApplicationFor;
+
 /* ---- NOTE -------------------------------------------------------------------
  *
- *  The magic class 'AutowareUser' is a class that makes it easy to work with
+ *  The magic class 'FieldOperatorApplication' is a class that makes it easy to work with
  *  Autoware from C++. The main features of this class are as follows
  *
  *    (1) Launch Autoware in an independent process upon instantiation of the
@@ -53,7 +56,7 @@ namespace concealer
  *        initialize, plan, and engage.
  *
  * -------------------------------------------------------------------------- */
-class AutowareUser : public rclcpp::Node
+class FieldOperatorApplication : public rclcpp::Node
 {
   std::atomic<bool> is_stop_requested = false;
 
@@ -81,15 +84,15 @@ protected:
   auto shutdownAutoware() -> void;
 
 public:
-  CONCEALER_PUBLIC explicit AutowareUser(pid_t pid = 0);
+  CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);
 
   template <typename... Ts>
-  CONCEALER_PUBLIC explicit AutowareUser(Ts &&... xs)
-  : AutowareUser(ros2_launch(std::forward<decltype(xs)>(xs)...))
+  CONCEALER_PUBLIC explicit FieldOperatorApplication(Ts &&... xs)
+  : FieldOperatorApplication(ros2_launch(std::forward<decltype(xs)>(xs)...))
   {
   }
 
-  ~AutowareUser() override = default;
+  ~FieldOperatorApplication() override = default;
 
   auto spinSome() -> void;
 
@@ -149,5 +152,12 @@ public:
   virtual auto setVelocityLimit(double) -> void = 0;
 };
 }  // namespace concealer
+
+namespace autoware_auto_vehicle_msgs::msg
+{
+auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
+
+auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
+}  // namespace autoware_auto_vehicle_msgs::msg
 
 #endif  // CONCEALER__AUTOWARE_USER_HPP_

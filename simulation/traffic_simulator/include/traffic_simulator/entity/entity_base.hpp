@@ -17,9 +17,9 @@
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <boost/optional.hpp>
-#include <concealer/autoware_user.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
@@ -52,7 +52,7 @@ public:
 
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray &);
 
-  virtual auto asAutoware() const -> concealer::AutowareUser &;
+  virtual auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &;
 
   virtual void cancelRequest();
 
@@ -101,16 +101,16 @@ public:
 
   /*   */ auto getLinearJerk() const -> double;
 
-  /*   */ auto getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+  /*   */ auto getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   /*   */ auto getLaneletPose(double matching_distance) const
-    -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
 
   /*   */ auto getMapPose(const geometry_msgs::msg::Pose &) -> geometry_msgs::msg::Pose;
 
-  virtual auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
+  virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
 
@@ -191,6 +191,10 @@ public:
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
 
+  virtual auto activateOutOfRangeJob(
+    double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
+    double min_jerk, double max_jerk) -> void;
+
   virtual auto setVelocityLimit(double) -> void;
 
   virtual void startNpcLogic();
@@ -222,7 +226,7 @@ protected:
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
-  boost::optional<double> target_speed_;
+  std::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
 
   std::unique_ptr<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>

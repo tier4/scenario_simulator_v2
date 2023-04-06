@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <nav_msgs/msg/occupancy_grid.hpp>
+#include <optional>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
 #include <simulation_interface/conversions.hpp>

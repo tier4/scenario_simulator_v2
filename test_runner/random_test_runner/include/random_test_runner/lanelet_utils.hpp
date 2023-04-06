@@ -21,6 +21,7 @@
 #include <lanelet2_routing/RoutingGraph.h>
 
 #include <boost/filesystem.hpp>
+#include <optional>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "random_test_runner/data_types.hpp"
@@ -51,7 +52,7 @@ public:
   double computeDistance(
     const traffic_simulator_msgs::msg::LaneletPose & p1,
     const traffic_simulator_msgs::msg::LaneletPose & p2);
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> getOppositeLaneLet(
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> getOppositeLaneLet(
     const traffic_simulator_msgs::msg::LaneletPose & pose);
   std::vector<LaneletPart> getLanesWithinDistance(
     const traffic_simulator_msgs::msg::LaneletPose & pose, double min_distance,

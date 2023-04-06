@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <geometry/intersection/intersection.hpp>
+#include <optional>
 
 namespace math
 {
@@ -50,11 +51,11 @@ bool isIntersect2D(const std::vector<LineSegment> & lines)
   return false;
 }
 
-boost::optional<geometry_msgs::msg::Point> getIntersection2D(
+std::optional<geometry_msgs::msg::Point> getIntersection2D(
   const LineSegment & line0, const LineSegment & line1)
 {
   if (!isIntersect2D(line0, line1)) {
-    return boost::none;
+    return std::nullopt;
   }
   const auto det =
     (line0.start_point.x - line0.end_point.x) * (line1.end_point.y - line1.start_point.y) -
@@ -78,7 +79,7 @@ std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineS
       if (i != m) {
         const auto point = getIntersection2D(lines[i], lines[m]);
         if (point) {
-          ret.emplace_back(point.get());
+          ret.emplace_back(point.value());
         }
       }
     }

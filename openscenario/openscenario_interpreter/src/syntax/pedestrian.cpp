@@ -24,6 +24,7 @@ Pedestrian::Pedestrian(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
   mass(readAttribute<Double>("mass", node, local())),
   model(readAttribute<String>("model", node, local())),
+  model3d(readAttribute<String>("model3d", node, local(), "")),
   pedestrian_category(readAttribute<PedestrianCategory>("pedestrianCategory", node, local())),
   parameter_declarations(
     readElement<ParameterDeclarations>("ParameterDeclarations", node, local())),

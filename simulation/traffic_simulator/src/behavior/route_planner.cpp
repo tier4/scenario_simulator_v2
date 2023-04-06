@@ -46,9 +46,9 @@ std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
       cancelGoal(entity_lanelet_pose);
     }
   } else {
-    if (hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, whole_route_.get())) {
+    if (hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, whole_route_.value())) {
       return hdmap_utils_ptr_->getFollowingLanelets(
-        entity_lanelet_pose.lanelet_id, whole_route_.get(), horizon, true);
+        entity_lanelet_pose.lanelet_id, whole_route_.value(), horizon, true);
     }
   }
   cancelGoal(entity_lanelet_pose);
@@ -66,15 +66,15 @@ auto RoutePlanner::getRouteLanelets(
   plan(entity_lanelet_pose, target_lanelet_pose);
 
   if (not whole_route_ or whole_route_->empty()) {
-    whole_route_ = boost::none;
+    whole_route_ = std::nullopt;
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   } else {
     return hdmap_utils_ptr_->getFollowingLanelets(
-      entity_lanelet_pose.lanelet_id, whole_route_.get(), horizon, true);
+      entity_lanelet_pose.lanelet_id, whole_route_.value(), horizon, true);
   }
 }
 
-void RoutePlanner::cancelGoal() { whole_route_ = boost::none; }
+void RoutePlanner::cancelGoal() { whole_route_ = std::nullopt; }
 
 void RoutePlanner::cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose)
 {
@@ -126,7 +126,7 @@ void RoutePlanner::plan(
       hdmap_utils_ptr_->getRoute(entity_lanelet_pose.lanelet_id, target_lanelet_pose.lanelet_id);
     return;
   }
-  if (hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, whole_route_.get())) {
+  if (hdmap_utils_ptr_->isInRoute(entity_lanelet_pose.lanelet_id, whole_route_.value())) {
     return;
   } else {
     whole_route_ =

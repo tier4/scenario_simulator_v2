@@ -18,10 +18,10 @@
 #include <algorithm>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
 #include <concealer/autoware.hpp>
-#include <concealer/autoware_universe_user.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <memory>
+#include <optional>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
@@ -36,9 +36,10 @@ namespace entity
 {
 class EgoEntity : public VehicleEntity
 {
-  const std::unique_ptr<concealer::AutowareUser> autoware_user;
+  const std::unique_ptr<concealer::FieldOperatorApplication> field_operator_application;
 
-  static auto makeAutowareUser(const Configuration &) -> std::unique_ptr<concealer::AutowareUser>;
+  static auto makeFieldOperatorApplication(const Configuration &)
+    -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
   auto addLaneletPoseToEntityStatus() -> void;
 
@@ -64,7 +65,7 @@ public:
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
 
-  auto asAutoware() const -> concealer::AutowareUser & override;
+  auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication & override;
 
   auto getCurrentAction() const -> std::string override;
 
@@ -79,7 +80,7 @@ public:
 
   auto getEntityTypename() const -> const std::string & override;
 
-  auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
+  auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 

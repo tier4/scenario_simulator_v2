@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -33,21 +34,21 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   in_stop_sequence_ = false;
 }
 
-const boost::optional<traffic_simulator_msgs::msg::Obstacle>
+const std::optional<traffic_simulator_msgs::msg::Obstacle>
 StopAtCrossingEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_stop_target_) {
-    return boost::none;
+    return std::nullopt;
   }
-  if (distance_to_stop_target_.get() < 0) {
-    return boost::none;
+  if (distance_to_stop_target_.value() < 0) {
+    return std::nullopt;
   }
-  if (distance_to_stop_target_.get() > trajectory->getLength()) {
-    return boost::none;
+  if (distance_to_stop_target_.value() > trajectory->getLength()) {
+    return std::nullopt;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
   obstacle.type = obstacle.ENTITY;
-  obstacle.s = distance_to_stop_target_.get();
+  obstacle.s = distance_to_stop_target_.value();
   return obstacle;
 }
 
@@ -70,13 +71,13 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::ca
   }
 }
 
-boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double current_velocity)
+std::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double current_velocity)
 {
   if (!distance_to_stop_target_) {
-    return boost::none;
+    return std::nullopt;
   }
   double rest_distance =
-    distance_to_stop_target_.get() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1);
+    distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1);
   if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     return 0;
   }
@@ -119,22 +120,22 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (distance_to_front_entity) {
-    if (distance_to_front_entity.get() <= distance_to_stop_target_.get()) {
+    if (distance_to_front_entity.value() <= distance_to_stop_target_.value()) {
       in_stop_sequence_ = false;
       return BT::NodeStatus::FAILURE;
     }
   }
   if (distance_to_stopline) {
-    if (distance_to_stopline.get() <= distance_to_stop_target_.get()) {
+    if (distance_to_stopline.value() <= distance_to_stop_target_.value()) {
       in_stop_sequence_ = false;
       return BT::NodeStatus::FAILURE;
     }
   }
-  boost::optional<double> target_linear_speed;
+  std::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
     target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);
   } else {
-    target_linear_speed = boost::none;
+    target_linear_speed = std::nullopt;
   }
   if (!distance_to_stop_target_) {
     setOutput("updated_status", calculateUpdatedEntityStatus(0));
@@ -145,13 +146,13 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     return BT::NodeStatus::SUCCESS;
   }
   if (target_speed) {
-    if (target_speed.get() > target_linear_speed.get()) {
-      target_speed = target_linear_speed.get();
+    if (target_speed.value() > target_linear_speed.value()) {
+      target_speed = target_linear_speed.value();
     }
   } else {
-    target_speed = target_linear_speed.get();
+    target_speed = target_linear_speed.value();
   }
-  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.value()));
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

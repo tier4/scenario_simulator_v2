@@ -75,7 +75,7 @@ public:
     static auto convert(const geometry_msgs::msg::Pose & pose)
     {
       if (const auto result = core->toLaneletPose(pose, false); result) {
-        return result.get();
+        return result.value();
       } else {
         throw Error(
           "The specified WorldPosition = [", pose.position.x, ", ", pose.position.y, ", ",
@@ -152,7 +152,7 @@ public:
       auto s = [](auto &&... xs) {
         if (const auto result = core->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
             result) {
-          return result.get();
+          return result.value();
         } else {
           return std::numeric_limits<
             typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
@@ -208,19 +208,29 @@ public:
       return core->setBehaviorParameter(entity_ref, [&]() {
         auto behavior_parameter = core->getBehaviorParameter(entity_ref);
 
-#define UPDATE_IF_IS_NOT_INFINITY(DATA_MEMBER)                                            \
-  if (not std::isinf(dynamic_constraints.DATA_MEMBER)) {                                  \
-    behavior_parameter.dynamic_constraints.DATA_MEMBER = dynamic_constraints.DATA_MEMBER; \
-  }                                                                                       \
-  static_assert(true)
+        if (not std::isinf(dynamic_constraints.max_speed)) {
+          behavior_parameter.dynamic_constraints.max_speed = dynamic_constraints.max_speed;
+        }
 
-        UPDATE_IF_IS_NOT_INFINITY(max_speed);
-        UPDATE_IF_IS_NOT_INFINITY(max_acceleration);
-        UPDATE_IF_IS_NOT_INFINITY(max_acceleration_rate);
-        UPDATE_IF_IS_NOT_INFINITY(max_deceleration);
-        UPDATE_IF_IS_NOT_INFINITY(max_deceleration_rate);
+        if (not std::isinf(dynamic_constraints.max_acceleration)) {
+          behavior_parameter.dynamic_constraints.max_acceleration =
+            dynamic_constraints.max_acceleration;
+        }
 
-#undef UPDATE_IF_IS_NOT_INFINITY
+        if (not std::isinf(dynamic_constraints.max_acceleration_rate)) {
+          behavior_parameter.dynamic_constraints.max_acceleration_rate =
+            dynamic_constraints.max_acceleration_rate;
+        }
+
+        if (not std::isinf(dynamic_constraints.max_deceleration)) {
+          behavior_parameter.dynamic_constraints.max_deceleration =
+            dynamic_constraints.max_deceleration;
+        }
+
+        if (not std::isinf(dynamic_constraints.max_deceleration_rate)) {
+          behavior_parameter.dynamic_constraints.max_deceleration_rate =
+            dynamic_constraints.max_deceleration_rate;
+        }
 
         return behavior_parameter;
       }());
@@ -249,6 +259,7 @@ public:
           configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
+          configuration.set_object_recognition_delay(controller.properties.template get<Double>("detectedObjectPublishingDelay"));
           configuration.set_pos_noise_stddev(controller.properties.template get<Double>("detectedObjectPositionStandardDeviation"));
           configuration.set_probability_of_lost(controller.properties.template get<Double>("detectedObjectMissingProbability"));
           configuration.set_random_seed(controller.properties.template get<UnsignedInteger>("randomSeed"));
@@ -273,7 +284,7 @@ public:
           return configuration;
         }());
 
-        core->asAutoware(entity_ref)
+        core->asFieldOperatorApplication(entity_ref)
           .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
       }
     }
@@ -336,7 +347,7 @@ public:
     {
       if (const auto result = core->getBoundingBoxDistance(std::forward<decltype(xs)>(xs)...);
           result) {
-        return result.get();
+        return result.value();
       } else {
         using value_type = typename std::decay<decltype(result)>::type::value_type;
         return std::numeric_limits<value_type>::quiet_NaN();
@@ -369,7 +380,7 @@ public:
     static auto evaluateTimeHeadway(Ts &&... xs)
     {
       if (const auto result = core->getTimeHeadway(std::forward<decltype(xs)>(xs)...); result) {
-        return result.get();
+        return result.value();
       } else {
         using value_type = typename std::decay<decltype(result)>::type::value_type;
         return std::numeric_limits<value_type>::quiet_NaN();
@@ -385,25 +396,16 @@ public:
       const std::string & entity_ref, const Performance & performance,
       const Properties & properties)
     {
-      core->addMetric<metrics::OutOfRangeMetric>(entity_ref + "-out-of-range", [&]() {
-        metrics::OutOfRangeMetric::Config configuration;
-        configuration.target_entity = entity_ref;
-        configuration.min_velocity = -performance.max_speed;
-        configuration.max_velocity = +performance.max_speed;
-        configuration.min_acceleration = -performance.max_deceleration;
-        configuration.max_acceleration = +performance.max_acceleration;
-        configuration.min_jerk = properties.template get<Double>("minJerk", Double::lowest());
-        configuration.max_jerk = properties.template get<Double>("maxJerk", Double::max());
-        configuration.jerk_topic =
-          "/planning/scenario_planning/motion_velocity_optimizer/closest_jerk";
-        return configuration;
-      }());
+      core->activateOutOfRangeJob(
+        entity_ref, -performance.max_speed, +performance.max_speed, -performance.max_deceleration,
+        +performance.max_acceleration, properties.template get<Double>("minJerk", Double::lowest()),
+        properties.template get<Double>("maxJerk", Double::max()));
     }
 
     template <typename... Ts>
-    static auto asAutoware(Ts &&... xs) -> decltype(auto)
+    static auto asFieldOperatorApplication(Ts &&... xs) -> decltype(auto)
     {
-      return core->asAutoware(std::forward<decltype(xs)>(xs)...);
+      return core->asFieldOperatorApplication(std::forward<decltype(xs)>(xs)...);
     }
 
     static auto activateNonUserDefinedControllers() -> decltype(auto)

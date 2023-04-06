@@ -42,6 +42,7 @@ TaskQueue::TaskQueue()
   })
 {
 }
+
 void TaskQueue::stopAndJoin()
 {
   if (dispatcher.joinable()) {

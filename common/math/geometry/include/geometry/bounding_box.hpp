@@ -21,9 +21,9 @@
 #include <boost/geometry/algorithms/disjoint.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/optional.hpp>
 #include <geometry/transform.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <optional>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
 
@@ -31,7 +31,7 @@ namespace math
 {
 namespace geometry
 {
-boost::optional<double> getPolygonDistance(
+std::optional<double> getPolygonDistance(
   const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
   const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1);
 const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> get2DPolygon(

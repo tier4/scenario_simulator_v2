@@ -20,42 +20,38 @@
 
 namespace concealer
 {
-enum ThreadSafetyImpl : bool { ThreadUnsafe, ThreadSafe };
+enum class ThreadSafety : bool { unsafe, safe };
 
-template <typename MessageType, ThreadSafetyImpl ThreadSafety = ThreadUnsafe>
+template <typename MessageType, ThreadSafety thread_safety = ThreadSafety::unsafe>
 class SubscriberWrapper
 {
-private:
   typename MessageType::ConstSharedPtr current_value = std::make_shared<const MessageType>();
+
   typename rclcpp::Subscription<MessageType>::SharedPtr subscription;
 
 public:
-  template <typename T = MessageType>
-  auto operator()() const -> const typename std::enable_if<ThreadSafety == ThreadUnsafe, T>::type &
+  auto operator()() const -> decltype(auto)
   {
-    return *current_value;
-  }
-
-  template <typename T = MessageType>
-  auto operator()() const -> typename std::enable_if<ThreadSafety == ThreadSafe, T>::type
-  {
-    return *std::atomic_load(&current_value);
+    if constexpr (thread_safety == ThreadSafety::unsafe) {
+      return *current_value;
+    } else {
+      return *std::atomic_load(&current_value);
+    }
   }
 
   template <typename NodeInterface>
   SubscriberWrapper(
-    std::string topic, NodeInterface & autoware_interface,
-    std::function<void(const MessageType &)> callback = {})
+    const std::string & topic, NodeInterface & autoware_interface,
+    const std::function<void(const MessageType &)> & callback = {})
   : subscription(autoware_interface.template create_subscription<MessageType>(
       topic, 1, [this, callback](const typename MessageType::ConstSharedPtr message) {
-        if constexpr (ThreadSafety == ThreadSafe) {
+        if constexpr (thread_safety == ThreadSafety::safe) {
           std::atomic_store(&current_value, message);
-          if (current_value && callback) {
+          if (current_value and callback) {
             callback(*std::atomic_load(&current_value));
           }
         } else {
-          current_value = message;
-          if (current_value && callback) {
+          if (current_value = message; current_value and callback) {
             callback(*current_value);
           }
         }
@@ -63,7 +59,6 @@ public:
   {
   }
 };
-
 }  // namespace concealer
 
 #endif  // CONCEALER__SUBSCRIBER_WRAPPER_HPP_

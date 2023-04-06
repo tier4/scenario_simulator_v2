@@ -49,7 +49,7 @@ BT::NodeStatus FollowLaneAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
-  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.get()));
+  setOutput("updated_status", calculateUpdatedEntityStatus(target_speed.value()));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian
