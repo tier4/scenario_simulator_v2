@@ -75,7 +75,7 @@ public:
   auto getEntityOrientation() const noexcept -> geometry_msgs::msg::Quaternion;
   auto getActionStatus() const noexcept -> traffic_simulator_msgs::msg::ActionStatus;
   auto getEntityName() const noexcept -> std::string;
-  auto getLaneletPose() const -> traffic_simulator::LaneletPoseType;
+  auto getLaneletPose() const -> traffic_simulator::LaneletPose;
 
   /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;

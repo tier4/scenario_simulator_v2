@@ -95,7 +95,7 @@ auto ActionNode::getOtherEntityStatus(std::int64_t lanelet_id) const
   for (const auto & status : other_entity_status) {
     if (
       status.second.laneMatchingSucceed() &&
-      static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id == lanelet_id) {
+      static_cast<traffic_simulator::LaneletPose>(status.second).lanelet_id == lanelet_id) {
       ret.emplace_back(status.second);
     }
   }
@@ -136,7 +136,7 @@ auto ActionNode::getRightOfWayEntities(const std::vector<std::int64_t> & followi
       for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
         if (
           status.second.laneMatchingSucceed() &&
-          static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id == lanelet_id) {
+          static_cast<traffic_simulator::LaneletPose>(status.second).lanelet_id == lanelet_id) {
           ret.emplace_back(status.second);
         }
       }
@@ -160,7 +160,7 @@ auto ActionNode::getRightOfWayEntities() const
     for (const std::int64_t & lanelet_id : lanelet_ids) {
       if (
         status.second.laneMatchingSucceed() &&
-        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id == lanelet_id) {
+        static_cast<traffic_simulator::LaneletPose>(status.second).lanelet_id == lanelet_id) {
         ret.emplace_back(status.second);
       }
     }
@@ -253,7 +253,7 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
   if (status.laneMatchingSucceed()) {
     return spline.getCollisionPointIn2D(
       hdmap_utils->getLaneletPolygon(
-        static_cast<traffic_simulator::LaneletPoseType>(status).lanelet_id),
+        static_cast<traffic_simulator::LaneletPose>(status).lanelet_id),
       false, true);
   }
   return std::nullopt;
@@ -336,7 +336,7 @@ auto ActionNode::getConflictingEntityStatusOnCrossWalk(
       status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id) >= 1) {
+        static_cast<traffic_simulator::LaneletPose>(status.second).lanelet_id) >= 1) {
       conflicting_entity_status.emplace_back(status.second);
     }
   }
@@ -353,7 +353,7 @@ auto ActionNode::getConflictingEntityStatusOnLane(const std::vector<std::int64_t
       status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_lanes.begin(), conflicting_lanes.end(),
-        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id) >= 1) {
+        static_cast<traffic_simulator::LaneletPose>(status.second).lanelet_id) >= 1) {
       conflicting_entity_status.emplace_back(status.second);
     }
   }
@@ -370,14 +370,14 @@ auto ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
       status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id) >= 1) {
+        static_cast<traffic_simulator::LaneletPose>(status.second).lanelet_id) >= 1) {
       return true;
     }
     if (
       status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_lanes.begin(), conflicting_lanes.end(),
-        static_cast<traffic_simulator::LaneletPoseType>(status.second).lanelet_id) >= 1) {
+        static_cast<traffic_simulator::LaneletPose>(status.second).lanelet_id) >= 1) {
       return true;
     }
   }
@@ -497,7 +497,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   entity_status_updated.action_status.accel = accel_new;
   entity_status_updated.action_status.linear_jerk = linear_jerk_new;
   entity_status_updated.lanelet_pose_valid = false;
-  entity_status_updated.lanelet_pose = traffic_simulator::LaneletPoseType();
+  entity_status_updated.lanelet_pose = traffic_simulator::LaneletPose();
   return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
 }
 
@@ -555,8 +555,8 @@ auto ActionNode::getEntityName() const noexcept -> std::string
   return static_cast<traffic_simulator::EntityStatusType>(*entity_status).name;
 }
 
-auto ActionNode::getLaneletPose() const -> traffic_simulator::LaneletPoseType
+auto ActionNode::getLaneletPose() const -> traffic_simulator::LaneletPose
 {
-  return static_cast<traffic_simulator::LaneletPoseType>(*entity_status);
+  return static_cast<traffic_simulator::LaneletPose>(*entity_status);
 }
 }  // namespace entity_behavior

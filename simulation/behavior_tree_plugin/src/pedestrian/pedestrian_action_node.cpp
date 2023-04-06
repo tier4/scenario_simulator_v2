@@ -56,11 +56,10 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
   const auto lanelet_pose = estimateLaneletPose(updated_status.pose);
   if (lanelet_pose) {
     updated_status.lanelet_pose_valid = true;
-    updated_status.lanelet_pose =
-      static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose.value());
+    updated_status.lanelet_pose = static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value());
   } else {
     updated_status.lanelet_pose_valid = false;
-    updated_status.lanelet_pose = traffic_simulator::LaneletPoseType();
+    updated_status.lanelet_pose = traffic_simulator::LaneletPose();
   }
   return traffic_simulator::CanonicalizedEntityStatus(updated_status, hdmap_utils);
 }
@@ -68,7 +67,7 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
 auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
   -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
 {
-  std::optional<traffic_simulator::LaneletPoseType> lanelet_pose;
+  std::optional<traffic_simulator::LaneletPose> lanelet_pose;
   if (entity_status->laneMatchingSucceed()) {
     lanelet_pose = hdmap_utils->toLaneletPose(pose, getLaneletPose().lanelet_id, 1.0);
   } else {

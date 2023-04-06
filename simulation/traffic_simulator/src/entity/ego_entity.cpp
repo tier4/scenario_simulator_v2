@@ -212,7 +212,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     const auto unique_route_lanelets =
       traffic_simulator::helper::getUniqueValues(getRouteLanelets());
 
-    std::optional<LaneletPoseType> lanelet_pose;
+    std::optional<LaneletPose> lanelet_pose;
 
     if (unique_route_lanelets.empty()) {
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);

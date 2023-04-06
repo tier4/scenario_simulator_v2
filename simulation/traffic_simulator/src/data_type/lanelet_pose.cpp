@@ -20,7 +20,7 @@ namespace traffic_simulator
 namespace lanelet_pose
 {
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
-  const LaneletPoseType & maybe_non_canonicalized_lanelet_pose,
+  const LaneletPose & maybe_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
   map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
@@ -28,7 +28,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 }
 
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
-  const LaneletPoseType & maybe_non_canonicalized_lanelet_pose,
+  const LaneletPose & maybe_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
   const std::vector<std::int64_t> & route_lanelets)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils, route_lanelets)),
@@ -37,11 +37,11 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 }
 
 auto CanonicalizedLaneletPose::canonicalize(
-  const LaneletPoseType & may_non_canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPoseType
+  const LaneletPose & may_non_canonicalized_lanelet_pose,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPose
 {
   if (
-    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPoseType>>(
+    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
       hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose))) {
     return canonicalized.value();
   } else {
@@ -57,12 +57,12 @@ auto CanonicalizedLaneletPose::canonicalize(
 }
 
 auto CanonicalizedLaneletPose::canonicalize(
-  const LaneletPoseType & may_non_canonicalized_lanelet_pose,
+  const LaneletPose & may_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const std::vector<std::int64_t> & route_lanelets) -> LaneletPoseType
+  const std::vector<std::int64_t> & route_lanelets) -> LaneletPose
 {
   if (
-    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPoseType>>(
+    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
       hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose, route_lanelets))) {
     return canonicalized.value();
   } else {
@@ -79,7 +79,7 @@ auto CanonicalizedLaneletPose::canonicalize(
 
 bool isSameLaneletId(const CanonicalizedLaneletPose & p0, const CanonicalizedLaneletPose & p1)
 {
-  return static_cast<LaneletPoseType>(p0).lanelet_id && static_cast<LaneletPoseType>(p1).lanelet_id;
+  return static_cast<LaneletPose>(p0).lanelet_id && static_cast<LaneletPose>(p1).lanelet_id;
 }
 }  // namespace lanelet_pose
 }  // namespace traffic_simulator

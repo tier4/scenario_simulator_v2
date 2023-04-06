@@ -312,7 +312,7 @@ public:
 
 #undef FORWARD_TO_ENTITY_MANAGER
 
-  auto canonicalize(const LaneletPoseType & maybe_non_canonicalized_lanelet_pose) const
+  auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
     -> CanonicalizedLaneletPose;
   auto canonicalize(const EntityStatusType & may_non_canonicalized_entity_status) const
     -> CanonicalizedEntityStatus;

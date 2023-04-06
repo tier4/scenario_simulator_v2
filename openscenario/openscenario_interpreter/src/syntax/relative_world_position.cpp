@@ -43,7 +43,7 @@ RelativeWorldPosition::operator geometry_msgs::msg::Point() const
 
 RelativeWorldPosition::operator NativeLanePosition() const
 {
-  throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, LaneletPoseType);
+  throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, LaneletPose);
 }
 
 RelativeWorldPosition::operator NativeWorldPosition() const

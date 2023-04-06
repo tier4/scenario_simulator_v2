@@ -120,7 +120,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return static_cast<traffic_simulator::LaneletPoseType>(
+    return static_cast<traffic_simulator::LaneletPose>(
              makeNativeRelativeLanePosition(triggering_entity, entity_ref))
       .offset;
   } else {
@@ -136,7 +136,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return static_cast<traffic_simulator::LaneletPoseType>(
+    return static_cast<traffic_simulator::LaneletPose>(
              makeNativeRelativeLanePosition(triggering_entity, entity_ref))
       .s;
   } else {

@@ -417,7 +417,7 @@ public:
 
       if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
         entity_status.pose = toMapPose(pose);
-        entity_status.lanelet_pose = static_cast<LaneletPoseType>(pose);
+        entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
         entity_status.lanelet_pose_valid = true;
       } else {
         entity_status.pose = pose;

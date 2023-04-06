@@ -55,9 +55,9 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
  * @param roll roll value in the lane coordinate
  * @param pitch pitch value in the lane coordinate
  * @param yaw yaw value in the lane coordinate
- * @return LaneletPoseType
+ * @return LaneletPose
  */
-LaneletPoseType constructLaneletPose(
+LaneletPose constructLaneletPose(
   std::int64_t lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
   double yaw = 0);
 
@@ -127,7 +127,7 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPoseType & ll_pose);
+std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPose & ll_pose);
 
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point);
 

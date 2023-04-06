@@ -57,9 +57,9 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWay
 
 void FollowLaneAction::getBlackBoardValues()
 {
-  traffic_simulator::LaneletPoseType target_lanelet_pose;
+  traffic_simulator::LaneletPose target_lanelet_pose;
   VehicleActionNode::getBlackBoardValues();
-  if (!getInput<traffic_simulator::LaneletPoseType>("target_lanelet_pose", target_lanelet_pose)) {
+  if (!getInput<traffic_simulator::LaneletPose>("target_lanelet_pose", target_lanelet_pose)) {
     target_lanelet_pose_ = std::nullopt;
   } else {
     target_lanelet_pose_ = target_lanelet_pose;

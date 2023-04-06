@@ -185,7 +185,7 @@ auto DistanceCondition::distance<  //
     overload(
       [&](const WorldPosition & position) {
         if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return static_cast<traffic_simulator::LaneletPoseType>(
+          return static_cast<traffic_simulator::LaneletPose>(
                    makeNativeRelativeLanePosition(
                      triggering_entity, static_cast<NativeLanePosition>(position)))
             .offset;
@@ -195,7 +195,7 @@ auto DistanceCondition::distance<  //
       },
       [&](const RelativeWorldPosition & position) {
         if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return static_cast<traffic_simulator::LaneletPoseType>(
+          return static_cast<traffic_simulator::LaneletPose>(
                    makeNativeRelativeLanePosition(
                      triggering_entity, static_cast<NativeLanePosition>(position)))
             .offset;
@@ -205,7 +205,7 @@ auto DistanceCondition::distance<  //
       },
       [&](const LanePosition & position) {
         if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return static_cast<traffic_simulator::LaneletPoseType>(
+          return static_cast<traffic_simulator::LaneletPose>(
                    makeNativeRelativeLanePosition(
                      triggering_entity, static_cast<NativeLanePosition>(position)))
             .offset;
@@ -225,7 +225,7 @@ auto DistanceCondition::distance<  //
     overload(
       [&](const WorldPosition & position) {
         if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return static_cast<traffic_simulator::LaneletPoseType>(
+          return static_cast<traffic_simulator::LaneletPose>(
                    makeNativeRelativeLanePosition(
                      triggering_entity, static_cast<NativeLanePosition>(position)))
             .s;
@@ -235,7 +235,7 @@ auto DistanceCondition::distance<  //
       },
       [&](const RelativeWorldPosition & position) {
         if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return static_cast<traffic_simulator::LaneletPoseType>(
+          return static_cast<traffic_simulator::LaneletPose>(
                    makeNativeRelativeLanePosition(
                      triggering_entity, static_cast<NativeLanePosition>(position)))
             .s;
@@ -245,7 +245,7 @@ auto DistanceCondition::distance<  //
       },
       [&](const LanePosition & position) {
         if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
-          return static_cast<traffic_simulator::LaneletPoseType>(
+          return static_cast<traffic_simulator::LaneletPose>(
                    makeNativeRelativeLanePosition(
                      triggering_entity, static_cast<NativeLanePosition>(position)))
             .s;

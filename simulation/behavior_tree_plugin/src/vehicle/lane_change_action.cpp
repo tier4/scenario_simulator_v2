@@ -111,7 +111,7 @@ BT::NodeStatus LaneChangeAction::tick()
         return BT::NodeStatus::FAILURE;
       }
       std::optional<std::pair<math::geometry::HermiteCurve, double>> traj_with_goal;
-      traffic_simulator::LaneletPoseType along_pose, goal_pose;
+      traffic_simulator::LaneletPose along_pose, goal_pose;
       switch (lane_change_parameters_->constraint.type) {
         case traffic_simulator::lane_change::Constraint::Type::NONE:
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
@@ -243,7 +243,7 @@ BT::NodeStatus LaneChangeAction::tick()
       current_s_ = 0;
       lane_change_velocity_ = 0;
       traffic_simulator::EntityStatusType entity_status_updated;
-      traffic_simulator::LaneletPoseType lanelet_pose;
+      traffic_simulator::LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;

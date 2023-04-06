@@ -46,11 +46,11 @@ auto CanonicalizedEntityStatus::canonicalize(
   auto canonicalized = may_non_canonicalized_entity_status;
   if (may_non_canonicalized_entity_status.lanelet_pose_valid) {
     canonicalized.lanelet_pose_valid = true;
-    canonicalized.lanelet_pose = static_cast<LaneletPoseType>(
+    canonicalized.lanelet_pose = static_cast<LaneletPose>(
       CanonicalizedLaneletPose(may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils));
   } else {
     canonicalized.lanelet_pose_valid = false;
-    canonicalized.lanelet_pose = LaneletPoseType();
+    canonicalized.lanelet_pose = LaneletPose();
   }
   return canonicalized;
 }
@@ -63,11 +63,11 @@ auto CanonicalizedEntityStatus::canonicalize(
   auto canonicalized = may_non_canonicalized_entity_status;
   if (may_non_canonicalized_entity_status.lanelet_pose_valid) {
     canonicalized.lanelet_pose_valid = true;
-    canonicalized.lanelet_pose = static_cast<LaneletPoseType>(CanonicalizedLaneletPose(
+    canonicalized.lanelet_pose = static_cast<LaneletPose>(CanonicalizedLaneletPose(
       may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils, route_lanelets));
   } else {
     canonicalized.lanelet_pose_valid = false;
-    canonicalized.lanelet_pose = LaneletPoseType();
+    canonicalized.lanelet_pose = LaneletPose();
   }
   return canonicalized;
 }

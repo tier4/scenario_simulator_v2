@@ -89,7 +89,7 @@ public:
       }
     }
 
-    static auto canonicalize(const traffic_simulator::LaneletPoseType & non_canonicalized)
+    static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> traffic_simulator::CanonicalizedLaneletPose
     {
       return core->canonicalize(non_canonicalized);
@@ -105,7 +105,7 @@ public:
     template <typename OSCLanePosition>
     static auto makeNativeLanePosition(const OSCLanePosition & osc_lane_position)
     {
-      traffic_simulator::LaneletPoseType native_lane_position;
+      traffic_simulator::LaneletPose native_lane_position;
       native_lane_position.lanelet_id =
         boost::lexical_cast<std::int64_t>(osc_lane_position.lane_id);
       native_lane_position.s = osc_lane_position.s;
@@ -175,7 +175,7 @@ public:
         }
       };
 
-      traffic_simulator::LaneletPoseType position;
+      traffic_simulator::LaneletPose position;
       position.lanelet_id = std::numeric_limits<std::int64_t>::max();
       position.s = s(from, to);
       position.offset = t(from, to);
@@ -449,7 +449,7 @@ public:
     {
       if (auto lanelet_pose = core->getLaneletPose(entity_ref)) {
         return static_cast<Double>(
-          std::abs(static_cast<traffic_simulator::LaneletPoseType>(lanelet_pose.value()).rpy.z));
+          std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).rpy.z));
       } else {
         return Double::nan();
       }

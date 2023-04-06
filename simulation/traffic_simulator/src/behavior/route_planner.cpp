@@ -33,7 +33,7 @@ auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & wa
 auto RoutePlanner::getRouteLanelets(
   const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon) -> std::vector<std::int64_t>
 {
-  const auto lanelet_pose = static_cast<LaneletPoseType>(entity_lanelet_pose);
+  const auto lanelet_pose = static_cast<LaneletPose>(entity_lanelet_pose);
   // If the queue is not empty, calculating route from the entity_lanelet_pose to waypoint_queue_.front()
   if (!waypoint_queue_.empty()) {
     updateRoute(entity_lanelet_pose);
@@ -101,17 +101,17 @@ void RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_p
       return;
     }
   }
-  const auto lanelet_pose = static_cast<LaneletPoseType>(entity_lanelet_pose);
+  const auto lanelet_pose = static_cast<LaneletPose>(entity_lanelet_pose);
   if (!route_) {
     route_ = hdmap_utils_ptr_->getRoute(
-      lanelet_pose.lanelet_id, static_cast<LaneletPoseType>(waypoint_queue_.front()).lanelet_id);
+      lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id);
     return;
   }
   if (hdmap_utils_ptr_->isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return;
   } else {
     route_ = hdmap_utils_ptr_->getRoute(
-      lanelet_pose.lanelet_id, static_cast<LaneletPoseType>(waypoint_queue_.front()).lanelet_id);
+      lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id);
     return;
   }
 }

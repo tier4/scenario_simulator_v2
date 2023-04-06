@@ -269,7 +269,7 @@ void EntityBase::requestLaneChange(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");
     }
-    reference_lanelet_id = static_cast<LaneletPoseType>(lanelet_pose.value()).lanelet_id;
+    reference_lanelet_id = static_cast<LaneletPose>(lanelet_pose.value()).lanelet_id;
   } else {
     if (other_status_.find(target.entity_name) == other_status_.end()) {
       THROW_SEMANTIC_ERROR(
