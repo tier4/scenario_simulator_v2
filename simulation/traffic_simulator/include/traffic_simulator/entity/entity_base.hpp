@@ -191,6 +191,10 @@ public:
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
 
+  virtual auto activateOutOfRangeJob(
+    double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
+    double min_jerk, double max_jerk) -> void;
+
   virtual auto setVelocityLimit(double) -> void;
 
   virtual void startNpcLogic();
