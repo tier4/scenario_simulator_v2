@@ -12,15 +12,15 @@ endif()
 
 find_package(ament_cmake_auto REQUIRED)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(XcercesC xerces-c)
+pkg_check_modules(XercesC xerces-c)
 ament_auto_find_build_dependencies()
 
 # global includes
-include_directories(${XcercesC_INCLUDE_DIRS})
+include_directories(${XercesC_INCLUDE_DIRS})
 
 # common shared library
 ament_auto_add_library(${PROJECT_NAME} SHARED src/${PROJECT_NAME}.cpp)
-target_link_libraries(${PROJECT_NAME} ${XcercesC_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${XercesC_LIBRARIES})
 
 # node
 ament_auto_add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
