@@ -39,9 +39,9 @@ double RelativeTargetSpeed::getAbsoluteValue(
       switch (type) {
         default:
         case Type::DELTA:
-          return static_cast<EntityStatus>(status).action_status.twist.linear.x + value;
+          return status.getTwist().linear.x + value;
         case Type::FACTOR:
-          return static_cast<EntityStatus>(status).action_status.twist.linear.x * value;
+          return status.getTwist().linear.x * value;
       }
     } else {
       THROW_SEMANTIC_ERROR(
@@ -54,9 +54,9 @@ double RelativeTargetSpeed::getAbsoluteValue(
     switch (type) {
       default:
       case Type::DELTA:
-        return static_cast<EntityStatus>(iter->second).action_status.twist.linear.x + value;
+        return iter->second.getTwist().linear.x + value;
       case Type::FACTOR:
-        return static_cast<EntityStatus>(iter->second).action_status.twist.linear.x * value;
+        return iter->second.getTwist().linear.x * value;
     }
   }
 }
