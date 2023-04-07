@@ -74,7 +74,7 @@ void RoutePlanner::cancelWaypoint(const CanonicalizedLaneletPose & entity_lanele
   }
 }
 
-std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame() const
+auto RoutePlanner::getGoalPosesInWorldFrame() const -> std::vector<geometry_msgs::msg::Pose>
 {
   std::vector<geometry_msgs::msg::Pose> ret;
   for (const auto & lanelet_pose : waypoint_queue_) {
@@ -83,7 +83,7 @@ std::vector<geometry_msgs::msg::Pose> RoutePlanner::getGoalPosesInWorldFrame() c
   return ret;
 }
 
-std::vector<CanonicalizedLaneletPose> RoutePlanner::getGoalPoses() const
+auto RoutePlanner::getGoalPoses() const -> std::vector<CanonicalizedLaneletPose>
 {
   std::vector<CanonicalizedLaneletPose> goal_poses;
   for (const auto & waypoint : waypoint_queue_) {
@@ -92,7 +92,7 @@ std::vector<CanonicalizedLaneletPose> RoutePlanner::getGoalPoses() const
   return goal_poses;
 }
 
-void RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose)
+auto RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void
 {
   if (waypoint_queue_.front() <= entity_lanelet_pose) {
     cancelWaypoint(entity_lanelet_pose);

@@ -33,14 +33,14 @@ public:
 
   auto setWaypoints(const std::vector<CanonicalizedLaneletPose> & waypoints) -> void;
 
-  void cancelRoute();
-  std::vector<CanonicalizedLaneletPose> getGoalPoses() const;
-  std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame() const;
+  auto cancelRoute() -> void;
+  auto getGoalPoses() const -> std::vector<CanonicalizedLaneletPose>;
+  auto getGoalPosesInWorldFrame() const -> std::vector<geometry_msgs::msg::Pose>;
 
 private:
-  void cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose);
+  auto cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void;
 
-  void updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose);
+  auto updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void;
 
   std::optional<std::vector<std::int64_t>> route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
