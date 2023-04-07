@@ -175,6 +175,7 @@ BT::NodeStatus LaneChangeAction::tick()
        * @brief Force changing speed in order to fulfill constraint.
        */
       case traffic_simulator::lane_change::Constraint::Policy::FORCE:
+        entity_status->setTwist(geometry_msgs::msg::Twist());
         entity_status->setAccel(geometry_msgs::msg::Accel());
         entity_status->setLinearVelocity(lane_change_velocity_);
         current_s_ = current_s_ + entity_status->getTwist().linear.x * step_time;

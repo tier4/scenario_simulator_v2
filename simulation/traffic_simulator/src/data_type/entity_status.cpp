@@ -27,7 +27,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
-  const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
+  const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
   const std::vector<std::int64_t> & route_lanelets)
 : entity_status_(canonicalize(may_non_canonicalized_entity_status, hdmap_utils, route_lanelets))
