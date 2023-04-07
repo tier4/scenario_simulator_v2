@@ -78,6 +78,7 @@ auto API::setEntityStatus(
     status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
+    status.lanelet_pose = traffic_simulator::LaneletPose();
   }
   entity_manager_ptr_->setEntityStatus(name, canonicalize(status));
 }
