@@ -120,10 +120,10 @@ auto API::setEntityStatus(
   const std::string & name, const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  const auto lanelet_pose =
-    entity_manager_ptr_->toLaneletPose(map_pose, getBoundingBox(name), false);
   EntityStatus status;
-  if (lanelet_pose) {
+  if (
+    const auto lanelet_pose =
+      entity_manager_ptr_->toLaneletPose(map_pose, getBoundingBox(name), false)) {
     status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
