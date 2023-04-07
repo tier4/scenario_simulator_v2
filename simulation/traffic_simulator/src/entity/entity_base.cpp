@@ -711,22 +711,22 @@ void EntityBase::activateOutOfRangeJob(
      */
     [this, tolerance, max_velocity, min_velocity, min_acceleration, max_acceleration, min_jerk,
      max_jerk](double) {
-      auto velocity_ = status_.action_status.twist.linear.x;
-      auto accel_ = status_.action_status.accel.linear.x;
-      auto jerk_ = status_.action_status.linear_jerk;
-      if (!(min_velocity <= velocity_ + tolerance && velocity_ - tolerance <= max_velocity)) {
+      const auto velocity = getCurrentTwist().linear.x;
+      const auto accel = getCurrentAccel().linear.x;
+      const auto jerk = getLinearJerk();
+      if (!(min_velocity <= velocity + tolerance && velocity - tolerance <= max_velocity)) {
         THROW_SPECIFICATION_VIOLATION(
-          "Entity: ", name, " - current velocity (which is ", velocity_,
+          "Entity: ", name, " - current velocity (which is ", velocity,
           ") is out of range (which is [", min_velocity, ", ", max_velocity, "])");
       }
-      if (!(min_acceleration <= accel_ + tolerance && accel_ - tolerance <= max_acceleration)) {
+      if (!(min_acceleration <= accel + tolerance && accel - tolerance <= max_acceleration)) {
         THROW_SPECIFICATION_VIOLATION(
-          "Entity: ", name, " - current acceleration (which is ", accel_,
+          "Entity: ", name, " - current acceleration (which is ", accel,
           ") is out of range (which is [", min_acceleration, ", ", max_acceleration, "])");
       }
-      if (!(min_jerk <= jerk_ + tolerance && jerk_ - tolerance <= max_jerk)) {
+      if (!(min_jerk <= jerk + tolerance && jerk - tolerance <= max_jerk)) {
         THROW_SPECIFICATION_VIOLATION(
-          "Entity: ", name, " - current jerk (which is ", jerk_, ") is out of range (which is [",
+          "Entity: ", name, " - current jerk (which is ", jerk, ") is out of range (which is [",
           min_jerk, ", ", max_jerk, "])");
       }
       return false;
