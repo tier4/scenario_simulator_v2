@@ -29,17 +29,14 @@ class CanonicalizedEntityStatus
 {
 public:
   explicit CanonicalizedEntityStatus(
-    const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
+    const EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
   explicit CanonicalizedEntityStatus(
-    const traffic_simulator_msgs::msg::EntityStatus & may_non_canonicalized_entity_status,
+    const EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
     const std::vector<std::int64_t> & route_lanelets);
   explicit CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
-  explicit operator traffic_simulator_msgs::msg::EntityStatus() const noexcept
-  {
-    return entity_status_;
-  }
+  explicit operator EntityStatus() const noexcept { return entity_status_; }
   CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj)
   {
     this->entity_status_ = obj.entity_status_;
