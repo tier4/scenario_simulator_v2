@@ -83,17 +83,19 @@ public:
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id, const std::vector<double> & s) const;
   std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
-    geometry_msgs::msg::Pose pose, bool include_crosswalk, double matching_distance = 1.0) const;
+    const geometry_msgs::msg::Pose & pose, bool include_crosswalk,
+    double matching_distance = 1.0) const;
   std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
-    geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+    const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
     bool include_crosswalk, double matching_distance = 1.0) const;
   std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
-    geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance = 1.0) const;
+    const geometry_msgs::msg::Pose & pose, std::int64_t lanelet_id,
+    double matching_distance = 1.0) const;
   std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
-    geometry_msgs::msg::Pose pose, std::vector<std::int64_t> lanelet_ids,
+    const geometry_msgs::msg::Pose & pose, const std::vector<std::int64_t> & lanelet_ids,
     double matching_distance = 1.0) const;
   std::vector<traffic_simulator_msgs::msg::LaneletPose> toLaneletPoses(
-    geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance = 5.0,
+    const geometry_msgs::msg::Pose & pose, std::int64_t lanelet_id, double matching_distance = 5.0,
     bool include_opposite_direction = true) const;
   std::optional<std::int64_t> matchToLane(
     const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,

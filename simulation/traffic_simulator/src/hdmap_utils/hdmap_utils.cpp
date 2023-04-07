@@ -470,7 +470,7 @@ std::optional<std::int64_t> HdMapUtils::matchToLane(
 }
 
 std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, bool include_crosswalk, double matching_distance) const
+  const geometry_msgs::msg::Pose & pose, bool include_crosswalk, double matching_distance) const
 {
   const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
   if (lanelet_ids.empty()) {
@@ -486,7 +486,7 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPos
 }
 
 std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance) const
+  const geometry_msgs::msg::Pose & pose, std::int64_t lanelet_id, double matching_distance) const
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
   const auto s = spline->getSValue(pose, matching_distance);
@@ -518,7 +518,7 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPos
 }
 
 std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, std::vector<std::int64_t> lanelet_ids,
+  const geometry_msgs::msg::Pose & pose, const std::vector<std::int64_t> & lanelet_ids,
   double matching_distance) const
 {
   for (const auto id : lanelet_ids) {
@@ -531,7 +531,7 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPos
 }
 
 std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
   bool include_crosswalk, double matching_distance) const
 {
   const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
@@ -560,7 +560,7 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPos
 }
 
 std::vector<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPoses(
-  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id, double matching_distance,
+  const geometry_msgs::msg::Pose & pose, std::int64_t lanelet_id, double matching_distance,
   bool include_opposite_direction) const
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> ret;
