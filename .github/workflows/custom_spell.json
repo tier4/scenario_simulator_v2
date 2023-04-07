@@ -27,6 +27,8 @@
     "randomizers",
     "subspline",
     "TESTRANDOMIZER",
-    "travelling"
+    "travelling",
+    "xerces",
+    "xercesc"
   ]
 }
