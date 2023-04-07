@@ -37,6 +37,13 @@ EntityBase::EntityBase(
   hdmap_utils_ptr_(hdmap_utils_ptr),
   npc_logic_started_(false)
 {
+  if (name != static_cast<EntityStatus>(entity_status).name) {
+    THROW_SIMULATION_ERROR(
+      "The name of the entity does not match the name of the entity listed in entity_status.",
+      " The name of the entity is ", name,
+      " and the name of the entity listed in entity_status is ",
+      static_cast<EntityStatus>(entity_status).name);
+  }
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
