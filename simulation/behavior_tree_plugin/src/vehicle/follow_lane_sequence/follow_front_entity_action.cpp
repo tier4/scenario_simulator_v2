@@ -55,10 +55,10 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
   if (!entity_status->laneMatchingSucceed()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (getCurrentTwist().linear.x >= 0) {
+  if (entity_status->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon = getHorizon();
-    const auto lanelet_pose = getLaneletPose();
+    const auto lanelet_pose = entity_status->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       lanelet_pose.s, lanelet_pose.s + horizon, 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
@@ -115,9 +115,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  const double front_entity_linear_velocity =
-    static_cast<traffic_simulator::EntityStatusType>(front_entity_status)
-      .action_status.twist.linear.x;
+  const double front_entity_linear_velocity = front_entity_status.getTwist().linear.x;
   if (target_speed.value() <= front_entity_linear_velocity) {
     setOutput(
       "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(

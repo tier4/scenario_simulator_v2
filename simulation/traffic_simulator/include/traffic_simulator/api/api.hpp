@@ -301,7 +301,7 @@ public:
 
   auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
     -> CanonicalizedLaneletPose;
-  auto canonicalize(const EntityStatusType & may_non_canonicalized_entity_status) const
+  auto canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
     -> CanonicalizedEntityStatus;
 
   auto toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const

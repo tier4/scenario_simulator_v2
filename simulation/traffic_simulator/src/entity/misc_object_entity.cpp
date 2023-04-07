@@ -28,7 +28,7 @@ MiscObjectEntity::MiscObjectEntity(
 
 void MiscObjectEntity::onUpdate(double, double)
 {
-  auto status = static_cast<EntityStatusType>(status_);
+  auto status = static_cast<EntityStatus>(status_);
   status.action_status.twist = geometry_msgs::msg::Twist();
   status.action_status.accel = geometry_msgs::msg::Accel();
   status.action_status.linear_jerk = 0;
@@ -42,7 +42,7 @@ auto MiscObjectEntity::getCurrentAction() const -> std::string
   if (not npc_logic_started_) {
     return "waiting";
   } else {
-    return static_cast<EntityStatusType>(status_).action_status.current_action;
+    return static_cast<EntityStatus>(status_).action_status.current_action;
   }
 }
 

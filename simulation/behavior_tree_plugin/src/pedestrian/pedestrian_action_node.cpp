@@ -50,7 +50,7 @@ auto PedestrianActionNode::calculateUpdatedEntityStatus(double target_speed) con
 auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
   -> traffic_simulator::CanonicalizedEntityStatus
 {
-  auto updated_status = static_cast<traffic_simulator::EntityStatusType>(
+  auto updated_status = static_cast<traffic_simulator::EntityStatus>(
     ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       target_speed, behavior_parameter.dynamic_constraints));
   const auto lanelet_pose = estimateLaneletPose(updated_status.pose);
@@ -69,7 +69,8 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
 {
   std::optional<traffic_simulator::LaneletPose> lanelet_pose;
   if (entity_status->laneMatchingSucceed()) {
-    lanelet_pose = hdmap_utils->toLaneletPose(pose, getLaneletPose().lanelet_id, 1.0);
+    lanelet_pose =
+      hdmap_utils->toLaneletPose(pose, entity_status->getLaneletPose().lanelet_id, 1.0);
   } else {
     lanelet_pose = hdmap_utils->toLaneletPose(pose, getBoundingBox(), true);
   }

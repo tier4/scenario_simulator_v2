@@ -120,7 +120,7 @@ void TestExecutor::update(double current_time)
     if (timeout_reached) {
       if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
         const auto status =
-          static_cast<traffic_simulator::EntityStatusType>(api_->getEntityStatus(ego_name_));
+          static_cast<traffic_simulator::EntityStatus>(api_->getEntityStatus(ego_name_));
         if (!goal_reached_metric_.isGoalReached(status)) {
           RCLCPP_INFO(logger_, "Timeout reached");
           error_reporter_.reportTimeout();
@@ -132,7 +132,7 @@ void TestExecutor::update(double current_time)
   }
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
     const auto status =
-      static_cast<traffic_simulator::EntityStatusType>(api_->getEntityStatus(ego_name_));
+      static_cast<traffic_simulator::EntityStatus>(api_->getEntityStatus(ego_name_));
     for (const auto & npc : test_description_.npcs_descriptions) {
       if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
         if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {

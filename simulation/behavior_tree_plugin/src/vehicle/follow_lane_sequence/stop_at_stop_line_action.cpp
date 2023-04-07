@@ -56,10 +56,10 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculat
   if (!entity_status->laneMatchingSucceed()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (getCurrentTwist().linear.x >= 0) {
+  if (entity_status->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon = getHorizon();
-    const auto lanelet_pose = getLaneletPose();
+    const auto lanelet_pose = entity_status->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       lanelet_pose.s, lanelet_pose.s + horizon, 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
@@ -128,7 +128,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     }
   }
 
-  if (std::fabs(getCurrentTwist().linear.x) < 0.001) {
+  if (std::fabs(entity_status->getTwist().linear.x) < 0.001) {
     if (distance_to_stopline_) {
       if (distance_to_stopline_.value() <= vehicle_parameters.bounding_box.dimensions.x + 5) {
         stopped_ = true;
@@ -155,7 +155,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;
   }
-  auto target_linear_speed = calculateTargetSpeed(getCurrentTwist().linear.x);
+  auto target_linear_speed = calculateTargetSpeed(entity_status->getTwist().linear.x);
   if (!target_linear_speed) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;

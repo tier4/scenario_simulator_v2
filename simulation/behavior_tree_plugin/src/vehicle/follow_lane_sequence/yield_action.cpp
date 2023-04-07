@@ -55,10 +55,10 @@ const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoint
   if (!entity_status->laneMatchingSucceed()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (getCurrentTwist().linear.x >= 0) {
+  if (entity_status->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon = getHorizon();
-    const auto lanelet_pose = getLaneletPose();
+    const auto lanelet_pose = entity_status->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       lanelet_pose.s, lanelet_pose.s + horizon, 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
@@ -82,7 +82,7 @@ std::optional<double> YieldAction::calculateTargetSpeed()
   if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     return 0;
   }
-  return getCurrentTwist().linear.x;
+  return entity_status->getTwist().linear.x;
 }
 
 BT::NodeStatus YieldAction::tick()

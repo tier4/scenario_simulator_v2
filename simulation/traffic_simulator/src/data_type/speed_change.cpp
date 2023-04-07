@@ -35,13 +35,13 @@ double RelativeTargetSpeed::getAbsoluteValue(
   const std::unordered_map<std::string, CanonicalizedEntityStatus> & other_status) const
 {
   if (const auto iter = other_status.find(reference_entity_name); iter == other_status.end()) {
-    if (static_cast<EntityStatusType>(status).name == reference_entity_name) {
+    if (static_cast<EntityStatus>(status).name == reference_entity_name) {
       switch (type) {
         default:
         case Type::DELTA:
-          return static_cast<EntityStatusType>(status).action_status.twist.linear.x + value;
+          return static_cast<EntityStatus>(status).action_status.twist.linear.x + value;
         case Type::FACTOR:
-          return static_cast<EntityStatusType>(status).action_status.twist.linear.x * value;
+          return static_cast<EntityStatus>(status).action_status.twist.linear.x * value;
       }
     } else {
       THROW_SEMANTIC_ERROR(
@@ -54,9 +54,9 @@ double RelativeTargetSpeed::getAbsoluteValue(
     switch (type) {
       default:
       case Type::DELTA:
-        return static_cast<EntityStatusType>(iter->second).action_status.twist.linear.x + value;
+        return static_cast<EntityStatus>(iter->second).action_status.twist.linear.x + value;
       case Type::FACTOR:
-        return static_cast<EntityStatusType>(iter->second).action_status.twist.linear.x * value;
+        return static_cast<EntityStatus>(iter->second).action_status.twist.linear.x * value;
     }
   }
 }

@@ -386,7 +386,7 @@ public:
     const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
   {
     auto makeEntityStatus = [&]() {
-      EntityStatusType entity_status;
+      EntityStatus entity_status;
 
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
         if (auto iter = std::find_if(

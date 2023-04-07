@@ -20,7 +20,7 @@ namespace traffic_simulator
 namespace entity_status
 {
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
-  const EntityStatusType & may_non_canonicalized_entity_status,
+  const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : entity_status_(canonicalize(may_non_canonicalized_entity_status, hdmap_utils))
 {
@@ -35,13 +35,13 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj)
-: entity_status_(static_cast<EntityStatusType>(obj))
+: entity_status_(static_cast<EntityStatus>(obj))
 {
 }
 
 auto CanonicalizedEntityStatus::canonicalize(
-  const EntityStatusType & may_non_canonicalized_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> EntityStatusType
+  const EntityStatus & may_non_canonicalized_entity_status,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> EntityStatus
 {
   auto canonicalized = may_non_canonicalized_entity_status;
   if (may_non_canonicalized_entity_status.lanelet_pose_valid) {
@@ -56,9 +56,9 @@ auto CanonicalizedEntityStatus::canonicalize(
 }
 
 auto CanonicalizedEntityStatus::canonicalize(
-  const EntityStatusType & may_non_canonicalized_entity_status,
+  const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const std::vector<std::int64_t> & route_lanelets) -> EntityStatusType
+  const std::vector<std::int64_t> & route_lanelets) -> EntityStatus
 {
   auto canonicalized = may_non_canonicalized_entity_status;
   if (may_non_canonicalized_entity_status.lanelet_pose_valid) {
@@ -72,21 +72,47 @@ auto CanonicalizedEntityStatus::canonicalize(
   return canonicalized;
 }
 
-void CanonicalizedEntityStatus::setTwist(const geometry_msgs::msg::Twist & twist)
+auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose
+{
+  if (!laneMatchingSucceed()) {
+    THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
+  }
+  return entity_status_.lanelet_pose;
+}
+
+auto CanonicalizedEntityStatus::setTwist(const geometry_msgs::msg::Twist & twist) -> void
 {
   entity_status_.action_status.twist = twist;
 }
 
-void CanonicalizedEntityStatus::setLinearVelocity(double linear_velocity)
+auto CanonicalizedEntityStatus::getTwist() const noexcept -> geometry_msgs::msg::Twist
+{
+  return entity_status_.action_status.twist;
+}
+
+auto CanonicalizedEntityStatus::setLinearVelocity(double linear_velocity) -> void
 {
   entity_status_.action_status.twist.linear.x = linear_velocity;
 }
 
-void CanonicalizedEntityStatus::setAccel(const geometry_msgs::msg::Accel & accel)
+auto CanonicalizedEntityStatus::setAccel(const geometry_msgs::msg::Accel & accel) -> void
 {
   entity_status_.action_status.accel = accel;
 }
 
-void CanonicalizedEntityStatus::setTime(double time) { entity_status_.time = time; }
+auto CanonicalizedEntityStatus::getAccel() -> geometry_msgs::msg::Accel
+{
+  return entity_status_.action_status.accel;
+}
+
+auto CanonicalizedEntityStatus::setLinearJerk(double linear_jerk) -> void
+{
+  entity_status_.action_status.linear_jerk = linear_jerk;
+}
+
+auto CanonicalizedEntityStatus::getLinearJerk() -> double
+{
+  return entity_status_.action_status.linear_jerk;
+}
 }  // namespace entity_status
 }  // namespace traffic_simulator

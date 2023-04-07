@@ -181,7 +181,7 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
 
 auto EntityBase::getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
 {
-  const auto status = static_cast<EntityStatusType>(getStatus());
+  const auto status = static_cast<EntityStatus>(getStatus());
   if (laneMatchingSucceed()) {
     return CanonicalizedLaneletPose(status.lanelet_pose, hdmap_utils_ptr_);
   }
@@ -282,7 +282,7 @@ void EntityBase::requestLaneChange(
         target.entity_name, " exists on lane.");
     }
     reference_lanelet_id =
-      static_cast<EntityStatusType>(other_status_.at(target.entity_name)).lanelet_pose.lanelet_id;
+      static_cast<EntityStatus>(other_status_.at(target.entity_name)).lanelet_pose.lanelet_id;
   }
   const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
     reference_lanelet_id, target.direction, target.shift);
@@ -658,7 +658,7 @@ void EntityBase::setOtherStatus(
 
 auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
 {
-  auto new_status = static_cast<EntityStatusType>(status);
+  auto new_status = static_cast<EntityStatus>(status);
 
   /*
      FIXME: DIRTY HACK!!!
@@ -677,14 +677,14 @@ auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
-  auto status = static_cast<EntityStatusType>(getStatus());
+  auto status = static_cast<EntityStatus>(getStatus());
   status.action_status.twist.linear.x = linear_velocity;
   setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 {
-  auto status = static_cast<EntityStatusType>(getStatus());
+  auto status = static_cast<EntityStatus>(getStatus());
   status.action_status.accel.linear.x = linear_acceleration;
   setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
@@ -743,7 +743,7 @@ void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
 void EntityBase::stopAtEndOfRoad()
 {
-  auto status = static_cast<EntityStatusType>(getStatus());
+  auto status = static_cast<EntityStatus>(getStatus());
   status.action_status.twist = geometry_msgs::msg::Twist();
   status.action_status.accel = geometry_msgs::msg::Accel();
   status.action_status.linear_jerk = 0;
@@ -752,7 +752,7 @@ void EntityBase::stopAtEndOfRoad()
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
-  auto status = static_cast<EntityStatusType>(getStatus());
+  auto status = static_cast<EntityStatus>(getStatus());
   status.time = current_time;
   setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }

@@ -63,14 +63,14 @@ public:
   /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
 
   // clang-format off
-  DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        static_cast<EntityStatusType>(getStatus()).bounding_box)
-  DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       static_cast<EntityStatusType>(getStatus()).action_status.accel)
-  DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       static_cast<EntityStatusType>(getStatus()).action_status.twist)
+  DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        static_cast<EntityStatus>(getStatus()).bounding_box)
+  DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       static_cast<EntityStatus>(getStatus()).action_status.accel)
+  DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       static_cast<EntityStatus>(getStatus()).action_status.twist)
   DEFINE_GETTER(DynamicConstraints,       traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
   DEFINE_GETTER(EntityStatusBeforeUpdate, const CanonicalizedEntityStatus &,           status_before_update_)
-  DEFINE_GETTER(EntitySubtype,            traffic_simulator_msgs::msg::EntitySubtype,      static_cast<EntityStatusType>(getStatus()).subtype)
-  DEFINE_GETTER(LinearJerk,               double,                                          static_cast<EntityStatusType>(getStatus()).action_status.linear_jerk)
-  DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        static_cast<EntityStatusType>(getStatus()).pose)
+  DEFINE_GETTER(EntitySubtype,            traffic_simulator_msgs::msg::EntitySubtype,      static_cast<EntityStatus>(getStatus()).subtype)
+  DEFINE_GETTER(LinearJerk,               double,                                          static_cast<EntityStatus>(getStatus()).action_status.linear_jerk)
+  DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        static_cast<EntityStatus>(getStatus()).pose)
   DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
   DEFINE_GETTER(Status,                   const CanonicalizedEntityStatus &,           status_)
   DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
@@ -82,7 +82,7 @@ public:
 
   DEFINE_CHECK_FUNCTION(isNpcLogicStarted, npc_logic_started_)
   DEFINE_CHECK_FUNCTION(
-    laneMatchingSucceed, static_cast<EntityStatusType>(getStatus()).lanelet_pose_valid)
+    laneMatchingSucceed, static_cast<EntityStatus>(getStatus()).lanelet_pose_valid)
 #undef DEFINE_CHECK_FUNCTION
 
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;

@@ -103,8 +103,7 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t
 {
   if (status_.laneMatchingSucceed()) {
     return route_planner_.getRouteLanelets(
-      CanonicalizedLaneletPose(
-        static_cast<EntityStatusType>(status_).lanelet_pose, hdmap_utils_ptr_),
+      CanonicalizedLaneletPose(static_cast<EntityStatus>(status_).lanelet_pose, hdmap_utils_ptr_),
       horizon);
   } else {
     return {};
@@ -156,7 +155,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (status_updated->laneMatchingSucceed()) {
-      const auto lanelet_pose = static_cast<LaneletPose>(*status_updated);
+      const auto lanelet_pose = status_updated->getLaneletPose();
       if (
         hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
         hdmap_utils_ptr_->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s) {

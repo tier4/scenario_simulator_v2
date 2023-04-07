@@ -145,7 +145,7 @@ auto EntityManager::getEntityStatus(const std::string & name) const -> Canonical
   if (const auto iter = entities_.find(name); iter == entities_.end()) {
     THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   } else {
-    auto entity_status = static_cast<EntityStatusType>(iter->second->getStatus());
+    auto entity_status = static_cast<EntityStatus>(iter->second->getStatus());
     entity_status.action_status.current_action = getCurrentAction(name);
     entity_status.time = current_time_;
     return CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_);
@@ -462,7 +462,7 @@ bool EntityManager::isInLanelet(
   const std::string & name, const std::int64_t lanelet_id, const double tolerance)
 {
   double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
-  const auto status = static_cast<EntityStatusType>(getEntityStatus(name));
+  const auto status = static_cast<EntityStatus>(getEntityStatus(name));
 
   if (not status.lanelet_pose_valid) {
     return false;
@@ -642,7 +642,7 @@ void EntityManager::update(const double current_time, const double step_time)
     } else {
       status_with_trajectory.obstacle_find = false;
     }
-    status_with_trajectory.status = static_cast<EntityStatusType>(status);
+    status_with_trajectory.status = static_cast<EntityStatus>(status);
     status_with_trajectory.name = name;
     status_with_trajectory.time = current_time + step_time;
     status_array_msg.data.emplace_back(status_with_trajectory);

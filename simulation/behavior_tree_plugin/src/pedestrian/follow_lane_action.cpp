@@ -45,7 +45,8 @@ BT::NodeStatus FollowLaneAction::tick()
     setOutput("updated_status", entity_status);
     return BT::NodeStatus::RUNNING;
   }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(getLaneletPose().lanelet_id);
+  auto following_lanelets =
+    hdmap_utils->getFollowingLanelets(entity_status->getLaneletPose().lanelet_id);
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }

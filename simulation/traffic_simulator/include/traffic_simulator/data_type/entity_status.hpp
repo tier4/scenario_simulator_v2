@@ -18,11 +18,10 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
-using EntityStatusType = traffic_simulator_msgs::msg::EntityStatus;
+using EntityStatus = traffic_simulator_msgs::msg::EntityStatus;
 
 namespace entity_status
 {
@@ -41,34 +40,31 @@ public:
   {
     return entity_status_;
   }
-  explicit operator geometry_msgs::msg::Pose() const noexcept { return entity_status_.pose; }
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const
-  {
-    if (!laneMatchingSucceed()) {
-      THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
-    }
-    return entity_status_.lanelet_pose;
-  }
   CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj)
   {
     this->entity_status_ = obj.entity_status_;
     return *this;
   }
-  bool laneMatchingSucceed() const noexcept { return entity_status_.lanelet_pose_valid; }
-  void setTwist(const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist());
-  void setLinearVelocity(double linear_velocity);
-  void setAccel(const geometry_msgs::msg::Accel & accel = geometry_msgs::msg::Accel());
-  void setTime(double time);
+  auto laneMatchingSucceed() const noexcept -> bool { return entity_status_.lanelet_pose_valid; }
+  auto getMapPose() const noexcept -> geometry_msgs::msg::Pose { return entity_status_.pose; }
+  auto getLaneletPose() const -> LaneletPose;
+  auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
+  auto getTwist() const noexcept -> geometry_msgs::msg::Twist;
+  auto setLinearVelocity(double linear_velocity) -> void;
+  auto setAccel(const geometry_msgs::msg::Accel & accel) -> void;
+  auto getAccel() -> geometry_msgs::msg::Accel;
+  auto setLinearJerk(double) -> void;
+  auto getLinearJerk() -> double;
 
 private:
   auto canonicalize(
-    const EntityStatusType & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> EntityStatusType;
+    const EntityStatus & may_non_canonicalized_entity_status,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> EntityStatus;
   auto canonicalize(
-    const EntityStatusType & may_non_canonicalized_entity_status,
+    const EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const std::vector<std::int64_t> & route_lanelets) -> EntityStatusType;
-  EntityStatusType entity_status_;
+    const std::vector<std::int64_t> & route_lanelets) -> EntityStatus;
+  EntityStatus entity_status_;
 };
 }  // namespace entity_status
 

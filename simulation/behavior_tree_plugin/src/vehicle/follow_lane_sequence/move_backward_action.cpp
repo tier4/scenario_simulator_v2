@@ -38,10 +38,10 @@ const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateW
   if (!entity_status->laneMatchingSucceed()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (getCurrentTwist().linear.x >= 0) {
+  if (entity_status->getTwist().linear.x >= 0) {
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
-  const auto lanelet_pose = getLaneletPose();
+  const auto lanelet_pose = entity_status->getLaneletPose();
   const auto ids = hdmap_utils->getPreviousLanelets(lanelet_pose.lanelet_id);
   // DIFFERENT SPLINE - recalculation needed
   math::geometry::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ids));
@@ -78,8 +78,8 @@ BT::NodeStatus MoveBackwardAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!target_speed) {
-    target_speed =
-      hdmap_utils->getSpeedLimit(hdmap_utils->getPreviousLanelets(getLaneletPose().lanelet_id));
+    target_speed = hdmap_utils->getSpeedLimit(
+      hdmap_utils->getPreviousLanelets(entity_status->getLaneletPose().lanelet_id));
   }
   setOutput(
     "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(

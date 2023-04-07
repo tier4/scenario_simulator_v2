@@ -66,16 +66,9 @@ public:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
-  auto getCurrentTwist() const noexcept -> geometry_msgs::msg::Twist;
-  auto getCurrentAccel() const noexcept -> geometry_msgs::msg::Accel;
-  auto getCurrentLinearJerk() const noexcept -> double;
   auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
-  auto getEntityPose() const noexcept -> geometry_msgs::msg::Pose;
-  auto getEntityPosition() const noexcept -> geometry_msgs::msg::Point;
-  auto getEntityOrientation() const noexcept -> geometry_msgs::msg::Quaternion;
   auto getActionStatus() const noexcept -> traffic_simulator_msgs::msg::ActionStatus;
   auto getEntityName() const noexcept -> std::string;
-  auto getLaneletPose() const -> traffic_simulator::LaneletPose;
 
   /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;
