@@ -201,6 +201,9 @@ BT::NodeStatus LaneChangeAction::tick()
         geometry_msgs::msg::Accel accel_new;
         accel_new.linear.x = target_accel;
         geometry_msgs::msg::Twist twist_new;
+        /**
+         * @note Hard coded parameter, -10.0 is a minimin linear velocity of the entity.
+        */
         twist_new.linear.x = std::clamp(
           entity_status->getTwist().linear.x + accel_new.linear.x * step_time, -10.0,
           vehicle_parameters.performance.max_speed);
