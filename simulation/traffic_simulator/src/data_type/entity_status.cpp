@@ -100,7 +100,7 @@ auto CanonicalizedEntityStatus::setAccel(const geometry_msgs::msg::Accel & accel
   entity_status_.action_status.accel = accel;
 }
 
-auto CanonicalizedEntityStatus::getAccel() -> geometry_msgs::msg::Accel
+auto CanonicalizedEntityStatus::getAccel() const noexcept -> geometry_msgs::msg::Accel
 {
   return entity_status_.action_status.accel;
 }
@@ -110,9 +110,11 @@ auto CanonicalizedEntityStatus::setLinearJerk(double linear_jerk) -> void
   entity_status_.action_status.linear_jerk = linear_jerk;
 }
 
-auto CanonicalizedEntityStatus::getLinearJerk() -> double
+auto CanonicalizedEntityStatus::getLinearJerk() const noexcept -> double
 {
   return entity_status_.action_status.linear_jerk;
 }
+
+auto CanonicalizedEntityStatus::getTime() const noexcept -> double { return entity_status_.time; }
 }  // namespace entity_status
 }  // namespace traffic_simulator

@@ -49,9 +49,10 @@ public:
   auto getTwist() const noexcept -> geometry_msgs::msg::Twist;
   auto setLinearVelocity(double linear_velocity) -> void;
   auto setAccel(const geometry_msgs::msg::Accel & accel) -> void;
-  auto getAccel() -> geometry_msgs::msg::Accel;
+  auto getAccel() const noexcept -> geometry_msgs::msg::Accel;
   auto setLinearJerk(double) -> void;
-  auto getLinearJerk() -> double;
+  auto getLinearJerk() const noexcept -> double;
+  auto getTime() const noexcept -> double;
 
 private:
   auto canonicalize(

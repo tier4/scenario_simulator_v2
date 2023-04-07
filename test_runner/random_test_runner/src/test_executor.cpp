@@ -119,9 +119,7 @@ void TestExecutor::update(double current_time)
     bool timeout_reached = current_time >= test_timeout;
     if (timeout_reached) {
       if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-        const auto status =
-          static_cast<traffic_simulator::EntityStatus>(api_->getEntityStatus(ego_name_));
-        if (!goal_reached_metric_.isGoalReached(status)) {
+        if (!goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
           RCLCPP_INFO(logger_, "Timeout reached");
           error_reporter_.reportTimeout();
         }
@@ -131,8 +129,6 @@ void TestExecutor::update(double current_time)
     }
   }
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-    const auto status =
-      static_cast<traffic_simulator::EntityStatus>(api_->getEntityStatus(ego_name_));
     for (const auto & npc : test_description_.npcs_descriptions) {
       if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
         if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
@@ -143,9 +139,9 @@ void TestExecutor::update(double current_time)
       }
     }
 
-    if (almost_standstill_metric_.isAlmostStandingStill(status)) {
+    if (almost_standstill_metric_.isAlmostStandingStill(api_->getEntityStatus(ego_name_))) {
       RCLCPP_INFO(logger_, "Standstill duration exceeded");
-      if (goal_reached_metric_.isGoalReached(status)) {
+      if (goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
         RCLCPP_INFO(logger_, "Goal reached, standstill expected");
       } else {
         error_reporter_.reportStandStill();
