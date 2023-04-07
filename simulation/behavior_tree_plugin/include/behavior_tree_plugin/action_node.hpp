@@ -78,23 +78,23 @@ public:
   static BT::PortsList providedPorts()
   {
     return {
-      BT::InputPort<traffic_simulator::behavior::Request>("request"),
-      BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("entity_status"),
+      // clang-format off
       BT::InputPort<double>("current_time"),
       BT::InputPort<double>("step_time"),
-      BT::InputPort<std::optional<double>>("target_speed"),
-      BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>(
-        "updated_status"),
-      BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<EntityStatusDict>("other_entity_status"),
-      BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>(
-        "entity_type_list"),
+      BT::InputPort<std::optional<double>>("target_speed"),
+      BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("entity_status"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManagerBase>>("traffic_light_manager"),
+      BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>("entity_type_list"),
       BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManagerBase>>(
-        "traffic_light_manager"),
+      BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
-      BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
+      BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("updated_status"),
+      BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
+      BT::OutputPort<traffic_simulator::behavior::Request>("request"),
+      // clang-format on
+    };
   }
   auto getBlackBoardValues() -> void;
   auto getEntityStatus(const std::string & target_name) const

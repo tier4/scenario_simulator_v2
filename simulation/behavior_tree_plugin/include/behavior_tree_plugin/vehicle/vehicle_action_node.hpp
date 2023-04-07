@@ -41,9 +41,12 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
+      // clang-format off
+      BT::InputPort<std::shared_ptr<math::geometry::CatmullRomSpline>>("reference_trajectory"),
       BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
       BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters"),
-      BT::InputPort<std::shared_ptr<math::geometry::CatmullRomSpline>>("reference_trajectory")};
+      // clang-format on
+    };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
