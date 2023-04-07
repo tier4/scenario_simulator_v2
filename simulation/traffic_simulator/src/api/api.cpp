@@ -257,10 +257,8 @@ bool API::updateEntityStatusInSim()
       *req.mutable_ego_entity_status_before_update());
   }
   for (const auto & name : entity_manager_ptr_->getEntityNames()) {
-    auto status = static_cast<EntityStatus>(getEntityStatus(name));
     traffic_simulator_msgs::EntityStatus proto;
-    status.name = name;
-    simulation_interface::toProto(status, proto);
+    simulation_interface::toProto(static_cast<EntityStatus>(getEntityStatus(name)), proto);
     *req.add_status() = proto;
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
