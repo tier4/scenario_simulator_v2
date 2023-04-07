@@ -190,7 +190,7 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
-  -> const EntityStatus
+  -> const CanonicalizedEntityStatus
 {
   EntityStatus status;
   {
@@ -237,7 +237,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     }
   }
 
-  return status;
+  return traffic_simulator::CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
 }
 
 auto EgoEntity::getEntityTypename() const -> const std::string &
@@ -348,12 +348,12 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   auto entity_status = getEntityStatus(current_time + step_time, step_time);
   if (previous_linear_velocity_) {
-    entity_status.action_status.linear_jerk =
-      (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time;
+    entity_status.setLinearJerk(
+      (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time);
   } else {
-    entity_status.action_status.linear_jerk = 0;
+    entity_status.setLinearJerk(0.0);
   }
-  setStatus(CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_));
+  setStatus(entity_status);
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
