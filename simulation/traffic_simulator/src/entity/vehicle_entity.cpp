@@ -174,6 +174,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
 
 void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_.laneMatchingSucceed()) {
     route_planner_.setWaypoints({lanelet_pose});
   }
@@ -182,6 +183,7 @@ void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lane
 
 void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false);
       lanelet_pose) {
     requestAcquirePosition(CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_));
@@ -195,6 +197,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPos
   if (!laneMatchingSucceed()) {
     return;
   }
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   route_planner_.setWaypoints(waypoints);
   std::vector<geometry_msgs::msg::Pose> goal_poses;
   for (const auto & waypoint : waypoints) {
