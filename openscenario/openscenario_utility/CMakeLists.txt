@@ -8,12 +8,13 @@ find_package(ament_cmake_python REQUIRED)
 ament_python_install_package(${PROJECT_NAME})
 
 install(
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/
+  DESTINATION lib/${PROJECT_NAME})
+
+install(
   DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
   DESTINATION include
 )
-
-install(
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/
-  DESTINATION lib/${PROJECT_NAME})
+ament_export_include_directories(include)
 
 ament_package()

@@ -15,14 +15,10 @@
 #ifndef OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 #define OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 
-#include <concealer/execute.hpp>
 #include <deque>
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_preprocessor_msgs/srv/check_derivative_remained.hpp>
-#include <openscenario_preprocessor_msgs/srv/derive.hpp>
-#include <openscenario_preprocessor_msgs/srv/load.hpp>
-#include <rclcpp/rclcpp.hpp>
+#include <openscenario_utility/xml_validator.hpp>
 
 namespace openscenario_preprocessor
 {
@@ -30,20 +26,9 @@ struct ScenarioSet
 {
   ScenarioSet() = default;
 
-  explicit ScenarioSet(openscenario_preprocessor_msgs::srv::Load::Request & load_request)
+  explicit ScenarioSet(std::string path, int expect, float frame_rate)
+  : path(path), expect(expect), frame_rate(frame_rate)
   {
-    path = load_request.path;
-    expect = load_request.expect;
-    frame_rate = load_request.frame_rate;
-  }
-
-  auto getDeriveResponse() -> openscenario_preprocessor_msgs::srv::Derive::Response
-  {
-    openscenario_preprocessor_msgs::srv::Derive::Response response;
-    response.path = path;
-    response.expect = expect;
-    response.frame_rate = frame_rate;
-    return response;
   }
 
   std::string path;
@@ -53,27 +38,25 @@ struct ScenarioSet
   float frame_rate;
 };
 
-class Preprocessor : public rclcpp::Node
+class Preprocessor
 {
 public:
-  explicit Preprocessor(const rclcpp::NodeOptions &);
+  explicit Preprocessor() : xml_validator("") {}
 
-private:
+protected:
   void preprocessScenario(ScenarioSet &);
 
-  [[nodiscard]] bool validateXOSC(const boost::filesystem::path &, bool);
-
-  rclcpp::Service<openscenario_preprocessor_msgs::srv::Load>::SharedPtr load_server;
-
-  rclcpp::Service<openscenario_preprocessor_msgs::srv::Derive>::SharedPtr derive_server;
-
-  rclcpp::Service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>::SharedPtr
-    check_server;
+  [[nodiscard]] bool validateXOSC(
+    const boost::filesystem::path & target_file, const boost::filesystem::path & xsd_file,
+    bool verbose = false);
 
   std::deque<ScenarioSet> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
+
+  openscenario_utility::XMLValidator xml_validator;
 };
+
 }  // namespace openscenario_preprocessor
 
 #endif  // OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_

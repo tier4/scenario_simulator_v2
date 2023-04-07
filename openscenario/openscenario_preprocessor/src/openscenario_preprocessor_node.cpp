@@ -12,16 +12,80 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <glog/logging.h>
+//#include <glog/logging.h>
 
 #include <cstdlib>
 #include <memory>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
+#include <openscenario_preprocessor_msgs/srv/check_derivative_remained.hpp>
+#include <openscenario_preprocessor_msgs/srv/derive.hpp>
+#include <openscenario_preprocessor_msgs/srv/load.hpp>
+#include <rclcpp/rclcpp.hpp>
+
+class PreprocessorNode : public rclcpp::Node, public openscenario_preprocessor::Preprocessor
+{
+public:
+  explicit PreprocessorNode(const rclcpp::NodeOptions & options)
+  : rclcpp::Node("preprocessor", options),
+    openscenario_preprocessor::Preprocessor(),
+    load_server(create_service<openscenario_preprocessor_msgs::srv::Load>(
+      "~/load",
+      [this](
+        const openscenario_preprocessor_msgs::srv::Load::Request::SharedPtr request,
+        openscenario_preprocessor_msgs::srv::Load::Response::SharedPtr response) -> void {
+        auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+        try {
+          auto s = openscenario_preprocessor::ScenarioSet(
+            request->path, request->expect, request->frame_rate);
+          preprocessScenario(s);
+          response->has_succeeded = true;
+          response->message = "success";
+        } catch (std::exception & e) {
+          response->has_succeeded = false;
+          response->message = e.what();
+          preprocessed_scenarios.clear();
+        }
+      })),
+    derive_server(create_service<openscenario_preprocessor_msgs::srv::Derive>(
+      "~/derive",
+      [this](
+        const openscenario_preprocessor_msgs::srv::Derive::Request::SharedPtr,
+        openscenario_preprocessor_msgs::srv::Derive::Response::SharedPtr response) -> void {
+        auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+        if (preprocessed_scenarios.empty()) {
+          response->path = "no output";
+        } else {
+          response->path = preprocessed_scenarios.front().path;
+          response->expect = preprocessed_scenarios.front().expect;
+          response->frame_rate = preprocessed_scenarios.front().frame_rate;
+          preprocessed_scenarios.pop_front();
+        }
+      })),
+    check_server(create_service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>(
+      "~/check",
+      [this](
+        const openscenario_preprocessor_msgs::srv::CheckDerivativeRemained::Request::SharedPtr,
+        openscenario_preprocessor_msgs::srv::CheckDerivativeRemained::Response::SharedPtr response)
+        -> void {
+        auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+        response->derivative_remained = not preprocessed_scenarios.empty();
+      }))
+  {
+  }
+
+private:
+  rclcpp::Service<openscenario_preprocessor_msgs::srv::Load>::SharedPtr load_server;
+
+  rclcpp::Service<openscenario_preprocessor_msgs::srv::Derive>::SharedPtr derive_server;
+
+  rclcpp::Service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>::SharedPtr
+    check_server;
+};
 
 int main(const int argc, char const * const * const argv)
 {
-  google::InitGoogleLogging(argv[0]);
-  google::InstallFailureSignalHandler();
+  //  google::InitGoogleLogging(argv[0]);
+  //  google::InstallFailureSignalHandler();
 
   rclcpp::init(argc, argv);
 
@@ -29,7 +93,7 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::NodeOptions options{};
 
-  auto node = std::make_shared<openscenario_preprocessor::Preprocessor>(options);
+  auto node = std::make_shared<PreprocessorNode>(options);
 
   executor.add_node((*node).get_node_base_interface());
 
