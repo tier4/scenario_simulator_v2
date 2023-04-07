@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<?xml-model href="OpenSCENARIO-1.2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<OpenSCENARIO>
+    <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
+    <ParameterValueDistribution>
+        <ScenarioFile filepath="/home/hans/Documents/sample.xosc"/>
+        <Deterministic>
+            <DeterministicMultiParameterDistribution>
+                <ValueSetDistribution>
+                    <ParameterValueSet>
+                        <ParameterAssignment parameterRef="LINE_ID" value="34564"/>
+                        <ParameterAssignment parameterRef="offset" value="1.0"/>
+                    </ParameterValueSet>
+                </ValueSetDistribution>
+            </DeterministicMultiParameterDistribution>
+        </Deterministic>
+    </ParameterValueDistribution>
+</OpenSCENARIO>
