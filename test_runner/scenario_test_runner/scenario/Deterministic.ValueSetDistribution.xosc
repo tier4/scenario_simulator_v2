@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
-<?xml-model href="OpenSCENARIO-1.2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <OpenSCENARIO>
     <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
     <ParameterValueDistribution>
-        <ScenarioFile filepath="/home/hans/Documents/sample.xosc"/>
+        <ScenarioFile filepath="$(ros2 pkg prefix --share scenario_test_runner)/scenario/sample.xosc"/>
         <Deterministic>
             <DeterministicMultiParameterDistribution>
                 <ValueSetDistribution>
