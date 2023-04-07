@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <vector>
@@ -31,21 +32,21 @@ FollowFrontEntityAction::FollowFrontEntityAction(
 {
 }
 
-const boost::optional<traffic_simulator_msgs::msg::Obstacle>
+const std::optional<traffic_simulator_msgs::msg::Obstacle>
 FollowFrontEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)
 {
   if (!distance_to_front_entity_) {
-    return boost::none;
+    return std::nullopt;
   }
-  if (distance_to_front_entity_.get() < 0) {
-    return boost::none;
+  if (distance_to_front_entity_.value() < 0) {
+    return std::nullopt;
   }
-  if (distance_to_front_entity_.get() > trajectory->getLength()) {
-    return boost::none;
+  if (distance_to_front_entity_.value() > trajectory->getLength()) {
+    return std::nullopt;
   }
   traffic_simulator_msgs::msg::Obstacle obstacle;
   obstacle.type = obstacle.ENTITY;
-  obstacle.s = distance_to_front_entity_.get();
+  obstacle.s = distance_to_front_entity_.value();
   return obstacle;
 }
 
@@ -96,26 +97,26 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   distance_to_front_entity_ =
-    getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.get());
+    getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.value());
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
   if (distance_to_conflicting_entity) {
-    if (distance_to_front_entity_.get() > distance_to_conflicting_entity.get()) {
+    if (distance_to_front_entity_.value() > distance_to_conflicting_entity.value()) {
       return BT::NodeStatus::FAILURE;
     }
   }
   if (distance_to_stopline) {
-    if (distance_to_front_entity_.get() > distance_to_stopline.get()) {
+    if (distance_to_front_entity_.value() > distance_to_stopline.value()) {
       return BT::NodeStatus::FAILURE;
     }
   }
-  auto front_entity_status = getEntityStatus(front_entity_name.get());
+  auto front_entity_status = getEntityStatus(front_entity_name.value());
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  if (target_speed.get() <= front_entity_status.action_status.twist.linear.x) {
-    auto entity_status_updated = calculateUpdatedEntityStatus(target_speed.get());
+  if (target_speed.value() <= front_entity_status.action_status.twist.linear.x) {
+    auto entity_status_updated = calculateUpdatedEntityStatus(target_speed.value());
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
@@ -123,7 +124,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   if (
-    distance_to_front_entity_.get() >=
+    distance_to_front_entity_.value() >=
     (calculateStopDistance(behavior_parameter.dynamic_constraints) +
      vehicle_parameters.bounding_box.dimensions.x + 5)) {
     auto entity_status_updated =
@@ -134,7 +135,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
   } else if (
-    distance_to_front_entity_.get() <=
+    distance_to_front_entity_.value() <=
     calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     auto entity_status_updated =
       calculateUpdatedEntityStatus(front_entity_status.action_status.twist.linear.x - 2);

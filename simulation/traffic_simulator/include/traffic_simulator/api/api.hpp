@@ -22,6 +22,7 @@
 #include <boost/variant.hpp>
 #include <cassert>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/conversions.hpp>
@@ -33,8 +34,6 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/metrics/metrics.hpp>
-#include <traffic_simulator/metrics/metrics_manager.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
@@ -69,29 +68,25 @@ public:
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getEntityPose(name); },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
-    metrics_manager_(configuration.metrics_log_path, configuration.verbose),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    zeromq_client_(simulation_interface::protocol, configuration.simulator_host)
+    zeromq_client_(
+      simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
-    metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(configuration.verbose);
   }
 
-  void closeZMQConnection() { zeromq_client_.closeConnection(); }
-
-  template <typename T, typename... Ts>
-  void addMetric(const std::string & name, Ts &&... xs)
+  template <typename Node>
+  int getZMQSocketPort(Node & node)
   {
-    metrics_manager_.addMetric<T>(name, std::forward<Ts>(xs)...);
+    if (!node.has_parameter("port")) node.declare_parameter("port", 5555);
+    return node.get_parameter("port").as_int();
   }
 
-  metrics::MetricLifecycle getMetricLifecycle(const std::string & name);
-
-  bool metricExists(const std::string & name);
+  void closeZMQConnection() { zeromq_client_.closeConnection(); }
 
   void setVerbose(const bool verbose);
 
@@ -210,7 +205,7 @@ public:
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
 
-  boost::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
+  std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
   bool reachPosition(
     const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance);
@@ -226,7 +221,8 @@ public:
 
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
   bool attachDetectionSensor(
-    const std::string &, double pos_noise_stddev, double probability_of_lost, int random_seed = 0);
+    const std::string &, double pos_noise_stddev, double probability_of_lost,
+    double object_recognition_delay, int random_seed = 0);
 
   bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
 
@@ -296,6 +292,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setBehaviorParameter);
@@ -318,8 +315,6 @@ private:
   const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
 
   const std::shared_ptr<traffic_simulator::traffic::TrafficController> traffic_controller_ptr_;
-
-  metrics::MetricsManager metrics_manager_;
 
   const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
 

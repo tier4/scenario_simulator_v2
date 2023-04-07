@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
 #include <memory>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>
@@ -54,7 +55,7 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
   const auto lanelet_pose = estimateLaneletPose(updated_status.pose);
   if (lanelet_pose) {
     updated_status.lanelet_pose_valid = true;
-    updated_status.lanelet_pose = lanelet_pose.get();
+    updated_status.lanelet_pose = lanelet_pose.value();
   } else {
     updated_status.lanelet_pose_valid = false;
     updated_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
@@ -63,9 +64,9 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
 }
 
 auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
   if (entity_status.lanelet_pose_valid) {
     lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status.lanelet_pose.lanelet_id, 1.0);
   } else {

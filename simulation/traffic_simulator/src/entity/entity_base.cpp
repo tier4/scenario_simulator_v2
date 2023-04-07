@@ -197,16 +197,16 @@ auto EntityBase::getEntityStatusBeforeUpdate() const
 
 auto EntityBase::getLinearJerk() const -> double { return getStatus().action_status.linear_jerk; }
 
-auto EntityBase::getLaneletPose() const -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+auto EntityBase::getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   if (status_.lanelet_pose_valid) {
     return status_.lanelet_pose;
   }
-  return boost::none;
+  return std::nullopt;
 }
 
 auto EntityBase::getLaneletPose(double matching_distance) const
-  -> boost::optional<traffic_simulator_msgs::msg::LaneletPose>
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getStatus().type.type) {
     return hdmap_utils_ptr_->toLaneletPose(
@@ -309,7 +309,7 @@ void EntityBase::requestLaneChange(
     reference_lanelet_id, target.direction, target.shift);
   if (lane_change_target_id) {
     requestLaneChange(
-      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.get(), target.offset),
+      traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);
   } else {
     THROW_SEMANTIC_ERROR(
@@ -587,7 +587,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cancel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      [this]() { target_speed_ = std::nullopt; }, job::Type::LINEAR_VELOCITY, true,
       job::Event::POST_UPDATE);
   }
 }
@@ -629,7 +629,7 @@ void EntityBase::requestSpeedChange(
       /**
        * @brief Cancel speed change request.
        */
-      [this]() { target_speed_ = boost::none; }, job::Type::LINEAR_VELOCITY, true,
+      [this]() { target_speed_ = std::nullopt; }, job::Type::LINEAR_VELOCITY, true,
       job::Event::POST_UPDATE);
   }
 }
@@ -662,7 +662,6 @@ void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
 {
   other_status_.clear();
-
   for (const auto & [other_name, other_status] : status) {
     if (other_name != name) {
       /*
@@ -674,7 +673,9 @@ void EntityBase::setOtherStatus(
       */
       // const auto p0 = other_status.pose.position;
       // const auto p1 = status_.pose.position;
-      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance < 30) {
+      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance <
+      // 30)
+      // {
       other_status_.emplace(other_name, other_status);
       // }
     }
@@ -719,6 +720,48 @@ void EntityBase::setTrafficLightManager(
   const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & traffic_light_manager)
 {
   traffic_light_manager_ = traffic_light_manager;
+}
+
+void EntityBase::activateOutOfRangeJob(
+  double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
+  double min_jerk, double max_jerk)
+{
+  /**
+   * @brief This value was determined heuristically rather than for
+   * technical reasons.
+   */
+  constexpr double tolerance = 0.01;
+  job_list_.append(
+    /**
+     * @brief Checking if the values of velocity, acceleration and jerk are within the acceptable
+     * range
+     */
+    [this, tolerance, max_velocity, min_velocity, min_acceleration, max_acceleration, min_jerk,
+     max_jerk](double) {
+      auto velocity_ = status_.action_status.twist.linear.x;
+      auto accel_ = status_.action_status.accel.linear.x;
+      auto jerk_ = status_.action_status.linear_jerk;
+      if (!(min_velocity <= velocity_ + tolerance && velocity_ - tolerance <= max_velocity)) {
+        THROW_SPECIFICATION_VIOLATION(
+          "Entity: ", name, " - current velocity (which is ", velocity_,
+          ") is out of range (which is [", min_velocity, ", ", max_velocity, "])");
+      }
+      if (!(min_acceleration <= accel_ + tolerance && accel_ - tolerance <= max_acceleration)) {
+        THROW_SPECIFICATION_VIOLATION(
+          "Entity: ", name, " - current acceleration (which is ", accel_,
+          ") is out of range (which is [", min_acceleration, ", ", max_acceleration, "])");
+      }
+      if (!(min_jerk <= jerk_ + tolerance && jerk_ - tolerance <= max_jerk)) {
+        THROW_SPECIFICATION_VIOLATION(
+          "Entity: ", name, " - current jerk (which is ", jerk_, ") is out of range (which is [",
+          min_jerk, ", ", max_jerk, "])");
+      }
+      return false;
+    },
+    /**
+     * @brief This job is always ACTIVE
+     */
+    [this]() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
 }
 
 auto EntityBase::setVelocityLimit(double) -> void {}

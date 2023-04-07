@@ -15,10 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__HDMAP_UTILS__CACHE_HPP_
 #define TRAFFIC_SIMULATOR__HDMAP_UTILS__CACHE_HPP_
 
-#include <boost/optional.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <mutex>
+#include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <unordered_map>
 #include <vector>

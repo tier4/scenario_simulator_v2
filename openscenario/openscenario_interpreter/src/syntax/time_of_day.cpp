@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__METRICS__METRICS_HPP_
-#define TRAFFIC_SIMULATOR__METRICS__METRICS_HPP_
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/time_of_day.hpp>
 
-#include <traffic_simulator/metrics/metric_base.hpp>
-#include <traffic_simulator/metrics/momentary_stop_metric.hpp>
-#include <traffic_simulator/metrics/out_of_range_metric.hpp>
-#include <traffic_simulator/metrics/reaction_time_metric.hpp>
-
-#endif  // TRAFFIC_SIMULATOR__METRICS__METRICS_HPP_
+namespace openscenario_interpreter
+{
+inline namespace syntax
+{
+TimeOfDay::TimeOfDay(const pugi::xml_node & node, Scope & scope)
+: animation(readAttribute<Boolean>("animation", node, scope)),
+  date_time(readAttribute<String>("dateTime", node, scope))
+{
+}
+}  // namespace syntax
+}  // namespace openscenario_interpreter

@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__MISC_OBJECT_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__MISC_OBJECT_ENTITY_HPP_
 
+#include <optional>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator_msgs/msg/misc_object_parameters.hpp>
 
@@ -46,9 +47,9 @@ public:
 
   std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override { return {}; }
 
-  boost::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
+  std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
-    return boost::none;
+    return std::nullopt;
   }
 
   auto getRouteLanelets(const double) -> std::vector<std::int64_t> override

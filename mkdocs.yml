@@ -55,10 +55,10 @@ nav:
   - Home: README.md
   - Release Note: ReleaseNotes.md
   - User Guide:
-      - Quick Start : user_guide/QuickStart.md
-      - Build Instructions : user_guide/BuildInstructions.md
-      - Run on Docker : user_guide/RunWithDocker.md
-      - Scenario Writing Tips : user_guide/ScenarioTips.md
+      - Quick Start: user_guide/QuickStart.md
+      - Build Instructions: user_guide/BuildInstructions.md
+      - Run on Docker: user_guide/RunWithDocker.md
+      - Scenario Writing Tips: user_guide/ScenarioTips.md
       - Scenario Editor:
           - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
           - user_guide/scenario_editor/CreateSimpleScenario.md
@@ -75,15 +75,15 @@ nav:
       - developer_guide/AutowareAPI.md
       - developer_guide/NPCBehavior.md
       - developer_guide/BehaviorPlugin.md
-#      - developer_guide/ErrorCategories.md
+      #      - developer_guide/ErrorCategories.md
       - developer_guide/OpenSCENARIOSupport.md
       - developer_guide/SimpleSensorSimulator.md
       - developer_guide/SystemArchitecture.md
       - developer_guide/TrafficSimulator.md
       - developer_guide/ZeroMQ.md
-      - developer_guide/Metrics.md
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
+# cspell: ignore TIERIV
       - developer_guide/TIERIVScenarioFormatVersion2.md
       - developer_guide/CONTRIBUTING.md
       - developer_guide/Communication.md

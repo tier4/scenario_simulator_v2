@@ -16,6 +16,7 @@
 
 #include <limits>
 #include <memory>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
@@ -24,18 +25,7 @@
 
 namespace traffic_simulator
 {
-metrics::MetricLifecycle API::getMetricLifecycle(const std::string & name)
-{
-  return metrics_manager_.getLifecycle(name);
-}
-
-bool API::metricExists(const std::string & name) { return metrics_manager_.exists(name); }
-
-void API::setVerbose(const bool verbose)
-{
-  metrics_manager_.setVerbose(verbose);
-  entity_manager_ptr_->setVerbose(verbose);
-}
+void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbose); }
 
 bool API::despawn(const std::string & name)
 {
@@ -96,18 +86,18 @@ auto API::setEntityStatus(
   status.action_status = action_status;
   if (lanelet_pose) {
     status.lanelet_pose_valid = true;
-    status.lanelet_pose = lanelet_pose.get();
+    status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
   }
   entity_manager_ptr_->setEntityStatus(name, status);
 }
 
-boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
+std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
 {
   geometry_msgs::msg::Pose pose = getRelativePose(from, to);
   if (pose.position.x > 0) {
-    return boost::none;
+    return std::nullopt;
   }
   traffic_simulator_msgs::msg::EntityStatus to_status = getEntityStatus(to);
   double ret = (pose.position.x * -1) / (to_status.action_status.twist.linear.x);
@@ -165,7 +155,7 @@ auto API::setEntityStatus(
     map_pose, entity_manager_ptr_->getEntityStatus(name).bounding_box, false);
   traffic_simulator_msgs::msg::EntityStatus status;
   if (lanelet_pose) {
-    status.lanelet_pose = lanelet_pose.get();
+    status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
   }
@@ -214,11 +204,11 @@ bool API::attachDetectionSensor(
 
 bool API::attachDetectionSensor(
   const std::string & entity_name, double pos_noise_stddev, double probability_of_lost,
-  int random_seed)
+  double object_recognition_delay, int random_seed)
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
     entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1, 300, false,
-    pos_noise_stddev, random_seed, probability_of_lost));
+    pos_noise_stddev, random_seed, probability_of_lost, object_recognition_delay));
 }
 
 bool API::attachOccupancyGridSensor(
@@ -317,7 +307,7 @@ bool API::updateEntityStatusInSim()
       pose, entity_manager_ptr_->getEntityStatus(status.name()).bounding_box, false);
     if (lanelet_pose) {
       status_msg.lanelet_pose_valid = true;
-      status_msg.lanelet_pose = lanelet_pose.get();
+      status_msg.lanelet_pose = lanelet_pose.value();
     } else {
       status_msg.lanelet_pose_valid = false;
       status_msg.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
@@ -331,7 +321,7 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
-  boost::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = boost::none;
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = std::nullopt;
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
@@ -349,7 +339,6 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    metrics_manager_.calculate();
     if (!updateEntityStatusInSim()) {
       return false;
     }
@@ -360,7 +349,6 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    metrics_manager_.calculate();
     return true;
   }
 }

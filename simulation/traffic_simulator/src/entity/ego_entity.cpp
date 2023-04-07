@@ -17,6 +17,7 @@
 #include <boost/lexical_cast.hpp>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <system_error>
 #include <thread>
@@ -202,20 +203,21 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
       if (previous_angular_velocity_) {
         accel.linear.x = vehicle_model_ptr_->getAx();
         accel.angular.z =
-          (vehicle_model_ptr_->getWz() - previous_angular_velocity_.get()) / step_time;
+          (vehicle_model_ptr_->getWz() - previous_angular_velocity_.value()) / step_time;
       }
       return accel;
     }();
 
-    const auto route_lanelets = getRouteLanelets();
+    const auto unique_route_lanelets =
+      traffic_simulator::helper::getUniqueValues(getRouteLanelets());
 
-    boost::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+    std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
-    if (route_lanelets.empty()) {
+    if (unique_route_lanelets.empty()) {
       lanelet_pose =
         hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
     } else {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, route_lanelets, 1.0);
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
       if (!lanelet_pose) {
         lanelet_pose =
           hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
@@ -226,13 +228,13 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
       math::geometry::CatmullRomSpline spline(
         hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
       if (const auto s_value = spline.getSValue(status.pose)) {
-        status.pose.position.z = spline.getPoint(s_value.get()).z;
+        status.pose.position.z = spline.getPoint(s_value.value()).z;
       }
     }
 
     status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
     if (status.lanelet_pose_valid) {
-      status.lanelet_pose = lanelet_pose.get();
+      status.lanelet_pose = lanelet_pose.value();
     }
   }
 
@@ -245,9 +247,9 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle>
+auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  return boost::none;
+  return std::nullopt;
 }
 
 auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
@@ -258,7 +260,6 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
     for (const auto & point : universe->getPathWithLaneId().points) {
       std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
     }
-    ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
   }
 
   return ids;
@@ -274,15 +275,15 @@ auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
     quaternion_operation::getRotationMatrix(initial_pose_->orientation) * relative_position;
 
   geometry_msgs::msg::Pose current_pose;
-  current_pose.position.x = initial_pose_.get().position.x + relative_position(0);
-  current_pose.position.y = initial_pose_.get().position.y + relative_position(1);
-  current_pose.position.z = initial_pose_.get().position.z + relative_position(2);
+  current_pose.position.x = initial_pose_.value().position.x + relative_position(0);
+  current_pose.position.y = initial_pose_.value().position.y + relative_position(1);
+  current_pose.position.z = initial_pose_.value().position.z + relative_position(2);
   current_pose.orientation = [this]() {
     geometry_msgs::msg::Vector3 rpy;
     rpy.x = 0;
     rpy.y = 0;
     rpy.z = vehicle_model_ptr_->getYaw();
-    return initial_pose_.get().orientation *
+    return initial_pose_.value().orientation *
            quaternion_operation::convertEulerAngleToQuaternion(rpy);
   }();
 
@@ -342,7 +343,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   auto entity_status = getEntityStatus(current_time + step_time, step_time);
   if (previous_linear_velocity_) {
     entity_status.action_status.linear_jerk =
-      (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
+      (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time;
   } else {
     entity_status.action_status.linear_jerk = 0;
   }
