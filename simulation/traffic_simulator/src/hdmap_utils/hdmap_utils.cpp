@@ -1398,29 +1398,23 @@ std::optional<double> HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to) const
 {
-  return getLongitudinalDistance(from.lanelet_id, from.s, to.lanelet_id, to.s);
-}
-
-std::optional<double> HdMapUtils::getLongitudinalDistance(
-  std::int64_t from_lanelet_id, double from_s, std::int64_t to_lanelet_id, double to_s) const
-{
-  if (from_lanelet_id == to_lanelet_id) {
-    if (from_s > to_s) {
+  if (from.lanelet_id == to.lanelet_id) {
+    if (from.s > to.s) {
       return std::nullopt;
     } else {
-      return to_s - from_s;
+      return to.s - from.s;
     }
   }
-  const auto route = getRoute(from_lanelet_id, to_lanelet_id);
+  const auto route = getRoute(from.lanelet_id, to.lanelet_id);
   if (route.empty()) {
     return std::nullopt;
   }
   double distance = 0;
   for (const auto lanelet_id : route) {
-    if (lanelet_id == from_lanelet_id) {
-      distance = getLaneletLength(from_lanelet_id) - from_s;
-    } else if (lanelet_id == to_lanelet_id) {
-      distance = distance + to_s;
+    if (lanelet_id == from.lanelet_id) {
+      distance = getLaneletLength(from.lanelet_id) - from.s;
+    } else if (lanelet_id == to.lanelet_id) {
+      distance = distance + to.s;
     } else {
       distance = distance + getLaneletLength(lanelet_id);
     }
@@ -1713,7 +1707,7 @@ std::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   const std::vector<geometry_msgs::msg::Point> & waypoints) const
 {
   auto traffic_light_ids = getTrafficLightIdsOnPath(route_lanelets);
-  if (traffic_light_ids.size() == 0) {
+  if (traffic_light_ids.empty()) {
     return std::nullopt;
   }
   std::set<double> collision_points;
@@ -1734,7 +1728,7 @@ std::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   const math::geometry::CatmullRomSplineInterface & spline) const
 {
   auto traffic_light_ids = getTrafficLightIdsOnPath(route_lanelets);
-  if (traffic_light_ids.size() == 0) {
+  if (traffic_light_ids.empty()) {
     return std::nullopt;
   }
   std::set<double> collision_points;

@@ -24,6 +24,7 @@
 #include <set>
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -112,8 +113,8 @@ auto ActionNode::getYieldStopDistance(const std::vector<std::int64_t> & followin
       const auto other_status = getOtherEntityStatus(right_of_way_id);
       if (!other_status.empty() && entity_status->laneMatchingSucceed()) {
         const auto lanelet_pose = entity_status->getLaneletPose();
-        auto distance =
-          hdmap_utils->getLongitudinalDistance(lanelet_pose.lanelet_id, lanelet_pose.s, lanelet, 0);
+        auto distance = hdmap_utils->getLongitudinalDistance(
+          lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
         if (distance) {
           distances.insert(distance.value());
         }

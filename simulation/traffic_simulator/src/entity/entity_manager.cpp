@@ -461,7 +461,6 @@ bool EntityManager::isEgoSpawned() const
 bool EntityManager::isInLanelet(
   const std::string & name, const std::int64_t lanelet_id, const double tolerance)
 {
-  double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
   const auto status = static_cast<EntityStatus>(getEntityStatus(name));
 
   if (not status.lanelet_pose_valid) {
@@ -471,9 +470,10 @@ bool EntityManager::isInLanelet(
     return true;
   } else {
     auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(
-      lanelet_id, l, status.lanelet_pose.lanelet_id, status.lanelet_pose.s);
+      helper::constructLaneletPose(lanelet_id, hdmap_utils_ptr_->getLaneletLength(lanelet_id)),
+      status.lanelet_pose);
     auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(
-      status.lanelet_pose.lanelet_id, status.lanelet_pose.s, lanelet_id, 0);
+      status.lanelet_pose, helper::constructLaneletPose(lanelet_id, 0));
     if (dist0 and dist0.value() < tolerance) {
       return true;
     }

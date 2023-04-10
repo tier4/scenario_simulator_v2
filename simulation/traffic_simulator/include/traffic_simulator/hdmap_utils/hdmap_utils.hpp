@@ -136,8 +136,6 @@ public:
   std::optional<double> getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
     const traffic_simulator_msgs::msg::LaneletPose & to) const;
-  std::optional<double> getLongitudinalDistance(
-    std::int64_t from_lanelet_id, double from_s, std::int64_t to_lanelet_id, double to_s) const;
   double getSpeedLimit(const std::vector<std::int64_t> & lanelet_ids) const;
   bool isInRoute(std::int64_t lanelet_id, const std::vector<std::int64_t> & route) const;
   std::vector<std::int64_t> getFollowingLanelets(
