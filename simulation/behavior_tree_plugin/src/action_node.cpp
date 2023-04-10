@@ -400,7 +400,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
   const auto canonicalized = hdmap_utils->canonicalizeLaneletPose(lanelet_pose, route_lanelets);
   if (
     const auto canonicalized_lanelet_pose =
-      std::get<std::optional<traffic_simulator_msgs::msg::LaneletPose>>(canonicalized)) {
+      std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
     // If canonicalize succeed, set canonicalized pose and set other values.
     traffic_simulator::EntityStatus entity_status_updated;
     {
@@ -416,7 +416,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
     // If canonicalize failed, set end of road lanelet pose.
     if (const auto end_of_road_lanelet_id = std::get<std::optional<std::int64_t>>(canonicalized)) {
       if (lanelet_pose.s < 0) {
-        traffic_simulator_msgs::msg::LaneletPose end_of_road_lanelet_pose;
+        traffic_simulator::LaneletPose end_of_road_lanelet_pose;
         {
           end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
           end_of_road_lanelet_pose.s = 0;
@@ -434,7 +434,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
         }
         return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
       } else {
-        traffic_simulator_msgs::msg::LaneletPose end_of_road_lanelet_pose;
+        traffic_simulator::LaneletPose end_of_road_lanelet_pose;
         {
           end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
           end_of_road_lanelet_pose.s =
