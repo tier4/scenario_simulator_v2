@@ -103,8 +103,7 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t
 {
   if (status_.laneMatchingSucceed()) {
     return route_planner_.getRouteLanelets(
-      CanonicalizedLaneletPose(static_cast<EntityStatus>(status_).lanelet_pose, hdmap_utils_ptr_),
-      horizon);
+      CanonicalizedLaneletPose(status_.getLaneletPose(), hdmap_utils_ptr_), horizon);
   } else {
     return {};
   }
