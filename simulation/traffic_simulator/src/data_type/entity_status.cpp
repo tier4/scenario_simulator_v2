@@ -117,4 +117,14 @@ auto CanonicalizedEntityStatus::getLinearJerk() const noexcept -> double
 
 auto CanonicalizedEntityStatus::getTime() const noexcept -> double { return entity_status_.time; }
 }  // namespace entity_status
+
+bool isSameLaneletId(const CanonicalizedEntityStatus & s0, const CanonicalizedEntityStatus & s1)
+{
+  return s0.getLaneletPose().lanelet_id == s1.getLaneletPose().lanelet_id;
+}
+
+bool isSameLaneletId(const CanonicalizedEntityStatus & s, std::int64_t lanelet_id)
+{
+  return s.getLaneletPose().lanelet_id == lanelet_id;
+}
 }  // namespace traffic_simulator

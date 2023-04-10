@@ -21,7 +21,7 @@ namespace traffic_simulator
 {
 using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
-namespace lanelet_pose
+inline namespace lanelet_pose
 {
 class CanonicalizedLaneletPose
 {
@@ -68,11 +68,11 @@ private:
   const LaneletPose lanelet_pose_;
   const geometry_msgs::msg::Pose map_pose_;
 };
-
-bool isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &);
 }  // namespace lanelet_pose
 
-using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;
+bool isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &);
+bool isSameLaneletId(const CanonicalizedLaneletPose &, std::int64_t lanelet_id);
+
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_

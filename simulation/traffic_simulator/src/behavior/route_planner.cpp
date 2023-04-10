@@ -65,7 +65,7 @@ void RoutePlanner::cancelWaypoint(const CanonicalizedLaneletPose & entity_lanele
       cancelRoute();
       break;
     }
-    if (lanelet_pose::isSameLaneletId(waypoint_queue_.front(), entity_lanelet_pose)) {
+    if (isSameLaneletId(waypoint_queue_.front(), entity_lanelet_pose)) {
       waypoint_queue_.pop_front();
       continue;
     } else {

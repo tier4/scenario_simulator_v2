@@ -23,7 +23,7 @@ namespace traffic_simulator
 {
 using EntityStatus = traffic_simulator_msgs::msg::EntityStatus;
 
-namespace entity_status
+inline namespace entity_status
 {
 class CanonicalizedEntityStatus
 {
@@ -66,7 +66,8 @@ private:
 };
 }  // namespace entity_status
 
-using CanonicalizedEntityStatus = entity_status::CanonicalizedEntityStatus;
+bool isSameLaneletId(const CanonicalizedEntityStatus &, const CanonicalizedEntityStatus &);
+bool isSameLaneletId(const CanonicalizedEntityStatus &, std::int64_t lanelet_id);
 
 }  // namespace traffic_simulator
 

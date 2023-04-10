@@ -76,10 +76,17 @@ auto CanonicalizedLaneletPose::canonicalize(
       ") is invalid, please check lanelet length, connection and entity route.");
   }
 }
-
-bool isSameLaneletId(const CanonicalizedLaneletPose & p0, const CanonicalizedLaneletPose & p1)
-{
-  return static_cast<LaneletPose>(p0).lanelet_id && static_cast<LaneletPose>(p1).lanelet_id;
-}
 }  // namespace lanelet_pose
+
+bool isSameLaneletId(
+  const lanelet_pose::CanonicalizedLaneletPose & p0,
+  const lanelet_pose::CanonicalizedLaneletPose & p1)
+{
+  return static_cast<LaneletPose>(p0).lanelet_id == static_cast<LaneletPose>(p1).lanelet_id;
+}
+
+bool isSameLaneletId(const lanelet_pose::CanonicalizedLaneletPose & p, std::int64_t lanelet_id)
+{
+  return static_cast<LaneletPose>(p).lanelet_id == lanelet_id;
+}
 }  // namespace traffic_simulator
