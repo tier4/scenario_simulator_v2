@@ -14,6 +14,7 @@
 
 //#include <glog/logging.h>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cstdlib>
 #include <memory>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
@@ -25,7 +26,7 @@
 class PreprocessorNode : public rclcpp::Node, public openscenario_preprocessor::Preprocessor
 {
 public:
-  explicit PreprocessorNode(const rclcpp::NodeOptions & options)
+  explicit PreprocessorNode(const rclcpp::NodeOptions & options, const std::string xsd_path)
   : rclcpp::Node("preprocessor", options),
     openscenario_preprocessor::Preprocessor(),
     load_server(create_service<openscenario_preprocessor_msgs::srv::Load>(
@@ -93,7 +94,10 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::NodeOptions options{};
 
-  auto node = std::make_shared<PreprocessorNode>(options);
+  std::string xsd_path = ament_index_cpp::get_package_share_directory("openscenario_utility") +
+                         "/../lib/openscenario_utility/resources/OpenSCENARIO-1.2.xsd";
+
+  auto node = std::make_shared<PreprocessorNode>(options, xsd_path);
 
   executor.add_node((*node).get_node_base_interface());
 

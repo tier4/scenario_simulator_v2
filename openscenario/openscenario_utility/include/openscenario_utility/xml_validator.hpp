@@ -28,11 +28,10 @@ namespace openscenario_utility
 class XMLValidator
 {
 public:
-  explicit XMLValidator(boost::filesystem::path xsd_file = boost::filesystem::path(""))
+  explicit XMLValidator(boost::filesystem::path xsd_file) : xsd_file(xsd_file)
   {
     // Initialize Xerces library
     xercesc::XMLPlatformUtils::Initialize();
-    setXSDFile(xsd_file);
   }
 
   ~XMLValidator()
@@ -41,7 +40,6 @@ public:
     xercesc::XMLPlatformUtils::Terminate();
   }
 
-  void setXSDFile(boost::filesystem::path xsd_file) { this->xsd_file = xsd_file; }
 
   [[nodiscard]] bool validate(const boost::filesystem::path & xml_file) noexcept
   {
@@ -55,7 +53,7 @@ public:
       // Set the validation scheme
       xercesc::ErrorHandler * error_handler = new xercesc::HandlerBase();
       parser.setErrorHandler(error_handler);
-      parser.setValidationScheme(xercesc::XercesDOMParser::Val_Always);
+      parser.setValidationScheme(xercesc::XercesDOMParser::Val_Auto);
       parser.setDoNamespaces(true);
       parser.setDoSchema(true);
       parser.setValidationConstraintFatal(true);
@@ -66,7 +64,6 @@ public:
       int error_count = parser.getErrorCount();
       delete error_handler;
       return error_count == 0;
-
     } catch (const xercesc::XMLException & ex) {
       std::cerr << "Error: " << ex.getMessage() << std::endl;
       return false;
