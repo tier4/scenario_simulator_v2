@@ -449,7 +449,7 @@ std::optional<std::int64_t> HdMapUtils::matchToLane(
   std::vector<std::pair<std::int64_t, double>> id_and_distance;
   for (const auto & match : matches) {
     /**
-     * @brief Hard coded parameter. Matching threshold for lanelet.
+     * @note Hard coded parameter. Matching threshold for lanelet.
      */
     if (match.distance <= 1.0) {
       auto lanelet_pose = toLaneletPose(pose, match.lanelet.id());

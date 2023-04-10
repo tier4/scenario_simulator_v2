@@ -69,12 +69,25 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
 {
   std::optional<traffic_simulator::LaneletPose> lanelet_pose;
   if (entity_status->laneMatchingSucceed()) {
+    /**
+     * @note Hard coded parameter. 1.0 is a matching threshold for lanelet. 
+     * In this branch, try to matching pedestrian entity to specified lanelet_id.
+    */
     lanelet_pose =
       hdmap_utils->toLaneletPose(pose, entity_status->getLaneletPose().lanelet_id, 1.0);
   } else {
+    /**
+     * @note In this branch, try to matching pedestrian entity considering bounding box.
+     * true means considering crosswalk.
+    */
     lanelet_pose = hdmap_utils->toLaneletPose(pose, getBoundingBox(), true);
   }
   if (!lanelet_pose) {
+    /**
+     * @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
+     * true means considering crosswalk.
+     * In this branch, the algorithum only consider entty pose. 
+    */
     lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);
   }
   if (lanelet_pose) {
