@@ -340,15 +340,17 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
     if (on_traj) {
       if (rest_distance < l) {
         for (double s_val = 0; s_val < rest_distance; s_val = s_val + 1.0) {
-          auto map_pose = toMapPose(*id_itr, s_val, 0);
-          ret.emplace_back(map_pose.pose.position);
+          ret.emplace_back(
+            toMapPose(traffic_simulator::helper::constructLaneletPose(*id_itr, s_val, 0))
+              .pose.position);
         }
         break;
       } else {
         rest_distance = rest_distance - l;
         for (double s_val = 0; s_val < l; s_val = s_val + 1.0) {
-          auto map_pose = toMapPose(*id_itr, s_val, 0);
-          ret.emplace_back(map_pose.pose.position);
+          ret.emplace_back(
+            toMapPose(traffic_simulator::helper::constructLaneletPose(*id_itr, s_val, 0.0))
+              .pose.position);
         }
         continue;
       }
@@ -357,15 +359,17 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
       on_traj = true;
       if ((s + forward_distance) < l) {
         for (double s_val = s; s_val < s + forward_distance; s_val = s_val + 1.0) {
-          auto map_pose = toMapPose(lanelet_id, s_val, 0);
-          ret.emplace_back(map_pose.pose.position);
+          ret.emplace_back(
+            toMapPose(traffic_simulator::helper::constructLaneletPose(lanelet_id, s_val, 0.0))
+              .pose.position);
         }
         break;
       } else {
         rest_distance = rest_distance - (l - s);
         for (double s_val = s; s_val < l; s_val = s_val + 1.0) {
-          auto map_pose = toMapPose(lanelet_id, s_val, 0);
-          ret.emplace_back(map_pose.pose.position);
+          ret.emplace_back(
+            toMapPose(traffic_simulator::helper::constructLaneletPose(lanelet_id, s_val, 0.0))
+              .pose.position);
         }
         continue;
       }
@@ -1185,10 +1189,14 @@ std::optional<std::pair<math::geometry::HermiteCurve, double>> HdMapUtils::getLa
       break;
   }
   const auto along_pose = getAlongLaneletPose(from_pose, longitudinal_distance);
-  const auto left_point =
-    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset + 5.0).pose.position;
+  // clang-format off
+  const auto left_point = 
+    toMapPose(traffic_simulator::helper::constructLaneletPose(
+      along_pose.lanelet_id, along_pose.s, along_pose.offset + 5.0)).pose.position;
   const auto right_point =
-    toMapPose(along_pose.lanelet_id, along_pose.s, along_pose.offset - 5.0).pose.position;
+    toMapPose(traffic_simulator::helper::constructLaneletPose(
+      along_pose.lanelet_id, along_pose.s, along_pose.offset - 5.0)).pose.position;
+  // clang-format on
   const auto collision_point = getCenterPointsSpline(lane_change_parameter.target.lanelet_id)
                                  ->getCollisionPointIn2D(left_point, right_point);
   if (!collision_point) {
@@ -1221,7 +1229,8 @@ std::optional<std::pair<math::geometry::HermiteCurve, double>> HdMapUtils::getLa
   std::vector<math::geometry::HermiteCurve> curves;
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
-    auto goal_pose = toMapPose(lane_change_parameter.target.lanelet_id, to_s, 0);
+    auto goal_pose = toMapPose(traffic_simulator::helper::constructLaneletPose(
+      lane_change_parameter.target.lanelet_id, to_s));
     if (
       math::geometry::getRelativePose(from_pose, goal_pose.pose).position.x <=
       forward_distance_threshold) {
@@ -1259,8 +1268,7 @@ math::geometry::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
 {
   geometry_msgs::msg::Vector3 start_vec;
   geometry_msgs::msg::Vector3 to_vec;
-  geometry_msgs::msg::Pose goal_pose =
-    toMapPose(to_pose.lanelet_id, to_pose.s, to_pose.offset).pose;
+  geometry_msgs::msg::Pose goal_pose = toMapPose(to_pose).pose;
   switch (trajectory_shape) {
     case traffic_simulator::lane_change::TrajectoryShape::CUBIC:
       start_vec = getVectorFromPose(from_pose, tangent_vector_size);
@@ -1324,50 +1332,32 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::toMapPoints(
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
-  std::int64_t lanelet_id, double s, double offset,
-  const geometry_msgs::msg::Quaternion & quat) const
-{
-  geometry_msgs::msg::PoseStamped ret;
-  ret.header.frame_id = "map";
-  const auto spline = getCenterPointsSpline(lanelet_id);
-  ret.pose = spline->getPose(s);
-  const auto normal_vec = spline->getNormalVector(s);
-  const auto diff = math::geometry::normalize(normal_vec) * offset;
-  ret.pose.position = ret.pose.position + diff;
-  const auto tangent_vec = spline->getTangentVector(s);
-  geometry_msgs::msg::Vector3 rpy;
-  rpy.x = 0.0;
-  rpy.y = 0.0;
-  rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
-  ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy) * quat;
-  return ret;
-}
-
-geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
 {
   if (
     const auto pose = std::get<std::optional<traffic_simulator_msgs::msg::LaneletPose>>(
       canonicalizeLaneletPose(lanelet_pose))) {
-    return toMapPose(
-      pose->lanelet_id, pose->s, pose->offset,
-      quaternion_operation::convertEulerAngleToQuaternion(pose->rpy));
+    geometry_msgs::msg::PoseStamped ret;
+    ret.header.frame_id = "map";
+    const auto spline = getCenterPointsSpline(pose->lanelet_id);
+    ret.pose = spline->getPose(pose->s);
+    const auto normal_vec = spline->getNormalVector(pose->s);
+    const auto diff = math::geometry::normalize(normal_vec) * pose->offset;
+    ret.pose.position = ret.pose.position + diff;
+    const auto tangent_vec = spline->getTangentVector(pose->s);
+    geometry_msgs::msg::Vector3 rpy;
+    rpy.x = 0.0;
+    rpy.y = 0.0;
+    rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
+    ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy) *
+                           quaternion_operation::convertEulerAngleToQuaternion(pose->rpy);
+    return ret;
   } else {
     THROW_SEMANTIC_ERROR(
       "Lanelet pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
       ",offset=", lanelet_pose.offset, ",rpy.x=", lanelet_pose.rpy.x, ",rpy.y=", lanelet_pose.rpy.y,
       ",rpy.z=", lanelet_pose.rpy.z, ") is invalid, please check lanelet length and connection.");
   }
-}
-
-geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
-  std::int64_t lanelet_id, double s, double offset) const
-{
-  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
-  lanelet_pose.lanelet_id = lanelet_id;
-  lanelet_pose.s = s;
-  lanelet_pose.offset = offset;
-  return toMapPose(lanelet_pose);
 }
 
 std::optional<geometry_msgs::msg::Vector3> HdMapUtils::getTangentVector(
