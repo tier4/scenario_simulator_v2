@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <OpenSCENARIO>
     <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
     <ParameterValueDistribution>
@@ -7,7 +6,7 @@
             <DeterministicMultiParameterDistribution>
                 <ValueSetDistribution>
                     <ParameterValueSet>
-                        <ParameterAssignment parameterRef="LINE_ID" value="34564"/>
+                        <ParameterAssignment parameterRef="LANE_ID" value="34564"/>
                         <ParameterAssignment parameterRef="offset" value="1.0"/>
                     </ParameterValueSet>
                 </ValueSetDistribution>

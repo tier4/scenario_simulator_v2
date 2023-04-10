@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <OpenSCENARIO>
-    <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
+    <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="LANE_ID = [34510, 34513, 34564]" revMajor="0" revMinor="0"/>
     <ParameterValueDistribution>
         <ScenarioFile filepath="$(ros2 pkg prefix --share scenario_test_runner)/scenario/sample.xosc"/>
         <Deterministic>
