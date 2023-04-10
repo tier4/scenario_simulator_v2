@@ -188,9 +188,8 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
 
 auto EntityBase::getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
 {
-  const auto status = static_cast<EntityStatus>(getStatus());
   if (laneMatchingSucceed()) {
-    return CanonicalizedLaneletPose(status.lanelet_pose, hdmap_utils_ptr_);
+    return CanonicalizedLaneletPose(status_.getLaneletPose(), hdmap_utils_ptr_);
   }
   return std::nullopt;
 }
