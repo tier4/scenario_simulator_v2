@@ -265,8 +265,8 @@ bool API::updateEntityStatusInSim()
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
   for (const auto & status : res.status()) {
-    EntityStatus status_msg;
-    status_msg = static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(status.name()));
+    EntityStatus status_msg =
+      static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(status.name()));
     geometry_msgs::msg::Pose pose;
     simulation_interface::toMsg(status.pose(), pose);
     status_msg.pose = pose;
