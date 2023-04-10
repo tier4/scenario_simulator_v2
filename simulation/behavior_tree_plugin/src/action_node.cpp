@@ -110,7 +110,7 @@ auto ActionNode::getYieldStopDistance(const std::vector<std::int64_t> & followin
     const auto right_of_way_ids = hdmap_utils->getRightOfWayLaneletIds(lanelet);
     for (const auto right_of_way_id : right_of_way_ids) {
       const auto other_status = getOtherEntityStatus(right_of_way_id);
-      if (other_status.size() != 0 && entity_status->laneMatchingSucceed()) {
+      if (!other_status.empty() && entity_status->laneMatchingSucceed()) {
         const auto lanelet_pose = entity_status->getLaneletPose();
         auto distance =
           hdmap_utils->getLongitudinalDistance(lanelet_pose.lanelet_id, lanelet_pose.s, lanelet, 0);
