@@ -49,7 +49,9 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
               if (auto parameter_node =
                     parameter_declarations.find_child_by_attribute("name", name.c_str());
                   parameter_node) {
-                parameter_node.attribute("value").set_value(parameter.as<std::string>().c_str());
+                std::stringstream parameter_stringstream;
+                parameter_stringstream << value;
+                parameter_node.attribute("value").set_value(parameter_stringstream.str().c_str());
               } else {
                 std::cout << "Parameter " << name << " not found in base scenario" << std::endl;
               }
@@ -57,6 +59,7 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
 
             ScenarioSet derived_scenario = scenario;
 
+            // generate new scenario file name
             boost::filesystem::path derived_scenario_path(derived_scenario.path);
             derived_scenario_path = output_directory / derived_scenario_path.filename();
             derived_scenario_path.replace_extension(
