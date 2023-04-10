@@ -129,7 +129,7 @@ bool isSameLaneletId(const CanonicalizedEntityStatus & s0, const CanonicalizedEn
   return s0.getLaneletPose().lanelet_id == s1.getLaneletPose().lanelet_id;
 }
 
-bool isSameLaneletId(const CanonicalizedEntityStatus & s, const std::int64_t & lanelet_id)
+bool isSameLaneletId(const CanonicalizedEntityStatus & s, const std::int64_t lanelet_id)
 {
   return s.getLaneletPose().lanelet_id == lanelet_id;
 }

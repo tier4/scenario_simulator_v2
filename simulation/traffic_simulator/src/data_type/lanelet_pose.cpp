@@ -85,7 +85,8 @@ bool isSameLaneletId(
   return static_cast<LaneletPose>(p0).lanelet_id == static_cast<LaneletPose>(p1).lanelet_id;
 }
 
-bool isSameLaneletId(const lanelet_pose::CanonicalizedLaneletPose & p, std::int64_t lanelet_id)
+bool isSameLaneletId(
+  const lanelet_pose::CanonicalizedLaneletPose & p, const std::int64_t lanelet_id)
 {
   return static_cast<LaneletPose>(p).lanelet_id == lanelet_id;
 }

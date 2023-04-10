@@ -68,7 +68,7 @@ private:
 }  // namespace entity_status
 
 bool isSameLaneletId(const CanonicalizedEntityStatus &, const CanonicalizedEntityStatus &);
-bool isSameLaneletId(const CanonicalizedEntityStatus &, const std::int64_t & lanelet_id);
+bool isSameLaneletId(const CanonicalizedEntityStatus &, const std::int64_t lanelet_id);
 
 }  // namespace traffic_simulator
 

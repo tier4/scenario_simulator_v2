@@ -71,7 +71,7 @@ private:
 }  // namespace lanelet_pose
 
 bool isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &);
-bool isSameLaneletId(const CanonicalizedLaneletPose &, std::int64_t lanelet_id);
+bool isSameLaneletId(const CanonicalizedLaneletPose &, const std::int64_t lanelet_id);
 
 }  // namespace traffic_simulator
 
