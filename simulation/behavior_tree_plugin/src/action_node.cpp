@@ -290,10 +290,9 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
 {
   if (status.laneMatchingSucceed()) {
     const auto polygon = math::geometry::transformPoints(
-      static_cast<traffic_simulator::EntityStatus>(status).pose,
-      math::geometry::getPointsFromBbox(
-        static_cast<traffic_simulator::EntityStatus>(status).bounding_box, width_extension_right,
-        width_extension_left, length_extension_front, length_extension_rear));
+      status.getMapPose(), math::geometry::getPointsFromBbox(
+                             status.getBoundingBox(), width_extension_right, width_extension_left,
+                             length_extension_front, length_extension_rear));
     return spline.getCollisionPointIn2D(polygon, false, true);
   }
   return std::nullopt;
@@ -507,11 +506,6 @@ auto ActionNode::calculateStopDistance(
     .getRunningDistance(
       0, constraints, entity_status->getTwist(), entity_status->getAccel(),
       entity_status->getLinearJerk());
-}
-
-auto ActionNode::getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox
-{
-  return static_cast<traffic_simulator::EntityStatus>(*entity_status).bounding_box;
 }
 
 auto ActionNode::getActionStatus() const noexcept -> traffic_simulator_msgs::msg::ActionStatus

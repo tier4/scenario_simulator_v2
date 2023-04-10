@@ -66,7 +66,6 @@ public:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
-  auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
   auto getActionStatus() const noexcept -> traffic_simulator_msgs::msg::ActionStatus;
   auto getEntityName() const noexcept -> std::string;
 

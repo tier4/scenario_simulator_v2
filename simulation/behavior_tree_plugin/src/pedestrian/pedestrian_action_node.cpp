@@ -80,7 +80,7 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
      * @note In this branch, try to matching pedestrian entity considering bounding box.
      * true means considering crosswalk.
     */
-    lanelet_pose = hdmap_utils->toLaneletPose(pose, getBoundingBox(), true);
+    lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status->getBoundingBox(), true);
   }
   if (!lanelet_pose) {
     /**

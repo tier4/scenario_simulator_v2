@@ -221,7 +221,7 @@ BT::NodeStatus LaneChangeAction::tick()
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
       traffic_simulator::EntityStatus entity_status_updated;
       entity_status_updated.pose = pose;
-      auto lanelet_pose = hdmap_utils->toLaneletPose(pose, getBoundingBox(), false);
+      auto lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status->getBoundingBox(), false);
       if (lanelet_pose) {
         entity_status_updated.lanelet_pose = lanelet_pose.value();
       } else {
