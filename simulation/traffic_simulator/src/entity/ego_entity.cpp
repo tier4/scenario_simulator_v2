@@ -214,11 +214,26 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
 
     std::optional<LaneletPose> lanelet_pose;
 
+    /**
+     * lanelet ids from Autoware route topic was assigned in unique_route_lanelets
+    */
     if (unique_route_lanelets.empty()) {
+      /**
+      * @note Hard coded parameter. 1.0 is a matching threshold for lanelet. 
+      * In this branch, try to matching ego entity considering bounding box.
+      */
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
     } else {
+      /**
+      * @note Hard coded parameter. 1.0 is a matching threshold for lanelet. 
+      * In this branch, try to matching ego entity to specified lanelet_ids from Autoware route topic.
+      */
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
       if (!lanelet_pose) {
+        /**
+        * @note Hard coded parameter. 1.0 is a matching threshold for lanelet. 
+        * In this branch, try to matching ego entity considering bounding box.
+        */
         lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
       }
     }
