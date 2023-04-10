@@ -26,8 +26,11 @@ inline namespace syntax
  */
 Stochastic::Stochastic(const pugi::xml_node & node, Scope & scope)
 : number_of_test_runs(readAttribute<UnsignedInt>("numberOfTestRuns", node, scope)),
-  random_seed(
-    scope.seed = static_cast<double>(readAttribute<Double>("randomSeed", node, scope, 0))),
+  random_seed([&] {
+    auto seed = static_cast<double>(readAttribute<Double>("randomSeed", node, scope, 0));
+    scope.random_engine.seed(seed);
+    return seed;
+  }()),
   stochastic_distribution(
     readElement<StochasticDistribution>("StochasticDistribution", node, scope))
 {

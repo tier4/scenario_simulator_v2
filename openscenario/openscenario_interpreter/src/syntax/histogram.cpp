@@ -24,8 +24,7 @@ Histogram::Histogram(const pugi::xml_node & node, openscenario_interpreter::Scop
   bins(readElements<HistogramBin, 1>("Bin", node, scope)),
   bin_adaptor(bins),
   distribute(
-    bin_adaptor.intervals.begin(), bin_adaptor.intervals.end(), bin_adaptor.densities.begin()),
-  random_engine(scope.seed)
+    bin_adaptor.intervals.begin(), bin_adaptor.intervals.end(), bin_adaptor.densities.begin())
 {
 }
 

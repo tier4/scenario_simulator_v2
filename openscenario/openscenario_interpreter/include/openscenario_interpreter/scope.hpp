@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
+#include <random>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -192,7 +193,8 @@ public:
 
   std::list<EntityRef> actors;
 
-  double seed;  // NOTE: `seed` is used only for sharing randomSeed in Stochastic now
+  // NOTE: `random_engine` is used only for sharing random number generator in Stochastic now
+  std::mt19937 random_engine;
 
   Scope() = delete;
 

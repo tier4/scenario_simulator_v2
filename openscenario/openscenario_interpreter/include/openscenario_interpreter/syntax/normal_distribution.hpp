@@ -39,7 +39,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 
 struct NormalDistribution : public ComplexType,
-                            private Scope,
+                            protected Scope,
                             public SingleParameterDistributionBase
 {
   const Range range;
@@ -49,8 +49,6 @@ struct NormalDistribution : public ComplexType,
   const Double variance;
 
   std::normal_distribution<Double::value_type> distribute;
-
-  std::mt19937 random_engine;
 
   explicit NormalDistribution(const pugi::xml_node &, Scope & scope);
 

@@ -36,7 +36,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct PoissonDistribution : public ComplexType,
-                             private Scope,
+                             protected Scope,
                              public SingleParameterDistributionBase
 {
   const Range range;
@@ -44,8 +44,6 @@ struct PoissonDistribution : public ComplexType,
   const Double expected_value;
 
   std::poisson_distribution<> distribute;
-
-  std::mt19937 random_engine;
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
 

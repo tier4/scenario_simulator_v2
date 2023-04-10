@@ -34,14 +34,12 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct UniformDistribution : public ComplexType,
-                             private Scope,
+                             protected Scope,
                              public SingleParameterDistributionBase
 {
   const Range range;
 
   std::uniform_real_distribution<Double::value_type> distribute;
-
-  std::mt19937 random_engine;
 
   explicit UniformDistribution(const pugi::xml_node &, Scope & scope);
 

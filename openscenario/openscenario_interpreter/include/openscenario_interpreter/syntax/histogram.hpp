@@ -34,7 +34,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct Histogram : public ComplexType, private Scope, public SingleParameterDistributionBase
+struct Histogram : public ComplexType, protected Scope, public SingleParameterDistributionBase
 {
   /**
    * Note: HistogramBin must be stored in continuous range and ascending order to `bins`
@@ -57,8 +57,6 @@ struct Histogram : public ComplexType, private Scope, public SingleParameterDist
   } bin_adaptor;
 
   std::piecewise_constant_distribution<Double::value_type> distribute;
-
-  std::mt19937 random_engine;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
   auto derive() -> std::vector<Object> override;
