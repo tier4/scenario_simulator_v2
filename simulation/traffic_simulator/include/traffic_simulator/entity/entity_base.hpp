@@ -206,7 +206,7 @@ public:
 
   virtual void startNpcLogic();
 
-  /*   */ void stopAtEndOfRoad();
+  /*   */ void stopAtCurrentPosition();
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 

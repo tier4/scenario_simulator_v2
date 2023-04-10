@@ -241,7 +241,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
       if (
         hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
         hdmap_utils_ptr_->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s) {
-        stopAtEndOfRoad();
+        stopAtCurrentPosition();
         return;
       }
     }
