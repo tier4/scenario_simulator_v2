@@ -700,12 +700,12 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(
 
 bool HdMapUtils::isInRoute(std::int64_t lanelet_id, const std::vector<std::int64_t> & route) const
 {
-  for (const auto id : route) {
-    if (id == lanelet_id) {
-      return true;
-    }
+  if (auto result = std::find_if(
+        route.begin(), route.end(), [lanelet_id](const auto id) { return lanelet_id == id; });
+      result == route.end()) {
+    return false;
   }
-  return false;
+  return true;
 }
 
 std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(

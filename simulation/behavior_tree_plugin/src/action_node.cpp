@@ -136,7 +136,7 @@ auto ActionNode::getRightOfWayEntities(const std::vector<std::int64_t> & followi
       for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
         if (
           status.second.laneMatchingSucceed() &&
-          status.second.getLaneletPose().lanelet_id == lanelet_id) {
+          traffic_simulator::isSameLaneletId(status.second, lanelet_id)) {
           ret.emplace_back(status.second);
         }
       }
@@ -161,7 +161,7 @@ auto ActionNode::getRightOfWayEntities() const
     for (const std::int64_t & lanelet_id : lanelet_ids) {
       if (
         status.second.laneMatchingSucceed() &&
-        status.second.getLaneletPose().lanelet_id == lanelet_id) {
+        traffic_simulator::isSameLaneletId(status.second, lanelet_id)) {
         ret.emplace_back(status.second);
       }
     }
