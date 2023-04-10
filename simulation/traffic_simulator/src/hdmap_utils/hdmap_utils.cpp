@@ -91,24 +91,24 @@ auto HdMapUtils::canonicalizeLaneletPose(
   -> std::tuple<
     std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<std::int64_t>>
 {
-  auto clamped = lanelet_pose;
-  while (clamped.s < 0) {
-    if (const auto ids = getPreviousLaneletIds(clamped.lanelet_id); ids.empty()) {
-      return {std::nullopt, clamped.lanelet_id};
+  auto canonicalized = lanelet_pose;
+  while (canonicalized.s < 0) {
+    if (const auto ids = getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+      return {std::nullopt, canonicalized.lanelet_id};
     } else {
-      clamped.s += getLaneletLength(ids[0]);
-      clamped.lanelet_id = ids[0];
+      canonicalized.s += getLaneletLength(ids[0]);
+      canonicalized.lanelet_id = ids[0];
     }
   }
-  while (clamped.s > getLaneletLength(clamped.lanelet_id)) {
-    if (const auto ids = getNextLaneletIds(clamped.lanelet_id); ids.empty()) {
-      return {std::nullopt, clamped.lanelet_id};
+  while (canonicalized.s > getLaneletLength(canonicalized.lanelet_id)) {
+    if (const auto ids = getNextLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+      return {std::nullopt, canonicalized.lanelet_id};
     } else {
-      clamped.s -= getLaneletLength(clamped.lanelet_id);
-      clamped.lanelet_id = ids[0];
+      canonicalized.s -= getLaneletLength(canonicalized.lanelet_id);
+      canonicalized.lanelet_id = ids[0];
     }
   }
-  return {clamped, std::nullopt};
+  return {canonicalized, std::nullopt};
 }
 
 auto HdMapUtils::canonicalizeLaneletPose(
@@ -117,33 +117,33 @@ auto HdMapUtils::canonicalizeLaneletPose(
   -> std::tuple<
     std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<std::int64_t>>
 {
-  auto clamped = lanelet_pose;
-  while (clamped.s < 0) {
+  auto canonicalized = lanelet_pose;
+  while (canonicalized.s < 0) {
     // When canonicalizing to backward lanelet_id, do not consider route
-    if (const auto ids = getPreviousLaneletIds(clamped.lanelet_id); ids.empty()) {
-      return {std::nullopt, clamped.lanelet_id};
+    if (const auto ids = getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+      return {std::nullopt, canonicalized.lanelet_id};
     } else {
-      clamped.s += getLaneletLength(ids[0]);
-      clamped.lanelet_id = ids[0];
+      canonicalized.s += getLaneletLength(ids[0]);
+      canonicalized.lanelet_id = ids[0];
     }
   }
-  while (clamped.s > getLaneletLength(clamped.lanelet_id)) {
+  while (canonicalized.s > getLaneletLength(canonicalized.lanelet_id)) {
     bool next_lanelet_found = false;
     // When canonicalizing to forward lanelet_id, consider route
-    for (const auto id : getNextLaneletIds(clamped.lanelet_id)) {
+    for (const auto id : getNextLaneletIds(canonicalized.lanelet_id)) {
       if (std::any_of(route_lanelets.begin(), route_lanelets.end(), [id](auto id_on_route) {
             return id == id_on_route;
           })) {
-        clamped.s -= getLaneletLength(clamped.lanelet_id);
-        clamped.lanelet_id = id;
+        canonicalized.s -= getLaneletLength(canonicalized.lanelet_id);
+        canonicalized.lanelet_id = id;
         next_lanelet_found = true;
       }
     }
     if (!next_lanelet_found) {
-      return {std::nullopt, clamped.lanelet_id};
+      return {std::nullopt, canonicalized.lanelet_id};
     }
   }
-  return {clamped, std::nullopt};
+  return {canonicalized, std::nullopt};
 }
 
 std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
