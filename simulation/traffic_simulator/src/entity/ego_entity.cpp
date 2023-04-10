@@ -264,7 +264,7 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 
   if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get()); universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
-      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+      ids += point.lane_ids;
     }
   }
 

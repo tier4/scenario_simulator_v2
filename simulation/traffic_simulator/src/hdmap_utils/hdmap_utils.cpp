@@ -740,9 +740,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
     return ret;
   }
   std::int64_t end_lanelet = candidate_lanelet_ids[candidate_lanelet_ids.size() - 1];
-  const auto followings = getFollowingLanelets(end_lanelet, distance - total_distance, false);
-  std::copy(followings.begin(), followings.end(), std::back_inserter(ret));
-  return ret;
+  return getFollowingLanelets(end_lanelet, distance - total_distance, false) + ret;
 }
 
 std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
@@ -816,8 +814,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
     return ret;
   }
   for (const auto lanelet_id : lanelet_ids) {
-    std::vector<geometry_msgs::msg::Point> center_points = getCenterPoints(lanelet_id);
-    std::copy(center_points.begin(), center_points.end(), std::back_inserter(ret));
+    ret += getCenterPoints(lanelet_id);
   }
   ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
   return ret;
