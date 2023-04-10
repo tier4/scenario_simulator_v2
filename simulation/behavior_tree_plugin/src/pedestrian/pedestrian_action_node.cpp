@@ -86,7 +86,7 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
     /**
      * @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
      * true means considering crosswalk.
-     * In this branch, the algorithum only consider entty pose. 
+     * In this branch, the algorithm only consider entity pose. 
     */
     lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);
   }
