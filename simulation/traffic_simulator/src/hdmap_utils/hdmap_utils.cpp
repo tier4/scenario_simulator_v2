@@ -743,8 +743,11 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
   if (total_distance > distance) {
     return ret;
   }
-  std::int64_t end_lanelet = candidate_lanelet_ids[candidate_lanelet_ids.size() - 1];
-  return getFollowingLanelets(end_lanelet, distance - total_distance, false) + ret;
+  // clang-format off
+  return getFollowingLanelets(
+    candidate_lanelet_ids[candidate_lanelet_ids.size() - 1], 
+    distance - total_distance, false) + ret;
+  // clang-format on
 }
 
 std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
