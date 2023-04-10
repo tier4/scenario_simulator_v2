@@ -67,12 +67,12 @@ public:
   DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       static_cast<EntityStatus>(getStatus()).action_status.accel)
   DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       static_cast<EntityStatus>(getStatus()).action_status.twist)
   DEFINE_GETTER(DynamicConstraints,       traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
-  DEFINE_GETTER(EntityStatusBeforeUpdate, const CanonicalizedEntityStatus &,           status_before_update_)
+  DEFINE_GETTER(EntityStatusBeforeUpdate, const CanonicalizedEntityStatus &,               status_before_update_)
   DEFINE_GETTER(EntitySubtype,            traffic_simulator_msgs::msg::EntitySubtype,      static_cast<EntityStatus>(getStatus()).subtype)
   DEFINE_GETTER(LinearJerk,               double,                                          static_cast<EntityStatus>(getStatus()).action_status.linear_jerk)
   DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        static_cast<EntityStatus>(getStatus()).pose)
   DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
-  DEFINE_GETTER(Status,                   const CanonicalizedEntityStatus &,           status_)
+  DEFINE_GETTER(Status,                   const CanonicalizedEntityStatus &,               status_)
   DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
   // clang-format on
 #undef DEFINE_GETTER
