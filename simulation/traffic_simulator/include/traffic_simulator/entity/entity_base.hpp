@@ -80,9 +80,10 @@ public:
 #define DEFINE_CHECK_FUNCTION(FUNCTION_NAME, BOOL_VARIABLE) \
   /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
 
-  DEFINE_CHECK_FUNCTION(isNpcLogicStarted, npc_logic_started_)
-  DEFINE_CHECK_FUNCTION(
-    laneMatchingSucceed, static_cast<EntityStatus>(getStatus()).lanelet_pose_valid)
+  // clang-format off
+  DEFINE_CHECK_FUNCTION(isNpcLogicStarted,   npc_logic_started_)
+  DEFINE_CHECK_FUNCTION(laneMatchingSucceed, status_.laneMatchingSucceed())
+  // clang-format on
 #undef DEFINE_CHECK_FUNCTION
 
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
