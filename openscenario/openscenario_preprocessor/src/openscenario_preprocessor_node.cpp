@@ -28,7 +28,10 @@ class PreprocessorNode : public rclcpp::Node, public openscenario_preprocessor::
 public:
   explicit PreprocessorNode(const rclcpp::NodeOptions & options, const std::string xsd_path)
   : rclcpp::Node("preprocessor", options),
-    openscenario_preprocessor::Preprocessor(),
+    openscenario_preprocessor::Preprocessor(xsd_path, [this]{
+      declare_parameter<std::string>("output_directory", "/tmp/openscenario_preprocessor");
+        return get_parameter("output_directory").as_string();
+    }()),
     load_server(create_service<openscenario_preprocessor_msgs::srv::Load>(
       "~/load",
       [this](

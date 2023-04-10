@@ -56,8 +56,18 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
             }
 
             ScenarioSet derived_scenario = scenario;
-            derived_scenario.path += "." + std::to_string(parameter_list.index());
 
+            boost::filesystem::path derived_scenario_path(derived_scenario.path);
+            derived_scenario_path = output_directory / derived_scenario_path.filename();
+            derived_scenario_path.replace_extension(
+              derived_scenario_path.extension().string() + "." +
+              std::to_string(parameter_list.index()));
+
+            derived_scenario.path = derived_scenario_path.string();
+
+            if (not boost::filesystem::exists(output_directory)) {
+              boost::filesystem::create_directories(output_directory);
+            }
             derived_script.save_file(derived_scenario.path.c_str());
 
             preprocessed_scenarios.emplace_back(derived_scenario);

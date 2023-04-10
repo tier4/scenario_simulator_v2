@@ -41,7 +41,10 @@ struct ScenarioSet
 class Preprocessor
 {
 public:
-  explicit Preprocessor() : xml_validator("") {}
+  explicit Preprocessor(boost::filesystem::path xsd_path, boost::filesystem::path output_directory)
+  : xml_validator(xsd_path), output_directory(output_directory)
+  {
+  }
 
 protected:
   void preprocessScenario(ScenarioSet &);
@@ -55,6 +58,8 @@ protected:
   std::mutex preprocessed_scenarios_mutex;
 
   openscenario_utility::XMLValidator xml_validator;
+
+  boost::filesystem::path output_directory;
 };
 
 }  // namespace openscenario_preprocessor
