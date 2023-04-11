@@ -39,7 +39,7 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
 std::vector<Object> ProbabilityDistributionSet::derive()
 {
   size_t index = distribute(random_engine);
-  return std::vector<Object>({elements.at(index)});
+  return std::vector<Object>({make<String>(elements.at(index).value)});
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
