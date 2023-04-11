@@ -39,7 +39,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 
 struct NormalDistribution : public ComplexType,
-                            protected Scope,
+                            private Scope,
                             public SingleParameterDistributionBase
 {
   const Range range;

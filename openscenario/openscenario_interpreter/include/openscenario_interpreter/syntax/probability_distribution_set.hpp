@@ -34,7 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 
 struct ProbabilityDistributionSet : public ComplexType,
-                                    protected Scope,
+                                    private Scope,
                                     public SingleParameterDistributionBase
 {
   const std::vector<ProbabilityDistributionSetElement> elements;

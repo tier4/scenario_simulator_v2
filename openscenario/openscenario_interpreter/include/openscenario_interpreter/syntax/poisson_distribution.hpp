@@ -36,7 +36,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct PoissonDistribution : public ComplexType,
-                             protected Scope,
+                             private Scope,
                              public SingleParameterDistributionBase
 {
   const Range range;

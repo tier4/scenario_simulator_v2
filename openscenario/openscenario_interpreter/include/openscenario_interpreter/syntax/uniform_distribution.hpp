@@ -34,7 +34,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct UniformDistribution : public ComplexType,
-                             protected Scope,
+                             private Scope,
                              public SingleParameterDistributionBase
 {
   const Range range;
