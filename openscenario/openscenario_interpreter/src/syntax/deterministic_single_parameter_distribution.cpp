@@ -40,5 +40,12 @@ ParameterDistribution DeterministicSingleParameterDistribution::derive()
     },
     *this);
 }
+
+auto DeterministicSingleParameterDistribution::getNumberOfDeriveScenarios() const -> size_t
+{
+  return apply<size_t>(
+    [](auto & unnamed_distribution) { return unnamed_distribution.getNumberOfDeriveScenarios(); },
+    (DeterministicSingleParameterDistributionType &)*this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

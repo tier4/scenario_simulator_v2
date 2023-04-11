@@ -35,6 +35,10 @@ auto DistributionRange::derive() -> SingleUnnamedParameterDistribution
   }
   return unnamed_distribution;
 }
+auto DistributionRange::getNumberOfDeriveScenarios() const -> size_t
+{
+  return int((range.upper_limit - range.lower_limit) / step_width) + 1;
+}
 
 }  // namespace syntax
 }  // namespace openscenario_interpreter

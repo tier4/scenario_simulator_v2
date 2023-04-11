@@ -32,5 +32,6 @@ std::vector<Object> Histogram::derive()
 {
   return std::vector<Object>({make<Double>(distribute(random_engine))});
 }
+
 }  // namespace syntax
 }  // namespace openscenario_interpreter

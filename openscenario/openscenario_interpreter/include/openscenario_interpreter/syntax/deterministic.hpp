@@ -40,6 +40,8 @@ struct Deterministic : public ParameterDistributionContainer
   explicit Deterministic(const pugi::xml_node &, Scope & scope);
 
   auto derive() -> ParameterDistribution override;
+
+  auto getNumberOfDeriveScenarios() const -> size_t override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

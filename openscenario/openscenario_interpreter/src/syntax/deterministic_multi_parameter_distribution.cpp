@@ -29,5 +29,10 @@ ParameterDistribution DeterministicMultiParameterDistribution::derive()
 {
   return DeterministicMultiParameterDistributionType::derive();
 }
+
+auto DeterministicMultiParameterDistribution::getNumberOfDeriveScenarios() const -> size_t
+{
+  return DeterministicMultiParameterDistributionType::getNumberOfDeriveScenarios();
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

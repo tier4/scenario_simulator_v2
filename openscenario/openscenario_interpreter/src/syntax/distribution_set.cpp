@@ -32,5 +32,7 @@ auto DistributionSet::derive() -> SingleUnnamedParameterDistribution
   }
   return distribution;
 }
+
+auto DistributionSet::getNumberOfDeriveScenarios() const -> size_t { return std::size(elements); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

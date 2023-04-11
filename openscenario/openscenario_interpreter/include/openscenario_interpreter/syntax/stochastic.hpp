@@ -58,6 +58,8 @@ struct Stochastic : public ComplexType, public ParameterDistributionContainer
     }
     return distribution;
   }
+
+  auto getNumberOfDeriveScenarios() const -> size_t override { return number_of_test_runs; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -36,5 +36,17 @@ ParameterDistribution Deterministic::derive()
   }
   return distribution;
 }
+
+auto Deterministic::getNumberOfDeriveScenarios() const -> size_t
+{
+  return std::accumulate(
+    deterministic_parameter_distributions.begin(), deterministic_parameter_distributions.end(), 1,
+    [](size_t pre_result, auto distribution) {
+      return pre_result *
+             apply<size_t>(
+               [](auto & distribution) { return distribution.getNumberOfDeriveScenarios(); },
+               distribution);
+    });
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

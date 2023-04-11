@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <openscenario_interpreter/object.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -33,17 +34,32 @@ using SingleUnnamedParameterDistribution = std::vector<Object>;
 struct SingleParameterDistributionBase
 {
   virtual auto derive() -> SingleUnnamedParameterDistribution = 0;
+
+  virtual auto getNumberOfDeriveScenarios() const -> size_t
+  {
+    throw Error("getNumberOfDeriveScenarios() is not implemented");
+  }
 };
 
 struct MultiParameterDistributionBase
 {
   virtual auto derive() -> ParameterDistribution = 0;
+
+  virtual auto getNumberOfDeriveScenarios() const -> size_t
+  {
+    throw Error("getNumberOfDeriveScenarios() is not implemented");
+  }
 };
 
 // container types of distribution data generator
 struct ParameterDistributionContainer
 {
   virtual auto derive() -> ParameterDistribution = 0;
+
+  virtual auto getNumberOfDeriveScenarios() const -> size_t
+  {
+    throw Error("getNumberOfDeriveScenarios() is not implemented");
+  }
 };
 
 auto mergeParameterDistribution(

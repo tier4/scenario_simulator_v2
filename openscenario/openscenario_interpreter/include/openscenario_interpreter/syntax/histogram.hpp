@@ -59,6 +59,7 @@ struct Histogram : public ComplexType, protected Scope, public SingleParameterDi
   std::piecewise_constant_distribution<Double::value_type> distribute;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
+
   auto derive() -> std::vector<Object> override;
 };
 }  // namespace syntax

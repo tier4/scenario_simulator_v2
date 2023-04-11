@@ -43,6 +43,8 @@ struct DistributionRange : private Scope, public ComplexType, public SingleParam
   explicit DistributionRange(const pugi::xml_node &, Scope &);
 
   auto derive() -> SingleUnnamedParameterDistribution override;
+
+  auto getNumberOfDeriveScenarios() const -> size_t override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
