@@ -45,7 +45,8 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
                 .select_node(pugi::xpath_query{"/OpenSCENARIO/ParameterDeclarations"})
                 .node();
 
-            for (const auto & [name, parameter] : *parameter_list.value()) {
+            // embedding parameter values
+            for (const auto & [name, value] : *parameter_list.value()) {
               if (auto parameter_node =
                     parameter_declarations.find_child_by_attribute("name", name.c_str());
                   parameter_node) {
