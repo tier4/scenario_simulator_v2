@@ -44,6 +44,11 @@ struct DistributionRange : private Scope, public ComplexType, public SingleParam
 
   auto derive() -> SingleUnnamedParameterDistribution override;
 
+  auto derive(size_t index, size_t total_size) -> Object
+  {
+    return make<Double>(range.lower_limit + step_width * index);
+  }
+
   auto getNumberOfDeriveScenarios() const -> size_t override;
 };
 }  // namespace syntax

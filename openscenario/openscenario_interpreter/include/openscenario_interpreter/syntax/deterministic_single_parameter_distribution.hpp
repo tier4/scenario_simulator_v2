@@ -43,6 +43,16 @@ struct DeterministicSingleParameterDistribution
 
   auto derive() -> ParameterDistribution override;
 
+  auto derive(size_t index, size_t total_size) -> ParameterList
+  {
+    return {
+      {parameter_name, apply<Object>(
+                         [index, total_size](auto && single_parameter_distribution) {
+                           return single_parameter_distribution.derive(index, total_size);
+                         },
+                         (DeterministicSingleParameterDistributionType &)*this)}};
+  }
+
   auto getNumberOfDeriveScenarios() const -> size_t override;
 };
 }  // namespace syntax

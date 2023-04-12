@@ -41,6 +41,15 @@ struct Deterministic : public ParameterDistributionContainer
 
   auto derive() -> ParameterDistribution override;
 
+  auto derive(size_t index, size_t total_size) -> ParameterList
+  {
+    auto child = std::next(deterministic_parameter_distributions.begin(), std::floor(index / total_size));
+    return apply<ParameterList>([&](auto & child_distribution) {
+      return child_distribution.derive(
+        index % total_size, total_size / deterministic_parameter_distributions.size());
+    }, (DeterministicParameterDistribution &)child);
+  }
+
   auto getNumberOfDeriveScenarios() const -> size_t override;
 };
 }  // namespace syntax
