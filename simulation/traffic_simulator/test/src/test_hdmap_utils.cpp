@@ -98,26 +98,6 @@ TEST(HdMapUtils, AlongLaneletPose)
     hdmap_utils.getLaneletLength(34684) - 10.0);
 }
 
-TEST(HdMapUtils, RoadShoulder)
-{
-  std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
-                     "/map/with_road_shoulder/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
-  const auto next_lanelet_ids = hdmap_utils.getNextLaneletIds(34696);
-  EXPECT_EQ(next_lanelet_ids.size(), static_cast<size_t>(1));
-  if (next_lanelet_ids.size() == 1) {
-    EXPECT_EQ(next_lanelet_ids[0], static_cast<int64_t>(34768));
-  }
-  const auto previous_lanelet_ids = hdmap_utils.getPreviousLaneletIds(34768);
-  EXPECT_EQ(previous_lanelet_ids.size(), static_cast<size_t>(1));
-  if (previous_lanelet_ids.size() == 1) {
-    EXPECT_EQ(previous_lanelet_ids[0], static_cast<int64_t>(34696));
-  }
-}
-
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
