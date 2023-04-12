@@ -39,7 +39,8 @@ struct DeterministicMultiParameterDistribution : public DeterministicMultiParame
 
   auto derive() -> ParameterDistribution override;
 
-  auto derive(size_t index, size_t total_size) -> ParameterList {
+  auto derive(size_t index, size_t total_size) -> ParameterList
+  {
     return DeterministicMultiParameterDistributionType::derive(index, total_size);
   }
 
