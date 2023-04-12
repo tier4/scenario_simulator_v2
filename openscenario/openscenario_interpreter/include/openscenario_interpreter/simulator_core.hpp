@@ -37,7 +37,7 @@ using NativeRelativeWorldPosition = NativeWorldPosition;
 
 using NativeLanePosition = traffic_simulator::CanonicalizedLaneletPose;
 
-using NativeRelativeLanePosition = NativeLanePosition;
+using NativeRelativeLanePosition = traffic_simulator::LaneletPose;
 
 class SimulatorCore
 {
@@ -182,7 +182,7 @@ public:
       position.rpy.x = std::numeric_limits<double>::quiet_NaN();
       position.rpy.y = std::numeric_limits<double>::quiet_NaN();
       position.rpy.z = std::numeric_limits<double>::quiet_NaN();
-      return canonicalize(position);
+      return position;
     }
 
     template <typename... Ts>
