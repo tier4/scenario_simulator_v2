@@ -25,18 +25,7 @@
 
 namespace traffic_simulator
 {
-metrics::MetricLifecycle API::getMetricLifecycle(const std::string & name)
-{
-  return metrics_manager_.getLifecycle(name);
-}
-
-bool API::metricExists(const std::string & name) { return metrics_manager_.exists(name); }
-
-void API::setVerbose(const bool verbose)
-{
-  metrics_manager_.setVerbose(verbose);
-  entity_manager_ptr_->setVerbose(verbose);
-}
+void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbose); }
 
 bool API::despawn(const std::string & name)
 {
@@ -350,7 +339,6 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    metrics_manager_.calculate();
     if (!updateEntityStatusInSim()) {
       return false;
     }
@@ -361,7 +349,6 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    metrics_manager_.calculate();
     return true;
   }
 }
