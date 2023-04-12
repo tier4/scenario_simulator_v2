@@ -83,7 +83,7 @@ HdMapUtils::HdMapUtils(
   all_graphs.push_back(pedestrian_routing_graph_ptr_);
 }
 
-const std::vector<std::int64_t> HdMapUtils::getLaneletIds()
+std::vector<std::int64_t> HdMapUtils::getLaneletIds() const
 {
   std::vector<std::int64_t> ret;
   for (const auto & lanelet : lanelet_map_ptr_->laneletLayer) {
