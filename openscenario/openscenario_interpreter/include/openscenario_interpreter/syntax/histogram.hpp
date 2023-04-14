@@ -34,7 +34,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct Histogram : public ComplexType, protected Scope, public SingleParameterDistributionBase
+struct Histogram : public ComplexType, private Scope, public SingleParameterDistributionBase
 {
   /**
    * Note: HistogramBin must be stored in continuous range and ascending order to `bins`
