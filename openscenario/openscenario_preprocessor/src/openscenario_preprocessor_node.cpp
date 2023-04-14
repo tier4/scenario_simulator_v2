@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//#include <glog/logging.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cstdlib>
 #include <memory>
@@ -90,9 +88,6 @@ private:
 
 int main(const int argc, char const * const * const argv)
 {
-  //  google::InitGoogleLogging(argv[0]);
-  //  google::InstallFailureSignalHandler();
-
   rclcpp::init(argc, argv);
 
   rclcpp::executors::SingleThreadedExecutor executor{};
