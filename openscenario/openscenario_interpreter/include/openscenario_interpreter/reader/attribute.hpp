@@ -81,7 +81,7 @@ auto substitute(std::string attribute, Scope & scope)
       // TODO {"find-exec", find_exec},
       // TODO {"find-pkg-prefix", find_pkg_prefix},
       {"find-pkg-share", find_pkg_share},
-      {"ros2", ros2},  // NOTE: TIER IV extension (Not included in the ROS2 Launch XML Substitution)
+      {"ros2", ros2},  // NOTE: TIER IV extension (Not included in the ROS 2 Launch XML Substitution)
       {"var", var},
     };
 

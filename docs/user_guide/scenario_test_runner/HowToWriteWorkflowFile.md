@@ -13,7 +13,7 @@ The workflow file defines how to execute scenarios and its expected results.
 ## Examples of writing parameters
 ### path
 
-You can solve relative path from the "share" directories in your ROS2 packages.
+You can solve relative path from the "share" directories in your ROS 2 packages.
 ```yaml
 path: $(find-pkg-share PACKAGE_NAME)/test/scenario/simple.xosc
 ```
