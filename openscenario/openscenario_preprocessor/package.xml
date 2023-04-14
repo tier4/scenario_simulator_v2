@@ -10,7 +10,6 @@
 
 	<buildtool_depend>ament_cmake_auto</buildtool_depend>
 
-	<depend>libgoogle-glog-dev</depend>
 	<depend>openscenario_interpreter</depend>
 	<depend>openscenario_preprocessor_msgs</depend>
 	<depend>rclcpp</depend>
