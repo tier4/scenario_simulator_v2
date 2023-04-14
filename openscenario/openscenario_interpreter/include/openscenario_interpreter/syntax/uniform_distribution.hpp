@@ -44,6 +44,9 @@ struct UniformDistribution : public ComplexType,
   explicit UniformDistribution(const pugi::xml_node &, Scope & scope);
 
   auto derive() -> std::vector<Object> override;
+
+  auto derive(size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+    -> ParameterList override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

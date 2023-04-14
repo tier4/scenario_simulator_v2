@@ -32,5 +32,11 @@ std::vector<Object> NormalDistribution::derive()
 {
   return std::vector<Object>({make<Double>(distribute(random_engine))});
 }
+
+ParameterList NormalDistribution::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+{
+  return ParameterList({{"", make<Double>(distribute(random_engine))}});
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

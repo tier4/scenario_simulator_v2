@@ -32,5 +32,11 @@ std::vector<Object> PoissonDistribution::derive()
 {
   return std::vector<Object>({make<Double>(range.evaluate(distribute(random_engine)))});
 }
+
+ParameterList PoissonDistribution::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+{
+  return ParameterList({{"", make<Double>(range.evaluate(distribute(random_engine)))}});
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -30,10 +30,11 @@ using ParameterListSharedPtr = std::shared_ptr<ParameterList>;
 using ParameterDistribution = std::vector<ParameterListSharedPtr>;
 using SingleUnnamedParameterDistribution = std::vector<Object>;
 
-// generator types distribution
-struct SingleParameterDistributionBase
+struct ParallelDerivableParameterDistributionBase
 {
-  virtual auto derive() -> SingleUnnamedParameterDistribution = 0;
+  virtual auto derive(
+    size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+    -> ParameterList = 0;
 
   virtual auto getNumberOfDeriveScenarios() const -> size_t
   {
@@ -41,25 +42,21 @@ struct SingleParameterDistributionBase
   }
 };
 
-struct MultiParameterDistributionBase
+// generator types distribution
+struct SingleParameterDistributionBase : public ParallelDerivableParameterDistributionBase
+{
+  virtual auto derive() -> SingleUnnamedParameterDistribution = 0;
+};
+
+struct MultiParameterDistributionBase : public ParallelDerivableParameterDistributionBase
 {
   virtual auto derive() -> ParameterDistribution = 0;
-
-  virtual auto getNumberOfDeriveScenarios() const -> size_t
-  {
-    throw Error("getNumberOfDeriveScenarios() is not implemented");
-  }
 };
 
 // container types of distribution data generator
-struct ParameterDistributionContainer
+struct ParameterDistributionContainer : public ParallelDerivableParameterDistributionBase
 {
   virtual auto derive() -> ParameterDistribution = 0;
-
-  virtual auto getNumberOfDeriveScenarios() const -> size_t
-  {
-    throw Error("getNumberOfDeriveScenarios() is not implemented");
-  }
 };
 
 auto mergeParameterDistribution(

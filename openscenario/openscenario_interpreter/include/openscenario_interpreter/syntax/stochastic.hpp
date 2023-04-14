@@ -39,25 +39,20 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 
-struct Stochastic : public ComplexType, public ParameterDistributionContainer
+struct Stochastic : public ComplexType, public ParameterDistributionContainer, private Scope
 {
   const UnsignedInt number_of_test_runs;
 
   const Double random_seed;
 
-  StochasticDistribution stochastic_distribution;
+  std::list<StochasticDistribution> stochastic_distributions;
 
   explicit Stochastic(const pugi::xml_node &, Scope & scope);
 
-  auto derive() -> ParameterDistribution override
-  {
-    ParameterDistribution distribution;
-    for (size_t i = 0; i < number_of_test_runs; i++) {
-      auto derived = stochastic_distribution.derive();
-      distribution.insert(distribution.end(), derived.begin(), derived.end());
-    }
-    return distribution;
-  }
+  auto derive() -> ParameterDistribution override;
+
+  auto derive(size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+    -> ParameterList override;
 
   auto getNumberOfDeriveScenarios() const -> size_t override { return number_of_test_runs; }
 };

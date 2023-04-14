@@ -41,5 +41,12 @@ std::vector<Object> ProbabilityDistributionSet::derive()
   size_t index = distribute(random_engine);
   return std::vector<Object>({make<String>(elements.at(index).value)});
 }
+
+ParameterList ProbabilityDistributionSet::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+{
+  size_t index = distribute(random_engine);
+  return ParameterList{{"", make<String>(elements.at(index).value)}};
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

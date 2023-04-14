@@ -38,5 +38,19 @@ auto StochasticDistribution::derive() -> ParameterDistribution
     },
     *this);
 }
+
+ParameterList StochasticDistribution::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+{
+  return {
+    {parameter_name, make(apply<ParameterList>(
+                            [&](auto & unnamed_distribution) {
+                              return unnamed_distribution.derive(
+                                local_index, local_size, global_index, global_size);
+                            },
+                            (StochasticDistributionType &)*this)
+                            .begin()
+                            ->second)}};
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -40,10 +40,8 @@ struct DistributionSet : private Scope, public ComplexType, public SingleParamet
 
   auto derive() -> SingleUnnamedParameterDistribution override;
 
-  auto derive(size_t index, size_t total_size) -> Object
-  {
-    return make<String>(std::next(elements.begin(), index)->value);
-  }
+  auto derive(size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+    -> ParameterList override;
 
   auto getNumberOfDeriveScenarios() const -> size_t override;
 };

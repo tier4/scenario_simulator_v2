@@ -40,10 +40,8 @@ struct ValueSetDistribution : public Scope, public MultiParameterDistributionBas
 
   auto derive() -> ParameterDistribution override;
 
-  auto derive(size_t index, size_t total_size) -> ParameterList
-  {
-    return *std::next(parameter_value_sets.begin(), index)->evaluate();
-  }
+  auto derive(size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+    -> ParameterList override;
 
   auto getNumberOfDeriveScenarios() const -> size_t override;
 };

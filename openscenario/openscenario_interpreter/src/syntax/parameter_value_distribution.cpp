@@ -37,5 +37,15 @@ auto ParameterValueDistribution::getNumberOfDeriveScenarios() const -> size_t
     [](auto & distribution) { return distribution.getNumberOfDeriveScenarios(); },
     (DistributionDefinition &)*this);
 }
+
+ParameterList ParameterValueDistribution::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+{
+  return apply<ParameterList>(
+    [&](auto & distribution) {
+      return distribution.derive(local_index, local_size, global_index, global_size);
+    },
+    (DistributionDefinition &)*this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

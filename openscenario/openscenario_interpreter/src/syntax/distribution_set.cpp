@@ -34,5 +34,11 @@ auto DistributionSet::derive() -> SingleUnnamedParameterDistribution
 }
 
 auto DistributionSet::getNumberOfDeriveScenarios() const -> size_t { return std::size(elements); }
+
+auto DistributionSet::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
+{
+  return ParameterList({{"", make<String>(std::next(elements.begin(), local_index)->value)}});
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
