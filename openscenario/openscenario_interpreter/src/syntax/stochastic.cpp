@@ -51,8 +51,8 @@ auto Stochastic::derive() -> ParameterDistribution
   return distribution;
 }
 
-ParameterList Stochastic::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+auto Stochastic::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
 {
   // update random_engine
   random_engine.seed(random_seed);

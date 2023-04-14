@@ -25,7 +25,7 @@ ParameterValueDistribution::ParameterValueDistribution(
 {
 }
 
-ParameterDistribution ParameterValueDistribution::derive()
+auto ParameterValueDistribution::derive() -> ParameterDistribution
 {
   return apply<ParameterDistribution>(
     [](auto & distribution) { return distribution.derive(); }, *this);
@@ -38,8 +38,8 @@ auto ParameterValueDistribution::getNumberOfDeriveScenarios() const -> size_t
     (DistributionDefinition &)*this);
 }
 
-ParameterList ParameterValueDistribution::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+auto ParameterValueDistribution::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
 {
   return apply<ParameterList>(
     [&](auto & distribution) {

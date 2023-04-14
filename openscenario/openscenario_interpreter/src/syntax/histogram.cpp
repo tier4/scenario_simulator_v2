@@ -28,15 +28,15 @@ Histogram::Histogram(const pugi::xml_node & node, openscenario_interpreter::Scop
 {
 }
 
-std::vector<Object> Histogram::derive()
+auto Histogram::derive() -> SingleUnnamedParameterDistribution
 {
   return std::vector<Object>({make<Double>(distribute(random_engine))});
 }
-ParameterList Histogram::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+
+auto Histogram::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
 {
   return ParameterList({{"", make<Double>(distribute(random_engine))}});
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

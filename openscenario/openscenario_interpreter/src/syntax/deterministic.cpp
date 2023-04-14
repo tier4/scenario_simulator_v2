@@ -25,7 +25,7 @@ Deterministic::Deterministic(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-ParameterDistribution Deterministic::derive()
+auto Deterministic::derive() -> ParameterDistribution
 {
   ParameterDistribution distribution;
   for (auto additional_distribution : deterministic_parameter_distributions) {
@@ -35,18 +35,6 @@ ParameterDistribution Deterministic::derive()
         [](auto & distribution) { return distribution.derive(); }, additional_distribution));
   }
   return distribution;
-}
-
-auto Deterministic::getNumberOfDeriveScenarios() const -> size_t
-{
-  return std::accumulate(
-    deterministic_parameter_distributions.begin(), deterministic_parameter_distributions.end(), 1,
-    [](size_t pre_result, auto distribution) {
-      return pre_result *
-             apply<size_t>(
-               [](auto & distribution) { return distribution.getNumberOfDeriveScenarios(); },
-               distribution);
-    });
 }
 
 auto Deterministic::derive(
@@ -61,6 +49,18 @@ auto Deterministic::derive(
         global_index, global_size);
     },
     (DeterministicParameterDistribution &)*child);
+}
+
+auto Deterministic::getNumberOfDeriveScenarios() const -> size_t
+{
+  return std::accumulate(
+    deterministic_parameter_distributions.begin(), deterministic_parameter_distributions.end(), 1,
+    [](size_t pre_result, auto distribution) {
+      return pre_result *
+             apply<size_t>(
+               [](auto & distribution) { return distribution.getNumberOfDeriveScenarios(); },
+               distribution);
+    });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

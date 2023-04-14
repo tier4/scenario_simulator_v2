@@ -28,13 +28,14 @@ NormalDistribution::NormalDistribution(
   distribute(static_cast<double>(expected_value.data), static_cast<double>(variance.data))
 {
 }
-std::vector<Object> NormalDistribution::derive()
+
+auto NormalDistribution::derive() -> SingleUnnamedParameterDistribution
 {
   return std::vector<Object>({make<Double>(distribute(random_engine))});
 }
 
-ParameterList NormalDistribution::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+auto NormalDistribution::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
 {
   return ParameterList({{"", make<Double>(distribute(random_engine))}});
 }

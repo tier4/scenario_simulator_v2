@@ -35,10 +35,6 @@ auto DistributionRange::derive() -> SingleUnnamedParameterDistribution
   }
   return unnamed_distribution;
 }
-auto DistributionRange::getNumberOfDeriveScenarios() const -> size_t
-{
-  return int((range.upper_limit - range.lower_limit) / step_width) + 1;
-}
 
 auto DistributionRange::derive(
   size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
@@ -46,5 +42,9 @@ auto DistributionRange::derive(
   return ParameterList({{"", make<Double>(range.lower_limit + step_width * local_index)}});
 }
 
+auto DistributionRange::getNumberOfDeriveScenarios() const -> size_t
+{
+  return int((range.upper_limit - range.lower_limit) / step_width) + 1;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

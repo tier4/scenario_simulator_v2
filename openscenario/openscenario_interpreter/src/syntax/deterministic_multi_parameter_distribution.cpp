@@ -25,14 +25,9 @@ DeterministicMultiParameterDistribution::DeterministicMultiParameterDistribution
 {
 }
 
-ParameterDistribution DeterministicMultiParameterDistribution::derive()
+auto DeterministicMultiParameterDistribution::derive() -> ParameterDistribution
 {
   return DeterministicMultiParameterDistributionType::derive();
-}
-
-auto DeterministicMultiParameterDistribution::getNumberOfDeriveScenarios() const -> size_t
-{
-  return DeterministicMultiParameterDistributionType::getNumberOfDeriveScenarios();
 }
 
 auto DeterministicMultiParameterDistribution::derive(
@@ -40,6 +35,11 @@ auto DeterministicMultiParameterDistribution::derive(
 {
   return DeterministicMultiParameterDistributionType::derive(
     local_index, local_size, global_index, global_size);
+}
+
+auto DeterministicMultiParameterDistribution::getNumberOfDeriveScenarios() const -> size_t
+{
+  return DeterministicMultiParameterDistributionType::getNumberOfDeriveScenarios();
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

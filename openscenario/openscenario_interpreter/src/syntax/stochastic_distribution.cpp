@@ -39,8 +39,8 @@ auto StochasticDistribution::derive() -> ParameterDistribution
     *this);
 }
 
-ParameterList StochasticDistribution::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+auto StochasticDistribution::derive(
+  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
 {
   return {
     {parameter_name, make(apply<ParameterList>(

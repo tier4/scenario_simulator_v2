@@ -35,15 +35,15 @@ auto ValueSetDistribution::derive() -> ParameterDistribution
   return parameters;
 }
 
-auto ValueSetDistribution::getNumberOfDeriveScenarios() const -> size_t
-{
-  return std::size(parameter_value_sets);
-}
-
 auto ValueSetDistribution::derive(
   size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
 {
   return *(std::next(parameter_value_sets.begin(), local_index)->evaluate());
+}
+
+auto ValueSetDistribution::getNumberOfDeriveScenarios() const -> size_t
+{
+  return std::size(parameter_value_sets);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
