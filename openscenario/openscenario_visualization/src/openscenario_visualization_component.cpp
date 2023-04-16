@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @mainpage ROS2 visualization component for OpenSCENARIO entities
+ * @mainpage ROS 2 visualization component for OpenSCENARIO entities
  * @tableofcontents
  * @image html images/rviz.png width=1280px height=540px
  * @author Masaya Kataoka
  * @date 2020-11-19
  * @section interface
   <table>
-    <caption id="multi_row">ROS2 Topic interface</caption>
+    <caption id="multi_row">ROS 2 Topic interface</caption>
     <tr>
       <th>Name</th>
       <th>Type</th>

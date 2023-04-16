@@ -7,7 +7,7 @@ import "geometry_msgs.proto";
 package traffic_simulator_msgs;
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/ActionStatus type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/ActionStatus type in ROS 2.
  **/
 message ActionStatus {
   string current_action = 1;     // Current action of the entity.
@@ -17,7 +17,7 @@ message ActionStatus {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/BoundingBox type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/BoundingBox type in ROS 2.
  **/
 message BoundingBox {
   geometry_msgs.Point center = 1;       // Center point of the bounding box.
@@ -25,7 +25,7 @@ message BoundingBox {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/LaneletPose type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/LaneletPose type in ROS 2.
  **/
 message LaneletPose {
   int64 lanelet_id = 1;           // Lanelet id of the entity exists.
@@ -35,7 +35,7 @@ message LaneletPose {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/EntityType type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/EntityType type in ROS 2.
  **/
 
 message EntityType {
@@ -49,7 +49,7 @@ message EntityType {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/EntitySubtype type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/EntitySubtype type in ROS 2.
  **/
 message EntitySubtype {
   enum Enum {
@@ -66,7 +66,7 @@ message EntitySubtype {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/EntityStatus type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/EntityStatus type in ROS 2.
  **/
 message EntityStatus {
   EntityType type = 1;            // Type of the entity.
@@ -81,7 +81,7 @@ message EntityStatus {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/Performance type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Performance type in ROS 2.
  **/
 message Performance {
   double max_speed = 1;             // Max speed of the entity.
@@ -92,7 +92,7 @@ message Performance {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/Axle type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Axle type in ROS 2.
  **/
 message Axle {
   double max_steering = 1;   // Max steering of the entity axle.
@@ -103,7 +103,7 @@ message Axle {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/Axles type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Axles type in ROS 2.
  **/
 message Axles {
   Axle front_axle = 1; // Parameters of the front axle of the entity.
@@ -111,12 +111,12 @@ message Axles {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/Property type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Property type in ROS 2.
  **/
 message Property {}
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/VehicleParameters type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/VehicleParameters type in ROS 2.
  **/
 message VehicleParameters {
   string name = 1;              // Name of the vehicle entity
@@ -127,7 +127,7 @@ message VehicleParameters {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/PedestrianParameters type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/PedestrianParameters type in ROS 2.
  **/
 message PedestrianParameters {
   string name = 1;                // Name of the pedestrian entity.
@@ -140,7 +140,7 @@ message MiscObjectParameters {
 }
 
 /**
- * Protobuf definition of traffic_simulator_msgs/msg/Waypoints type in ROS2.
+ * Protobuf definition of traffic_simulator_msgs/msg/Waypoints type in ROS 2.
  **/
 message Waypoints {
   repeated geometry_msgs.Point waypoints = 1; // Waypoints of the entity.

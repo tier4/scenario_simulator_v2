@@ -1,6 +1,6 @@
 # OpenSCENARIO Support
 
-The ROS2 package `openscenario_interpreter` provides scenario-based simulation on [ASAM OpenSCENARIO 1.0](https://www.asam.net/standards/detail/openscenario/).
+The ROS 2 package `openscenario_interpreter` provides scenario-based simulation on [ASAM OpenSCENARIO 1.0](https://www.asam.net/standards/detail/openscenario/).
 This section describes the differences between our OpenSCENARIO Interpreter and the OpenSCENARIO standard set by ASAM, and the OpenSCENARIO implementation by other companies and organizations.
 If you want to know about OpenSCENARIO, refer to the link below.
 
@@ -168,10 +168,10 @@ See Reference for specific strings.
 | currentTurnIndicatorsState | `<ENTITY-REF>.currentTurnIndicatorsState`                                                                | Returns Autoware's [turn indicators state](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/msg/TurnIndicatorsCommand.idl). `<ENTITY-REF>` must be the name of Vehicle with ObjectController's property `isEgo` set to true. |
 | RelativeHeadingCondition   | `RelativeHeadingCondition(<ENTITY-REF>)` <br> `RelativeHeadingCondition(<ENTITY-REF>, <LANE-ID>, <S>)`   | Returns the relative angle to the lane heading.                                                                                                                                                                                                                    |
 
-#### External ROS2 topic condition
+#### External ROS 2 topic condition
 
-You can pass values from another ROS2 node to a scenario through ROS2 topics.
-The `name` field should be filled with the name of the ROS2 topic like below.
+You can pass values from another ROS 2 node to a scenario through ROS 2 topics.
+The `name` field should be filled with the name of the ROS 2 topic like below.
 ```XML
   <ByValueCondition>
      <UserDefinedValueCondition name="/count_up" rule="equalTo" value="500" />

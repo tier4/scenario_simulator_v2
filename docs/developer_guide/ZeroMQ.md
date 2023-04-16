@@ -42,8 +42,8 @@ sequenceDiagram
       Traffic Simulator ->+ Simple Sensor Simulator : UpdateFrameRequest
       Simple Sensor Simulator ->-Traffic Simulator : UpdateFrameResponse
       Traffic Simulator ->+ Simple Sensor Simulator : UpdateEntityStatusRequest
-      Simple Sensor Simulator ->> Autoware : Send Pointcloud (ROS2 topic)
-      Simple Sensor Simulator ->> Autoware : Send Detection Result (ROS2 topic)
+      Simple Sensor Simulator ->> Autoware : Send Pointcloud (ROS 2 topic)
+      Simple Sensor Simulator ->> Autoware : Send Detection Result (ROS 2 topic)
       Simple Sensor Simulator ->-Traffic Simulator : UpdateEntityStatusResponse
     end
 ```

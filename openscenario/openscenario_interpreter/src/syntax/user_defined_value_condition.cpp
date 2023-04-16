@@ -160,7 +160,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     };
 #else
     throw SyntaxError(
-      "The ability to have ROS2 topics as values for `UserDefinedValueCondition` is enabled only "
+      "The ability to have ROS 2 topics as values for `UserDefinedValueCondition` is enabled only "
       "when the `UserDefinedValue` type is present in the `tier4_simulation_msgs` package.");
 #endif
   } else {
