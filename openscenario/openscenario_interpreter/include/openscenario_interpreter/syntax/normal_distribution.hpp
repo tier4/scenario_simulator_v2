@@ -54,7 +54,7 @@ struct NormalDistribution : public ComplexType,
 
   auto derive() -> Object override;
 
-  auto derive(size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+  auto derive(std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size)
     -> ParameterList override;
 };
 }  // namespace syntax

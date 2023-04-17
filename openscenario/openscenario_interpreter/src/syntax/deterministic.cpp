@@ -38,7 +38,7 @@ auto Deterministic::derive() -> ParameterDistribution
 }
 
 auto Deterministic::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
 {
   auto child =
     std::next(deterministic_parameter_distributions.begin(), std::floor(local_index / local_size));
@@ -51,13 +51,13 @@ auto Deterministic::derive(
     (DeterministicParameterDistribution &)*child);
 }
 
-auto Deterministic::getNumberOfDeriveScenarios() const -> size_t
+auto Deterministic::getNumberOfDeriveScenarios() const -> std::size_t
 {
   return std::accumulate(
     deterministic_parameter_distributions.begin(), deterministic_parameter_distributions.end(), 1,
-    [](size_t pre_result, auto distribution) {
+    [](std::size_t pre_result, auto distribution) {
       return pre_result *
-             apply<size_t>(
+             apply<std::size_t>(
                [](auto & distribution) { return distribution.getNumberOfDeriveScenarios(); },
                distribution);
     });

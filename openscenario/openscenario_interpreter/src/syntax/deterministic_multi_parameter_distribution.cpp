@@ -31,13 +31,13 @@ auto DeterministicMultiParameterDistribution::derive() -> ParameterDistribution
 }
 
 auto DeterministicMultiParameterDistribution::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
 {
   return DeterministicMultiParameterDistributionType::derive(
     local_index, local_size, global_index, global_size);
 }
 
-auto DeterministicMultiParameterDistribution::getNumberOfDeriveScenarios() const -> size_t
+auto DeterministicMultiParameterDistribution::getNumberOfDeriveScenarios() const -> std::size_t
 {
   return DeterministicMultiParameterDistributionType::getNumberOfDeriveScenarios();
 }

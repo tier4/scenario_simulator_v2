@@ -40,7 +40,7 @@ Stochastic::Stochastic(const pugi::xml_node & node, Scope & scope)
 auto Stochastic::derive() -> ParameterDistribution
 {
   ParameterDistribution distribution;
-  for (size_t i = 0; i < number_of_test_runs; i++) {
+  for (std::size_t i = 0; i < number_of_test_runs; i++) {
     ParameterListSharedPtr parameter_list = std::make_shared<ParameterList>();
     for (auto & stochastic_distribution : stochastic_distributions) {
       auto derived = stochastic_distribution.derive();
@@ -52,7 +52,7 @@ auto Stochastic::derive() -> ParameterDistribution
 }
 
 auto Stochastic::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
 {
   // update random_engine
   random_engine.seed(random_seed);

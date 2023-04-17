@@ -38,14 +38,14 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
 
 auto ProbabilityDistributionSet::derive() -> Object
 {
-  size_t index = distribute(random_engine);
+  std::size_t index = distribute(random_engine);
   return make<String>(elements.at(index).value);
 }
 
 auto ProbabilityDistributionSet::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
 {
-  size_t index = distribute(random_engine);
+  std::size_t index = distribute(random_engine);
   return ParameterList{{"", make<String>(elements.at(index).value)}};
 }
 }  // namespace syntax

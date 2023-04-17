@@ -36,12 +36,12 @@ auto ValueSetDistribution::derive() -> ParameterDistribution
 }
 
 auto ValueSetDistribution::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
 {
   return *(std::next(parameter_value_sets.begin(), local_index)->evaluate());
 }
 
-auto ValueSetDistribution::getNumberOfDeriveScenarios() const -> size_t
+auto ValueSetDistribution::getNumberOfDeriveScenarios() const -> std::size_t
 {
   return std::size(parameter_value_sets);
 }

@@ -33,10 +33,10 @@ using SingleUnnamedParameterDistribution = std::vector<Object>;
 struct ParallelDerivableParameterDistributionBase
 {
   virtual auto derive(
-    size_t local_index, size_t local_size, size_t global_index, size_t global_size)
+    std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size)
     -> ParameterList = 0;
 
-  virtual auto getNumberOfDeriveScenarios() const -> size_t
+  virtual auto getNumberOfDeriveScenarios() const -> std::size_t
   {
     throw Error("getNumberOfDeriveScenarios() is not implemented");
   }

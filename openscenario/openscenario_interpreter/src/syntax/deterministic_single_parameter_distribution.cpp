@@ -42,7 +42,7 @@ auto DeterministicSingleParameterDistribution::derive() -> ParameterDistribution
 }
 
 auto DeterministicSingleParameterDistribution::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
 {
   return {
     {parameter_name, apply<ParameterList>(
@@ -55,9 +55,9 @@ auto DeterministicSingleParameterDistribution::derive(
                        ->second}};
 }
 
-auto DeterministicSingleParameterDistribution::getNumberOfDeriveScenarios() const -> size_t
+auto DeterministicSingleParameterDistribution::getNumberOfDeriveScenarios() const -> std::size_t
 {
-  return apply<size_t>(
+  return apply<std::size_t>(
     [](auto & unnamed_distribution) { return unnamed_distribution.getNumberOfDeriveScenarios(); },
     (DeterministicSingleParameterDistributionType &)*this);
 }

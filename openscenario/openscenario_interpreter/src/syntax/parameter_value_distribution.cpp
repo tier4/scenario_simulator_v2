@@ -31,15 +31,15 @@ auto ParameterValueDistribution::derive() -> ParameterDistribution
     [](auto & distribution) { return distribution.derive(); }, *this);
 }
 
-auto ParameterValueDistribution::getNumberOfDeriveScenarios() const -> size_t
+auto ParameterValueDistribution::getNumberOfDeriveScenarios() const -> std::size_t
 {
-  return apply<size_t>(
+  return apply<std::size_t>(
     [](auto & distribution) { return distribution.getNumberOfDeriveScenarios(); },
     (DistributionDefinition &)*this);
 }
 
 auto ParameterValueDistribution::derive(
-  size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
 {
   return apply<ParameterList>(
     [&](auto & distribution) {
