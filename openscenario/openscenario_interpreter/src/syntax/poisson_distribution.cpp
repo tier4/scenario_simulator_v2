@@ -34,7 +34,8 @@ auto PoissonDistribution::derive() -> Object
 }
 
 ParameterList PoissonDistribution::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size)
+  std::size_t local_index, std::size_t local_size, std::size_t global_index,
+  std::size_t global_size)
 {
   return ParameterList({{"", make<Double>(range.evaluate(distribute(random_engine)))}});
 }

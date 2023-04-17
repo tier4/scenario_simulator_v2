@@ -32,7 +32,8 @@ auto StochasticDistribution::derive() -> Object
 }
 
 auto StochasticDistribution::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index,
+  std::size_t global_size) -> ParameterList
 {
   return {
     {parameter_name, make(apply<ParameterList>(

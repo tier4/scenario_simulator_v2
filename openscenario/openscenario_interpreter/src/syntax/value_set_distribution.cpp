@@ -36,7 +36,8 @@ auto ValueSetDistribution::derive() -> ParameterDistribution
 }
 
 auto ValueSetDistribution::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index,
+  std::size_t global_size) -> ParameterList
 {
   return *(std::next(parameter_value_sets.begin(), local_index)->evaluate());
 }

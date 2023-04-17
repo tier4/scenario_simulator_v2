@@ -52,7 +52,8 @@ auto Stochastic::derive() -> ParameterDistribution
 }
 
 auto Stochastic::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index,
+  std::size_t global_size) -> ParameterList
 {
   // update random_engine
   random_engine.seed(random_seed);

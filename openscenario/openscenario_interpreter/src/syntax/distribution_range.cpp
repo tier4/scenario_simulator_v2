@@ -37,7 +37,8 @@ auto DistributionRange::derive() -> SingleUnnamedParameterDistribution
 }
 
 auto DistributionRange::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index,
+  std::size_t global_size) -> ParameterList
 {
   return ParameterList({{"", make<Double>(range.lower_limit + step_width * local_index)}});
 }

@@ -38,7 +38,8 @@ auto Deterministic::derive() -> ParameterDistribution
 }
 
 auto Deterministic::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index,
+  std::size_t global_size) -> ParameterList
 {
   auto child =
     std::next(deterministic_parameter_distributions.begin(), std::floor(local_index / local_size));

@@ -31,7 +31,8 @@ auto DeterministicMultiParameterDistribution::derive() -> ParameterDistribution
 }
 
 auto DeterministicMultiParameterDistribution::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index,
+  std::size_t global_size) -> ParameterList
 {
   return DeterministicMultiParameterDistributionType::derive(
     local_index, local_size, global_index, global_size);

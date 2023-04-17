@@ -62,8 +62,9 @@ struct Histogram : public ComplexType, private Scope, public StochasticParameter
 
   auto derive() -> Object override;
 
-  auto derive(std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size)
-    -> ParameterList override;
+  auto derive(
+    std::size_t local_index, std::size_t local_size, std::size_t global_index,
+    std::size_t global_size) -> ParameterList override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

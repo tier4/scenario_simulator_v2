@@ -41,8 +41,9 @@ struct ParameterValueDistribution : public DistributionDefinition,
 
   auto derive() -> ParameterDistribution override;
 
-  auto derive(std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size)
-    -> ParameterList override;
+  auto derive(
+    std::size_t local_index, std::size_t local_size, std::size_t global_index,
+    std::size_t global_size) -> ParameterList override;
 
   auto getNumberOfDeriveScenarios() const -> std::size_t override;
 };

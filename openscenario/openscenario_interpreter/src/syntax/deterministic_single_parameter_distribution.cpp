@@ -42,7 +42,8 @@ auto DeterministicSingleParameterDistribution::derive() -> ParameterDistribution
 }
 
 auto DeterministicSingleParameterDistribution::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index, std::size_t global_size) -> ParameterList
+  std::size_t local_index, std::size_t local_size, std::size_t global_index,
+  std::size_t global_size) -> ParameterList
 {
   return {
     {parameter_name, apply<ParameterList>(
