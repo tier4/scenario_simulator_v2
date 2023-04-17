@@ -61,7 +61,6 @@ protected:
 
   boost::filesystem::path output_directory;
 };
-
 }  // namespace openscenario_preprocessor
 
 #endif  // OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
