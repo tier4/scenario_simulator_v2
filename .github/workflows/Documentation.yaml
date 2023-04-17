@@ -22,9 +22,9 @@ jobs:
       - name: run protoc-gen-doc
         run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.10.10"
+          python-version: "3.10"
       - name: Install
         run: pip3 install mkdocs mkdocs-material pymdown-extensions fontawesome_markdown markdown python-markdown-math plantuml-markdown mkdocs-codeinclude-plugin mkdocs-git-revision-date-localized-plugin plantuml
       - name: Install doxygen/depends of doxybook
