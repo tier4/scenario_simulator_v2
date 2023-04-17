@@ -33,19 +33,16 @@ public:
     xercesc::XMLPlatformUtils::Initialize();
   }
 
-  ~XMLValidator()
-  {
-    xercesc::XMLPlatformUtils::Terminate();
-  }
+  ~XMLValidator() { xercesc::XMLPlatformUtils::Terminate(); }
 
   [[nodiscard]] bool validate(const boost::filesystem::path & xml_file) noexcept
   {
     try {
-      xercesc::XercesDOMParser parser;
+      auto parser = xercesc::XercesDOMParser();
       parser.loadGrammar(xsd_file.string().c_str(), xercesc::Grammar::SchemaGrammarType, true);
 
-      xercesc::ErrorHandler * error_handler = new xercesc::HandlerBase();
-      parser.setErrorHandler(error_handler);
+      auto error_handler = std::make_unique<xercesc::HandlerBase>();
+      parser.setErrorHandler(error_handler.get());
       parser.setValidationScheme(xercesc::XercesDOMParser::Val_Auto);
       parser.setDoNamespaces(true);
       parser.setDoSchema(true);
@@ -53,9 +50,7 @@ public:
 
       parser.parse(xml_file.string().c_str());
 
-      int error_count = parser.getErrorCount();
-      delete error_handler;
-      return error_count == 0;
+      return parser.getErrorCount() == 0;
     } catch (const xercesc::XMLException & ex) {
       std::cerr << "Error: " << ex.getMessage() << std::endl;
       return false;
