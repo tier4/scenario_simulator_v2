@@ -30,27 +30,20 @@ class XMLValidator
 public:
   explicit XMLValidator(boost::filesystem::path xsd_file) : xsd_file(xsd_file)
   {
-    // Initialize Xerces library
     xercesc::XMLPlatformUtils::Initialize();
   }
 
   ~XMLValidator()
   {
-    // Terminate Xerces library
     xercesc::XMLPlatformUtils::Terminate();
   }
-
 
   [[nodiscard]] bool validate(const boost::filesystem::path & xml_file) noexcept
   {
     try {
-      // Create a DOM parser
       xercesc::XercesDOMParser parser;
-
-      // Load the XSD file
       parser.loadGrammar(xsd_file.string().c_str(), xercesc::Grammar::SchemaGrammarType, true);
 
-      // Set the validation scheme
       xercesc::ErrorHandler * error_handler = new xercesc::HandlerBase();
       parser.setErrorHandler(error_handler);
       parser.setValidationScheme(xercesc::XercesDOMParser::Val_Auto);
@@ -58,7 +51,6 @@ public:
       parser.setDoSchema(true);
       parser.setValidationConstraintFatal(true);
 
-      // Parse the XML file
       parser.parse(xml_file.string().c_str());
 
       int error_count = parser.getErrorCount();
