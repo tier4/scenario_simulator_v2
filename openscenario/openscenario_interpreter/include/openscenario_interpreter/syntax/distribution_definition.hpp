@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
-#define OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_DEFINITION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_DEFINITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/deterministic.hpp>
@@ -47,4 +47,4 @@ DEFINE_LAZY_VISITOR(
 
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_DEFINITION_HPP_

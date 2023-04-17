@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__STOCHASTIC_HPP_
-#define OPENSCENARIO_INTERPRETER__STOCHASTIC_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_HPP_
 
 #include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
@@ -59,4 +59,4 @@ struct Stochastic : public ComplexType, public ParameterDistributionContainer, p
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__STOCHASTIC_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_HPP_

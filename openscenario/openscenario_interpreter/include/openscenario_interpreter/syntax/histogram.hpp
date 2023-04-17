@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
-#define OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_HPP_
 
 #include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
@@ -68,4 +68,4 @@ struct Histogram : public ComplexType, private Scope, public StochasticParameter
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_HPP_

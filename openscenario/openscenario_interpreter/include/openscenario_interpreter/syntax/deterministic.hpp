@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
-#define OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_HPP_
 
 #include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
@@ -49,4 +49,4 @@ struct Deterministic : public ParameterDistributionContainer
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_HPP_

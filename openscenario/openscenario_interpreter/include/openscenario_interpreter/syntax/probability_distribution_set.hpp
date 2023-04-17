@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
-#define OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_HPP_
 
 #include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/syntax/probability_distribution_set_element.hpp>
@@ -65,4 +65,4 @@ struct ProbabilityDistributionSet : public ComplexType,
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_HPP_
