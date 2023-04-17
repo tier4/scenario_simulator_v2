@@ -35,13 +35,13 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct StochasticDistribution : public StochasticDistributionType,
-                                public ParameterDistributionContainer
+                                public StochasticParameterDistributionBase
 {
   const String parameter_name;
 
   explicit StochasticDistribution(const pugi::xml_node &, Scope & scope);
 
-  auto derive() -> ParameterDistribution override;
+  auto derive() -> Object override;
 
   auto derive(size_t local_index, size_t local_size, size_t global_index, size_t global_size)
     -> ParameterList override;

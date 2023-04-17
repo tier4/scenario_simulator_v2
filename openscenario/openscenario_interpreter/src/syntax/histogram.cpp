@@ -28,10 +28,7 @@ Histogram::Histogram(const pugi::xml_node & node, openscenario_interpreter::Scop
 {
 }
 
-auto Histogram::derive() -> SingleUnnamedParameterDistribution
-{
-  return std::vector<Object>({make<Double>(distribute(random_engine))});
-}
+auto Histogram::derive() -> Object { return make<Double>(distribute(random_engine)); }
 
 auto Histogram::derive(
   size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList

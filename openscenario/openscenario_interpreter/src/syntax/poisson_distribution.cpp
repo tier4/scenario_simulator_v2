@@ -28,9 +28,9 @@ PoissonDistribution::PoissonDistribution(
 {
 }
 
-auto PoissonDistribution::derive() -> SingleUnnamedParameterDistribution
+auto PoissonDistribution::derive() -> Object
 {
-  return std::vector<Object>({make<Double>(range.evaluate(distribute(random_engine)))});
+  return make<Double>(range.evaluate(distribute(random_engine)));
 }
 
 ParameterList PoissonDistribution::derive(

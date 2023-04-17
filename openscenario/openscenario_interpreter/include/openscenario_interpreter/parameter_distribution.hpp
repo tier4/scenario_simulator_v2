@@ -53,6 +53,11 @@ struct MultiParameterDistributionBase : public ParallelDerivableParameterDistrib
   virtual auto derive() -> ParameterDistribution = 0;
 };
 
+struct StochasticParameterDistributionBase : public ParallelDerivableParameterDistributionBase
+{
+  virtual auto derive() -> Object = 0;
+};
+
 // container types of distribution data generator
 struct ParameterDistributionContainer : public ParallelDerivableParameterDistributionBase
 {

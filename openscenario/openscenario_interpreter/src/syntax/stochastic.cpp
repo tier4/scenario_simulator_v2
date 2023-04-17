@@ -44,7 +44,7 @@ auto Stochastic::derive() -> ParameterDistribution
     ParameterListSharedPtr parameter_list = std::make_shared<ParameterList>();
     for (auto & stochastic_distribution : stochastic_distributions) {
       auto derived = stochastic_distribution.derive();
-      distribution.insert(distribution.end(), derived.begin(), derived.end());
+      parameter_list->emplace(stochastic_distribution.parameter_name, derived);
     }
     distribution.emplace_back(parameter_list);
   }

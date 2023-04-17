@@ -36,10 +36,10 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
 {
 }
 
-auto ProbabilityDistributionSet::derive() -> SingleUnnamedParameterDistribution
+auto ProbabilityDistributionSet::derive() -> Object
 {
   size_t index = distribute(random_engine);
-  return std::vector<Object>({make<String>(elements.at(index).value)});
+  return make<String>(elements.at(index).value);
 }
 
 auto ProbabilityDistributionSet::derive(

@@ -25,18 +25,10 @@ StochasticDistribution::StochasticDistribution(const pugi::xml_node & node, Scop
 {
 }
 
-auto StochasticDistribution::derive() -> ParameterDistribution
+auto StochasticDistribution::derive() -> Object
 {
-  return apply<ParameterDistribution>(
-    [this](auto & unnamed_distribution) {
-      ParameterDistribution distribution;
-      for (const auto & parameter : unnamed_distribution.derive()) {
-        distribution.emplace_back(
-          std::make_shared<ParameterList>(ParameterList{{parameter_name, make(parameter)}}));
-      }
-      return distribution;
-    },
-    *this);
+  return apply<Object>(
+    [](auto & unnamed_distribution) { return unnamed_distribution.derive(); }, *this);
 }
 
 auto StochasticDistribution::derive(

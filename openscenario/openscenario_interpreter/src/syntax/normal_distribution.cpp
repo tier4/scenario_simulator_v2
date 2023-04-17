@@ -29,10 +29,7 @@ NormalDistribution::NormalDistribution(
 {
 }
 
-auto NormalDistribution::derive() -> SingleUnnamedParameterDistribution
-{
-  return std::vector<Object>({make<Double>(distribute(random_engine))});
-}
+auto NormalDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
 
 auto NormalDistribution::derive(
   size_t local_index, size_t local_size, size_t global_index, size_t global_size) -> ParameterList

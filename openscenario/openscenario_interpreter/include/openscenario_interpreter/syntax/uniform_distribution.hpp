@@ -35,7 +35,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct UniformDistribution : public ComplexType,
                              private Scope,
-                             public SingleParameterDistributionBase
+                             public StochasticParameterDistributionBase
 {
   const Range range;
 
@@ -43,7 +43,7 @@ struct UniformDistribution : public ComplexType,
 
   explicit UniformDistribution(const pugi::xml_node &, Scope & scope);
 
-  auto derive() -> SingleUnnamedParameterDistribution override;
+  auto derive() -> Object override;
 
   auto derive(size_t local_index, size_t local_size, size_t global_index, size_t global_size)
     -> ParameterList override;
