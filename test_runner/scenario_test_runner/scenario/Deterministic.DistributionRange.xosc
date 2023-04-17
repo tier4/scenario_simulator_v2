@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <OpenSCENARIO>
-    <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="offset=[-1.0,0.0,1.0]" revMajor="0" revMinor="0"/>
-    <ParameterValueDistribution>
-        <ScenarioFile filepath="$(ros2 pkg prefix --share scenario_test_runner)/scenario/sample.xosc"/>
-        <Deterministic>
-            <DeterministicSingleParameterDistribution parameterName="offset">
-                <DistributionRange stepWidth="1.0">
-                    <Range lowerLimit="-1.0" upperLimit="1.0"/>
-                </DistributionRange>
-            </DeterministicSingleParameterDistribution>
-        </Deterministic>
-    </ParameterValueDistribution>
+  <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="offset=[-1.0,0.0,1.0]" revMajor="0" revMinor="0"/>
+  <ParameterValueDistribution>
+    <ScenarioFile filepath="$(ros2 pkg prefix --share scenario_test_runner)/scenario/sample.xosc"/>
+    <Deterministic>
+      <DeterministicSingleParameterDistribution parameterName="offset">
+        <DistributionRange stepWidth="1.0">
+          <Range lowerLimit="-1.0" upperLimit="1.0"/>
+        </DistributionRange>
+      </DeterministicSingleParameterDistribution>
+    </Deterministic>
+  </ParameterValueDistribution>
 </OpenSCENARIO>
