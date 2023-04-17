@@ -133,7 +133,7 @@ Major Changes :race_car: :red_car: :blue_car:
 | Feature                                       | Brief summary                                                                                                                                                            | Category                                                          | Pull request                                                    | Contributor                                   |
 |-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------|
 | Entity label publisher                        | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`.                                                                                | `traffic_simulator`                                               | [#726](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
-| ROS2 Launch XML-like substitution syntax      | Add new substitution syntax `$(ros2 <argument>...)`.                                                                                                                     | `openscenario_interpreter`                                        | [#727](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
+| ROS 2 Launch XML-like substitution syntax      | Add new substitution syntax `$(ros2 <argument>...)`.                                                                                                                     | `openscenario_interpreter`                                        | [#727](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
 | `Filter by range` option                      | Add `filter by range` option for detection sensor. If false, simulate detection result by lidar detection. If true, simulate detection result by range.                  | `traffic_simulator`                                               | [#729](https://github.com/tier4/scenario_simulator_v2/pull/729) | [hakuturu583](https://github.com/hakuturu583) |
 | Optimization of the trajectory calculation    | Hermite curve optimization, entities' trajectories calculated only when route changes                                                                                    | `traffic_simulator`, `behavior_tree_plugin`                       | [#708](https://github.com/tier4/scenario_simulator_v2/pull/708) | [danielm1405](https://github.com/danielm1405) |
 | OpenSCENARIO `Controller.Properties.Property` | Support new controller property `isClairvoyant`.                                                                                                                         | `openscenario_interpreter`                                        | [#735](https://github.com/tier4/scenario_simulator_v2/pull/735) | [yamacir-kit](https://github.com/yamacir-kit) |
@@ -161,7 +161,7 @@ Minor Tweaks :oncoming_police_car:
 ## Version 0.6.3
 - Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
 - Fix problem in warping NPCs spawned in world coordinate. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/686))
-- End of support for ROS2 Foxy and Autoware.Auto ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/696)).
+- End of support for ROS 2 Foxy and Autoware.Auto ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/696)).
 - Fix problem in ideal steer acc geared dynamics model. Vehicle was pulled back very slowly even if the vehicle is stopped. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/698))
 - Fix problem in getFrontEntityName function, consider yaw difference while stopping at crossing entity. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/703))
 - Fix problem in delay steer acc geared dynamics model. Vehicle was pulled back very slowly even if the vehicle is stopped. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/707))
@@ -206,7 +206,7 @@ Minor Tweaks :oncoming_police_car:
 - Add NPC Behavior Plugin and Behavior-Tree Plugin for Vehicle and Pedestrian. ([link](https://github.com/tier4/scenario_simulator_v2/pull/566))
 - Rename package `openscenario_msgs` to `traffic_simulator_msgs`
 - Start supporting galactic environment with Docker. ([link](https://github.com/tier4/scenario_simulator_v2/pull/576))
-- Update `UserDefinedValueCondition` to subscribe ROS2 topic if path-like name given ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/567)).
+- Update `UserDefinedValueCondition` to subscribe ROS 2 topic if path-like name given ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/567)).
 - Add new package `openscenario_msgs` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/567)).
 - Add getNearbyLaneletIds and filterLaneletIds function in HdMapUtils class. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/585))
 - Fix calculating way of longitudinal distance. If forward distance and backward distance was calculated, choose smaller one. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/586))
@@ -288,7 +288,7 @@ Minor Tweaks :oncoming_police_car:
 - Update AcquirePositionAction to support WorldPosition as destination.
 - Update syntax 'RoadNetwork.LogicFile' to allow user to specify the directory that contains `lanelet2_map.osm`.
 - Check boost::none in TargetSpeedPlanner class.
-- Add ROS2 galactic support.
+- Add ROS 2 galactic support.
 - Update EgoEntity to publish self-position as PoseWithCovarianceStamped.
 
 ## Version 0.3.0
