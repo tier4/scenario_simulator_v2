@@ -35,10 +35,8 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
         if (xml_validator.validate(base_scenario_path)) {
           auto base_scenario = std::make_shared<OpenScenario>(base_scenario_path);
           auto p = parameter_value_distribution.derive();
-          std::cout << "Number of derived scenarios: " << p.size() << std::endl;
 
           for (const auto & parameter_list : p | boost::adaptors::indexed()) {
-            std::cout << "scenario number : " << parameter_list.index() << std::endl;
             pugi::xml_document derived_script;
             derived_script.reset(base_scenario->script);  // deep copy
 
