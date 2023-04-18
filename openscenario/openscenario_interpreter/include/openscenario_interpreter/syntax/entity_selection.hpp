@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_SELECTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_SELECTION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/selected_entities.hpp>
 
 namespace openscenario_interpreter
@@ -31,8 +32,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct EntitySelection
+struct EntitySelection : public Scope, public SelectedEntities
 {
+  EntitySelection(const pugi::xml_node & node, Scope & scope);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

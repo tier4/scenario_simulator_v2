@@ -17,6 +17,8 @@
 #include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 
+#include "openscenario_interpreter/reader/attribute.hpp"
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -27,12 +29,11 @@ Entities::Entities(const pugi::xml_node & node, Scope & scope)
     emplace(readAttribute<String>("name", node, scope), make<ScenarioObject>(node, scope));
   });
 
-  scope.global().entities = this;
-
   traverse<0, unbounded>(node, "EntitySelection", [&](auto && node) {
-    throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
-    return unspecified;
+    emplace(readAttribute<String>("name", node, scope), make<EntitySelection>(node, scope));
   });
+
+  scope.global().entities = this;
 }
 
 auto Entities::isAdded(const EntityRef & entity_ref) const -> bool

@@ -12,31 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__BY_TYPE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__BY_TYPE_HPP_
-
-#include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/object_type.hpp>
-#include <pugixml.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/entity_selection.hpp>
+#include <openscenario_interpreter/syntax/selected_entities.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ByType -----------------------------------------------------------------
- *
- *  <xsd:complexType name="ByType">
- *    <xsd:attribute name="objectType" type="ObjectType" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct ByType
+EntitySelection::EntitySelection(const pugi::xml_node & node, Scope & scope)
+: Scope(readAttribute<String>("name", node, scope), scope),
+  SelectedEntities(readElement<SelectedEntities>("Members", node, scope))
 {
-  const ObjectType objectType;
-
-  ByType(const pugi::xml_node &, Scope &);
-};
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__BY_TYPE_HPP_

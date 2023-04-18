@@ -12,31 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__BY_TYPE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__BY_TYPE_HPP_
-
-#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/by_type.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
-#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ByType -----------------------------------------------------------------
- *
- *  <xsd:complexType name="ByType">
- *    <xsd:attribute name="objectType" type="ObjectType" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct ByType
+ByType::ByType(const pugi::xml_node & tree, Scope & scope)
+: objectType(readAttribute<ObjectType>("objectType", tree, scope))
 {
-  const ObjectType objectType;
-
-  ByType(const pugi::xml_node &, Scope &);
-};
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__BY_TYPE_HPP_
