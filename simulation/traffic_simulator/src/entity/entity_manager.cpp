@@ -260,7 +260,11 @@ auto EntityManager::getLongitudinalDistance(
       static_cast<LaneletPose>(to), static_cast<LaneletPose>(from));
 
     if (forward_distance && backward_distance) {
-      return std::min(forward_distance.value(), std::abs(backward_distance.value()));
+      if (forward_distance.value() > backward_distance.value()) {
+        return -backward_distance.value();
+      } else {
+        return forward_distance.value();
+      }
     } else if (forward_distance) {
       return forward_distance.value();
     } else if (backward_distance) {
