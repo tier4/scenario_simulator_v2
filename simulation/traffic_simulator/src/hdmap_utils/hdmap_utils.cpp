@@ -100,7 +100,7 @@ auto HdMapUtils::canonicalizeLaneletPose(
       canonicalized.lanelet_id = ids[0];
     }
   }
-  while (canonicalized.s > getLaneletLength(canonicalized.lanelet_id)) {
+  while (canonicalized.s > (getLaneletLength(canonicalized.lanelet_id) + 0.2)) {
     if (const auto ids = getNextLaneletIds(canonicalized.lanelet_id); ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
