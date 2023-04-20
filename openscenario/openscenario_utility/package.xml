@@ -14,7 +14,6 @@
   <depend>python3-yaml</depend>
   <depend>rclcpp</depend>
   <depend>rclpy</depend>
-  <depend>xerces</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

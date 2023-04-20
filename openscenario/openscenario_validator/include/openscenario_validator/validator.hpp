@@ -12,44 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_UTILITY__XML_VALIDATOR_HPP_
-#define OPENSCENARIO_UTILITY__XML_VALIDATOR_HPP_
+#ifndef OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_
+#define OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_
 
 #include <boost/filesystem.hpp>
-#include <xercesc/framework/LocalFileInputSource.hpp>
+#include <iostream>
+#include <openscenario_validator/schema.hpp>
+#include <stdexcept>
+#include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
-#include <xercesc/sax/ErrorHandler.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/validators/common/Grammar.hpp>
 
-namespace openscenario_utility
+namespace openscenario_validator
 {
-class XMLValidator
+struct XMLPlatform
 {
+  XMLPlatform();
+
+  ~XMLPlatform();
+};
+
+static XMLPlatform platform{};
+
+class OpenSCENARIOValidator
+{
+  xercesc::XercesDOMParser parser;
+
+  xercesc::MemBufInputSource input_source;
+
+  std::unique_ptr<xercesc::HandlerBase> error_handler;
+
 public:
-  explicit XMLValidator(boost::filesystem::path xsd_file) : xsd_file(xsd_file)
+  explicit OpenSCENARIOValidator()
+  : input_source(reinterpret_cast<const XMLByte *>(schema.data()), schema.size(), "xsd"),
+    error_handler(std::make_unique<xercesc::HandlerBase>())
   {
-    xercesc::XMLPlatformUtils::Initialize();
-  }
-
-  ~XMLValidator() { xercesc::XMLPlatformUtils::Terminate(); }
-
-  [[nodiscard]] bool validate(const boost::filesystem::path & xml_file) noexcept
-  {
-    try {
-      auto parser = xercesc::XercesDOMParser();
-      parser.loadGrammar(xsd_file.string().c_str(), xercesc::Grammar::SchemaGrammarType, true);
-
-      auto error_handler = std::make_unique<xercesc::HandlerBase>();
+    if (not parser.loadGrammar(input_source, xercesc::Grammar::SchemaGrammarType)) {
+      throw std::runtime_error(
+        "Failed to load XSD schema. This is an unexpected error and an implementation issue. "
+        "Please contact the developer.");
+    } else {
       parser.setErrorHandler(error_handler.get());
       parser.setValidationScheme(xercesc::XercesDOMParser::Val_Auto);
       parser.setDoNamespaces(true);
       parser.setDoSchema(true);
       parser.setValidationConstraintFatal(true);
+    }
+  }
 
+  [[nodiscard]] auto validate(const boost::filesystem::path & xml_file) noexcept -> bool
+  {
+    try {
       parser.parse(xml_file.string().c_str());
-
       return parser.getErrorCount() == 0;
     } catch (const xercesc::XMLException & ex) {
       std::cerr << "Error: " << ex.getMessage() << std::endl;
@@ -60,7 +75,12 @@ public:
     }
   }
 
-  boost::filesystem::path xsd_file;
+  template <typename... Ts>
+  [[nodiscard]] auto operator()(Ts &&... xs) noexcept -> decltype(auto)
+  {
+    return validate(std::forward<decltype(xs)>(xs)...);
+  }
 };
-}  // namespace openscenario_utility
-#endif  //OPENSCENARIO_UTILITY__XML_VALIDATOR_HPP_
+}  // namespace openscenario_validator
+
+#endif  //OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_

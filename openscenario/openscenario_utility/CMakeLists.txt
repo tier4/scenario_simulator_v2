@@ -11,11 +11,4 @@ install(
   DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/
   DESTINATION lib/${PROJECT_NAME})
 
-install(
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
-  DESTINATION include
-)
-
-ament_export_include_directories(include)
-
 ament_package()

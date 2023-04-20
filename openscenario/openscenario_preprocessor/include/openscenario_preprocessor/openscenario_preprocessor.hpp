@@ -15,49 +15,48 @@
 #ifndef OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 #define OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 
-#include <deque>
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_utility/xml_validator.hpp>
+#include <openscenario_validator/validator.hpp>
+#include <queue>
 
 namespace openscenario_preprocessor
 {
-struct ScenarioSet
+struct Scenario
 {
-  ScenarioSet() = default;
+  Scenario() = default;
 
-  explicit ScenarioSet(std::string path, int expect, float frame_rate)
+  explicit Scenario(const boost::filesystem::path & path, int expect, double frame_rate)
   : path(path), expect(expect), frame_rate(frame_rate)
   {
   }
 
-  std::string path;
+  boost::filesystem::path path;
 
   int expect;
 
-  float frame_rate;
+  double frame_rate;
 };
 
 class Preprocessor
 {
 public:
-  explicit Preprocessor(boost::filesystem::path xsd_path, boost::filesystem::path output_directory)
-  : xml_validator(xsd_path), output_directory(output_directory)
+  explicit Preprocessor(const boost::filesystem::path & output_directory)
+  : validate(), output_directory(output_directory)
   {
+    if (not boost::filesystem::exists(output_directory)) {
+      boost::filesystem::create_directories(output_directory);
+    }
   }
 
 protected:
-  void preprocessScenario(ScenarioSet &);
+  void preprocessScenario(const Scenario &);
 
-  [[nodiscard]] bool validateXOSC(
-    const boost::filesystem::path & target_file, const boost::filesystem::path & xsd_file,
-    bool verbose = false);
-
-  std::deque<ScenarioSet> preprocessed_scenarios;
+  std::queue<Scenario> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
 
-  openscenario_utility::XMLValidator xml_validator;
+  openscenario_validator::OpenSCENARIOValidator validate;
 
   boost::filesystem::path output_directory;
 };

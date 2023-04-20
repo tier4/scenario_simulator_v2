@@ -13,80 +13,78 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
+#include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
 
 namespace openscenario_preprocessor
 {
-void Preprocessor::preprocessScenario(ScenarioSet & scenario)
+void Preprocessor::preprocessScenario(const Scenario & scenario)
 {
   using openscenario_interpreter::OpenScenario;
   using openscenario_interpreter::ParameterValueDistribution;
+  using openscenario_interpreter::ParameterValueDistributionDefinition;
 
-  if (xml_validator.validate(scenario.path)) {
-    if (auto script = std::make_shared<OpenScenario>(scenario.path);
-        script->category.is_also<ParameterValueDistribution>()) {
-      auto & parameter_value_distribution = script->category.as<ParameterValueDistribution>();
-      auto base_scenario_path = parameter_value_distribution.scenario_file.filepath;
+  if (validate(scenario.path)) {
+    if (OpenScenario script{scenario.path};
+        script.category.is<ParameterValueDistributionDefinition>()) {
+      auto & parameter_value_distribution = script.category.as<ParameterValueDistribution>();
+      auto scenario_file_path = parameter_value_distribution.scenario_file.filepath;
 
-      if (boost::filesystem::exists(base_scenario_path)) {
-        if (xml_validator.validate(base_scenario_path)) {
-          auto base_scenario = std::make_shared<OpenScenario>(base_scenario_path);
-          auto p = parameter_value_distribution.derive();
+      if (boost::filesystem::exists(scenario_file_path) and validate(scenario_file_path)) {
+        OpenScenario scenario_file{scenario_file_path};
 
-          for (const auto & parameter_list : p | boost::adaptors::indexed()) {
-            pugi::xml_document derived_script;
-            derived_script.reset(base_scenario->script);  // deep copy
+        auto p = parameter_value_distribution.derive();
 
-            auto parameter_declarations =
-              derived_script.document_element()
-                .select_node(pugi::xpath_query{"/OpenSCENARIO/ParameterDeclarations"})
-                .node();
+        for (const auto & parameter_list : p | boost::adaptors::indexed()) {
+          pugi::xml_document derived_script;
 
-            // embedding parameter values
-            for (const auto & [name, value] : *parameter_list.value()) {
-              if (auto parameter_node =
-                    parameter_declarations.find_child_by_attribute("name", name.c_str());
-                  parameter_node) {
-                std::stringstream parameter_stringstream;
-                parameter_stringstream << value;
-                parameter_node.attribute("value").set_value(parameter_stringstream.str().c_str());
-              } else {
-                std::cout << "Parameter " << name << " not found in base scenario" << std::endl;
-              }
+          derived_script.reset(scenario_file.script);  // deep copy
+
+          auto parameter_declarations =
+            derived_script.document_element()
+              .select_node(pugi::xpath_query{"/OpenSCENARIO/ParameterDeclarations"})
+              .node();
+
+          // embedding parameter values
+          for (const auto & [name, value] : *parameter_list.value()) {
+            if (
+              auto parameter_node =
+                parameter_declarations.find_child_by_attribute("name", name.c_str())) {
+              parameter_node.attribute("value").set_value(
+                boost::lexical_cast<std::string>(value).c_str());
+            } else {
+              std::cerr << "Parameter " << std::quoted(name) << " is not declared in scenario "
+                        << std::quoted(scenario_file_path.string()) << ", so ignore it."
+                        << std::endl;
             }
-
-            ScenarioSet derived_scenario = scenario;
-
-            // generate new scenario file name
-            boost::filesystem::path derived_scenario_path(derived_scenario.path);
-            derived_scenario_path = output_directory / derived_scenario_path.filename();
-            derived_scenario_path.replace_extension(
-              std::to_string(parameter_list.index()) + derived_scenario_path.extension().string());
-
-            derived_scenario.path = derived_scenario_path.string();
-
-            if (not boost::filesystem::exists(output_directory)) {
-              boost::filesystem::create_directories(output_directory);
-            }
-            derived_script.save_file(derived_scenario.path.c_str());
-
-            preprocessed_scenarios.emplace_back(derived_scenario);
           }
-        } else {
-          throw common::Error("base scenario is not valid : " + base_scenario_path.string());
+
+          const auto derived_scenario_path =
+            output_directory /
+            (scenario.path.stem().string() + "." + std::to_string(parameter_list.index()) +
+             scenario.path.extension().string());
+
+          derived_script.save_file(derived_scenario_path.c_str());
+
+          preprocessed_scenarios.emplace(
+            derived_scenario_path, scenario.expect, scenario.frame_rate);
         }
       } else {
-        throw common::Error("base scenario does not exist : " + base_scenario_path.string());
+        throw common::Error(
+          "Scenario file ", std::quoted(scenario_file_path.string()),
+          " described in ParameterDistributionDefinition file ",
+          std::quoted(scenario.path.string()),
+          " does not exist. Please check if the file path is correct.");
       }
     } else {
       // normal scenario
-      preprocessed_scenarios.emplace_back(scenario);
+      preprocessed_scenarios.push(scenario);
     }
   } else {
-    throw common::Error("the scenario file is not valid. Please check your scenario");
+    throw common::Error("The scenario file is not valid. Please check your scenario");
   }
 }
 }  // namespace openscenario_preprocessor
