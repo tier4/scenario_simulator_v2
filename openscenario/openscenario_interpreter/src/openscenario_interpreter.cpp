@@ -131,6 +131,7 @@ auto Interpreter::engage() const -> void
 {
   for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
     if (
+      scenario_object.template is<ScenarioObject>() and
       scenario_object.template as<ScenarioObject>().is_added and
       scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
       asAutoware(name).engage();
@@ -142,9 +143,10 @@ auto Interpreter::engageable() const -> bool
 {
   return std::all_of(
     std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
+    std::cend(currentScenarioDefinition()->entities), [](const auto & each) {
       const auto & [name, scenario_object] = each;
-      return not scenario_object.template as<ScenarioObject>().is_added or
+      return not scenario_object.template is<ScenarioObject>() or
+             not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>()
                    .object_controller.isUserDefinedController() or
              asAutoware(name).engageable();
@@ -155,9 +157,10 @@ auto Interpreter::engaged() const -> bool
 {
   return std::all_of(
     std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
+    std::cend(currentScenarioDefinition()->entities), [](const auto & each) {
       const auto & [name, scenario_object] = each;
-      return not scenario_object.template as<ScenarioObject>().is_added or
+      return not scenario_object.template is<ScenarioObject>() or
+             not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>()
                    .object_controller.isUserDefinedController() or
              asAutoware(name).engaged();
