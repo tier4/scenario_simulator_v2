@@ -25,11 +25,11 @@ inline namespace syntax
 Entities::Entities(const pugi::xml_node & node, Scope & scope)
 {
   traverse<0, unbounded>(node, "ScenarioObject", [&](auto && node) {
-    emplace(readAttribute<String>("name", node, scope), make<ScenarioObject>(node, scope));
+    entities.emplace(readAttribute<String>("name", node, scope), make<ScenarioObject>(node, scope));
   });
 
   traverse<0, unbounded>(node, "EntitySelection", [&](auto && node) {
-    emplace(readAttribute<String>("name", node, scope), make<EntitySelection>(node, scope));
+    entities.emplace(readAttribute<String>("name", node, scope), make<EntitySelection>(node, scope));
   });
 
   scope.global().entities = this;
@@ -42,7 +42,7 @@ auto Entities::isAdded(const EntityRef & entity_ref) const -> bool
 
 auto Entities::ref(const EntityRef & entity_ref, bool allow_entity_selection) const -> Object
 {
-  if (auto entry = find(entity_ref); entry == end()) {
+  if (auto entry = entities.find(entity_ref); entry == std::end(entities)) {
     throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");
   } else if (not allow_entity_selection and entry->second.is<EntitySelection>()) {
     THROW_SEMANTIC_ERROR(

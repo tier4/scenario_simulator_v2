@@ -33,13 +33,23 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Entities : public std::unordered_map<std::string, Object>  // TODO to be data member
+struct Entities
 {
+private:
+  std::unordered_map<std::string, Object> entities;
+
+public:
   explicit Entities(const pugi::xml_node &, Scope &);
 
   auto isAdded(const EntityRef &) const -> bool;
 
-  auto ref(const EntityRef &, bool = false) const -> Object;
+  auto ref(const EntityRef &) const -> Object;
+
+  auto flatten(const EntityRef &) const -> std::list<EntityRef>;
+
+  auto begin() const { return entities.begin(); }
+
+  auto end() const { return entities.end(); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
