@@ -744,9 +744,9 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
     return ret;
   }
   // clang-format off
-  return getFollowingLanelets(
+  return ret + getFollowingLanelets(
     candidate_lanelet_ids[candidate_lanelet_ids.size() - 1], 
-    distance - total_distance, false) + ret;
+    distance - total_distance, false);
   // clang-format on
 }
 
