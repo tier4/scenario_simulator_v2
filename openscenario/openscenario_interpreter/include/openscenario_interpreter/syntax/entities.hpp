@@ -39,7 +39,7 @@ struct Entities : public std::unordered_map<std::string, Object>  // TODO to be 
 
   auto isAdded(const EntityRef &) const -> bool;
 
-  auto ref(const EntityRef &) const -> Object;
+  auto ref(const EntityRef &, bool = false) const -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
