@@ -38,8 +38,8 @@ SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
 // clang-format off
 : ComplexType(
     choice(tree,
-      std::make_pair("EntityRef", [&](const auto & tree) { return make<SelectedEntityRefs>(tree, scope); }),
-      std::make_pair(   "ByType", [&](const auto & tree) { return make<   SelectedByTypes>(tree, scope); })))
+      std::make_pair("EntityRef", [&](const auto & tree) { return make<SelectedEntityRefs>(tree.parent(), scope); }),
+      std::make_pair(   "ByType", [&](const auto & tree) { return make<   SelectedByTypes>(tree.parent(), scope); })))
 // clang-format on
 {
 }
