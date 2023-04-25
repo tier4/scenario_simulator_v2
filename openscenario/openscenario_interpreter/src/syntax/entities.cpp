@@ -40,12 +40,16 @@ auto Entities::isAdded(const EntityRef & entity_ref) const -> bool
   return ref(entity_ref).template as<ScenarioObject>().is_added;
 }
 
-auto Entities::ref(const EntityRef & entity_ref) const -> Object
+auto Entities::ref(const EntityRef & entity_ref, bool allow_entity_selection) const -> Object
 {
-  try {
-    return at(entity_ref);
-  } catch (const std::out_of_range &) {
+  if (auto entry = find(entity_ref); entry == end()) {
     throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");
+  } else if (not allow_entity_selection and entry->second.is<EntitySelection>()) {
+    THROW_SEMANTIC_ERROR(
+      "tried to reference the entity `", entity_ref,
+      "` of the type `EntitySelection`, which is not allowed in this context.");
+  } else {
+    return entry->second;
   }
 }
 }  // namespace syntax
