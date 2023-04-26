@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__INTEGER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__INTEGER_HPP_
 
-#include <openscenario_interpreter/error.hpp>
 #include <boost/lexical_cast.hpp>
+#include <openscenario_interpreter/error.hpp>
 #include <string>
 
 namespace openscenario_interpreter
