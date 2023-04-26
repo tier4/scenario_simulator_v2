@@ -55,6 +55,53 @@ install(
   DESTINATION lib/${PROJECT_NAME})
 
 # ------------------------------------------------------------------------------
+#  parameter value distribution without ROS
+# ------------------------------------------------------------------------------
+add_library(parameter_value_distribution_without_ros SHARED
+  src/syntax/file_header.cpp
+  src/syntax/license.cpp
+  src/syntax/properties.cpp
+  src/syntax/property.cpp
+  src/syntax/file.cpp
+  src/syntax/open_scenario_category.cpp
+  src/syntax/parameter_value_distribution_definition.cpp
+  src/syntax/parameter_value_distribution.cpp
+  src/syntax/distribution_definition.cpp
+  src/syntax/deterministic.cpp
+  src/syntax/deterministic_parameter_distribution.cpp
+  src/syntax/deterministic_multi_parameter_distribution.cpp
+  src/syntax/deterministic_multi_parameter_distribution_type.cpp
+  src/syntax/value_set_distribution.cpp
+  src/syntax/deterministic_single_parameter_distribution.cpp
+  src/syntax/deterministic_single_parameter_distribution_type.cpp
+  src/syntax/distribution_range.cpp
+  src/syntax/double.cpp
+  src/syntax/distribution_set.cpp
+  src/syntax/distribution_set_element.cpp
+  src/syntax/stochastic.cpp
+  src/syntax/unsigned_integer.cpp
+  src/syntax/stochastic_distribution.cpp
+  src/syntax/stochastic_distribution_type.cpp
+  src/syntax/histogram.cpp
+  src/syntax/histogram_bin.cpp
+  src/syntax/normal_distribution.cpp
+  src/syntax/poisson_distribution.cpp
+  src/syntax/probability_distribution_set.cpp
+  src/syntax/probability_distribution_set_element.cpp
+  src/syntax/uniform_distribution.cpp
+
+  src/object.cpp
+  src/parameter_distribution.cpp
+  src/scope.cpp)
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+target_compile_definitions(parameter_value_distribution_without_ros PUBLIC -DWITHOUT_ROS)
+target_include_directories(parameter_value_distribution_without_ros PUBLIC include)
+target_include_directories(parameter_value_distribution_without_ros PUBLIC ${scenario_simulator_exception_INCLUDE_DIRS})
+target_link_libraries(parameter_value_distribution_without_ros
+  Boost::filesystem
+  pugixml)
+
+# ------------------------------------------------------------------------------
 #  test
 # ------------------------------------------------------------------------------
 
