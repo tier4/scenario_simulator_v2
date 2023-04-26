@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef WITHOUT_ROS
 #include <openscenario_interpreter/syntax/catalog_definition.hpp>
+#include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#endif  // WITHOUT_ROS
+
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
-#include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
 {
@@ -25,8 +29,10 @@ OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & 
 : Group(
     // clang-format off
     choice(tree,
+#ifndef WITHOUT_ROS
             std::make_pair("Storyboard",                [&](auto &&) { return make<ScenarioDefinition                  >(tree, scope);}),  // DIRTY HACK!!!
             std::make_pair("Catalog",                   [&](auto &&) { return make<CatalogDefinition                   >(tree, scope);}),
+#endif  // WITHOUT_ROS
             std::make_pair("ParameterValueDistribution",[&](auto &&) { return make<ParameterValueDistributionDefinition>(tree, scope);})))
 // clang-format on
 {
