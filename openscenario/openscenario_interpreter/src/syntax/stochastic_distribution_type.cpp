@@ -27,8 +27,8 @@ StochasticDistributionType::StochasticDistributionType(const pugi::xml_node & no
       std::make_pair("NormalDistribution",         [&](auto && node){return make<NormalDistribution        >(node, scope);}),
       std::make_pair("UniformDistribution",        [&](auto && node){return make<UniformDistribution       >(node, scope);}),
       std::make_pair("PoissonDistribution",        [&](auto && node){return make<PoissonDistribution       >(node, scope);}),
-      std::make_pair("Histogram",                  [&](auto && node){return make<Histogram                 >(node, scope);}),
-      std::make_pair("UserDefinedDistribution",    [&](auto && node){return make<UserDefinedDistribution   >(node, scope);})))
+      std::make_pair("Histogram",                  [&](auto && node){return make<Histogram                 >(node, scope);})))
+//      std::make_pair("UserDefinedDistribution",    [&](auto && node){return make<UserDefinedDistribution   >(node, scope);})))
 // clang-format on
 {
 }
