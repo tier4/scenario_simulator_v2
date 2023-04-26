@@ -3,7 +3,7 @@
     "*.drawio",
     "*/**/CHANGELOG.rst",
     "external/lanelet2_matching/**",
-    "openscenario/openscenario_utility/openscenario_utility/resources/*.xsd"
+    "*.xsd"
   ],
   "words": [
     "ARGN",
