@@ -11,6 +11,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_auto REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
 ament_auto_find_build_dependencies()
 
@@ -57,7 +58,8 @@ install(
 # ------------------------------------------------------------------------------
 #  parameter value distribution without ROS
 # ------------------------------------------------------------------------------
-add_library(parameter_value_distribution_without_ros SHARED
+add_library(parameter_value_distribution_without_ros STATIC
+  src/syntax/open_scenario.cpp
   src/syntax/file_header.cpp
   src/syntax/license.cpp
   src/syntax/properties.cpp
@@ -75,11 +77,10 @@ add_library(parameter_value_distribution_without_ros SHARED
   src/syntax/deterministic_single_parameter_distribution.cpp
   src/syntax/deterministic_single_parameter_distribution_type.cpp
   src/syntax/distribution_range.cpp
-  src/syntax/double.cpp
+  src/syntax/range.cpp
   src/syntax/distribution_set.cpp
   src/syntax/distribution_set_element.cpp
   src/syntax/stochastic.cpp
-  src/syntax/unsigned_integer.cpp
   src/syntax/stochastic_distribution.cpp
   src/syntax/stochastic_distribution_type.cpp
   src/syntax/histogram.cpp
@@ -90,17 +91,33 @@ add_library(parameter_value_distribution_without_ros SHARED
   src/syntax/probability_distribution_set_element.cpp
   src/syntax/uniform_distribution.cpp
 
+  src/syntax/boolean.cpp
+  src/syntax/double.cpp
+  src/syntax/integer.cpp
+  src/syntax/unsigned_integer.cpp
+  src/syntax/unsigned_short.cpp
+
+  src/syntax/parameter_value_set.cpp
+
+  src/utility/demangle.cpp
+
+  src/evaluate.cpp
   src/object.cpp
   src/parameter_distribution.cpp
   src/scope.cpp)
+
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 # cspell: ignore DWITHOUT
-target_compile_definitions(parameter_value_distribution_without_ros PUBLIC -DWITHOUT_ROS)
+target_compile_definitions(parameter_value_distribution_without_ros PUBLIC -DPARAMETER_VALUE_DISTRIBUTION_ONLY)
 target_include_directories(parameter_value_distribution_without_ros PUBLIC include)
 target_include_directories(parameter_value_distribution_without_ros PUBLIC ${scenario_simulator_exception_INCLUDE_DIRS})
 target_link_libraries(parameter_value_distribution_without_ros
   Boost::filesystem
   pugixml)
+
+install(
+  TARGETS parameter_value_distribution_without_ros
+  LIBRARY DESTINATION lib/${PROJECT_NAME})
 
 # ------------------------------------------------------------------------------
 #  test
