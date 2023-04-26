@@ -19,7 +19,12 @@ ament_auto_add_executable(${PROJECT_NAME}_node
   src/${PROJECT_NAME}.cpp
   src/${PROJECT_NAME}_node.cpp)
 
+ament_auto_add_executable(${PROJECT_NAME}_command
+  src/${PROJECT_NAME}.cpp
+  src/${PROJECT_NAME}_command.cpp)
+
 target_link_libraries(${PROJECT_NAME}_node XercesC::XercesC)
+target_link_libraries(${PROJECT_NAME}_command XercesC::XercesC)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

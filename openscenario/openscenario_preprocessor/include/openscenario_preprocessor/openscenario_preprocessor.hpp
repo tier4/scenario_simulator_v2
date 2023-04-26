@@ -49,9 +49,9 @@ public:
     }
   }
 
-protected:
   void preprocessScenario(const Scenario &);
 
+protected:
   std::queue<Scenario> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
