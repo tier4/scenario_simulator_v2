@@ -20,9 +20,9 @@
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-#ifndef WITHOUT_ROS
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
-#endif  // WITHOUT_ROS
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
 namespace openscenario_interpreter
 {
@@ -103,10 +103,10 @@ Scope::Scope(const std::string & name, const Scope & outer)
   frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
   scenario_definition(outer.scenario_definition),
   name(name)
-#ifndef WITHOUT_ROS
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
   ,
   actors(outer.actors)
-#endif  // WITHOUT_ROS
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 {
 }
 

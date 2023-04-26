@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 
-#ifndef WITHOUT_ROS
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <concealer/execute.hpp>
-#endif  // WITHOUT_ROS
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
 #include <boost/algorithm/string/replace.hpp>
 #include <functional>
@@ -40,7 +40,7 @@ auto substitute(std::string attribute, Scope & scope)
 {
   auto dirname = [](auto &&, auto && scope) { return scope.dirname(); };
 
-#ifndef WITHOUT_ROS
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
   auto find_pkg_share = [](auto && package_name, auto &&) {
     return ament_index_cpp::get_package_share_directory(package_name);
   };
@@ -64,7 +64,7 @@ auto substitute(std::string attribute, Scope & scope)
       return result;
     }
   };
-#endif  // WITHOUT_ROS
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
   auto var = [](auto && name, auto && scope) {
     // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO
@@ -86,11 +86,11 @@ auto substitute(std::string attribute, Scope & scope)
   // TODO {"exec-in-package", exec_in_package},
   // TODO {"find-exec", find_exec},
   // TODO {"find-pkg-prefix", find_pkg_prefix},
-#ifndef WITHOUT_ROS
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
       {"find-pkg-share", find_pkg_share},
       {"ros2",
        ros2},  // NOTE: TIER IV extension (Not included in the ROS 2 Launch XML Substitution)
-#endif         // WITHOUT_ROS
+#endif         // PARAMETER_VALUE_DISTRIBUTION_ONLY
       {"var", var},
     };
 
