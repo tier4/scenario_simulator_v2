@@ -18,10 +18,12 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <openscenario_validator/schema.hpp>
+#include <sstream>
 #include <stdexcept>
-#include <xercesc/framework/MemBufInputSource.hpp>
+#include <system_error>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
+#include <xercesc/util/XMLString.hpp>
 #include <xercesc/validators/common/Grammar.hpp>
 
 namespace openscenario_validator
@@ -37,46 +39,74 @@ static XMLPlatform platform{};
 
 class OpenSCENARIOValidator
 {
+  struct ErrorHandler : public xercesc::HandlerBase
+  {
+    using xercesc::HandlerBase::HandlerBase;
+
+    template <typename String>
+    auto makeErrorMessage(const String & category, const xercesc::SAXParseException & e)
+    {
+      // The following exception message is formatted to resemble GCC's
+      // compilation error message.
+      std::stringstream what;
+      what << xercesc::XMLString::transcode(e.getSystemId()) << ":" << e.getLineNumber() << ":"
+           << e.getColumnNumber() << ": " << category << ": "
+           << xercesc::XMLString::transcode(e.getMessage());
+      return what.str();
+    }
+
+    auto warning(const xercesc::SAXParseException & e) -> void override
+    {
+      std::cerr << makeErrorMessage("warning", e) << std::endl;
+    }
+
+    auto error(const xercesc::SAXParseException & e) -> void override
+    {
+      throw std::runtime_error(makeErrorMessage("error", e));
+    }
+
+    auto fatalError(const xercesc::SAXParseException & e) -> void override
+    {
+      throw std::runtime_error(makeErrorMessage("fatal", e));
+    }
+  };
+
   xercesc::XercesDOMParser parser;
 
-  xercesc::MemBufInputSource input_source;
+  ErrorHandler error_handler;
 
-  std::unique_ptr<xercesc::HandlerBase> error_handler;
+  static constexpr auto schema_filepath = "/tmp/OpenSCENARIO-1.2.xsd";
 
 public:
   explicit OpenSCENARIOValidator()
-  : input_source(reinterpret_cast<const XMLByte *>(schema.data()), schema.size(), "xsd"),
-    error_handler(std::make_unique<xercesc::HandlerBase>())
   {
-    if (not parser.loadGrammar(input_source, xercesc::Grammar::SchemaGrammarType)) {
+    if (auto file = std::ofstream(schema_filepath, std::ios::trunc)) {
+      file << schema;
+    } else {
+      throw std::system_error(errno, std::system_category());
+    }
+
+    if (not parser.loadGrammar(schema_filepath, xercesc::Grammar::SchemaGrammarType)) {
       throw std::runtime_error(
         "Failed to load XSD schema. This is an unexpected error and an implementation issue. "
         "Please contact the developer.");
     } else {
-      parser.setErrorHandler(error_handler.get());
-      parser.setValidationScheme(xercesc::XercesDOMParser::Val_Auto);
       parser.setDoNamespaces(true);
       parser.setDoSchema(true);
-      parser.setValidationConstraintFatal(true);
+      parser.setErrorHandler(&error_handler);
+      parser.setExternalNoNamespaceSchemaLocation(schema_filepath);
+      parser.setValidationSchemaFullChecking(true);
+      parser.setValidationScheme(xercesc::XercesDOMParser::Val_Always);
     }
   }
 
-  [[nodiscard]] auto validate(const boost::filesystem::path & xml_file) noexcept -> bool
+  auto validate(const boost::filesystem::path & xml_file) -> void
   {
-    try {
-      parser.parse(xml_file.string().c_str());
-      return parser.getErrorCount() == 0;
-    } catch (const xercesc::XMLException & ex) {
-      std::cerr << "Error: " << ex.getMessage() << std::endl;
-      return false;
-    } catch (...) {
-      std::cerr << "Error: Unknown exception" << std::endl;
-      return false;
-    }
+    parser.parse(xml_file.string().c_str());
   }
 
   template <typename... Ts>
-  [[nodiscard]] auto operator()(Ts &&... xs) noexcept -> decltype(auto)
+  auto operator()(Ts &&... xs) -> decltype(auto)
   {
     return validate(std::forward<decltype(xs)>(xs)...);
   }
