@@ -27,64 +27,61 @@ void Preprocessor::preprocessScenario(const Scenario & scenario)
   using openscenario_interpreter::ParameterValueDistribution;
   using openscenario_interpreter::ParameterValueDistributionDefinition;
 
-  if (validate(scenario.path)) {
-    if (OpenScenario script{scenario.path};
-        script.category.is<ParameterValueDistributionDefinition>()) {
-      auto & parameter_value_distribution = script.category.as<ParameterValueDistribution>();
-      auto scenario_file_path = parameter_value_distribution.scenario_file.filepath;
+  validate(scenario.path);
 
-      if (boost::filesystem::exists(scenario_file_path) and validate(scenario_file_path)) {
-        OpenScenario scenario_file{scenario_file_path};
+  if (OpenScenario script{scenario.path};
+      script.category.is<ParameterValueDistributionDefinition>()) {
+    auto & parameter_value_distribution = script.category.as<ParameterValueDistribution>();
+    auto scenario_file_path = parameter_value_distribution.scenario_file.filepath;
 
-        auto p = parameter_value_distribution.derive();
+    if (boost::filesystem::exists(scenario_file_path)) {
+      validate(scenario_file_path);
 
-        for (const auto & parameter_list : p | boost::adaptors::indexed()) {
-          pugi::xml_document derived_script;
+      OpenScenario scenario_file{scenario_file_path};
 
-          derived_script.reset(scenario_file.script);  // deep copy
+      auto p = parameter_value_distribution.derive();
 
-          auto parameter_declarations =
-            derived_script.document_element()
-              .select_node(pugi::xpath_query{"/OpenSCENARIO/ParameterDeclarations"})
-              .node();
+      for (const auto & parameter_list : p | boost::adaptors::indexed()) {
+        pugi::xml_document derived_script;
 
-          // embedding parameter values
-          for (const auto & [name, value] : *parameter_list.value()) {
-            if (
-              auto parameter_node =
-                parameter_declarations.find_child_by_attribute("name", name.c_str())) {
-              parameter_node.attribute("value").set_value(
-                boost::lexical_cast<std::string>(value).c_str());
-            } else {
-              std::cerr << "Parameter " << std::quoted(name) << " is not declared in scenario "
-                        << std::quoted(scenario_file_path.string()) << ", so ignore it."
-                        << std::endl;
-            }
+        derived_script.reset(scenario_file.script);  // deep copy
+
+        auto parameter_declarations =
+          derived_script.document_element()
+            .select_node(pugi::xpath_query{"/OpenSCENARIO/ParameterDeclarations"})
+            .node();
+
+        // embedding parameter values
+        for (const auto & [name, value] : *parameter_list.value()) {
+          if (
+            auto parameter_node =
+              parameter_declarations.find_child_by_attribute("name", name.c_str())) {
+            parameter_node.attribute("value").set_value(
+              boost::lexical_cast<std::string>(value).c_str());
+          } else {
+            std::cerr << "Parameter " << std::quoted(name) << " is not declared in scenario "
+                      << std::quoted(scenario_file_path.string()) << ", so ignore it." << std::endl;
           }
-
-          const auto derived_scenario_path =
-            output_directory /
-            (scenario.path.stem().string() + "." + std::to_string(parameter_list.index()) +
-             scenario.path.extension().string());
-
-          derived_script.save_file(derived_scenario_path.c_str());
-
-          preprocessed_scenarios.emplace(
-            derived_scenario_path, scenario.expect, scenario.frame_rate);
         }
-      } else {
-        throw common::Error(
-          "Scenario file ", std::quoted(scenario_file_path.string()),
-          " described in ParameterDistributionDefinition file ",
-          std::quoted(scenario.path.string()),
-          " does not exist. Please check if the file path is correct.");
+
+        const auto derived_scenario_path =
+          output_directory /
+          (scenario.path.stem().string() + "." + std::to_string(parameter_list.index()) +
+           scenario.path.extension().string());
+
+        derived_script.save_file(derived_scenario_path.c_str());
+
+        preprocessed_scenarios.emplace(derived_scenario_path, scenario.expect, scenario.frame_rate);
       }
     } else {
-      // normal scenario
-      preprocessed_scenarios.push(scenario);
+      std::stringstream what;
+      what << "Scenario file " << std::quoted(scenario_file_path.string())
+           << " described in ParameterDistributionDefinition file "
+           << std::quoted(scenario.path.string()) << " does not exist";
+      throw std::runtime_error(what.str());
     }
   } else {
-    throw common::Error("The scenario file is not valid. Please check your scenario");
+    preprocessed_scenarios.push(scenario);  // normal scenario
   }
 }
 }  // namespace openscenario_preprocessor
