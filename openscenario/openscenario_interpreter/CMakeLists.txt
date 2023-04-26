@@ -94,6 +94,7 @@ add_library(parameter_value_distribution_without_ros SHARED
   src/parameter_distribution.cpp
   src/scope.cpp)
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+# cspell: ignore DWITHOUT
 target_compile_definitions(parameter_value_distribution_without_ros PUBLIC -DWITHOUT_ROS)
 target_include_directories(parameter_value_distribution_without_ros PUBLIC include)
 target_include_directories(parameter_value_distribution_without_ros PUBLIC ${scenario_simulator_exception_INCLUDE_DIRS})
