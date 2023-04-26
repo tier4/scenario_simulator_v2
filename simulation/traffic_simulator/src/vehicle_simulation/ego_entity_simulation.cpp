@@ -31,7 +31,7 @@ static auto getParameter(const std::string & name, T value = {})
 }
 
 EgoEntitySimulation::EgoEntitySimulation(
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters, const traffic_simulator::Configuration &,
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   double step_time)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),

@@ -59,6 +59,9 @@ class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
 
+  // will be moved to simple_sensor_simulator
+  std::unique_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
+
 public:
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(NodeT && node, const Configuration & configuration = Configuration())
@@ -98,9 +101,20 @@ public:
   {
     auto register_to_entity_manager = [&]() {
       if (behavior == VehicleBehavior::autoware()) {
-        return entity_manager_ptr_->entityExists(name) or
-               entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration, clock_.getStepTime());
+        if (not entity_manager_ptr_->entityExists(name)) {
+          if (entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
+                name, pose, parameters, configuration, clock_.getStepTime())) {
+            ego_entity_simulation_ =
+                std::make_unique<vehicle_simulation::EgoEntitySimulation>(parameters, clock_.getStepTime());
+            const auto& status = entity_manager_ptr_->getEntityStatus(name);
+            ego_entity_simulation_->setInitialStatus(status);
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, behavior);
@@ -290,7 +304,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
-  FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
@@ -304,6 +317,21 @@ public:
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 #undef FORWARD_TO_ENTITY_MANAGER
+
+  void requestSpeedChange(const std::string & name, double target_speed, bool continuous);
+
+  void requestSpeedChange(
+      const std::string & name, const double target_speed, const speed_change::Transition transition,
+      const speed_change::Constraint constraint, const bool continuous);
+
+  void requestSpeedChange(
+      const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+      bool continuous);
+
+  void requestSpeedChange(
+      const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+      const speed_change::Transition transition, const speed_change::Constraint constraint,
+      const bool continuous);
 
 private:
   bool updateSensorFrame();

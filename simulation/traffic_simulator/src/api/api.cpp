@@ -58,6 +58,9 @@ auto API::setEntityStatus(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   entity_manager_ptr_->setEntityStatus(name, status);
+  if (entity_manager_ptr_->isEgo(name) && getCurrentTime() <= 0) {
+    ego_entity_simulation_->setInitialStatus(status);
+  }
 }
 
 auto API::setEntityStatus(
@@ -91,6 +94,9 @@ auto API::setEntityStatus(
     status.lanelet_pose_valid = false;
   }
   entity_manager_ptr_->setEntityStatus(name, status);
+  if (entity_manager_ptr_->isEgo(name) && getCurrentTime() <= 0) {
+    ego_entity_simulation_->setInitialStatus(status);
+  }
 }
 
 std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
@@ -317,13 +323,25 @@ bool API::updateEntityStatusInSim()
     simulation_interface::toMsg(status.action_status().twist(), status_msg.action_status.twist);
     simulation_interface::toMsg(status.action_status().accel(), status_msg.action_status.accel);
     entity_manager_ptr_->setEntityStatus(status.name(), status_msg);
+    if (entity_manager_ptr_->isEgo(status.name()) && getCurrentTime() <= 0) {
+      ego_entity_simulation_->setInitialStatus(status_msg);
+    }
   }
   return res.result().success();
 }
 
 bool API::updateFrame()
 {
-  std::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = std::nullopt;
+  // will be moved to simple_sensor_simulated and replaced with zeromq call to update and receive ego status
+  if (ego_entity_simulation_) {
+    ego_entity_simulation_->onUpdate(clock_.getCurrentSimulationTime(), clock_.getStepTime());
+    if (not entity_manager_ptr_->isEgoSpawned()) {
+      THROW_SEMANTIC_ERROR(
+          "Malformed state: ego simulated but not registered in entity manager.");
+    }
+    entity_manager_ptr_->setEntityStatusExternally(entity_manager_ptr_->getEgoName(), ego_entity_simulation_->getStatus());
+  }
+
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
@@ -395,6 +413,39 @@ void API::requestLaneChange(
   const lane_change::Constraint & constraint)
 {
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
+}
+
+void API::requestSpeedChange(const std::string & name, double target_speed, bool continuous) {
+  assert(entity_manager_ptr_);
+  entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
+  if (entity_manager_ptr_->isEgo(name) and getCurrentTime() <= 0) {
+    ego_entity_simulation_->requestSpeedChange(target_speed);
+  }
+}
+
+void API::requestSpeedChange(
+    const std::string & name, const double target_speed, const speed_change::Transition transition,
+    const speed_change::Constraint constraint, const bool continuous) {
+  assert(entity_manager_ptr_);
+  entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
+  if (entity_manager_ptr_->isEgo(name) and getCurrentTime() <= 0) {
+    ego_entity_simulation_->requestSpeedChange(target_speed);
+  }
+}
+
+void API::requestSpeedChange(
+    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+    bool continuous) {
+  assert(entity_manager_ptr_);
+  entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
+}
+
+void API::requestSpeedChange(
+    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, const speed_change::Constraint constraint,
+    const bool continuous) {
+  assert(entity_manager_ptr_);
+  entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
 }
 
 }  // namespace traffic_simulator

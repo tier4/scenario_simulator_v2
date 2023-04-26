@@ -94,8 +94,6 @@ class EntityManager
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
   std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
-  // will be moved to simple_sensor_simulator
-  std::unique_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
 
   double step_time_;
 
@@ -393,6 +391,9 @@ public:
   auto setEntityStatus(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &)
     -> void;
 
+  auto setEntityStatusExternally(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &)
+    -> void;
+
   void setVerbose(const bool verbose);
 
   template <typename Entity, typename Pose, typename Parameters, typename... Ts>
@@ -423,7 +424,7 @@ public:
 
       entity_status.time = getCurrentTime();
 
-      entity_status.name = parameters.name;
+      entity_status.name = name;
 
       entity_status.bounding_box = parameters.bounding_box;
 
@@ -452,11 +453,6 @@ public:
           name, std::make_unique<Entity>(
                   name, makeEntityStatus(), parameters, std::forward<decltype(xs)>(xs)...));
         success) {
-      if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
-        ego_entity_simulation_ =
-          std::make_unique<vehicle_simulation::EgoEntitySimulation>(parameters, std::forward<decltype(xs)>(xs)...);
-        ego_entity_simulation_->setInitialStatus(iter->second->getStatus());
-      }
       iter->second->setHdMapUtils(hdmap_utils_ptr_);
       iter->second->setTrafficLightManager(traffic_light_manager_ptr_);
       if (npc_logic_started_ && not isEgo(name)) {

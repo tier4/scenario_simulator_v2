@@ -68,7 +68,7 @@ public:
   auto setAutowareStatus() -> void;
 
   explicit EgoEntitySimulation(
-    const traffic_simulator_msgs::msg::VehicleParameters &, const traffic_simulator::Configuration &, double);
+    const traffic_simulator_msgs::msg::VehicleParameters &, double);
 
   auto onUpdate(double time, double step_time) -> void;
 

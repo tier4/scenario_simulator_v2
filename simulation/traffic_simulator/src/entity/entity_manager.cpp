@@ -511,10 +511,6 @@ void EntityManager::requestSpeedChange(
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
-  if (isEgo(name)) {
-    ego_entity_simulation_->requestSpeedChange(target_speed);
-  }
-
   return entities_.at(name)->requestSpeedChange(target_speed, continuous);
 }
 
@@ -524,9 +520,6 @@ void EntityManager::requestSpeedChange(
 {
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
-  }
-  if (isEgo(name)) {
-    ego_entity_simulation_->requestSpeedChange(target_speed);
   }
 
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
@@ -561,10 +554,18 @@ auto EntityManager::setEntityStatus(
       "You cannot set entity status to the ego vehicle name ", std::quoted(name),
       " after starting scenario.");
   } else {
-    if (isEgo(name)) {
-      ego_entity_simulation_->setInitialStatus(status);
-    }
     entities_.at(name)->setStatus(status);
+  }
+}
+
+auto EntityManager::setEntityStatusExternally(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status)
+  -> void
+{
+  if (not isEgo(name)) {
+    THROW_SEMANTIC_ERROR(
+        "You cannot set entity status externally to the vehicle other than ego named ", std::quoted(name), ".");
+  } else {
+    dynamic_cast<EgoEntity *>(entities_[name].get())->setStatusExtenaly(status);
   }
 }
 
@@ -590,11 +591,6 @@ traffic_simulator_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
     std::cout << "update " << name << " behavior" << std::endl;
   }
   entities_[name]->setEntityTypeList(type_list);
-  if (isEgo(name)) {
-    ego_entity_simulation_->onUpdate(current_time_, step_time_);
-    dynamic_cast<EgoEntity *>(entities_[name].get())
-      ->setStatusExtenaly(ego_entity_simulation_->getStatus());
-  }
   entities_[name]->onUpdate(current_time_, step_time_);
   return entities_[name]->getStatus();
 }
