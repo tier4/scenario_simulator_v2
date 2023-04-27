@@ -37,14 +37,15 @@ void Preprocessor::preprocessScenario(const Scenario & scenario)
     if (boost::filesystem::exists(scenario_file_path)) {
       validate(scenario_file_path);
 
-      OpenScenario scenario_file{scenario_file_path};
+      pugi::xml_document scenario_file_doc;
+      scenario_file_doc.load_file(scenario_file_path.c_str());
 
       auto p = parameter_value_distribution.derive();
 
       for (const auto & parameter_list : p | boost::adaptors::indexed()) {
         pugi::xml_document derived_script;
 
-        derived_script.reset(scenario_file.script);  // deep copy
+        derived_script.reset(scenario_file_doc);  // deep copy
 
         auto parameter_declarations =
           derived_script.document_element()
