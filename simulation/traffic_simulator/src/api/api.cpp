@@ -29,6 +29,9 @@ void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbo
 
 bool API::despawn(const std::string & name)
 {
+  if (entity_manager_ptr_->isEgo(name)) {
+    ego_entity_simulation_.reset();
+  }
   const auto result = entity_manager_ptr_->despawnEntity(name);
   if (!result) {
     return false;

@@ -101,20 +101,17 @@ public:
   {
     auto register_to_entity_manager = [&]() {
       if (behavior == VehicleBehavior::autoware()) {
-        if (not entity_manager_ptr_->entityExists(name)) {
-          if (entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                name, pose, parameters, configuration, clock_.getStepTime())) {
-            ego_entity_simulation_ =
-                std::make_unique<vehicle_simulation::EgoEntitySimulation>(parameters, clock_.getStepTime());
-            const auto& status = entity_manager_ptr_->getEntityStatus(name);
-            ego_entity_simulation_->setInitialStatus(status);
-            return true;
-          } else {
-            return false;
-          }
-        } else {
+        if (entity_manager_ptr_->entityExists(name)) {
           return true;
         }
+        if (entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
+            name, pose, parameters, configuration, clock_.getStepTime())) {
+          ego_entity_simulation_ =
+              std::make_unique<vehicle_simulation::EgoEntitySimulation>(parameters, clock_.getStepTime());
+          ego_entity_simulation_->setInitialStatus(entity_manager_ptr_->getEntityStatus(name));
+          return true;
+        }
+        return false;
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, behavior);
