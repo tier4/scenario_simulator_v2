@@ -139,7 +139,7 @@ auto EgoEntity::addLaneletPoseToEntityStatus() -> void
     status.lanelet_pose = lanelet_pose.value();
   }
 
-  setStatusInternal(status);
+  setStatus(status);
 }
 
 auto EgoEntity::getEntityTypename() const -> const std::string &
@@ -187,7 +187,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   field_operator_application->spinSome();
 
   EntityBase::onUpdate(current_time, step_time);
-  setStatusInternal(externaly_updated_status_);
+  setStatus(externaly_updated_status_);
 
   addLaneletPoseToEntityStatus();
   updateStandStillDuration(step_time);
@@ -285,19 +285,9 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 {
 }
 
-auto EgoEntity::setStatusInternal(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
-{
-  VehicleEntity::setStatus(status);
-}
-
 auto EgoEntity::setStatusExtenaly(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   externaly_updated_status_ = status;
-}
-
-auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
-{
-  VehicleEntity::setStatus(status);
 }
 
 void EgoEntity::requestSpeedChange(double value, bool)

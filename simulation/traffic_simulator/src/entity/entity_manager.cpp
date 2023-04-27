@@ -521,7 +521,6 @@ void EntityManager::requestSpeedChange(
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
-
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 
@@ -542,7 +541,6 @@ void EntityManager::requestSpeedChange(
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
-
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 

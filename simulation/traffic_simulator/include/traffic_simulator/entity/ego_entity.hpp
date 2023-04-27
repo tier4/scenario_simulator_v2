@@ -43,8 +43,6 @@ class EgoEntity : public VehicleEntity
 
   auto addLaneletPoseToEntityStatus() -> void;
 
-  auto setStatusInternal(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
-
   traffic_simulator_msgs::msg::EntityStatus externaly_updated_status_;
 
 public:
@@ -112,8 +110,6 @@ public:
     -> void override;
 
   auto setStatusExtenaly(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
-
-  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void override;
 
   void requestSpeedChange(double, bool continuous) override;
 
