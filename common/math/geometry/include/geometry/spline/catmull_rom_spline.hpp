@@ -59,14 +59,7 @@ public:
     double width, double s, double z_offset = 0) const;
   const std::vector<geometry_msgs::msg::Point> getPolygon(
     double width, size_t num_points = 30, double z_offset = 0);
-  /**
-   * @brief template function for serialize control points
-   */
-  template <class Archive>
-  void serialize(Archive & archive)
-  {
-    archive("CatmullRomSpline", control_points);
-  }
+  const std::vector<geometry_msgs::msg::Point> control_points;
 
 private:
   const std::vector<geometry_msgs::msg::Point> getRightBounds(
@@ -82,7 +75,6 @@ private:
   std::vector<double> length_list_;
   std::vector<double> maximum_2d_curvatures_;
   double total_length_;
-  const std::vector<geometry_msgs::msg::Point> control_points;
 };
 }  // namespace geometry
 }  // namespace math
