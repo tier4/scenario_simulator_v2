@@ -23,7 +23,7 @@ namespace math
 {
 namespace geometry
 {
-PolynomialSolver::PolynomialSolver(double epsilon) : epsilon(epsilon) {}
+PolynomialSolver::PolynomialSolver(double tolerance) : tolerance(tolerance) {}
 
 double PolynomialSolver::linearFunction(double a, double b, double t) const { return a * t + b; }
 
@@ -40,8 +40,8 @@ double PolynomialSolver::quadraticFunction(double a, double b, double c, double 
 std::vector<double> PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const
 {
-  if (std::fabs(a) < epsilon) {
-    if (std::fabs(b) < epsilon) {
+  if (std::fabs(a) < tolerance) {
+    if (std::fabs(b) < tolerance) {
       if (min_value <= 0 && 0 <= max_value) {
         return {0};
       }
@@ -59,11 +59,11 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const
 {
   std::vector<double> candidates, ret;
-  if (std::fabs(a) < epsilon) {
+  if (std::fabs(a) < tolerance) {
     return solveLinearEquation(b, c);
   }
   double root = b * b - 4 * a * c;
-  if (std::fabs(root) < epsilon) {
+  if (std::fabs(root) < tolerance) {
     candidates = {-b / (2 * a)};
   } else if (root < 0) {
     candidates = {};
@@ -81,8 +81,7 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
 std::vector<double> PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
 {
-  std::cout << "A" << a << ",Epsilon : " << epsilon << std::endl;
-  if (std::fabs(a) < epsilon) {
+  if (std::fabs(a) < tolerance) {
     return solveQuadraticEquation(b, c, d);
   }
   std::vector<double> solutions, candidates, ret;
@@ -112,7 +111,7 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
   double r2 = r * r;
   double q3 = q * q * q;
   double A, B;
-  if (r2 <= (q3 + epsilon)) {  //<<-- FIXED!
+  if (r2 <= (q3 + tolerance)) {  //<<-- FIXED!
     double t = r / sqrt(q3);
     if (t < -1) {
       t = -1;
@@ -142,7 +141,7 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
     x[0] = (A + B) - a;
     x[1] = -0.5 * (A + B) - a;
     x[2] = 0.5 * sqrt(3.) * (A - B);
-    if (fabs(x[2]) < epsilon) {
+    if (fabs(x[2]) < tolerance) {
       x[2] = x[1];
       return 2;
     }

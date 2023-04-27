@@ -24,7 +24,7 @@ namespace geometry
 class PolynomialSolver
 {
 public:
-  explicit PolynomialSolver(double epsilon = 1e-7);
+  explicit PolynomialSolver(double tolerance = 1e-7);
   /**
  * @brief solve linear equation a*x + b = 0
  *
@@ -84,7 +84,7 @@ public:
  * @return double result of quadratic function
  */
   double linearFunction(double a, double b, double t) const;
-  const double epsilon;
+  const double tolerance;
 
 private:
   /**
