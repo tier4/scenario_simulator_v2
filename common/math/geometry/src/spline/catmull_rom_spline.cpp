@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cereal/archives/binary.hpp>
+#include <fstream>
 #include <geometry/linear_algebra.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <iostream>

@@ -14,6 +14,7 @@
 #ifndef GEOMETRY__SPLINE__CATMULL_ROM_SPLINE_HPP_
 #define GEOMETRY__SPLINE__CATMULL_ROM_SPLINE_HPP_
 
+#include <cereal/cereal.hpp>
 #include <exception>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
@@ -58,6 +59,14 @@ public:
     double width, double s, double z_offset = 0) const;
   const std::vector<geometry_msgs::msg::Point> getPolygon(
     double width, size_t num_points = 30, double z_offset = 0);
+  /**
+   * @brief template function for serialize control points
+   */
+  template <class Archive>
+  void serialize(Archive & archive)
+  {
+    archive("CatmullRomSpline", control_points);
+  }
 
 private:
   const std::vector<geometry_msgs::msg::Point> getRightBounds(
