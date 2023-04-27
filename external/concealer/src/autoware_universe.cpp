@@ -93,10 +93,17 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
 
   task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
-    setGoalPose(route.back());
+
+    if (get_parameter("allow_goal_modification").get_value<bool>()) {
+      setRoughGoalPose(route.back());
+    } else {
+      setGoalPose(route.back());
+    }
+
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
       setCheckpoint(each);
     }
+
     waitForAutowareStateToBeWaitingForEngage();
   });
 }

@@ -286,6 +286,11 @@ public:
 
         core->asAutoware(entity_ref)
           .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
+
+        core->asAutoware(entity_ref)
+          .declare_parameter<bool>(
+            "allow_goal_modification",
+            controller.properties.template get<Boolean>("allowGoalModification"));
       }
     }
 
