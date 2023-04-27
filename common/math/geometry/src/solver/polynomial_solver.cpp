@@ -88,8 +88,6 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
 std::vector<double> PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
 {
-  RCLCPP_ERROR_STREAM(
-    rclcpp::get_logger("hoge"), a << "," << b << "," << c << "," << d << "," << tolerance);
   if (std::abs(a) < tolerance) {
     return solveQuadraticEquation(b, c, d);
   }
