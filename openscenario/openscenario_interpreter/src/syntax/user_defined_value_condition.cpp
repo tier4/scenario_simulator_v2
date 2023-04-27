@@ -90,17 +90,11 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
       std::make_pair(
         "currentMinimumRiskManeuverState.state",
         [result]() {
-          auto s = asAutoware(result.str(1)).getMinimumRiskManeuverStateName();
-          std::cout << "currentMinimumRiskManeuverState.state is called : " << s << std::endl;
-          return make<String>(s);
+          return make<String>(asAutoware(result.str(1)).getMinimumRiskManeuverStateName());
         }),
       std::make_pair(
         "currentEmergencyState",
-        [result]() {
-          auto s = asAutoware(result.str(1)).getEmergencyStateName();
-          std::cout << "currentEmergencyState is called : " << s << std::endl;
-          return make<String>(s);
-        }),
+        [result]() { return make<String>(asAutoware(result.str(1)).getEmergencyStateName()); }),
       std::make_pair(
         "currentTurnIndicatorsState",
         [result]() {
