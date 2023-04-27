@@ -38,8 +38,8 @@ double PolynomialSolver::quadraticFunction(double a, double b, double c, double 
 std::vector<double> PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const
 {
-  if (std::fabs(a) < tolerance) {
-    if (std::fabs(b) < tolerance) {
+  if (std::abs(a) < tolerance) {
+    if (std::abs(b) < tolerance) {
       if (min_value <= 0 && 0 <= max_value) {
         return {0};
       }
@@ -49,7 +49,12 @@ std::vector<double> PolynomialSolver::solveLinearEquation(
   double ret = -b / a;
   if (min_value <= ret && ret <= max_value) {
     return {ret};
+  } else if (std::abs(ret - max_value) < tolerance) {
+    return {max_value};
+  } else if (std::abs(ret - min_value) < tolerance) {
+    return {min_value};
   }
+
   return {};
 }
 
@@ -57,11 +62,11 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const
 {
   std::vector<double> candidates, ret;
-  if (std::fabs(a) < tolerance) {
+  if (std::abs(a) < tolerance) {
     return solveLinearEquation(b, c);
   }
   double root = b * b - 4 * a * c;
-  if (std::fabs(root) < tolerance) {
+  if (std::abs(root) < tolerance) {
     candidates = {-b / (2 * a)};
   } else if (root < 0) {
     candidates = {};
@@ -71,6 +76,10 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
       ret.emplace_back(candidate);
+    } else if (std::abs(candidate - max_value) < tolerance) {
+      ret.emplace_back(max_value);
+    } else if (std::abs(candidate - min_value) < tolerance) {
+      ret.emplace_back(min_value);
     }
   }
   return ret;
@@ -79,7 +88,9 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
 std::vector<double> PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
 {
-  if (std::fabs(a) < tolerance) {
+  RCLCPP_ERROR_STREAM(
+    rclcpp::get_logger("hoge"), a << "," << b << "," << c << "," << d << "," << tolerance);
+  if (std::abs(a) < tolerance) {
     return solveQuadraticEquation(b, c, d);
   }
   std::vector<double> solutions, candidates, ret;
@@ -94,6 +105,10 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
       ret.emplace_back(candidate);
+    } else if (std::abs(candidate - max_value) < tolerance) {
+      ret.emplace_back(max_value);
+    } else if (std::abs(candidate - min_value) < tolerance) {
+      ret.emplace_back(min_value);
     }
   }
   return ret;
