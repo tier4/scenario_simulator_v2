@@ -23,8 +23,6 @@ namespace math
 {
 namespace geometry
 {
-PolynomialSolver::PolynomialSolver(double tolerance) : tolerance(tolerance) {}
-
 double PolynomialSolver::linearFunction(double a, double b, double t) const { return a * t + b; }
 
 double PolynomialSolver::cubicFunction(double a, double b, double c, double d, double t) const
