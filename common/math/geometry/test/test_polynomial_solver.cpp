@@ -26,7 +26,6 @@ bool checkValueWithTolerance(double value, double expected, double tolerance)
   if (std::fabs(value - expected) < tolerance) {
     return true;
   }
-  std::cout << value << std::endl;
   return false;
 }
 

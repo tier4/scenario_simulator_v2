@@ -173,14 +173,11 @@ std::optional<double> HermiteCurve::getSValue(
   const auto line = math::geometry::transformPoints(pose, {p0, p1});
   const auto s = getCollisionPointIn2D(line[0], line[1], false);
   if (!s) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return std::nullopt;
   }
   if (autoscale) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return s.value() * getLength();
   }
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   return s.value();
 }
 
