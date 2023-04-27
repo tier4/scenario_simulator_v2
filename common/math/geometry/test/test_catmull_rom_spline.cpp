@@ -201,7 +201,6 @@ TEST(CatmullRomSpline, GetSValue2)
     EXPECT_TRUE(result);
     if (result) {
       EXPECT_DOUBLE_EQ(result.value(), 0.42440442127906564);
-      // EXPECT_DOUBLE_EQ(result.value(), 0.468657);
     }
   }
 }
