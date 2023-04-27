@@ -14,7 +14,6 @@
 #ifndef GEOMETRY__SPLINE__CATMULL_ROM_SPLINE_HPP_
 #define GEOMETRY__SPLINE__CATMULL_ROM_SPLINE_HPP_
 
-#include <cereal/cereal.hpp>
 #include <exception>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
