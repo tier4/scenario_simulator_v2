@@ -184,6 +184,7 @@ TEST(CatmullRomSpline, GetSValue2)
   p.orientation.w = 0.891092;
   const auto result = spline.getSValue(p);
   EXPECT_TRUE(result);
+  EXPECT_DOUBLE_EQ(result.value(), 0.92433178422155371);
 }
 
 TEST(CatmullRomSpline, GetTrajectory)
