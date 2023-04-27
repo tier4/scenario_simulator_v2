@@ -135,12 +135,15 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
   double c = cy_ * ex - cx_ * ey;
   double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
   auto solutions = solver_.solveCubicEquation(a, b, c, d);
+  std::cout << a << "," << b << "," << c << "," << d << std::endl;
+  std::cout << "num solutions : " << solutions.size() << std::endl;
   for (const auto solution : solutions) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
     double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
     double tx = (x - point0.x) / (point1.x - point0.x);
     double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
     double ty = (y - point0.y) / (point1.y - point0.y);
+    std::cout << "solution :" << solution << std::endl;
     if (std::abs(tx - ty) > epsilon || std::isnan(tx) || std::isnan(ty)) {
       if ((0 <= tx && tx <= 1) || (0 <= ty && ty <= 1)) {
         if (0 <= solution && solution <= 1) {
@@ -156,11 +159,14 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
     }
   }
   if (s_values.empty()) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return std::nullopt;
   }
   if (search_backward) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return *std::max_element(s_values.begin(), s_values.end());
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   return *std::min_element(s_values.begin(), s_values.end());
 }
 
@@ -173,11 +179,14 @@ std::optional<double> HermiteCurve::getSValue(
   const auto line = math::geometry::transformPoints(pose, {p0, p1});
   const auto s = getCollisionPointIn2D(line[0], line[1], false);
   if (!s) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return std::nullopt;
   }
   if (autoscale) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return s.value() * getLength();
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   return s.value();
 }
 

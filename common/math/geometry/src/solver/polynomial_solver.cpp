@@ -23,6 +23,8 @@ namespace math
 {
 namespace geometry
 {
+PolynomialSolver::PolynomialSolver(double epsilon) : epsilon(epsilon) {}
+
 double PolynomialSolver::linearFunction(double a, double b, double t) const { return a * t + b; }
 
 double PolynomialSolver::cubicFunction(double a, double b, double c, double d, double t) const
@@ -38,9 +40,8 @@ double PolynomialSolver::quadraticFunction(double a, double b, double c, double 
 std::vector<double> PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const
 {
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if (std::fabs(a) < e) {
-    if (std::fabs(b) < e) {
+  if (std::fabs(a) < epsilon) {
+    if (std::fabs(b) < epsilon) {
       if (min_value <= 0 && 0 <= max_value) {
         return {0};
       }
@@ -58,12 +59,11 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const
 {
   std::vector<double> candidates, ret;
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if (std::fabs(a) < e) {
+  if (std::fabs(a) < epsilon) {
     return solveLinearEquation(b, c);
   }
   double root = b * b - 4 * a * c;
-  if (std::fabs(root) < e) {
+  if (std::fabs(root) < epsilon) {
     candidates = {-b / (2 * a)};
   } else if (root < 0) {
     candidates = {};
@@ -81,8 +81,8 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
 std::vector<double> PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
 {
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if (std::fabs(a) < e) {
+  std::cout << "A" << a << ",Epsilon : " << epsilon << std::endl;
+  if (std::fabs(a) < epsilon) {
     return solveQuadraticEquation(b, c, d);
   }
   std::vector<double> solutions, candidates, ret;
@@ -105,7 +105,6 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
 int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, double c) const
 {
   x = std::vector<double>(3);
-  const double eps = std::numeric_limits<double>::epsilon();
   double a2 = a * a;
   double q = (a2 - 3 * b) / 9;
   double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
@@ -113,7 +112,7 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
   double r2 = r * r;
   double q3 = q * q * q;
   double A, B;
-  if (r2 <= (q3 + eps)) {  //<<-- FIXED!
+  if (r2 <= (q3 + epsilon)) {  //<<-- FIXED!
     double t = r / sqrt(q3);
     if (t < -1) {
       t = -1;
@@ -143,7 +142,7 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
     x[0] = (A + B) - a;
     x[1] = -0.5 * (A + B) - a;
     x[2] = 0.5 * sqrt(3.) * (A - B);
-    if (fabs(x[2]) < eps) {
+    if (fabs(x[2]) < epsilon) {
       x[2] = x[1];
       return 2;
     }
