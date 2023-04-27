@@ -182,9 +182,28 @@ TEST(CatmullRomSpline, GetSValue2)
   p.orientation.y = -0.00566353;
   p.orientation.z = -0.453507;
   p.orientation.w = 0.891092;
-  const auto result = spline.getSValue(p);
-  EXPECT_TRUE(result);
-  EXPECT_DOUBLE_EQ(result.value(), 0.92433178422155371);
+  {
+    const auto result = spline.getSValue(p);
+    EXPECT_TRUE(result);
+    if (result) {
+      EXPECT_DOUBLE_EQ(result.value(), 0.92433178422155371);
+    }
+  }
+  p.position.x = 89122.5;
+  p.position.y = 43363.8;
+  p.position.z = 3.13364;
+  p.orientation.x = 0.0159365;
+  p.orientation.y = -0.00578704;
+  p.orientation.z = -0.446597;
+  p.orientation.w = 0.894575;
+  {
+    const auto result = spline.getSValue(p);
+    EXPECT_TRUE(result);
+    if (result) {
+      EXPECT_DOUBLE_EQ(result.value(), 0.42440442127906564);
+      // EXPECT_DOUBLE_EQ(result.value(), 0.468657);
+    }
+  }
 }
 
 TEST(CatmullRomSpline, GetTrajectory)
