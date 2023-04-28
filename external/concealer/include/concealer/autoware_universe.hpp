@@ -49,25 +49,19 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   friend class TransitionAssertion<AutowareUniverse>;
 
   using Acceleration = geometry_msgs::msg::AccelWithCovarianceStamped;
-  using Checkpoint = geometry_msgs::msg::PoseStamped;
   using ControlModeReport = autoware_auto_vehicle_msgs::msg::ControlModeReport;
   using GearReport = autoware_auto_vehicle_msgs::msg::GearReport;
-  using GoalPose = geometry_msgs::msg::PoseStamped;
   using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
   using Odometry = nav_msgs::msg::Odometry;
-  using RoughGoalPose = geometry_msgs::msg::PoseStamped;
   using SteeringReport = autoware_auto_vehicle_msgs::msg::SteeringReport;
   using TurnIndicatorsReport = autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport = autoware_auto_vehicle_msgs::msg::VelocityReport;
 
   CONCEALER_DEFINE_PUBLISHER(Acceleration);
-  CONCEALER_DEFINE_PUBLISHER(Checkpoint);
   CONCEALER_DEFINE_PUBLISHER(ControlModeReport);
   CONCEALER_DEFINE_PUBLISHER(GearReport);
-  CONCEALER_DEFINE_PUBLISHER(GoalPose);
   CONCEALER_DEFINE_PUBLISHER(InitialPose);
   CONCEALER_DEFINE_PUBLISHER(Odometry);
-  CONCEALER_DEFINE_PUBLISHER(RoughGoalPose);
   CONCEALER_DEFINE_PUBLISHER(SteeringReport);
   CONCEALER_DEFINE_PUBLISHER(TurnIndicatorsReport);
   CONCEALER_DEFINE_PUBLISHER(VelocityReport);
@@ -145,13 +139,10 @@ public:
   : Autoware(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     CONCEALER_INIT_PUBLISHER(Acceleration, "/localization/acceleration"),
-    CONCEALER_INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     CONCEALER_INIT_PUBLISHER(ControlModeReport, "/vehicle/status/control_mode"),
     CONCEALER_INIT_PUBLISHER(GearReport, "/vehicle/status/gear_status"),
-    CONCEALER_INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     CONCEALER_INIT_PUBLISHER(InitialPose, "/initialpose"),
     CONCEALER_INIT_PUBLISHER(Odometry, "/localization/kinematic_state"),
-    CONCEALER_INIT_PUBLISHER(RoughGoalPose, "/rviz/routing/rough_goal"),
     CONCEALER_INIT_PUBLISHER(SteeringReport, "/vehicle/status/steering_status"),
     CONCEALER_INIT_PUBLISHER(TurnIndicatorsReport, "/vehicle/status/turn_indicators_status"),
     CONCEALER_INIT_PUBLISHER(VelocityReport, "/vehicle/status/velocity_status"),
