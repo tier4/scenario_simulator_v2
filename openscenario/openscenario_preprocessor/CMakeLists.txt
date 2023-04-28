@@ -12,7 +12,7 @@ endif()
 
 find_package(ament_cmake_auto REQUIRED)
 find_package(XercesC          REQUIRED)
-find_package(Boost            REQUIRED COMPONENTS filesystem program_options)
+find_package(Boost            REQUIRED COMPONENTS filesystem program_options regex)
 find_package(pugixml          REQUIRED)
 
 ament_auto_find_build_dependencies()
@@ -22,10 +22,12 @@ ament_auto_add_executable(${PROJECT_NAME}_node
   src/${PROJECT_NAME}_node.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node XercesC::XercesC)
+target_link_libraries(${PROJECT_NAME}_node yaml-cpp)
 
 find_library(parameter_value_distribution_LIBRARYIES parameter_value_distribution_without_ros)
 
 add_executable(${PROJECT_NAME}_command
+  src/t4v2.cpp
   src/${PROJECT_NAME}.cpp
   src/${PROJECT_NAME}_command.cpp)
 
@@ -33,12 +35,16 @@ target_compile_definitions(${PROJECT_NAME}_command PUBLIC -DPARAMETER_VALUE_DIST
 
 target_include_directories(${PROJECT_NAME}_command PUBLIC include)
 target_include_directories(${PROJECT_NAME}_command PUBLIC ${XercesC_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME}_command PUBLIC ${YAML_CPP_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME}_command PUBLIC ${YAML_CPP_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME}_command PUBLIC ${openscenario_interpreter_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME}_command PUBLIC ${openscenario_validator_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME}_command Boost::filesystem Boost::program_options)
+target_link_libraries(${PROJECT_NAME}_command Boost::filesystem Boost::program_options Boost::regex)
 target_link_libraries(${PROJECT_NAME}_command XercesC::XercesC)
 target_link_libraries(${PROJECT_NAME}_command pugixml)
+target_link_libraries(${PROJECT_NAME}_command yaml-cpp)
+
 target_link_libraries(${PROJECT_NAME}_command ${parameter_value_distribution_LIBRARYIES})
 target_link_libraries(${PROJECT_NAME}_command ${openscenario_validator_LIBRARIES})
 
