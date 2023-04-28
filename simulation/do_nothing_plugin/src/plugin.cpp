@@ -29,3 +29,7 @@ const std::string & DoNothingBehavior::getCurrentAction() const
   return behavior;
 }
 }  // namespace entity_behavior
+
+#include "pluginlib/class_list_macros.hpp"
+
+PLUGINLIB_EXPORT_CLASS(entity_behavior::DoNothingBehavior, entity_behavior::BehaviorPluginBase)
