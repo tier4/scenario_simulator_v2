@@ -26,11 +26,6 @@ public:
   void configure(const rclcpp::Logger & logger) override;
   const std::string & getCurrentAction() const override;
 
-  auto getBehaviorParameter() -> traffic_simulator_msgs::msg::BehaviorParameter override;
-
-  auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
-    -> void override;
-
 #define DEFINE_GETTER_SETTER(NAME, TYPE)        \
 public:                                         \
   TYPE get##NAME() override { return TYPE(); }; \
@@ -63,9 +58,10 @@ public:                                                                \
 private:                                                               \
   TYPE FIELD_NAME;
   // clang-format off
-  DEFINE_GETTER_SETTER(CurrentTime,  double,                                    current_time_)
-  DEFINE_GETTER_SETTER(StepTime,     double,                                    step_time_)
-  DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus, entity_status_)
+  DEFINE_GETTER_SETTER(CurrentTime,       double,                                         current_time_)
+  DEFINE_GETTER_SETTER(StepTime,          double,                                         step_time_)
+  DEFINE_GETTER_SETTER(EntityStatus,      traffic_simulator_msgs::msg::EntityStatus,      entity_status_)
+  DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter, behavior_parameter_)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };
