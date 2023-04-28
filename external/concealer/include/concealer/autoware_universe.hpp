@@ -16,6 +16,7 @@
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
@@ -94,11 +95,13 @@ class AutowareUniverse : public Autoware, public TransitionAssertion<AutowareUni
   using CooperateCommands = tier4_rtc_msgs::srv::CooperateCommands;
   using Engage = tier4_external_api_msgs::srv::Engage;
   // TODO using InitializePose = tier4_external_api_msgs::srv::InitializePose;
+  using SetRoutePoints = autoware_adapi_v1_msgs::srv::SetRoutePoints;
   using SetVelocityLimit = tier4_external_api_msgs::srv::SetVelocityLimit;
 
   ServiceWithValidation<CooperateCommands> requestCooperateCommands;
   ServiceWithValidation<Engage> requestEngage;
   // TODO ServiceWithValidation<InitializePose> requestInitializePose;
+  ServiceWithValidation<SetRoutePoints> requestSetRoutePoints;
   ServiceWithValidation<SetVelocityLimit> requestSetVelocityLimit;
 
 private:
@@ -164,6 +167,7 @@ public:
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/external/set/engage", *this),
     // TODO requestInitializePose("/api/autoware/set/initialize_pose", *this),
+    requestSetRoutePoints("/api/routing/set_route_points", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this)
   // clang-format on
   {

@@ -94,15 +94,20 @@ auto AutowareUniverse::plan(const std::vector<geometry_msgs::msg::PoseStamped> &
   task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
 
-    if (get_parameter("allow_goal_modification").get_value<bool>()) {
-      setRoughGoalPose(route.back());
-    } else {
-      setGoalPose(route.back());
-    }
+    auto request = std::make_shared<SetRoutePoints::Request>();
+
+    request->header = route.back().header;
+
+    request->option.allow_goal_modification =
+      get_parameter("allow_goal_modification").get_value<bool>();
+
+    request->goal = route.back().pose;
 
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-      setCheckpoint(each);
+      request->waypoints.push_back(each.pose);
     }
+
+    requestSetRoutePoints(request);
 
     waitForAutowareStateToBeWaitingForEngage();
   });
