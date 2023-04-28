@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
+#include <openscenario_preprocessor/deriver.hpp>
 #include <openscenario_validator/validator.hpp>
 #include <queue>
 
@@ -38,25 +39,38 @@ struct Scenario
   double frame_rate;
 };
 
+enum class ScenarioFormat {
+  t4v2,
+  xosc,
+};
+
+std::istream & operator>>(std::istream & is, ScenarioFormat & format);
+
 class Preprocessor
 {
 public:
   explicit Preprocessor(const boost::filesystem::path & output_directory)
-  : validate(), output_directory(output_directory)
+  : output_directory(output_directory)
   {
     if (not boost::filesystem::exists(output_directory)) {
       boost::filesystem::create_directories(output_directory);
     }
   }
 
-  void preprocessScenario(const Scenario &);
+  void preprocessScenario(
+    const boost::filesystem::path & scenario_path,
+    ScenarioFormat output_format = ScenarioFormat::xosc);
+
+  void generateDerivedScenarioFromDistribution(
+    openscenario_interpreter::ParameterDistribution & distribution, const boost::filesystem::path & path,
+    ScenarioFormat output_format);
 
 protected:
-  std::queue<Scenario> preprocessed_scenarios;
+  std::queue<boost::filesystem::path> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
 
-  openscenario_validator::OpenSCENARIOValidator validate;
+  Deriver derive;
 
   boost::filesystem::path output_directory;
 };
