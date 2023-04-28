@@ -43,7 +43,7 @@ void Preprocessor::generateDerivedScenarioFromDistribution(
   openscenario_interpreter::ParameterDistribution & distribution,
   const boost::filesystem::path & path, ScenarioFormat output_format)
 {
-//  std::cout << "generateDerivedScenarioFromDistribution" << std::endl;
+  //  std::cout << "generateDerivedScenarioFromDistribution" << std::endl;
   for (const auto & parameter_list : distribution | boost::adaptors::indexed()) {
     pugi::xml_document derived_script;
 
@@ -84,17 +84,17 @@ void Preprocessor::generateDerivedScenarioFromDistribution(
           auto root_xml = derived_scenario_xml.root();
 
           auto derived_scenario_json = tojson::pugixml2json(root_xml);
-//          derived_scenario_xml.print(std::cout);
+          //          derived_scenario_xml.print(std::cout);
           std::cout << derived_scenario_json << std::endl;
           std::cout << "finish convert to json" << std::endl;
           const auto derived_scenario_path_t4v2 =
             output_directory /
             (path.stem().string() + "." + std::to_string(parameter_list.index()) + ".yaml");
-//          std::cout << "save as t4v2 scenario" << std::endl;
+          //          std::cout << "save as t4v2 scenario" << std::endl;
 
           std::ofstream derived_scenario_yaml{derived_scenario_path_t4v2};
           derived_scenario_yaml << tojson::emitters::toyaml(derived_scenario_json);
-//          std::cout << "Generated " << tojson::emitters::toyaml(derived_scenario_json) << std::endl;
+          //          std::cout << "Generated " << tojson::emitters::toyaml(derived_scenario_json) << std::endl;
           derived_scenario_yaml.close();
           return derived_scenario_path_t4v2;
         } else {

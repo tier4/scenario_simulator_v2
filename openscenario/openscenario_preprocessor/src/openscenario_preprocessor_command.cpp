@@ -91,7 +91,7 @@ int main(const int argc, char const * const * const argv)
   auto scenario_path = boost::filesystem::path(scenario_option);
 
   boost::filesystem::path tmp_output_directory = "/tmp/openscenario_preprocessor";
-  if(not boost::filesystem::exists(tmp_output_directory)){
+  if (not boost::filesystem::exists(tmp_output_directory)) {
     boost::filesystem::create_directories(tmp_output_directory);
   }
 
@@ -102,13 +102,12 @@ int main(const int argc, char const * const * const argv)
     openscenario_preprocessor::T4V2 t4v2;
     auto xosc_string_scenarios = t4v2.deriveToXoscStringScenarios(scenario_path);
 
-
     boost::filesystem::path t4v2_output_directory = "/tmp/openscenario_preprocessor/t4v2_derived";
-    if(not boost::filesystem::exists(t4v2_output_directory)){
+    if (not boost::filesystem::exists(t4v2_output_directory)) {
       boost::filesystem::create_directories(t4v2_output_directory);
     }
     for (const auto & xosc_string_scenario : xosc_string_scenarios | boost::adaptors::indexed()) {
-//      std::cout << xosc_string_scenario.value() << std::endl;
+      //      std::cout << xosc_string_scenario.value() << std::endl;
       boost::filesystem::path xosc_scenario_path =
         t4v2_output_directory / (std::to_string(xosc_string_scenario.index()) + ".xosc");
       std::ofstream ofs(xosc_scenario_path.c_str());
@@ -116,7 +115,7 @@ int main(const int argc, char const * const * const argv)
       ofs.close();
       xosc_scenario_paths.push_back(xosc_scenario_path);
     }
-//    std::cout << "finish writing xosc scenarios from t4v2 format" << std::endl;
+    //    std::cout << "finish writing xosc scenarios from t4v2 format" << std::endl;
   } else {
     xosc_scenario_paths.push_back(scenario_path);
   }
@@ -132,14 +131,14 @@ int main(const int argc, char const * const * const argv)
 
       openscenario_preprocessor::Preprocessor preprocessor(output_directory_option);
 
-//        try {
-          preprocessor.preprocessScenario(
-            "/tmp/openscenario_preprocessor/parameter_value_distribution.xosc", format_option);
-//        }catch (rapidxml::parse_error & ex){
-//                std::cerr << "[Error] something went wrong during deriving scenario : " << ex.what()
-//                        << ", " << ex.where<char>() << std::endl;
-////                return 1;
-//        }
+      //        try {
+      preprocessor.preprocessScenario(
+        "/tmp/openscenario_preprocessor/parameter_value_distribution.xosc", format_option);
+      //        }catch (rapidxml::parse_error & ex){
+      //                std::cerr << "[Error] something went wrong during deriving scenario : " << ex.what()
+      //                        << ", " << ex.where<char>() << std::endl;
+      ////                return 1;
+      //        }
       //  } catch (std::runtime_error & ex) {
       //    std::cerr << "[Error] something went wrong during deriving scenario : " << ex.what()
       //              << std::endl;

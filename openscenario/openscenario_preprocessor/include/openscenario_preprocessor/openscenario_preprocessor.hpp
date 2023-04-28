@@ -62,8 +62,8 @@ public:
     ScenarioFormat output_format = ScenarioFormat::xosc);
 
   void generateDerivedScenarioFromDistribution(
-    openscenario_interpreter::ParameterDistribution & distribution, const boost::filesystem::path & path,
-    ScenarioFormat output_format);
+    openscenario_interpreter::ParameterDistribution & distribution,
+    const boost::filesystem::path & path, ScenarioFormat output_format);
 
 protected:
   std::queue<boost::filesystem::path> preprocessed_scenarios;

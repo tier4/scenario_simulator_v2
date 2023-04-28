@@ -42,7 +42,7 @@ public:
         } catch (std::exception & e) {
           response->has_succeeded = false;
           response->message = e.what();
-//          std::queue<openscenario_preprocessor::Scenario>().swap(preprocessed_scenarios);
+          //          std::queue<openscenario_preprocessor::Scenario>().swap(preprocessed_scenarios);
         }
       })),
     derive_server(create_service<openscenario_preprocessor_msgs::srv::Derive>(

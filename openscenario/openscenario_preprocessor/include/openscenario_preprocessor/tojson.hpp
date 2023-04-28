@@ -130,7 +130,7 @@ inline json pugixml2json(const pugi::xml_node & root)
       if (child == child.parent().first_child())
         n[key].emplace_back(pugixml2json(child));
       else
-//        n[key].emplace_back(child.value());
+        //        n[key].emplace_back(child.value());
 
         n["@text"] = child.value();
       // toyaml through the attributes
@@ -143,7 +143,7 @@ inline json pugixml2json(const pugi::xml_node & root)
       if (child == child.parent().first_child())
         j[key] = pugixml2json(child);
       else
-//        j[key].emplace_back(child.value());
+        //        j[key].emplace_back(child.value());
         j["@text"] = child.value();
       // toyaml through the attributes
       for (auto & attr : child.attributes()) {
