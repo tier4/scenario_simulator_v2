@@ -21,6 +21,7 @@ void DoNothingBehavior::configure(const rclcpp::Logger &) {}
 void DoNothingBehavior::update(double current_time, double step_time)
 {
   entity_status_.time = current_time;
+  setUpdatedStatus(entity_status_);
 }
 
 const std::string & DoNothingBehavior::getCurrentAction() const

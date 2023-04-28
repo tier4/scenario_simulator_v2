@@ -54,11 +54,7 @@ void VehicleEntity::cancelRequest()
 
 auto VehicleEntity::getCurrentAction() const -> std::string
 {
-  if (not npc_logic_started_) {
-    return "waiting";
-  } else {
-    return behavior_plugin_ptr_->getCurrentAction();
-  }
+  return behavior_plugin_ptr_->getCurrentAction();
 }
 
 auto VehicleEntity::getDefaultDynamicConstraints() const

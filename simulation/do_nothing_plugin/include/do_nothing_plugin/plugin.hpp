@@ -44,7 +44,6 @@ public:                                         \
   DEFINE_GETTER_SETTER(RouteLanelets,        std::vector<std::int64_t>)
   DEFINE_GETTER_SETTER(TargetSpeed,          std::optional<double>)
   DEFINE_GETTER_SETTER(TrafficLightManager,  std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
-  DEFINE_GETTER_SETTER(UpdatedStatus,        traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(VehicleParameters,    traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,            traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on
@@ -62,6 +61,7 @@ private:                                                               \
   DEFINE_GETTER_SETTER(StepTime,          double,                                         step_time_)
   DEFINE_GETTER_SETTER(EntityStatus,      traffic_simulator_msgs::msg::EntityStatus,      entity_status_)
   DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter, behavior_parameter_)
+  DEFINE_GETTER_SETTER(UpdatedStatus,     traffic_simulator_msgs::msg::EntityStatus,      updated_status_)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };
