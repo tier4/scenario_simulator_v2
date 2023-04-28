@@ -83,6 +83,10 @@ public:
  * @return double result of quadratic function
  */
   double linearFunction(double a, double b, double t) const;
+
+  /**
+   * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver
+   */
   constexpr static double tolerance = 1e-7;
 
 private:
