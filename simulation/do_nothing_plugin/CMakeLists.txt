@@ -13,6 +13,8 @@ ament_auto_add_library(${PROJECT_NAME}
   src/plugin.cpp
 )
 
+pluginlib_export_plugin_description_file(traffic_simulator plugins.xml)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   set(ament_cmake_copyright_FOUND TRUE)
