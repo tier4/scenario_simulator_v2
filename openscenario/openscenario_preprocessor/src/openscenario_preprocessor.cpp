@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
 #include <openscenario_preprocessor/tojson.hpp>
+#include <openscenario_preprocessor/yaml_xml.hpp>
 #include <regex>
 
 namespace openscenario_preprocessor
