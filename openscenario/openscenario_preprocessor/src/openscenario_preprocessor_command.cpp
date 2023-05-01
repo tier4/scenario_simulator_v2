@@ -17,7 +17,6 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
 #include <openscenario_preprocessor/t4v2.hpp>
-#include <openscenario_preprocessor/tojson.hpp>
 
 const std::string_view template_scenario = R"###(
 <OpenSCENARIO>
