@@ -19,7 +19,6 @@
 #include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
 #include <openscenario_preprocessor/tojson.hpp>
-#include <openscenario_preprocessor/yaml_xml.hpp>
 #include <regex>
 
 namespace openscenario_preprocessor
@@ -44,7 +43,6 @@ void Preprocessor::generateDerivedScenarioFromDistribution(
   openscenario_interpreter::ParameterDistribution & distribution,
   const boost::filesystem::path & path, ScenarioFormat output_format)
 {
-  //  std::cout << "generateDerivedScenarioFromDistribution" << std::endl;
   for (const auto & parameter_list : distribution | boost::adaptors::indexed()) {
     pugi::xml_document derived_script;
 
@@ -73,31 +71,25 @@ void Preprocessor::generateDerivedScenarioFromDistribution(
       output_directory / (path.stem().string() + "." + std::to_string(parameter_list.index()) +
                           path.extension().string());
 
-    try {
-      auto derived_scenario_path = [&]() {
-        if (output_format == ScenarioFormat::t4v2) {
-          YAML::Emitter yaml_emitter;
-          convertXMLtoYAML(derived_script, yaml_emitter);
+    auto derived_scenario_path = [&]() {
+      if (output_format == ScenarioFormat::t4v2) {
+        YAML::Emitter yaml_emitter;
+        convertXMLtoYAML(derived_script, yaml_emitter);
 
-          const auto derived_scenario_path_t4v2 =
-            output_directory /
-            (path.stem().string() + "." + std::to_string(parameter_list.index()) + ".yaml");
+        const auto derived_scenario_path_t4v2 =
+          output_directory /
+          (path.stem().string() + "." + std::to_string(parameter_list.index()) + ".yaml");
 
-          std::ofstream derived_scenario_yaml{derived_scenario_path_t4v2};
-          derived_scenario_yaml << yaml_emitter.c_str();
-          derived_scenario_yaml.close();
-          return derived_scenario_path_t4v2;
-        } else {
-          derived_script.save_file(derived_scenario_path_xosc.c_str());
-          return derived_scenario_path_xosc;
-        }
-      }();
-      preprocessed_scenarios.emplace(derived_scenario_path);
-    } catch (rapidxml::parse_error & ex) {
-      std::cerr << "[Error] something went wrong during deriving scenario : " << ex.what() << ", "
-                << ex.where<char>() << std::endl;
-      //                return 1;
-    }
+        std::ofstream derived_scenario_yaml{derived_scenario_path_t4v2};
+        derived_scenario_yaml << yaml_emitter.c_str();
+        derived_scenario_yaml.close();
+        return derived_scenario_path_t4v2;
+      } else {
+        derived_script.save_file(derived_scenario_path_xosc.c_str());
+        return derived_scenario_path_xosc;
+      }
+    }();
+    preprocessed_scenarios.emplace(derived_scenario_path);
   }
 }
 

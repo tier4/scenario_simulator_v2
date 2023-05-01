@@ -69,7 +69,6 @@ int main(const int argc, char const * const * const argv)
 
   options_description description("openscenario_preprocessor_command");
 
-  //  -o <directory> -p param.json -s scenario.yaml
   description.add_options()(
     "output-directory,o",
     value<std::string>()->default_value("/tmp/openscenario_preprocessor/derived"),
@@ -107,7 +106,6 @@ int main(const int argc, char const * const * const argv)
       boost::filesystem::create_directories(t4v2_output_directory);
     }
     for (const auto & xosc_string_scenario : xosc_string_scenarios | boost::adaptors::indexed()) {
-      //      std::cout << xosc_string_scenario.value() << std::endl;
       boost::filesystem::path xosc_scenario_path =
         t4v2_output_directory / (std::to_string(xosc_string_scenario.index()) + ".xosc");
       std::ofstream ofs(xosc_scenario_path.c_str());
@@ -115,7 +113,6 @@ int main(const int argc, char const * const * const argv)
       ofs.close();
       xosc_scenario_paths.push_back(xosc_scenario_path);
     }
-    //    std::cout << "finish writing xosc scenarios from t4v2 format" << std::endl;
   } else {
     xosc_scenario_paths.push_back(scenario_path);
   }
@@ -131,24 +128,8 @@ int main(const int argc, char const * const * const argv)
 
       openscenario_preprocessor::Preprocessor preprocessor(output_directory_option);
 
-      //        try {
       preprocessor.preprocessScenario(
         "/tmp/openscenario_preprocessor/parameter_value_distribution.xosc", format_option);
-      //        }catch (rapidxml::parse_error & ex){
-      //                std::cerr << "[Error] something went wrong during deriving scenario : " << ex.what()
-      //                        << ", " << ex.where<char>() << std::endl;
-      ////                return 1;
-      //        }
-      //  } catch (std::runtime_error & ex) {
-      //    std::cerr << "[Error] something went wrong during deriving scenario : " << ex.what()
-      //              << std::endl;
-      //    return 1;
-      //  }catch (std::exception & ex) {
-      //    std::cerr << "[Error] unknown error occured during deriving scenario : " << ex.what()
-      //              << std::endl;
-      //    std::cerr << "Please contact developers of this software." << std::endl;
-      //    return 1;
-      //  }
     }
   } else {
     // TODO
