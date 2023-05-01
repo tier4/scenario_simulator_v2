@@ -73,32 +73,22 @@ void Preprocessor::generateDerivedScenarioFromDistribution(
       output_directory / (path.stem().string() + "." + std::to_string(parameter_list.index()) +
                           path.extension().string());
 
-    derived_script.save_file(derived_scenario_path_xosc.c_str());
-
     try {
       auto derived_scenario_path = [&]() {
         if (output_format == ScenarioFormat::t4v2) {
-          std::cout << "convert to json : " << derived_scenario_path_xosc.c_str() << std::endl;
+          YAML::Emitter yaml_emitter;
+          convertXMLtoYAML(derived_script, yaml_emitter);
 
-          pugi::xml_document derived_scenario_xml;
-          derived_scenario_xml.load_file(derived_scenario_path_xosc.c_str());
-          auto root_xml = derived_scenario_xml.root();
-
-          auto derived_scenario_json = tojson::pugixml2json(root_xml);
-          //          derived_scenario_xml.print(std::cout);
-          std::cout << derived_scenario_json << std::endl;
-          std::cout << "finish convert to json" << std::endl;
           const auto derived_scenario_path_t4v2 =
             output_directory /
             (path.stem().string() + "." + std::to_string(parameter_list.index()) + ".yaml");
-          //          std::cout << "save as t4v2 scenario" << std::endl;
 
           std::ofstream derived_scenario_yaml{derived_scenario_path_t4v2};
-          derived_scenario_yaml << tojson::emitters::toyaml(derived_scenario_json);
-          //          std::cout << "Generated " << tojson::emitters::toyaml(derived_scenario_json) << std::endl;
+          derived_scenario_yaml << yaml_emitter.c_str();
           derived_scenario_yaml.close();
           return derived_scenario_path_t4v2;
         } else {
+          derived_script.save_file(derived_scenario_path_xosc.c_str());
           return derived_scenario_path_xosc;
         }
       }();
@@ -108,6 +98,73 @@ void Preprocessor::generateDerivedScenarioFromDistribution(
                 << ex.where<char>() << std::endl;
       //                return 1;
     }
+  }
+}
+
+void Preprocessor::convertXMLtoYAML(const pugi::xml_node & xml, YAML::Emitter & emitter)
+{
+  if (xml.attributes().empty() && xml.children().empty()) {
+    emitter << "";
+    return;
+  }
+
+  // the map of node name and {total count, used count}
+  std::map<std::string, std::pair<int, int>> count;
+  for (const auto & child : xml.children()) {
+    if (count.find(child.name()) != count.end()) {
+      count[child.name()] = std::make_pair(1, 0);
+    } else {
+      count[child.name()].first++;
+    }
+  }
+
+  // iterate attributes
+  if (not xml.attributes().empty()) {
+    emitter << YAML::BeginMap;
+
+    for (const auto & attr : xml.attributes()) {
+      emitter << YAML::Key << attr.name();
+      emitter << YAML::Value << YAML::SingleQuoted << attr.as_string();
+    }
+    // end map in child element part
+  }
+
+  // iterate child elements
+  if (not xml.children().empty()) {
+    if (xml.attributes().empty()) {
+      emitter << YAML::BeginMap;
+    }
+
+    for (const auto & child : xml.children()) {
+      // count == 1, make single map in yaml
+      if (count[child.name()].first == 1) {
+        emitter << YAML::Key << child.name();
+        emitter << YAML::Value;
+        convertXMLtoYAML(child, emitter);
+      } else {
+        // count > 1, make sequence in yaml
+        if (count[child.name()].second == 0) {
+          // first node
+          emitter << YAML::BeginSeq;
+          emitter << YAML::Key << child.name();
+          emitter << YAML::Value;
+          convertXMLtoYAML(child, emitter);
+          count[child.name()].second++;
+        } else if (count[child.name()].second == count[child.name()].first - 1) {
+          // last node
+          convertXMLtoYAML(child, emitter);
+          emitter << YAML::EndSeq;
+        } else {
+          // middle node
+          convertXMLtoYAML(child, emitter);
+          count[child.name()].second++;
+        }
+      }
+    }
+  }
+
+  if (not xml.attributes().empty() or not xml.children().empty()) {
+    emitter << YAML::EndMap;
   }
 }
 

@@ -15,6 +15,8 @@
 #ifndef OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 #define OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 
+#include <yaml-cpp/yaml.h>
+
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_preprocessor/deriver.hpp>
@@ -64,6 +66,8 @@ public:
   void generateDerivedScenarioFromDistribution(
     openscenario_interpreter::ParameterDistribution & distribution,
     const boost::filesystem::path & path, ScenarioFormat output_format);
+
+  void convertXMLtoYAML(const pugi::xml_node & xml, YAML::Emitter & emitter);
 
 protected:
   std::queue<boost::filesystem::path> preprocessed_scenarios;
