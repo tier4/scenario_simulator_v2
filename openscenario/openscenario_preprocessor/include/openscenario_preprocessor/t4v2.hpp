@@ -17,7 +17,6 @@
 
 #include <boost/filesystem.hpp>
 #include <openscenario_interpreter/parameter_distribution.hpp>
-#include <openscenario_preprocessor/tojson.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_preprocessor
@@ -26,6 +25,8 @@ class T4V2
 {
 public:
   auto deriveToXoscStringScenarios(boost::filesystem::path path) -> std::vector<std::string>;
+
+  auto loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document;
 
   auto generateParameterValueDistributionFromScenarioModifiers(std::string scenario_modifiers_str)
     -> pugi::xml_document;

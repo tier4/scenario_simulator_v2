@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <yaml-cpp/yaml.h>
+
 #include <boost/range/adaptor/indexed.hpp>
 #include <iostream>
-#include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
-#include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
 #include <openscenario_preprocessor/deriver.hpp>
 #include <openscenario_preprocessor/t4v2.hpp>
 #include <openscenario_preprocessor/template_distributions.hpp>
@@ -48,11 +47,7 @@ auto T4V2::deriveToXoscStringScenarios(boost::filesystem::path path) -> std::vec
   base_scenario_ofs << split.second;
   base_scenario_ofs.close();
 
-  auto openscenario_json =
-    tojson::loadyaml("/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
-  auto openscenario_xml = tojson::emitters::toxml(openscenario_json);
-  pugi::xml_document openscenario_doc;
-  openscenario_doc.load_string(openscenario_xml.c_str());
+  auto openscenario_doc = loadScenarioFile("/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
 
   std::vector<std::string> derived_scenarios;
   if (not split.first.empty()) {
@@ -210,5 +205,46 @@ auto T4V2::deriveScenarioWithScenarioModifiers(
   }
 
   return derived_scripts;
+}
+
+template <class XMLClass>
+void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
+{
+  switch (yaml.Type()) {
+    case YAML::NodeType::Scalar:
+      break;
+    case YAML::NodeType::Sequence:
+      break;
+    case YAML::NodeType::Map:
+      for (const auto & element : yaml) {
+        auto key = element.first.as<std::string>();
+        if (element.second.IsScalar()) {
+          xml.append_attribute(key.c_str()).set_value(element.second.as<std::string>().c_str());
+        } else if (element.second.IsSequence()) {
+          for (const auto & sequence_element : element.second) {
+            auto child = xml.append_child(key.c_str());
+            convertYAMLtoXML(sequence_element, child);
+          }
+        } else {
+          auto child = xml.append_child(key.c_str());
+          convertYAMLtoXML(element.second, child);
+        }
+      }
+      break;
+    case YAML::NodeType::Null:
+      break;
+    default:
+      throw std::runtime_error("Unknown YAML node type");
+  }
+}
+
+auto T4V2::loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document
+{
+  std::cout << "loading scenario file: " << path << std::endl;
+  YAML::Node scenario_yaml = YAML::LoadFile(path.string());
+  pugi::xml_document doc;
+  std::cout << "convert yaml to xml" << std::endl;
+  convertYAMLtoXML(scenario_yaml, doc);
+  return doc;
 }
 }  // namespace openscenario_preprocessor
