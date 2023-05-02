@@ -43,23 +43,23 @@ struct ParallelDerivableParameterDistributionBase
 };
 
 // generator types distribution
-struct SingleParameterDistributionBase : public ParallelDerivableParameterDistributionBase
+struct SingleParameterDistributionBase
 {
   virtual auto derive() -> SingleUnnamedParameterDistribution = 0;
 };
 
-struct MultiParameterDistributionBase : public ParallelDerivableParameterDistributionBase
+struct MultiParameterDistributionBase
 {
   virtual auto derive() -> ParameterDistribution = 0;
 };
 
-struct StochasticParameterDistributionBase : public ParallelDerivableParameterDistributionBase
+struct StochasticParameterDistributionBase
 {
   virtual auto derive() -> Object = 0;
 };
 
 // container types of distribution data generator
-struct ParameterDistributionContainer : public ParallelDerivableParameterDistributionBase
+struct ParameterDistributionContainer
 {
   virtual auto derive() -> ParameterDistribution = 0;
 };

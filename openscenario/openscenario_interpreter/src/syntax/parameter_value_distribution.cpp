@@ -30,23 +30,5 @@ auto ParameterValueDistribution::derive() -> ParameterDistribution
   return apply<ParameterDistribution>(
     [](auto & distribution) { return distribution.derive(); }, *this);
 }
-
-auto ParameterValueDistribution::getNumberOfDeriveScenarios() const -> std::size_t
-{
-  return apply<std::size_t>(
-    [](auto & distribution) { return distribution.getNumberOfDeriveScenarios(); },
-    (DistributionDefinition &)*this);
-}
-
-auto ParameterValueDistribution::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index,
-  std::size_t global_size) -> ParameterList
-{
-  return apply<ParameterList>(
-    [&](auto & distribution) {
-      return distribution.derive(local_index, local_size, global_index, global_size);
-    },
-    (DistributionDefinition &)*this);
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

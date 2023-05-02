@@ -29,12 +29,5 @@ Histogram::Histogram(const pugi::xml_node & node, openscenario_interpreter::Scop
 }
 
 auto Histogram::derive() -> Object { return make<Double>(distribute(random_engine)); }
-
-auto Histogram::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index,
-  std::size_t global_size) -> ParameterList
-{
-  return ParameterList({{"", make<Double>(distribute(random_engine))}});
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

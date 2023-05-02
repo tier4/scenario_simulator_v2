@@ -41,13 +41,5 @@ auto ProbabilityDistributionSet::derive() -> Object
   std::size_t index = distribute(random_engine);
   return make<String>(elements.at(index).value);
 }
-
-auto ProbabilityDistributionSet::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index,
-  std::size_t global_size) -> ParameterList
-{
-  std::size_t index = distribute(random_engine);
-  return ParameterList{{"", make<String>(elements.at(index).value)}};
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
