@@ -23,7 +23,8 @@
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 
-namespace vehicle_simulation {
+namespace vehicle_simulation
+{
 enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
@@ -67,8 +68,7 @@ class EgoEntitySimulation
 public:
   auto setAutowareStatus() -> void;
 
-  explicit EgoEntitySimulation(
-    const traffic_simulator_msgs::msg::VehicleParameters &, double);
+  explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double);
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 

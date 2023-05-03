@@ -105,9 +105,9 @@ public:
           return true;
         }
         if (entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-            name, pose, parameters, configuration, clock_.getStepTime())) {
-          ego_entity_simulation_ =
-              std::make_unique<vehicle_simulation::EgoEntitySimulation>(parameters, clock_.getStepTime());
+              name, pose, parameters, configuration, clock_.getStepTime())) {
+          ego_entity_simulation_ = std::make_unique<vehicle_simulation::EgoEntitySimulation>(
+            parameters, clock_.getStepTime());
           ego_entity_simulation_->setInitialStatus(entity_manager_ptr_->getEntityStatus(name));
           return true;
         }
@@ -318,17 +318,17 @@ public:
   void requestSpeedChange(const std::string & name, double target_speed, bool continuous);
 
   void requestSpeedChange(
-      const std::string & name, const double target_speed, const speed_change::Transition transition,
-      const speed_change::Constraint constraint, const bool continuous);
+    const std::string & name, const double target_speed, const speed_change::Transition transition,
+    const speed_change::Constraint constraint, const bool continuous);
 
   void requestSpeedChange(
-      const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-      bool continuous);
+    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+    bool continuous);
 
   void requestSpeedChange(
-      const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-      const speed_change::Transition transition, const speed_change::Constraint constraint,
-      const bool continuous);
+    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, const speed_change::Constraint constraint,
+    const bool continuous);
 
 private:
   bool updateSensorFrame();

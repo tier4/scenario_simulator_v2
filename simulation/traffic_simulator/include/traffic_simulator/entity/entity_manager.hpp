@@ -44,7 +44,7 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-#include <traffic_simulator/vehicle_simulation//ego_entity_simulation.hpp>
+#include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -391,8 +391,8 @@ public:
   auto setEntityStatus(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &)
     -> void;
 
-  auto setEntityStatusExternally(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &)
-    -> void;
+  auto setEntityStatusExternally(
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &) -> void;
 
   void setVerbose(const bool verbose);
 

@@ -336,12 +336,14 @@ bool API::updateEntityStatusInSim()
 bool API::updateFrame()
 {
   if (ego_entity_simulation_) {
-    ego_entity_simulation_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime(), entity_manager_ptr_->isNpcLogicStarted());
+    ego_entity_simulation_->update(
+      clock_.getCurrentSimulationTime(), clock_.getStepTime(),
+      entity_manager_ptr_->isNpcLogicStarted());
     if (not entity_manager_ptr_->isEgoSpawned()) {
-      THROW_SEMANTIC_ERROR(
-          "Malformed state: ego simulated but not registered in entity manager.");
+      THROW_SEMANTIC_ERROR("Malformed state: ego simulated but not registered in entity manager.");
     }
-    entity_manager_ptr_->setEntityStatusExternally(entity_manager_ptr_->getEgoName(), ego_entity_simulation_->getStatus());
+    entity_manager_ptr_->setEntityStatusExternally(
+      entity_manager_ptr_->getEgoName(), ego_entity_simulation_->getStatus());
   }
 
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
@@ -417,7 +419,8 @@ void API::requestLaneChange(
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
 
-void API::requestSpeedChange(const std::string & name, double target_speed, bool continuous) {
+void API::requestSpeedChange(const std::string & name, double target_speed, bool continuous)
+{
   assert(entity_manager_ptr_);
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
   if (entity_manager_ptr_->isEgo(name) and getCurrentTime() <= 0) {
@@ -426,8 +429,9 @@ void API::requestSpeedChange(const std::string & name, double target_speed, bool
 }
 
 void API::requestSpeedChange(
-    const std::string & name, const double target_speed, const speed_change::Transition transition,
-    const speed_change::Constraint constraint, const bool continuous) {
+  const std::string & name, const double target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
+{
   assert(entity_manager_ptr_);
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
   if (entity_manager_ptr_->isEgo(name) and getCurrentTime() <= 0) {
@@ -436,16 +440,17 @@ void API::requestSpeedChange(
 }
 
 void API::requestSpeedChange(
-    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-    bool continuous) {
+  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
+{
   assert(entity_manager_ptr_);
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
 }
 
 void API::requestSpeedChange(
-    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, const speed_change::Constraint constraint,
-    const bool continuous) {
+  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+  const speed_change::Transition transition, const speed_change::Constraint constraint,
+  const bool continuous)
+{
   assert(entity_manager_ptr_);
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
 }

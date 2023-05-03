@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <concealer/autoware_universe.hpp>
-#include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 
 namespace vehicle_simulation
 {
@@ -31,8 +31,7 @@ static auto getParameter(const std::string & name, T value = {})
 }
 
 EgoEntitySimulation::EgoEntitySimulation(
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-  double step_time)
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
@@ -188,12 +187,14 @@ void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_s
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC:
-        input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
+        input << autoware->getGearSign() * autoware->getAcceleration(),
+          autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
+        input << autoware->getGearSign() * autoware->getAcceleration(),
+          autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
@@ -300,4 +301,4 @@ auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
 
   status_ = status;
 }
-}  // namespace vehicle_simulator
+}  // namespace vehicle_simulation
