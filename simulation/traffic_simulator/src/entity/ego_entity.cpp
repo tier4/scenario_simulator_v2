@@ -284,7 +284,8 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 {
 }
 
-auto EgoEntity::setStatusExternally(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+auto EgoEntity::setStatusExternally(const traffic_simulator_msgs::msg::EntityStatus & status)
+  -> void
 {
   externally_updated_status_ = status;
 }
