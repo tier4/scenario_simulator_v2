@@ -70,7 +70,7 @@ public:
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::VehicleParameters &, double);
 
-  auto onUpdate(double time, double step_time) -> void;
+  auto onUpdate(double time, double step_time, bool npc_logic_started) -> void;
 
   auto requestSpeedChange(double value) -> void;
 

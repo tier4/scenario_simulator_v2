@@ -178,36 +178,38 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
-void EgoEntitySimulation::onUpdate(double time, double step_time)
+void EgoEntitySimulation::onUpdate(double time, double step_time, bool npc_logic_started)
 {
   autoware->rethrow();
 
-  Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
+  if (npc_logic_started) {
+    Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
 
-  switch (vehicle_model_type_) {
-    case VehicleModelType::DELAY_STEER_ACC:
-    case VehicleModelType::IDEAL_STEER_ACC:
-      input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
-      break;
+    switch (vehicle_model_type_) {
+      case VehicleModelType::DELAY_STEER_ACC:
+      case VehicleModelType::IDEAL_STEER_ACC:
+        input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
+        break;
 
-    case VehicleModelType::DELAY_STEER_ACC_GEARED:
-    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-      input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
-      break;
+      case VehicleModelType::DELAY_STEER_ACC_GEARED:
+      case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+        input << autoware->getGearSign() * autoware->getAcceleration(), autoware->getSteeringAngle();
+        break;
 
-    case VehicleModelType::DELAY_STEER_VEL:
-    case VehicleModelType::IDEAL_STEER_VEL:
-      input << autoware->getVelocity(), autoware->getSteeringAngle();
-      break;
+      case VehicleModelType::DELAY_STEER_VEL:
+      case VehicleModelType::IDEAL_STEER_VEL:
+        input << autoware->getVelocity(), autoware->getSteeringAngle();
+        break;
 
-    default:
-      THROW_SEMANTIC_ERROR(
-        "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
+      default:
+        THROW_SEMANTIC_ERROR(
+          "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
+    }
+
+    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+    vehicle_model_ptr_->setInput(input);
+    vehicle_model_ptr_->update(step_time);
   }
-
-  vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
-  vehicle_model_ptr_->setInput(input);
-  vehicle_model_ptr_->update(step_time);
 
   updateStatus(time, step_time);
   updatePreviousValues();
