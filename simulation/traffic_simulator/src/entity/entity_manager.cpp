@@ -564,7 +564,7 @@ auto EntityManager::setEntityStatusExternally(
       "You cannot set entity status externally to the vehicle other than ego named ",
       std::quoted(name), ".");
   } else {
-    dynamic_cast<EgoEntity *>(entities_[name].get())->setStatusExtenally(status);
+    dynamic_cast<EgoEntity *>(entities_[name].get())->setStatusExternally(status);
   }
 }
 

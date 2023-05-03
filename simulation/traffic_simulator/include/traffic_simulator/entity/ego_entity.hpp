@@ -109,7 +109,7 @@ public:
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
 
-  auto setStatusExtenally(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+  auto setStatusExternally(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
   void requestSpeedChange(double, bool continuous) override;
 
