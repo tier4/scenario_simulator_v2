@@ -335,9 +335,8 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
-  // will be moved to simple_sensor_simulated and replaced with zeromq call to update and receive ego status
   if (ego_entity_simulation_) {
-    ego_entity_simulation_->onUpdate(clock_.getCurrentSimulationTime(), clock_.getStepTime(), entity_manager_ptr_->isNpcLogicStarted());
+    ego_entity_simulation_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime(), entity_manager_ptr_->isNpcLogicStarted());
     if (not entity_manager_ptr_->isEgoSpawned()) {
       THROW_SEMANTIC_ERROR(
           "Malformed state: ego simulated but not registered in entity manager.");

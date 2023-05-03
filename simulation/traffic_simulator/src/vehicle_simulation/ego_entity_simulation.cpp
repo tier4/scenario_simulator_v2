@@ -178,7 +178,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
-void EgoEntitySimulation::onUpdate(double time, double step_time, bool npc_logic_started)
+void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_started)
 {
   autoware->rethrow();
 
