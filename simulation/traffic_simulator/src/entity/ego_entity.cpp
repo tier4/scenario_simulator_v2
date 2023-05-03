@@ -34,7 +34,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-
 template <typename T>
 static auto getParameter(const std::string & name, T value = {})
 {
@@ -187,7 +186,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   field_operator_application->spinSome();
 
   EntityBase::onUpdate(current_time, step_time);
-  setStatus(externaly_updated_status_);
+  setStatus(externally_updated_status_);
 
   addLaneletPoseToEntityStatus();
   updateStandStillDuration(step_time);
@@ -285,9 +284,9 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 {
 }
 
-auto EgoEntity::setStatusExtenaly(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+auto EgoEntity::setStatusExtenally(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
-  externaly_updated_status_ = status;
+  externally_updated_status_ = status;
 }
 
 void EgoEntity::requestSpeedChange(double value, bool)

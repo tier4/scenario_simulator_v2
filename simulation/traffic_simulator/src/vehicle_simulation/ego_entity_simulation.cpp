@@ -18,7 +18,6 @@
 
 namespace vehicle_simulation
 {
-
 template <typename T>
 static auto getParameter(const std::string & name, T value = {})
 {
