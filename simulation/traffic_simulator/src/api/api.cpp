@@ -191,6 +191,8 @@ bool API::initialize(double realtime_factor, double step_time)
     simulation_api_schema::InitializeRequest req;
     req.set_step_time(step_time);
     req.set_realtime_factor(realtime_factor);
+    req.set_initialize_time(clock_.getCurrentSimulationTime());
+    simulation_interface::toProto(clock_.getCurrentRosTime(), *req.mutable_initialize_ros_time());
     simulation_api_schema::InitializeResponse res;
     zeromq_client_.call(req, res);
     return res.result().success();
