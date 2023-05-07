@@ -423,7 +423,7 @@ void API::requestSpeedChange(const std::string & name, double target_speed, bool
 {
   assert(entity_manager_ptr_);
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
-  if (entity_manager_ptr_->isEgo(name) and (isnan(getCurrentTime()) or getCurrentTime() <= 0.0)) {
+  if (entity_manager_ptr_->isEgo(name) and not isNpcLogicStarted()) {
     ego_entity_simulation_->requestSpeedChange(target_speed);
   }
 }
@@ -434,7 +434,7 @@ void API::requestSpeedChange(
 {
   assert(entity_manager_ptr_);
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
-  if (entity_manager_ptr_->isEgo(name) and (isnan(getCurrentTime()) or getCurrentTime() <= 0.0)) {
+  if (entity_manager_ptr_->isEgo(name) and not isNpcLogicStarted()) {
     ego_entity_simulation_->requestSpeedChange(target_speed);
   }
 }
