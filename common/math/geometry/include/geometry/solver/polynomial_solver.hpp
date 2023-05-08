@@ -90,7 +90,7 @@ public:
    * The reason this value is not std::numeric_limits<double>::epsilon is that when using 
    * this set of functions to find the intersection of a Catmull-Rom spline curve and a line segment, 
    * it was confirmed that when the solution is very close to the endpoints of the Hermite curves 
-   * that make up the Catmull-Rom spline, the solution will no longer be obtained.
+   * that make up the Catmull-Rom spline, the solution could not calculated.
    */
   constexpr static double tolerance = 1e-7;
 
